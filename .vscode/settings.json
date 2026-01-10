@@ -1,0 +1,33 @@
+{
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit",
+        "source.fixAll.eslint": "explicit"
+    },
+    "html.format.indentInnerHtml": true,
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+    "eslint.workingDirectories": ["./client", "./server"],
+    "eslint.probe": ["javascript", "typescript", "html", "vue", "markdown"],
+    "eslint.validate": ["javascript", "typescript", "html", "vue", "markdown"],
+    "cSpell.words": [
+        "Capturez",
+        "Classique",
+        "Créer",
+        "déclaré",
+        "décommenter",
+        "départ",
+        "drapeau",
+        "être",
+        "gagner",
+        "Gagnez",
+        "Joueurs",
+        "lorsque",
+        "mettre",
+        "moyenne",
+        "partie",
+        "ramenez",
+        "vainqueur",
+        "votre"
+    ]
+}

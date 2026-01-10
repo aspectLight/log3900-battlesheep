@@ -1,0 +1,45 @@
+<div class="board" tabindex="0" (contextmenu)="disableContextMenu($event)">
+  @for (row of board.matrix; track $index) {
+    <div class="row">
+      @for (cell of row; track cell.x + '-' + cell.y) {
+        <div class="cell"
+            [class]="cell.tile.type"
+            [class.isAvailable]="availableCells.includes(cell) "
+            (mousedown)="handleMouseDown($event, cell)"
+            (mousemove)="handleMouseMove(cell)"
+            (mouseup)="handleMouseUp()"
+            (dragstart)="handleDrag(cell)"
+            (dragover)="handleDragOver($event)"
+            (drop)="handleDrop(cell)"
+            (dragend)="handleDragEnd()"  >
+            
+          @if(cell.item) {
+            <div class="overlay"></div>
+            <img class="tile-image" [src]="cell.tile.imagePath" [alt]="cell.tile.type" draggable="false" />
+            <img class="item" [src]="cell.item.imagePath" [alt]="cell.item.name" [title]="cell.item.description" />
+          } @else {
+            <img class="tile-image" [src]="cell.tile.imagePath" [alt]="cell.tile.type" draggable="false" />
+          }
+
+          @if (cell.player) {
+            <app-player [player]="cell.player"></app-player>
+          }
+          @if(selectedCell) {
+            @if (cell.x === selectedCell!.x && cell.y === selectedCell!.y && isSelectionActive) {
+              <div class="selected">
+                <img src="./assets/ui/selected.gif">
+              </div>
+            }
+          }
+          @if (selectedPath.includes(cell) && selectedCell && isSelectionActive) {
+            @if (cell.hasPathUp) { <div class="path vertical top"></div> }
+            @if (cell.hasPathDown) { <div class="path vertical bottom"></div> }
+            @if (cell.hasPathLeft) { <div class="path horizontal left"></div> }
+            @if (cell.hasPathRight) { <div class="path horizontal right"></div> }
+          }
+
+        </div>
+      }
+    </div>
+  }
+</div>

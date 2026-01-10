@@ -1,0 +1,76 @@
+<div class="toolbox">
+    <div class="tiles" (mousedown)="toggleTab('tiles')">
+        <button class="tab-button" [class.active]="activeTab === 'tiles'"><p>TUILES</p></button>
+        <div class="list container">
+            <div class="tile-list">
+                @for (tile of filteredTiles; track tile) {
+                <div class="tile-item">
+                    <button
+                        (click)="setActiveTile(tile.key)"
+                        [title]="tile.value.description"
+                        [class.active-overlay]="this.getActiveTile().type === tile.key"
+                    >
+                        <img class="item-img" [src]="tile.value.images.default" [alt]="tile.value.name" draggable="false" />
+                    </button>
+                </div>
+                }
+            </div>
+            @if (activeTab ==='tiles') {
+            <div class="controls" [@fadeInOut]>
+                <div class="instructions">
+                    <br />
+                    <li><strong>Clic droit</strong> pour placer</li>
+                    <li><strong>Clic gauche</strong> pour effacer</li>
+                </div>
+                <img class="tutorial-gif" src="./assets/ui/tile_controler.gif" alt="tile controler" />
+            </div>
+            }
+        </div>
+    </div>
+    <div class="items" (mousedown)="toggleTab('item')">
+        <button class="tab-button" [class.active]="activeTab === 'item'"><p>OBJETS</p></button>
+        <div class="list container">
+            <div class="item-list">
+                @for(item of items | keyvalue: noSort; track item) {
+                <div class="item-item" (dragstart)="startDrag(item.key)" (dragend)="handleDragEnd()" [draggable]="getItemCount(item.key) !== 0">
+                    <button [title]="item.value.description" [class.grayed-out]="getItemCount(item.key) === 0">
+                        <img
+                            class="item-img"
+                            [src]="item.value.imagePath"
+                            [alt]="item.value.name"
+                            draggable="false"
+                            [class.grayed-out]="isItemDragging(item.key)"
+                        />
+                    </button>
+                </div>
+                }
+            </div>
+            @if (activeTab ==='item') {
+            <div class="controls" [@fadeInOut]>
+                <div class="item-count">
+                    <br />
+                    <li>Items à placer: {{ getItemCount('random') }}</li>
+                    <li>Point de départs à placer: {{ getSpawnPointCount() }}</li>
+                </div>
+                <div class="instructions">
+                    <br />
+                    <li><strong>Maintenir clic droit</strong> pour sélectionner</li>
+                    <li><strong>Relâcher</strong> pour placer</li>
+                </div>
+                <img class="tutorial-gif" src="./assets/ui/item_controler.gif" alt="item controler" />
+            </div>
+            }
+        </div>
+    </div>
+
+    <div class="infos" (mousedown)="toggleTab('infos')">
+        <button class="tab-button" [class.active]="activeTab === 'infos'"><p>INFOS</p></button>
+        <div class="list">
+            <p>Nom:</p>
+            <input type="text" (input)="updateName()" [(ngModel)]="nameInput" [placeholder]="namePlaceholder" maxlength="20" />
+            <br />
+            <p>Description:</p>
+            <textarea (input)="updateDescription()" [(ngModel)]="descriptionInput" [placeholder]="descriptionPlaceholder" maxlength="200"></textarea>
+        </div>
+    </div>
+</div>

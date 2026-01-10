@@ -1,0 +1,17 @@
+<div class="player-creation-container">
+    <h1>Personnages</h1>
+    <div class="characters-container">
+        @for(char of getAvatarKeys() ; track characters[char].id){
+            <div
+                class="char"
+                (click)="selectCharacter(char)"
+                [class.selected]="characters[char] === selectedCharacter"
+                [class.disabled]="isCharacterDisabled(char)"
+                title="{{ characters[char].name }}"
+            >
+                <img [src]="characters[char].avatar" alt="{{ characters[char].name }}" class="char-avatar"/>
+                <span class="char-name">{{ characters[char].name }}</span>
+            </div>
+        }
+    </div>
+</div>

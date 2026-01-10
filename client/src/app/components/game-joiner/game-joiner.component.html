@@ -1,0 +1,27 @@
+@if (showError) {
+    <app-pop-up
+        popUpMessage="{{errorMessage}}"
+        [showSecondButton]="false"
+        (confirm)="this.showError = false">
+    </app-pop-up>
+}
+
+<div class="header">
+    <button class="return-button" routerLink="/home">
+        <img src="./assets/ui/left.png" />
+        Menu Principal
+    </button>
+    <h3>Rejoindre une partie</h3>
+    <p>Entrez le code de la partie à 4 chiffres</p>
+    <p>Vous pouvez trouver ce code dans la salle d'attente de la partie</p>
+</div>
+
+<div class="join-game-container">
+    <input #gameCode type="text" pattern="\d{4}" maxlength="4" title="Entrez exactement 4 chiffres" required>
+    <button
+        class="square-button"
+        (click) = "joinGame()"
+        >
+        Accéder à la salle d'attente
+    </button>
+</div>

@@ -1,0 +1,62 @@
+
+.dialogue {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+
+.errors {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    max-height: 70%;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    overflow-y: auto;
+}
+
+.errors h2 {
+    color: red;
+    margin-bottom: 10px;
+}
+
+h3 {
+    color: black;
+    opacity: 0.5;
+}
+
+.errors ul {
+    text-align: left;
+    color: black;
+}
+
+.errors ul li {
+    margin-bottom: 5px;
+}
+
+.errors button {
+    background: red;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.errors button:hover {
+    background: rgb(0, 0, 0);
+}
+
+.buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}

@@ -1,0 +1,17 @@
+@defer {
+<div class="game-editor">
+    <div class="left-side">
+        <app-toolbox [resetSignal]="resetToolboxFlag"></app-toolbox>
+    </div>
+    <div class="right-side">
+        <app-board [board]="board" mode="edit"></app-board>
+        <div class="footer">
+            <app-save-game [board]="board"></app-save-game>
+            {{ this.getGameName() }}
+            <app-restart-game [board]="board" (restartConfirmed)="onRestartConfirmed()"></app-restart-game>
+        </div>
+    </div>
+</div>
+} @placeholder {
+<div>loading</div>
+}

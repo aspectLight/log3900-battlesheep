@@ -1,0 +1,36 @@
+.header {
+    position: relative;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+    overflow: hidden;
+}
+
+.return-button {
+    position: absolute;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+}
+
+.return-button:hover {
+    color: red;
+}
+
+.return-button:active {
+    color: darkred;
+}
+
+img {
+    width: 15px;
+}
+
+.game-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}

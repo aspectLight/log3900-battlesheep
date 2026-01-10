@@ -1,0 +1,32 @@
+export enum WaitingRoomEvents {
+    GenerateCode = 'generateCode',
+    GenerateCodeResponse = 'generateCodeResponse',
+    CreateWaitingRoom = 'createWaitingRoom',
+    WaitingRoomCreated = 'waitingRoomCreated',
+    ToggleLockWaitingRoom = 'toggleLockWaitingRoom',
+    WaitingRoomLocked = 'waitingRoomLocked',
+    WaitingRoomUnlocked = 'waitingRoomUnlocked',
+
+    CheckRoomExists = 'checkRoomExists',
+    RoomExistsResponse = 'roomExistsResponse',
+    GetReservedAvatars = 'getReservedAvatars',
+    UpdateAvatarReserved = 'updateAvatarReserved',
+    ReserveAvatar = 'reserveAvatar',
+    JoinWaitingRoom = 'joinWaitingRoom',
+    JoinRoomResponse = 'joinRoomResponse',
+    CreatePlayer = 'createPlayer',
+    PlayerCreated = 'playerCreated',
+    PlayerJoined = 'playerJoined',
+    LeaveRoom = 'leaveRoom',
+    LeaveRoomResponse = 'leaveRoomResponse',
+    PlayerLeft = 'playerLeft',
+    KickPlayer = 'kickPlayer',
+    PlayerKicked = 'playerKicked',
+    LeaveWaitingRoom = 'leaveWaitingRoom',
+
+    StartGame = 'startGame',
+    CancelRoom = 'cancelRoom',
+    RoomCanceled = 'roomCanceled',
+
+    WaitingRoomError = 'waitingRoomError',
+}

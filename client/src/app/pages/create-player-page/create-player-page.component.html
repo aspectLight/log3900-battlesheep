@@ -1,0 +1,70 @@
+<div class="header">
+    <button class="return-button" routerLink="/create-game">
+        <img src="./assets/ui/left.png" />
+        Créer une partie
+    </button>
+    <h3>Créer un joueur</h3>
+</div>
+<div class="container">
+    <div class="char-grid">
+        <app-character-grid 
+        (characterSelected)="onCharacterSelected($event)"
+        [reservedAvatars]="reservedAvatars"
+        [socketId]="getId()">
+        </app-character-grid>
+    </div>
+    <div class="char-input">
+        @if(selectedCharacter.character.name) {
+        <div class="selected-character-preview">
+            <img [src]="selectedCharacter.character.avatarFull" [alt]="selectedCharacter.character.name" />
+            <p>{{ selectedCharacter.character.name }}</p>
+        </div>
+        } @else {
+            <div class="selected-character-preview">
+                <img src="./assets/avatars/emptyFull.png">
+                <p> Choisissez votre personnage</p>
+            </div>
+        }
+        <div class="validate-player-container">
+            <input #playerName placeholder="Votre nom" maxlength="20">
+            <button
+                class="square-button"
+                (click) = "createPlayer()"
+                >
+                @if (isHost) {
+                    Créer la partie
+                }
+                @else {
+                    Accéder à la salle d'attente
+                }
+            </button>
+        </div>
+    </div>
+    <div class="stats-cont">
+        <app-bonus-choices (bonusSelected)="onBonusSelected($event)"></app-bonus-choices>
+    </div>
+</div>
+
+@if (gameModified===true) {
+    <app-pop-up
+        popUpMessage="Le jeu sélectionné est caché ou supprimé."
+        [showSecondButton]="false"
+        (confirm)="handlePopUp()">
+    </app-pop-up>
+}
+
+@if (showError===true) {
+    <app-pop-up
+        popUpMessage="{{errorMessage}}"
+        [showSecondButton]="false"
+        (confirm)="handlePopUp()">
+    </app-pop-up>
+}
+
+@if (!validCharacter) {
+    <app-pop-up
+        popUpMessage="Veillez à choisir un personnage, un nom et les 2 bonus."
+        [showSecondButton]="false"
+        (confirm)="validCharacter=true">
+    </app-pop-up>
+}
