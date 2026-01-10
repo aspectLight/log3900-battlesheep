@@ -1,126 +1,345 @@
-
 .main-container {
     display: flex;
     flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 50px;
-    padding: 25px;
-    height: 92vh;
+    justify-content: space-between;
+    align-items: stretch;
+    min-height: 90vh;
+    height: 100%;
+    width: 100%;
+    padding: clamp(1rem, 2vw, 2rem);
+    gap: clamp(1rem, 3vw, 3rem);
+    box-sizing: border-box;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
 }
 
+.main-container > * {
+  overflow: hidden;
+}
+
+.left-side, .right-side {
+    
+    border-radius: 12px;
+    flex: 1;
+    min-width: 250px;
+    max-width: 25%;
+    padding: clamp(0.5rem, 1.5vw, 1.5rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    overflow: visible;
+}
+.right-side {
+    background-color: #2a0e0e;
+    border: 4px solid #8b5e34;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 25%;
+    height: 100%;
+    padding: clamp(0.5rem, 1.5vw, 1.5rem);
+    gap: 15px;
+    box-sizing: border-box;
+    min-width: 200px;
+    overflow: hidden;
+}
+
+/* Pour éviter les doublons */
+.right-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 25%;
+    gap: 15px;
+}
+
+/* Ornements des coins plus détaillés */
+.right-side::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    pointer-events: none;
+    z-index: 0;
+    
+    /* Coins décoratifs aux quatre angles */
+    background-image: 
+        /* Coin supérieur gauche */
+        radial-gradient(circle at 15px 15px, transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
+        radial-gradient(circle at 25px 15px, transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
+        radial-gradient(circle at 15px 25px, transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
+        
+        /* Coin supérieur droit */
+        radial-gradient(circle at calc(100% - 15px) 15px, transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
+        radial-gradient(circle at calc(100% - 25px) 15px, transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
+        radial-gradient(circle at calc(100% - 15px) 25px, transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
+        
+        /* Coin inférieur gauche */
+        radial-gradient(circle at 15px calc(100% - 15px), transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
+        radial-gradient(circle at 25px calc(100% - 15px), transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
+        radial-gradient(circle at 15px calc(100% - 25px), transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
+        
+        /* Coin inférieur droit */
+        radial-gradient(circle at calc(100% - 15px) calc(100% - 15px), transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
+        radial-gradient(circle at calc(100% - 25px) calc(100% - 15px), transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
+        radial-gradient(circle at calc(100% - 15px) calc(100% - 25px), transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px);
+        
+    /* Taille de tous les gradients */
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+/* Lignes décoratives reliant les cercles */
+.right-side::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    pointer-events: none;
+    z-index: 0;
+    
+    /* Structure florale aux coins */
+    background-image:
+        /* Coin supérieur gauche - lignes horizontales et verticales */
+        linear-gradient(to right, #f3d06a, #f3d06a), 
+        linear-gradient(to bottom, #f3d06a, #f3d06a),
+        
+        /* Coin supérieur droit - lignes horizontales et verticales */
+        linear-gradient(to left, #f3d06a, #f3d06a),
+        linear-gradient(to bottom, #f3d06a, #f3d06a),
+        
+        /* Coin inférieur gauche - lignes horizontales et verticales */
+        linear-gradient(to right, #f3d06a, #f3d06a),
+        linear-gradient(to top, #f3d06a, #f3d06a),
+        
+        /* Coin inférieur droit - lignes horizontales et verticales */
+        linear-gradient(to left, #f3d06a, #f3d06a),
+        linear-gradient(to top, #f3d06a, #f3d06a);
+    
+    background-size: 
+        25px 2px, /* Supérieur gauche - H */
+        2px 25px, /* Supérieur gauche - V */
+        
+        25px 2px, /* Supérieur droit - H */
+        2px 25px, /* Supérieur droit - V */
+        
+        25px 2px, /* Inférieur gauche - H */
+        2px 25px, /* Inférieur gauche - V */
+        
+        25px 2px, /* Inférieur droit - H */
+        2px 25px; /* Inférieur droit - V */
+    
+    background-position:
+        15px 15px, /* Supérieur gauche - H */
+        15px 15px, /* Supérieur gauche - V */
+        
+        calc(100% - 15px) 15px, /* Supérieur droit - H */
+        calc(100% - 15px) 15px, /* Supérieur droit - V */
+        
+        15px calc(100% - 15px), /* Inférieur gauche - H */
+        15px calc(100% - 15px), /* Inférieur gauche - V */
+        
+        calc(100% - 15px) calc(100% - 15px), /* Inférieur droit - H */
+        calc(100% - 15px) calc(100% - 15px); /* Inférieur droit - V */
+    
+    background-repeat: no-repeat;
+}
+
+.left-side > * {
+    overflow: visible;
+}
 
 .left-side {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100%;
-  width: 60%;
-  justify-content: space-between;
+    app-combat {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        aspect-ratio: 1/1;
+        overflow: visible;
+    }
 
+    app-player-hud {
+        display: flex;
+        width: 100%;
+        min-height: 0;
+        max-height: 40%;
+        overflow: visible;
+        justify-content: center;
+        align-items: center;
+    }
 }
-
-app-player-hud {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 
 .middle {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+    padding: clamp(0.5rem, 1.5vw, 1.5rem);
+    gap: 10px;
+}
+
+.middle > * {
   width: 100%;
+  overflow: visible;
+  margin: 0;
 }
 
 .middle p {
   align-self: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
 }
 
 .right-side {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 25px;
-  height: 100%;
-  width: 60%;
+  width: 25%;
   justify-content: space-between;
+}
+
+.board-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    overflow: hidden;
+}
+
+.middle .board-container {
+    aspect-ratio: 1/1;
+}
+
+.middle .board {
+    width: 80vh;
+    height: 80vh;
+    max-width: 100%;
+}
+
+.left-side .board-container {
+    aspect-ratio: 1/1;
+    width: 100%;
+}
+
+.left-side .board {
+    width: 100%;
+    height: 100%;
+}
+
+.middle app-combat {
+    width: 80vh;
+    height: 80vh;
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .board {
     background-color: #2b2b2b;
-    border: 8px solid #444444;
-    box-shadow: 
-      0 0 0 2px #111111, 
-      0 0 0 8px #333333;
-      border-radius: 5px;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+
+    &.combatMode {
+        pointer-events: none;
+
+        app-board {
+            filter: blur(2px);
+        }
+
+        &::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url('../../../assets/combat/ak.gif');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 50%;
+            z-index: 1;
+        }
+    }
 }
-
-.board.combatMode {
-  position: relative; 
-  width: 70%;
-  background-color: #2b2b2b;
-  border: 8px solid #444444;
-  border-radius: 5px;
-  box-shadow: 
-    0 0 0 2px #111111, 
-    0 0 0 8px #333333;
-  pointer-events: none; 
-  
-}
-
-.board.combatMode app-board {
-  filter: blur(2px);
-}
-
-.board.combatMode::after {
-  content: "COMBAT";
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items:center;
-  position: absolute;
-  top: -20%; 
-  left: 50%;
-  transform: translate(-50%, -50%); 
-  width: 30%; 
-  height: 15%; 
-  font-size: 1.6rem; 
-  font-weight: bold;
-  color: #990000;
-  text-transform: uppercase;
-  background-color: #2b2b2b;
-  border: 1px solid #444444;
-  box-shadow: 
-    0 0 0 2px #111111, 
-    0 0 0 8px #333333;
-  border-radius: 40px; 
-  padding: 5px 10px; 
-  z-index: 3; 
-}
-
-.board.combatMode::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url('../../../assets/combat/ak.gif');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 50%;
-  z-index: 2; 
-}
-
-
-
 
 app-game-settings {
-  align-self: flex-start; 
+    position: absolute;
+    top: 0;
+    left: 0;
+    align-self: flex-start;
 }
 
 app-timer {
-  z-index: -1;
+    z-index: 1;
+    margin-bottom: 10px;
+}
+
+player-hud {
+    z-index: 9999;
+}
+
+app-chatbox {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: auto;
+}
+
+.flightinfos {
+    background-color: rgba(22, 7, 7, 0.6);
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #3a1212;
+    margin: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.debug-info {
+    background-color: rgba(22, 7, 7, 0.6);
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #3a1212;
+    margin: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #ff6a6a;
+}
+
+.right-side app-actions-hud {
+    flex: 0 0 auto;
+    width: 100%;
+    z-index: 1;
+}
+
+.right-side .flightinfos,
+.right-side .debug-info {
+    flex: 0 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.right-side app-chatbox {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 60%;
+    width: 100%;
+    display: flex;
+    margin-top: auto;
 }

@@ -81,7 +81,7 @@ describe('PlayerCreationService', () => {
                 expect(player instanceof Player).toBeTrue();
                 expect(player.name).toBe('John Doe');
                 expect(player.avatar).not.toBeNull();
-                expect(player.bonusChoice).toBe(BonusType.Health);
+                expect(player['bonusChoice']).toBe(BonusType.Health);
                 expect(player.d4Choice).toBe('attack');
             }
         });
@@ -105,7 +105,7 @@ describe('PlayerCreationService', () => {
                 expect(player instanceof Player).toBeTrue();
                 expect(player.name).toBe('John Doe');
                 expect(player.avatar).not.toBeNull();
-                expect(player.bonusChoice).toBe(BonusType.Speed);
+                expect(player['bonusChoice']).toBe(BonusType.Speed);
                 expect(player.d4Choice).toBe('defense');
             }
         });

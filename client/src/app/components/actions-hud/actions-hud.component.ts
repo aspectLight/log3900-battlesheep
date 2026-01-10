@@ -2,7 +2,6 @@ import { NgStyle } from '@angular/common';
 import { Component } from '@angular/core';
 import { GameManagerService } from '@app/services/game-manager.service';
 import { PlayerCard } from '@app/interfaces/character';
-import { Player } from '@app/classes/player';
 
 @Component({
     selector: 'app-actions-hud',
@@ -23,6 +22,8 @@ export class ActionsHudComponent {
                 isHost: this.gameManager.room.organisatorId === player.id,
                 playerColor: player.color,
                 isDisconnected: false,
+                playerTeam: player.team ? player.team : null,
+                hasFlag: this.gameManager.playerWithFlag === player.id,
             })),
             ...disconnectedPlayers.map((player) => ({
                 player,
@@ -30,14 +31,11 @@ export class ActionsHudComponent {
                 isHost: false,
                 playerColor: player.color,
                 isDisconnected: true,
+                playerTeam: player.team ? player.team : null,
             })),
         ];
 
         return allPlayers;
-    }
-
-    get players() {
-        return this.gameManager.getPlayers();
     }
 
     toggleCard(index: number) {
@@ -46,21 +44,5 @@ export class ActionsHudComponent {
         });
 
         this.playerCardList[index].isActive = true;
-    }
-
-    hoverCard(index: number) {
-        if (!this.playerCardList[index].isActive) {
-            this.playerCardList[index].isActive = true;
-        }
-    }
-
-    unhoverCard(index: number) {
-        if (this.playerCardList[index].isActive) {
-            this.playerCardList[index].isActive = false;
-        }
-    }
-
-    findPlayerIndex(player: Player): number {
-        return this.playerCardList.findIndex((card) => card.player.id === player.id);
     }
 }

@@ -2,10 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Board } from '@app/classes/board';
 import { Game } from '@app/classes/game';
+import { API_ENDPOINTS } from '@common/api-endpoints.constants';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { ItemService } from './item.service';
-import { API_ENDPOINTS } from '@common/api-endpoints.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -34,7 +34,7 @@ export class GameService {
     }
 
     getId() {
-        return this.game._id ? this.game._id : undefined;
+        return this.game._id;
     }
     getName() {
         return this.game.name;
@@ -47,6 +47,9 @@ export class GameService {
     }
     getBoard(): Board {
         return this.game.getBoard();
+    }
+    getMode() {
+        return this.game.mode;
     }
 
     setName(name: string) {

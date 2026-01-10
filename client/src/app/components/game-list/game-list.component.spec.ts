@@ -37,6 +37,17 @@ describe('GameListComponent', () => {
             modificationDate: new Date().toISOString(),
         } as Game);
 
+        // Ensure the board's tiles have proper orientation and state
+        for (let i = 0; i < MEDIUM_BOARD_SIZE; i++) {
+            for (let j = 0; j < MEDIUM_BOARD_SIZE; j++) {
+                const cell = mockGame1.board.getCell(i, j);
+                if (cell) {
+                    cell.tile.orientation = 'Horizontal';
+                    cell.tile.state = 'default';
+                }
+            }
+        }
+
         const mockGame2 = new Game();
         mockGame2['setData']({
             _id: '2',
@@ -47,6 +58,17 @@ describe('GameListComponent', () => {
             isVisible: false,
             modificationDate: new Date().toISOString(),
         } as Game);
+
+        // Ensure the board's tiles have proper orientation and state
+        for (let i = 0; i < LARGE_BOARD_SIZE; i++) {
+            for (let j = 0; j < LARGE_BOARD_SIZE; j++) {
+                const cell = mockGame2.board.getCell(i, j);
+                if (cell) {
+                    cell.tile.orientation = 'Horizontal';
+                    cell.tile.state = 'default';
+                }
+            }
+        }
 
         gameServiceSpy.fetchGames.and.returnValue(of([mockGame1, mockGame2]));
 
@@ -76,33 +98,6 @@ describe('GameListComponent', () => {
         expect(component.games[0].name).toBe('Game 1');
     });
 
-    it('should return the correct _id of the game', () => {
-        const mockGame = new Game();
-        mockGame['setData']({
-            _id: '1',
-            name: 'Game 1',
-            description: 'Description 1',
-            mode: 'ctf',
-            board: new Board(MEDIUM_BOARD_SIZE),
-            isVisible: true,
-            modificationDate: new Date().toISOString(),
-        } as Game);
-
-        expect(component.trackById(mockGame)).toBe('1');
-
-        mockGame['setData']({
-            _id: '20',
-            name: 'Game 1',
-            description: 'Description 1',
-            mode: 'ctf',
-            board: new Board(LARGE_BOARD_SIZE),
-            isVisible: true,
-            modificationDate: new Date().toISOString(),
-        } as Game);
-
-        expect(component.trackById(mockGame)).toBe('20');
-    });
-
     it('should return the correct date for a game', () => {
         const mockGame = new Game();
         mockGame['setData']({
@@ -115,12 +110,7 @@ describe('GameListComponent', () => {
             modificationDate: new Date('2025-02-06').toISOString(),
         } as Game);
 
-        gameListServiceSpy.getDate.and.returnValue('2025-02-06');
-
-        const result = component.getDate(mockGame);
-
-        expect(gameListServiceSpy.getDate).toHaveBeenCalledWith(mockGame);
-        expect(result).toBe('2025-02-06');
+        expect(mockGame.modificationDate).toBe(new Date('2025-02-06').toISOString());
     });
 
     it('should call onCheckboxClick and fetchGames', () => {
@@ -137,10 +127,11 @@ describe('GameListComponent', () => {
 
         gameListServiceSpy.onCheckboxClick.and.returnValue(of(mockGame));
 
-        component.onCheckboxClick(mockGame);
+        const mockEvent = new MouseEvent('click');
+        component.onCheckboxClick(mockGame, mockEvent);
+        component.onConfirmVisibility();
 
         expect(gameListServiceSpy.onCheckboxClick).toHaveBeenCalledWith(mockGame);
-
         expect(gameServiceSpy.fetchGames).toHaveBeenCalled();
     });
 
@@ -205,8 +196,10 @@ describe('GameListComponent', () => {
         gameListServiceSpy.onDeleteClick.and.returnValue(of(mockGame));
 
         component.onDeleteClick(mockGame);
+        component.onConfirmDelete();
 
         expect(gameListServiceSpy.onDeleteClick).toHaveBeenCalledWith(mockGame);
+        expect(gameServiceSpy.fetchGames).toHaveBeenCalled();
     });
 
     it('should call handleDeleteError when onDeleteClick fails', () => {
@@ -229,18 +222,19 @@ describe('GameListComponent', () => {
         const handleDeleteErrorSpy = spyOn<any>(component, 'handleDeleteError');
 
         component.onDeleteClick(mockGame);
+        component.onConfirmDelete();
 
         expect(gameListServiceSpy.onDeleteClick).toHaveBeenCalledWith(mockGame);
         expect(handleDeleteErrorSpy).toHaveBeenCalledWith(errorResponse);
     });
 
-    it('should show "Le jeu a déjà été supprimé." when error is 404', () => {
+    it('should show "Le jeu a été supprimé." when error is 404', () => {
         const errorResponse = new HttpErrorResponse({ status: 404, statusText: 'Not Found' });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (component as any).handleDeleteError(errorResponse);
 
-        expect(component.errorMessage).toBe('Le jeu a déjà été supprimé.');
+        expect(component.errorMessage).toBe('Le jeu a été supprimé.');
     });
 
     it('should show "Une erreur est survenue. Veuillez réessayer." for other errors', () => {
@@ -255,8 +249,102 @@ describe('GameListComponent', () => {
     it('getAllGames() should handle errors by setting games to an empty array', () => {
         gameServiceSpy.fetchGames.and.returnValue(throwError(() => new Error('Failed to fetch games')));
 
+        // Spy on the gamesLength EventEmitter
+        spyOn(component.gamesLength, 'emit');
+
+        // Call getAllGames through the component's public interface
         component['getAllGames']();
 
+        // Verify games array is empty
         expect(component.games).toEqual([]);
+        // Verify gamesLength emitted 0
+        expect(component.gamesLength.emit).toHaveBeenCalledWith(0);
+    });
+
+    it('should clear error state when onCancel is called', () => {
+        // Set up initial state
+        component.showError = true;
+        component.errorMessage = 'Test error message';
+
+        // Call onCancel
+        component.onCancel();
+
+        // Verify the error state is cleared
+        expect(component.showError).toBeFalse();
+        expect(component.errorMessage).toBe('');
+    });
+
+    it('should not call onCheckboxClick when pendingGame is null', () => {
+        // Set pendingGame to null
+        component['pendingGame'] = null;
+
+        // Call onConfirmVisibility
+        component.onConfirmVisibility();
+
+        // Verify onCheckboxClick was not called
+        expect(gameListServiceSpy.onCheckboxClick).not.toHaveBeenCalled();
+    });
+
+    it('should call onCheckboxClick when pendingGame exists', () => {
+        // Set up a mock game
+        const mockGame = new Game();
+        mockGame['setData']({
+            _id: '1',
+            name: 'Test Game',
+            description: 'Test Description',
+            mode: 'classique',
+            board: new Board(MEDIUM_BOARD_SIZE),
+            isVisible: true,
+            modificationDate: new Date().toISOString(),
+        } as Game);
+
+        // Set pendingGame
+        component['pendingGame'] = mockGame;
+
+        // Set up the spy to return success
+        gameListServiceSpy.onCheckboxClick.and.returnValue(of(mockGame));
+
+        // Call onConfirmVisibility
+        component.onConfirmVisibility();
+
+        // Verify onCheckboxClick was called with the mock game
+        expect(gameListServiceSpy.onCheckboxClick).toHaveBeenCalledWith(mockGame);
+    });
+
+    it('should not call onDeleteClick when pendingGame is null', () => {
+        // Set pendingGame to null
+        component['pendingGame'] = null;
+
+        // Call onConfirmDelete
+        component.onConfirmDelete();
+
+        // Verify onDeleteClick was not called
+        expect(gameListServiceSpy.onDeleteClick).not.toHaveBeenCalled();
+    });
+
+    it('should call onDeleteClick when pendingGame exists', () => {
+        // Set up a mock game
+        const mockGame = new Game();
+        mockGame['setData']({
+            _id: '1',
+            name: 'Test Game',
+            description: 'Test Description',
+            mode: 'classique',
+            board: new Board(MEDIUM_BOARD_SIZE),
+            isVisible: true,
+            modificationDate: new Date().toISOString(),
+        } as Game);
+
+        // Set pendingGame
+        component['pendingGame'] = mockGame;
+
+        // Set up the spy to return success
+        gameListServiceSpy.onDeleteClick.and.returnValue(of(mockGame));
+
+        // Call onConfirmDelete
+        component.onConfirmDelete();
+
+        // Verify onDeleteClick was called with the mock game
+        expect(gameListServiceSpy.onDeleteClick).toHaveBeenCalledWith(mockGame);
     });
 });

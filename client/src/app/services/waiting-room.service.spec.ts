@@ -1,11 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { WaitingRoomService } from './waiting-room.service';
 import { Player } from '@app/classes/player';
 import { Room } from '@app/interfaces/room';
+import { WaitingRoomService } from './waiting-room.service';
 
 describe('WaitingRoomService', () => {
-    const player = new Player('mockPlayerId');
+    const player = new Player('mockPlayer');
+    player.id = 'mockPlayerId';
     const mockPlayerList: Player[] = [player];
     let service: WaitingRoomService;
     const mockRoom = {
@@ -32,6 +33,11 @@ describe('WaitingRoomService', () => {
 
     it('should get the room observable', () => {
         expect(service.room$).toBeTruthy();
+    });
+
+    it('should return player by its id', () => {
+        service.updateRoom(mockRoom);
+        expect(service.getPlayerFromId('mockPlayerId')).toEqual(player);
     });
 
     it('should update the room', () => {
@@ -63,6 +69,12 @@ describe('WaitingRoomService', () => {
         service.room$.subscribe((room) => {
             expect(room.isLocked).toBeTrue();
         });
+    });
+
+    it('should send an error when max player number is reached', () => {
+        service.maxPlayerLimitReached();
+        expect(service.isError).toEqual(true);
+        expect(service.errorMessage).toEqual('Le nombre maximum de joueurs a été atteint, impossible de déverouiller la salle.');
     });
 
     it('should start the game', () => {

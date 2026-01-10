@@ -1,4 +1,3 @@
-import { GameRoomEvents } from '@app/gateways/game-room/game-room.gateway.events';
 import { Player } from '@app/interfaces/player';
 import { GameRoomService } from '@app/services/game-room/game-room.service';
 import { WaitingRoomService } from '@app/services/waiting-room/waiting-room.service';
@@ -13,8 +12,8 @@ import {
     WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { WaitingRoomEvents } from './waiting-room.gateway.events';
-
+import { WaitingRoomEvents, GameRoomEvents } from '@common/socket.constants';
+import { ErrorMessages } from '@common/error-messages.constants';
 @WebSocketGateway({ cors: { origin: '*' } })
 @Injectable()
 export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -29,10 +28,12 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
     @SubscribeMessage(WaitingRoomEvents.CreateWaitingRoom)
     handleCreateRoom(@MessageBody() data: { roomId: string; gameId: string; organisator: Player }, @ConnectedSocket() socket: Socket) {
         try {
+            data.organisator.inventory = [];
             const room = this.waitingRoomService.createRoom(data.roomId, data.gameId, data.organisator, socket.id);
+            this.logger.log(`Salle ${data.roomId} créée par ${data.organisator.id}`);
             socket.join(data.roomId);
             this.server.to(socket.id).emit(WaitingRoomEvents.WaitingRoomCreated, room);
-            this.logger.log(`Salle ${data.roomId} créée par ${data.organisator.id}`);
+            this.server.to(data.roomId).emit(WaitingRoomEvents.UpdateAvatarReserved, { reservedAvatars: room.reservedAvatars });
         } catch (error) {
             socket.emit(WaitingRoomEvents.WaitingRoomError, error.message);
         }
@@ -42,8 +43,8 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
     handleJoinRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
         try {
             const room = this.waitingRoomService.findRoomById(roomId);
-            if (!room) throw new Error("La salle n'existe pas");
-            if (room.isLocked) throw new Error('La salle est verrouillée');
+            if (!room) throw new Error(ErrorMessages.RoomDoesNotExist);
+            if (room.isLocked) throw new Error(ErrorMessages.RoomLocked);
             socket.emit(WaitingRoomEvents.JoinRoomResponse, { success: true, room });
 
             this.waitingRoomService.joinRoom(roomId, socket.id);
@@ -69,7 +70,12 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
                     newName = `${originalName} -${counter}`;
                 }
                 data.player.name = newName;
-                this.waitingRoomService.addCharacter(data.roomId, data.player, socket.id);
+                data.player.inventory = [];
+                if (data.player.isVirtual === true) {
+                    this.waitingRoomService.addCharacter(data.roomId, data.player, data.player.name);
+                } else {
+                    this.waitingRoomService.addCharacter(data.roomId, data.player, socket.id);
+                }
                 this.server.to(data.roomId).emit(WaitingRoomEvents.PlayerCreated, room.players);
                 this.logger.log(`Joueur ${data.player.name} ajouté à la salle : ${data.roomId}`);
             }
@@ -79,9 +85,9 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
     }
 
     @SubscribeMessage(WaitingRoomEvents.ReserveAvatar)
-    handleReserveAvatar(@MessageBody() data: { roomId: string; chosenAvatar: string }, @ConnectedSocket() socket: Socket) {
+    handleReserveAvatar(@MessageBody() data: { roomId: string; chosenAvatar: string; playerId: string }, @ConnectedSocket() socket: Socket) {
         try {
-            this.waitingRoomService.reserveCharacter(data.roomId, socket.id, data.chosenAvatar);
+            this.waitingRoomService.reserveCharacter(data.roomId, data.playerId, data.chosenAvatar);
             const room = this.waitingRoomService.findRoomById(data.roomId);
             if (room) {
                 this.server.to(data.roomId).emit(WaitingRoomEvents.UpdateAvatarReserved, { reservedAvatars: room.reservedAvatars });
@@ -106,9 +112,10 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
         }
     }
 
-    @SubscribeMessage(WaitingRoomEvents.LeaveRoom)
+    @SubscribeMessage(WaitingRoomEvents.LeaveWaitingRoom)
     handleLeaveRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
         try {
+            this.logger.log(`Salle ${roomId} : joueur ${socket.id} essaye de quitter la salle`);
             const isRoomDeleted = this.waitingRoomService.leaveRoom(roomId, socket.id);
             if (isRoomDeleted) {
                 socket.emit(WaitingRoomEvents.LeaveRoomResponse, { success: true });
@@ -129,6 +136,7 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
     @SubscribeMessage(WaitingRoomEvents.ToggleLockWaitingRoom)
     handleLockRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
         try {
+            this.logger.log('toggle lock from gateway', roomId, socket.id);
             const isLocked = this.waitingRoomService.toggleLockRoom(roomId, socket.id);
             if (isLocked) {
                 this.server.to(roomId).emit(WaitingRoomEvents.WaitingRoomLocked);
@@ -163,9 +171,9 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
         try {
             const waitingRoom = this.waitingRoomService.findRoomById(roomId);
             if (!waitingRoom.isLocked) {
-                throw new Error("La salle n'est pas verrouillée");
+                throw new Error(ErrorMessages.RoomNotLocked);
             }
-            const gameRoom = this.gameRoomService.createRoom(waitingRoom);
+            const gameRoom = await this.gameRoomService.createRoom(waitingRoom);
 
             const sockets = await this.server.in(roomId).fetchSockets();
 
@@ -183,9 +191,66 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
     }
 
     @SubscribeMessage(WaitingRoomEvents.GenerateCode)
-    async handleGenerateCode(@ConnectedSocket() socket: Socket) {
+    handleGenerateCode(@ConnectedSocket() socket: Socket) {
         const code = this.waitingRoomService.generateCode();
         socket.emit(WaitingRoomEvents.GenerateCodeResponse, { code });
+    }
+
+    @SubscribeMessage(WaitingRoomEvents.SendMessageToWaitingRoom)
+    async handleSendMessage(@MessageBody() data: { message: string; playerName: string | null; roomId: string }, @ConnectedSocket() socket: Socket) {
+        try {
+            const message = {
+                type: 'received',
+                name: data.playerName,
+                content: data.message,
+                time: new Date().toLocaleTimeString('en-GB', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false,
+                }),
+            };
+            this.waitingRoomService.addMessage(data.roomId, message);
+            this.server.except(socket.id).to(data.roomId).emit(WaitingRoomEvents.MassMessage, message);
+            this.logger.log(`Joueur ${socket.id} a envoyé le message ${data.message} (salle ${data.roomId})`);
+        } catch (error) {
+            socket.emit(WaitingRoomEvents.WaitingRoomError, error.message);
+        }
+    }
+
+    @SubscribeMessage(WaitingRoomEvents.GetMessagesFromWaitingRoom)
+    async handleGetMessagesFromWaitingRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
+        try {
+            const room = this.waitingRoomService.findRoomById(roomId);
+            socket.emit(WaitingRoomEvents.GetMessagesResponse, room.messages);
+            this.logger.log(`Joueur ${socket.id} a demandé tous les messages de la room ${roomId})`);
+        } catch (error) {
+            socket.emit(WaitingRoomEvents.WaitingRoomError, error.message);
+        }
+    }
+
+    @SubscribeMessage(GameRoomEvents.AddJournalEntry)
+    async handleAddJournalEntry(
+        @MessageBody() data: { roomId: string; entry: { type: string; content: string } },
+        @ConnectedSocket() socket: Socket,
+    ) {
+        try {
+            const entry = {
+                type: data.entry.type,
+                content: data.entry.content,
+                time: new Date().toLocaleTimeString('en-GB', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false,
+                }),
+            };
+            this.gameRoomService.addJournalEntry(data.roomId, entry);
+            this.server.to(data.roomId).emit(GameRoomEvents.AddJournalEntry, entry);
+            this.logger.log(`Joueur ${socket.id} a ajouté une entrée de journal dans la room ${data.roomId}`);
+        } catch (error) {
+            socket.emit(GameRoomEvents.GameRoomError, error.message);
+        }
     }
 
     handleConnection(@ConnectedSocket() socket: Socket) {

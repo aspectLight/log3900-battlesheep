@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { TestBed } from '@angular/core/testing';
 import { PathService } from './path.service';
 import { Cell } from '@app/classes/cell';
 import { Board } from '@app/classes/board';
 import { Tile } from '@app/classes/tile';
 import { Coords } from '@app/interfaces/coords';
+import { Item } from '@app/classes/item';
 
 describe('PathService', () => {
     let service: PathService;
@@ -151,6 +153,33 @@ describe('PathService', () => {
             expect(coords).toEqual([
                 { x: cellA.x, y: cellA.y },
                 { x: cellB.x, y: cellB.y },
+            ]);
+        });
+
+        it('should truncate path at first non-spawnPoint item', () => {
+            // Create cells with different item types
+            const spawnCell1 = new Cell(new Tile('snow'), 0, 0);
+            const spawnCell2 = new Cell(new Tile('snow'), 1, 0);
+            const nonSpawnCell = new Cell(new Tile('snow'), 2, 0);
+            const spawnCell3 = new Cell(new Tile('snow'), 3, 0);
+
+            // Add items to cells
+            spawnCell1.addItem(new Item('spawnPoint'));
+            spawnCell2.addItem(new Item('spawnPoint'));
+            nonSpawnCell.addItem(new Item('adrenaline'));
+            spawnCell3.addItem(new Item('spawnPoint'));
+
+            // Set up the path
+            service.selectedPath = [spawnCell1, spawnCell2, nonSpawnCell, spawnCell3];
+
+            // Get coordinates
+            const coords = service.getSelectedPathAsCoords();
+
+            // Should only include up to the non-spawnPoint cell
+            expect(coords).toEqual([
+                { x: spawnCell1.x, y: spawnCell1.y },
+                { x: spawnCell2.x, y: spawnCell2.y },
+                { x: nonSpawnCell.x, y: nonSpawnCell.y },
             ]);
         });
     });

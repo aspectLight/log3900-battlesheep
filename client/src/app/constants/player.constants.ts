@@ -11,76 +11,81 @@ export const AVATAR_TYPES: {
     viktor: {
         name: 'Viktor',
         id: 1,
-        avatar: './assets/avatars/viktorAvatar.png',
-        avatarFull: './assets/avatars/viktorFull.png',
+        avatar: './assets/avatars/new/viktorAvatar.png',
+        avatarFull: './assets/avatars/new/viktorFull.png',
     },
     petrov: {
         name: 'Petrov',
         id: 2,
-        avatar: './assets/avatars/petrovAvatar.png',
-        avatarFull: './assets/avatars/petrovFull.png',
+        avatar: './assets/avatars/new/petrovAvatar.png',
+        avatarFull: './assets/avatars/new/petrovFull.png',
     },
     dmitry: {
         name: 'Dmitry',
         id: 3,
-        avatar: './assets/avatars/dmitryAvatar.png',
-        avatarFull: './assets/avatars/dmitryFull.png',
+        avatar: './assets/avatars/new/dmitryAvatar.png',
+        avatarFull: './assets/avatars/new/dmitryFull.png',
     },
     ladeve: {
         name: 'Ladeve',
         id: 4,
-        avatar: './assets/avatars/ladeveAvatar.png',
-        avatarFull: './assets/avatars/ladeveFull.png',
+        avatar: './assets/avatars/new/ladeveAvatar.png',
+        avatarFull: './assets/avatars/new/ladeveFull.png',
     },
     irina: {
         name: 'Irina',
         id: 5,
-        avatar: './assets/avatars/irinaAvatar.png',
-        avatarFull: './assets/avatars/irinaFull.png',
+        avatar: './assets/avatars/new/irinaAvatar.png',
+        avatarFull: './assets/avatars/new/irinaFull.png',
     },
     sokolov: {
         name: 'Sokolov',
         id: 6,
-        avatar: './assets/avatars/sokolovAvatar.png',
-        avatarFull: './assets/avatars/sokolovFull.png',
+        avatar: './assets/avatars/new/sokolovAvatar.png',
+        avatarFull: './assets/avatars/new/sokolovFull.png',
     },
     georgie: {
         name: 'Georgie',
         id: 7,
-        avatar: './assets/avatars/georgieAvatar.png',
-        avatarFull: './assets/avatars/georgieFull.png',
+        avatar: './assets/avatars/new/georgieAvatar.png',
+        avatarFull: './assets/avatars/new/georgieFull.png',
     },
     misha: {
         name: 'Misha',
         id: 8,
-        avatar: './assets/avatars/mishaAvatar.png',
-        avatarFull: './assets/avatars/mishaFull.png',
+        avatar: './assets/avatars/new/mishaAvatar.png',
+        avatarFull: './assets/avatars/new/mishaFull.png',
     },
     gorkina: {
         name: 'Gorkina',
         id: 9,
-        avatar: './assets/avatars/gorkinaAvatar.png',
-        avatarFull: './assets/avatars/gorkinaFull.png',
+        avatar: './assets/avatars/new/gorkinaAvatar.png',
+        avatarFull: './assets/avatars/new/gorkinaFull.png',
     },
     sergei: {
         name: 'Sergei',
         id: 10,
-        avatar: './assets/avatars/sergeiAvatar.png',
-        avatarFull: './assets/avatars/sergeiFull.png',
+        avatar: './assets/avatars/new/sergeiAvatar.png',
+        avatarFull: './assets/avatars/new/sergeiFull.png',
     },
     ivanov: {
         name: 'Ivanov',
         id: 11,
-        avatar: './assets/avatars/ivanovAvatar.png',
-        avatarFull: './assets/avatars/ivanovFull.png',
+        avatar: './assets/avatars/new/ivanovAvatar.png',
+        avatarFull: './assets/avatars/new/ivanovFull.png',
     },
     volkov: {
         name: 'Volkov',
         id: 12,
-        avatar: './assets/avatars/volkovAvatar.png',
-        avatarFull: './assets/avatars/volkovFull.png',
+        avatar: './assets/avatars/new/volkovAvatar.png',
+        avatarFull: './assets/avatars/new/volkovFull.png',
     },
 };
+
+export const enum VirtualPlayerType {
+    Aggressive = 'aggressive',
+    Defensive = 'defensive',
+}
 
 export const DEFAULT_STATS_VALUE = 4;
 export const DEFAULT_ACTION_POINTS = 1;
@@ -91,3 +96,8 @@ export const D6_VALUE = 6;
 export const BONUS_VALUE = 2;
 
 export const MAX_ENTITY_ID = 1000;
+
+export const PROPAGANDA_HEALTH_THRESHOLD = 3;
+export const PROPAGANDA_ATTACK_THRESHOLD = 6;
+
+export const DELAY = 150;

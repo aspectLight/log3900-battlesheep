@@ -59,7 +59,16 @@ describe('WaitingRoomGateway', () => {
         const gameId = 'game456';
         const organisator = { id: 'org1' };
         const socketId = 'socket789';
-        const mockRoom = { id: roomId, gameId, organisatorId: organisator.id, roomId, players: [], isLocked: false };
+        const mockRoom = {
+            id: roomId,
+            gameId,
+            organisatorId: organisator.id,
+            roomId,
+            players: [],
+            isLocked: false,
+            messages: [],
+            journalEntries: [],
+        };
 
         Object.defineProperty(socket, 'id', { value: socketId });
         socket.join = stub();
@@ -103,7 +112,16 @@ describe('WaitingRoomGateway', () => {
         const organisator = { id: 'org1' };
         const roomId = 'room123';
         const socketId = 'socket789';
-        const mockRoom = { id: roomId, gameId, organisatorId: organisator.id, roomId, players: [], isLocked: false };
+        const mockRoom = {
+            id: roomId,
+            gameId,
+            organisatorId: organisator.id,
+            roomId,
+            players: [],
+            isLocked: false,
+            messages: [],
+            journalEntries: [],
+        };
 
         Object.defineProperty(socket, 'id', { value: socketId });
 
@@ -147,7 +165,7 @@ describe('WaitingRoomGateway', () => {
         const roomId = 'room123';
         const gameId = 'game456';
         const socketId = 'socket789';
-        const mockRoom = { id: roomId, gameId, organisatorId: organisator.id, roomId, players: [], isLocked: true };
+        const mockRoom = { id: roomId, gameId, organisatorId: organisator.id, roomId, players: [], isLocked: true, messages: [], journalEntries: [] };
 
         Object.defineProperty(socket, 'id', { value: socketId });
         socket.emit = stub();
@@ -165,7 +183,16 @@ describe('WaitingRoomGateway', () => {
         const gameId = 'game456';
         const socketId = 'socket789';
         const player = { id: 'player1', name: 'Alice' };
-        const mockRoom = { id: roomId, gameId, organisatorId: organisator.id, roomId, players: [organisator], isLocked: true };
+        const mockRoom = {
+            id: roomId,
+            gameId,
+            organisatorId: organisator.id,
+            roomId,
+            players: [organisator],
+            isLocked: true,
+            messages: [],
+            journalEntries: [],
+        };
 
         Object.defineProperty(socket, 'id', { value: socketId });
 
@@ -186,6 +213,45 @@ describe('WaitingRoomGateway', () => {
 
         expect(waitingRoomService.findRoomById.calledWith(roomId)).toBeTruthy();
         expect(waitingRoomService.addCharacter.calledWith(roomId, { ...player, name: expectedName }, socketId)).toBeTruthy();
+        expect(server.to.calledWith(roomId)).toBeTruthy();
+    });
+
+    it('should allow a user to create virtual player', () => {
+        const organisator = { id: 'org1', name: 'Alice' };
+        const roomId = 'room123';
+        const gameId = 'game456';
+        const socketId = 'socket789';
+        const player = { id: 'player1', name: 'Alice', isVirtual: true };
+        const mockRoom = {
+            id: roomId,
+            gameId,
+            organisatorId: organisator.id,
+            roomId,
+            players: [organisator],
+            isLocked: true,
+            messages: [],
+            journalEntries: [],
+        };
+
+        Object.defineProperty(socket, 'id', { value: socketId });
+
+        server.to.returns({
+            emit: (event: string) => {
+                expect(event).toEqual(WaitingRoomEvents.PlayerCreated);
+            },
+        } as BroadcastOperator<unknown, unknown>);
+
+        socket.emit = stub();
+
+        waitingRoomService.findRoomById.returns(mockRoom);
+        waitingRoomService.addCharacter = stub();
+
+        gateway.handleCreatePlayer({ roomId, player }, socket);
+
+        const expectedName = 'Alice -2';
+
+        expect(waitingRoomService.findRoomById.calledWith(roomId)).toBeTruthy();
+        expect(waitingRoomService.addCharacter.calledWith(roomId, { ...player, name: expectedName }, expectedName)).toBeTruthy();
         expect(server.to.calledWith(roomId)).toBeTruthy();
     });
 
@@ -211,7 +277,16 @@ describe('WaitingRoomGateway', () => {
         const gameId = 'game456';
         const socketId = 'socket789';
         const chosenAvatar = 'Avatar 1';
-        const mockRoom = { id: roomId, gameId, organisatorId: organisator.id, roomId, players: [organisator], isLocked: true };
+        const mockRoom = {
+            id: roomId,
+            gameId,
+            organisatorId: organisator.id,
+            roomId,
+            players: [organisator],
+            isLocked: true,
+            messages: [],
+            journalEntries: [],
+        };
 
         Object.defineProperty(socket, 'id', { value: socketId });
 
@@ -224,10 +299,11 @@ describe('WaitingRoomGateway', () => {
         socket.emit = stub();
 
         waitingRoomService.findRoomById.returns(mockRoom);
+        const reserveCharacterSpy = jest.spyOn(waitingRoomService, 'reserveCharacter');
 
-        gateway.handleReserveAvatar({ roomId, chosenAvatar }, socket);
+        gateway.handleReserveAvatar({ roomId, chosenAvatar, playerId: organisator.id }, socket);
 
-        expect(waitingRoomService.reserveCharacter.calledWith(roomId, socketId, chosenAvatar)).toBeTruthy();
+        expect(reserveCharacterSpy).toHaveBeenCalledWith(roomId, organisator.id, chosenAvatar);
         expect(waitingRoomService.findRoomById.calledWith(roomId)).toBeTruthy();
         expect(server.to.calledWith(roomId)).toBeTruthy();
     });
@@ -236,6 +312,7 @@ describe('WaitingRoomGateway', () => {
         const roomId = 'room123';
         const socketId = 'socket789';
         const chosenAvatar = 'Avatar 1';
+        const playerId = 'playerId';
         const error = new Error('Erreur 1');
 
         Object.defineProperty(socket, 'id', { value: socketId });
@@ -243,7 +320,7 @@ describe('WaitingRoomGateway', () => {
 
         waitingRoomService.findRoomById.throws(error);
 
-        gateway.handleReserveAvatar({ roomId, chosenAvatar }, socket);
+        gateway.handleReserveAvatar({ roomId, chosenAvatar, playerId }, socket);
 
         expect(socket.emit.calledWith(WaitingRoomEvents.WaitingRoomError, error.message)).toBeTruthy();
     });
@@ -257,7 +334,17 @@ describe('WaitingRoomGateway', () => {
             { reservorId: '001', chosenAvatar: 'Avatar 1' },
             { reservorId: '002', chosenAvatar: 'Avatar 2' },
         ];
-        const mockRoom = { id: roomId, gameId, organisatorId: organisator.id, roomId, players: [organisator], reservedAvatars, isLocked: true };
+        const mockRoom = {
+            id: roomId,
+            gameId,
+            organisatorId: organisator.id,
+            roomId,
+            players: [organisator],
+            reservedAvatars,
+            isLocked: true,
+            messages: [],
+            journalEntries: [],
+        };
 
         Object.defineProperty(socket, 'id', { value: socketId });
 
@@ -296,7 +383,16 @@ describe('WaitingRoomGateway', () => {
         const roomId = 'room123';
         const gameId = 'game456';
         const socketId = 'socket789';
-        const mockRoom = { id: roomId, gameId, organisatorId: organisator.id, roomId, players: [organisator], isLocked: true };
+        const mockRoom = {
+            id: roomId,
+            gameId,
+            organisatorId: organisator.id,
+            roomId,
+            players: [organisator],
+            isLocked: true,
+            messages: [],
+            journalEntries: [],
+        };
 
         Object.defineProperty(socket, 'id', { value: socketId });
         const emitStub = stub();
@@ -328,7 +424,17 @@ describe('WaitingRoomGateway', () => {
             { reservorId: 'org1', chosenAvatar: 'Avatar 1' },
             { reservorId: 'org2', chosenAvatar: 'Avatar 2' },
         ];
-        const mockRoom = { id: roomId, gameId, organisatorId: organisator.id, roomId, players: [organisator], reservedAvatars, isLocked: true };
+        const mockRoom = {
+            id: roomId,
+            gameId,
+            organisatorId: organisator.id,
+            roomId,
+            players: [organisator],
+            reservedAvatars,
+            isLocked: true,
+            messages: [],
+            journalEntries: [],
+        };
 
         Object.defineProperty(socket, 'id', { value: socketId });
         socket.emit = stub();
@@ -427,7 +533,17 @@ describe('WaitingRoomGateway', () => {
         const playerToKick = { id: 'player2', name: 'Bob' };
         const gameId = 'game456';
         const reservedAvatars = [{ reservorId: 'org1', chosenAvatar: 'Avatar 1' }];
-        const mockRoom = { id: roomId, gameId, organisatorId: organisator.id, roomId, players: [organisator], reservedAvatars, isLocked: true };
+        const mockRoom = {
+            id: roomId,
+            gameId,
+            organisatorId: organisator.id,
+            roomId,
+            players: [organisator],
+            reservedAvatars,
+            isLocked: true,
+            messages: [],
+            journalEntries: [],
+        };
 
         Object.defineProperty(socket, 'id', { value: socketId });
         socket.emit = stub();
@@ -471,8 +587,26 @@ describe('WaitingRoomGateway', () => {
         const socketId2 = 'socket2';
         const organisator = { id: 'org1', name: 'Alice' };
         const gameId = 'game456';
-        const mockRoom = { id: roomId, gameId, organisatorId: organisator.id, roomId, players: [organisator], isLocked: true };
-        const mockGameRoom = { id: `game_${roomId}`, gameId, organisatorId: organisator.id, roomId: gameId, players: [organisator], isLocked: true };
+        const mockRoom = {
+            id: roomId,
+            gameId,
+            organisatorId: organisator.id,
+            roomId,
+            players: [organisator],
+            isLocked: true,
+            messages: [],
+            journalEntries: [],
+        };
+        const mockGameRoom = {
+            id: `game_${roomId}`,
+            gameId,
+            organisatorId: organisator.id,
+            roomId: gameId,
+            players: [organisator],
+            isLocked: true,
+            messages: [],
+            journalEntries: [],
+        };
 
         const playerSocket1 = createStubInstance<Socket>(Socket);
         const playerSocket2 = createStubInstance<Socket>(Socket);
@@ -495,7 +629,7 @@ describe('WaitingRoomGateway', () => {
         } as BroadcastOperator<unknown, unknown>);
 
         waitingRoomService.findRoomById.returns(mockRoom);
-        gameRoomService.createRoom.returns(mockGameRoom);
+        gameRoomService.createRoom.returns(Promise.resolve(mockGameRoom));
         waitingRoomService.deleteRoom = stub();
 
         await gateway.handleStartGame(roomId, socket);
@@ -513,7 +647,16 @@ describe('WaitingRoomGateway', () => {
         const roomId = 'room123';
         const organisator = { id: 'org1', name: 'Alice' };
         const gameId = 'game456';
-        const mockRoom = { id: roomId, gameId, organisatorId: organisator.id, roomId, players: [organisator], isLocked: false };
+        const mockRoom = {
+            id: roomId,
+            gameId,
+            organisatorId: organisator.id,
+            roomId,
+            players: [organisator],
+            isLocked: false,
+            messages: [],
+            journalEntries: [],
+        };
 
         waitingRoomService.findRoomById.returns(mockRoom);
 
@@ -551,6 +694,100 @@ describe('WaitingRoomGateway', () => {
 
         expect(waitingRoomService.generateCode.called).toBeTruthy();
         expect(socket.emit.calledWith(WaitingRoomEvents.GenerateCodeResponse, { code })).toBeTruthy();
+    });
+
+    it('send a message to the waitingRoom', () => {
+        const socketId = 'socket789';
+        const roomId = 'room123';
+        const organisator = { id: 'org1', name: 'Alice' };
+        const gameId = 'game456';
+        const mockRoom = {
+            id: roomId,
+            roomId,
+            gameId,
+            organisatorId: organisator.id,
+            players: [organisator],
+            isLocked: false,
+            messages: [],
+            journalEntries: [],
+        };
+
+        waitingRoomService.findRoomById.returns(mockRoom);
+        Object.defineProperty(socket, 'id', { value: socketId });
+        socket.emit = stub();
+        const emitStub = stub();
+        server.to = stub();
+        const toStub = stub().returns({ emit: emitStub } as any);
+        server.to.returns({ emit: emitStub } as any);
+        server.except = stub();
+        server.except.returns({ to: toStub } as any);
+
+        const message = { message: 'message1', playerName: 'player1', roomId };
+        gateway.handleSendMessage(message, socket);
+        expect(waitingRoomService.addMessage.calledOnce).toBeTruthy();
+        expect(server.except.calledWith(socketId)).toBeTruthy();
+    });
+
+    it('should emit an error if one is encountered on handleSendMessage', () => {
+        const roomId = 'room123';
+        const socketId = 'socket789';
+        const error = new Error('Erreur 1');
+
+        Object.defineProperty(socket, 'id', { value: socketId });
+        socket.emit = stub();
+
+        waitingRoomService.addMessage.throws(error);
+
+        const message = { message: 'message1', playerName: 'player1', roomId };
+        gateway.handleSendMessage(message, socket);
+
+        expect(socket.emit.calledWith(WaitingRoomEvents.WaitingRoomError, error.message)).toBeTruthy();
+    });
+
+    it('should retrieve messages from the waiting room and send them to the socket', () => {
+        const socketId = 'socket789';
+        const roomId = 'room123';
+        const gameId = 'game456';
+        const organisator = { id: 'org1', name: 'Alice' };
+        const mockMessages = [
+            { type: 'received', name: 'player1', content: 'Hello', time: '12:00:00' },
+            { type: 'received', name: 'player2', content: 'Hi', time: '12:01:00' },
+        ];
+
+        const mockRoom = {
+            id: roomId,
+            roomId,
+            gameId,
+            organisatorId: organisator.id,
+            players: [organisator],
+            isLocked: false,
+            messages: mockMessages,
+            journalEntries: [],
+        };
+
+        waitingRoomService.findRoomById.returns(mockRoom);
+        Object.defineProperty(socket, 'id', { value: socketId });
+        socket.emit = stub();
+
+        gateway.handleGetMessagesFromWaitingRoom(roomId, socket);
+
+        expect(waitingRoomService.findRoomById.calledOnceWith(roomId)).toBeTruthy();
+        expect(socket.emit.calledWith(WaitingRoomEvents.GetMessagesResponse, mockMessages)).toBeTruthy();
+    });
+
+    it('should emit an error if one is encountered on handleGetMessagesFromWaitingRoom', () => {
+        const roomId = 'room123';
+        const socketId = 'socket789';
+        const error = new Error('Erreur 1');
+
+        Object.defineProperty(socket, 'id', { value: socketId });
+        socket.emit = stub();
+
+        waitingRoomService.findRoomById.throws(error);
+
+        gateway.handleGetMessagesFromWaitingRoom(roomId, socket);
+
+        expect(socket.emit.calledWith(WaitingRoomEvents.WaitingRoomError, error.message)).toBeTruthy();
     });
 
     it('should handle connection', () => {
@@ -604,5 +841,59 @@ describe('WaitingRoomGateway', () => {
         gateway.handleDisconnect(socket);
 
         expect(errorSpy).toHaveBeenCalledWith(`Erreur lors du traitement de la déconnexion du joueur ${socketId}: ${error.message}`);
+    });
+
+    it('should handle adding a journal entry', async () => {
+        const roomId = 'room123';
+        const socketId = 'socket789';
+        const entryData = {
+            roomId,
+            entry: {
+                type: 'info',
+                content: 'Test journal entry',
+            },
+        };
+
+        Object.defineProperty(socket, 'id', { value: socketId });
+
+        const emitStub = stub();
+        server.to.returns({ emit: emitStub } as unknown as BroadcastOperator<unknown, unknown>);
+
+        gameRoomService.addJournalEntry = stub();
+
+        await gateway.handleAddJournalEntry(entryData, socket);
+
+        // Verify journal entry was added
+        expect(gameRoomService.addJournalEntry.calledOnce).toBeTruthy();
+        expect(gameRoomService.addJournalEntry.firstCall.args[0]).toEqual(roomId);
+        expect(gameRoomService.addJournalEntry.firstCall.args[1].type).toEqual('info');
+        expect(gameRoomService.addJournalEntry.firstCall.args[1].content).toEqual('Test journal entry');
+        expect(gameRoomService.addJournalEntry.firstCall.args[1].time).toBeDefined();
+
+        // Verify entry was broadcasted to clients in the room
+        expect(server.to.calledWith(roomId)).toBeTruthy();
+        expect(emitStub.calledWith(GameRoomEvents.AddJournalEntry)).toBeTruthy();
+    });
+
+    it('should emit an error if one is encountered on handleAddJournalEntry', () => {
+        const roomId = 'room123';
+        const socketId = 'socket789';
+        const error = new Error('Erreur journal');
+        const entryData = {
+            roomId,
+            entry: {
+                type: 'info',
+                content: 'Test journal entry',
+            },
+        };
+
+        Object.defineProperty(socket, 'id', { value: socketId });
+        socket.emit = stub();
+
+        gameRoomService.addJournalEntry.throws(error);
+
+        gateway.handleAddJournalEntry(entryData, socket);
+
+        expect(socket.emit.calledWith(GameRoomEvents.GameRoomError, error.message)).toBeTruthy();
     });
 });

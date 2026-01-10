@@ -3,22 +3,25 @@
         <img src="./assets/ui/left.png">
         Page d'accueil
     </button>
-    <h3> Créer une partie </h3>
+    <h1> Créer une partie </h1>
 </div>
 
 <app-game-list 
     [isAddBoardVisible]="false" 
     [isModifierVisible]="false" 
-    (selectedGame)="onSelectGame($event)" 
+    (selectedGame)="onSelectGame($event)"
+    (gamesLength)="onGamesLengthChange($event)"
     class="game-list">
 </app-game-list>
 
-<button 
-    class="square-button" 
-    [disabled]="!selectedGame" 
-    (click)="createGame()">
-    Créer une partie
-</button>
+@if (hasGames) {
+    <button 
+        class="square-button" 
+        [disabled]="!selectedGame" 
+        (click)="createGame()">
+        Créer une partie
+    </button>
+}
 
 @if (gameModified===true) {
     <app-pop-up

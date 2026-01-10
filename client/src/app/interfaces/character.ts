@@ -34,4 +34,6 @@ export interface PlayerCard {
     isActive: boolean;
     isHost?: boolean;
     isDisconnected?: boolean;
+    playerTeam?: number | null;
+    hasFlag?: boolean;
 }

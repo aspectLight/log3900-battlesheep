@@ -1,6 +1,11 @@
 import { Item } from '@app/interfaces/item';
 import { Coords } from './coords';
 
+export enum VirtualPlayerType {
+    Aggressive = 'aggressive',
+    Defensive = 'defensive',
+}
+
 export interface Player {
     id: string;
     name?: string;
@@ -14,6 +19,10 @@ export interface Player {
     d6Choice?: string;
     evasionPoints?: number;
     color?: string;
-    inventory?: [Item];
+    inventory?: Item[];
     stats?: { [key: string]: { maxValue: number; value: number; description: string } };
+    isVirtual?: boolean;
+    profile?: VirtualPlayerType;
+    hasBoots?: boolean;
+    team?: number;
 }

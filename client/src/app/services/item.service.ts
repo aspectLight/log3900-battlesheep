@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Board } from '@app/classes/board';
-import { BOARD_SIZES, UNIQUE_ITEM_COUNT } from '@app/constants/board.constants';
-import { ErrorMessages } from '@app/constants/error-messages.constants';
+import { BOARD_CONFIGS, UNIQUE_ITEM_COUNT } from '@app/constants/board.constants';
+import { ErrorMessages } from '@common/error-messages.constants';
 import { ITEM_TYPES } from '@app/constants/item.constants';
 
 @Injectable({
@@ -81,7 +81,7 @@ export class ItemService {
     }
 
     getMaximumItemCount(board: Board): number {
-        const boardSize = Object.values(BOARD_SIZES).find((size) => size.board === board.size);
+        const boardSize = Object.values(BOARD_CONFIGS).find((size) => size.board === board.size);
 
         if (!boardSize) {
             throw new Error(ErrorMessages.InvalidBoardSize + board.size);

@@ -8,7 +8,7 @@ import { PaintService } from '@app/services/paint.service';
 import { ActionService } from '@app/services/action.service';
 import { Subscription } from 'rxjs';
 import { GameManagerService } from '@app/services/game-manager.service';
-import { SocketService } from '@app/services/socket.service';
+import { MovementSocketService } from '@app/services/socket/movement-socket.service';
 
 @Component({
     selector: 'app-board',
@@ -18,11 +18,11 @@ import { SocketService } from '@app/services/socket.service';
 })
 
 /*
-Pour l'instant, nous avons aucune utilité de faire un service pour les modes de jeux, d'ou le choix d'implémentation avec des if.
-Nous aurions pû faire un décorateur, ou même une map de fonction, mais le code devient beaucoup moins maintenable.
+For now, we have no need to create a service for game modes, hence the choice to implement with if statements.
+We could have used a decorator, or even a function map, but the code becomes much less maintainable.
 
-De plus, nous n'avons pas vraiment encore choisi si nous allons réutiliser ce component pour le jeu principal. Ainsi, ajouter un tel service aussi tôt 
-dans le projet viendrait rajouter du couplage entre service, que nous aurons potentiellement besoin d'enlever plus tard selon nos choix futurs.
+Additionally, we haven't really decided yet if we're going to reuse this component for the main game. Therefore, adding such a service this early
+in the project would add coupling between services that we might potentially need to remove later based on our future choices.
 */
 export class BoardComponent implements OnInit, OnDestroy {
     @Input() board!: Board;
@@ -38,7 +38,7 @@ export class BoardComponent implements OnInit, OnDestroy {
         private dragDropService: DragDropService,
         private actionService: ActionService,
         public gameManagerService: GameManagerService,
-        public socketService: SocketService,
+        public movementSocketService: MovementSocketService,
     ) {}
 
     get selectedPath() {
@@ -53,8 +53,8 @@ export class BoardComponent implements OnInit, OnDestroy {
         return this.actionService.getIsSelectionActive();
     }
 
-    get isDebugMode() {
-        return this.gameManagerService.isDebugMode;
+    get isActionActive() {
+        return this.actionService.getIsActionActive();
     }
 
     ngOnInit(): void {
@@ -79,17 +79,20 @@ export class BoardComponent implements OnInit, OnDestroy {
             this.actionService.selectSingleCell(cell);
 
             if (event.button === 2) {
-                if (this.gameManagerService.room.isDebugging) {
-                    if (this.gameManagerService.getMainPlayer()?.id === this.gameManagerService.currentPlayerId)
-                        this.socketService.teleportPlayer(cell.x, cell.y);
+                if (this.gameManagerService.room.isDebugging && this.gameManagerService.isPlayerTurn) {
+                    this.movementSocketService.teleportPlayer(cell.x, cell.y);
                     return;
                 }
                 this.actionService.toggleSelection();
                 return;
             } else {
-                this.actionService.interact();
-                if (!this.isSelectionActive) return;
-                this.movePlayerFromPath();
+                if (this.isActionActive) {
+                    this.actionService.interact();
+                    return;
+                } else {
+                    if (!this.isSelectionActive) return;
+                    this.movePlayerFromPath();
+                }
             }
         }
     }
@@ -137,15 +140,15 @@ export class BoardComponent implements OnInit, OnDestroy {
         }
     }
 
-    movePlayerFromPath(): void {
+    disableContextMenu(event: MouseEvent): void {
+        event.preventDefault();
+    }
+
+    private movePlayerFromPath(): void {
         const moveInfo = this.gameManagerService.getMoveInfo();
 
         if (moveInfo) {
-            this.socketService.movedPlayer(moveInfo);
+            this.movementSocketService.movedPlayer(moveInfo);
         }
-    }
-
-    disableContextMenu(event: MouseEvent): void {
-        event.preventDefault();
     }
 }

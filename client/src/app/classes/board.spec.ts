@@ -66,24 +66,6 @@ describe('Board', () => {
         expect(() => board.setTileDefault(0, expectedSize)).toThrowError('Invalid position (0, 5)');
     });
 
-    it('clearBoard() should reset all tiles to default', () => {
-        board.setTile(0, 0, new Tile('water'));
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        board.setTile(2, 3, new Tile('stone'));
-
-        expect(board.getCell(0, 0)?.tile.type).toBe('water');
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        expect(board.getCell(2, 3)?.tile.type).toBe('stone');
-
-        board.clearBoard();
-
-        for (let i = 0; i < board.size; i++) {
-            for (let j = 0; j < board.size; j++) {
-                expect(board.getCell(i, j)?.tile.type).toBe('snow');
-            }
-        }
-    });
-
     it('should create a board from data with item', () => {
         board.matrix[0][0].addItem(new Item('propaganda'));
 
@@ -114,5 +96,106 @@ describe('Board', () => {
         const player = board.getPlayerById('456');
 
         expect(player).toBeNull();
+    });
+
+    describe('getPlayerCoordsById', () => {
+        it('should return correct coordinates when player is found', () => {
+            const player = new Player('player1', 'Player 1');
+            const x = 2;
+            const y = 3;
+            const cell = board.getCell(x, y);
+            if (cell) {
+                cell.player = player;
+            }
+
+            const coords = board.getPlayerCoordsById(player.id);
+            expect(coords).toEqual({ x, y });
+        });
+
+        it('should return null when player is not found', () => {
+            const coords = board.getPlayerCoordsById('nonexistent');
+            expect(coords).toBeNull();
+        });
+    });
+
+    describe('getTwoNearestEmptyCells', () => {
+        it('should return two nearest empty cells', () => {
+            // Create a scenario with some obstacles
+            board.setTile(1, 1, new Tile('wall'));
+            board.setTile(1, 2, new Tile('tree'));
+            board.setTile(2, 1, new Tile('stone'));
+
+            const startCoords = { x: 0, y: 0 };
+            const emptyCells = board.getTwoNearestEmptyCells(startCoords);
+
+            expect(emptyCells.length).toBe(2);
+            // The two nearest empty cells should be (0,1) and (1,0)
+            expect(emptyCells.some((cell) => cell.x === 0 && cell.y === 1)).toBeTrue();
+            expect(emptyCells.some((cell) => cell.x === 1 && cell.y === 0)).toBeTrue();
+        });
+
+        it('should return empty array when no empty cells are available', () => {
+            // Fill the board with obstacles
+            for (let i = 0; i < board.size; i++) {
+                for (let j = 0; j < board.size; j++) {
+                    if (i !== 0 || j !== 0) {
+                        // Leave the start position empty
+                        board.setTile(i, j, new Tile('wall'));
+                    }
+                }
+            }
+
+            const startCoords = { x: 0, y: 0 };
+            const emptyCells = board.getTwoNearestEmptyCells(startCoords);
+
+            expect(emptyCells.length).toBe(0);
+        });
+
+        it('should not return cells with players or items', () => {
+            // Add a player and an item to nearby cells
+            const player = new Player('player1', 'Player 1');
+            const cellWithPlayer = board.getCell(0, 1);
+            if (cellWithPlayer) {
+                cellWithPlayer.player = player;
+            }
+
+            const cellWithItem = board.getCell(1, 0);
+            if (cellWithItem) {
+                cellWithItem.addItem(new Item('propaganda'));
+            }
+
+            const startCoords = { x: 0, y: 0 };
+            const emptyCells = board.getTwoNearestEmptyCells(startCoords);
+
+            expect(emptyCells.length).toBe(2);
+            // Should not include cells with players or items
+            expect(emptyCells.some((cell) => cell.x === 0 && cell.y === 1)).toBeFalse();
+            expect(emptyCells.some((cell) => cell.x === 1 && cell.y === 0)).toBeFalse();
+        });
+
+        it('should handle edge case when queue.shift() returns undefined', () => {
+            // Create a spy on Array.prototype.shift to force it to return undefined
+            const originalShift = Array.prototype.shift;
+            let shiftCallCount = 0;
+
+            // Mock implementation that returns undefined on first call
+            Array.prototype.shift = function () {
+                shiftCallCount++;
+                if (shiftCallCount === 1) {
+                    return undefined;
+                }
+                return originalShift.apply(this);
+            };
+
+            const startCoords = { x: 0, y: 0 };
+            const emptyCells = board.getTwoNearestEmptyCells(startCoords);
+
+            // Restore original shift implementation
+            Array.prototype.shift = originalShift;
+
+            // Since we forced shift to return undefined on the first call,
+            // the algorithm should have exited the while loop early
+            expect(emptyCells.length).toBe(0);
+        });
     });
 });

@@ -64,7 +64,7 @@ describe('GameValidationService', () => {
             },
         ];
 
-        const configureBoard = (size: number, spawnPoints: number, items: number): Board => {
+        const configureBoard = (size: number, spawnPoints: number, items: number, hasFlag: boolean = false): Board => {
             board = new Board(size);
             const positions = new Set<string>();
             let count = 0;
@@ -81,6 +81,8 @@ describe('GameValidationService', () => {
 
                 if (count < spawnPoints) {
                     board.matrix[x][y].item = new Item('spawnPoint');
+                } else if (hasFlag && count === spawnPoints) {
+                    board.matrix[x][y].item = new Item('flag');
                 } else {
                     board.matrix[x][y].item = new Item(ITEMS[0]);
                 }
@@ -104,7 +106,7 @@ describe('GameValidationService', () => {
 
             it(`should validate items on a board of ${boardSize} with ${itemsNumber} items`, () => {
                 board = configureBoard(boardSize, spawnPointsNumber, itemsNumber);
-                const itemsTest = service.validateItems(board);
+                const itemsTest = service.validateItems(board, false);
 
                 if (itemsValid) {
                     expect(itemsTest.isValid).toBeTrue();
@@ -113,6 +115,29 @@ describe('GameValidationService', () => {
                     expect(itemsTest.message).toBe(errorMessage);
                 }
             });
+        });
+
+        it('should validate CTF game with required flag and items', () => {
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            board = configureBoard(10, 2, 2, true);
+            const itemsTest = service.validateItems(board, true);
+            expect(itemsTest.isValid).toBeTrue();
+        });
+
+        it('should invalidate CTF game without flag', () => {
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            board = configureBoard(10, 2, 2, false);
+            const itemsTest = service.validateItems(board, true);
+            expect(itemsTest.isValid).toBeFalse();
+            expect(itemsTest.message).toBe('Le jeu doit avoir au moins un drapeau.');
+        });
+
+        it('should invalidate CTF game with flag but wrong number of items', () => {
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            board = configureBoard(10, 2, 1, true);
+            const itemsTest = service.validateItems(board, true);
+            expect(itemsTest.isValid).toBeFalse();
+            expect(itemsTest.message).toBe('Il doit y avoir 2 items.');
         });
     });
 
@@ -379,7 +404,7 @@ describe('GameValidationService', () => {
             const spyValidateSpawnPoints = spyOn(service, 'validateSpawnPoints').and.callFake(() => ({ isValid: true }));
             const spyValidateTerrainTilesAccessibility = spyOn(service, 'validateTerrainTilesAccessibility').and.callFake(() => ({ isValid: true }));
             const spyValidateDoors = spyOn(service, 'validateDoors').and.callFake(() => []);
-            service.validateGame(name, description, board);
+            service.validateGame(name, description, board, false);
 
             expect(spyValidateName).toHaveBeenCalledWith(name);
             expect(spyValidateDescription).toHaveBeenCalledWith(description);

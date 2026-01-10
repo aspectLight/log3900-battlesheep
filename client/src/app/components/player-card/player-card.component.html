@@ -1,7 +1,12 @@
-<div class="player-container" style="position: relative;">
+<div class="player-container">
     @if (isHost){
         <div class="host-container">
             <img src="./assets/ui/crown.png" alt="Is Host" class="host-indicator"/>
+        </div>
+    }
+    @if (isVirtualPlayer){
+        <div class="virtual-player-container">
+            <img src="./assets/ui/robot.png" alt="Is Virtual Player" class="virtual-player-indicator"/>
         </div>
     }
     @if(showKick){
@@ -15,20 +20,22 @@
     <div class="div2 player-name">
         <p>{{ player.name }}</p>
     </div>
-    <div class="div3 stat">
-        <h3>Vie</h3>
-        <p>{{ player.stats.health.value }}</p>
-    </div>
-    <div class="div4 stat">
-        <h3>Rapidité</h3>
-        <p>{{ player.stats.speed.value }}</p>
-    </div>
-    <div class="div5 stat">
-        <h3>Attaque</h3>
-        <p>{{ player.stats.attack.value }}</p>
-    </div>
-    <div class="div6 stat">
-        <h3>Défense</h3>
-        <p>{{ player.stats.defense.value }}</p>
+    <div class="stats-row">
+        <div class="div3 stat">
+            <h3>Vie</h3>
+            <p>{{ player.stats.health.value }}</p>
+        </div>
+        <div class="div4 stat">
+            <h3>Rapidité</h3>
+            <p>{{ player.stats.speed.value }}</p>
+        </div>
+        <div class="div5 stat">
+            <h3>Attaque</h3>
+            <p>{{ player.stats.attack.value }}</p>
+        </div>
+        <div class="div6 stat">
+            <h3>Défense</h3>
+            <p>{{ player.stats.defense.value }}</p>
+        </div>
     </div>
 </div>

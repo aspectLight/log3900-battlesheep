@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { ITEM_TYPES } from '@app/constants/item.constants';
 import { ItemService } from './item.service';
-import { BOARD_SIZES } from '@app/constants/board.constants';
+import { BoardSizes, BOARD_CONFIGS } from '@app/constants/board.constants';
 import { Board } from '@app/classes/board';
 import { Item } from '@app/classes/item';
 
@@ -92,7 +92,7 @@ describe('ItemService', () => {
     });
 
     it('should correctly update inventory and totalItemsPlaced when setting item count from board', () => {
-        mockBoard = new Board(BOARD_SIZES['grande'].board);
+        mockBoard = new Board(BOARD_CONFIGS[BoardSizes.Grande].board);
         const item = new Item('adrenaline');
         const spawn = new Item('spawnPoint');
 

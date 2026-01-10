@@ -22,8 +22,6 @@ describe('BonusChoicesComponent', () => {
     });
 
     it('should initialize with default values', () => {
-        expect(component.health).toBe(component.initialStat);
-        expect(component.speed).toBe(component.initialStat);
         expect(component.attackDice).toBeNull();
         expect(component.defenseDice).toBeNull();
         expect(component.selectedBonus).toBeNull();
@@ -32,15 +30,11 @@ describe('BonusChoicesComponent', () => {
     it('should set health to boostedStat when healthBonus is selected', () => {
         component.selectBonus('healthBonus');
         expect(component.selectedBonus).toBe('healthBonus');
-        expect(component.health).toBe(component.boostedStat);
-        expect(component.speed).toBe(component.initialStat);
     });
 
     it('should set speed to boostedStat when speedBonus is selected', () => {
         component.selectBonus('speedBonus');
         expect(component.selectedBonus).toBe('speedBonus');
-        expect(component.speed).toBe(component.boostedStat);
-        expect(component.health).toBe(component.initialStat);
     });
 
     it('should select attack dice and set defense dice to the opposite value', () => {

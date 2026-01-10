@@ -7,4 +7,7 @@ export const ROUTES: { [key: string]: string } = {
     home: '/home',
     game: '/game',
     join: '/join-game',
+    endGame: '/end-game',
 };
+
+export const LOADING_SCREEN_DELAY = 800;

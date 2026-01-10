@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable max-lines */
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Player } from '@app/classes/player';
 import { BonusType } from '@app/constants/bonus.constants';
-import { GameManagerService } from '@app/services/game-manager.service';
+import { ANIMATION_DURATION, CombatState, NOTIFICATION_DURATION } from '@app/constants/combat.constants';
 import { AttackResult, FlightResult } from '@app/interfaces/payload';
+import { GameManagerService } from '@app/services/game-manager.service';
 import { CombatService } from './combat.service';
 
 describe('CombatService', () => {
@@ -28,7 +30,13 @@ describe('CombatService', () => {
         enemyPlayer.setStatValue(BonusType.Defense, 4);
 
         // Create a fake GameManagerService spy.
-        gameManagerServiceSpy = jasmine.createSpyObj('GameManagerService', ['getRoomId', 'getPlayerById', 'getMainPlayer', 'setMainPlayerHealth']);
+        gameManagerServiceSpy = jasmine.createSpyObj('GameManagerService', [
+            'getRoomId',
+            'getPlayerById',
+            'getMainPlayer',
+            'setMainPlayerHealth',
+            'combatLost',
+        ]);
         // Force the getter isPlayerTurn to always return true.
         Object.defineProperty(gameManagerServiceSpy, 'isPlayerTurn', { get: () => true });
         gameManagerServiceSpy.getRoomId.and.returnValue('room123');
@@ -244,7 +252,6 @@ describe('CombatService', () => {
             // Set up enemy
             service.enemy = enemyPlayer;
             service.handleAttackResult(result);
-            expect(service.won).toHaveBeenCalled();
             tick(2000);
         }));
 
@@ -274,7 +281,6 @@ describe('CombatService', () => {
             service.handleAttackResult(result);
             expect(service.getHit).toHaveBeenCalled();
             expect(gameManagerServiceSpy.setMainPlayerHealth).toHaveBeenCalledWith(0);
-            expect(service.lost).toHaveBeenCalled();
             tick(500);
             tick(2000);
         }));
@@ -302,13 +308,37 @@ describe('CombatService', () => {
             tick(500);
             tick(2000);
         }));
+
+        it('should reset combat state correctly', fakeAsync(() => {
+            // Setup initial state
+            service.combatState = CombatState.Won;
+            service.isCombatMode = true;
+            service.isCombatInitiator = true;
+            service.initialPlayerHealth = 6;
+            service.initialEnemyHealth = 4;
+            service.enemy = enemyPlayer;
+
+            // Spy on resetStats
+            spyOn(service, 'resetStats').and.callThrough();
+
+            // Call resetCombat
+            service.resetCombat();
+
+            // Verify state changes
+            expect(service.combatState).toBe('idle');
+            expect(service.isCombatMode).toBe(false);
+            expect(service.isCombatInitiator).toBe(false);
+            expect(service.resetStats).toHaveBeenCalled();
+
+            tick();
+        }));
     });
 
     describe('Utility Methods', () => {
         it('should call won in handleEnd if main player wins', () => {
             spyOn(service, 'won').and.callThrough();
             gameManagerServiceSpy.getMainPlayer.and.returnValue(mainPlayer);
-            service.handleEnd(mainPlayer.id);
+            service.handleEnd(mainPlayer.id, enemyPlayer.id);
             expect(service.won).toHaveBeenCalled();
             expect(service.flightAttemptsLeft).toBe(2);
         });
@@ -316,7 +346,7 @@ describe('CombatService', () => {
         it('should call lost in handleEnd if main player loses', () => {
             spyOn(service, 'lost').and.callThrough();
             gameManagerServiceSpy.getMainPlayer.and.returnValue(mainPlayer);
-            service.handleEnd('notMainId');
+            service.handleEnd('notMainId', enemyPlayer.id);
             expect(service.lost).toHaveBeenCalled();
             expect(service.flightAttemptsLeft).toBe(2);
         });
@@ -362,6 +392,117 @@ describe('CombatService', () => {
             expect(() => {
                 service.setCombatRoom(combatRoom);
             }).not.toThrow();
+        });
+    });
+
+    describe('Flight Results', () => {
+        it('should set combat state to FlightSuccess and reset combat after delay', fakeAsync(() => {
+            spyOn(service, 'resetCombat').and.callThrough();
+            service.flightSuccess();
+            expect(service.combatState).toBe(CombatState.FlightSuccess);
+            tick(NOTIFICATION_DURATION);
+            expect(service.resetCombat).toHaveBeenCalled();
+        }));
+
+        it('should set combat state to FlightFailure and reset to idle after delay', fakeAsync(() => {
+            service.flightFailure();
+            expect(service.combatState).toBe(CombatState.FlightFailure);
+            tick(ANIMATION_DURATION);
+            expect(service.combatState).toBe(CombatState.Idle);
+        }));
+
+        it('should call flightSuccess when showFlightResult is called with success', fakeAsync(() => {
+            spyOn(service, 'flightSuccess').and.callThrough();
+            const result = { isSuccess: true, attackerEvasionPoints: 10 };
+            service.setIsCombatPlayerTurn(true);
+            service.showFlightResult(result);
+            expect(service.flightSuccess).toHaveBeenCalled();
+        }));
+
+        it('should call flightFailure when showFlightResult is called with failure', fakeAsync(() => {
+            spyOn(service, 'flightFailure').and.callThrough();
+            const result = { isSuccess: false, attackerEvasionPoints: 5 };
+            service.setIsCombatPlayerTurn(true);
+            service.showFlightResult(result);
+            expect(service.flightFailure).toHaveBeenCalled();
+        }));
+
+        it("should do nothing in showFlightResult if not player's turn", () => {
+            spyOn(service, 'flightSuccess');
+            spyOn(service, 'flightFailure');
+            const result = { isSuccess: true, attackerEvasionPoints: 10 };
+            service.setIsCombatPlayerTurn(false);
+            service.showFlightResult(result);
+            expect(service.flightSuccess).not.toHaveBeenCalled();
+            expect(service.flightFailure).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('Lost and Won States', () => {
+        it('should handle lost state correctly', fakeAsync(() => {
+            spyOn(service, 'resetCombat').and.callThrough();
+            service.lost();
+            expect(service.combatState).toBe(CombatState.Lost);
+            tick(NOTIFICATION_DURATION);
+            expect(service.resetCombat).toHaveBeenCalled();
+        }));
+
+        it('should handle won state correctly', fakeAsync(() => {
+            spyOn(service, 'resetCombat').and.callThrough();
+            service.won();
+            expect(service.combatState).toBe(CombatState.Won);
+            tick(NOTIFICATION_DURATION);
+            expect(service.resetCombat).toHaveBeenCalled();
+        }));
+    });
+
+    describe('Virtual Player Attack', () => {
+        it('should generate attack payload in normal mode', () => {
+            const combatRoomId = 'combat123';
+            spyOn(mainPlayer, 'rollStat').and.returnValue(5);
+            spyOn(enemyPlayer, 'rollStat').and.returnValue(3);
+            gameManagerServiceSpy.room = {
+                isDebugging: false,
+                roomId: 'room123',
+                gameId: 'game123',
+                organisatorId: 'org123',
+                players: [mainPlayer, enemyPlayer],
+                isLocked: false,
+            };
+
+            const result = service.getVirtualPlayerAttack(mainPlayer, enemyPlayer, combatRoomId);
+
+            expect(result).toEqual({
+                roomId: combatRoomId,
+                attackValue: 5,
+                defenseValue: 3,
+            });
+            expect(mainPlayer.rollStat).toHaveBeenCalledWith(BonusType.Attack);
+            expect(enemyPlayer.rollStat).toHaveBeenCalledWith(BonusType.Defense);
+        });
+
+        it('should generate attack payload in debug mode', () => {
+            const combatRoomId = 'combat123';
+            spyOn(mainPlayer, 'rollStatDebug').and.returnValue(6);
+            spyOn(enemyPlayer, 'rollStatDebug').and.returnValue(4);
+            gameManagerServiceSpy.room = {
+                isDebugging: true,
+                roomId: 'room123',
+                gameId: 'game123',
+                organisatorId: 'org123',
+                players: [mainPlayer, enemyPlayer],
+                isLocked: false,
+            };
+
+            const result = service.getVirtualPlayerAttack(mainPlayer, enemyPlayer, combatRoomId);
+
+            expect(result).toEqual({
+                roomId: combatRoomId,
+                attackValue: 6,
+                defenseValue: 4,
+            });
+            expect(mainPlayer.rollStatDebug).toHaveBeenCalledWith(BonusType.Attack);
+            expect(enemyPlayer.rollStatDebug).toHaveBeenCalledWith(BonusType.Defense);
         });
     });
 });

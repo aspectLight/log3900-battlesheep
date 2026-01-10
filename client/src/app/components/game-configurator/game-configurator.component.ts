@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameService } from '@app/services/game.service';
-import { BOARD_SIZES } from '@app/constants/board.constants';
-import { MODES } from '@app/constants/game.constants';
+import { BOARD_CONFIGS, BoardSizes } from '@app/constants/board.constants';
+import { MODES, MODE_DESCRIPTIONS } from '@app/constants/game.constants';
 import { ROUTES } from '@app/constants/routes.constants';
 
 @Component({
@@ -12,11 +12,13 @@ import { ROUTES } from '@app/constants/routes.constants';
 })
 export class GameConfiguratorComponent {
     mode: string = 'classique';
-    modeDescription: string = MODES[this.mode];
-    boardSize: string = 'moyenne';
-    board: number = BOARD_SIZES[this.boardSize].board;
-    players: string = BOARD_SIZES[this.boardSize].players;
-    items: number = BOARD_SIZES[this.boardSize].items;
+    modeDescription: string = MODE_DESCRIPTIONS[this.mode as MODES];
+    boardSize: BoardSizes = BoardSizes.Moyenne;
+    board: number = BOARD_CONFIGS[this.boardSize].board;
+    players: string = BOARD_CONFIGS[this.boardSize].players;
+    items: number = BOARD_CONFIGS[this.boardSize].items;
+
+    readonly boardSizes = BoardSizes;
 
     constructor(
         private router: Router,
@@ -25,18 +27,18 @@ export class GameConfiguratorComponent {
 
     onModeChange(mode: string): void {
         this.mode = mode;
-        this.modeDescription = MODES[this.mode];
+        this.modeDescription = MODE_DESCRIPTIONS[this.mode as MODES];
     }
 
-    onSizeChange(boardSize: string): void {
+    onSizeChange(boardSize: BoardSizes): void {
         this.boardSize = boardSize;
-        this.board = BOARD_SIZES[this.boardSize].board;
-        this.players = BOARD_SIZES[this.boardSize].players;
-        this.items = BOARD_SIZES[this.boardSize].items;
+        this.board = BOARD_CONFIGS[this.boardSize].board;
+        this.players = BOARD_CONFIGS[this.boardSize].players;
+        this.items = BOARD_CONFIGS[this.boardSize].items;
     }
 
     createGame(): void {
-        this.router.navigate(['/edit-game']);
+        this.router.navigate([ROUTES.edit]);
         this.gameService.setNewGame();
         this.gameService.setGameSettings(this.mode, this.board);
     }

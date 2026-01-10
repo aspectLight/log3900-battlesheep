@@ -1,10 +1,15 @@
+/* eslint-disable max-lines */
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Board } from '@app/classes/board';
+import { Cell } from '@app/classes/cell';
 import { Game } from '@app/classes/game';
+import { Item } from '@app/classes/item';
 import { Player } from '@app/classes/player';
 import { BonusType } from '@app/constants/bonus.constants';
+import { ITEM_TYPES } from '@app/constants/item.constants';
+import { ROUTES } from '@app/constants/routes.constants';
 import { Coords } from '@app/interfaces/coords';
 import { Room } from '@app/interfaces/room';
 import { API_ENDPOINTS } from '@common/api-endpoints.constants';
@@ -20,26 +25,36 @@ import { PathService } from './path.service';
 export class GameManagerService {
     notificationMessage: string;
 
-    notificationDuration: number;
-    isMainPlayerTurn: boolean = false;
+    notificationTime: number;
     isNotificationVisible: boolean = false;
-    canPlayerMove: boolean = false;
+
     isGameCanceled: boolean = false;
     isGameFinished: boolean = false;
-    currentPlayerId: string = '';
+    isGameLoaded: boolean = false;
     gameCountdown: Subject<number> = new Subject<number>();
+    turnCountdown: Subject<number> = new Subject<number>();
+
+    currentPlayerId: string = '';
+    disconnectedPlayer: Player[] = [];
+    turnChangeSubject = new Subject<void>();
+    turnChange = this.turnChangeSubject.asObservable();
+    canEndTurn: boolean = false;
+
+    isReplacementPopupVisible: boolean = false;
+    replacementPopupMessage: string = '';
+    pendingReplacement: { player: Player; newItem: Item; candidateItems: Item[]; cellCoords: Coords } | null = null;
+    dropItem: (item: Item, coords: Coords) => void;
 
     movementService: MovementService;
     room: Room;
 
-    disconnectedPlayer: Player[] = [];
+    playerWithFlag: string | null = null;
+    winner: string;
 
-    isGameLoaded: boolean = false;
     private game: Game;
     private board: Board;
-    private mainPlayer: Player | undefined;
 
-    // private interval: number | null;
+    private mainPlayerId: string = '';
     private currentPlayerSubject = new BehaviorSubject<Player>(new Player());
     private currentPlayer: Observable<Player> = this.currentPlayerSubject.asObservable();
 
@@ -65,6 +80,27 @@ export class GameManagerService {
         return this.room.isDebugging;
     }
 
+    get isCTF(): boolean {
+        return this.game.isCTF;
+    }
+
+    get mainPlayer(): Player | null {
+        return this.board.getPlayerById(this.mainPlayerId);
+    }
+
+    hasWon(): boolean {
+        const winner = this.getPlayers().find((p) => p.id === this.winner);
+        if (!winner) return false;
+        return this.mainPlayerId === winner.id || (this.mainPlayer?.team !== undefined && this.mainPlayer.team === winner.team);
+    }
+
+    getWinner(): string {
+        if (this.isCTF) {
+            return this.room.players.find((p) => p.id === this.winner)?.team === 1 ? 'USSR' : 'USA';
+        }
+        return this.room.players.find((p) => p.id === this.winner)?.name as string;
+    }
+
     getGame() {
         return this.game;
     }
@@ -73,8 +109,6 @@ export class GameManagerService {
         this.isGameCanceled = false;
         this.isGameFinished = false;
         this.isGameLoaded = false;
-        this.canPlayerMove = false;
-        this.isMainPlayerTurn = false;
         this.disconnectedPlayer = [];
     }
 
@@ -82,16 +116,48 @@ export class GameManagerService {
         this.isGameCanceled = true;
     }
 
-    finishGame() {
-        const delay = 3000;
+    finishGame(winnerId: string) {
+        const delay = 5000;
         this.isGameFinished = true;
+        this.winner = winnerId;
         setTimeout(() => {
-            this.router.navigate(['/home']);
+            this.router.navigate([ROUTES.endGame]);
             this.isGameFinished = false;
         }, delay);
+        for (const player of this.room.players) {
+            if (!player.isVirtual) player.clearInfo();
+        }
+    }
+
+    loadGame(): Observable<Game> {
+        const subject = new Subject<Game>();
+        if (this.room.gameId) {
+            this.fetchGame(this.room.gameId).subscribe((game) => {
+                this.game = new Game(game);
+                this.board = this.game.board;
+                this.isGameLoaded = true;
+                subject.next(game);
+                subject.complete();
+            });
+        }
+        return subject.asObservable();
+    }
+
+    fetchGame(gameId: string): Observable<Game> {
+        return this.http.get<Game>(environment.serverUrl + API_ENDPOINTS.games + gameId);
+    }
+
+    getIsGameLoaded(): boolean {
+        return this.isGameLoaded;
+    }
+
+    getBoard(): Board {
+        return this.board;
     }
 
     addPlayersToBoard(players: Player[]): boolean {
+        const uniqueItems = { ...ITEM_TYPES };
+
         for (const p of players) {
             const player = Player.fromObject(p);
             const cell = this.board.getCell(player.spawnPoint.x, player.spawnPoint.y);
@@ -109,8 +175,32 @@ export class GameManagerService {
         const matrix = this.board.matrix;
         for (const row of matrix) {
             for (const cell of row) {
-                if (cell.item && cell.item.type === 'spawnPoint' && !cell.player) {
-                    cell.item = null;
+                if (cell.item && !cell.player) {
+                    if (cell.item.type === 'spawnPoint') {
+                        cell.item = null;
+                    } else if (cell.item.type === 'random') {
+                        const seed = this.room.roomId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+                        const availableItems = Object.keys(uniqueItems).filter(
+                            (type) => type !== 'random' && type !== 'spawnPoint' && type !== 'flag',
+                        );
+                        if (availableItems.length === 0) {
+                            cell.item = null;
+                        } else {
+                            const randomIndex = Math.abs(seed) % availableItems.length;
+                            const randomItemType = availableItems[randomIndex];
+                            cell.item = new Item(randomItemType);
+                            delete uniqueItems[randomItemType];
+                        }
+                    } else if (cell.item.type in uniqueItems) {
+                        delete uniqueItems[cell.item.type];
+                    } else {
+                        cell.item = null;
+                    }
+                } else if (cell.player && cell.item) {
+                    if (cell.item.type === 'spawnPoint') {
+                        const playerColor = cell.player.color;
+                        cell.item.imagePath = `assets/items/${playerColor}_spawn.gif`;
+                    }
                 }
             }
         }
@@ -118,20 +208,12 @@ export class GameManagerService {
         return true;
     }
 
-    movePlayer(dx: number, dy: number): boolean {
-        return this.movementService.movePlayer(this.board, dx, dy);
-    }
-
-    getBoard(): Board {
-        return this.board;
-    }
-
     getPlayers(): Player[] {
         return this.room.players;
     }
 
     getMainPlayer() {
-        return this.mainPlayer;
+        return this.board.getPlayerById(this.mainPlayerId);
     }
 
     getCurrentPlayer(): Observable<Player> {
@@ -142,57 +224,48 @@ export class GameManagerService {
         return this.room.roomId;
     }
 
-    stopPlayer(player: Player): void {
-        this.movementService.stopPlayer(player);
-    }
-
     setMainPlayer(id: string | undefined) {
-        const foundPlayer = this.room.players.find((p) => p.id === id);
-        if (!foundPlayer) return;
-        this.mainPlayer = Player.fromObject(foundPlayer);
+        if (!id) return;
+        this.mainPlayerId = id;
+        if (!this.mainPlayer) return;
+        this.mainPlayer.onReplaceItem = (newItem: Item, inventory: [Item | null, Item | null], cellCoords: Coords) => {
+            const invItems = inventory.filter((item) => item !== null) as Item[];
+            const candidateItems = [...invItems, newItem];
+            this.triggerReplacementPopup(this.mainPlayer as Player, newItem, candidateItems, cellCoords);
+        };
     }
 
-    fetchGame(gameId: string): Observable<Game> {
-        return this.http.get<Game>(environment.serverUrl + API_ENDPOINTS.games + gameId);
+    getPlayerById(playerId: string): Player | null {
+        return this.board.getPlayerById(playerId);
     }
 
-    getIsGameLoaded(): boolean {
-        return this.isGameLoaded;
-    }
+    disconnectPlayer(playerId: string) {
+        const playerIndex = this.room.players.findIndex((player) => player.id === playerId);
 
-    loadGame(): Observable<Game> {
-        const subject = new Subject<Game>();
-        if (this.room.gameId) {
-            this.fetchGame(this.room.gameId).subscribe((game) => {
-                this.game = new Game(game);
-                this.board = this.game.board;
-                this.isGameLoaded = true;
-                subject.next(game);
-                subject.complete();
-            });
+        if (playerIndex !== -1) {
+            const [disconnected] = this.room.players.splice(playerIndex, 1);
+            this.disconnectedPlayer.push(disconnected);
+            this.getPlayerById(playerId)?.clearInfo();
+            this.removePlayer(playerId);
         }
-        return subject.asObservable();
     }
 
-    redirect(): void {
-        this.router.navigate(['/game']);
+    removePlayer(playerId: string): void {
+        const player = this.board.getPlayerById(playerId);
+
+        if (player) {
+            const playerCell = player.cell;
+            if (playerCell && playerCell.getEntity() === player) {
+                playerCell.removeEntity();
+            }
+        }
     }
 
-    handleTurnStarting(player: Player, startTime: number): void {
-        this.clearPaths();
-        const delay = startTime - Date.now();
-        this.notificationMessage = `Le tour de ${player.name} commence dans 3 secondes!`;
-        this.isNotificationVisible = true;
-        this.notificationDuration = delay;
-        setTimeout(() => {
-            this.startTurn(player);
-            this.isNotificationVisible = false;
-        }, delay);
-    }
-
-    startTurn(player: Player): void {
-        this.updateCurrentPlayer(player);
-        this.isMainPlayerTurn = this.mainPlayer?.id === player.id;
+    updateScore(playerId: string): number {
+        const foundPlayer = this.room.players.find((p) => p.id === playerId);
+        if (!foundPlayer) return 0;
+        foundPlayer.fightsWon++;
+        return foundPlayer.fightsWon;
     }
 
     setPlayer(player: Player) {
@@ -215,17 +288,25 @@ export class GameManagerService {
         return this.pathService.getAllCellsFromPaths(this.board);
     }
 
-    async movePlayerFromPath(callback?: () => void) {
-        await this.movementService.movePlayerFromPath(this.board, this.pathService.selectedPath);
+    async movePlayerFromPath(callback?: (item?: Item, cell?: Cell) => void) {
+        this.canEndTurn = false;
+        const result = await this.movementService.movePlayerFromPath(this.board, this.pathService.selectedPath);
         this.resetPlayerSelection();
 
-        if (callback) {
-            callback();
+        if (result.success && result.cell) {
+            const collectedItem = this.handleItemCollection(result.cell);
+            if (callback) {
+                callback(collectedItem?.item, collectedItem?.cell);
+            }
         }
+        this.pathService.clearPath();
     }
 
     teleportPlayer(destinationX: number, destinationY: number) {
-        this.movementService.teleportPlayer(this.board, destinationX, destinationY);
+        const cell = this.board.getCell(destinationX, destinationY);
+        if (!cell) return;
+        this.handleItemCollection(cell);
+        this.movementService.teleportPlayer(this.board, cell.x, cell.y);
         this.resetPlayerSelection();
     }
 
@@ -251,7 +332,7 @@ export class GameManagerService {
     }
 
     setMovementPoints(points: number) {
-        if (!this.mainPlayer) return;
+        if (!this.mainPlayer || !this.isPlayerTurn) return;
         this.mainPlayer.movementPoints = points;
     }
 
@@ -264,47 +345,110 @@ export class GameManagerService {
         return this.pathService.selectedPath;
     }
 
-    getPlayerById(playerId: string): Player | null {
-        return this.board.getPlayerById(playerId);
+    isPlayerMoving() {
+        return this.movementService.isMoving();
+    }
+
+    handleTurnStarting(player: Player, countdown: number): void {
+        this.clearPaths();
+        this.notificationMessage = `Le tour de ${player.name} commence dans 3 secondes!`;
+        this.notificationTime = countdown;
+        this.updateCurrentPlayer(player);
+    }
+
+    startTurn(player: Player): void {
+        this.updateCurrentPlayer(player);
+    }
+
+    triggerReplacementPopup(player: Player, newItem: Item, candidateItems: Item[], cellCoords: Coords): void {
+        this.pendingReplacement = { player, newItem, candidateItems, cellCoords };
+        this.replacementPopupMessage = "Inventaire plein ! Choisissez l'objet à rejeter :";
+        this.isReplacementPopupVisible = true;
+    }
+
+    processReplacement(selectedItem: Item): [Item, Coords] {
+        let toDrop: Item | undefined;
+        let coords: Coords = { x: -1, y: -1 };
+        if (this.pendingReplacement) {
+            const { player, newItem, cellCoords } = this.pendingReplacement;
+            coords = cellCoords;
+            const index = player.inventory.findIndex((item) => item === selectedItem);
+            if (index !== -1) {
+                player.updateItemsEffect(-1);
+                toDrop = player.inventory[index] as Item;
+                player.inventory[index] = newItem;
+                player.updateItemsEffect(1);
+            } else {
+                toDrop = newItem;
+            }
+            this.pendingReplacement = null;
+            this.isReplacementPopupVisible = false;
+        }
+        return [toDrop as Item, coords];
+    }
+
+    addItemToBoard(item: Item, coords: Coords): void {
+        if (coords.x < 0 || coords.y < 0 || coords.x >= this.board.matrix.length || coords.y >= this.board.matrix[0].length) {
+            return;
+        }
+        this.board.matrix[coords.x][coords.y].addItem(item);
+    }
+
+    combatLost(loserId: string): void {
+        const loser = this.board.getPlayerById(loserId);
+        if (!loser) {
+            return;
+        }
+        const playerCoords = this.board.getPlayerCoordsById(loserId);
+        if (!playerCoords) {
+            return;
+        }
+        const emptyCells = this.board.getTwoNearestEmptyCells(playerCoords);
+        for (let i = 0; i < 2; i++) {
+            if (loser.inventory[i]) {
+                loser.updateItemsEffect(-1);
+                this.dropItem(loser.inventory[i] as Item, emptyCells[i]);
+            }
+        }
+        loser.inventory = [null, null];
     }
 
     setMainPlayerHealth(value: number) {
         this.mainPlayer?.setStatValue(BonusType.Health, value);
     }
 
-    disconnectPlayer(playerId: string) {
-        const playerIndex = this.room.players.findIndex((player) => player.id === playerId);
+    redirect(): void {
+        this.router.navigate([ROUTES.game]);
+    }
 
-        if (playerIndex !== -1) {
-            const [disconnected] = this.room.players.splice(playerIndex, 1);
-            this.disconnectedPlayer.push(disconnected);
-            this.removePlayer(playerId);
+    private handleItemCollection(cell: Cell): { item: Item; cell: Cell } | undefined {
+        if (!cell.item) {
+            return undefined;
         }
-    }
-
-    removePlayer(playerId: string): void {
-        const player = this.board.getPlayerById(playerId);
-
-        if (player) {
-            const playerCell = player.cell;
-            if (playerCell && playerCell.getEntity() === player) {
-                playerCell.removeEntity();
-            }
+        const item = cell.item;
+        if (item.type === 'spawnPoint') {
+            return undefined;
         }
-    }
 
-    updateScore(playerId: string): number {
-        const foundPlayer = this.room.players.find((p) => p.id === playerId);
-        if (!foundPlayer) return 0;
-        foundPlayer.fightsWon++;
-        return foundPlayer.fightsWon ?? 0;
-    }
+        let playerToUpdate: Player | null;
+        if (this.isPlayerTurn && this.mainPlayer) {
+            playerToUpdate = this.mainPlayer;
+        }
+        playerToUpdate = this.getBoard().getPlayerById(this.currentPlayerId);
 
-    isPlayerTurnOver() {
-        return this.mainPlayer?.movementPoints === 0 && this.mainPlayer.actionPoints === 0;
+        if (!playerToUpdate) {
+            return undefined;
+        }
+        if (playerToUpdate.addItem(item) !== true) {
+            playerToUpdate.replaceItem(item, { x: cell.x, y: cell.y });
+        }
+
+        cell.removeItem();
+        return { item, cell };
     }
 
     private updateCurrentPlayer(player: Player): void {
         this.currentPlayerSubject.next(player);
+        this.turnChangeSubject.next();
     }
 }

@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Item } from '@app/classes/item';
 
 @Component({
     selector: 'app-pop-up',
@@ -12,8 +13,14 @@ export class PopUpComponent {
     @Input() description: string;
     @Input() firstOption: string = 'Ok';
     @Input() secondOption: string = 'Oui';
+    @Input() items: Item[] = [];
     @Output() cancel = new EventEmitter<void>();
     @Output() confirm = new EventEmitter<void>();
+    @Output() itemSelected = new EventEmitter<Item>();
+
+    onSelect(item: Item): void {
+        this.itemSelected.emit(item);
+    }
     onConfirm(): void {
         this.confirm.emit();
     }

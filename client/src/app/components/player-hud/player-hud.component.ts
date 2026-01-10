@@ -1,29 +1,34 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ItemCardComponent } from '@app/components/item-card/item-card.component';
 import { Item } from '@app/classes/item';
 import { Player } from '@app/classes/player';
-import { ItemCard } from '@app/interfaces/character';
 import { GameManagerService } from '@app/services/game-manager.service';
 
 @Component({
     selector: 'app-player-hud',
-    imports: [],
+    imports: [CommonModule, ItemCardComponent],
     templateUrl: './player-hud.component.html',
     styleUrl: './player-hud.component.scss',
 })
 export class PlayerHudComponent {
-    cards: ItemCard[] = [
-        { item: new Item('barbedWire'), isExpanded: false },
-        { item: new Item('propaganda'), isExpanded: false },
-    ];
-
-    healthCount: number;
-    defCount: number;
-    speedCount: number;
+    private expandedCards: { [key: number]: boolean } = {};
 
     constructor(private gameManager: GameManagerService) {}
 
-    get player(): Player | undefined {
+    get player(): Player | null {
         return this.gameManager.getMainPlayer();
+    }
+
+    get cards() {
+        return (
+            this.player?.inventory
+                .filter((item) => item !== null)
+                .map((item, index) => ({
+                    item: item as Item,
+                    isExpanded: this.expandedCards[index] || false,
+                })) || []
+        );
     }
 
     get defensePoints() {
@@ -59,18 +64,18 @@ export class PlayerHudComponent {
     }
 
     toggleCard(index: number) {
-        this.cards[index].isExpanded = !this.cards[index].isExpanded;
+        this.expandedCards[index] = !this.expandedCards[index];
     }
 
     hoverCard(index: number) {
-        if (!this.cards[index].isExpanded) {
-            this.cards[index].isExpanded = true;
+        if (!this.expandedCards[index]) {
+            this.expandedCards[index] = true;
         }
     }
 
     unhoverCard(index: number) {
-        if (this.cards[index].isExpanded) {
-            this.cards[index].isExpanded = false;
+        if (this.expandedCards[index]) {
+            this.expandedCards[index] = false;
         }
     }
 }

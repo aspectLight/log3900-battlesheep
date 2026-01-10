@@ -1,3 +1,10 @@
-.container {
-    height: 95%;
+app-game-play {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
 }
+

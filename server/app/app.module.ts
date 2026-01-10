@@ -11,6 +11,8 @@ import { GameRoomGateway } from './gateways/game-room/game-room.gateway';
 import { GameRoomService } from './services/game-room/game-room.service';
 import { GameMovementService } from './services/game-movement/game-movement.service';
 import { GameCombatService } from './services/game-combat/game-combat.service';
+import { GameMovementVPService } from './services/virtual-players/game-movement-vp.service';
+import { MovementAlgorithmsService } from './services/movement-algorithms/movement-algorithms.service';
 
 @Module({
     imports: [
@@ -36,6 +38,8 @@ import { GameCombatService } from './services/game-combat/game-combat.service';
         GameRoomService,
         GameMovementService,
         GameCombatService,
+        GameMovementVPService,
+        MovementAlgorithmsService,
     ],
 })
 export class AppModule {}

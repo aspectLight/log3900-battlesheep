@@ -4,8 +4,14 @@
     width: 100%;
     justify-content: center;
     align-items: center;
-    padding: 10px 0;
-    overflow: hidden;
+}
+
+.game-editor-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-height: 120vh;
+    height: 100%;
 }
 
 .return-button {
@@ -27,10 +33,10 @@
 
 img {
     width: 15px;
+    max-width: 15px;
 }
 
 .game-editor {
     display: flex;
     flex-direction: column;
-    gap: 1px;
 }

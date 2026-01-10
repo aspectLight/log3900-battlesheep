@@ -20,6 +20,7 @@ export enum MoveCosts {
     Ice = 0,
     Snow = 1,
     Water = 2,
+    WaterWithBoots = 1,
     Tree = Infinity,
     Stone = Infinity,
     Door = 1,

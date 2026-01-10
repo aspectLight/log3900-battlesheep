@@ -1,6 +1,7 @@
 import { Player } from '@app/interfaces/player';
 
 export interface Combat {
+    associatedRoomId: string;
     combatRoomId: string;
     players: Player[];
     attackerId: string;

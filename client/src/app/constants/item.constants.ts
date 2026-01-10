@@ -5,9 +5,10 @@ export interface ItemType {
 }
 
 export const ITEM_TYPES: { [key: string]: ItemType } = {
+    // Category 1
     adrenaline: {
         name: 'Adrenaline',
-        description: 'Ajoute 2 points de rapidité, enlève 1 point de défense',
+        description: 'Ajoute 2 points de vie',
         imagePath: './assets/items/drug.png',
     },
 
@@ -17,21 +18,23 @@ export const ITEM_TYPES: { [key: string]: ItemType } = {
         imagePath: './assets/items/vodka.png',
     },
 
+    // Category 2
     propaganda: {
         name: 'Propaganda',
-        description: "Ajoute 2 points d'attaque et 1 point de défense si le joueur est à 1 point de vie",
+        description: "Ajoute 5 points d'attaque et 5 points de défense si le joueur est à moins de 3 points de vie",
         imagePath: './assets/items/propaganda.png',
     },
 
     barbedWire: {
         name: 'Barbed Wire',
-        description: 'Enlève 1 point de vie à votre adversaire si sa tentative de fuite échoue',
+        description: "La fuite est impossible pour l'adversaire, seulement si vous êtes l'instigateur du combat",
         imagePath: './assets/items/barbed_wire.png',
     },
 
+    // Category 3
     camouflage: {
         name: 'Camouflage',
-        description: "Augmente les chances de s'enfuir du combat à 50%",
+        description: "Permet de se déplacer vers n'importe quelle case pour 1 point d'action",
         imagePath: './assets/items/camouflage.png',
     },
 
@@ -41,14 +44,33 @@ export const ITEM_TYPES: { [key: string]: ItemType } = {
         imagePath: './assets/items/boots.png',
     },
 
-    spawnPoint: {
-        name: 'Spawn',
-        description: 'Un feu de camp servant de base',
-        imagePath: './assets/items/spawn.gif',
+    airStrike: {
+        name: 'Air Strike',
+        description: "Permet d'attaquer à distance",
+        imagePath: './assets/items/air_strike.png',
     },
+
+    // Other
     random: {
         name: 'Random',
         description: 'Un item aléatoire qui sera révélé en pleine partie',
         imagePath: './assets/items/dice.png',
     },
+    flag: {
+        name: 'Flag',
+        description: 'Un drapeau à ramener à la base',
+        imagePath: './assets/items/flag.png',
+    },
+
+    spawnPoint: {
+        name: 'Spawn',
+        description: 'Un feu de camp servant de base',
+        imagePath: './assets/items/spawn.gif',
+    },
 };
+
+export const PROPAGANDA_ATTACK_BOOST = 5;
+export const PROPAGANDA_DEFENSE_BOOST = 5;
+
+export const VODKA_ATTACK_BOOST = 2;
+export const VODKA_SPEED_REDUCTION = 1;

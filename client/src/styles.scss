@@ -1,5 +1,5 @@
 html, body {
-    height: 100%;
+    height: 100vh;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -12,25 +12,41 @@ html, body {
     font-style: normal;
 }
 
+/* Create a fixed background container */
+html::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background-image: url('./assets/ui/16.png');
+    background-repeat: repeat-x;
+    background-size: 50% 100%; 
+    z-index: -2;
+    animation: seamlessScroll 40s linear infinite;
+}
+
+/* Create a fixed blur overlay */
+html::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
+    z-index: -1;
+}
+
 body {
     font-family: 'CustomFont';
     font-size: 1.5em;
     color: white;
-    position: relative;
-    
-    &::before {
-        content: "";
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 200%;
-        height: 100%;
-        background-image: url('./assets/ui/16.png');
-        background-repeat: repeat-x;
-        background-size: 50% 100%; 
-        z-index: -1;
-        animation: seamlessScroll 20s linear infinite;
-    }
+    transform-style: preserve-3d;
 }
 
 @keyframes seamlessScroll {

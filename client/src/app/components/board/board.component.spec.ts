@@ -13,6 +13,9 @@ import { Item } from '@app/classes/item';
 import { Player } from '@app/classes/player';
 import { Room } from '@app/interfaces/room';
 import { BehaviorSubject } from 'rxjs';
+import { MovementSocketService } from '@app/services/socket/movement-socket.service';
+import { Socket } from 'socket.io-client';
+import { ActionSocketService } from '@app/services/socket/action-socket.service';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 describe('BoardComponent', () => {
@@ -23,6 +26,8 @@ describe('BoardComponent', () => {
     let actionServiceSpy: jasmine.SpyObj<ActionService>;
     let gameManagerServiceSpy: jasmine.SpyObj<GameManagerService>;
     let socketServiceSpy: jasmine.SpyObj<SocketService>;
+    let movementSocketServiceSpy: jasmine.SpyObj<MovementSocketService>;
+    let actionSocketServiceSpy: jasmine.SpyObj<ActionSocketService>;
 
     const BOARD_SIZE = 10;
     let board: Board;
@@ -51,7 +56,16 @@ describe('BoardComponent', () => {
         dragDropServiceSpy = jasmine.createSpyObj('DragDropService', ['startDrag', 'handleDragEnd', 'allowDrop', 'handleDrop']);
         actionServiceSpy = jasmine.createSpyObj(
             'ActionService',
-            ['selectCell', 'toggleSelection', 'interact', 'selectSingleCell', 'getIsSelectionActive'],
+            [
+                'selectCell',
+                'toggleSelection',
+                'interact',
+                'selectSingleCell',
+                'getIsSelectionActive',
+                'getIsActionActive',
+                'setSelectionActive',
+                'switchModes',
+            ],
             {
                 selectedCell$: new BehaviorSubject<Cell | null>(null),
             },
@@ -63,8 +77,39 @@ describe('BoardComponent', () => {
             'getMainPlayer',
             'getMoveInfo',
         ]);
-        socketServiceSpy = jasmine.createSpyObj('SocketService', ['teleportPlayer', 'movedPlayer']);
-
+        socketServiceSpy = jasmine.createSpyObj('SocketService', [
+            'teleportPlayer',
+            'movedPlayer',
+            'registerSocketService',
+            'setUpConnection',
+            'connect',
+            'getId',
+            'getRoomId',
+            'abandonGame',
+            'endPlayerTurn',
+            'getPlayerMovements',
+            'finishGame',
+            'dropItem',
+            'virtualPlayerTurn',
+            'reconnect',
+        ]);
+        socketServiceSpy.socket = {} as Socket;
+        movementSocketServiceSpy = jasmine.createSpyObj('MovementSocketService', [
+            'movedPlayer',
+            'setUpConnection',
+            'getPlayerMovements',
+            'teleportPlayer',
+        ]);
+        movementSocketServiceSpy.socket = {} as Socket;
+        actionSocketServiceSpy = jasmine.createSpyObj('ActionSocketService', [
+            'setUpConnection',
+            'toggleDebugMode',
+            'startCombat',
+            'flightAttempt',
+            'attack',
+            'toggleDoor',
+        ]);
+        actionSocketServiceSpy.socket = {} as Socket;
         gameManagerServiceSpy.getSelectedPath.and.returnValue([cell1, cell2]);
         gameManagerServiceSpy.getPaths.and.returnValue([cell1, cell2]);
         gameManagerServiceSpy.getMoveInfo.and.returnValue(moveInfo);
@@ -81,6 +126,8 @@ describe('BoardComponent', () => {
                 { provide: ActionService, useValue: actionServiceSpy },
                 { provide: GameManagerService, useValue: gameManagerServiceSpy },
                 { provide: SocketService, useValue: socketServiceSpy },
+                { provide: MovementSocketService, useValue: movementSocketServiceSpy },
+                { provide: ActionSocketService, useValue: actionSocketServiceSpy },
             ],
         }).compileComponents();
 
@@ -127,7 +174,7 @@ describe('BoardComponent', () => {
             expect(dragDropServiceSpy.startDrag).toHaveBeenCalledWith(
                 jasmine.objectContaining({
                     name: 'Adrenaline',
-                    description: 'Ajoute 2 points de rapidité, enlève 1 point de défense',
+                    description: 'Ajoute 2 points de vie',
                     imagePath: './assets/items/drug.png',
                     type: 'adrenaline',
                 }),
@@ -165,11 +212,19 @@ describe('BoardComponent', () => {
             component.disableContextMenu(event);
             expect(spyPrevent).toHaveBeenCalled();
         });
+        it('should call socketService.movedPlayer when movePlayerFromPath is called and move info is available', () => {
+            // Use a spy to access the private method
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            spyOn<any>(component, 'movePlayerFromPath').and.callThrough();
 
-        it('movePlayerFromPath should call socketService.movedPlayer when move info is available', () => {
-            component.movePlayerFromPath();
+            // Setup the moveInfo to be returned
+            gameManagerServiceSpy.getMoveInfo.and.returnValue(moveInfo);
+
+            // Call the method through the component instance
+            component['movePlayerFromPath']();
+
             expect(gameManagerServiceSpy.getMoveInfo).toHaveBeenCalled();
-            expect(socketServiceSpy.movedPlayer).toHaveBeenCalledWith(moveInfo);
+            expect(movementSocketServiceSpy.movedPlayer).toHaveBeenCalledWith(moveInfo);
         });
     });
 
@@ -180,6 +235,7 @@ describe('BoardComponent', () => {
             actionServiceSpy.toggleSelection.calls.reset();
             actionServiceSpy.interact.calls.reset();
             socketServiceSpy.teleportPlayer.calls.reset();
+            movementSocketServiceSpy.teleportPlayer.calls.reset();
             fixture.detectChanges();
         });
 
@@ -208,10 +264,11 @@ describe('BoardComponent', () => {
             it('should handle right click with debugging true and teleport player if main player', () => {
                 event = new MouseEvent('mousedown', { button: 2 });
                 gameManagerServiceSpy.room.isDebugging = true;
+                Object.defineProperty(gameManagerServiceSpy, 'isPlayerTurn', { get: () => true });
                 gameManagerServiceSpy.currentPlayerId = gameManagerServiceSpy.getMainPlayer()?.id as string;
                 component.handleMouseDown(event, cell1);
                 expect(actionServiceSpy.selectSingleCell).toHaveBeenCalledWith(cell1);
-                expect(socketServiceSpy.teleportPlayer).toHaveBeenCalledWith(cell1.x, cell1.y);
+                expect(movementSocketServiceSpy.teleportPlayer).toHaveBeenCalledWith(cell1.x, cell1.y);
             });
 
             it('should handle right click with debugging false', () => {
@@ -220,24 +277,44 @@ describe('BoardComponent', () => {
                 component.handleMouseDown(event, cell);
                 expect(actionServiceSpy.toggleSelection).toHaveBeenCalled();
                 expect(actionServiceSpy.selectSingleCell).toHaveBeenCalledWith(cell);
-                expect(socketServiceSpy.teleportPlayer).not.toHaveBeenCalled();
+                expect(movementSocketServiceSpy.teleportPlayer).not.toHaveBeenCalled();
             });
 
-            it('should handle left click (button not 2) in play mode', () => {
+            it('should call interact when isActionActive is true', () => {
                 event = new MouseEvent('mousedown', { button: 0 });
-                actionServiceSpy.getIsSelectionActive.and.returnValue(true);
-                component.handleMouseDown(event, cell);
-                expect(gameManagerServiceSpy.getMoveInfo).toHaveBeenCalled();
-                expect(socketServiceSpy.movedPlayer).toHaveBeenCalledWith(moveInfo);
-                expect(actionServiceSpy.interact).toHaveBeenCalled();
-            });
-
-            it('should not call movePlayerFromPath when left click and selection is not active', () => {
-                event = new MouseEvent('mousedown', { button: 0 });
+                actionServiceSpy.getIsActionActive.and.returnValue(true);
                 actionServiceSpy.getIsSelectionActive.and.returnValue(false);
-                const movePathSpy = spyOn(component, 'movePlayerFromPath');
+
                 component.handleMouseDown(event, cell);
+
+                expect(actionServiceSpy.interact).toHaveBeenCalled();
+                expect(actionServiceSpy.selectSingleCell).toHaveBeenCalledWith(cell);
+            });
+
+            it('should call movePlayerFromPath when isActionActive is false and isSelectionActive is true', () => {
+                event = new MouseEvent('mousedown', { button: 0 });
+                actionServiceSpy.getIsActionActive.and.returnValue(false);
+                actionServiceSpy.getIsSelectionActive.and.returnValue(true);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const movePathSpy = spyOn<any>(component, 'movePlayerFromPath');
+
+                component.handleMouseDown(event, cell);
+
+                expect(movePathSpy).toHaveBeenCalled();
+                expect(actionServiceSpy.interact).not.toHaveBeenCalled();
+            });
+
+            it('should do nothing when isActionActive is false and isSelectionActive is false', () => {
+                event = new MouseEvent('mousedown', { button: 0 });
+                actionServiceSpy.getIsActionActive.and.returnValue(false);
+                actionServiceSpy.getIsSelectionActive.and.returnValue(false);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const movePathSpy = spyOn<any>(component, 'movePlayerFromPath');
+
+                component.handleMouseDown(event, cell);
+
                 expect(movePathSpy).not.toHaveBeenCalled();
+                expect(actionServiceSpy.interact).not.toHaveBeenCalled();
             });
         });
 
@@ -248,19 +325,76 @@ describe('BoardComponent', () => {
             expect(gameManagerServiceSpy.setPathFromCoord).toHaveBeenCalledWith({ x: cell.x, y: cell.y });
         });
 
+        describe('handleMouseMove selection behavior', () => {
+            let cell: Cell;
+
+            beforeEach(() => {
+                cell = new Cell(new Tile('snow'), 7, 7);
+            });
+
+            it('should not set selection active when cell is not available', () => {
+                gameManagerServiceSpy.getPaths.and.returnValue([]);
+                actionServiceSpy.getIsActionActive.and.returnValue(false);
+
+                component.handleMouseMove(cell);
+
+                expect(actionServiceSpy.setSelectionActive).not.toHaveBeenCalled();
+            });
+
+            it('should not set selection active when action is active', () => {
+                gameManagerServiceSpy.getPaths.and.returnValue([cell]);
+                actionServiceSpy.getIsActionActive.and.returnValue(true);
+
+                component.handleMouseMove(cell);
+
+                expect(actionServiceSpy.setSelectionActive).not.toHaveBeenCalled();
+            });
+        });
+
         it('should call movePlayerFromPath when left click and selection is active', () => {
             component.mode = 'play';
             fixture.detectChanges();
 
-            const movePathSpy = spyOn(component, 'movePlayerFromPath');
-
-            const event = new MouseEvent('mousedown', { button: 0 });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const movePathSpy = spyOn<any>(component, 'movePlayerFromPath');
+            actionServiceSpy.getIsActionActive.and.returnValue(false);
             actionServiceSpy.getIsSelectionActive.and.returnValue(true);
 
+            const event = new MouseEvent('mousedown', { button: 0 });
             component.handleMouseDown(event, cell1);
 
-            expect(actionServiceSpy.interact).toHaveBeenCalled();
             expect(movePathSpy).toHaveBeenCalled();
+            expect(actionServiceSpy.interact).not.toHaveBeenCalled();
+        });
+
+        it('should teleport player when debugging is enabled and it is player turn', () => {
+            const cell = new Cell(new Tile('snow'), 5, 5);
+            gameManagerServiceSpy.room.isDebugging = true;
+            Object.defineProperty(gameManagerServiceSpy, 'isPlayerTurn', { get: () => true });
+
+            component.handleMouseDown(new MouseEvent('mousedown', { button: 2 }), cell);
+
+            expect(movementSocketServiceSpy.teleportPlayer).toHaveBeenCalledWith(cell.x, cell.y);
+        });
+
+        it('should not teleport player when debugging is disabled', () => {
+            const cell = new Cell(new Tile('snow'), 5, 5);
+            gameManagerServiceSpy.room.isDebugging = false;
+            Object.defineProperty(gameManagerServiceSpy, 'isPlayerTurn', { get: () => true });
+
+            component.handleMouseDown(new MouseEvent('mousedown', { button: 2 }), cell);
+
+            expect(movementSocketServiceSpy.teleportPlayer).not.toHaveBeenCalled();
+        });
+
+        it('should not teleport player when it is not player turn', () => {
+            const cell = new Cell(new Tile('snow'), 5, 5);
+            gameManagerServiceSpy.room.isDebugging = true;
+            Object.defineProperty(gameManagerServiceSpy, 'isPlayerTurn', { get: () => false });
+
+            component.handleMouseDown(new MouseEvent('mousedown', { button: 2 }), cell);
+
+            expect(movementSocketServiceSpy.teleportPlayer).not.toHaveBeenCalled();
         });
     });
 
@@ -275,9 +409,10 @@ describe('BoardComponent', () => {
             expect(gameManagerServiceSpy.getPaths).toHaveBeenCalled();
         });
 
-        it('should return isDebugMode from gameManagerService', () => {
-            Object.defineProperty(gameManagerServiceSpy, 'isDebugMode', { get: () => true });
-            expect(component.isDebugMode).toBe(true);
+        it('should return isSelectionActive from actionService', () => {
+            actionServiceSpy.getIsSelectionActive.and.returnValue(true);
+            expect(component.isSelectionActive).toBe(true);
+            expect(actionServiceSpy.getIsSelectionActive).toHaveBeenCalled();
         });
     });
 });

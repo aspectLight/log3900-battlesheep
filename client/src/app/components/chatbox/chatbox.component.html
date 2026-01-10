@@ -1,29 +1,81 @@
-<div class="chatbox">
-    <!-- En-tête -->
-    <div class="chatbox-header">
+<div class="chatbox" [class.collapsed]="isCollapsed">
+  <div class="chatbox-header">
+    @if(showMessages) {
       <h3>Chat</h3>
-      <button class="close-btn">&times;</button>
-    </div>
-  
-    <!-- Conteneur des messages -->
-    <div class="chatbox-messages">
-      @for (msg of messages; track msg) {
-        <div class="message" [ngClass]="msg.type">
-          <div class="message-content">{{ msg.content }}</div>
-          <div class="message-time">{{ msg.time }}</div>
-        </div>
+    } @else {
+      <h3>Journal</h3>
+    }
+    <div class="header-buttons">
+      @if(showMessages) {
+        <button class="change-btn" (click)="showMessages = false">&imof;</button>
+      } @else {
+        <button class="change-btn" (click)="showMessages = true">&origof;</button>
       }
-
-    </div>
-  
-    <!-- Zone de saisie -->
-    <div class="chatbox-input">
-      <input 
-        type="text" 
-        placeholder="Écrire un message..." 
-        [(ngModel)]="newMessage"
-        (keydown.enter)="sendMessage()"
-      />
-      <button (click)="sendMessage()">Envoyer</button>
+      <div class="toggle-button" (click)="toggleChatbox()">
+        @if (isCollapsed) {
+          <span>▼</span>
+        } @else {
+          <span>▲</span>
+        }
+      </div>
     </div>
   </div>
+
+  <div class="chatbox-content" [class.hidden]="isCollapsed">
+    @if(showMessages) {
+      <div class="chatbox-messages" #chatboxMessages>
+        @for (msg of messages; track msg.time) {
+          <div class="message">
+            <div class="message-content">{{msg.time}} - {{msg.name}}: {{ msg.content }}</div>
+          </div>
+        }
+      </div>
+    
+      <div class="chatbox-input">
+        <input 
+          type="text" 
+          maxlength="200" 
+          placeholder="Écrire un message..." 
+          [(ngModel)]="newMessage"
+          (keydown.enter)="sendMessage()"
+        />
+        <button (click)="sendMessage()" class="square-button">Envoyer</button>
+      </div>
+    } @else {
+      @if (!journal || journal.length === 0) {
+        <div class="chatbox-messages">
+          <div class="journalEntry">
+            Le journal est vide pour le moment
+          </div>
+        </div>
+      } @else {
+        <div class="chatbox-messages" #chatboxMessages>
+          @for (journalEntry of journal; track journalEntry) {
+            <div class="message" [ngClass]="journalEntry.type">
+              <div class="message-content">
+                {{ journalEntry.time }} [{{journalEntry.type}}] {{ journalEntry.content }}
+              </div>
+            </div>
+          }
+        </div>
+      }
+    
+      <div class="filter">
+        <button
+          (click)="filterByName()"
+          class="filter-btn"
+          [ngClass]="{ 'active': withFilter }"
+        >
+          Filtrer
+        </button>
+        <button
+          (click)="resetFilter()"
+          class="filter-btn"
+          [ngClass]="{ 'active': !withFilter }"
+        >
+          Aucun
+        </button>
+      </div>
+    }
+  </div>
+</div>

@@ -61,4 +61,24 @@ describe('PlayerCardComponent', () => {
         component.onKickClick();
         expect(component.banEvent.emit).toHaveBeenCalledWith(component.player);
     });
+
+    it('should set isVirtualPlayer to true when player is virtual', () => {
+        const mockPlayer: Player = new Player('Player1', 'georgie', BonusType.Health, BonusType.Attack);
+        mockPlayer.isVirtual = true;
+        component.player = mockPlayer;
+
+        component.ngOnInit();
+
+        expect(component.isVirtualPlayer).toBeTrue();
+    });
+
+    it('should not set isVirtualPlayer when player is not virtual', () => {
+        const mockPlayer: Player = new Player('Player1', 'georgie', BonusType.Health, BonusType.Attack);
+        mockPlayer.isVirtual = false;
+        component.player = mockPlayer;
+
+        component.ngOnInit();
+
+        expect(component.isVirtualPlayer).toBeFalse();
+    });
 });

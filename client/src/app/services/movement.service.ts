@@ -3,54 +3,51 @@ import { Board } from '@app/classes/board';
 import { Cell } from '@app/classes/cell';
 import { Player } from '@app/classes/player';
 import { Coords } from '@app/interfaces/coords';
-
-const DELAY = 150;
+import { DELAY } from '@app/constants/player.constants';
 
 @Injectable({
     providedIn: 'root',
 })
 export class MovementService {
     selectedPlayer: Player;
+    private movingPlayer: Player | null = null;
+    private isExecutingPath = false;
 
     selectPlayer(player: Player) {
         this.selectedPlayer = player;
     }
 
-    movePlayer(board: Board, dx: number, dy: number): boolean {
-        if (!this.selectedPlayer) return false;
+    movePlayer(board: Board, dx: number, dy: number): { success: boolean; cell?: Cell } {
+        const player = this.isExecutingPath ? this.movingPlayer : this.selectedPlayer;
+        if (!player) return { success: false };
 
-        if (!this.selectedPlayer.isAlive()) {
-            this.selectedPlayer.setState('dead');
-            return false;
+        if (!player.cell) {
+            return { success: false };
         }
 
-        if (!this.selectedPlayer.cell) {
-            return false;
-        }
-
-        const oldCell = this.selectedPlayer.cell;
+        const oldCell = player.cell;
         const newX = oldCell.x + dx;
         const newY = oldCell.y + dy;
 
-        this.updatePlayerOrientation(this.selectedPlayer, dx, dy);
+        this.updatePlayerOrientation(player, dx, dy);
 
         const targetCell = board.getCell(newX, newY);
         if (!targetCell) {
-            return false;
+            return { success: false };
         }
 
         if (targetCell.player) {
-            return false;
+            return { success: false };
         }
 
-        if (targetCell.tile.type === 'wall') return false;
+        if (targetCell.tile.type === 'wall') return { success: false };
 
         oldCell.removeEntity();
-        targetCell.addEntity(this.selectedPlayer);
-        this.selectedPlayer.addCell(targetCell);
+        targetCell.addEntity(player);
+        player.addCell(targetCell);
 
-        this.selectedPlayer.setState('moving');
-        return true;
+        player.setState('moving');
+        return { success: true, cell: targetCell };
     }
 
     teleportPlayer(board: Board, destinationX: number, destinationY: number): boolean {
@@ -67,6 +64,7 @@ export class MovementService {
             targetCell.addEntity(player);
             player.addCell(targetCell);
         }
+        player.setState('idle');
         return true;
     }
 
@@ -74,35 +72,73 @@ export class MovementService {
         player.setState('idle');
     }
 
-    async movePlayerFromPath(board: Board, paths: Coords[]): Promise<boolean> {
-        if (!this.selectedPlayer || !this.selectedPlayer.cell) {
-            return false;
-        }
-        for (let i = 1; i < paths.length; i++) {
-            const currentPos = {
-                x: this.selectedPlayer.cell.x,
-                y: this.selectedPlayer.cell.y,
-            };
-            const nextPos = paths[i];
-
-            const dx = nextPos.x - currentPos.x;
-            const dy = nextPos.y - currentPos.y;
-
-            this.selectedPlayer.setState('moving');
-
-            const moved = this.movePlayer(board, dx, dy);
-
-            if (moved) {
-                await this.delay(DELAY);
-            } else {
-                return false;
-            }
-        }
-        this.selectedPlayer.setState('idle');
-        return true;
+    isMoving(): boolean {
+        return this.isExecutingPath || this.selectedPlayer?.animationState === 'moving';
     }
 
-    private isCellFree(cell: Cell) {
+    async movePlayerFromPath(board: Board, paths: Coords[]): Promise<{ success: boolean; cell?: Cell }> {
+        if (!this.selectedPlayer || !this.selectedPlayer.cell || paths.length <= 1) {
+            return { success: false };
+        }
+
+        this.movingPlayer = this.selectedPlayer;
+        this.isExecutingPath = true;
+
+        try {
+            let lastCell: Cell | undefined;
+            for (let i = 1; i < paths.length; i++) {
+                if (!this.movingPlayer || !this.movingPlayer.cell) {
+                    this.isExecutingPath = false;
+                    this.movingPlayer = null;
+                    return { success: false };
+                }
+
+                const currentPos = {
+                    x: this.movingPlayer.cell.x,
+                    y: this.movingPlayer.cell.y,
+                };
+                const nextPos = paths[i];
+
+                const dx = nextPos.x - currentPos.x;
+                const dy = nextPos.y - currentPos.y;
+
+                this.movingPlayer.setState('moving');
+
+                const moveResult = this.movePlayer(board, dx, dy);
+
+                if (!moveResult.success) {
+                    this.isExecutingPath = false;
+                    this.movingPlayer = null;
+                    return { success: false };
+                }
+
+                if (moveResult.cell) {
+                    lastCell = moveResult.cell;
+                }
+
+                await new Promise((resolve) => {
+                    const timer = setTimeout(() => {
+                        clearTimeout(timer);
+                        resolve(null);
+                    }, DELAY);
+                });
+            }
+
+            if (this.movingPlayer) {
+                this.movingPlayer.setState('idle');
+            }
+
+            this.isExecutingPath = false;
+            this.movingPlayer = null;
+            return { success: true, cell: lastCell };
+        } catch (error) {
+            this.isExecutingPath = false;
+            this.movingPlayer = null;
+            return { success: false };
+        }
+    }
+
+    isCellFree(cell: Cell) {
         if (
             cell.player ||
             ['wall', 'tree', 'stone', 'corner', 'intersection'].includes(cell.tile.type) ||
@@ -117,9 +153,5 @@ export class MovementService {
         else if (dx < 0) player.setOrientation('up');
         else if (dy > 0) player.setOrientation('right');
         else if (dy < 0) player.setOrientation('left');
-    }
-
-    private async delay(ms: number) {
-        return new Promise((resolve) => setTimeout(resolve, ms));
     }
 }

@@ -5,7 +5,8 @@ import { GameManagerService } from './game-manager.service';
 import { CombatService } from './combat.service';
 import { Player } from '@app/classes/player';
 import { SocketService } from './socket.service';
-
+import { MovementService } from './movement.service';
+import { ActionSocketService } from './socket/action-socket.service';
 @Injectable({
     providedIn: 'root',
 })
@@ -16,14 +17,19 @@ export class ActionService {
     isSelectionActive = new BehaviorSubject<boolean>(false);
     isSelectionActive$ = this.isSelectionActive.asObservable();
 
+    isActionActive = new BehaviorSubject<boolean>(false);
+    isActionActive$ = this.isActionActive.asObservable();
+
     constructor(
         private gameManager: GameManagerService,
         private combatService: CombatService,
         private socketService: SocketService,
+        private movementService: MovementService,
+        private actionSocketService: ActionSocketService,
     ) {}
 
     get player() {
-        return this.gameManager.movementService.selectedPlayer;
+        return this.gameManager.getMainPlayer();
     }
 
     get enemy(): Player | null {
@@ -46,13 +52,27 @@ export class ActionService {
         return this.isSelectionActive.value;
     }
 
+    getIsActionActive(): boolean {
+        return this.isActionActive.value;
+    }
+
     startCombat(cell: Cell) {
         if (!cell.player) return;
         this.enemy = cell.player;
-        this.setSelectionActive(false); // Deselect the cell
+        this.setSelectionActive(false);
         const startCombatInfo = this.combatService.startCombat(this.enemy);
         if (!startCombatInfo) return;
-        this.socketService.startCombat(startCombatInfo);
+        this.actionSocketService.startCombat(startCombatInfo);
+    }
+
+    switchModes() {
+        if (this.isSelectionActive.value) {
+            this.isSelectionActive.next(false);
+            this.isActionActive.next(true);
+        } else {
+            this.isSelectionActive.next(true);
+            this.isActionActive.next(false);
+        }
     }
 
     toggleSelection(): void {
@@ -62,14 +82,25 @@ export class ActionService {
         if (!newState) {
             this.selectedCell.next(null);
         }
+        this.isActionActive.next(false);
+    }
+
+    toggleAction(): void {
+        const newState = !this.isActionActive.value;
+        this.isActionActive.next(newState);
+        this.isSelectionActive.next(false);
     }
 
     setSelectionActive(value: boolean): void {
         this.isSelectionActive.next(value);
     }
 
+    setActionActive(value: boolean): void {
+        this.isActionActive.next(value);
+    }
+
     selectCell(cell: Cell): void {
-        if (this.isSelectionActive.value) {
+        if (this.isSelectionActive.value || this.isActionActive.value) {
             this.selectedCell.next(cell);
             this.canFight = this.canPlayerFight();
             this.canAct = this.canPlayerAct();
@@ -83,20 +114,22 @@ export class ActionService {
     }
 
     interact(): void {
-        if (!this.player) return;
+        if (!this.player || this.player.actionPoints <= 0 || !this.gameManager.isPlayerTurn) return;
 
         const cell = this.selectedCell.value;
+        if (!cell) return;
 
-        if (!cell || !this.isCellCloseToPlayer() || this.player.actionPoints <= 0) return;
+        const hasCamo = this.player.hasItem('camouflage');
+        const hasAirStrike = this.player.hasItem('airStrike');
 
-        if (cell.tile.type === 'door') {
-            if (cell.tile.state === 'closed' && !cell.player) {
-                this.toggleDoor(cell);
-            } else if (cell.tile.state === 'opened' && !cell.player) {
-                this.toggleDoor(cell);
-            }
+        if (!this.isCellCloseToPlayer()) {
+            this.handleRemoteAction(cell, hasAirStrike, hasCamo);
+            return;
         }
-        if (cell.player) {
+
+        this.handleDoorToggle(cell);
+
+        if (cell.player && (!this.gameManager.isCTF || this.player.team !== cell.player.team)) {
             this.startCombat(cell);
             this.removeActionPoints();
         }
@@ -106,10 +139,11 @@ export class ActionService {
         if (!this.player) return;
         if (this.gameManager.isDebugMode) return;
         this.player.actionPoints--;
+        this.switchModes();
     }
 
     toggleDoor(cell: Cell) {
-        this.socketService.toggleDoor(cell.x, cell.y);
+        this.actionSocketService.toggleDoor(cell.x, cell.y);
         this.removeActionPoints();
     }
 
@@ -139,39 +173,51 @@ export class ActionService {
     }
 
     canPlayerFight(): boolean {
-        // Check if player exists and has action points
         if (!this.player || this.player.actionPoints <= 0) {
             return false;
         }
 
-        // Check if there's a selected cell with an enemy player
         const cell = this.selectedCell.value;
         if (!cell || !cell.player || cell.player.id === this.player.id) {
             return false;
         }
 
-        // Check if the cell with enemy is adjacent to the player
         return this.isCellCloseToPlayer();
     }
 
     canPlayerAct(): boolean {
-        // Check if player exists and has action points
         if (!this.player || this.player.actionPoints <= 0) {
             return false;
         }
 
-        // Check if there's a selected cell
         const cell = this.selectedCell.value;
         if (!cell) {
             return false;
         }
 
-        // Check if cell is adjacent to player
         if (!this.isCellCloseToPlayer()) {
             return false;
         }
 
-        // Check if cell has a door or a player (something to interact with)
         return (cell.tile.type === 'door' && (cell.tile.state === 'closed' || cell.tile.state === 'opened') && !cell.player) || cell.player !== null;
+    }
+
+    private handleRemoteAction(cell: Cell, hasAirStrike: boolean, hasCamo: boolean): void {
+        if (cell.player && hasAirStrike) {
+            this.startCombat(cell);
+            this.removeActionPoints();
+        } else if (cell && hasCamo && this.movementService.isCellFree(cell)) {
+            const playerId = cell.player?.id || '';
+            this.socketService.teleportPlayer(cell.x, cell.y, playerId, hasCamo);
+            this.removeActionPoints();
+        }
+    }
+
+    private handleDoorToggle(cell: Cell): void {
+        if (cell.tile.type === 'door' && !cell.player && !cell.item) {
+            if (cell.tile.state === 'closed' || cell.tile.state === 'opened') {
+                this.toggleDoor(cell);
+            }
+        }
     }
 }

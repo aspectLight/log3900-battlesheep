@@ -1,6 +1,12 @@
-@if (isNotificationVisible) {
-<app-notification [message]="notificationMessage" [duration]="notificationDuration"></app-notification>
-} 
+<app-notification [message]="notificationMessage" [mode]="turnStartingMode"></app-notification>
+
+@if (isPopUpVisible) {
+    <app-pop-up 
+         [popUpMessage]="replaceMessage"
+         [items]="candidateItems"
+         (itemSelected)="onItemReplacement($event)">
+    </app-pop-up>
+}
 @if (isGameLoaded) {
 
 
@@ -13,7 +19,7 @@
     } -->
 
 @if (isGameFinished) {
-    <app-notification message="La partie est fini. Maximum de 3 victoires atteintes" [duration]=3000></app-notification>
+    <app-notification [message]="generateEndMessage()" [time]=5000 [mode]="finishMode"></app-notification>
 }
 
 @if(isCombatMode) {
@@ -21,8 +27,10 @@
 <div class="main-container">
     <div class="left-side">
         <app-game-settings></app-game-settings>
-        <div class="board combatMode">
-            <app-board [board]="board" mode="play"></app-board>
+        <div class="board-container">
+            <div class="board combatMode">
+                <app-board [board]="board" mode="play"></app-board>
+            </div>
         </div>
         <app-player-hud></app-player-hud>
     </div>
@@ -38,7 +46,7 @@
     <div class="right-side">
         <app-actions-hud></app-actions-hud>
         <p class="flightinfos">{{flightAttemptsLeft}} tentatives d'évasion restantes</p>
-        <app-chatbox></app-chatbox>
+        <app-chatbox roomType="GameRoom"></app-chatbox>
     </div>
 </div>
 
@@ -52,16 +60,18 @@
     <div class="middle">
         <!-- <app-timer></app-timer> -->
         <p class="gameCountdown">Tour en cours: {{gameCountdown}}</p>
-        <div class="board">
-            <app-board [board]="board" mode="play"></app-board>
+        <div class="board-container">
+            <div class="board">
+                <app-board [board]="board" mode="play"></app-board>
+            </div>
         </div>
     </div>
     <div class="right-side">
         <app-actions-hud></app-actions-hud>
         @if (isDebugging) {
-            <div>Game is in debug mode</div>
+            <div class="debug-info">Game is in debug mode</div>
         }
-        <app-chatbox></app-chatbox>
+        <app-chatbox roomType="GameRoom"></app-chatbox>
     </div>
 </div>
 } } @else {
@@ -72,5 +82,5 @@
             (confirm)="goBackToMenu()">
         </app-pop-up>
     }
-<p>loading</p>
+<app-loading-screen></app-loading-screen>
 }

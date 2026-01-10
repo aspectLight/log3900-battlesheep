@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { PopUpComponent } from '@app/components//pop-up/pop-up.component';
+import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { GameManagerService } from '@app/services/game-manager.service';
 import { SocketService } from '@app/services/socket.service';
-
+import { ROUTES } from '@app/constants/routes.constants';
 @Component({
     selector: 'app-game-settings',
     imports: [PopUpComponent],
@@ -26,9 +26,14 @@ export class GameSettingsComponent {
     get description(): string {
         const room = this.gameManagerService.room;
         const activePlayerName = room.players.find((p) => p.id === this.gameManagerService.currentPlayerId)?.name;
-        return `${this.gameManagerService.getGame().description}    Joueurs: ${room.players.length}    Actif: ${activePlayerName}    Taille: ${
-            this.gameManagerService.getBoard().size
-        }`;
+        const details = [
+            this.gameManagerService.getGame().description,
+            '',
+            `Joueurs: ${room.players.length}`,
+            `Joueur actif: ${activePlayerName}`,
+            `Taille du plateau: ${this.gameManagerService.getBoard().size}x${this.gameManagerService.getBoard().size}`,
+        ];
+        return details.join('\n');
     }
 
     get roomId() {
@@ -41,6 +46,6 @@ export class GameSettingsComponent {
 
     quitGame() {
         this.socketService.abandonGame(this.roomId);
-        this.router.navigate(['/home']);
+        this.router.navigate([ROUTES.home]);
     }
 }

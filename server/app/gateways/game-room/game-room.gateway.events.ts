@@ -37,6 +37,18 @@ export enum GameRoomEvents {
     DebugModeDisabled = 'debugModeDisabled',
     PlayerTeleported = 'playerTeleported',
 
+    SendMessageToGameRoom = 'sendMessageToGameRoom',
+    MassMessage = 'massMessage',
+    GetMessagesFromGameRoom = 'getMessagesFromGameRoom',
+    GetMessagesResponse = 'getMessagesResponse',
+
+    AddJournalEntry = 'addJournalEntry',
+    GetJournalEntriesFromGameRoom = 'getJournalEntriesFromGameRoom',
+    GetJournalEntriesResponse = 'getJournalEntriesResponse',
+    GetStatistics = 'getStatistics',
+    GetStatisticsResponse = 'getStatisticsResponse',
+    QuitEndGame = 'quitEndGame',
+
     GameRoomError = 'gameRoomError',
     UpdateScore = 'updateScore',
     DoorToggled = 'doorToggled',

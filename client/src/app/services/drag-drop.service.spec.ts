@@ -157,4 +157,23 @@ describe('DragDropService', () => {
 
         expect(targetCell.removeItem).toHaveBeenCalled();
     });
+
+    it('should reset state if dropped on a closed door', () => {
+        const mockItem = { type: 'Adrenaline' } as Item;
+        const doorCell = {
+            tile: {
+                type: 'door',
+                state: 'closed',
+                moveModifier: 1,
+            },
+        } as Cell;
+
+        service.startDrag(mockItem);
+        service.handleDrop(doorCell);
+
+        expect(service['isDragging']).toBeFalse();
+        expect(service['draggedItem']).toBeNull();
+        expect(itemServiceSpy.putBackItem).not.toHaveBeenCalled();
+        expect(itemServiceSpy.placeItem).not.toHaveBeenCalled();
+    });
 });

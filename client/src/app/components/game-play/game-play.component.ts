@@ -1,7 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Board } from '@app/classes/board';
-import { Game } from '@app/classes/game';
 import { ActionsHudComponent } from '@app/components/actions-hud/actions-hud.component';
 import { BoardComponent } from '@app/components/board/board.component';
 import { ChatboxComponent } from '@app/components/chatbox/chatbox.component';
@@ -13,7 +12,11 @@ import { CombatService } from '@app/services/combat.service';
 import { GameManagerService } from '@app/services/game-manager.service';
 import { SocketService } from '@app/services/socket.service';
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
-
+import { Item } from '@app/classes/item';
+import { LoadingScreenComponent } from '@app/components/loading-screen/loading-screen.component';
+import { ActionSocketService } from '@app/services/socket/action-socket.service';
+import { ROUTES } from '@app/constants/routes.constants';
+import { GAME_RESULT_MESSAGES, MODES, OUTCOME } from '@app/constants/game.constants';
 @Component({
     selector: 'app-game-play',
     imports: [
@@ -25,24 +28,28 @@ import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
         CombatComponent,
         NotificationComponent,
         PopUpComponent,
+        LoadingScreenComponent,
     ],
     templateUrl: './game-play.component.html',
     styleUrl: './game-play.component.scss',
 })
 export class GamePlayComponent implements OnInit {
-    game: Game;
     isGameLoaded: boolean = false;
+    turnCountdown: number;
     gameCountdown: number;
     combatCountdown: number;
     isTurnToFight: boolean;
     showError: boolean;
     debugMode: boolean = false;
+    finishMode: string = 'finishGame';
+    turnStartingMode: string = 'turnStarting';
 
     constructor(
         private gameManager: GameManagerService,
         private combatService: CombatService,
         public router: Router,
         private socketService: SocketService,
+        private actionSocketService: ActionSocketService,
     ) {}
 
     get board(): Board {
@@ -65,8 +72,20 @@ export class GamePlayComponent implements OnInit {
         return this.gameManager.notificationMessage;
     }
 
-    get notificationDuration(): number {
-        return this.gameManager.notificationDuration;
+    get isPopUpVisible(): boolean {
+        return this.gameManager.isReplacementPopupVisible;
+    }
+
+    get replaceMessage(): string {
+        return this.gameManager.replacementPopupMessage;
+    }
+
+    get candidateItems() {
+        return this.gameManager.pendingReplacement?.candidateItems as Item[];
+    }
+
+    get notificationTime(): number {
+        return this.gameManager.notificationTime;
     }
 
     get isGameCanceled(): boolean {
@@ -84,21 +103,14 @@ export class GamePlayComponent implements OnInit {
     @HostListener('window:keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
         if (event.key === 'd') {
-            this.socketService.toggleDebugMode();
+            this.actionSocketService.toggleDebugMode();
         }
     }
 
     ngOnInit(): void {
         if (this.gameManager.getIsGameLoaded() && this.gameManager.room.gameId) {
             this.isGameLoaded = true;
-        } else if (this.gameManager.room.gameId) {
-            this.gameManager.loadGame().subscribe({
-                next: () => {
-                    this.isGameLoaded = true;
-                    this.gameManager.addPlayersToBoard(this.gameManager.getPlayers());
-                },
-            });
-        } else {
+        } else if (!this.gameManager.room.gameId) {
             this.showError = true;
         }
 
@@ -113,6 +125,19 @@ export class GamePlayComponent implements OnInit {
     }
 
     goBackToMenu() {
-        this.router.navigate(['/home']);
+        this.router.navigate([ROUTES.home]);
+    }
+
+    onItemReplacement(selectedItem: Item): void {
+        const [toDrop, coords] = this.gameManager.processReplacement(selectedItem);
+        this.socketService.dropItem(toDrop, coords);
+    }
+
+    generateEndMessage(): string {
+        const outcome = this.gameManager.hasWon() ? OUTCOME.WIN : OUTCOME.LOSE;
+        const mode = this.gameManager.isCTF ? MODES.CTF : MODES.CLASSIQUE;
+        const winner = this.gameManager.getWinner();
+
+        return GAME_RESULT_MESSAGES[outcome][mode]({ winner });
     }
 }

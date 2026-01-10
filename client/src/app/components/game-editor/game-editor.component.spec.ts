@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Board } from '@app/classes/board';
-import { BOARD_SIZES } from '@app/constants/board.constants';
+import { BoardSizes, BOARD_CONFIGS } from '@app/constants/board.constants';
 import { GameService } from '@app/services/game.service';
 import { GameEditorComponent } from './game-editor.component';
 import { ToolboxComponent } from '@app/components/toolbox/toolbox.component';
@@ -48,14 +48,14 @@ describe('GameEditorComponent', () => {
     });
 
     it('should get board when modifying', () => {
-        gameServiceSpy.getBoard.and.returnValue(new Board(BOARD_SIZES['moyenne'].board));
+        gameServiceSpy.getBoard.and.returnValue(new Board(BOARD_CONFIGS[BoardSizes.Moyenne].board));
         gameServiceSpy.getName.and.returnValue('Test Game');
         component.ngOnInit();
         expect(gameServiceSpy.getBoard).toHaveBeenCalled();
     });
 
     it('should get game setting when not modifying', () => {
-        gameServiceSpy.getBoard.and.returnValue(new Board(BOARD_SIZES['moyenne'].board));
+        gameServiceSpy.getBoard.and.returnValue(new Board(BOARD_CONFIGS[BoardSizes.Moyenne].board));
         gameServiceSpy.getName.and.returnValue('Test Game');
         gameServiceSpy.isGameBeingModified = false;
         component.ngOnInit();
@@ -64,7 +64,7 @@ describe('GameEditorComponent', () => {
     });
 
     it('should undo modifications, get board and reset toolbox inputs when restart is triggered', () => {
-        gameServiceSpy.getBoard.and.returnValue(new Board(BOARD_SIZES['moyenne'].board));
+        gameServiceSpy.getBoard.and.returnValue(new Board(BOARD_CONFIGS[BoardSizes.Moyenne].board));
 
         component.onRestartConfirmed();
 

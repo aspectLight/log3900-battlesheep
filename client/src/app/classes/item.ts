@@ -1,4 +1,4 @@
-import { ErrorMessages } from '@app/constants/error-messages.constants';
+import { ErrorMessages } from '@common/error-messages.constants';
 import { Entity } from './entity';
 import { ITEM_TYPES } from '@app/constants/item.constants';
 

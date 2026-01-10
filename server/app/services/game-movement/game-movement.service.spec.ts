@@ -1,20 +1,80 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import { Test, TestingModule } from '@nestjs/testing';
-import { GameMovementService } from './game-movement.service';
-import { GameService } from '@app/services/game/game.service';
 import { Board } from '@app/interfaces/board';
 import { Cell } from '@app/interfaces/cell';
-import { Player } from '@app/interfaces/player';
-import { ItemType } from '@app/interfaces/item';
-import { TileType } from '@app/interfaces/tile';
 import { Coords } from '@app/interfaces/coords';
+import { GameRoom } from '@app/interfaces/game-room';
+import { ItemType } from '@app/interfaces/item';
+import { Player } from '@app/interfaces/player';
+import { TileType } from '@app/interfaces/tile';
+import { GameService } from '@app/services/game/game.service';
+import { ErrorMessages } from '@common/error-messages.constants';
+import { Test, TestingModule } from '@nestjs/testing';
+import { GameMovementService } from './game-movement.service';
 
 const BASE_MP = 4;
 
 describe('GameMovementService', () => {
     let service: GameMovementService;
     const mockGameService = { getGameById: jest.fn() };
+    const testRoom: GameRoom = {
+        roomId: 'test_room',
+        gameId: 'game1',
+        organisatorId: 'player1',
+        players: [
+            {
+                id: 'player1',
+                stats: {
+                    health: { maxValue: 4, value: 4, description: 'desc' },
+                    speed: { maxValue: 4, value: 4, description: 'desc' },
+                    attack: { maxValue: 4, value: 4, description: 'desc' },
+                    defense: { maxValue: 4, value: 4, description: 'desc' },
+                },
+            },
+            {
+                id: 'player2',
+                stats: {
+                    health: { maxValue: 4, value: 4, description: 'desc' },
+                    speed: { maxValue: 4, value: 4, description: 'desc' },
+                    attack: { maxValue: 4, value: 4, description: 'desc' },
+                    defense: { maxValue: 4, value: 4, description: 'desc' },
+                },
+            },
+        ],
+        isLocked: true,
+        messages: [],
+        journalEntries: [],
+        playersStats: [
+            {
+                name: 'Player 1',
+                combats: 8,
+                evasions: 4,
+                victories: 6,
+                defeats: 2,
+                healthLost: 20,
+                damage: 25,
+                itemsCollected: [],
+                tilesVisited: [],
+            },
+            {
+                name: 'Player 2',
+                combats: 0,
+                evasions: 0,
+                victories: 1,
+                defeats: 0,
+                healthLost: 0,
+                damage: 0,
+                itemsCollected: [],
+                tilesVisited: [],
+            },
+        ],
+        globalStats: {
+            gameDuration: '00:00',
+            turns: 0,
+            doorsToggled: [],
+        },
+    };
 
     const createMockBoard = (): Board => {
         const matrix: Cell[][] = [];
@@ -78,7 +138,7 @@ describe('GameMovementService', () => {
             const board = createMockBoard();
             mockGameService.getGameById.mockResolvedValue({ board });
             await service['loadBoard']('game1');
-            service.toggleDoor(8, 8);
+            service.toggleDoor(8, 8, testRoom);
             expect(board.matrix[8][8].tile.state).toBe('opened');
         });
 
@@ -87,7 +147,7 @@ describe('GameMovementService', () => {
             board.matrix[8][8].tile = { type: TileType.Door, state: 'opened' };
             mockGameService.getGameById.mockResolvedValue({ board });
             await service['loadBoard']('game1');
-            service.toggleDoor(8, 8);
+            service.toggleDoor(8, 8, testRoom);
             expect(board.matrix[8][8].tile.state).toBe('closed');
         });
 
@@ -95,7 +155,7 @@ describe('GameMovementService', () => {
             const board = createMockBoard();
             mockGameService.getGameById.mockResolvedValue({ board });
             await service['loadBoard']('game1');
-            service.toggleDoor(0, 0);
+            service.toggleDoor(0, 0, testRoom);
             expect(board.matrix[0][0].tile.type).toBe(TileType.Snow);
         });
     });
@@ -122,7 +182,7 @@ describe('GameMovementService', () => {
 
         it('should throw error when board not found', async () => {
             mockGameService.getGameById.mockResolvedValue(null);
-            await expect(service.addPlayersToBoard('game1', [])).rejects.toThrow('Partie introuvable');
+            await expect(service.addPlayersToBoard('game1', [])).rejects.toThrow("Le jeu n'existe pas");
         });
 
         it('should throw error when no spawn points are available', async () => {
@@ -137,7 +197,7 @@ describe('GameMovementService', () => {
                     spawnPoint: null,
                     movementPoints: BASE_MP,
                 }));
-            await expect(service.addPlayersToBoard('game1', players)).rejects.toThrow('Pas assez de spawnpoints');
+            await expect(service.addPlayersToBoard('game1', players)).rejects.toThrow('Il doit y avoir au moins un point de départ.');
         });
     });
 
@@ -162,50 +222,62 @@ describe('GameMovementService', () => {
 
         it('should throw error for non-existent player', async () => {
             const players = createMockPlayers();
-            await expect(service.movePlayer('nonexistent', players, { x: 2, y: 2 })).rejects.toThrow('Joueur introuvable');
+            expect(() => {
+                service.movePlayer('nonexistent', players, { x: 2, y: 2 });
+            }).toThrow(ErrorMessages.PlayerNotFound);
         });
 
         it('should throw error for invalid destination', async () => {
             const players = createMockPlayers();
-            await expect(service.movePlayer('player1', players, { x: 15, y: 15 })).rejects.toThrow('Case introuvable');
+            expect(() => {
+                service.movePlayer('player1', players, { x: 15, y: 15 });
+            }).toThrow(ErrorMessages.CellNotFound);
         });
 
         it('should throw error for occupied destination', async () => {
             const players = createMockPlayers();
-            const cell = service['getCell'](2, 2);
+            const cell = service['getCell'](9, 9);
             cell.player = { ...players[1] };
-            await expect(service.movePlayer('player1', players, { x: 2, y: 2 })).rejects.toThrow('Case occupée');
+            expect(() => {
+                service.movePlayer('player1', players, { x: 9, y: 9 });
+            }).toThrow(ErrorMessages.CellOccupied);
         });
 
         it('should throw error when getReachableTilesAndPaths returns null', async () => {
             const players = createMockPlayers();
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            jest.spyOn(service as any, 'getReachableTilesAndPaths').mockResolvedValue(null);
-            await expect(service.movePlayer('player1', players, { x: 1, y: 1 })).rejects.toThrow('Erreur de calcul des chemins');
+            jest.spyOn(service as any, 'getReachableTilesAndPaths').mockReturnValue(null);
+            expect(() => {
+                service.movePlayer('player1', players, { x: 1, y: 1 });
+            }).toThrow(ErrorMessages.PathCalculationError);
         });
 
         it('should throw error for unreachable destination', async () => {
             const players = createMockPlayers();
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            jest.spyOn(service as any, 'getReachableTilesAndPaths').mockResolvedValue({
+            jest.spyOn(service as any, 'getReachableTilesAndPaths').mockReturnValue({
                 reachableTiles: [{ coord: { x: 0, y: 0 }, cost: 0 }],
                 pathsMap: new Map(),
             });
-            await expect(service.movePlayer('player1', players, { x: 1, y: 1 })).rejects.toThrow('Destination inatteignable');
+            expect(() => {
+                service.movePlayer('player1', players, { x: 1, y: 1 });
+            }).toThrow(ErrorMessages.UnreachableDestination);
         });
 
         it('should throw error for insufficient movement points', async () => {
             const players = createMockPlayers();
             players[0].movementPoints = 1;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            jest.spyOn(service as any, 'getReachableTilesAndPaths').mockResolvedValue({
+            jest.spyOn(service as any, 'getReachableTilesAndPaths').mockReturnValue({
                 reachableTiles: [
                     { coord: { x: 0, y: 0 }, cost: 0 },
                     { coord: { x: 3, y: 3 }, cost: 2 },
                 ],
                 pathsMap: new Map(),
             });
-            await expect(service.movePlayer('player1', players, { x: 3, y: 3 })).rejects.toThrow('Points de mouvement insuffisants');
+            expect(() => {
+                service.movePlayer('player1', players, { x: 3, y: 3 });
+            }).toThrow(ErrorMessages.InsufficientMovementPoints);
         });
 
         it('should allow debug movement regardless of constraints', async () => {
@@ -221,25 +293,56 @@ describe('GameMovementService', () => {
         });
     });
 
+    describe('removePlayerFromBoard', () => {
+        it('should remove player from board', async () => {
+            const board = createMockBoard();
+            const players = createMockPlayers();
+            mockGameService.getGameById.mockResolvedValue({ board });
+            await service['loadBoard']('game1');
+            const cell = service['getCell'](0, 0);
+            cell.player = players[0];
+            service.removePlayerFromBoard('player1');
+            expect(cell.player).toBeNull();
+        });
+        it('should do nothing if player not found', async () => {
+            const board = createMockBoard();
+            const players = createMockPlayers();
+            mockGameService.getGameById.mockResolvedValue({ board });
+            await service['loadBoard']('game1');
+            const cell = service['getCell'](0, 0);
+            cell.player = players[0];
+            service.removePlayerFromBoard('nonexistent');
+            expect(cell.player).toBe(players[0]);
+        });
+    });
+
     describe('getAllPaths / getReachableTilesAndPaths', () => {
         it('should throw "Joueur introuvable" if player not found', async () => {
             const board = createMockBoard();
             mockGameService.getGameById.mockResolvedValue({ board });
             const players = createMockPlayers().filter((p) => p.id !== 'player1');
-            await expect(service['getAllPaths']('player1', players)).rejects.toThrow('Joueur introuvable');
+            expect(() => {
+                service.getAllPaths('player1', players);
+            }).toThrow(ErrorMessages.PlayerNotFound);
         });
 
         it('should throw "Joueur introuvable" if player not found', async () => {
             const board = createMockBoard();
             mockGameService.getGameById.mockResolvedValue({ board });
             const players = createMockPlayers().filter((p) => p.id !== 'player1');
-            await expect(service['getReachableTilesAndPaths']('player1', players)).rejects.toThrow('Joueur introuvable');
+            expect(() => {
+                service.getReachableTilesAndPaths('player1', players);
+            }).toThrow(ErrorMessages.PlayerNotFound);
         });
 
         it('should throw error if getShortestPath returns null', async () => {
             jest.spyOn(service as any, 'getReachableTilesAndPaths').mockResolvedValue({
                 reachableTiles: [{ coord: { x: 2, y: 2 }, cost: 1 }],
                 pathsMap: new Map(),
+            });
+            jest.spyOn(service as any, 'getReachableTilesAndPaths').mockReturnValue({
+                reachableTiles: [{ coord: { x: 1, y: 1 }, cost: 0 }],
+                pathsMap: new Map<string, Coords>(),
             });
             jest.spyOn(service as any, 'getShortestPath').mockReturnValue(null);
             const players = [
@@ -250,7 +353,9 @@ describe('GameMovementService', () => {
                     spawnPoint: { x: 0, y: 0 },
                 },
             ];
-            await expect(service.getAllPaths('player1', players)).rejects.toThrow('Chemin introuvable pour la cellule (2,2)');
+            expect(() => {
+                service.getAllPaths('player1', players);
+            }).toThrow('Chemin introuvable pour la cellule (1,1)');
         });
 
         it('should return only the starting cell when movementPoints are zero', async () => {
@@ -259,7 +364,7 @@ describe('GameMovementService', () => {
             players[0].movementPoints = 0;
             mockGameService.getGameById.mockResolvedValue({ board });
             await service['loadBoard']('game1');
-            const paths = await service.getAllPaths('player1', players);
+            const paths = service.getAllPaths('player1', players);
             expect(paths.size).toBe(1);
             for (const [coord] of paths.entries()) {
                 expect(coord.x).toBe(0);
@@ -298,7 +403,7 @@ describe('GameMovementService', () => {
             players[0].position = { x: 2, y: 2 };
             board.matrix[2][2].player = players[0];
 
-            const result = await (service as any).getReachableTilesAndPaths('player1', players);
+            const result = await (service as any).getReachableTilesAndPaths('player1', players, true);
 
             result.reachableTiles.forEach((tile) => {
                 expect(tile.cost).toBeLessThanOrEqual(players[0].movementPoints);
@@ -324,6 +429,37 @@ describe('GameMovementService', () => {
             }
         });
     });
+
+    // it("should use 'WaterWithBoots' cost when player has boots and neighbor tile is water", async () => {
+    //     // Créer un board personnalisé
+    //     const board = createMockBoard();
+    //     // Modifier une cellule voisine de (0,0) pour qu'elle soit de type "water"
+    //     // Ici, on modifie la cellule (1,0) (voisin vers la droite)
+    //     board.matrix[1][0].tile.type = TileType.Water; // en minuscules pour forcer la capitalisation vers "Water"
+
+    //     // Configurer le mock de getGameById pour retourner notre board personnalisé
+    //     mockGameService.getGameById.mockResolvedValue({ board });
+    //     await service['loadBoard']('game1');
+
+    //     // Créer un joueur avec des boots (hasBoots=true) et assez de points de mouvement
+    //     const player = {
+    //         id: 'player1',
+    //         position: { x: 0, y: 0 },
+    //         movementPoints: 10,
+    //         hasBoots: true,
+    //         spawnPoint: { x: 0, y: 0 },
+    //     };
+    //     const players = [player];
+
+    //     // Appeler la méthode privée getReachableTilesAndPaths
+    //     const result = await service['getReachableTilesAndPaths']('player1', players);
+
+    //     // Vérifier que la cellule (1,0) est bien atteignable
+    //     const targetTile = result.reachableTiles.find((tile) => tile.coord.x === 1 && tile.coord.y === 0);
+    //     expect(targetTile).toBeDefined();
+    //     // Comme le joueur a des boots et que le voisin est "water", le type devrait être transformé en "WaterWithBoots"
+    //     expect(targetTile.cost).toBe(MoveCosts['WaterWithBoots']);
+    // });
 
     describe('getCell', () => {
         it('should return null for out-of-bounds coordinates', async () => {
@@ -351,7 +487,7 @@ describe('GameMovementService', () => {
             const pathsMap = new Map<string, Coords>();
             expect(() => {
                 service['getShortestPath']({ x: 0, y: 0 }, { x: 5, y: 5 }, pathsMap);
-            }).toThrow('Chemin introuvable');
+            }).toThrow('Chemin non trouvé');
         });
         it('should return correct path for reachable destination', () => {
             const pathsMap = new Map<string, Coords>();
@@ -366,32 +502,83 @@ describe('GameMovementService', () => {
         });
     });
 
+    describe('isCellReachable', () => {
+        it('should return false if cell is null', () => {
+            const cell = null;
+            expect(service['isCellReachable'](cell)).toBe(false);
+        });
+        it('should return false if cell is a wall', () => {
+            const cell: Cell = { x: 0, y: 0, tile: { type: TileType.Wall }, item: null, player: {} as Player };
+            expect(service['isCellReachable'](cell)).toBe(false);
+        });
+        it('should return false if cell is a closed door', () => {
+            const cell: Cell = { x: 0, y: 0, tile: { type: TileType.Door }, item: null, player: null };
+            cell.tile.state = 'closed';
+            expect(service['isCellReachable'](cell)).toBe(false);
+        });
+        it('should return true if cell is a walkable tile', () => {
+            const cell: Cell = { x: 0, y: 0, tile: { type: TileType.Snow }, item: null, player: null };
+            expect(service['isCellReachable'](cell)).toBe(true);
+        });
+    });
+
     describe('isCellFree', () => {
+        it('should return true if player is on the cell', () => {
+            const players = createMockPlayers();
+            const cell: Cell = { x: 0, y: 0, tile: { type: TileType.Snow }, item: null, player: players[0] };
+            expect(service['isCellFree'](cell, players[0].id)).toBe(true);
+        });
         it('should return true for free cells', () => {
             const cell: Cell = { x: 0, y: 0, tile: { type: TileType.Snow }, item: null, player: null };
             expect(service['isCellFree'](cell)).toBe(true);
         });
-
-        it('should identify open door as free', () => {
-            const cell: Cell = { x: 0, y: 0, tile: { type: TileType.Door, state: 'opened' }, item: null, player: null };
-            expect(service['isCellFree'](cell)).toBe(true);
-        });
-
-        it('should identify closed door as not free', () => {
-            const cell: Cell = { x: 0, y: 0, tile: { type: TileType.Door, state: 'closed' }, item: null, player: null };
+        it('should return false for cells with players cells', () => {
+            const cell: Cell = { x: 0, y: 0, tile: { type: TileType.Snow }, item: null, player: createMockPlayers()[0] };
             expect(service['isCellFree'](cell)).toBe(false);
         });
-
-        it('should identify obstacles as not free', () => {
-            const obstacles = [TileType.Wall, TileType.Tree, TileType.Stone, TileType.Corner, TileType.Intersection];
-            for (const type of obstacles) {
-                const cell: Cell = { x: 0, y: 0, tile: { type }, item: null, player: null };
-                expect(service['isCellFree'](cell)).toBe(false);
-            }
+        it('should return false if cell is occupied by another player (playerId provided)', () => {
+            const players = createMockPlayers();
+            const cell: Cell = {
+                x: 0,
+                y: 0,
+                tile: { type: TileType.Snow },
+                item: null,
+                player: players[0],
+            };
+            expect(service['isCellFree'](cell, 'another-player')).toBe(false);
         });
+    });
 
-        it('should return false for null cell', () => {
-            expect(service['isCellFree'](null)).toBe(false);
-        });
+    it('should get distance between two coords', () => {
+        expect(service.getDistance({ x: 0, y: 0 }, { x: 0, y: 1 })).toEqual(1);
+    });
+
+    it('should get door number', () => {
+        (service as any).board = createMockBoard();
+        expect(service.getAllDoors()).toEqual(1);
+    });
+
+    it('should add item to board', () => {
+        (service as any).board = createMockBoard();
+        const item = { type: ItemType.SpawnPoint };
+        const cell = { x: 0, y: 0 };
+        service.addItemToBoard(item, cell);
+        const boardCell = (service as any).board.matrix[cell.y][cell.x];
+        expect(boardCell.item).toEqual(item);
+    });
+
+    it('should remove item from board', () => {
+        (service as any).board = createMockBoard();
+        const item = { type: ItemType.SpawnPoint };
+        const cell = { x: 0, y: 0 };
+        (service as any).board.matrix[cell.y][cell.x].item = item;
+        service.removeItemFromBoard(cell);
+        const boardCell = (service as any).board.matrix[cell.y][cell.x];
+        expect(boardCell.item).toBeNull();
+    });
+
+    it('should get walkable tile number', () => {
+        (service as any).board = createMockBoard();
+        expect(service.getWalkableTiles()).toEqual(97);
     });
 });

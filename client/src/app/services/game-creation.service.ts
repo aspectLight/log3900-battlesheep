@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Game } from '@app/classes/game';
-import { Player } from '@app/classes/player';
+import { MODES } from '@app/constants/game.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -8,12 +8,15 @@ import { Player } from '@app/classes/player';
 export class GameCreationService {
     selectedGame: Game;
     gameCode: string;
-    selectedPlayer: Player;
 
     private _isHost: boolean = false;
 
     get isHost(): boolean {
         return this._isHost;
+    }
+
+    get isCTF(): boolean {
+        return this.selectedGame?.mode === MODES.CTF;
     }
 
     set isHost(value: boolean) {

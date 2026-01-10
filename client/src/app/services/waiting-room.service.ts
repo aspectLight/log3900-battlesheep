@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Player } from '@app/classes/player';
 import { Room } from '@app/interfaces/room';
+import { ErrorMessages } from '@common/error-messages.constants';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -16,8 +17,16 @@ export class WaitingRoomService {
         isDebugging: false,
     });
 
+    isError: boolean = false;
+    errorMessage: string = '';
+
     get room$() {
         return this.currentRoom.asObservable();
+    }
+
+    getPlayerFromId(playerId: string): Player | undefined {
+        const room = this.currentRoom.getValue();
+        return room.players.find((player) => player.id === playerId);
     }
 
     updateRoom(room: Room) {
@@ -45,6 +54,11 @@ export class WaitingRoomService {
         const room = this.currentRoom.getValue();
         room.isLocked = isLocked;
         this.updateRoom(room);
+    }
+
+    maxPlayerLimitReached() {
+        this.isError = true;
+        this.errorMessage = ErrorMessages.MaxPlayerLimitReached;
     }
 
     startGame(newRoomId: string) {

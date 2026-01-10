@@ -3,7 +3,7 @@ import { Player } from '@app/classes/player';
 import { BonusType } from '@app/constants/bonus.constants';
 import { Subject } from 'rxjs';
 import { GameManagerService } from './game-manager.service';
-import { ANIMATION_DURATION, NOTIFICATION_DURATION } from '@app/constants/combat.constants';
+import { ANIMATION_DURATION, NOTIFICATION_DURATION, CombatState } from '@app/constants/combat.constants';
 import { CombatPayload, CombatRoom, AttackResult, AttackPayload, FlightResult } from '@app/interfaces/payload';
 
 @Injectable({
@@ -14,9 +14,10 @@ export class CombatService {
     combatStateChange: Subject<string> = new Subject<string>();
     isCombatMode: boolean = false;
     isCombatPlayerTurn: boolean = false;
+    isCombatInitiator: boolean = false;
     enemy: Player | null;
     flightAttemptsLeft: number = 2;
-    combatState: 'idle' | 'miss' | 'hit' | 'getHit' | 'getMissed' | 'lost' | 'won' = 'idle';
+    combatState: CombatState = CombatState.Idle;
     showResults: boolean = false;
     combatCountdown: Subject<number> = new Subject<number>();
     initialPlayerHealth: number;
@@ -28,6 +29,8 @@ export class CombatService {
 
     canFight: boolean = false;
     canAct: boolean = false;
+
+    wasFlightEnd: boolean = false;
 
     constructor(private gameManagerService: GameManagerService) {}
 
@@ -51,10 +54,8 @@ export class CombatService {
     setCombatRoom(combatRoom: CombatRoom) {
         this.combatRoom = combatRoom;
         let enemyId: string;
-
         if (this.isCombatPlayerTurn) enemyId = this.combatRoom.currentOpponentId;
         else enemyId = this.combatRoom.currentPlayerId;
-
         const enemy = this.gameManagerService.getPlayerById(enemyId);
         this.setEnemy(enemy);
         if (!this.enemy) return;
@@ -89,12 +90,6 @@ export class CombatService {
             if (result.isAttackSuccess) {
                 this.hit();
                 this.enemy.setStatValue(BonusType.Health, result.opponentHealthPoints);
-
-                // Check if enemy is defeated
-                if (result.opponentHealthPoints <= 0) {
-                    this.won();
-                    return;
-                }
             } else {
                 this.miss();
             }
@@ -102,11 +97,6 @@ export class CombatService {
             if (result.isAttackSuccess) {
                 this.getHit();
                 this.gameManagerService.setMainPlayerHealth(result.opponentHealthPoints);
-
-                // Check if player is defeated
-                if (result.opponentHealthPoints <= 0) {
-                    this.lost();
-                }
             } else {
                 this.getMissed();
             }
@@ -115,7 +105,18 @@ export class CombatService {
         this.showResults = true;
         setTimeout(() => {
             this.showResults = false;
-        }, NOTIFICATION_DURATION); // Give more time to see the results
+        }, NOTIFICATION_DURATION);
+        this.wasFlightEnd = false;
+    }
+
+    showFlightResult(result: FlightResult) {
+        if (this.isCombatPlayerTurn) {
+            if (result.isSuccess) {
+                this.flightSuccess();
+            } else {
+                this.flightFailure();
+            }
+        }
     }
 
     handleFlightResult(result: FlightResult) {
@@ -124,15 +125,17 @@ export class CombatService {
                 this.flightAttemptsLeft--;
             }
         }
+        this.wasFlightEnd = true;
     }
 
-    handleEnd(winnerId: string) {
+    handleEnd(winnerId: string, loserId: string) {
         if (this.gameManagerService.getMainPlayer()?.id === winnerId) this.won();
         else {
+            this.loserId = loserId;
             this.lost();
-            this.loserId = (this.gameManagerService.getMainPlayer() as Player).id;
         }
         this.flightAttemptsLeft = 2;
+        this.gameManagerService.combatLost(loserId);
     }
 
     resetStats() {
@@ -157,6 +160,8 @@ export class CombatService {
         if (!enemy || !this.isPlayerTurn) {
             return null;
         }
+
+        this.isCombatInitiator = true;
 
         return {
             roomId: this.roomId,
@@ -185,56 +190,84 @@ export class CombatService {
     }
 
     miss() {
-        this.combatState = 'miss';
-        this.combatStateChange.next('miss');
+        this.combatState = CombatState.Miss;
+        this.combatStateChange.next(CombatState.Miss);
         setTimeout(() => {
-            this.combatState = 'idle';
+            this.combatState = CombatState.Idle;
         }, ANIMATION_DURATION);
     }
 
     hit() {
-        this.combatState = 'hit';
-        this.combatStateChange.next('hit');
+        this.combatState = CombatState.Hit;
+        this.combatStateChange.next(CombatState.Hit);
         setTimeout(() => {
-            this.combatState = 'idle';
+            this.combatState = CombatState.Idle;
         }, ANIMATION_DURATION);
     }
 
     getHit() {
-        this.combatState = 'getHit';
-        this.combatStateChange.next('getHit');
+        this.combatState = CombatState.GetHit;
+        this.combatStateChange.next(CombatState.GetHit);
         setTimeout(() => {
-            this.combatState = 'idle';
+            this.combatState = CombatState.Idle;
         }, ANIMATION_DURATION);
     }
 
     getMissed() {
-        this.combatState = 'getMissed';
-        this.combatStateChange.next('getMissed');
+        this.combatState = CombatState.GetMissed;
+        this.combatStateChange.next(CombatState.GetMissed);
         setTimeout(() => {
-            this.combatState = 'idle';
+            this.combatState = CombatState.Idle;
+        }, ANIMATION_DURATION);
+    }
+
+    flightSuccess() {
+        this.combatState = CombatState.FlightSuccess;
+        this.combatStateChange.next(CombatState.FlightSuccess);
+        setTimeout(() => {
+            this.resetCombat();
+        }, NOTIFICATION_DURATION);
+    }
+    flightFailure() {
+        this.combatState = CombatState.FlightFailure;
+        this.combatStateChange.next(CombatState.FlightFailure);
+        setTimeout(() => {
+            this.combatState = CombatState.Idle;
         }, ANIMATION_DURATION);
     }
 
     lost() {
-        this.combatState = 'lost';
-        this.combatStateChange.next('lost');
+        this.combatState = CombatState.Lost;
+        this.combatStateChange.next(CombatState.Lost);
         setTimeout(() => {
             this.resetCombat();
         }, NOTIFICATION_DURATION);
     }
 
     won() {
-        this.combatState = 'won';
-        this.combatStateChange.next('won');
+        this.combatState = CombatState.Won;
+        this.combatStateChange.next(CombatState.Won);
         setTimeout(() => {
             this.resetCombat();
         }, NOTIFICATION_DURATION);
     }
 
     resetCombat() {
-        this.combatState = 'idle';
+        this.combatState = CombatState.Idle;
         this.isCombatMode = false;
         this.resetStats();
+        this.isCombatInitiator = false;
+    }
+
+    getVirtualPlayerAttack(playerAttacking: Player, playerDefending: Player, combatRoomId: string): AttackPayload {
+        const isDebugging = this.gameManagerService.room.isDebugging;
+        const defenseValue = isDebugging ? playerDefending.rollStatDebug(BonusType.Defense) : playerDefending.rollStat(BonusType.Defense);
+        const attackValue = isDebugging ? playerAttacking.rollStatDebug(BonusType.Attack) : playerAttacking.rollStat(BonusType.Attack);
+        const attackInfo: AttackPayload = {
+            roomId: combatRoomId,
+            attackValue,
+            defenseValue,
+        };
+        return attackInfo;
     }
 }

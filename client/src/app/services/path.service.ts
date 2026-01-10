@@ -49,10 +49,16 @@ export class PathService {
     }
 
     getSelectedPathAsCoords(): Coords[] {
-        return this.selectedPath.map((cell) => ({
-            x: cell.x,
-            y: cell.y,
-        }));
+        const path = this.selectedPath.map((cell) => ({ x: cell.x, y: cell.y }));
+
+        for (let i = 1; i < this.selectedPath.length; i++) {
+            const item = this.selectedPath[i].getItem();
+            if (item && item.type !== 'spawnPoint') {
+                return path.slice(0, i + 1);
+            }
+        }
+
+        return path;
     }
 
     getAllCellsFromPaths(board: Board): Cell[] {

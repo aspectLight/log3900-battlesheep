@@ -7,7 +7,7 @@ import { GameService } from '@app/services/game.service';
 import { HTTP_STATUS_CODES } from '@app/constants/http-status-code.constants';
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { ROUTES } from '@app/constants/routes.constants';
-import { ErrorMessages } from '@app/constants/error-messages.constants';
+import { ErrorMessages, WARNING_MESSAGES } from '@common/error-messages.constants';
 
 @Component({
     selector: 'app-save-game',
@@ -20,6 +20,8 @@ export class SaveGameComponent {
     errors: { message?: string }[] = [];
     showError: boolean;
     errorMessage: string;
+    showSecondButton: boolean = false;
+    onConfirm: () => void = this.closeDialogue;
 
     constructor(
         private router: Router,
@@ -28,30 +30,40 @@ export class SaveGameComponent {
     ) {}
 
     onSaveGame(): void {
-        const isBoardValid = this.validateBoard();
-        if (isBoardValid) {
-            this.gameService.setBoard(this.board);
-            if (this.gameService.isGameBeingModified) {
-                this.gameService.fetchGames().subscribe({
-                    next: (games) => {
-                        const gameExists = games.find((game) => game._id === this.gameService.getId());
-                        if (gameExists) this.saveModifications();
-                        else this.saveNewGame();
-                    },
-                });
-            } else this.saveNewGame();
-        }
+        if (!this.validateBoard()) return;
+        this.errorMessage = WARNING_MESSAGES.SaveConfirmation;
+        this.showError = true;
+        this.showSecondButton = true;
+        this.onConfirm = this.onConfirmSave;
+    }
+
+    onConfirmSave(): void {
+        this.closeDialogue();
+        this.gameService.setBoard(this.board);
+        if (this.gameService.isGameBeingModified) {
+            this.gameService.fetchGames().subscribe({
+                next: (games) => {
+                    const gameExists = games.find((game) => game._id === this.gameService.getId());
+                    if (gameExists) this.saveModifications();
+                    else this.saveNewGame();
+                },
+            });
+        } else this.saveNewGame();
     }
 
     closeDialogue(): void {
         this.errors = [];
         this.showError = false;
+        this.errorMessage = '';
+        this.showSecondButton = false;
+        this.onConfirm = this.closeDialogue;
     }
 
     private validateBoard(): boolean {
         const name = this.gameService.getName();
         const description = this.gameService.getDescription();
-        this.errors = this.gameValidationService.validateGame(name, description, this.board);
+        const isCTF = this.gameService.getMode() === 'ctf';
+        this.errors = this.gameValidationService.validateGame(name, description, this.board, isCTF);
         return this.errors.length === 0;
     }
 

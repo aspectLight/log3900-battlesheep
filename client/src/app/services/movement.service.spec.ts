@@ -32,25 +32,25 @@ describe('MovementService', () => {
     });
 
     it('should not move a player if no player is selected', () => {
-        expect(service.movePlayer(mockBoard, 1, 1)).toBe(false);
+        expect(service.movePlayer(mockBoard, 1, 1)).toEqual({ success: false });
     });
 
     it('should not move a player if the player is dead', () => {
         service.selectPlayer(mockPlayer);
         mockPlayer.setStatValue(BonusType.Health, 0);
-        expect(service.movePlayer(mockBoard, 1, 1)).toBe(false);
+        expect(service.movePlayer(mockBoard, 1, 1)).toEqual({ success: false });
     });
 
     it('should not move a player if the player has no cell', () => {
         mockPlayer.cell = null;
         service.selectPlayer(mockPlayer);
-        expect(service.movePlayer(mockBoard, 1, 1)).toBe(false);
+        expect(service.movePlayer(mockBoard, 1, 1)).toEqual({ success: false });
     });
 
     it('should not move a player if the target cell is out of bounds', () => {
         mockPlayer.cell = mockCell;
         service.selectPlayer(mockPlayer);
-        expect(service.movePlayer(mockBoard, 1, 11)).toBe(false);
+        expect(service.movePlayer(mockBoard, 1, 11)).toEqual({ success: false });
     });
 
     it('should not move a player if the target cell is occupied', () => {
@@ -59,7 +59,7 @@ describe('MovementService', () => {
         const targetCell = new Cell(new Tile('ice'), 2, 2);
         targetCell.player = new Player('anotherPlayer');
         mockBoard.matrix[2][2] = targetCell;
-        expect(service.movePlayer(mockBoard, 1, 1)).toBe(false);
+        expect(service.movePlayer(mockBoard, 1, 1)).toEqual({ success: false });
     });
 
     it('should not move a player on a cell with a wall', () => {
@@ -67,7 +67,7 @@ describe('MovementService', () => {
         service.selectPlayer(mockPlayer);
         const targetCell = new Cell(new Tile('wall'), 2, 2);
         mockBoard.matrix[2][2] = targetCell;
-        expect(service.movePlayer(mockBoard, 1, 1)).toBe(false);
+        expect(service.movePlayer(mockBoard, 1, 1)).toEqual({ success: false });
     });
 
     it('should move a player to the target cell', () => {
@@ -75,7 +75,7 @@ describe('MovementService', () => {
         service.selectPlayer(mockPlayer);
         const targetCell = new Cell(new Tile('ice'), 1, 2);
         mockBoard.matrix[1][2] = targetCell;
-        expect(service.movePlayer(mockBoard, 0, 1)).toBe(true);
+        expect(service.movePlayer(mockBoard, 0, 1)).toEqual({ success: true, cell: targetCell });
         expect(mockPlayer.cell).toBe(targetCell);
     });
 
@@ -127,7 +127,7 @@ describe('MovementService', () => {
         service.selectPlayer(mockPlayer);
 
         // Override movePlayer to simulate a failure (return false)
-        spyOn(service, 'movePlayer').and.returnValue(false);
+        spyOn(service, 'movePlayer').and.returnValue({ success: false });
 
         // Define a path: first element is the starting cell, second is the target coordinate
         const nextCoords = { x: 2, y: 2 };
@@ -136,7 +136,7 @@ describe('MovementService', () => {
         // Call movePlayerFromPath; it should return false because movePlayer fails
         const result = await service.movePlayerFromPath(mockBoard, paths);
 
-        expect(result).toBeFalse();
+        expect(result).toEqual({ success: false });
     });
 
     it('should return false if the cell has a player', () => {
@@ -199,5 +199,66 @@ describe('MovementService', () => {
         service.selectedPlayer = undefined as unknown as Player;
         const result = service.teleportPlayer(mockBoard, 1, 2);
         expect(result).toBeFalse();
+    });
+
+    describe('isMoving', () => {
+        it('should return true if the player is moving', () => {
+            service.selectPlayer(mockPlayer);
+            mockPlayer.setState('moving');
+            expect(service.isMoving()).toBeTrue();
+        });
+
+        it('should return true if a path execution is in progress', () => {
+            service['isExecutingPath'] = true;
+            expect(service.isMoving()).toBeTrue();
+        });
+
+        it('should return false if player is not moving and no path execution is in progress', () => {
+            service['isExecutingPath'] = false;
+            service.selectPlayer(mockPlayer);
+            mockPlayer.setState('idle');
+            expect(service.isMoving()).toBeFalse();
+        });
+
+        it('should return false if no player is selected', () => {
+            service['isExecutingPath'] = false;
+            service.selectedPlayer = undefined as unknown as Player;
+            expect(service.isMoving()).toBeFalse();
+        });
+    });
+
+    it('should return false if movingPlayer becomes null during path execution', async () => {
+        // Setup: assign the player with a starting cell at (1,1)
+        mockPlayer.cell = new Cell(new Tile('ice'), 1, 1);
+        service.selectPlayer(mockPlayer);
+
+        // Define a path with multiple steps
+        const paths = [mockPlayer.cell, { x: 2, y: 2 }, { x: 3, y: 3 }];
+
+        // Override movePlayer to make movingPlayer null after first move
+        spyOn(service, 'movePlayer').and.callFake(() => {
+            service['movingPlayer'] = null;
+            return { success: true };
+        });
+
+        const result = await service.movePlayerFromPath(mockBoard, paths);
+        expect(result).toEqual({ success: false });
+    });
+
+    it('should handle errors during path execution', async () => {
+        // Setup: assign the player with a starting cell at (1,1)
+        mockPlayer.cell = new Cell(new Tile('ice'), 1, 1);
+        service.selectPlayer(mockPlayer);
+
+        // Define a path with multiple steps
+        const paths = [mockPlayer.cell, { x: 2, y: 2 }, { x: 3, y: 3 }];
+
+        // Override movePlayer to throw an error
+        spyOn(service, 'movePlayer').and.throwError('Test error');
+
+        const result = await service.movePlayerFromPath(mockBoard, paths);
+        expect(result).toEqual({ success: false });
+        expect(service['isExecutingPath']).toBeFalse();
+        expect(service['movingPlayer']).toBeNull();
     });
 });
