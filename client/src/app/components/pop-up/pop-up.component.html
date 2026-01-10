@@ -2,15 +2,22 @@
     <div class="errors">
         <h2>{{ popUpMessage }}</h2>
         @if(description) {
-            <h3> {{description}}</h3>
+        <h3> {{description}}</h3>
         }
         <div class="buttons">
+            @if (items.length === 0) {
+            <button (click)="onConfirm()">{{firstOption}}</button>
+            }
             @if(showSecondButton) {
                 <button (click)="onCancel()">{{secondOption}}</button>
-            }
-            <button (click)="onConfirm()">{{firstOption}}</button>
-
+                }
         </div>
-
+        <div class="item-options">
+            @for (item of items; track item) {
+            <button (click)="onSelect(item)">
+                {{ item.name }}
+            </button>
+            }
+        </div>
     </div>
 </div>

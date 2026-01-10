@@ -7,7 +7,8 @@ import { GameManagerService } from '@app/services/game-manager.service';
 import { SocketService } from '@app/services/socket.service';
 import { of, Subject } from 'rxjs';
 import { GamePlayComponent } from './game-play.component';
-
+import { Item } from '@app/classes/item';
+import { ActionSocketService } from '@app/services/socket/action-socket.service';
 const countDownValue = 10;
 const notificationDuration = 5000;
 
@@ -18,6 +19,7 @@ describe('GamePlayComponent', () => {
     let mockCombatService: jasmine.SpyObj<CombatService>;
     let mockRouter: jasmine.SpyObj<Router>;
     let mockSocketService: jasmine.SpyObj<SocketService>;
+    let mockActionSocketService: jasmine.SpyObj<ActionSocketService>;
     let gameCountdownSubject: Subject<number>;
     let combatCountdownSubject: Subject<number>;
 
@@ -41,13 +43,13 @@ describe('GamePlayComponent', () => {
         // Create mock services
         mockGameManagerService = jasmine.createSpyObj(
             'GameManagerService',
-            ['getBoard', 'getIsGameLoaded', 'loadGame', 'addPlayersToBoard', 'getPlayers'],
+            ['getBoard', 'getIsGameLoaded', 'loadGame', 'addPlayersToBoard', 'getPlayers', 'hasWon', 'getWinner', 'processReplacement'],
             {
                 room: mockRoom,
                 gameCountdown: gameCountdownSubject,
                 isNotificationVisible: false,
                 notificationMessage: 'Test notification',
-                notificationDuration: 3000,
+                notificationTime: 3000,
                 isGameCanceled: false,
                 isGameFinished: false,
             },
@@ -56,6 +58,8 @@ describe('GamePlayComponent', () => {
         mockGameManagerService.getIsGameLoaded.and.returnValue(false);
         mockGameManagerService.loadGame.and.returnValue(of(mockGame));
         mockGameManagerService.getPlayers.and.returnValue([]);
+        mockGameManagerService.hasWon.and.returnValue(false);
+        mockGameManagerService.getWinner.and.returnValue('Player1');
 
         mockCombatService = jasmine.createSpyObj('CombatService', ['getCombatMode'], {
             combatCountdown: combatCountdownSubject,
@@ -65,7 +69,8 @@ describe('GamePlayComponent', () => {
         mockCombatService.getCombatMode.and.returnValue(false);
 
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-        mockSocketService = jasmine.createSpyObj('SocketService', ['toggleDebugMode']);
+        mockSocketService = jasmine.createSpyObj('SocketService', ['toggleDebugMode', 'dropItem']);
+        mockActionSocketService = jasmine.createSpyObj('ActionSocketService', ['toggleDebugMode']);
 
         await TestBed.configureTestingModule({
             imports: [GamePlayComponent],
@@ -74,6 +79,7 @@ describe('GamePlayComponent', () => {
                 { provide: CombatService, useValue: mockCombatService },
                 { provide: Router, useValue: mockRouter },
                 { provide: SocketService, useValue: mockSocketService },
+                { provide: ActionSocketService, useValue: mockActionSocketService },
             ],
         }).compileComponents();
 
@@ -94,17 +100,6 @@ describe('GamePlayComponent', () => {
 
             expect(component.isGameLoaded).toBeTrue();
             expect(mockGameManagerService.loadGame).not.toHaveBeenCalled();
-        });
-
-        it('should load game if not already loaded and gameId exists', () => {
-            mockGameManagerService.getIsGameLoaded.and.returnValue(false);
-            mockGameManagerService.room.gameId = 'test-game';
-
-            component.ngOnInit();
-
-            expect(mockGameManagerService.loadGame).toHaveBeenCalled();
-            expect(component.isGameLoaded).toBeTrue();
-            expect(mockGameManagerService.addPlayersToBoard).toHaveBeenCalled();
         });
 
         it('should set showError to true if gameId does not exist', () => {
@@ -136,6 +131,13 @@ describe('GamePlayComponent', () => {
 
             expect(component.combatCountdown).toBe(countDownValue);
             expect(component.isTurnToFight).toBe(mockCombatService.isCombatPlayerTurn);
+        });
+
+        it('should handle game countdown subscription', () => {
+            const testCount = 120;
+            component.ngOnInit();
+            gameCountdownSubject.next(testCount);
+            expect(component.gameCountdown).toBe(testCount);
         });
     });
 
@@ -172,11 +174,11 @@ describe('GamePlayComponent', () => {
             expect(component.notificationMessage).toBe('Test message');
         });
 
-        it('should get notificationDuration from gameManagerService', () => {
+        it('should get notificationTime from gameManagerService', () => {
             // Set the property before testing the getter
-            Object.defineProperty(mockGameManagerService, 'notificationDuration', { get: () => notificationDuration });
+            Object.defineProperty(mockGameManagerService, 'notificationTime', { get: () => notificationDuration });
 
-            expect(component.notificationDuration).toBe(notificationDuration);
+            expect(component.notificationTime).toBe(notificationDuration);
         });
 
         it('should get isGameCanceled from gameManagerService', () => {
@@ -199,6 +201,40 @@ describe('GamePlayComponent', () => {
 
             expect(component.isDebugging).toBeTrue();
         });
+
+        it('should get isPopUpVisible from gameManagerService', () => {
+            // Set the property before testing the getter
+            Object.defineProperty(mockGameManagerService, 'isReplacementPopupVisible', { get: () => true });
+
+            expect(component.isPopUpVisible).toBeTrue();
+        });
+
+        it('should get replaceMessage from gameManagerService', () => {
+            const testMessage = 'Test replacement message';
+            // Set the property before testing the getter
+            Object.defineProperty(mockGameManagerService, 'replacementPopupMessage', { get: () => testMessage });
+
+            expect(component.replaceMessage).toBe(testMessage);
+        });
+
+        it('should get candidateItems from gameManagerService pendingReplacement', () => {
+            const mockItems = [new Item('adrenaline'), new Item('vodka')];
+            // Set the property before testing the getter
+            Object.defineProperty(mockGameManagerService, 'pendingReplacement', {
+                get: () => ({ candidateItems: mockItems }),
+            });
+
+            expect(component.candidateItems).toEqual(mockItems);
+        });
+
+        it('should return undefined for candidateItems when pendingReplacement is null', () => {
+            // Set the property before testing the getter
+            Object.defineProperty(mockGameManagerService, 'pendingReplacement', {
+                get: () => null,
+            });
+
+            expect(component.candidateItems).toBeUndefined();
+        });
     });
 
     describe('onKeyDown', () => {
@@ -207,7 +243,7 @@ describe('GamePlayComponent', () => {
 
             component.onKeyDown(keyEvent);
 
-            expect(mockSocketService.toggleDebugMode).toHaveBeenCalled();
+            expect(mockActionSocketService.toggleDebugMode).toHaveBeenCalled();
         });
 
         it('should not toggle debug mode when other keys are pressed', () => {
@@ -215,7 +251,7 @@ describe('GamePlayComponent', () => {
 
             component.onKeyDown(keyEvent);
 
-            expect(mockSocketService.toggleDebugMode).not.toHaveBeenCalled();
+            expect(mockActionSocketService.toggleDebugMode).not.toHaveBeenCalled();
         });
     });
 
@@ -224,6 +260,69 @@ describe('GamePlayComponent', () => {
             component.goBackToMenu();
 
             expect(mockRouter.navigate).toHaveBeenCalledWith(['/home']);
+        });
+    });
+
+    describe('onItemReplacement', () => {
+        it('should process replacement and drop the item', () => {
+            // Create a mock item
+            const selectedItem = new Item('adrenaline');
+            const mockToDrop = new Item('vodka');
+            const mockCoords = { x: 5, y: 5 };
+
+            // Set up the mock to return the expected values
+            mockGameManagerService.processReplacement = jasmine.createSpy('processReplacement').and.returnValue([mockToDrop, mockCoords]);
+
+            // Call the method
+            component.onItemReplacement(selectedItem);
+
+            // Verify the service methods were called correctly
+            expect(mockGameManagerService.processReplacement).toHaveBeenCalledWith(selectedItem);
+            expect(mockSocketService.dropItem).toHaveBeenCalledWith(mockToDrop, mockCoords);
+        });
+    });
+
+    describe('generateEndMessage', () => {
+        beforeEach(() => {
+            // Reset spies before each test
+            mockGameManagerService.hasWon.calls.reset();
+            mockGameManagerService.getWinner.calls.reset();
+        });
+
+        it('should generate win message for CTF mode', () => {
+            mockGameManagerService.hasWon.and.returnValue(true);
+            Object.defineProperty(mockGameManagerService, 'isCTF', { get: () => true });
+            mockGameManagerService.getWinner.and.returnValue('USSR');
+
+            const message = component.generateEndMessage();
+            expect(message).toBe('Victoire! Ton équipe a capturé le drapeau !');
+        });
+
+        it('should generate win message for classic mode', () => {
+            mockGameManagerService.hasWon.and.returnValue(true);
+            Object.defineProperty(mockGameManagerService, 'isCTF', { get: () => false });
+            mockGameManagerService.getWinner.and.returnValue('Player1');
+
+            const message = component.generateEndMessage();
+            expect(message).toBe('Victoire! Tu as gagné trois combats');
+        });
+
+        it('should generate lose message for CTF mode', () => {
+            mockGameManagerService.hasWon.and.returnValue(false);
+            Object.defineProperty(mockGameManagerService, 'isCTF', { get: () => true });
+            mockGameManagerService.getWinner.and.returnValue('USA');
+
+            const message = component.generateEndMessage();
+            expect(message).toBe("Défaite! L'équipe USA a capturé le drapeau !");
+        });
+
+        it('should generate lose message for classic mode', () => {
+            mockGameManagerService.hasWon.and.returnValue(false);
+            Object.defineProperty(mockGameManagerService, 'isCTF', { get: () => false });
+            mockGameManagerService.getWinner.and.returnValue('Player2');
+
+            const message = component.generateEndMessage();
+            expect(message).toBe('Défaite! Player2 a gagné trois combats');
         });
     });
 });

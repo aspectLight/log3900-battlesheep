@@ -21,10 +21,4 @@ describe('Entity', () => {
         entity.addCell(cell);
         expect(entity.cell).toBe(cell);
     });
-
-    it('should remove a cell correctly', () => {
-        entity.addCell(cell);
-        entity.removeCell();
-        expect(entity.cell).toBeNull();
-    });
 });

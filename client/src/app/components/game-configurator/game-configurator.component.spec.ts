@@ -4,8 +4,8 @@ import { GameConfiguratorComponent } from './game-configurator.component';
 import { GameService } from '@app/services/game.service';
 import { CommonModule } from '@angular/common';
 import { provideHttpClient } from '@angular/common/http';
-import { BOARD_SIZES } from '@app/constants/board.constants';
-import { MODES } from '@app/constants/game.constants';
+import { BoardSizes, BOARD_CONFIGS } from '@app/constants/board.constants';
+import { MODES, MODE_DESCRIPTIONS } from '@app/constants/game.constants';
 import { ROUTES } from '@app/constants/routes.constants';
 
 describe('GameConfiguratorComponent', () => {
@@ -33,22 +33,22 @@ describe('GameConfiguratorComponent', () => {
     });
 
     it('should initialize with default mode and board size', () => {
-        expect(component.mode).toBe('classique');
-        expect(component.modeDescription).toBe(MODES['classique']);
-        expect(component.boardSize).toBe('moyenne');
-        expect(component.board).toBe(BOARD_SIZES['moyenne'].board);
+        expect(component.mode).toBe(MODES.CLASSIQUE);
+        expect(component.modeDescription).toBe(MODE_DESCRIPTIONS[MODES.CLASSIQUE]);
+        expect(component.boardSize).toBe(BoardSizes.Moyenne);
+        expect(component.board).toBe(BOARD_CONFIGS[BoardSizes.Moyenne].board);
     });
 
     it('should update mode when onModeChange is called', () => {
-        component.onModeChange('ctf');
-        expect(component.mode).toBe('ctf');
-        expect(component.modeDescription).toBe(MODES['ctf']);
+        component.onModeChange(MODES.CTF);
+        expect(component.mode).toBe(MODES.CTF);
+        expect(component.modeDescription).toBe(MODE_DESCRIPTIONS[MODES.CTF]);
     });
 
     it('should update board size when onSizeChange is called', () => {
-        component.onSizeChange('grande');
-        expect(component.boardSize).toBe('grande');
-        expect(component.board).toBe(BOARD_SIZES['grande'].board);
+        component.onSizeChange(BoardSizes.Grande);
+        expect(component.boardSize).toBe(BoardSizes.Grande);
+        expect(component.board).toBe(BOARD_CONFIGS[BoardSizes.Grande].board);
     });
 
     it('should navigate to /edit-game and set game settings when createGame is called', () => {

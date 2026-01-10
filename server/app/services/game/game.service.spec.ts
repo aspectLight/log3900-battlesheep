@@ -6,6 +6,7 @@ import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model, Types } from 'mongoose';
 import { Board } from '@app/model/schema/board.schema';
+import { ErrorMessages } from '@common/error-messages.constants';
 
 describe('GameService', () => {
     let service: GameService;
@@ -52,9 +53,7 @@ describe('GameService', () => {
 
     it('createGame() should throw 409 if a game with the same name already exists', async () => {
         (gameModel.findOne as jest.Mock).mockReturnValue({ exec: jest.fn().mockResolvedValue({} as Game) });
-        await expect(service.createGame({ name: 'Existing Game' } as Game)).rejects.toThrow(
-            new ConflictException('Un jeu avec le meme nom existe deja'),
-        );
+        await expect(service.createGame({ name: 'Existing Game' } as Game)).rejects.toThrow(new ConflictException(ErrorMessages.GameAlreadyExists));
     });
 
     it('getAllGames() should return all games', async () => {
@@ -76,13 +75,13 @@ describe('GameService', () => {
     });
 
     it('getGameById() should throw 400 if the id format is invalid', async () => {
-        await expect(service.getGameById('invalidId')).rejects.toThrow(new BadRequestException("Le format de l'id n'est pas bon."));
+        await expect(service.getGameById('invalidId')).rejects.toThrow(new BadRequestException(ErrorMessages.InvalidIdFormat));
     });
 
     it('getGameById() should throw 404 if game does not exist', async () => {
         (gameModel.findById as jest.Mock).mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
 
-        await expect(service.getGameById(validMongoId)).rejects.toThrow(new NotFoundException(`Le jeu avec l'id ${validMongoId} n'existe pas.`));
+        await expect(service.getGameById(validMongoId)).rejects.toThrow(new NotFoundException(ErrorMessages.GameDoesNotExist));
     });
 
     it('updateGame() should update a game', async () => {
@@ -98,19 +97,19 @@ describe('GameService', () => {
 
     it('updateGame() should throw 400 if id is invalid', async () => {
         await expect(service.updateGame('invalidId', { name: 'updatedName' })).rejects.toThrow(
-            new BadRequestException("Le format de l'id n'est pas bon."),
+            new BadRequestException(ErrorMessages.InvalidIdFormat),
         );
     });
 
     it('updateGame() should throw 400 if the body is empty', async () => {
-        await expect(service.updateGame(validMongoId, {})).rejects.toThrow(new BadRequestException('Le corps de la requête est vide.'));
+        await expect(service.updateGame(validMongoId, {})).rejects.toThrow(new BadRequestException(ErrorMessages.EmptyRequestBody));
     });
 
     it('updateGame() should throw 404 if the game does not exist', async () => {
         (gameModel.findByIdAndUpdate as jest.Mock).mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
 
         await expect(service.updateGame(validMongoId, { name: 'updatedName' })).rejects.toThrow(
-            new NotFoundException(`Le jeu avec l'Id ${validMongoId} n'existe pas.`),
+            new NotFoundException(ErrorMessages.GameDoesNotExist),
         );
     });
 
@@ -123,13 +122,13 @@ describe('GameService', () => {
     });
 
     it('deleteGame() should throw 400 if game id is invalid', async () => {
-        await expect(service.deleteGame('invalidId')).rejects.toThrow(new BadRequestException("Le format de l'id n'est pas bon."));
+        await expect(service.deleteGame('invalidId')).rejects.toThrow(new BadRequestException(ErrorMessages.InvalidIdFormat));
     });
 
     it('deleteGame() should throw 404 if the game does not exist', async () => {
         (gameModel.findByIdAndDelete as jest.Mock).mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
 
-        await expect(service.deleteGame(validMongoId)).rejects.toThrow(new NotFoundException(`Le jeu avec l'Id ${validMongoId} n'existe pas.`));
+        await expect(service.deleteGame(validMongoId)).rejects.toThrow(new NotFoundException(ErrorMessages.GameDoesNotExist));
     });
 
     it('updateGame() should update modificationDate if board is updated', async () => {

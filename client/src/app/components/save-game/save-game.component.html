@@ -19,8 +19,10 @@
     @if (showError === true) {
         <app-pop-up
             popUpMessage="{{errorMessage}}"
-            (confirm)="closeDialogue()"
-            [showSecondButton]="false">
+            (confirm)="onConfirm()"
+            (cancel)="closeDialogue()"
+            [showSecondButton]="showSecondButton"
+            secondOption="Non">
         </app-pop-up>
     }
 </div>

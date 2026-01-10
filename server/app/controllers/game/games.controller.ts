@@ -3,7 +3,7 @@ import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 import { GameService } from '@app/services/game/game.service';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
-
+import { ErrorMessages } from '@common/error-messages.constants';
 @Controller('games')
 export class GameController {
     constructor(private readonly gameService: GameService) {}
@@ -15,7 +15,7 @@ export class GameController {
             return response.status(HttpStatus.OK).json(games);
         } catch (error) {
             const status = error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR;
-            const message = error.message || 'Une erreur inattendue est survenue.';
+            const message = error.message || ErrorMessages.PlainError;
             return response.status(status).json({ message });
         }
     }
@@ -27,7 +27,7 @@ export class GameController {
             return response.status(HttpStatus.OK).json(game);
         } catch (error) {
             const status = error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR;
-            const message = error.message || 'Une erreur inattendue est survenue.';
+            const message = error.message || ErrorMessages.PlainError;
             return response.status(status).json({ message });
         }
     }
@@ -39,7 +39,7 @@ export class GameController {
             return response.status(HttpStatus.CREATED).send();
         } catch (error) {
             const status = error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR;
-            const message = error.message || 'Une erreur inattendue est survenue.';
+            const message = error.message || ErrorMessages.PlainError;
             return response.status(status).json({ message });
         }
     }
@@ -51,7 +51,7 @@ export class GameController {
             return response.status(HttpStatus.OK).json(updatedGame);
         } catch (error) {
             const status = error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR;
-            const message = error.message || 'Une erreur inattendue est survenue.';
+            const message = error.message || ErrorMessages.PlainError;
             return response.status(status).json({ message });
         }
     }
@@ -63,7 +63,7 @@ export class GameController {
             return response.status(HttpStatus.NO_CONTENT).send();
         } catch (error) {
             const status = error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR;
-            const message = error.message || 'Une erreur inattendue est survenue.';
+            const message = error.message || ErrorMessages.PlainError;
             return response.status(status).json({ message });
         }
     }

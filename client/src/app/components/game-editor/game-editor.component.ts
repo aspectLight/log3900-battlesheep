@@ -1,14 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Board } from '@app/classes/board';
 import { BoardComponent } from '@app/components/board/board.component';
-import { RestartGameComponent } from '@app/components/restart-game/restart-game.component';
-import { SaveGameComponent } from '@app/components/save-game/save-game.component';
 import { ToolboxComponent } from '@app/components/toolbox/toolbox.component';
 import { GameService } from '@app/services/game.service';
-
+import { LoadingScreenComponent } from '@app/components/loading-screen/loading-screen.component';
 @Component({
     selector: 'app-game-editor',
-    imports: [ToolboxComponent, SaveGameComponent, RestartGameComponent, BoardComponent],
+    imports: [ToolboxComponent, BoardComponent, LoadingScreenComponent],
     templateUrl: './game-editor.component.html',
     styleUrls: ['./game-editor.component.scss'],
 })

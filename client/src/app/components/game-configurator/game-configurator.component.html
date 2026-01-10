@@ -9,38 +9,38 @@
                 Classique
             </label>
             <label class="ctf-label">
-                <input type="radio" name="mode" value="ctf" (change)="onModeChange('ctf')" disabled />
+                <input type="radio" name="mode" value="ctf" (change)="onModeChange('ctf')" />
                 CTF
             </label>
         </div>
         <span class="mode-description">{{ modeDescription }}</span>
     </div>
-    
+
     <div class="size-selection">
         <h2>Taille de la carte</h2>
         <div class="size-selection-buttons">
             <label>
-                <input type="radio" name="size" value="petite" (change)="onSizeChange('petite')" />
+                <input type="radio" name="size" value="petite" (change)="onSizeChange(boardSizes.Petite)" />
                 Petite
             </label>
             <label>
-                <input type="radio" name="size" value="moyenne" (change)="onSizeChange('moyenne')" checked />
+                <input type="radio" name="size" value="moyenne" (change)="onSizeChange(boardSizes.Moyenne)" checked />
                 Moyenne
             </label>
             <label>
-                <input type="radio" name="size" value="grande" (change)="onSizeChange('grande')" />
+                <input type="radio" name="size" value="grande" (change)="onSizeChange(boardSizes.Grande)" />
                 Grande
             </label>
         </div>
         <div class="size-description">
-            <span><strong>Grille: </strong>{{ board }}x{{ board }}</span> 
-            <span><strong>Joueurs: </strong>{{ players }}</span> 
+            <span><strong>Grille: </strong>{{ board }}x{{ board }}</span>
+            <span><strong>Joueurs: </strong>{{ players }}</span>
             <span><strong>Items: </strong>{{ items }}</span>
         </div>
     </div>
-    
+
     <div class="actions">
-        <br>
+        <br />
         <button class="cancel-btn" (click)="cancel()">Annuler</button>
         <button class="create-btn" (click)="createGame()">Créer</button>
     </div>

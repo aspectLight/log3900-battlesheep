@@ -24,7 +24,7 @@ describe('ToolboxComponent', () => {
 
     beforeEach(async () => {
         dragDropServiceSpy = jasmine.createSpyObj('DragndropService', ['handleDragEnd', 'startDrag', 'getDraggedItem']);
-        gameServiceSpy = jasmine.createSpyObj('GameService', ['getName', 'getDescription', 'getDescription', 'setName', 'setDescription']);
+        gameServiceSpy = jasmine.createSpyObj('GameService', ['getName', 'getDescription', 'getDescription', 'setName', 'setDescription', 'getMode']);
         itemServiceSpy = jasmine.createSpyObj('ItemService', ['getItemCount', 'getSpawnPointCount', 'getTotalItemsPlaced']);
         paintServiceSpy = jasmine.createSpyObj('PaintService', ['disable']);
         tileServiceSpy = jasmine.createSpyObj('TileService', [
@@ -49,9 +49,9 @@ describe('ToolboxComponent', () => {
         itemServiceSpy.getItemCount.and.returnValue(ITEM_COUNT);
         dragDropServiceSpy.getDraggedItem.and.returnValue('adrenaline');
         tileServiceSpy.setActiveTile.and.returnValue();
-        tileServiceSpy.getActiveTileImage.and.returnValue('/assets/tiles/snow_variant1.png');
         paintServiceSpy.disable.and.returnValue();
         itemServiceSpy.getTotalItemsPlaced.and.returnValue(TOTAL_ITEM_COUNT);
+        gameServiceSpy.getMode.and.returnValue('classique');
 
         fixture = TestBed.createComponent(ToolboxComponent);
         component = fixture.componentInstance;
@@ -63,34 +63,24 @@ describe('ToolboxComponent', () => {
     });
 
     it('should call resetInputs when resetSignal changes', () => {
-        spyOn(component, 'resetInputs');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const resetInputsSpy = spyOn(component as any, 'resetInputs');
         // Create a SimpleChanges object where the resetSignal value has changed.
         const changes: SimpleChanges = {
             resetSignal: new SimpleChange(false, true, false),
         };
         component.ngOnChanges(changes);
-        expect(component.resetInputs).toHaveBeenCalled();
+        expect(resetInputsSpy).toHaveBeenCalled();
     });
-
     it('should not call resetInputs when resetSignal does not change', () => {
-        spyOn(component, 'resetInputs');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const resetInputsSpy = spyOn(component as any, 'resetInputs');
         // Create a SimpleChanges object where the resetSignal value remains the same.
         const changes: SimpleChanges = {
             resetSignal: new SimpleChange(true, true, false),
         };
         component.ngOnChanges(changes);
-        expect(component.resetInputs).not.toHaveBeenCalled();
-    });
-
-    it('should get active tile', () => {
-        expect(component.activeTile).toEqual('/assets/tiles/snow_variant1.png');
-    });
-
-    it('should not call toggleRotation when a key other than "r" is pressed', () => {
-        const event = new KeyboardEvent('keydown', { key: 'a' });
-        spyOn(component, 'toggleRotation');
-        document.dispatchEvent(event);
-        expect(component.toggleRotation).not.toHaveBeenCalled();
+        expect(resetInputsSpy).not.toHaveBeenCalled();
     });
 
     it('should call ngOnInit', () => {
@@ -109,20 +99,10 @@ describe('ToolboxComponent', () => {
         expect(tileServiceSpy.setActiveTile).not.toHaveBeenCalled();
     });
 
-    it('should get game name', () => {
-        component.getGameName();
-        expect(gameServiceSpy.getName).toHaveBeenCalled();
-    });
-
     it('should update name', () => {
         component.nameInput = 'test';
         component.updateName();
         expect(gameServiceSpy.setName).toHaveBeenCalledWith('test');
-    });
-
-    it('should get game description', () => {
-        component.getGameDescription();
-        expect(gameServiceSpy.getDescription).toHaveBeenCalled();
     });
 
     it('should update description', () => {
@@ -134,11 +114,6 @@ describe('ToolboxComponent', () => {
     it('should get item count', () => {
         expect(component.getItemCount('adrenaline')).toEqual(1);
         expect(itemServiceSpy.getItemCount).toHaveBeenCalled();
-    });
-
-    it('should toggle rotation', () => {
-        component.toggleRotation();
-        expect(tileServiceSpy.toggleRotation).toHaveBeenCalled();
     });
 
     it('should toggle tab', () => {
@@ -170,18 +145,23 @@ describe('ToolboxComponent', () => {
         expect(itemServiceSpy.getSpawnPointCount).toHaveBeenCalled();
     });
 
-    it('should get total item count', () => {
-        expect(component.getTotalItemsCount()).toEqual(TOTAL_ITEM_COUNT);
-        expect(itemServiceSpy.getTotalItemsPlaced).toHaveBeenCalled();
-    });
-
     it('should reset inputs', () => {
         component.nameInput = 'testName';
         component.descriptionInput = 'testDescription';
 
-        component.resetInputs();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (component as any).resetInputs();
 
         expect(component.nameInput).toBe('');
         expect(component.descriptionInput).toBe('');
+    });
+
+    it('should call resetInputs when onRestartConfirmed is called', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const resetInputsSpy = spyOn(component as any, 'resetInputs');
+
+        component.onRestartConfirmed();
+
+        expect(resetInputsSpy).toHaveBeenCalled();
     });
 });

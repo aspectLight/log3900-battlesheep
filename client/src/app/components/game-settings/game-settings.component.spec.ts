@@ -70,7 +70,7 @@ describe('GameSettingsComponent', () => {
     });
 
     it('should return the game description with player count', () => {
-        expect(component.description).toBe('mockDescription    Joueurs: 3    Actif: undefined    Taille: 3');
+        expect(component.description).toBe('mockDescription\n\nJoueurs: 3\nJoueur actif: undefined\nTaille du plateau: 3x3');
     });
 
     it('should return the room ID', () => {

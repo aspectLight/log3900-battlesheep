@@ -1,27 +1,30 @@
 import { MAX_ENTITY_ID } from '@app/constants/player.constants';
 import { Cell } from './cell';
 
-/* 
-Ceci est une classe en prévision des prochains sprints, notamment avec l'ajout d'une ia
-
-NOTE: 
-    - addCell est pour attribuer une case au player (pour permettre d'accéder au données de sa case)
+/* NOTE: 
+    - addCell is meant to assign a cell to the entity ( so that the player "knows where he is" )
 */
 
 export abstract class Entity {
-    id: string;
     cell: Cell | null = null;
 
+    private _id: string;
+
     constructor() {
-        this.id = this.generateRandomId();
+        this._id = this.generateRandomId();
+    }
+
+    get id(): string {
+        return this._id;
+    }
+
+    // For simplification, we allow the id to be set, only on specific cases
+    set id(id: string) {
+        this._id = id;
     }
 
     addCell(cell: Cell) {
         this.cell = cell;
-    }
-
-    removeCell() {
-        this.cell = null;
     }
 
     protected generateRandomId(): string {

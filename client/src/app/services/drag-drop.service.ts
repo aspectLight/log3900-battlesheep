@@ -26,7 +26,12 @@ export class DragDropService {
     handleDrop(cell: Cell): void {
         if (!this.isDragging || !this.draggedItem) return;
 
-        if (cell.tile.moveModifier < 0) {
+        if (cell.tile.moveModifier < 0 && cell.tile.type !== 'door') {
+            this.resetInteractionState();
+            return;
+        }
+
+        if (cell.tile.type === 'door' && cell.tile.state === 'closed') {
             this.resetInteractionState();
             return;
         }

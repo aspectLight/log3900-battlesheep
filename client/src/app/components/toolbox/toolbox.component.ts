@@ -1,20 +1,23 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { KeyValuePipe } from '@angular/common';
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Item } from '@app/classes/item';
 import { Tile } from '@app/classes/tile';
-import { ITEM_TYPES } from '@app/constants/item.constants';
-import { TILE_TYPES } from '@app/constants/tile.constants';
+import { ITEM_TYPES, ItemType } from '@app/constants/item.constants';
+import { TILE_TYPES, ALLOWED_TILES } from '@app/constants/tile.constants';
 import { DragDropService } from '@app/services/drag-drop.service';
 import { GameService } from '@app/services/game.service';
 import { ItemService } from '@app/services/item.service';
 import { PaintService } from '@app/services/paint.service';
 import { TileService } from '@app/services/tile.service';
+import { Board } from '@app/classes/board';
+import { SaveGameComponent } from '@app/components/save-game/save-game.component';
+import { RestartGameComponent } from '@app/components/restart-game/restart-game.component';
 
 @Component({
     selector: 'app-toolbox',
-    imports: [KeyValuePipe, FormsModule],
+    imports: [KeyValuePipe, FormsModule, SaveGameComponent, RestartGameComponent],
     templateUrl: './toolbox.component.html',
     styleUrls: ['./toolbox.component.scss'],
     animations: [
@@ -28,15 +31,12 @@ import { TileService } from '@app/services/tile.service';
 })
 export class ToolboxComponent implements OnInit, OnChanges {
     @Input() resetSignal: boolean;
-    /*
-    On doit filtrer les tuiles à afficher, donc, en gros, cacher les variantes.
-    De plus, on utilisera un keyvalue pipe pour les items, pour simplifier et rendre plus lisible le code.
-    */
+    @Input() board!: Board;
+
     items = ITEM_TYPES;
 
-    allowedTileKeys = ['door', 'water', 'ice', 'wall', 'tree', 'stone'];
     filteredTiles = Object.keys(TILE_TYPES)
-        .filter((key) => this.allowedTileKeys.includes(key))
+        .filter((key) => ALLOWED_TILES.includes(key))
         .map((key) => ({
             key,
             value: TILE_TYPES[key],
@@ -57,18 +57,33 @@ export class ToolboxComponent implements OnInit, OnChanges {
         private gameService: GameService,
     ) {}
 
-    get activeTile(): string {
-        return this.tileService.getActiveTileImage();
+    get gameMode() {
+        return this.gameService.getMode();
     }
 
     ngOnInit(): void {
         this.namePlaceholder = this.gameService.getName();
         this.descriptionPlaceholder = this.gameService.getDescription();
+        this.filterItems();
     }
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes.resetSignal && changes.resetSignal.currentValue !== changes.resetSignal.previousValue) {
             this.resetInputs();
+        }
+    }
+
+    filterItems() {
+        if (this.gameMode === 'classique') {
+            this.items = Object.keys(ITEM_TYPES)
+                .filter((key) => key !== 'flag')
+                .reduce(
+                    (acc, key) => {
+                        acc[key] = ITEM_TYPES[key];
+                        return acc;
+                    },
+                    {} as { [key: string]: ItemType },
+                );
         }
     }
 
@@ -83,16 +98,8 @@ export class ToolboxComponent implements OnInit, OnChanges {
         return this.tileService.getActiveTile();
     }
 
-    getGameName(): string {
-        return this.gameService.getName();
-    }
-
     updateName(): void {
         this.gameService.setName(this.nameInput);
-    }
-
-    getGameDescription(): string {
-        return this.gameService.getDescription();
     }
 
     updateDescription(): void {
@@ -101,10 +108,6 @@ export class ToolboxComponent implements OnInit, OnChanges {
 
     getItemCount(type: string): number {
         return this.itemService.getItemCount(type);
-    }
-
-    toggleRotation(): void {
-        this.tileService.toggleRotation();
     }
 
     toggleTab(tab: string): void {
@@ -135,14 +138,18 @@ export class ToolboxComponent implements OnInit, OnChanges {
         return this.itemService.getSpawnPointCount();
     }
 
-    getTotalItemsCount(): number {
-        return this.itemService.getTotalItemsPlaced();
+    noSort = () => 0;
+
+    onRestartConfirmed(): void {
+        this.resetInputs();
     }
 
-    resetInputs(): void {
+    getGameName(): string {
+        return this.gameService.getName();
+    }
+
+    private resetInputs(): void {
         this.nameInput = '';
         this.descriptionInput = '';
     }
-
-    noSort = () => 0;
 }

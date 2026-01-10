@@ -25,9 +25,15 @@
             <app-player [player]="cell.player"></app-player>
           }
           @if(selectedCell) {
-            @if (cell.x === selectedCell!.x && cell.y === selectedCell!.y && isSelectionActive) {
+            @if (cell.x === selectedCell!.x && cell.y === selectedCell!.y ) {
               <div class="selected">
-                <img src="./assets/ui/selected.gif">
+                @if (isSelectionActive) {
+                  <img src="./assets/ui/selected.gif">
+                } 
+
+                @if (isActionActive) {
+                  <img src="./assets/ui/action.gif">
+                }
               </div>
             }
           }

@@ -42,7 +42,10 @@ export class GameRoomService {
         }
     }
 
-    // clearRoom() {
-    //     this.currentRoom.next(null);
-    // }
+    setDebugMode(isDebugging: boolean) {
+        const room = this.currentRoom.getValue();
+        if (room) {
+            this.currentRoom.next({ ...room, isDebugging });
+        }
+    }
 }

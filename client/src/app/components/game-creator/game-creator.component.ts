@@ -5,10 +5,10 @@ import { GameListComponent } from '@app/components/game-list/game-list.component
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { GameCreationService } from '@app/services/game-creation.service';
 import { GameListService } from '@app/services/game-list.service';
-import { SocketService } from '@app/services/socket.service';
 
 import { Game } from '@app/classes/game';
 import { ROUTES } from '@app/constants/routes.constants';
+import { RoomSocketService } from '@app/services/socket/room-socket.service';
 
 @Component({
     selector: 'app-game-creator',
@@ -18,14 +18,14 @@ import { ROUTES } from '@app/constants/routes.constants';
 })
 export class GameCreatorComponent implements OnInit {
     selectedGame: Game | null = null;
-    gameModified: boolean = false;
-    errorMessage = 'Le jeu sélectionné est caché ou supprimé.';
+    gameModified = false;
+    hasGames = false;
 
     constructor(
         private router: Router,
         private gameListService: GameListService,
         private gameCreationService: GameCreationService,
-        private socketService: SocketService,
+        private socketService: RoomSocketService,
     ) {}
 
     ngOnInit() {
@@ -34,10 +34,11 @@ export class GameCreatorComponent implements OnInit {
     }
 
     onSelectGame(game: Game): void {
-        if (game) {
-            this.selectedGame = game;
-            this.gameCreationService.setSelectedGame(game);
-        }
+        this.selectedGame = game;
+    }
+
+    onGamesLengthChange(length: number): void {
+        this.hasGames = length > 0;
     }
 
     async createGame(): Promise<void> {

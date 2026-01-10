@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PopUpComponent } from './pop-up.component';
+import { Item } from '@app/classes/item';
 
 describe('PopUpComponent', () => {
     let component: PopUpComponent;
@@ -34,5 +35,14 @@ describe('PopUpComponent', () => {
         component.onCancel();
 
         expect(component.cancel.emit).toHaveBeenCalled();
+    });
+
+    it('should emit itemSelected event with the selected item when onSelect() is called', () => {
+        const mockItem = { name: 'Test Item' } as Item;
+        spyOn(component.itemSelected, 'emit');
+
+        component.onSelect(mockItem);
+
+        expect(component.itemSelected.emit).toHaveBeenCalledWith(mockItem);
     });
 });

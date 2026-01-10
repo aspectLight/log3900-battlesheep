@@ -138,11 +138,9 @@ describe('AutoTileService', () => {
 
     it('should not replace if no cell is selected ', () => {
         const setTileSpy = spyOn(board, 'setTile');
-        const putBackSpy = spyOn(service['itemService'], 'putBackItem');
 
         service['replaceTileAndRestoreItem'](-1, 0, new Board(2), 'water', 'newOrientation');
 
-        expect(putBackSpy).not.toHaveBeenCalled();
         expect(setTileSpy).not.toHaveBeenCalled();
     });
 
@@ -161,11 +159,9 @@ describe('AutoTileService', () => {
         });
 
         const setTileSpy = spyOn(testBoard, 'setTile');
-        const putBackSpy = spyOn(service['itemService'], 'putBackItem');
 
         service['replaceTileAndRestoreItem'](1, 1, testBoard, 'water', 'newOrientation');
 
-        expect(putBackSpy).toHaveBeenCalledWith((testItem as Item).type);
         expect(setTileSpy).toHaveBeenCalledWith(
             1,
             1,

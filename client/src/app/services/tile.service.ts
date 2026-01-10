@@ -11,10 +11,6 @@ export class TileService {
         return this.activeTile.clone();
     }
 
-    getActiveTileImage(): string {
-        return this.activeTile.imagePath;
-    }
-
     setActiveTile(tile: Tile): void {
         if (tile.type !== this.activeTile.type) {
             this.activeTile = tile;

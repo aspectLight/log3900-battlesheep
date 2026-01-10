@@ -4,3 +4,5 @@ export const enum BonusType {
     Attack = 'attack',
     Defense = 'defense',
 }
+
+export const STAT_WITH_BONUS = 6;

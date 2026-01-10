@@ -1,9 +1,8 @@
 import { Player } from '@app/interfaces/player';
 import { Room } from '@app/interfaces/room';
 import { Injectable } from '@nestjs/common';
-const MAX_CODE = 9999;
-const MAX_DIGITS = 4;
-
+import { ErrorMessages } from '@common/error-messages.constants';
+import { MAX_CODE, MAX_DIGITS } from '@app/constants/waiting-room.constants';
 @Injectable()
 export class WaitingRoomService {
     private waitingRooms: Room[] = [];
@@ -17,6 +16,8 @@ export class WaitingRoomService {
             players: [organisator],
             futurePlayers: [],
             isLocked: false,
+            messages: [],
+            journalEntries: [],
         };
         newRoom.reservedAvatars = [{ reservorId: organisator.id, chosenAvatar: organisator.avatar.name }];
         this.waitingRooms.push(newRoom);
@@ -26,10 +27,10 @@ export class WaitingRoomService {
     checkRoomExistence(roomId: string): boolean {
         const room = this.findRoomById(roomId);
         if (!room) {
-            throw new Error("La salle n'existe pas");
+            throw new Error(ErrorMessages.RoomDoesNotExist);
         }
         if (room.isLocked) {
-            throw new Error('La salle est verouillée');
+            throw new Error(ErrorMessages.RoomLocked);
         }
         return true;
     }
@@ -37,41 +38,46 @@ export class WaitingRoomService {
     joinRoom(roomId: string, playerId: string): Room | null {
         const room = this.findRoomById(roomId);
         if (!room) {
-            throw new Error("La salle n'existe pas");
+            throw new Error(ErrorMessages.RoomDoesNotExist);
         }
         if (room.isLocked) {
-            throw new Error('La salle est verouillée');
+            throw new Error(ErrorMessages.RoomLocked);
         }
-        if (!(room.players.some((p) => p.id === playerId) || room.futurePlayers.some((p) => p === playerId))) {
+        if (!(room.players.some((player) => player.id === playerId) || room.futurePlayers.some((player) => player === playerId))) {
             room.futurePlayers.push(playerId);
         }
         return room;
     }
 
     addCharacter(roomId: string, player: Player, socketId: string): Room | null {
+        const playerId = player.id;
         const room = this.findRoomById(roomId);
         if (!room) {
-            throw new Error("La salle n'existe pas");
+            throw new Error(ErrorMessages.RoomDoesNotExist);
         }
 
         if (room.isLocked) {
-            throw new Error('La salle est verouillée');
+            throw new Error(ErrorMessages.RoomLocked);
         }
 
-        if (room.players.some((p) => p === player)) {
-            throw new Error('Le joueur est déjà dans la salle');
+        if (room.players.some((p) => p.id === playerId)) {
+            throw new Error(ErrorMessages.PlayerAlreadyInRoom);
         }
         player.id = socketId;
-        room.futurePlayers = room.futurePlayers.filter((p) => p !== player.id);
+        room.futurePlayers = room.futurePlayers.filter((p) => p !== playerId);
         room.players.push(player);
         return room;
     }
 
+    addMessage(roomId: string, message: { type: string; name?: string | null; content: string; time: string }) {
+        const room = this.findRoomById(roomId);
+        if (!room) throw new Error("La salle n'existe pas");
+        room.messages.push(message);
+    }
+
     reserveCharacter(roomId: string, playerId: string, chosenAvatar: string) {
         const room = this.findRoomById(roomId);
-        if (!room) {
-            throw new Error("La salle n'existe pas");
-        }
+        if (!room) throw new Error(ErrorMessages.RoomDoesNotExist);
         room.reservedAvatars = room.reservedAvatars
             .filter((avatar) => avatar.reservorId !== playerId)
             .concat([{ reservorId: playerId, chosenAvatar }]);
@@ -80,7 +86,7 @@ export class WaitingRoomService {
     leaveRoom(roomId: string, playerId: string) {
         const room = this.findRoomById(roomId);
         if (!room) {
-            throw new Error("La salle n'existe pas");
+            throw new Error(ErrorMessages.RoomDoesNotExist);
         }
 
         if (playerId === room.organisatorId) {
@@ -95,10 +101,10 @@ export class WaitingRoomService {
     toggleLockRoom(roomId: string, organisatorId: string) {
         const room = this.findRoomById(roomId);
         if (!room) {
-            throw new Error("La salle n'existe pas");
+            throw new Error(ErrorMessages.RoomDoesNotExist);
         }
         if (room.organisatorId !== organisatorId) {
-            throw new Error("Seul l'organisteur de la partie peut verrouiller la partie");
+            throw new Error(ErrorMessages.HostOnlyLockRoom);
         }
         room.isLocked = !room.isLocked;
         return room.isLocked;
@@ -107,10 +113,10 @@ export class WaitingRoomService {
     kickPlayer(roomId: string, organisatorId: string, playerToKick: Player) {
         const room = this.findRoomById(roomId);
         if (!room) {
-            throw new Error("La salle n'existe pas");
+            throw new Error(ErrorMessages.RoomDoesNotExist);
         }
         if (room.organisatorId !== organisatorId) {
-            throw new Error("Seul l'organisteur de la partie peut exclure un joueur");
+            throw new Error(ErrorMessages.HostOnlyKickPlayer);
         }
         room.players = room.players.filter((player) => player.id !== playerToKick.id);
         room.reservedAvatars = room.reservedAvatars.filter((avatar) => avatar.reservorId !== playerToKick.id);

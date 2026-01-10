@@ -72,4 +72,28 @@ describe('GameRoomService', () => {
         service.toggleDebugMode();
         expect(service.room.isDebugging).toBeFalse();
     });
+
+    it('should set debug mode to specified value', () => {
+        const initialRoom: Room = {
+            roomId: 'room1',
+            gameId: 'game1',
+            organisatorId: 'org1',
+            players: [{ id: 'player1' } as Player],
+            isLocked: true,
+            isDebugging: false,
+        };
+        service.updateRoom(initialRoom);
+
+        // Test setting to true
+        service.setDebugMode(true);
+        expect(service.room.isDebugging).toBeTrue();
+
+        // Test setting to false
+        service.setDebugMode(false);
+        expect(service.room.isDebugging).toBeFalse();
+
+        // Test setting to true again
+        service.setDebugMode(true);
+        expect(service.room.isDebugging).toBeTrue();
+    });
 });

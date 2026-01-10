@@ -13,10 +13,6 @@ import { Bonus } from '@app/interfaces/character';
 export class BonusChoicesComponent {
     @Output() bonusSelected = new EventEmitter<Bonus>();
 
-    player = new Player();
-    initialStat = D4_VALUE;
-    boostedStat = D6_VALUE;
-
     selectedBonus: 'healthBonus' | 'speedBonus' | null = null;
     health = DEFAULT_STATS_VALUE;
     speed = DEFAULT_STATS_VALUE;
@@ -31,6 +27,11 @@ export class BonusChoicesComponent {
         defense: DEFAULT_STATS_VALUE,
         attack: DEFAULT_STATS_VALUE,
     };
+
+    private _player = new Player();
+    get player() {
+        return this._player;
+    }
 
     selectBonus(bonus: 'healthBonus' | 'speedBonus'): void {
         this.selectedBonus = bonus;

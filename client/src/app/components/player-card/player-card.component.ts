@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Player } from '@app/classes/player';
 @Component({
     selector: 'app-player-card',
-    standalone: true,
     templateUrl: './player-card.component.html',
     styleUrls: ['./player-card.component.scss'],
 })
@@ -12,6 +11,7 @@ export class PlayerCardComponent implements OnInit {
     @Input() isHost: boolean = false;
     @Input() showKick: boolean = false;
     avatar: string;
+    isVirtualPlayer: boolean = false;
 
     onKickClick() {
         this.banEvent.emit(this.player);
@@ -20,6 +20,10 @@ export class PlayerCardComponent implements OnInit {
     ngOnInit() {
         if (this.player && this.player.avatar) {
             this.avatar = this.player.avatar.avatarFull;
+        }
+
+        if (this.player && this.player.isVirtual) {
+            this.isVirtualPlayer = true;
         }
     }
 }

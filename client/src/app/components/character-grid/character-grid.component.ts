@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AVATAR_TYPES } from '@app/constants/player.constants';
-
+import { Reservation } from '@app/interfaces/reservation';
 @Component({
     imports: [CommonModule],
     selector: 'app-character-grid',
@@ -10,7 +10,7 @@ import { AVATAR_TYPES } from '@app/constants/player.constants';
 })
 export class CharacterGridComponent {
     @Output() characterSelected = new EventEmitter<{ name: string; id: number; avatar: string }>();
-    @Input() reservedAvatars: { reservorId: string; chosenAvatar: string }[] = [];
+    @Input() reservedAvatars: Reservation[] = [];
     @Input() socketId: string = '';
 
     characters = AVATAR_TYPES;

@@ -22,10 +22,6 @@ describe('TileService', () => {
         expect(service.getActiveTile()).toEqual(testTile);
     });
 
-    it('should get the active tile image', () => {
-        expect(service.getActiveTileImage()).toEqual(testTile.imagePath);
-    });
-
     it('should set the active tile', () => {
         expect(service.getActiveTile()).toEqual(testTile);
     });

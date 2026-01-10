@@ -73,4 +73,9 @@
             <textarea (input)="updateDescription()" [(ngModel)]="descriptionInput" [placeholder]="descriptionPlaceholder" maxlength="200"></textarea>
         </div>
     </div>
+    <div class="footer">
+        <app-save-game [board]="board"></app-save-game>
+        {{ getGameName() }}
+        <app-restart-game [board]="board" (restartConfirmed)="onRestartConfirmed()"></app-restart-game>
+    </div>
 </div>

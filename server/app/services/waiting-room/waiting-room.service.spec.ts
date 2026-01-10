@@ -43,7 +43,7 @@ describe('WaitingRoomService', () => {
         const player = { id: '1', avatar: { name: 'Avatar1' } };
         service.createRoom('room1', 'game1', player, 'socket1');
         service.toggleLockRoom('room1', 'socket1');
-        expect(() => service.checkRoomExistence('room1')).toThrowError('La salle est verouillée');
+        expect(() => service.checkRoomExistence('room1')).toThrowError('La salle est verrouillée');
     });
 
     it('should join a room', () => {
@@ -64,7 +64,7 @@ describe('WaitingRoomService', () => {
         const player = { id: '1', avatar: { name: 'Avatar1' } };
         service.createRoom('room1', 'game1', player, 'socket1');
         service.toggleLockRoom('room1', 'socket1');
-        expect(() => service.joinRoom('room1', 'player2')).toThrowError('La salle est verouillée');
+        expect(() => service.joinRoom('room1', 'player2')).toThrowError('La salle est verrouillée');
     });
 
     it('should add a character to a room', () => {
@@ -87,7 +87,7 @@ describe('WaitingRoomService', () => {
         service.createRoom('room1', 'game1', player, 'socket1');
         service.toggleLockRoom('room1', 'socket1');
         const newPlayer: Player = { id: '2' };
-        expect(() => service.addCharacter('room1', newPlayer, 'socket2')).toThrowError('La salle est verouillée');
+        expect(() => service.addCharacter('room1', newPlayer, 'socket2')).toThrowError('La salle est verrouillée');
     });
 
     it('should throw error if player is already in room when calling joinRoom', () => {
@@ -96,6 +96,26 @@ describe('WaitingRoomService', () => {
         const newPlayer: Player = { id: '2' };
         service.addCharacter('room1', newPlayer, 'socket2');
         expect(() => service.addCharacter('room1', newPlayer, 'socket1')).toThrowError('Le joueur est déjà dans la salle');
+    });
+
+    it('should add message to room', () => {
+        const player = { id: '1', avatar: { name: 'Avatar1' } };
+        service.createRoom('room1', 'game1', player, 'socket1');
+        const message = {
+            type: 'test',
+            name: 'testName',
+            content: 'testContent',
+            time: 'testTime',
+        };
+        const room = service.findRoomById('room1');
+        service.addMessage('room1', message);
+        expect(room.messages).toEqual([message]);
+    });
+
+    it('should throw an error if the room does not exist', () => {
+        expect(() => {
+            service.addMessage('nonExistingRoom', { type: 'test', content: 'testContent', time: 'testTime' });
+        }).toThrowError("La salle n'existe pas");
     });
 
     it('should reserve an avatar', () => {

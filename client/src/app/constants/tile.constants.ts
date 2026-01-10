@@ -237,3 +237,5 @@ export const TILE_TYPES: {
         rotations: ['TUp', 'TRight', 'TDown', 'TLeft', 'Cross'],
     },
 };
+
+export const ALLOWED_TILES = ['door', 'water', 'ice', 'wall', 'tree', 'stone'];

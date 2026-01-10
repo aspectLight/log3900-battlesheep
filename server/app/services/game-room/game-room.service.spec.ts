@@ -1,45 +1,78 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GameRoomEvents } from '@app/gateways/game-room/game-room.gateway.events';
+import { COUNTDOWN_INTERVAL } from '@app/constants/game-room.constants';
 import { GameRoom } from '@app/interfaces/game-room';
 import { Player } from '@app/interfaces/player';
+import { Game } from '@app/model/schema/game.schema';
+import { GameMovementService } from '@app/services/game-movement/game-movement.service';
+import { GameService } from '@app/services/game/game.service';
+import { GameRoomEvents } from '@common/socket.constants';
+import { Test, TestingModule } from '@nestjs/testing';
+import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { GameRoomService } from './game-room.service';
-const COUNTDOWN_INTERVAL = 1000;
+const TEST_ROOM = {
+    roomId: 'test_room',
+    gameId: 'test_game',
+    organisatorId: 'test_organisator',
+    players: [
+        {
+            id: 'test_player',
+            stats: {
+                health: { maxValue: 100, value: 100, description: 'Health points' },
+                speed: { maxValue: 10, value: 10, description: 'Movement points' },
+                attack: { maxValue: 10, value: 10, description: 'Attack points' },
+                defense: { maxValue: 10, value: 10, description: 'Defense points' },
+            },
+            inventory: [],
+            position: { x: 0, y: 0 },
+        },
+    ],
+    isLocked: false,
+    isDebugging: false,
+    turnTimer: undefined,
+    timeRemaining: undefined,
+    messages: [],
+    journalEntries: [],
+    playersStats: [],
+    globalStats: {
+        gameDuration: '00:00',
+        turns: 0,
+        doorsToggled: [],
+    },
+    startTime: new Date(),
+} as GameRoom;
+let gameService: SinonStubbedInstance<GameService>;
+
 describe('GameRoomService', () => {
     let service: GameRoomService;
     let fakeServer: any;
-    let testRoom: GameRoom;
-    beforeEach(() => {
-        service = new GameRoomService();
+    let testRoom;
+    gameService = createStubInstance<GameService>(GameService);
+    const mockGameMovementService = { removeItemFromBoard: jest.fn(), addItemToBoard: jest.fn() };
+
+    beforeEach(async () => {
+        testRoom = JSON.parse(JSON.stringify(TEST_ROOM));
+        const module: TestingModule = await Test.createTestingModule({
+            providers: [
+                GameRoomService,
+                { provide: GameService, useValue: gameService },
+                { provide: GameMovementService, useValue: mockGameMovementService },
+            ],
+        }).compile();
+
+        service = module.get<GameRoomService>(GameRoomService);
+
         fakeServer = {
             to: jest.fn().mockReturnThis(),
             emit: jest.fn(),
         };
         service.setServer(fakeServer);
-
-        testRoom = {
-            roomId: 'test_room',
-            gameId: 'game1',
-            organisatorId: 'player1',
-            players: [
-                {
-                    id: 'player1',
-                    stats: {
-                        health: { maxValue: 4, value: 4, description: 'desc' },
-                        speed: { maxValue: 4, value: 4, description: 'desc' },
-                        attack: { maxValue: 4, value: 4, description: 'desc' },
-                        defense: { maxValue: 4, value: 4, description: 'desc' },
-                    },
-                },
-            ],
-            isLocked: true,
-        };
         service['gameRooms'] = [testRoom];
     });
 
     describe('Create GameRoom', () => {
-        it('should create a room with a waiting room', () => {
+        it('should create a room with a waiting room', async () => {
             const waitingRoom: GameRoom = {
                 roomId: 'room1',
                 gameId: 'game1',
@@ -50,14 +83,21 @@ describe('GameRoomService', () => {
                     },
                 ],
                 isLocked: true,
+                messages: [],
+                journalEntries: [],
             };
-            const newRoom = service.createRoom(waitingRoom);
+            gameService.getGameById.returns(Promise.resolve({ mode: 'ctf' } as Game));
+            (service as any).assignTurnOrder = stub().returns(waitingRoom.players);
+            (service as any).assignColor = stub().returns(waitingRoom.players);
+            (service as any).assignTeam = stub().returns(waitingRoom.players);
+
+            const newRoom = await service.createRoom(waitingRoom);
             expect(newRoom.roomId).toBe('game_room1');
             expect(newRoom.isLocked).toBeTruthy();
             expect(newRoom.players.length).toBeGreaterThan(0);
         });
 
-        it('should throw an error if a room with same name already exists', () => {
+        it('should throw an error if a room with same name already exists', async () => {
             const waitingRoom: GameRoom = {
                 roomId: 'test_room',
                 gameId: 'game1',
@@ -68,8 +108,10 @@ describe('GameRoomService', () => {
                     },
                 ],
                 isLocked: true,
+                messages: [],
+                journalEntries: [],
             };
-            expect(() => service.createRoom(waitingRoom)).toThrowError('La salle existe déjà');
+            await expect(service.createRoom(waitingRoom)).rejects.toThrowError('La salle existe déjà');
         });
     });
 
@@ -79,8 +121,8 @@ describe('GameRoomService', () => {
                 id: 'player2',
             });
             const abandonResult = service.abandonGame(testRoom.roomId, 'player1');
-            expect(testRoom.organisatorId).toBe('player2');
-            expect(abandonResult).toBe(true);
+            expect(testRoom.organisatorId).toBe('test_organisator');
+            expect(abandonResult).toBe(false);
         });
 
         it('should delete the room if players count is less than or equal to 1', () => {
@@ -96,6 +138,9 @@ describe('GameRoomService', () => {
             testRoom.players.push({
                 id: 'player3',
             });
+            testRoom.players.push({
+                id: 'player4',
+            });
             const abandonResult = service.abandonGame(testRoom.roomId, 'player2');
             expect(abandonResult).toBe(false);
         });
@@ -103,6 +148,30 @@ describe('GameRoomService', () => {
         it('should throw an error if the room doesnt exist', () => {
             expect(() => {
                 service.abandonGame('nonExistingRoom', 'player1');
+            }).toThrowError("La salle n'existe pas");
+        });
+
+        it('should set the first player as new organizer when the organizer abandons the game', () => {
+            testRoom.organisatorId = 'test_organisator';
+            testRoom.players = [{ id: 'player1' }, { id: 'player2' }];
+            service.abandonGame(testRoom.roomId, 'test_organisator');
+            expect(testRoom.organisatorId).toBe('player1');
+            expect(testRoom.isDebugging).toBe(false);
+        });
+    });
+
+    describe('isHost', () => {
+        it('should find if a player is the host', () => {
+            testRoom.players.push({
+                id: 'player2',
+            });
+            expect(service.isHost(testRoom.roomId, 'test_organisator')).toBe(true);
+            expect(service.isHost(testRoom.roomId, 'player2')).toBe(false);
+        });
+
+        it('should throw an error if the room doesnt exist', () => {
+            expect(() => {
+                service.isHost('nonExistentRoom', 'player1');
             }).toThrowError("La salle n'existe pas");
         });
     });
@@ -114,35 +183,76 @@ describe('GameRoomService', () => {
         });
     });
 
+    it('should add message to room', () => {
+        const message = {
+            type: 'test',
+            name: 'testName',
+            content: 'testContent',
+            time: 'testTime',
+        };
+        service.addMessage(testRoom.roomId, message);
+        expect(testRoom.messages).toEqual([message]);
+    });
+
+    it('should throw an error if the room does not exist on adding message', () => {
+        expect(() => {
+            service.addMessage('nonExistingRoom', { type: 'test', content: 'testContent', time: 'testTime' });
+        }).toThrowError("La salle n'existe pas");
+    });
+
+    it('should add entry to room', () => {
+        const entry = {
+            type: 'test',
+            content: 'testContent',
+            time: 'testTime',
+        };
+        const expectedEntry = {
+            type: entry.type,
+            content: entry.content,
+            time: 'testTime',
+        };
+        jest.spyOn(Date.prototype, 'toLocaleTimeString').mockReturnValue('testTime');
+        service.addJournalEntry(testRoom.roomId, entry);
+        expect(testRoom.journalEntries).toEqual([expectedEntry]);
+    });
+
+    it('should throw an error if the room does not exist on adding journal entry', () => {
+        expect(() => {
+            service.addJournalEntry('nonExistingRoom', { type: 'test', content: 'testContent', time: 'testTime' });
+        }).toThrowError("La salle n'existe pas");
+    });
+
     describe('prepareNextTurn', () => {
         it('should emit TurnStarting and set a turn timeout', () => {
             jest.useFakeTimers();
             const TURN_BREAK = 3;
             const startTurnSpy = jest.spyOn(service, 'startTurn').mockImplementation(() => {});
             service.prepareNextTurn(testRoom.roomId);
+            jest.advanceTimersByTime((TURN_BREAK + 1) * COUNTDOWN_INTERVAL);
 
             expect(fakeServer.to).toHaveBeenCalledWith(testRoom.roomId);
             expect(fakeServer.emit).toHaveBeenCalledWith(
                 GameRoomEvents.TurnStarting,
                 expect.objectContaining({
                     nextPlayer: testRoom.players[0],
-                    startTime: expect.any(Number),
+                    countdown: TURN_BREAK,
                 }),
             );
-            jest.advanceTimersByTime(TURN_BREAK + 1);
-            jest.runOnlyPendingTimers();
             expect(startTurnSpy).toHaveBeenCalled();
+            jest.runOnlyPendingTimers();
+            jest.useRealTimers();
         });
 
         it('should throw an error if the room doesnt exist', () => {
             expect(() => {
                 service.prepareNextTurn('nonExistingRoom');
-            }).toThrowError("La partie n'existe pas");
+            }).toThrowError("Le jeu n'existe pas");
         });
     });
 
     describe('startTurn', () => {
         it('should update countdown and call endTurn when turn ends', () => {
+            jest.useFakeTimers();
             const TURN_DURATION = 30;
             const TIME_LEFT = 29;
             const endTurnSpy = jest.spyOn(service, 'endTurn').mockImplementation(() => {});
@@ -159,7 +269,7 @@ describe('GameRoomService', () => {
         it('should throw an error in startTurn if the room doesnt exist', () => {
             expect(() => {
                 service.startTurn('nonExistingRoom');
-            }).toThrowError("La partie n'existe pas");
+            }).toThrowError("Le jeu n'existe pas");
         });
     });
 
@@ -176,7 +286,23 @@ describe('GameRoomService', () => {
         it('should throw an error in endTurn if the room doesnt exist', () => {
             expect(() => {
                 service.endTurn('nonExistingRoom');
-            }).toThrowError("La partie n'existe pas");
+            }).toThrowError("Le jeu n'existe pas");
+        });
+    });
+
+    describe('isPlayerTurn', () => {
+        it("should check if it is a player's turn", () => {
+            testRoom.players.push({
+                id: 'player2',
+            });
+            expect(service.isPlayerTurn(testRoom.roomId, 'test_player')).toBe(true);
+            expect(service.isPlayerTurn(testRoom.roomId, 'player2')).toBe(false);
+        });
+
+        it('should throw an error if the room doesnt exist', () => {
+            expect(() => {
+                service.isPlayerTurn('nonExistentRoom', 'player1');
+            }).toThrowError("Le jeu n'existe pas");
         });
     });
 
@@ -198,6 +324,8 @@ describe('GameRoomService', () => {
                     },
                 ],
                 isLocked: true,
+                messages: [],
+                journalEntries: [],
             };
 
             service['gameRooms'].push(testRoom2);
@@ -208,7 +336,7 @@ describe('GameRoomService', () => {
         it('should throw an error in endGame if the room doesnt exist', () => {
             expect(() => {
                 service.endGame('nonExistingRoom');
-            }).toThrowError("La partie n'existe pas");
+            }).toThrowError("Le jeu n'existe pas");
         });
     });
 
@@ -247,6 +375,7 @@ describe('GameRoomService', () => {
         jest.useFakeTimers();
 
         it('should start the countdown and emit update events if the first player has movementPoints >= 1', () => {
+            jest.useFakeTimers();
             const TIME_REMAINING = 9;
             testRoom.timeRemaining = 10;
             testRoom.players[0].movementPoints = 2;
@@ -274,7 +403,7 @@ describe('GameRoomService', () => {
         it('should throw an error if the room does not exist', () => {
             expect(() => {
                 service.resumeTurn('nonExistingRoom');
-            }).toThrowError("La partie n'existe pas");
+            }).toThrowError("Le jeu n'existe pas");
         });
     });
 
@@ -285,7 +414,7 @@ describe('GameRoomService', () => {
         });
 
         it('should return rooms where the player is in the players array', () => {
-            const foundRooms = service.findRoomsByPlayerId('player1');
+            const foundRooms = service.findRoomsByPlayerId('test_player');
             expect(foundRooms).toContain(testRoom);
         });
 
@@ -306,6 +435,8 @@ describe('GameRoomService', () => {
                     },
                 ],
                 isLocked: true,
+                messages: [],
+                journalEntries: [],
             };
             service['gameRooms'].push(room1);
             const foundRooms = service.findRoomsByPlayerId('player4');
@@ -322,6 +453,8 @@ describe('GameRoomService', () => {
                 isDebugging: false,
                 turnTimer: undefined,
                 timeRemaining: undefined,
+                messages: [],
+                journalEntries: [],
             };
 
             service['gameRooms'].push(roomWithoutPlayers);
@@ -421,5 +554,220 @@ describe('GameRoomService', () => {
 
             clearTimeoutSpy.mockRestore();
         });
+    });
+
+    describe('Inventory Management', () => {
+        const coords = { x: 0, y: 0 };
+        beforeEach(() => {
+            // S'assurer que tous les joueurs ont bien un inventaire et une position initialisés
+            testRoom.players.forEach((player) => {
+                player.inventory = [];
+                player.position = { x: 0, y: 0 };
+            });
+        });
+
+        describe('addItemToInventory', () => {
+            it('should add an item to the player inventory', () => {
+                const testItem = { type: 'sword' };
+                service.addItemToInventory(testRoom.roomId, 'test_player', testItem, coords);
+                const player = testRoom.players.find((p) => p.id === 'test_player');
+                expect(player.inventory).toContain(testItem);
+            });
+
+            it('should drop an item if the player is virtual', () => {
+                testRoom.players.push({ id: 'VP', inventory: [{ type: 'flag' }, { type: 'shield' }], isVirtual: true });
+                const testItem = { type: 'sword' };
+                service.addItemToInventory(testRoom.roomId, 'VP', testItem, coords);
+                expect(fakeServer.to).toHaveBeenCalledWith(testRoom.roomId);
+                expect(fakeServer.emit).toHaveBeenCalledWith(GameRoomEvents.ItemDropped, {
+                    roomId: testRoom.roomId,
+                    playerId: 'VP',
+                    item: { type: 'shield' },
+                    coords,
+                });
+            });
+        });
+
+        describe('removeItem', () => {
+            it('should remove the item from the player inventory if present', () => {
+                const testItem = { type: 'shield' };
+                const player = testRoom.players.find((p) => p.id === 'test_player');
+                if (!player.inventory) player.inventory = [];
+                player.inventory.push(testItem);
+                service.removeItemFromInventory(testRoom.roomId, 'test_player', testItem, coords);
+                expect(player.inventory).not.toContain(testItem);
+            });
+
+            it('should not change the inventory if the item is not present', () => {
+                const testItem = { type: 'bow' };
+                const player = testRoom.players.find((p) => p.id === 'test_player');
+                if (!player.inventory) player.inventory = [];
+                // L'inventaire est vide par défaut
+                service.removeItemFromInventory(testRoom.roomId, 'test_player', testItem, coords);
+                expect(player.inventory.length).toBe(0);
+            });
+
+            it('should do nothing if playerId is falsy', () => {
+                const testItem = { type: 'axe' };
+                const player = testRoom.players.find((p) => p.id === 'test_player');
+                if (!player.inventory) player.inventory = [];
+                player.inventory.push(testItem);
+                service.removeItemFromInventory(testRoom.roomId, '', testItem, coords);
+                // L'inventaire doit rester inchangé
+                expect(player.inventory).toContain(testItem);
+            });
+        });
+
+        describe('dropItemsWhenDisconnected', () => {
+            it('should emit the ItemDroppedDisconnected event with the correct payload', () => {
+                // Ajouter un deuxième joueur pour que le premier de la liste soit utilisé pour l'émission de l'événement
+                const secondPlayer = {
+                    id: 'player2',
+                    inventory: [],
+                    position: { x: 10, y: 20 },
+                    stats: {},
+                };
+                testRoom.players.push(secondPlayer);
+
+                // Configurer les données du joueur déconnecté (player1)
+                const player1 = testRoom.players.find((p) => p.id === 'test_player');
+                if (!player1.inventory) player1.inventory = [];
+                player1.inventory = [{ type: 'potion' }];
+                if (!player1.position) player1.position = { x: 0, y: 0 };
+                player1.position = { x: 5, y: 5 };
+
+                service.dropItemsWhenDisconnected(testRoom.roomId, 'test_player');
+
+                // Vérifier que l'événement est émis vers l'ID du premier joueur de la salle (ici player1)
+                expect(fakeServer.to).toHaveBeenCalledWith(testRoom.players[0].id);
+                expect(fakeServer.emit).toHaveBeenCalledWith(GameRoomEvents.ItemDroppedDisconnected, {
+                    roomId: testRoom.roomId,
+                    coords: player1.position,
+                    items: player1.inventory,
+                });
+            });
+        });
+    });
+
+    describe('isOpponent', () => {
+        it('should check if player is opponent from ctf', () => {
+            const secondPlayer = {
+                id: 'player2',
+                inventory: [],
+                position: { x: 10, y: 20 },
+                stats: {},
+                team: 1,
+            };
+            testRoom.players[0].team = 0;
+
+            expect(service.isOpponent(testRoom.players[0], secondPlayer, true)).toEqual(true);
+        });
+        it('should check if player is opponent from classic game', () => {
+            const secondPlayer = {
+                id: 'player2',
+                inventory: [],
+                position: { x: 10, y: 20 },
+                stats: {},
+                team: 1,
+            };
+            testRoom.players[0].team = 0;
+
+            expect(service.isOpponent(testRoom.players[0], secondPlayer, false)).toEqual(true);
+            expect(service.isOpponent(testRoom.players[0], testRoom.players[0], false)).toEqual(false);
+        });
+    });
+
+    it('should check if player is carrying flag', () => {
+        testRoom.players[0].inventory = [{ type: 'flag' }];
+
+        expect(service.isCarryingFlag(testRoom.players[0])).toEqual({ type: 'flag' });
+    });
+
+    it('should check if opponent is carrying flag', () => {
+        const secondPlayer = {
+            id: 'player2',
+            inventory: [{ type: 'flag' }],
+            position: { x: 10, y: 20 },
+            stats: {},
+            team: 1,
+        };
+        testRoom.players[0].team = 0;
+
+        expect(service.isOpponentCarryingFlag(testRoom.players[0], secondPlayer)).toEqual({ type: 'flag' });
+    });
+
+    it('should check if flag is with our team', () => {
+        const secondPlayer = {
+            id: 'player2',
+            inventory: [{ type: 'flag' }],
+            position: { x: 10, y: 20 },
+            stats: {},
+            team: 0,
+        };
+        testRoom.players.push(secondPlayer);
+        testRoom.players[0].inventory = [];
+        testRoom.players[0].team = 0;
+
+        expect(service.isFlagWithOurTeam(testRoom.players[0])).toEqual(secondPlayer);
+    });
+
+    it('should not check if flag is with our team', () => {
+        const secondPlayer = {
+            id: 'player2',
+            inventory: [{ type: 'flag' }],
+            position: { x: 10, y: 20 },
+            stats: {},
+            team: 1,
+        };
+        testRoom.players.push(secondPlayer);
+        testRoom.players[0].inventory = [];
+        testRoom.players[0].team = 0;
+        expect(service.isFlagWithOurTeam({ id: 'fakeId' } as Player)).toEqual(false);
+    });
+
+    it('should change organisator', () => {
+        const secondPlayer = {
+            id: 'player2',
+        };
+        testRoom.players.push(secondPlayer);
+
+        service.changeOrganisator(testRoom.roomId);
+
+        expect(testRoom.organisatorId).toEqual('test_player');
+        expect(() => {
+            service.changeOrganisator('nonExistentRoom');
+        }).toThrow("La salle n'existe pas");
+    });
+
+    it('should get random delay', () => {
+        const minSeconds = 10;
+        const maxSeconds = 20;
+
+        const result = service.getRandomDelay(minSeconds, maxSeconds);
+
+        expect(result).toBeGreaterThanOrEqual(minSeconds);
+        expect(result).toBeLessThanOrEqual(maxSeconds);
+    });
+
+    it('should assign colors', () => {
+        let players = [{ id: 0 }];
+
+        players = (service as any).assignColor(players);
+
+        expect(players).toEqual([{ id: 0, color: 'yellow' }]);
+    });
+
+    it('should assign teams', () => {
+        let players = [
+            { id: 0, team: undefined },
+            { id: 2, team: undefined },
+            { id: 3, team: undefined },
+            { id: 4, team: undefined },
+        ];
+
+        players = (service as any).assignTeam(players);
+        const team1 = players.filter((p) => p.team === 1);
+        const team2 = players.filter((p) => p.team === 2);
+        expect(team1.length).toEqual(team2.length);
     });
 });

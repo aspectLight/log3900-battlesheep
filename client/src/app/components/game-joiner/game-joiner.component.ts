@@ -3,8 +3,8 @@ import { Router, RouterLink } from '@angular/router';
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { ROUTES } from '@app/constants/routes.constants';
 import { GameCreationService } from '@app/services/game-creation.service';
-import { SocketService } from '@app/services/socket.service';
-
+import { MovementSocketService } from '@app/services/socket/movement-socket.service';
+import { RoomSocketService } from '@app/services/socket/room-socket.service';
 @Component({
     selector: 'app-game-joiner',
     templateUrl: './game-joiner.component.html',
@@ -17,11 +17,13 @@ export class GameJoinerComponent {
     errorMessage: string;
 
     constructor(
-        private socketService: SocketService,
+        private socketService: RoomSocketService,
+        private movementSocketService: MovementSocketService,
         private gameCreationService: GameCreationService,
         private router: Router,
     ) {
         this.gameCreationService.isHost = false;
+        this.movementSocketService.sync();
     }
 
     joinGame() {

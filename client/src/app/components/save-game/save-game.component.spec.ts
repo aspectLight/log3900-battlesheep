@@ -9,6 +9,9 @@ import { HTTP_STATUS_CODES } from '@app/constants/http-status-code.constants';
 import { of, throwError } from 'rxjs';
 import { SaveGameComponent } from './save-game.component';
 import { ROUTES } from '@app/constants/routes.constants';
+import { Board } from '@app/classes/board';
+import { BOARD_CONFIGS, BoardSizes } from '@app/constants/board.constants';
+import { WARNING_MESSAGES } from '@common/error-messages.constants';
 
 interface BoardComponentPrivate {
     validateBoard(): boolean;
@@ -33,12 +36,15 @@ describe('SaveGameComponent', () => {
             'setBoard',
             'fetchGames',
             'getId',
+            'getMode',
         ]);
         gameValidationServiceSpy = jasmine.createSpyObj('GameValidationService', ['validateGame']);
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
         gameServiceSpy.getName.and.returnValue('Nom1');
         gameServiceSpy.getDescription.and.returnValue('Description1');
+        gameServiceSpy.getMode.and.returnValue('classic');
+        gameServiceSpy.getBoard.and.returnValue(new Board(BOARD_CONFIGS[BoardSizes.Moyenne].board));
 
         gameValidationServiceSpy.validateGame.and.returnValue([]);
 
@@ -53,6 +59,7 @@ describe('SaveGameComponent', () => {
 
         fixture = TestBed.createComponent(SaveGameComponent);
         component = fixture.componentInstance;
+        component.board = new Board(BOARD_CONFIGS[BoardSizes.Moyenne].board);
         fixture.detectChanges();
     });
 
@@ -67,21 +74,22 @@ describe('SaveGameComponent', () => {
 
         expect(gameServiceSpy.getName).toHaveBeenCalled();
         expect(gameServiceSpy.getDescription).toHaveBeenCalled();
+        expect(gameServiceSpy.getMode).toHaveBeenCalled();
         expect(gameValidationServiceSpy.validateGame).toHaveBeenCalled();
     });
 
     it('should navigate to /admin-game on successful modificated save', () => {
-        gameServiceSpy['saveModifications'].and.returnValue(of(new Game()));
+        gameServiceSpy.saveModifications.and.returnValue(of(new Game()));
 
         component['saveModifications']();
 
-        expect(gameServiceSpy['saveModifications']).toHaveBeenCalled();
+        expect(gameServiceSpy.saveModifications).toHaveBeenCalled();
         expect(routerSpy.navigate).toHaveBeenCalledWith([ROUTES.admin]);
     });
 
     it('should call handleSaveError on error on modificated save', fakeAsync(() => {
         let errorResponse = new HttpErrorResponse({ status: 500, statusText: 'InternalServerError' });
-        gameServiceSpy['saveModifications'].and.returnValue(throwError(() => errorResponse));
+        gameServiceSpy.saveModifications.and.returnValue(throwError(() => errorResponse));
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spyError = spyOn(component as any, 'handleSaveError').and.callThrough();
 
@@ -91,7 +99,7 @@ describe('SaveGameComponent', () => {
         expect(component.errorMessage).toBe('Une erreur est survenue. Veuillez réessayer.');
 
         errorResponse = new HttpErrorResponse({ status: HTTP_STATUS_CODES.conflict, statusText: 'Conflict' });
-        gameServiceSpy['saveModifications'].and.returnValue(throwError(() => errorResponse));
+        gameServiceSpy.saveModifications.and.returnValue(throwError(() => errorResponse));
 
         component['saveModifications']();
 
@@ -100,17 +108,17 @@ describe('SaveGameComponent', () => {
     }));
 
     it('should navigate to /admin-game on successful on new save', () => {
-        gameServiceSpy['saveNewGame'].and.returnValue(of(void 0));
+        gameServiceSpy.saveNewGame.and.returnValue(of(void 0));
 
         component['saveNewGame']();
 
-        expect(gameServiceSpy['saveNewGame']).toHaveBeenCalled();
+        expect(gameServiceSpy.saveNewGame).toHaveBeenCalled();
         expect(routerSpy.navigate).toHaveBeenCalledWith([ROUTES.admin]);
     });
 
-    it('should call handleSaveError on error on modificated save', fakeAsync(() => {
+    it('should call handleSaveError on error on new save', fakeAsync(() => {
         let errorResponse = new HttpErrorResponse({ status: 500, statusText: 'InternalServerError' });
-        gameServiceSpy['saveNewGame'].and.returnValue(throwError(() => errorResponse));
+        gameServiceSpy.saveNewGame.and.returnValue(throwError(() => errorResponse));
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spyError = spyOn(component as any, 'handleSaveError').and.callThrough();
 
@@ -120,7 +128,7 @@ describe('SaveGameComponent', () => {
         expect(component.errorMessage).toBe('Une erreur est survenue. Veuillez réessayer.');
 
         errorResponse = new HttpErrorResponse({ status: HTTP_STATUS_CODES.conflict, statusText: 'Conflict' });
-        gameServiceSpy['saveNewGame'].and.returnValue(throwError(() => errorResponse));
+        gameServiceSpy.saveNewGame.and.returnValue(throwError(() => errorResponse));
 
         component['saveNewGame']();
 
@@ -146,7 +154,7 @@ describe('SaveGameComponent', () => {
 
         const saveModifications = spyOn(component as unknown as BoardComponentPrivate, 'saveModifications');
 
-        component.onSaveGame();
+        component.onConfirmSave();
 
         expect(saveModifications).toHaveBeenCalled();
     }));
@@ -160,7 +168,7 @@ describe('SaveGameComponent', () => {
 
         const saveNewGameSpy = spyOn(component as unknown as BoardComponentPrivate, 'saveNewGame');
 
-        component.onSaveGame();
+        component.onConfirmSave();
 
         expect(saveNewGameSpy).toHaveBeenCalled();
     }));
@@ -171,7 +179,7 @@ describe('SaveGameComponent', () => {
         const saveNewGameSpy = spyOn(component as unknown as BoardComponentPrivate, 'saveNewGame');
         gameServiceSpy.isGameBeingModified = false;
 
-        component.onSaveGame();
+        component.onConfirmSave();
 
         expect(saveNewGameSpy).toHaveBeenCalled();
     });
@@ -182,5 +190,17 @@ describe('SaveGameComponent', () => {
         component.closeDialogue();
 
         expect(component.errors).toEqual([]);
+    });
+
+    it('should set up confirmation dialog when onSaveGame is called with valid board', () => {
+        const validateBoardSpy = spyOn(component as unknown as BoardComponentPrivate, 'validateBoard');
+        validateBoardSpy.and.returnValue(true);
+
+        component.onSaveGame();
+
+        expect(component.errorMessage).toBe(WARNING_MESSAGES.SaveConfirmation);
+        expect(component.showError).toBeTrue();
+        expect(component.showSecondButton).toBeTrue();
+        expect(component.onConfirm).toBe(component.onConfirmSave);
     });
 });

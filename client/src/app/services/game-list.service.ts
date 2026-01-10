@@ -16,7 +16,7 @@ export class GameListService {
     ) {}
 
     getDate(game: Game): string {
-        const d = new Date(game.modificationDate).toLocaleString('fr-FR', {
+        const date = new Date(game.modificationDate).toLocaleString('fr-FR', {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
@@ -25,7 +25,7 @@ export class GameListService {
             minute: '2-digit',
             second: '2-digit',
         });
-        return d;
+        return date;
     }
 
     onCheckboxClick(game: Game): Observable<object> {

@@ -1,104 +1,82 @@
+<!-- Cards container moved outside the main container -->
+<div class="cards-container">
+  @for (card of cards; track card.item; let i = $index) {
+    <app-item-card [item]="card.item" [index]="i"></app-item-card>
+  }
+</div>
+
 <div class="container">
-  <div class="cards-container">
-    @for (card of cards; track card.item; let i = $index) {
-      <div class="card" (click)="toggleCard(i)" (mouseenter)="hoverCard(i)" (mouseleave)="unhoverCard(i)">
-        <div class="corner letter">{{ card.item.name[0] }}</div>
-        <!-- Corner decorations - all four corners now -->
-        <div class="corner-decoration top-left"></div>
-        <div class="corner-decoration top-right"></div>
-        <div class="corner-decoration bottom-left"></div>
-        <div class="corner-decoration bottom-right"></div>
-        
-        <!-- Side decorations -->
-        <div class="side-decoration left-side"></div>
-        <div class="side-decoration right-side"></div>
-        
-        <!-- Diamond accents -->
-        <div class="diamond diamond-left-1"></div>
-        <div class="diamond diamond-left-2"></div>
-        <div class="diamond diamond-left-3"></div>
-        <div class="diamond diamond-right-1"></div>
-        <div class="diamond diamond-right-2"></div>
-        <div class="diamond diamond-right-3"></div>
-        
-        <!-- Top and bottom borders -->
-        <div class="border-decoration top-border"></div>
-        <div class="border-decoration bottom-border"></div>
-
-        <div class="card-wrapper">
-          <img class="suit" [src]="card.item.imagePath" alt="Image de la carte" />
-          <div class="card-name"> {{card.item.name}}</div>
-          <div class="card-description"> {{card.item.description}}</div>
-        </div>
-        <div class="corner letter-reversed">{{ card.item.name[0] }}</div>
-      </div>
-
-    }
-  </div>
-
-
-  <div class="player-info">
+  <div class="player-hud">
     @if (player) {
-      <div class="left-side">
-        <div class="player-img">
+      <div class="player-header">
+        <div class="player-avatar">
           <img [src]="player.avatar?.avatar" alt="Player Avatar">
         </div>
-        <p class="player-name">{{ player.name || 'viktor' }}</p>
-        <!-- <div class="dices">
-          <div class="dice-selection">
-            <img src="./assets\items\D4.png" class="dice"> 
-            {{d4Stat}}
+        <div class="player-info">
+          <div class="name-row">
+            <h1 class="player-name">{{ player.name || 'viktor' }}</h1>
+            <div class="points-info">
+              <span class="point-value">{{ movementPoints }} Movements</span>
+              <span class="point-value">{{ actionPoints }} Actions</span>
+            </div>
           </div>
-          <div class="dice-selection">
-            <img src="./assets\items\D6.png" class="dice"> 
-            {{d6Stat}}	
-          </div>
-        </div> -->
-        <p class="ingame-points">Movements: {{ movementPoints }}</p>
-        <p class="ingame-points">Actions: {{ actionPoints }}</p>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <span class="section-title">STATS</span>
       </div>
       
-      <div class="right-side">
-        <p class="stats-title">stats</p>
-        
-        <div class="stats-container">
-          <div class="stat-row">
-            <div class="stat-label">vie</div>
-            <div class="stat-points">
-              @for(i of healthPoints; track i) {
-                <img src="./assets/stats/health.png" class="point">
-              }
-            </div>
+      <div class="stats-grid">
+        <div class="stat-row">
+          <span class="stat-label">Health</span>
+          <div class="stat-points">
+            @for(i of healthPoints; track i) {
+              <img src="./assets/stats/health.png" class="point">
+            }
           </div>
-          
-          <div class="stat-row">
-            <div class="stat-label">défense</div>
-            <div class="stat-points">
-              @for(i of defensePoints; track i) {
-                <img src="./assets/stats/defense.png" class="point">
-              }
-            </div>
-            <img [src]="getDice('defense')" class="dice">
-          </div>
+        </div>
 
-          <div class="stat-row">
-            <div class="stat-label">attaque</div>
-            <div class="stat-points">
-              @for(i of attackPoints; track i) {
-                <img src="./assets/stats/attack.png" class="point">
-              }
-            </div>
-            <img [src]="getDice('attack')" class="dice">
+        <div class="stat-row">
+          <span class="stat-label">Attack</span>
+          <div class="stat-points">
+            @for(i of attackPoints; track i) {
+              <img src="./assets/stats/attack.png" class="point">
+            }
           </div>
-          
-          <div class="stat-row">
-            <div class="stat-label">rapidité</div>
-            <div class="stat-points">
-              @for(i of speedPoints; track i) {
-                <img src="./assets/stats/speed.png" class="point">
-              }
-            </div>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-label">Defense</span>
+          <div class="stat-points">
+            @for(i of defensePoints; track i) {
+              <img src="./assets/stats/defense.png" class="point">
+            }
           </div>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-label">Speed</span>
+          <div class="stat-points">
+            @for(i of speedPoints; track i) {
+              <img src="./assets/stats/speed.png" class="point">
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <span class="section-title">DICE</span>
+      </div>
+
+      <div class="dice-grid">
+        <div class="dice-row">
+          <span class="dice-label">Attack</span>
+          <img [src]="getDice('attack')" class="dice">
+        </div>
+        <div class="dice-row">
+          <span class="dice-label">Defense</span>
+          <img [src]="getDice('defense')" class="dice">
         </div>
       </div>
     }

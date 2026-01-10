@@ -2,22 +2,23 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameCreationService } from '@app/services/game-creation.service';
 import { PlayerCreationService } from '@app/services/player-creation.service';
-import { SocketService } from '@app/services/socket.service';
 import { CreatePlayerPageComponent } from './create-player-page.component';
 
 import { ElementRef } from '@angular/core';
 import { Player } from '@app/classes/player';
-import { ErrorMessages } from '@app/constants/error-messages.constants';
-import { DEFAULT_STATS_VALUE } from '@app/constants/player.constants';
+import { ErrorMessages } from '@common/error-messages.constants';
+import { DEFAULT_STATS_VALUE, AVATAR_TYPES } from '@app/constants/player.constants';
 import { ROUTES } from '@app/constants/routes.constants';
 import { Subject } from 'rxjs';
+import { RoomSocketService } from '@app/services/socket/room-socket.service';
+import { BonusType } from '@app/constants/bonus.constants';
 
 describe('CreatePlayerPageComponent', () => {
     let component: CreatePlayerPageComponent;
     let fixture: ComponentFixture<CreatePlayerPageComponent>;
     let mockGameCreationService: jasmine.SpyObj<GameCreationService>;
     let mockPlayerCreationService: jasmine.SpyObj<PlayerCreationService>;
-    let mockSocketService: jasmine.SpyObj<SocketService>;
+    let mockSocketService: jasmine.SpyObj<RoomSocketService>;
     let mockRouter: jasmine.SpyObj<Router>;
 
     let roomLockedSubject: Subject<boolean>;
@@ -30,11 +31,13 @@ describe('CreatePlayerPageComponent', () => {
         mockPlayerCreationService = jasmine.createSpyObj('PlayerCreationService', ['createPlayer'], ['selectedCharacter', 'selectedBonus']);
         mockGameCreationService = jasmine.createSpyObj('GameCreationService', [], ['isHost', 'gameCode', 'selectedGame']);
         mockSocketService = jasmine.createSpyObj(
-            'SocketService',
-            ['getReservedAvatars', 'getId', 'reserveAvatar', 'createRoom', 'createPlayer'],
+            'RoomSocketService',
+            ['getReservedAvatars', 'getId', 'reserveAvatar', 'createRoom', 'createPlayer', 'sync'],
             ['roomLocked$', 'reservedAvatars$'],
         );
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+
+        mockSocketService.getId.and.returnValue('1');
 
         Object.defineProperty(mockGameCreationService, 'isHost', { get: () => true });
         Object.defineProperty(mockGameCreationService, 'gameCode', { get: () => 'testCode' });
@@ -63,7 +66,7 @@ describe('CreatePlayerPageComponent', () => {
             providers: [
                 { provide: PlayerCreationService, useValue: mockPlayerCreationService },
                 { provide: GameCreationService, useValue: mockGameCreationService },
-                { provide: SocketService, useValue: mockSocketService },
+                { provide: RoomSocketService, useValue: mockSocketService },
                 { provide: Router, useValue: mockRouter },
                 { provide: ActivatedRoute, useValue: {} },
             ],
@@ -105,7 +108,7 @@ describe('CreatePlayerPageComponent', () => {
         };
         component.onCharacterSelected(chosenAvatar);
         expect(mockPlayerCreationService.selectedCharacter).toEqual(expectedCharacter);
-        expect(mockSocketService.reserveAvatar).toHaveBeenCalledWith('testCode', chosenAvatar.name);
+        expect(mockSocketService.reserveAvatar).toHaveBeenCalledWith('testCode', chosenAvatar.name, chosenAvatar.id.toString());
     });
 
     it('onBonusSelected should update selectedBonus', () => {
@@ -152,5 +155,54 @@ describe('CreatePlayerPageComponent', () => {
         expect(component.gameModified).toBeFalse();
         expect(component.showError).toBeFalse();
         expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.home]);
+    });
+
+    it('should return empty string when getId returns undefined', () => {
+        mockSocketService.getId.and.returnValue(undefined);
+        expect(component.getId()).toBe('');
+    });
+
+    describe('previewPlayer getter', () => {
+        it('should return empty player when no character is selected', () => {
+            Object.defineProperty(mockPlayerCreationService, 'selectedCharacter', {
+                get: () => ({
+                    character: { name: '', id: 1, avatar: '', avatarFull: '' },
+                    bonus: { life: 0, speed: 0, defense: 0, attack: 0 },
+                }),
+            });
+            const player = component.previewPlayer;
+            expect(player.name).toBeNull();
+            expect(player.avatar).toBeNull();
+            expect(player.d4Choice).toBe(BonusType.Attack);
+            expect(player.d6Choice).toBeNull();
+        });
+
+        it('should create player with correct bonuses when character is selected', () => {
+            Object.defineProperty(mockPlayerCreationService, 'selectedCharacter', {
+                get: () => ({
+                    character: { name: 'TestChar', id: 1, avatar: '', avatarFull: '' },
+                    bonus: { life: 6, speed: 0, defense: 6, attack: 0 },
+                }),
+            });
+            const player = component.previewPlayer;
+            expect(player.name).toBe('TestChar');
+            expect(player.avatar).toBe(AVATAR_TYPES['testchar']);
+            expect(player.d4Choice).toBe(BonusType.Attack);
+            expect(player.d6Choice).toBe(BonusType.Defense);
+        });
+
+        it('should create player with speed and attack bonuses when no stat has bonus', () => {
+            Object.defineProperty(mockPlayerCreationService, 'selectedCharacter', {
+                get: () => ({
+                    character: { name: 'TestChar', id: 1, avatar: '', avatarFull: '' },
+                    bonus: { life: 0, speed: 0, defense: 0, attack: 0 },
+                }),
+            });
+            const player = component.previewPlayer;
+            expect(player.name).toBe('TestChar');
+            expect(player.avatar).toBe(AVATAR_TYPES['testchar']);
+            expect(player.d4Choice).toBe(BonusType.Defense);
+            expect(player.d6Choice).toBe(BonusType.Attack);
+        });
     });
 });

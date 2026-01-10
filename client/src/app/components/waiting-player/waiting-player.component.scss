@@ -1,7 +1,7 @@
 .return-button {
     position: fixed;
     top: 30px;
-    left : 10px;
+    left: 10px;
     display: flex;
     align-items: center;
     gap: 15px;
@@ -21,100 +21,208 @@
 
 .return-button > img {
     width: 15px;
-}
-
-.waiting-room-container {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    box-sizing: border-box;
+    max-width: 15px;
 }
 
 .header {
     display: flex;
     justify-content: center;
-    margin-bottom: -2rem;
+    margin-bottom: 10px;
+    width: 100%;
+    position: relative;
 }
 
-.waiting-room-container .title {
-    position: fixed;
-    top: 0px;
+.title {
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #e0d8c0;
+}
+
+.waiting-room-container {
+    width: 100vw;
+    height: 85%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .players-container {
-    position: fixed;
-    top: 80px;
-    bottom: calc(150px + .5em);
-    left: 0;
-    right: 0;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
+    justify-content: center;
     align-items: center;
+    width: 100%;
+    max-width: 90vw;
+    overflow-x: auto;
+    padding: 10px 20px;
+    gap: 10px;
+    
+    /* Ensure player cards compress instead of wrap */
+    ::ng-deep .player-container {
+        flex-shrink: 1;
+        min-width: 150px; /* Minimum size before horizontal scrolling starts */
+        width: auto;      /* Allow auto-sizing */
+        transform: scale(0.95); /* Slightly reduce scale */
+        transition: all 0.3s ease;
+    }
+    
+    /* Add scrollbar styling */
+    &::-webkit-scrollbar {
+        height: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
 }
 
 .chat-container {
     position: fixed;
-    bottom: 0;
-    right: 0;
+    bottom: 10px;
+    right: 10px;
+    width: 25vw;
 }
 
-.game-info {
-    position: fixed;
-    bottom: 20px;
+.game-info-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-bottom: 0rem;
+    width: 100%;
+    max-width: 600px;
+    border-radius: 8px;
+    padding-bottom: 30px;
+    gap: 20px;
+}
+
+.game-info {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    align-items: center;
+    text-align: center;
 }
 
 .game-info h3 {
-    margin-bottom: -1rem;
+    color: #e0d8c0;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.game-info h1 {
+    color: #fff0f0;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-size: 2.5rem;
+    margin: 0;
 }
 
 .host-options {
-    position: fixed;
-    bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    flex-wrap: wrap;
+    font-size: 1.2rem;
 }
 
 .waiting-msg {
-    position: fixed;
-    bottom: 16px;
+    color: #e0d8c0;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-align: center;
 }
 
+/* Reuse button styles from game-list */
 button {
-    padding: 10px 15px;
-    width: auto;
-}
-
-button:hover {
     cursor: pointer;
-    color: red;
+    background: none;
+    border: none;
+    outline: none;
+    color: inherit;
+    transition: all 0.3s ease;
 }
 
-button:active {
-    color: darkred;
+/* Apply square-button style from game-list */
+.host-options button {
+    width: 180px;
+    text-align: center;
+    padding: 0.75rem 1.5rem;
+    background-color: #550000;
+    color: #fff0f0;
+    border: 1px solid #7f1f1f;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(85, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+}
+
+.host-options button:hover {
+    background-color: #7f1f1f;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(85, 0, 0, 0.3);
+}
+
+.host-options button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(85, 0, 0, 0.2);
 }
 
 .startGame-btn {
     opacity: 0.5;
     cursor: not-allowed;
-}
-
-.startGame-btn:hover {
-    color: inherit; 
+    background-color: #2b2b2b;
+    color: #e0d8c0;
+    border-color: #3a3a3a;
+    pointer-events: none;
 }
 
 .startGame-btn.isClickable {
     opacity: 1;
-    cursor: pointer;
+    border-color: #7f1f1f;
+    pointer-events: auto
 }
 
 .startGame-btn.isClickable:hover {
-    color: red; 
+    background-color: #7f1f1f;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(85, 0, 0, 0.3);
+}
+
+.add-vp-btn {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #2b2b2b;
+    color: #e0d8c0;
+    border-color: #3a3a3a;
+    pointer-events: none;
+}
+
+.add-vp-btn.isClickable {
+    opacity: 1;
+    border-color: #7f1f1f;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.add-vp-btn.isClickable:hover {
+    background-color: #7f1f1f;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(85, 0, 0, 0.3);
 }

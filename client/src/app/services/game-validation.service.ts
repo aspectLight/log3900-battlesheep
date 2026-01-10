@@ -1,40 +1,29 @@
 import { Injectable } from '@angular/core';
 import { Board } from '@app/classes/board';
 import { Cell } from '@app/classes/cell';
-import { ErrorMessages, SPECIFIC_ERROR } from '@app/constants/error-messages.constants';
+import { ErrorMessages, SPECIFIC_ERROR } from '@common/error-messages.constants';
 import { ITEM_TYPES } from '@app/constants/item.constants';
-import { TILE_TYPES } from '@app/constants/tile.constants';
 import { Coords } from '@app/interfaces/coords';
 import { SaveValidationResult } from '@app/interfaces/save-validation-result';
-
-const TILES_COVERAGE_PERCENTAGE = 0.5;
-const TERRAIN_TILES = Object.keys(TILE_TYPES).filter((key) => ['water', 'ice', 'snow'].includes(key));
-const ACCESIBLE_TILES = Object.keys(TILE_TYPES).filter((key) => ['water', 'ice', 'snow', 'door'].includes(key));
-const WALL_TYPE_TILES = Object.keys(TILE_TYPES).filter((key) => ['wall', 'corner', 'intersection', 'stone', 'tree'].includes(key));
+import {
+    TERRAIN_TILES,
+    ACCESIBLE_TILES,
+    WALL_TYPE_TILES,
+    TILES_COVERAGE_PERCENTAGE,
+    REQUIRED_OBJECTS,
+} from '@app/constants/game-validation.constants';
 export const ITEMS = Object.keys(ITEM_TYPES).filter((key) => key !== 'spawnPoint');
-
-const BOARD_SIZES = {
-    small: 10,
-    medium: 15,
-    large: 20,
-};
-
-const REQUIRED_OBJECTS = {
-    [BOARD_SIZES.small]: 2,
-    [BOARD_SIZES.medium]: 4,
-    [BOARD_SIZES.large]: 6,
-};
 
 @Injectable({
     providedIn: 'root',
 })
 export class GameValidationService {
-    validateGame(name: string, description: string, board: Board): SaveValidationResult[] {
+    validateGame(name: string, description: string, board: Board, isCTF: boolean): SaveValidationResult[] {
         const nameValidation = this.validateName(name);
         const descriptionValidation = this.validateDescription(description);
         const coverageValidation = this.validateTerrainTilesCoverage(board);
         const spawnPointsValidation = this.validateSpawnPoints(board);
-        const itemsValidation = this.validateItems(board);
+        const itemsValidation = this.validateItems(board, isCTF);
         const accessibilityValidation = this.validateTerrainTilesAccessibility(board);
         const doorsValidation = this.validateDoors(board);
 
@@ -83,12 +72,24 @@ export class GameValidationService {
         return { isValid: false, message: SPECIFIC_ERROR.minSpawnPoints(requiredPoints) };
     }
 
-    validateItems(board: Board): SaveValidationResult {
+    validateItems(board: Board, isCTF: boolean): SaveValidationResult {
         const items = board.matrix.reduce((total, row) => {
             return total + row.filter((cell) => cell.item?.type && ITEMS.includes(cell.item.type)).length;
         }, 0);
 
+        const hasFlag = board.matrix.some((row) => row.some((cell) => cell.item?.type === 'flag'));
+
         const requiredItems = REQUIRED_OBJECTS[board.size];
+
+        if (isCTF) {
+            if (items === requiredItems && hasFlag) {
+                return { isValid: true };
+            }
+            if (!hasFlag) {
+                return { isValid: false, message: ErrorMessages.GameShouldHaveFlag };
+            }
+            return { isValid: false, message: SPECIFIC_ERROR.minItems(requiredItems) };
+        }
 
         if (items === requiredItems) {
             return { isValid: true };

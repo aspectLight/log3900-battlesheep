@@ -3,7 +3,7 @@
         <img src="./assets/ui/left.png" />
         Créer une partie
     </button>
-    <h3>Créer un joueur</h3>
+    <h1>Créer un joueur</h1>
 </div>
 <div class="container">
     <div class="char-grid">
@@ -16,13 +16,57 @@
     <div class="char-input">
         @if(selectedCharacter.character.name) {
         <div class="selected-character-preview">
-            <img [src]="selectedCharacter.character.avatarFull" [alt]="selectedCharacter.character.name" />
-            <p>{{ selectedCharacter.character.name }}</p>
+            <div class="character-image-container">
+                <img [src]="selectedCharacter.character.avatarFull" [alt]="selectedCharacter.character.name" />
+            </div>
+            <div class="character-name">
+                <p>{{ selectedCharacter.character.name }}</p>
+            </div>
+            <div class="stats-row">
+                <div class="stat stat-health">
+                    <h3>Vie</h3>
+                    <p>{{ previewPlayer.stats.health.value }}</p>
+                </div>
+                <div class="stat stat-speed">
+                    <h3>Rapidité</h3>
+                    <p>{{ previewPlayer.stats.speed.value }}</p>
+                </div>
+                <div class="stat stat-attack">
+                    <h3>Attaque</h3>
+                    <p>{{ previewPlayer.stats.attack.value }}</p>
+                </div>
+                <div class="stat stat-defense">
+                    <h3>Défense</h3>
+                    <p>{{ previewPlayer.stats.defense.value }}</p>
+                </div>
+            </div>
         </div>
         } @else {
             <div class="selected-character-preview">
-                <img src="./assets/avatars/emptyFull.png">
-                <p> Choisissez votre personnage</p>
+                <div class="character-image-container">
+                    <img src="./assets/avatars/new/emptyFull.png">
+                </div>
+                <div class="character-name">
+                    <p>Choisissez votre personnage</p>
+                </div>
+                <div class="stats-row">
+                    <div class="stat stat-health">
+                        <h3>Vie</h3>
+                        <p>0</p>
+                    </div>
+                    <div class="stat stat-speed">
+                        <h3>Rapidité</h3>
+                        <p>0</p>
+                    </div>
+                    <div class="stat stat-attack">
+                        <h3>Attaque</h3>
+                        <p>0</p>
+                    </div>
+                    <div class="stat stat-defense">
+                        <h3>Défense</h3>
+                        <p>0</p>
+                    </div>
+                </div>
             </div>
         }
         <div class="validate-player-container">

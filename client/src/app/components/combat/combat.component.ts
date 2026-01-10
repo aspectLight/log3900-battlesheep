@@ -1,19 +1,20 @@
 import { TitleCasePipe } from '@angular/common';
 import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { Cell } from '@app/classes/cell';
-import { Item } from '@app/classes/item';
 import { Player } from '@app/classes/player';
 import { BonusType } from '@app/constants/bonus.constants';
 import { ActionService } from '@app/services/action.service';
 import { CombatService } from '@app/services/combat.service';
 import { GameManagerService } from '@app/services/game-manager.service';
+import { ActionSocketService } from '@app/services/socket/action-socket.service';
 import { SocketService } from '@app/services/socket.service';
 import { Subscription } from 'rxjs';
-import { FEEDBACK_DURATION, NOTIFICATION_DURATION } from '@app/constants/combat.constants';
-
+import { FEEDBACK_DURATION, NOTIFICATION_DURATION, CombatState } from '@app/constants/combat.constants';
+import { AttackPayload } from '@app/interfaces/payload';
+import { ItemCardComponent } from '@app/components/item-card/item-card.component';
 @Component({
     selector: 'app-combat',
-    imports: [TitleCasePipe],
+    imports: [TitleCasePipe, ItemCardComponent],
     templateUrl: './combat.component.html',
     styleUrl: './combat.component.scss',
 })
@@ -23,30 +24,29 @@ export class CombatComponent implements OnInit, OnDestroy {
     selectedCell: Cell | null = null;
     cellReference: string = './assets/combat/placeholder.png';
 
-    item: Item | null;
-
     showNotification: boolean = false;
     notificationTitle: string = '';
     notificationMessage: string = '';
     notificationSuccess: boolean = true;
-    notificationTimeout: ReturnType<typeof setTimeout>;
+
     isWinLossNotification: boolean = false;
 
     private subscriptions: Subscription[] = [];
+    private notificationTimeout: ReturnType<typeof setTimeout>;
 
     constructor(
         private actionService: ActionService,
         private combatService: CombatService,
-        private socketService: SocketService,
+        private actionSocketService: ActionSocketService,
         private gameManager: GameManagerService,
+        private socketService: SocketService,
     ) {}
-
-    get flightAttempts() {
-        return this.combatService.flightAttemptsLeft;
-    }
 
     get isCombatPlayerTurn() {
         return this.combatService.isCombatPlayerTurn;
+    }
+    get showButtons(): boolean {
+        return this.gameManager.canEndTurn;
     }
 
     get isCombatMode(): boolean {
@@ -54,10 +54,10 @@ export class CombatComponent implements OnInit, OnDestroy {
     }
 
     get isPlayerTurn(): boolean {
-        return this.combatService.isPlayerTurn;
+        return this.gameManager.isPlayerTurn;
     }
 
-    get player(): Player | undefined {
+    get player(): Player | null {
         return this.gameManager.getMainPlayer();
     }
 
@@ -82,30 +82,41 @@ export class CombatComponent implements OnInit, OnDestroy {
     }
 
     get hasFlightAttempts(): boolean {
-        return this.combatService.flightAttemptsLeft !== 0;
+        return this.combatService.flightAttemptsLeft > 0;
+    }
+
+    get hasEnemyBarbedWire(): boolean {
+        return this.enemy?.inventory?.some((item) => item?.type === 'barbedWire') ?? false;
     }
 
     get isSelectionActive(): boolean {
         return this.actionService.getIsSelectionActive();
     }
 
-    get canFight(): boolean {
-        return this.combatService.canFight;
+    get isActionActive(): boolean {
+        return this.actionService.getIsActionActive();
     }
 
-    get canAct(): boolean {
-        return this.combatService.canAct;
+    get isCombatInitiator(): boolean {
+        return this.combatService.isCombatInitiator;
     }
 
-    set attackValue(value: number) {
+    get wasFlightEnd(): boolean {
+        return this.combatService.wasFlightEnd;
+    }
+
+    private set attackValue(value: number) {
         this.combatService.attackValue = value;
     }
 
-    set defenseValue(value: number) {
+    private set defenseValue(value: number) {
         this.combatService.defenseValue = value;
     }
 
     ngOnInit(): void {
+        // Initialize canEndTurn based on current turn when component loads
+        this.gameManager.canEndTurn = this.isPlayerTurn;
+
         this.subscriptions.push(
             this.actionService.selectedCell$.subscribe((cell) => {
                 this.selectedCell = cell;
@@ -113,13 +124,24 @@ export class CombatComponent implements OnInit, OnDestroy {
             }),
         );
         this.subscriptions.push(
-            this.socketService.attackTrigger.subscribe(() => {
-                this.attack();
+            this.actionSocketService.attackTrigger.subscribe(() => {
+                if (this.isCombatPlayerTurn) this.attack();
+                else this.getVirtualPlayerAttack();
             }),
         );
         this.subscriptions.push(
             this.combatService.combatStateChange.subscribe((state) => {
                 this.showCombatNotification(state);
+            }),
+        );
+        this.subscriptions.push(
+            this.gameManager.turnChange.subscribe(() => {
+                if (this.isPlayerTurn) {
+                    this.actionService.toggleSelection();
+                    this.gameManager.canEndTurn = true;
+                } else {
+                    this.gameManager.canEndTurn = false;
+                }
             }),
         );
     }
@@ -132,40 +154,12 @@ export class CombatComponent implements OnInit, OnDestroy {
         return this.combatService.getEnemy()?.stats[stat as BonusType].value;
     }
 
-    setEnemy(player: Player | null) {
-        this.combatService.setEnemy(player);
-    }
-
-    interact(): void {
-        this.actionService.interact();
+    toggleAction(): void {
+        this.actionService.toggleAction();
     }
 
     toggleSelection(): void {
         this.actionService.toggleSelection();
-    }
-
-    setCellReference(cell: Cell | null): void {
-        this.cellReference = './assets/combat/placeholder.png';
-        if (!cell) return;
-
-        if (cell.tile.type === 'door') {
-            this.cellReference = cell.tile.state === 'opened' ? './assets/combat/door_open.png' : './assets/combat/door_closed.png';
-        }
-
-        if (cell.player) {
-            this.setEnemy(cell.player);
-        }
-    }
-
-    startCombat() {
-        if (!this.enemy) return;
-
-        this.actionService.setSelectionActive(false);
-
-        const startCombatInfo = this.combatService.startCombat(this.enemy);
-        if (!startCombatInfo) return;
-
-        this.socketService.startCombat(startCombatInfo);
     }
 
     attack() {
@@ -175,24 +169,51 @@ export class CombatComponent implements OnInit, OnDestroy {
             this.attackValue = isDebugging ? this.player.rollStatDebug(BonusType.Attack) : this.player.rollStat(BonusType.Attack);
             const attackInfo = this.combatService.attack(this.attackValue, this.defenseValue);
             if (!attackInfo) return;
-            this.socketService.attack(attackInfo);
+            this.actionSocketService.attack(attackInfo);
         }
     }
 
+    getVirtualPlayerAttack() {
+        if (this.enemy && this.player) {
+            const isDebugging = this.gameManager.room.isDebugging;
+            const defenseValue = isDebugging ? this.player.rollStatDebug(BonusType.Defense) : this.player.rollStat(BonusType.Defense);
+            const attackValue = isDebugging ? this.enemy.rollStatDebug(BonusType.Attack) : this.enemy.rollStat(BonusType.Attack);
+            const attackInfo: AttackPayload = {
+                roomId: this.combatService.combatRoomId,
+                attackValue,
+                defenseValue,
+            };
+            this.actionSocketService.attack(attackInfo);
+        }
+    }
     flight() {
+        if (this.enemy?.hasItem('barbedWire') && !this.isCombatInitiator) {
+            this.displayNotification('Barbed wire', "La fuite est empêché par l'adversaire", false);
+            return;
+        }
         const flightInfo = this.combatService.flight();
         if (flightInfo) {
-            this.socketService.flightAttempt(flightInfo);
+            this.actionSocketService.flightAttempt(flightInfo);
         }
     }
 
     endTurn() {
+        if (this.gameManager.isPlayerMoving()) return;
         const gameRoomId = this.gameManager.getRoomId();
         this.socketService.endPlayerTurn(gameRoomId);
         this.displayNotification('Tour terminé', 'Votre tour est terminé', true);
     }
 
-    displayNotification(title: string, message: string, isSuccess: boolean, duration: number = FEEDBACK_DURATION) {
+    resetCombat() {
+        this.combatService.resetCombat();
+        this.showNotification = false;
+        this.isWinLossNotification = false;
+        if (this.notificationTimeout) {
+            clearTimeout(this.notificationTimeout);
+        }
+    }
+
+    private displayNotification(title: string, message: string, isSuccess: boolean, duration: number = FEEDBACK_DURATION) {
         if (this.notificationTimeout) {
             clearTimeout(this.notificationTimeout);
         }
@@ -210,7 +231,7 @@ export class CombatComponent implements OnInit, OnDestroy {
         }, duration);
     }
 
-    showCombatNotification(state: string) {
+    private showCombatNotification(state: string) {
         if (!this.enemy || !this.player) return;
         let title = '';
         let message = '';
@@ -220,45 +241,73 @@ export class CombatComponent implements OnInit, OnDestroy {
         this.isWinLossNotification = false;
 
         switch (state) {
-            case 'miss': {
+            case CombatState.Miss: {
                 title = 'Raté!';
                 message = '';
                 isSuccess = false;
                 break;
             }
-            case 'hit': {
+            case CombatState.Hit: {
                 const damage = Math.max(0, this.attackValue - this.defenseValue);
                 title = `-${damage}`;
                 message = '';
                 isSuccess = true;
                 break;
             }
-            case 'getHit': {
+            case CombatState.GetHit: {
                 const damageTaken = Math.max(0, this.attackValue - this.defenseValue);
                 title = `-${damageTaken}`;
                 message = '';
                 isSuccess = false;
                 break;
             }
-            case 'getMissed': {
+            case CombatState.GetMissed: {
                 title = 'Esquivé!';
                 message = '';
                 isSuccess = true;
                 break;
             }
-            case 'won': {
-                title = 'Victoire!';
-                message = `${this.player.name} a gagné le combat!`;
+            case CombatState.FlightSuccess: {
+                title = 'Tentative de fuite !';
+                message = 'Vous avez réussi à fuir!';
                 isSuccess = true;
                 duration = NOTIFICATION_DURATION;
+                break;
+            }
+            case CombatState.FlightFailure: {
+                title = 'Tentative de fuite !';
+                message = "Vous n'avez pas réussi à fuir!";
+                isSuccess = false;
+                duration = NOTIFICATION_DURATION;
+                break;
+            }
+            case CombatState.Won: {
+                if (this.wasFlightEnd) {
+                    title = 'Tentative de fuite réussie!';
+                    message = `${this.player.name} a réussi à fuir!`;
+                    isSuccess = true;
+                    duration = NOTIFICATION_DURATION;
+                } else {
+                    title = 'Victoire!';
+                    message = `${this.player.name} a gagné le combat!`;
+                    isSuccess = true;
+                    duration = NOTIFICATION_DURATION;
+                }
                 this.isWinLossNotification = true;
                 break;
             }
-            case 'lost': {
-                title = 'Défaite';
-                message = `${this.enemy.name} a gagné le combat!`;
-                isSuccess = false;
-                duration = NOTIFICATION_DURATION;
+            case CombatState.Lost: {
+                if (this.wasFlightEnd) {
+                    title = 'Tentative de fuite réussie!';
+                    message = `${this.player.name} a réussi à fuir!`;
+                    isSuccess = false;
+                    duration = NOTIFICATION_DURATION;
+                } else {
+                    title = 'Défaite';
+                    message = `${this.enemy.name} a gagné le combat!`;
+                    isSuccess = false;
+                    duration = NOTIFICATION_DURATION;
+                }
                 this.isWinLossNotification = true;
                 break;
             }
@@ -269,17 +318,12 @@ export class CombatComponent implements OnInit, OnDestroy {
         this.displayNotification(title, message, isSuccess, duration);
     }
 
-    exitCombat() {
-        this.combatService.setCombatMode(false);
-        this.displayNotification('Combat terminé', 'Vous êtes sorti du combat', true);
-    }
+    private setCellReference(cell: Cell | null): void {
+        this.cellReference = './assets/combat/placeholder.png';
+        if (!cell) return;
 
-    resetCombat() {
-        this.combatService.resetCombat();
-        this.showNotification = false;
-        this.isWinLossNotification = false;
-        if (this.notificationTimeout) {
-            clearTimeout(this.notificationTimeout);
+        if (cell.tile.type === 'door') {
+            this.cellReference = cell.tile.state === 'opened' ? './assets/combat/door_open.png' : './assets/combat/door_closed.png';
         }
     }
 }

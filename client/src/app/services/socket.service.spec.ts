@@ -2,16 +2,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { Game } from '@app/classes/game';
+import { Item } from '@app/classes/item';
 import { Player } from '@app/classes/player';
 import { ROUTES } from '@app/constants/routes.constants';
-import { Coords } from '@app/interfaces/coords';
-import { Room } from '@app/interfaces/room';
 import { GameManagerService } from '@app/services/game-manager.service';
 import { SocketService } from '@app/services/socket.service';
 import { WaitingRoomService } from '@app/services/waiting-room.service';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';
-import { AttackPayload, AttackResult, CombatPayload, CombatRoom, FlightResult } from '@app/interfaces/payload';
 import { CombatService } from './combat.service';
 import { GameCreationService } from './game-creation.service';
 import { GameRoomService } from './game-room.service';
@@ -47,6 +46,7 @@ describe('SocketService', () => {
         });
 
         const mockPlayer = new Player();
+        mockPlayer.name = 'Test Player';
         mockPlayer.id = 'testSocketId';
         mockPlayer.movementPoints = 3;
         mockPlayer.actionPoints = 1;
@@ -76,6 +76,10 @@ describe('SocketService', () => {
                 'finishGame',
                 'getPlayerById',
                 'resetManager',
+                'addItemToBoard',
+                'loadGame',
+                'addPlayersToBoard',
+                'getPlayers',
             ],
             {
                 room: {
@@ -87,11 +91,16 @@ describe('SocketService', () => {
                 currentPlayerId: 'testSocketId',
                 isDebugMode: false,
                 gameCountdown: jasmine.createSpyObj('BehaviorSubject', ['next']),
+                turnCountdown: jasmine.createSpyObj('BehaviorSubject', ['next']),
+                isGameLoaded: false,
             },
         );
 
         mockGameRoomService = jasmine.createSpyObj('GameRoomService', ['updateRoom', 'updatePlayers', 'toggleDebugMode'], {
-            room: { roomId: 'testRoomId' },
+            room: {
+                roomId: 'testRoomId',
+                players: [mockPlayer],
+            },
         });
 
         mockCombatService = jasmine.createSpyObj(
@@ -100,12 +109,12 @@ describe('SocketService', () => {
             {
                 isCombatMode: false,
                 combatCountdown: jasmine.createSpyObj('BehaviorSubject', ['next']),
-                loserId: '',
+                loserId: 'differentPlayerId',
             },
         );
 
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-        mockSocket = jasmine.createSpyObj('Socket', ['emit', 'on', 'once', 'id', 'disconnect'], { id: 'testSocketId' });
+        mockSocket = jasmine.createSpyObj('Socket', ['emit', 'on', 'once', 'id', 'disconnect', 'removeAllListeners'], { id: 'testSocketId' });
 
         // Create a more complete mock Board for the selectedGame
         const mockSelectedGameBoard = jasmine.createSpyObj('Board', [
@@ -169,572 +178,22 @@ describe('SocketService', () => {
 
         service = TestBed.inject(SocketService);
         service['socket'] = mockSocket;
-        service['room'] = { players: [] } as any;
     });
 
     it('should create', () => {
         expect(service).toBeTruthy();
     });
 
+    it('should get the player name', () => {
+        expect(service.playerName).toBe('Test Player');
+    });
+
     it('should return the socket ID when getId is called', () => {
         expect(service.getId()).toBe('testSocketId');
     });
 
-    it('should emit "createWaitingRoom" when createRoom is called', () => {
-        service.createRoom('room1', 'game1', { id: 'player1', name: 'Test' } as Player);
-        expect(mockSocket.emit).toHaveBeenCalledWith('createWaitingRoom', {
-            roomId: 'room1',
-            gameId: 'game1',
-            organisator: { id: 'player1', name: 'Test' },
-        });
-    });
-
-    it('should join a room and update state on success', () => {
-        const roomId = 'testRoomId';
-        const mockRoom = { id: roomId, players: [], roomId: '', organisatorId: '', gameId: '', isLocked: false, isDebugging: false } as Room;
-        const callback = jasmine.createSpy('callback');
-
-        service.joinRoom(roomId, callback);
-        expect(mockSocket.emit).toHaveBeenCalledWith('joinWaitingRoom', roomId);
-
-        const response = { success: true, room: mockRoom };
-        mockSocket.once.calls.argsFor(0)[1](response);
-
-        expect(mockWaitingRoomService.updateRoom).toHaveBeenCalledWith(mockRoom);
-        expect(mockWaitingRoomService.toggleLock).toHaveBeenCalledWith(false);
-        expect(callback).toHaveBeenCalledWith(true, undefined);
-    });
-
-    it('should call callback with error on failure of joinRoom', () => {
-        const roomId = 'testRoomId';
-        const callback = jasmine.createSpy('callback');
-        const errorMessage = 'Test Error Message';
-
-        service.joinRoom(roomId, callback);
-        expect(mockSocket.emit).toHaveBeenCalledWith('joinWaitingRoom', roomId);
-
-        const response = { success: false, error: errorMessage };
-        mockSocket.once.calls.argsFor(0)[1](response);
-
-        expect(mockWaitingRoomService.updateRoom).not.toHaveBeenCalled();
-        expect(mockWaitingRoomService.toggleLock).not.toHaveBeenCalled();
-        expect(callback).toHaveBeenCalledWith(false, errorMessage);
-    });
-
-    it("should emit 'createPlayer' on createPlayer call", () => {
-        const player = new Player();
-        service.createPlayer('testRoomId', player);
-
-        expect(mockSocket.emit).toHaveBeenCalledWith('createPlayer', { roomId: 'testRoomId', player });
-    });
-
-    it('should leave the room on success', () => {
-        const roomId = 'testRoomId';
-        const callback = jasmine.createSpy('callback');
-
-        service.leaveRoom(roomId, callback);
-
-        expect(mockSocket.emit).toHaveBeenCalledWith('leaveRoom', roomId);
-
-        const response = { success: true };
-        mockSocket.once.calls.argsFor(0)[1](response);
-
-        expect(callback).toHaveBeenCalledWith(true, undefined);
-    });
-
-    it('should call callback with error on failure of leaveRoom', () => {
-        const roomId = 'testRoomId';
-        const callback = jasmine.createSpy('callback');
-        const errorMessage = 'Test Error Message';
-
-        service.leaveRoom(roomId, callback);
-        expect(mockSocket.emit).toHaveBeenCalledWith('leaveRoom', roomId);
-
-        const response = { success: false, error: errorMessage };
-        mockSocket.once.calls.argsFor(0)[1](response);
-
-        expect(mockWaitingRoomService.updateRoom).not.toHaveBeenCalled();
-        expect(mockWaitingRoomService.toggleLock).not.toHaveBeenCalled();
-        expect(callback).toHaveBeenCalledWith(false, errorMessage);
-    });
-
-    it("should emit 'toggleLockWaitingRoom' on toggleLockRoom call", () => {
-        const roomId = 'testRoomId';
-        service.toggleLockRoom(roomId);
-
-        expect(mockSocket.emit).toHaveBeenCalledWith('toggleLockWaitingRoom', 'testRoomId');
-    });
-
-    it("should emit 'kickPlayer' on kickPlayer call", () => {
-        const roomId = 'testRoomId';
-        const player = new Player();
-        service.kickPlayer(roomId, player);
-
-        expect(mockSocket.emit).toHaveBeenCalledWith('kickPlayer', { roomId: 'testRoomId', player });
-    });
-
-    it("should emit 'reserveAvatar' with correct data", () => {
-        const roomId = '123';
-        let chosenAvatar = 'avatar1';
-
-        service.reserveAvatar(roomId, chosenAvatar);
-
-        service.reservedAvatars$.subscribe((avatars) => {
-            expect(avatars).toEqual([{ reservorId: mockSocket.id as any, chosenAvatar }]);
-        });
-
-        chosenAvatar = 'avatar2';
-        service.reserveAvatar(roomId, chosenAvatar);
-
-        service.reservedAvatars$.subscribe((avatars) => {
-            expect(avatars).toEqual([{ reservorId: mockSocket.id as any, chosenAvatar }]);
-        });
-
-        expect(mockSocket.emit).toHaveBeenCalledWith('reserveAvatar', { roomId, chosenAvatar });
-    });
-
-    it('should throw an error if socket ID is undefined', () => {
-        delete mockSocket.id;
-        service = TestBed.inject(SocketService);
-        service.connect();
-
-        expect(() => service.reserveAvatar('123', 'avatar1')).toThrowError('Socket ID non défini !');
-    });
-
-    it("should emit 'getReservedAvatars' on getReservedAvatars call", () => {
-        const roomId = 'testRoomId';
-        service.getReservedAvatars(roomId);
-
-        expect(mockSocket.emit).toHaveBeenCalledWith('getReservedAvatars', { roomId: 'testRoomId' });
-    });
-
-    it("should emit 'startGame' on startGame call", () => {
-        const roomId = 'testRoomId';
-        service['room'] = { players: [new Player(), new Player()] } as any;
-        service.startGame(roomId);
-        expect(mockSocket.emit).toHaveBeenCalledWith('startGame', roomId);
-    });
-
-    it('should generate code', () => {
-        const callback = jasmine.createSpy('callback');
-
-        service.generateCode(callback);
-
-        expect(mockSocket.emit).toHaveBeenCalledWith('generateCode');
-
-        const response = { code: '0000' };
-        mockSocket.once.calls.argsFor(0)[1](response);
-
-        expect(callback).toHaveBeenCalledWith('0000');
-    });
-
-    it('should listen to connect and log it', () => {
-        spyOn(console, 'log');
-
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'connect') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-
-        (service as any).setUpListeners();
-
-        eventCallback();
-    });
-
-    it('should listen to waitingRoomError and warn about it', () => {
-        spyOn(console, 'warn');
-
-        const error = 'Erreur 1';
-
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'waitingRoomError') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-
-        (service as any).setUpListeners();
-
-        eventCallback(error);
-
-        // eslint-disable-next-line no-console
-        expect(console.warn).toHaveBeenCalledWith('Erreur depuis le socket serveur de WaitingRoomGateway : \n', error);
-    });
-
-    it('should listen to waitingRoomCreated and call updateRoom', () => {
-        const mockRoom = { id: '0000', players: [], roomId: '', organisatorId: '', gameId: '', isLocked: false, isDebugging: false } as Room;
-
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'waitingRoomCreated') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-
-        (service as any).setUpListeners();
-
-        eventCallback(mockRoom);
-
-        expect(mockWaitingRoomService.updateRoom).toHaveBeenCalledWith(mockRoom);
-    });
-
-    it('should listen to playerCreated and call addPlayer and setMainPlayer', () => {
-        const players = [new Player(), new Player()];
-
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'playerCreated') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-
-        (service as any).setUpListeners();
-
-        eventCallback(players);
-
-        expect(mockWaitingRoomService.addPlayer).toHaveBeenCalledWith(players);
-        expect(mockGameManagerService.setMainPlayer).toHaveBeenCalledWith(mockSocket.id);
-    });
-
-    it('should automatically lock room when max players is reached', () => {
-        // Set up a room with max players for the selected board size
-        const maxPlayers = 2; // For board size 10, max is 2 players
-        const players = Array(maxPlayers)
-            .fill(null)
-            .map(() => new Player());
-
-        service['room'] = { players } as any;
-
-        // Create a complete mock Game object
-        const mockSelectedGameBoard = jasmine.createSpyObj('Board', [
-            'getPlayerById',
-            'getCell',
-            'createMatrix',
-            'createMatrixFromData',
-            'getMatrix',
-            'getSize',
-            'getPlayers',
-            'addPlayer',
-        ]);
-        mockSelectedGameBoard.matrix = [];
-        mockSelectedGameBoard.size = 10;
-
-        const mockGame = {
-            _id: 'testGameId',
-            name: 'Test Game',
-            description: 'Test Game Description',
-            mode: 'normal',
-            board: mockSelectedGameBoard,
-            isVisible: true,
-            modificationDate: Date.now().toString(),
-            getBoard: () => mockSelectedGameBoard,
-            setData: (data: any) => {
-                mockGame._id = data._id;
-                mockGame.name = data.name;
-                mockGame.description = data.description;
-                mockGame.mode = data.mode;
-                mockGame.board = data.board;
-                mockGame.isVisible = data.isVisible;
-                mockGame.modificationDate = data.modificationDate;
-            },
-        };
-
-        // Use type assertion to bypass type checking
-        mockGameCreationService.selectedGame = mockGame as any;
-        mockGameCreationService.gameCode = 'testGameCode';
-
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'playerCreated') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-
-        // Trigger the playerCreated event
-        eventCallback(players);
-
-        // Verify that toggleLockWaitingRoom was emitted with the game code
-        expect(mockSocket.emit).toHaveBeenCalledWith('toggleLockWaitingRoom', 'testGameCode');
-    });
-
-    it('should listen to playerJoined and log it', () => {
-        spyOn(console, 'log');
-
-        const data = { playerId: '000' };
-
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'playerJoined') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-
-        (service as any).setUpListeners();
-
-        eventCallback(data);
-    });
-
-    it('should listen to gameRoomCreated and call startGame and navigate', () => {
-        const gameRoomId = '0000';
-
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'gameRoomCreated') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-
-        (service as any).setUpListeners();
-
-        eventCallback(gameRoomId);
-
-        expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.game]);
-    });
-
-    it('should emit playGame when gameRoomCreated and user is organizer', () => {
-        // Create a game room where the current user is the organizer
-        const gameRoom = {
-            roomId: 'testRoomId',
-            organisatorId: 'testSocketId', // Same as mockSocket.id
-            players: [new Player()],
-        };
-
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'gameRoomCreated') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-
-        // Trigger the gameRoomCreated event
-        eventCallback(gameRoom);
-
-        // Verify that playGame was emitted with the room ID
-        expect(mockSocket.emit).toHaveBeenCalledWith('playGame', gameRoom.roomId);
-    });
-
-    it('should not emit playGame when gameRoomCreated and user is not organizer', () => {
-        // Create a game room where the current user is not the organizer
-        const gameRoom = {
-            roomId: 'testRoomId',
-            organisatorId: 'differentUserId', // Different from mockSocket.id
-            players: [new Player()],
-        };
-
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'gameRoomCreated') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-
-        // Reset the emit spy to clear previous calls
-        mockSocket.emit.calls.reset();
-
-        // Trigger the gameRoomCreated event
-        eventCallback(gameRoom);
-
-        // Verify that playGame was not emitted with the room ID
-        expect(mockSocket.emit).not.toHaveBeenCalledWith('playGame', gameRoom.roomId);
-    });
-
-    it('should listen to updateAvatarReserved and update ReservedAvatars', () => {
-        const data = { reservedAvatars: [{ reservorId: '0000', chosenAvatar: 'Vik' }] };
-
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'updateAvatarReserved') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-
-        (service as any).setUpListeners();
-
-        eventCallback(data);
-
-        service.reservedAvatars$.subscribe((updatedReservations) => {
-            expect(updatedReservations).toEqual(data.reservedAvatars);
-        });
-    });
-
-    it('should listen to playerLeft and call removePlayer', () => {
-        const playerId = { playerId: '0000' };
-
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'playerLeft') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-
-        (service as any).setUpListeners();
-
-        eventCallback(playerId);
-
-        expect(mockWaitingRoomService.removePlayer).toHaveBeenCalledWith(playerId);
-    });
-
-    it('should listen to roomCanceled and update RoomExists', () => {
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'roomCanceled') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-
-        (service as any).setUpListeners();
-
-        eventCallback();
-
-        service.roomExists$.subscribe((exists) => {
-            expect(exists).toEqual(false);
-        });
-    });
-
-    it('should listen to playerKicked and update isKicked', () => {
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'playerKicked') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-
-        (service as any).setUpListeners();
-
-        eventCallback();
-
-        service.isKicked$.subscribe((kicked) => {
-            expect(kicked).toEqual(true);
-        });
-    });
-
-    it('should listen to waitingRoomLocked, update roomLocked and call toggleLock', () => {
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'waitingRoomLocked') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-
-        (service as any).setUpListeners();
-
-        eventCallback();
-
-        service.roomLocked$.subscribe((locked) => {
-            expect(locked).toEqual(true);
-        });
-        expect(mockWaitingRoomService.toggleLock).toHaveBeenCalledWith(true);
-    });
-
-    it('should listen to waitingRoomUnlocked, update roomLocked and call toggleLock', () => {
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'waitingRoomUnlocked') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-
-        (service as any).setUpListeners();
-
-        eventCallback();
-
-        service.roomLocked$.subscribe((locked) => {
-            expect(locked).toEqual(false);
-        });
-        expect(mockWaitingRoomService.toggleLock).toHaveBeenCalledWith(false);
-    });
-
     it('should return the room ID when getRoomId is called', () => {
         expect(service.getRoomId()).toBe('testRoomId');
-    });
-
-    it('should emit toggleDebugMode when toggleDebugMode is called', () => {
-        service.toggleDebugMode();
-        expect(mockSocket.emit).toHaveBeenCalledWith('toggleDebugMode', 'testRoomId');
-    });
-
-    it('should return the socket ID when getSocketId is called', () => {
-        expect(service.getSocketId()).toBe('testSocketId');
     });
 
     it('should emit abandonGame when abandonGame is called', () => {
@@ -748,73 +207,24 @@ describe('SocketService', () => {
         service.endPlayerTurn(roomId);
         expect(mockSocket.emit).toHaveBeenCalledWith('endTurn', roomId);
     });
-
     it('should emit playerGetMovements when getPlayerMovements is called', () => {
-        service.getPlayerMovements();
-        expect(mockSocket.emit).toHaveBeenCalledWith('playerGetMovements', 'testRoomId');
-    });
-
-    it('should emit playerMoved with serialized map when movedPlayer is called', () => {
-        const moveInfo = {
+        // Since getPlayerMovements is private, we need to call it through a public method or adjust the test accordingly.
+        service['getPlayerMovements'](); // Accessing the private method directly for testing purposes
+        expect(mockSocket.emit).toHaveBeenCalledWith('playerGetMovements', {
             roomId: 'testRoomId',
-            playerId: 'testPlayerId',
-            map: new Map<Coords, Coords[]>([[{ x: 0, y: 0 }, [{ x: 1, y: 1 }]]]),
-            selectedPath: [{ x: 1, y: 1 }],
-        };
-
-        service.movedPlayer(moveInfo);
-
-        expect(mockSocket.emit).toHaveBeenCalledWith('playerMoved', {
-            roomId: 'testRoomId',
-            playerId: 'testPlayerId',
-            serializedMap: [[{ x: 0, y: 0 }, [{ x: 1, y: 1 }]]],
-            selectedPath: [{ x: 1, y: 1 }],
+            hasBoots: false,
+            hasCamo: false,
+            hasAirStrike: false,
         });
     });
 
-    it('should emit startCombat when startCombat is called', () => {
-        const combatPayload: CombatPayload = {
-            roomId: 'testRoomId',
-            opponentId: 'testOpponentId',
-        };
-        service.startCombat(combatPayload);
-        expect(mockSocket.emit).toHaveBeenCalledWith('startCombat', combatPayload);
-    });
-
-    it('should emit flightAttempt when flightAttempt is called', () => {
-        const combatPayload: CombatPayload = {
-            roomId: 'testRoomId',
-            opponentId: 'testOpponentId',
-        };
-        service.flightAttempt(combatPayload);
-        expect(mockSocket.emit).toHaveBeenCalledWith('flightAttempt', 'testRoomId');
-    });
-
-    it('should emit attack when attack is called', () => {
-        const attackPayload: AttackPayload = {
-            roomId: 'testRoomId',
-            attackValue: POSITION_Y,
-            defenseValue: POSITION_X,
-        };
-        service.attack(attackPayload);
-        expect(mockSocket.emit).toHaveBeenCalledWith('attack', attackPayload);
-    });
-
     it('should emit playerTeleported when teleportPlayer is called', () => {
-        service.teleportPlayer(POSITION_X, POSITION_Y);
+        service.teleportPlayer(POSITION_X, POSITION_Y, 'testSocketId');
         expect(mockSocket.emit).toHaveBeenCalledWith('playerTeleported', {
             roomId: 'testRoomId',
             playerId: 'testSocketId',
             destination: { x: POSITION_X, y: POSITION_Y },
-        });
-    });
-
-    it('should emit doorToggled when toggleDoor is called', () => {
-        service.toggleDoor(POSITION_X, POSITION_Y);
-        expect(mockSocket.emit).toHaveBeenCalledWith('doorToggled', {
-            roomId: 'testRoomId',
-            x: POSITION_X,
-            y: POSITION_Y,
+            hasCamo: undefined,
         });
     });
 
@@ -833,52 +243,42 @@ describe('SocketService', () => {
         expect(service.setUpConnection).toHaveBeenCalled();
     });
 
-    it('should listen to gameRoomError and warn about it', () => {
-        spyOn(console, 'warn');
-        const error = 'Game Room Error';
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'gameRoomError') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-        eventCallback(error);
-
-        // eslint-disable-next-line no-console
-        expect(console.warn).toHaveBeenCalledWith('Erreur depuis le socket serveur de GameRoomGateway : \n', error);
-    });
-
-    it('should listen to leaveWaitingRoom and navigate to home', () => {
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'leaveWaitingRoom') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-        eventCallback();
-
-        service.roomExists$.subscribe((exists) => {
-            expect(exists).toEqual(true);
-        });
-        expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.home]);
-    });
-
-    it('should listen to playerSpawned and update players', () => {
+    it('should listen to playerSpawned and update players', async () => {
         const players = [new Player(), new Player()];
         let eventCallback: (...args: unknown[]) => void = () => {};
 
+        // Create a mock Game object
+        const mockGame = new Game();
+        mockGame._id = 'testGameId';
+        mockGame.name = 'Test Game';
+        mockGame.description = 'Test Description';
+        mockGame.mode = 'classic';
+        mockGame.board = jasmine.createSpyObj('Board', [
+            'getPlayerById',
+            'getCell',
+            'createMatrix',
+            'createMatrixFromData',
+            'getMatrix',
+            'getSize',
+            'getPlayers',
+            'addPlayer',
+        ]);
+        mockGame.board.matrix = [];
+        mockGame.board.size = 10;
+
+        // Create a subject for the loadGame method
+        const loadGameSubject = new Subject<Game>();
+
+        // Make the mockGameManagerService.getPlayers return the players array
+        mockGameManagerService.getPlayers.and.returnValue(players);
+
+        // Mock the loadGame method to return the subject as an Observable
+        mockGameManagerService.loadGame.and.returnValue(loadGameSubject.asObservable());
+
+        // Mock the addPlayersToBoard method to return true
+        mockGameManagerService.addPlayersToBoard.and.returnValue(true);
+
+        // Set up a spy implementation for socket.on that captures the playerSpawned callback
         mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
             if (event === 'playerSpawned') {
                 eventCallback = callback;
@@ -889,9 +289,23 @@ describe('SocketService', () => {
         service = TestBed.inject(SocketService);
         service.connect();
         (service as any).setUpListeners();
+
+        // Trigger the playerSpawned event
         eventCallback(players);
 
+        // Verify initial expectations
         expect(mockGameRoomService.updatePlayers).toHaveBeenCalledWith(players);
+        expect(mockGameManagerService.loadGame).toHaveBeenCalled();
+
+        // Simulate the subscribe callback by manually setting isGameLoaded to true
+        mockGameManagerService.isGameLoaded = true;
+
+        // Manually trigger the loadGame subscription callback
+        loadGameSubject.next(mockGame);
+
+        // Now verify that the other methods were called
+        expect(mockGameManagerService.addPlayersToBoard).toHaveBeenCalledWith(players);
+        expect(mockGameManagerService.setMainPlayer).toHaveBeenCalledWith('testSocketId');
     });
 
     it('should listen to turnStarting and handle turn start when current player is the socket owner', () => {
@@ -921,7 +335,46 @@ describe('SocketService', () => {
         expect(mockGameManagerService.handleTurnStarting).toHaveBeenCalledWith(data.nextPlayer, data.startTime);
         expect(mockGameManagerService.setMovementPoints).toHaveBeenCalled();
         expect(mockGameManagerService.setActionPoints).toHaveBeenCalled();
-        expect(mockSocket.emit).toHaveBeenCalledWith('playerGetMovements', 'testRoomId');
+        expect(mockSocket.emit).toHaveBeenCalledWith('playerGetMovements', {
+            roomId: 'testRoomId',
+            hasBoots: false,
+            hasCamo: false,
+            hasAirStrike: false,
+        });
+    });
+
+    it('should return early when player is not found in turnStarting event', () => {
+        const data = {
+            nextPlayer: new Player(),
+            startTime: Date.now(),
+        };
+
+        // Set up room with no players to ensure player is undefined
+        mockGameManagerService.room.players = [];
+
+        let eventCallback: (...args: unknown[]) => void = () => {};
+        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
+            if (event === 'turnStarting') {
+                eventCallback = callback;
+            }
+            return mockSocket;
+        });
+
+        service = TestBed.inject(SocketService);
+        service.connect();
+        (service as any).setUpListeners();
+
+        // Reset spies to clear previous calls
+        mockGameManagerService.setMovementPoints.calls.reset();
+        mockGameManagerService.setActionPoints.calls.reset();
+        mockGameManagerService.selectPlayer.calls.reset();
+
+        eventCallback(data);
+
+        // Verify that none of the methods were called after the early return
+        expect(mockGameManagerService.setMovementPoints).not.toHaveBeenCalled();
+        expect(mockGameManagerService.setActionPoints).not.toHaveBeenCalled();
+        expect(mockGameManagerService.selectPlayer).not.toHaveBeenCalled();
     });
 
     it('should set currentPlayerId to nextPlayer.id when current player is not the socket owner', () => {
@@ -979,252 +432,6 @@ describe('SocketService', () => {
         expect(mockSocket.emit).not.toHaveBeenCalledWith('playerGetMovements', 'testRoomId');
     });
 
-    it('should listen to playerMovements and set paths when not in debug mode', () => {
-        const paths = [[{ x: 0, y: 0 }, [{ x: 1, y: 1 }]]];
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'playerMovements') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        // Ensure isDebugMode is false
-        Object.defineProperty(mockGameManagerService, 'isDebugMode', {
-            get: () => false,
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-        eventCallback(paths);
-
-        expect(mockGameManagerService.setPaths).toHaveBeenCalled();
-        expect(mockGameManagerService.clearPaths).not.toHaveBeenCalled();
-    });
-
-    it('should listen to playerMovements and clear paths when in debug mode', () => {
-        const paths = [[{ x: 0, y: 0 }, [{ x: 1, y: 1 }]]];
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'playerMovements') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        // Set isDebugMode to true
-        Object.defineProperty(mockGameManagerService, 'isDebugMode', {
-            get: () => true,
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-
-        // Reset the spy counts before triggering the event
-        mockGameManagerService.setPaths.calls.reset();
-        mockGameManagerService.clearPaths.calls.reset();
-
-        eventCallback(paths);
-
-        expect(mockGameManagerService.setPaths).not.toHaveBeenCalled();
-        expect(mockGameManagerService.clearPaths).toHaveBeenCalled();
-    });
-
-    it('should listen to playerMoved and handle player movement when player is found', () => {
-        const data = {
-            playerId: 'testPlayerId',
-            map: [[{ x: 0, y: 0 }, [{ x: 1, y: 1 }]]],
-            movementPoints: 2,
-            selectedPath: [{ x: 1, y: 1 }],
-        };
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'playerMoved') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        // Ensure getPlayerById returns a player
-        const mockBoard = mockGameManagerService.getBoard();
-        (mockBoard.getPlayerById as jasmine.Spy).and.returnValue(new Player());
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-        eventCallback(data);
-
-        expect(mockGameManagerService.setPlayer).toHaveBeenCalled();
-        expect(mockGameManagerService.setMovementPoints).toHaveBeenCalledWith(data.movementPoints);
-        expect(mockGameManagerService.setPaths).toHaveBeenCalled();
-        expect(mockGameManagerService.setSelectedPathFromCoords).toHaveBeenCalledWith(data.selectedPath);
-        expect(mockGameManagerService.movePlayerFromPath).toHaveBeenCalled();
-    });
-
-    it('should return early from playerMoved event when player is not found', () => {
-        const data = {
-            playerId: 'nonExistentPlayerId',
-            map: [[{ x: 0, y: 0 }, [{ x: 1, y: 1 }]]],
-            movementPoints: 2,
-            selectedPath: [{ x: 1, y: 1 }],
-        };
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'playerMoved') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        // Make getPlayerById return null to simulate player not found
-        const mockBoard = mockGameManagerService.getBoard();
-        (mockBoard.getPlayerById as jasmine.Spy).and.returnValue(null);
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-
-        // Reset all spies to clear previous calls
-        mockGameManagerService.setPlayer.calls.reset();
-        mockGameManagerService.setMovementPoints.calls.reset();
-        mockGameManagerService.setPaths.calls.reset();
-        mockGameManagerService.setSelectedPathFromCoords.calls.reset();
-        mockGameManagerService.movePlayerFromPath.calls.reset();
-
-        // Trigger the event
-        eventCallback(data);
-
-        // Verify that none of the subsequent methods were called
-        expect(mockGameManagerService.setPlayer).not.toHaveBeenCalled();
-        expect(mockGameManagerService.setMovementPoints).not.toHaveBeenCalled();
-        expect(mockGameManagerService.setPaths).not.toHaveBeenCalled();
-        expect(mockGameManagerService.setSelectedPathFromCoords).not.toHaveBeenCalled();
-        expect(mockGameManagerService.movePlayerFromPath).not.toHaveBeenCalled();
-    });
-
-    it('should automatically end player turn when player has no movement or action points left', () => {
-        // Set up the player with no movement or action points
-        const mockPlayer = new Player();
-        mockPlayer.id = 'testSocketId';
-        mockPlayer.movementPoints = 0;
-        mockPlayer.actionPoints = 0;
-
-        // Set up the game manager service to return the player with no points
-        mockGameManagerService.getMainPlayer.and.returnValue(mockPlayer);
-        mockGameManagerService.currentPlayerId = 'testSocketId';
-        mockGameManagerService.getRoomId.and.returnValue('testRoomId');
-
-        // Set up the data for the playerMoved event
-        const data = {
-            playerId: 'testPlayerId',
-            map: [[{ x: 0, y: 0 }, [{ x: 1, y: 1 }]]],
-            movementPoints: 0,
-            selectedPath: [{ x: 1, y: 1 }],
-        };
-
-        // Set up the event callback
-        let eventCallback: (...args: unknown[]) => void = () => {};
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'playerMoved') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        // Set up movePlayerFromPath to execute the callback immediately and return a Promise
-        mockGameManagerService.movePlayerFromPath.and.callFake(async (callback?: () => void) => {
-            if (callback) callback();
-            return Promise.resolve();
-        });
-
-        // Create the service and set up listeners
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-
-        // Reset the emit spy to clear previous calls
-        mockSocket.emit.calls.reset();
-
-        // Trigger the playerMoved event
-        eventCallback(data);
-
-        // Verify that endTurn was called with the room ID
-        expect(mockSocket.emit).toHaveBeenCalledWith('endTurn', 'testRoomId');
-    });
-
-    it('should not end player turn when player still has movement or action points', () => {
-        // Set up the player with movement points
-        const mockPlayer = new Player();
-        mockPlayer.id = 'testSocketId';
-        mockPlayer.movementPoints = 1;
-        mockPlayer.actionPoints = 0;
-
-        // Set up the game manager service to return the player with points
-        mockGameManagerService.getMainPlayer.and.returnValue(mockPlayer);
-        mockGameManagerService.currentPlayerId = 'testSocketId';
-        mockGameManagerService.getRoomId.and.returnValue('testRoomId');
-
-        // Set up the data for the playerMoved event
-        const data = {
-            playerId: 'testPlayerId',
-            map: [[{ x: 0, y: 0 }, [{ x: 1, y: 1 }]]],
-            movementPoints: 1,
-            selectedPath: [{ x: 1, y: 1 }],
-        };
-
-        // Set up the event callback
-        let eventCallback: (...args: unknown[]) => void = () => {};
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'playerMoved') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        // Create the service and set up listeners
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-
-        // Reset the emit spy to clear previous calls
-        mockSocket.emit.calls.reset();
-
-        // Trigger the playerMoved event
-        eventCallback(data);
-
-        // Verify that endTurn was not called
-        expect(mockSocket.emit).not.toHaveBeenCalledWith('endTurn', 'testRoomId');
-    });
-
-    it('should listen to playerTeleported and handle teleportation', () => {
-        const data = {
-            playerId: 'testPlayerId',
-            destination: { x: 5, y: 10 },
-        };
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'playerTeleported') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-        eventCallback(data);
-
-        expect(mockGameManagerService.setPlayer).toHaveBeenCalled();
-        expect(mockGameManagerService.teleportPlayer).toHaveBeenCalledWith(data.destination.x, data.destination.y);
-    });
-
     it('should listen to updateCountdown and update game countdown', () => {
         const countdown = 10;
         let eventCallback: (...args: unknown[]) => void = () => {};
@@ -1242,190 +449,6 @@ describe('SocketService', () => {
         eventCallback(countdown);
 
         expect(mockGameManagerService.gameCountdown.next).toHaveBeenCalledWith(countdown);
-    });
-
-    it('should listen to combatTurnStarted and handle combat turn', () => {
-        const mockCombatRoom: CombatRoom = {
-            combatRoomId: 'testCombatRoomId',
-            players: [new Player()],
-            attackerId: 'testAttackerId',
-            defenderId: 'testDefenderId',
-            currentPlayerId: 'testSocketId',
-            currentOpponentId: 'testOpponentId',
-        };
-
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'combatTurnStarted') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-        eventCallback(mockCombatRoom);
-
-        expect(mockCombatService.setIsCombatPlayerTurn).toHaveBeenCalledWith(true);
-        expect(mockCombatService.setCombatRoom).toHaveBeenCalledWith(mockCombatRoom);
-    });
-
-    it('should listen to performAttack and trigger attack', () => {
-        let eventCallback: (...args: unknown[]) => void = () => {};
-        const attackTriggerSubject = jasmine.createSpyObj('Subject', ['next']);
-        service['attackTriggerSubject'] = attackTriggerSubject;
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'performAttack') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-        eventCallback();
-
-        expect(attackTriggerSubject.next).toHaveBeenCalled();
-    });
-
-    it('should listen to attackResult and handle attack result', () => {
-        const attackResult: AttackResult = {
-            isAttackSuccess: true,
-            opponentHealthPoints: 80,
-            attackValue: 20,
-            defenseValue: 10,
-        };
-
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'attackResult') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-        eventCallback(attackResult);
-
-        expect(mockCombatService.handleAttackResult).toHaveBeenCalledWith(attackResult);
-    });
-
-    it('should listen to flightAttemptResult and handle flight result', () => {
-        const flightResult: FlightResult = {
-            isSuccess: true,
-            attackerEvasionPoints: 5,
-        };
-
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'flightAttemptResult') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-        eventCallback(flightResult);
-
-        expect(mockCombatService.handleFlightResult).toHaveBeenCalledWith(flightResult);
-    });
-
-    it('should listen to endCombat and handle combat end', () => {
-        const winnerId = 'testWinnerId';
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'endCombat') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-        eventCallback(winnerId);
-
-        expect(mockCombatService.handleEnd).toHaveBeenCalledWith(winnerId);
-    });
-
-    it('should teleport loser to spawn point when endCombat is triggered', () => {
-        // Set up a player with a spawn point
-        const spawnPoint = { x: 5, y: 10 };
-        const mockPlayer = new Player();
-        mockPlayer.id = 'testSocketId';
-        mockPlayer.spawnPoint = spawnPoint;
-
-        // Set up the game manager service room with the player
-        mockGameManagerService.room.players = [mockPlayer];
-
-        // Set up the socket ID to match the player ID
-        Object.defineProperty(mockSocket, 'id', { value: 'testSocketId' });
-
-        // Set up the combat service loserId to match the socket ID
-        mockCombatService.loserId = 'testSocketId';
-
-        // Create a spy for the teleportPlayer method
-        spyOn(service, 'teleportPlayer');
-
-        // Set up the event callback
-        let eventCallback: (...args: unknown[]) => void = () => {};
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'endCombat') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        // Create the service and set up listeners
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-
-        // Trigger the endCombat event
-        eventCallback('testWinnerId');
-
-        // Verify that handleEnd was called with the winner ID
-        expect(mockCombatService.handleEnd).toHaveBeenCalledWith('testWinnerId');
-
-        // Verify that teleportPlayer was called with the spawn point coordinates
-        // expect(service.teleportPlayer).toHaveBeenCalledWith(spawnPoint.x, spawnPoint.y);
-
-        // Verify that the combat service's loserId was reset to an empty string
-        expect(mockCombatService.loserId).toBe('');
-    });
-
-    it('should teleport player to spawn point when current socket is the combat loser', () => {
-        // Create a player with a spawn point at (5, 10)
-        const spawnPoint = { x: POSITION_X, y: POSITION_Y };
-        const mockPlayer = new Player();
-        mockPlayer.id = 'testSocketId';
-        mockPlayer.spawnPoint = spawnPoint;
-
-        // Set up the game manager service room with the player
-        mockGameManagerService.room.players = [mockPlayer];
-
-        // Set up the combat service loserId to match the socket ID
-        mockCombatService.loserId = 'testSocketId';
-
-        // Create a spy for the teleportPlayer method BEFORE calling it
-        spyOn(service, 'teleportPlayer');
-
-        // Directly call the teleportPlayer method with the expected parameters
-        service.teleportPlayer(POSITION_X, POSITION_Y);
-
-        // Verify that teleportPlayer was called with the spawn point coordinates
-        expect(service.teleportPlayer).toHaveBeenCalledWith(POSITION_X, POSITION_Y);
     });
 
     it('should listen to updateScore and handle score update', () => {
@@ -1447,6 +470,39 @@ describe('SocketService', () => {
         eventCallback(winnerId);
 
         expect(mockGameManagerService.updateScore).toHaveBeenCalledWith(winnerId);
+    });
+
+    it('should return early when main player is not found in updateScore event', () => {
+        const winnerId = 'testWinnerId';
+
+        // Set up the game manager service to return null for getMainPlayer
+        mockGameManagerService.getMainPlayer.and.returnValue(null);
+
+        // Create a spy for the finishGame method
+        spyOn(service, 'finishGame');
+
+        // Set up the event callback
+        let eventCallback: (...args: unknown[]) => void = () => {};
+        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
+            if (event === 'updateScore') {
+                eventCallback = callback;
+            }
+            return mockSocket;
+        });
+
+        // Create the service and set up listeners
+        service = TestBed.inject(SocketService);
+        service.connect();
+        (service as any).setUpListeners();
+
+        // Trigger the updateScore event
+        eventCallback(winnerId);
+
+        // Verify that updateScore was called with the winner ID
+        expect(mockGameManagerService.updateScore).toHaveBeenCalledWith(winnerId);
+
+        // Verify that finishGame was NOT called (early return)
+        expect(service.finishGame).not.toHaveBeenCalled();
     });
 
     it('should call finishGame when player reaches MAX_WINS', () => {
@@ -1544,7 +600,7 @@ describe('SocketService', () => {
     });
 
     it('should listen to playerAbandoned and disconnect player', () => {
-        const playerId = 'testPlayerId';
+        const playerId = 'testSocketId';
         let eventCallback: (...args: unknown[]) => void = () => {};
 
         mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
@@ -1554,144 +610,19 @@ describe('SocketService', () => {
             return mockSocket;
         });
 
+        spyOn(service, 'addToJournal').and.callThrough();
+
         service = TestBed.inject(SocketService);
         service.connect();
         (service as any).setUpListeners();
         eventCallback(playerId);
 
+        expect(service.addToJournal).toHaveBeenCalledWith({
+            type: 'TOUS',
+            content: ' Test Player a abandonné la partie.',
+        });
+
         expect(mockGameManagerService.disconnectPlayer).toHaveBeenCalledWith(playerId);
-    });
-
-    it('should listen to debugModeEnabled and toggle debug mode', () => {
-        spyOn(console, 'log');
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'debugModeEnabled') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-        eventCallback();
-
-        expect(mockGameRoomService.toggleDebugMode).toHaveBeenCalled();
-        expect(mockGameManagerService.clearPaths).toHaveBeenCalled();
-        expect(mockGameManagerService.setActionPoints).toHaveBeenCalledWith(1);
-    });
-
-    it('should listen to debugModeDisabled and toggle debug mode', () => {
-        spyOn(console, 'log');
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'debugModeDisabled') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-        eventCallback();
-
-        expect(mockGameRoomService.toggleDebugMode).toHaveBeenCalled();
-        expect(mockSocket.emit).toHaveBeenCalledWith('playerGetMovements', 'testRoomId');
-    });
-
-    it('should listen to doorToggled and toggle door state', () => {
-        const coords = { x: 5, y: 10 };
-        let eventCallback: (...args: unknown[]) => void = () => {};
-
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'doorToggled') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-        eventCallback(coords);
-
-        const cell = mockGameManagerService.getBoard().getCell(coords.x, coords.y);
-        expect(cell?.tile.toggleState).toHaveBeenCalled();
-        expect(mockSocket.emit).toHaveBeenCalledWith('playerGetMovements', 'testRoomId');
-    });
-
-    it('should end player turn when doorToggled and player has no movement or action points left', () => {
-        // Set up a player with no movement points and no action points
-        const mockPlayer = new Player();
-        mockPlayer.id = 'testSocketId';
-        mockPlayer.movementPoints = 0;
-        mockPlayer.actionPoints = 0;
-
-        // Set up the game manager service to return the player with no points
-        mockGameManagerService.getMainPlayer.and.returnValue(mockPlayer);
-        mockGameManagerService.currentPlayerId = 'testSocketId';
-        mockGameManagerService.getRoomId.and.returnValue('testRoomId');
-
-        // Set up the coordinates for the doorToggled event
-        const coords = { x: 5, y: 10 };
-
-        // Set up the event callback
-        let eventCallback: (...args: unknown[]) => void = () => {};
-        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
-            if (event === 'doorToggled') {
-                eventCallback = callback;
-            }
-            return mockSocket;
-        });
-
-        // Create the service and set up listeners
-        service = TestBed.inject(SocketService);
-        service.connect();
-        (service as any).setUpListeners();
-
-        // Reset the emit spy to clear previous calls
-        mockSocket.emit.calls.reset();
-
-        // Trigger the doorToggled event
-        eventCallback(coords);
-
-        // Verify that endTurn was called with the room ID
-        expect(mockSocket.emit).toHaveBeenCalledWith('endTurn', 'testRoomId');
-    });
-
-    // Direct test for the auto end turn condition
-    it('should directly test auto end turn when player has no movement or action points left', () => {
-        // Create a player with no movement points and no action points
-        const player = new Player();
-        player.id = 'testSocketId';
-        player.movementPoints = 0;
-        player.actionPoints = 0;
-
-        // Create a mock game manager service
-        const mockGameManager = jasmine.createSpyObj('GameManagerService', ['getRoomId', 'getMainPlayer']);
-        mockGameManager.getRoomId.and.returnValue('testRoomId');
-        mockGameManager.getMainPlayer.and.returnValue(player);
-        mockGameManager.currentPlayerId = 'testSocketId';
-
-        // Create the service and inject our mocks
-        service = TestBed.inject(SocketService);
-        service['gameManagerService'] = mockGameManager;
-
-        // Create a spy for the endPlayerTurn method
-        spyOn(service, 'endPlayerTurn');
-
-        // Directly execute the code we want to test
-        if (player && player.movementPoints <= 0 && player.actionPoints <= 0) {
-            const gameRoomId = service['gameManagerService'].getRoomId();
-            service.endPlayerTurn(gameRoomId);
-        }
-
-        // Verify that endPlayerTurn was called with the room ID
-        expect(service.endPlayerTurn).toHaveBeenCalledWith('testRoomId');
     });
 
     it('should listen to finishGame and finish the game', () => {
@@ -1710,5 +641,408 @@ describe('SocketService', () => {
         eventCallback();
 
         expect(mockGameManagerService.finishGame).toHaveBeenCalled();
+    });
+
+    describe('navigateToHome', () => {
+        it('should navigate to home route', () => {
+            service.navigateToHome();
+            expect(mockRouter.navigate).toHaveBeenCalledWith(['/home']);
+        });
+    });
+
+    describe('setUpConnection', () => {
+        it('should call setUpConnection on all registered socket services', () => {
+            // Create mock socket services
+            const mockSocketService1 = jasmine.createSpyObj('ISocketService', ['setUpConnection']);
+            const mockSocketService2 = jasmine.createSpyObj('ISocketService', ['setUpConnection']);
+
+            // Add mock services to the socketServices array
+            service['socketServices'] = [mockSocketService1, mockSocketService2];
+
+            // Call setUpConnection
+            service.setUpConnection();
+
+            // Verify that setUpConnection was called on each service
+            expect(mockSocketService1.setUpConnection).toHaveBeenCalled();
+            expect(mockSocketService2.setUpConnection).toHaveBeenCalled();
+        });
+    });
+
+    it('should emit itemDropped when dropItem is called', () => {
+        const item = new Item('adrenaline');
+        const coords = { x: 5, y: 10 };
+        service.dropItem(item, coords);
+        expect(mockSocket.emit).toHaveBeenCalledWith('itemDropped', {
+            roomId: 'testRoomId',
+            playerId: 'testSocketId',
+            item,
+            coords,
+        });
+    });
+
+    it('should listen to itemDropped and add item to board', () => {
+        // Create an item to be dropped
+        const item = new Item('adrenaline');
+        const coords = { x: 5, y: 10 };
+
+        // Set up the event callback
+        let eventCallback: (...args: unknown[]) => void = () => {};
+        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
+            if (event === 'itemDropped') {
+                eventCallback = callback;
+            }
+            return mockSocket;
+        });
+
+        // Create the service and set up listeners
+        service = TestBed.inject(SocketService);
+        service.connect();
+        (service as any).setUpListeners();
+
+        // Trigger the itemDropped event
+        eventCallback({ item, coords });
+
+        // Verify that addItemToBoard was called with the correct parameters
+        expect(mockGameManagerService.addItemToBoard).toHaveBeenCalledWith(item, coords);
+    });
+
+    it('should handle ItemDroppedDisconnected event and emit ItemDropped for each non-null item', () => {
+        // Simulate player inventory
+        const testItem1 = new Item('adrenaline');
+        const testItem2 = new Item('adrenaline');
+        const testItems = [testItem1, testItem2];
+
+        // Coords of player and roomId
+        const testCoords = { x: 5, y: 10 };
+        const testRoomId = 'testRoomId';
+
+        // Nearest empty cells
+        const emptyCells = [
+            { x: 6, y: 10 },
+            { x: 6, y: 11 },
+        ];
+        const boardSpy = jasmine.createSpyObj('Board', ['getTwoNearestEmptyCells']);
+        boardSpy.getTwoNearestEmptyCells.and.returnValue(emptyCells);
+        mockGameManagerService.getBoard.and.returnValue(boardSpy);
+
+        let eventCallback: (data: any) => void = () => {};
+        mockSocket.on.and.callFake((event: string, callback: (data: any) => void) => {
+            if (event === 'itemDroppedDisconnected') {
+                eventCallback = callback;
+            }
+            return mockSocket;
+        });
+
+        service = TestBed.inject(SocketService);
+        service.connect();
+        (service as any).setUpListeners();
+
+        const eventData = {
+            roomId: testRoomId,
+            coords: testCoords,
+            items: testItems,
+        };
+
+        eventCallback(eventData);
+
+        expect(mockSocket.emit).toHaveBeenCalledWith('itemDropped', {
+            roomId: testRoomId,
+            playerId: null,
+            item: testItem1,
+            coords: emptyCells[0],
+        });
+        expect(mockSocket.emit).toHaveBeenCalledWith('itemDropped', {
+            roomId: testRoomId,
+            playerId: null,
+            item: testItem2,
+            coords: emptyCells[1],
+        });
+
+        expect(mockSocket.emit).toHaveBeenCalledTimes(testItems.length);
+    });
+
+    it('should emit virtualPlayerTurn when virtualPlayerTurn is called', () => {
+        const playerId = 'testPlayerId';
+        service.virtualPlayerTurn(playerId);
+        expect(mockSocket.emit).toHaveBeenCalledWith('virtualPlayerTurn', {
+            roomId: 'testRoomId',
+            playerId,
+            isCTF: undefined,
+            skipTimeout: undefined,
+        });
+        expect(mockSocket.emit).toHaveBeenCalledWith('addJournalEntry', {
+            roomId: 'testRoomId',
+            entry: {
+                type: 'TOUS',
+                content: ' Test Player commence son tour.',
+            },
+        });
+    });
+
+    it('should handle virtual player turn when the current player is the organisator and the next player is virtual', () => {
+        // Create a virtual player for the next turn
+        const virtualPlayer = new Player();
+        virtualPlayer.id = 'virtualPlayerId';
+        virtualPlayer.isVirtual = true;
+        virtualPlayer.movementPoints = 3;
+
+        // Set up the room with the current player as the organisator
+        mockGameManagerService.room = {
+            roomId: 'testRoomId',
+            organisatorId: 'testSocketId', // Current player is the organisator
+            isDebugging: false,
+            players: [virtualPlayer],
+            gameId: 'testGameId',
+            isLocked: false,
+        };
+
+        const data = {
+            nextPlayer: virtualPlayer,
+            startTime: Date.now(),
+        };
+
+        let eventCallback: (...args: unknown[]) => void = () => {};
+        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
+            if (event === 'turnStarting') {
+                eventCallback = callback;
+            }
+            return mockSocket;
+        });
+
+        service = TestBed.inject(SocketService);
+        service.connect();
+        (service as any).setUpListeners();
+
+        // Reset spies to clear previous calls
+        mockGameManagerService.selectPlayer.calls.reset();
+        mockGameManagerService.setMovementPoints.calls.reset();
+        mockGameManagerService.setActionPoints.calls.reset();
+        mockSocket.emit.calls.reset();
+
+        // Trigger the turnStarting event
+        eventCallback(data);
+
+        // Verify that the virtual player was selected and points were set
+        expect(mockGameManagerService.selectPlayer).toHaveBeenCalled();
+        expect(mockGameManagerService.setMovementPoints).toHaveBeenCalledWith(virtualPlayer.movementPoints);
+        expect(mockGameManagerService.setActionPoints).toHaveBeenCalledWith(1);
+
+        // Verify that virtualPlayerTurn was called with the virtual player's ID
+        expect(mockSocket.emit).toHaveBeenCalledWith('virtualPlayerTurn', {
+            roomId: 'testRoomId',
+            playerId: virtualPlayer.id,
+            isCTF: undefined,
+            skipTimeout: undefined,
+        });
+        expect(mockSocket.emit).toHaveBeenCalledWith('addJournalEntry', {
+            roomId: 'testRoomId',
+            entry: {
+                type: 'TOUS',
+                content: ' Test Player commence son tour.',
+            },
+        });
+    });
+
+    it('should emit send message to game room', () => {
+        const message = 'Hello, world!';
+        service.sendMessageToGameRoom(message, 'Test Player');
+        expect(mockSocket.emit).toHaveBeenCalledWith('sendMessageToGameRoom', {
+            message,
+            playerName: 'Test Player',
+            roomId: 'testRoomId',
+        });
+    });
+
+    it('should emit quit end game', () => {
+        const roomId = 'testRoomId';
+        service.quitEndGame();
+        expect(mockSocket.emit).toHaveBeenCalledWith('quitEndGame', roomId);
+    });
+
+    it('should listen to updateStartingCountdown and update turn countdown', () => {
+        const countdown = 10;
+        let eventCallback: (...args: unknown[]) => void = () => {};
+
+        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
+            if (event === 'updateStartingCountdown') {
+                eventCallback = callback;
+            }
+            return mockSocket;
+        });
+
+        service = TestBed.inject(SocketService);
+        service.connect();
+        (service as any).setUpListeners();
+        eventCallback(countdown);
+
+        expect(mockGameManagerService.turnCountdown.next).toHaveBeenCalledWith(countdown);
+    });
+
+    it('should listen to itemDropped and handle flag item correctly', () => {
+        const mockItem = new Item('flag');
+        const mockCoords = { x: 5, y: 10 };
+        let eventCallback: (...args: unknown[]) => void = () => {};
+
+        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
+            if (event === 'itemDropped') {
+                eventCallback = callback;
+            }
+            return mockSocket;
+        });
+
+        service = TestBed.inject(SocketService);
+        service.connect();
+        (service as any).setUpListeners();
+
+        // Set initial playerWithFlag value
+        mockGameManagerService.playerWithFlag = 'somePlayerId';
+
+        // Trigger the itemDropped event
+        eventCallback({ item: mockItem, coords: mockCoords });
+
+        // Verify that addItemToBoard was called with the correct arguments
+        expect(mockGameManagerService.addItemToBoard).toHaveBeenCalledWith(mockItem, mockCoords);
+        // Verify that playerWithFlag was set to null when a flag item is dropped
+        expect(mockGameManagerService.playerWithFlag).toBeNull();
+    });
+
+    it('should listen to flagCollected and update playerWithFlag', () => {
+        const playerId = 'testPlayerId';
+        let eventCallback: (...args: unknown[]) => void = () => {};
+
+        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
+            if (event === 'flagCollected') {
+                eventCallback = callback;
+            }
+            return mockSocket;
+        });
+
+        service = TestBed.inject(SocketService);
+        service.connect();
+        (service as any).setUpListeners();
+
+        // Trigger the flagCollected event
+        eventCallback(playerId);
+
+        // Verify that playerWithFlag was updated with the player ID
+        expect(mockGameManagerService.playerWithFlag).toBe(playerId);
+    });
+
+    it('should listen to organizatorChanged and update organisatorId', () => {
+        const newOrganisatorId = 'newOrganisatorId';
+        let eventCallback: (...args: unknown[]) => void = () => {};
+
+        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
+            if (event === 'organizatorChanged') {
+                eventCallback = callback;
+            }
+            return mockSocket;
+        });
+
+        service = TestBed.inject(SocketService);
+        service.connect();
+        (service as any).setUpListeners();
+
+        // Set initial organisatorId value
+        mockGameManagerService.room.organisatorId = 'oldOrganisatorId';
+
+        // Trigger the organizatorChanged event
+        eventCallback({ newOrganisatorId });
+
+        // Verify that organisatorId was updated with the new value
+        expect(mockGameManagerService.room.organisatorId).toBe(newOrganisatorId);
+    });
+
+    it('should return early when game is in CTF mode in updateScore event', () => {
+        const winnerId = 'testWinnerId';
+        const score = 3;
+
+        // Set up the game manager service to return a score
+        mockGameManagerService.updateScore.and.returnValue(score);
+
+        // Set up the game manager service to indicate CTF mode
+        Object.defineProperty(mockGameManagerService, 'isCTF', {
+            get: () => true,
+        });
+
+        // Create a spy for the finishGame method
+        spyOn(service, 'finishGame');
+
+        // Set up the event callback
+        let eventCallback: (...args: unknown[]) => void = () => {};
+        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
+            if (event === 'updateScore') {
+                eventCallback = callback;
+            }
+            return mockSocket;
+        });
+
+        // Create the service and set up listeners
+        service = TestBed.inject(SocketService);
+        service.connect();
+        (service as any).setUpListeners();
+
+        // Trigger the updateScore event
+        eventCallback(winnerId);
+
+        // Verify that updateScore was called with the winner ID
+        expect(mockGameManagerService.updateScore).toHaveBeenCalledWith(winnerId);
+
+        // Verify that finishGame was NOT called (early return due to CTF mode)
+        expect(service.finishGame).not.toHaveBeenCalled();
+    });
+
+    it('should call finishGame when a virtual player wins and current player is the organizer', () => {
+        // Set up a virtual player as the winner
+        const virtualPlayer = new Player();
+        virtualPlayer.id = 'virtualPlayerId';
+        virtualPlayer.isVirtual = true;
+        virtualPlayer.name = 'Virtual Player';
+
+        // Set up the game manager service to return a score that meets the MAX_WINS threshold
+        const score = 3; // Assuming MAX_WINS is 3
+        mockGameManagerService.updateScore.and.returnValue(score);
+
+        // Set up the game manager service to return the virtual player as the winner
+        mockGameManagerService.room.players = [virtualPlayer];
+
+        // Set up the game manager service to return a main player that is not the winner
+        const mainPlayer = new Player();
+        mainPlayer.id = 'testSocketId';
+        mockGameManagerService.getMainPlayer.and.returnValue(mainPlayer);
+
+        // Set up the game manager service to indicate it's not CTF mode
+        Object.defineProperty(mockGameManagerService, 'isCTF', {
+            get: () => false,
+        });
+
+        // Set up the game manager service to have the current player as the organizer
+        mockGameManagerService.room.organisatorId = 'testSocketId';
+
+        // Create a spy for the finishGame method
+        spyOn(service, 'finishGame');
+
+        // Set up the event callback
+        let eventCallback: (...args: unknown[]) => void = () => {};
+        mockSocket.on.and.callFake((event: string, callback: (...args: any[]) => void) => {
+            if (event === 'updateScore') {
+                eventCallback = callback;
+            }
+            return mockSocket;
+        });
+
+        // Create the service and set up listeners
+        service = TestBed.inject(SocketService);
+        service.connect();
+        (service as any).setUpListeners();
+
+        // Trigger the updateScore event with the virtual player's ID as the winner
+        eventCallback('virtualPlayerId');
+
+        // Verify that updateScore was called with the winner ID
+        expect(mockGameManagerService.updateScore).toHaveBeenCalledWith('virtualPlayerId');
+
+        // Verify that finishGame was called with the winner's ID
+        expect(service.finishGame).toHaveBeenCalledWith('virtualPlayerId');
     });
 });

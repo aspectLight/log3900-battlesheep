@@ -7,11 +7,15 @@ import {
     D6_VALUE,
     DEFAULT_ACTION_POINTS,
     DEFAULT_MOVEMENT_POINTS,
+    PROPAGANDA_ATTACK_THRESHOLD,
+    PROPAGANDA_HEALTH_THRESHOLD,
+    VirtualPlayerType,
 } from '@app/constants/player.constants';
 import { Coords } from '@app/interfaces/coords';
 import { StatInfo } from '@app/interfaces/stat-info';
 import { Entity } from './entity';
 import { Item } from './item';
+import { PROPAGANDA_DEFENSE_BOOST, PROPAGANDA_ATTACK_BOOST, VODKA_ATTACK_BOOST, VODKA_SPEED_REDUCTION } from '@app/constants/item.constants';
 
 export type Orientation = 'up' | 'down' | 'left' | 'right';
 export type PlayerState = 'idle' | 'moving' | 'dead' | 'attacking';
@@ -41,11 +45,9 @@ export class Player extends Entity {
     inventory: [Item | null, Item | null];
 
     spawnPoint: Coords;
-    position: Coords;
     actionPoints: number;
     movementPoints: number;
 
-    bonusChoice: Stats | null;
     d4Choice: Stats;
     d6Choice: Stats | null;
 
@@ -54,8 +56,15 @@ export class Player extends Entity {
     color: string = 'yellow';
 
     fightsWon: number = 0;
+    team: number;
+    onReplaceItem?: (newItem: Item, currentInventory: [Item | null, Item | null], cellCoords: Coords) => void;
 
-    constructor(name?: string, avatar?: string, bonusChoice?: Stats, d6Choice?: Stats) {
+    isVirtual: boolean = false;
+    private profile: VirtualPlayerType | undefined;
+    private bonusChoice: Stats | null;
+    private appliedItemEffects: { [itemId: string]: boolean } = {};
+
+    constructor(name?: string, avatar?: string, bonusChoice?: Stats, d6Choice?: Stats, profile?: VirtualPlayerType) {
         super();
         this.name = name || null;
         this.avatar = avatar ? AVATAR_TYPES[avatar] : null;
@@ -67,6 +76,8 @@ export class Player extends Entity {
         this.inventory = [null, null];
         this.orientation = 'down';
         this.animationState = 'idle';
+        this.isVirtual = profile !== undefined;
+        this.profile = profile;
         this.applyBonus();
     }
 
@@ -87,8 +98,13 @@ export class Player extends Entity {
         if (obj.spawnPoint) {
             player.spawnPoint = obj.spawnPoint;
         }
+        if (obj.team !== undefined) {
+            player.team = obj.team;
+        }
 
         player.stats = { ...obj.stats };
+        player.profile = obj.profile;
+        player.isVirtual = obj.isVirtual;
 
         return player;
     }
@@ -103,14 +119,14 @@ export class Player extends Entity {
 
     setStatValue(stat: BonusType, value: number) {
         this.stats[stat].value = value;
+
+        if (stat === BonusType.Health) {
+            this.updatePropagandaEffects();
+        }
     }
 
     isAlive(): boolean {
         return this.stats.health.value > 0;
-    }
-
-    rollDice(diceNumber: number) {
-        return this.generateDiceValue(diceNumber);
     }
 
     rollStat(stat: Stats): number {
@@ -136,19 +152,138 @@ export class Player extends Entity {
         return 0;
     }
 
-    protected generateDiceValue(diceNumber: number) {
+    addItem(item: Item): boolean | (Item | null)[] {
+        if (this.inventory[0] === null) {
+            this.inventory[0] = item;
+            this.applyItemEffect(item);
+            return true;
+        } else if (this.inventory[1] === null) {
+            this.inventory[1] = item;
+            this.applyItemEffect(item);
+            return true;
+        } else {
+            return this.inventory;
+        }
+    }
+
+    replaceItem(newItem: Item, coords: Coords): void {
+        if (this.onReplaceItem) {
+            const cellCoords: Coords = { x: coords.x, y: coords.y };
+            this.onReplaceItem(newItem, this.inventory, cellCoords);
+        }
+    }
+
+    updateItemsEffect(multiplier: number) {
+        if (multiplier !== 0) {
+            if (multiplier > 0) {
+                this.inventory.forEach((item) => {
+                    if (item && this.appliedItemEffects[item.id]) {
+                        this.updateItemEffects(item, -1);
+                        delete this.appliedItemEffects[item.id];
+                    }
+                });
+            }
+
+            this.inventory.forEach((item) => {
+                if (item) {
+                    this.updateItemEffects(item, multiplier);
+                    if (multiplier > 0) {
+                        this.appliedItemEffects[item.id] = true;
+                    }
+                }
+            });
+        }
+    }
+
+    updatePropagandaEffects() {
+        const propagandaItem = this.findItem('propaganda');
+        if (propagandaItem) {
+            this.removeItemEffect(propagandaItem);
+            this.applyItemEffect(propagandaItem);
+        }
+    }
+
+    hasItem(itemType: string): boolean {
+        return this.findItem(itemType) !== null;
+    }
+
+    clearInfo(): void {
+        this.clearAllItemEffects();
+
+        this.stats[BonusType.Health].value = 4;
+        this.stats[BonusType.Speed].value = 4;
+        this.stats[BonusType.Attack].value = 4;
+        this.stats[BonusType.Defense].value = 4;
+        this.actionPoints = DEFAULT_ACTION_POINTS;
+        this.movementPoints = DEFAULT_MOVEMENT_POINTS;
+        this.inventory = [null, null];
+        this.bonusChoice = null;
+        this.d6Choice = null;
+        this.avatar = null;
+    }
+
+    clearAllItemEffects(): void {
+        this.inventory.forEach((item) => {
+            if (item && this.appliedItemEffects[item.id]) {
+                this.removeItemEffect(item);
+            }
+        });
+        this.appliedItemEffects = {};
+    }
+
+    applyItemEffect(item: Item): void {
+        if (!this.appliedItemEffects[item.id]) {
+            this.updateItemEffects(item, 1);
+            this.appliedItemEffects[item.id] = true;
+        }
+    }
+
+    removeItemEffect(item: Item): void {
+        if (this.appliedItemEffects[item.id]) {
+            this.updateItemEffects(item, -1);
+            delete this.appliedItemEffects[item.id];
+        }
+    }
+
+    private findItem(itemType: string): Item | null {
+        return this.inventory.find((item) => item?.type === itemType) || null;
+    }
+
+    private generateDiceValue(diceNumber: number) {
         return Math.floor(Math.random() * diceNumber) + 1;
     }
 
-    protected applyBonus(): void {
+    private applyBonus(): void {
         if (this.bonusChoice) this.stats[this.bonusChoice].value += BONUS_VALUE;
         this.movementPoints = this.stats[BonusType.Speed].value;
     }
 
-    protected applyDiceBonus(): void {
-        if (this.d6Choice) {
-            this.stats[this.d6Choice].value += this.generateDiceValue(D6_VALUE);
-            this.stats[this.d4Choice].value += this.generateDiceValue(D4_VALUE);
+    private updateItemEffects(item: Item, multiplier: number) {
+        switch (item.type) {
+            case 'adrenaline':
+                this.stats[BonusType.Health].value += 2 * multiplier;
+                break;
+            case 'vodka':
+                this.stats[BonusType.Attack].value += VODKA_ATTACK_BOOST * multiplier;
+                this.stats[BonusType.Speed].value -= VODKA_SPEED_REDUCTION * multiplier;
+                break;
+            case 'propaganda':
+                if (this.stats[BonusType.Health].value < PROPAGANDA_HEALTH_THRESHOLD && multiplier > 0) {
+                    this.stats[BonusType.Attack].value += PROPAGANDA_ATTACK_BOOST * multiplier;
+                    this.stats[BonusType.Defense].value += PROPAGANDA_DEFENSE_BOOST * multiplier;
+                } else if (multiplier < 0) {
+                    if (this.stats[BonusType.Attack].value > PROPAGANDA_ATTACK_THRESHOLD) {
+                        this.stats[BonusType.Attack].value += PROPAGANDA_ATTACK_BOOST * multiplier;
+                        this.stats[BonusType.Defense].value += PROPAGANDA_DEFENSE_BOOST * multiplier;
+                    }
+                }
+                break;
+            case 'camouflage':
+                break;
+            case 'waterproofBoots':
+                break;
+            case 'airStrike':
+                break;
         }
     }
 }

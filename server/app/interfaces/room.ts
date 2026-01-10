@@ -6,6 +6,13 @@ export interface Room {
     organisatorId: string;
     players: Player[];
     futurePlayers?: string[];
-    reservedAvatars?: { reservorId: string; chosenAvatar: string }[];
+    reservedAvatars?: Reservation[];
     isLocked: boolean;
+    messages: { type: string; content: string; time: string }[];
+    journalEntries: { type: string; content: string; time: string }[];
+}
+
+export interface Reservation {
+    reservorId: string;
+    chosenAvatar: string;
 }

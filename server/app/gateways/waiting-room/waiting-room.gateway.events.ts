@@ -24,6 +24,11 @@ export enum WaitingRoomEvents {
     PlayerKicked = 'playerKicked',
     LeaveWaitingRoom = 'leaveWaitingRoom',
 
+    SendMessageToWaitingRoom = 'sendMessageToWaitingRoom',
+    MassMessage = 'massMessage',
+    GetMessagesFromWaitingRoom = 'getMessagesFromWaitingRoom',
+    GetMessagesResponse = 'getMessagesResponse',
+
     StartGame = 'startGame',
     CancelRoom = 'cancelRoom',
     RoomCanceled = 'roomCanceled',

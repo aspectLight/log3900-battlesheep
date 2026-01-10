@@ -1,4 +1,4 @@
-import { ErrorMessages } from '@app/constants/error-messages.constants';
+import { ErrorMessages } from '@common/error-messages.constants';
 import { TILE_TYPES } from '@app/constants/tile.constants';
 
 export class Tile {

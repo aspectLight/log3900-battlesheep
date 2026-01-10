@@ -2,22 +2,21 @@ import { Injectable } from '@angular/core';
 import { Board } from '@app/classes/board';
 import { Tile } from '@app/classes/tile';
 import { Cell } from '@app/classes/cell';
-import { ItemService } from './item.service';
 import { AUTO_TILE_CONFIG, BitmaskMapping, CategoryConfig } from '@app/constants/auto-tile.constants';
 
 type TileCategory = 'wall' | 'water' | 'ice' | 'none';
 
 /*
-ATTENTION !
+ATTENTION!
 
-Pour ce code, on trouve justifié le fait de désactiver certaines vérifications lint.
-Le "autotile" est une fonction qu'on peut trouver sur plusieurs moteurs de jeux (ex. Godot), et 
-est implémenté de manière très similaire avec le bitmask et une map correspondant aux différentes valeurs.
+For this code, we find it justified to disable certain lint checks.
+The "autotile" is a function that can be found in several game engines (e.g., Godot), and
+is implemented in a very similar way with bitmasks and a map corresponding to different values.
 
-Le lint veut nous empêcher d'utiliser des nombres comme attribut et appliquer le camel case, ce qui est impossible.
-Il veut aussi nous empêcher d'utiliser les bitwise, ce qui va a l'encontre de la méthode commune qu'on essaye d'implémenter.
+The linter wants to prevent us from using numbers as attributes and applying camel case, which is impossible.
+It also wants to prevent us from using bitwise operations, which goes against the common method we're trying to implement.
 
-Voici nos sources:
+Here are our sources:
 https://code.tutsplus.com/how-to-use-tile-bitmasking-to-auto-tile-your-level-layouts--cms-25673t
 https://www.youtube.com/watch?v=mQRokJfkLY4&ab_channel=UnitOfTime
 */
@@ -30,8 +29,6 @@ https://www.youtube.com/watch?v=mQRokJfkLY4&ab_channel=UnitOfTime
     providedIn: 'root',
 })
 export class AutoTileService {
-    constructor(private itemService: ItemService) {}
-
     updateSurroundingTiles(x: number, y: number, board: Board): void {
         if (!this.isInBounds(x, y, board)) return;
         this.applyAutoTile(x, y, board);
@@ -189,9 +186,6 @@ export class AutoTileService {
     private replaceTileAndRestoreItem(x: number, y: number, board: Board, type: string, orientation: string): void {
         const cell = board.getCell(x, y);
         if (!cell) return;
-        if (cell.item) {
-            this.itemService.putBackItem(cell.item.type);
-        }
         board.setTile(x, y, new Tile(type, orientation, cell.tile.state));
     }
 }

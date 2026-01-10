@@ -5,7 +5,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { Game } from '@app/classes/game';
 import { Board } from '@app/classes/board';
 import { environment } from 'src/environments/environment';
-import { BOARD_SIZES } from '@app/constants/board.constants';
+import { BoardSizes, BOARD_CONFIGS } from '@app/constants/board.constants';
 import { HTTP_STATUS_CODES } from '@app/constants/http-status-code.constants';
 
 describe('GameService', () => {
@@ -38,7 +38,7 @@ describe('GameService', () => {
             mockGame.name = 'TestGame';
             mockGame.description = 'Test description';
             mockGame.mode = 'classique';
-            mockGame.board = new Board(BOARD_SIZES['moyenne'].board);
+            mockGame.board = new Board(BOARD_CONFIGS[BoardSizes.Moyenne].board);
             service.setGame(mockGame);
         });
 
@@ -62,23 +62,27 @@ describe('GameService', () => {
             const settings = service.getGameSettings();
             expect(settings).toEqual({
                 mode: 'classique',
-                boardSize: BOARD_SIZES['moyenne'].board,
+                boardSize: BOARD_CONFIGS[BoardSizes.Moyenne].board,
             });
         });
 
+        it('should get mode correctly', () => {
+            expect(service.getMode()).toBe('classique');
+        });
+
         it('should set game settings correctly', () => {
-            service.setGameSettings('ctf', BOARD_SIZES['petite'].board);
+            service.setGameSettings('ctf', BOARD_CONFIGS[BoardSizes.Petite].board);
             const settings = service.getGameSettings();
             expect(settings).toEqual({
                 mode: 'ctf',
-                boardSize: BOARD_SIZES['petite'].board,
+                boardSize: BOARD_CONFIGS[BoardSizes.Petite].board,
             });
         });
 
         it('should get and set board correctly', () => {
-            const newBoard = new Board(BOARD_SIZES['grande'].board);
+            const newBoard = new Board(BOARD_CONFIGS[BoardSizes.Grande].board);
             service.setBoard(newBoard);
-            expect(service.getBoard().size).toBe(BOARD_SIZES['grande'].board);
+            expect(service.getBoard().size).toBe(BOARD_CONFIGS[BoardSizes.Grande].board);
         });
     });
 
@@ -93,12 +97,12 @@ describe('GameService', () => {
         it('should set an existing game correctly', () => {
             const mockGame = new Game();
             mockGame.name = 'ExistingGame';
-            mockGame.board = new Board(BOARD_SIZES['moyenne'].board);
+            mockGame.board = new Board(BOARD_CONFIGS[BoardSizes.Moyenne].board);
             service.setGame(mockGame);
 
             expect(service.isGameBeingModified).toBeTrue();
             expect(service.getName()).toBe('ExistingGame');
-            expect(service.getBoard().size).toBe(BOARD_SIZES['moyenne'].board);
+            expect(service.getBoard().size).toBe(BOARD_CONFIGS[BoardSizes.Moyenne].board);
         });
 
         it('should initialize a new game when no saved game exists in localStorage', () => {

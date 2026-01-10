@@ -76,7 +76,7 @@ describe('GameController', () => {
         await controller.findAllGames(res);
 
         expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
-        expect(res.json).toHaveBeenCalledWith({ message: 'Une erreur inattendue est survenue.' });
+        expect(res.json).toHaveBeenCalledWith({ message: 'Une erreur est survenue. Veuillez réessayer.' });
     });
 
     it('findGameById() should return a game with valid ID', async () => {
@@ -133,7 +133,7 @@ describe('GameController', () => {
         await controller.findGameById('someId', res);
 
         expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
-        expect(res.json).toHaveBeenCalledWith({ message: 'Une erreur inattendue est survenue.' });
+        expect(res.json).toHaveBeenCalledWith({ message: 'Une erreur est survenue. Veuillez réessayer.' });
     });
 
     it('createGame() should return 201 if it creates the game', async () => {
@@ -179,7 +179,7 @@ describe('GameController', () => {
         await controller.createGame({ name: 'testGame' } as any, res);
 
         expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
-        expect(res.json).toHaveBeenCalledWith({ message: 'Une erreur inattendue est survenue.' });
+        expect(res.json).toHaveBeenCalledWith({ message: 'Une erreur est survenue. Veuillez réessayer.' });
     });
 
     it('deleteGame() should return 204 when the game is deleted', async () => {
@@ -237,7 +237,7 @@ describe('GameController', () => {
         await controller.deleteGame('id', res);
 
         expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
-        expect(res.json).toHaveBeenCalledWith({ message: 'Une erreur inattendue est survenue.' });
+        expect(res.json).toHaveBeenCalledWith({ message: 'Une erreur est survenue. Veuillez réessayer.' });
     });
 
     it('updateGame() should return 200 if game is updated', async () => {
@@ -309,6 +309,6 @@ describe('GameController', () => {
         await controller.updateGame('id', { name: 'updatedGame' } as any, res);
 
         expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
-        expect(res.json).toHaveBeenCalledWith({ message: 'Une erreur inattendue est survenue.' });
+        expect(res.json).toHaveBeenCalledWith({ message: 'Une erreur est survenue. Veuillez réessayer.' });
     });
 });

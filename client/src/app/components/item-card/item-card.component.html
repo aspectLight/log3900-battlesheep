@@ -1,0 +1,31 @@
+<div class="card">
+  <div class="corner letter">{{ item.name[0] }}</div>
+  <!-- Corner decorations - all four corners now -->
+  <div class="corner-decoration top-left"></div>
+  <div class="corner-decoration top-right"></div>
+  <div class="corner-decoration bottom-left"></div>
+  <div class="corner-decoration bottom-right"></div>
+  
+  <!-- Side decorations -->
+  <div class="side-decoration left-side"></div>
+  <div class="side-decoration right-side"></div>
+  
+  <!-- Diamond accents -->
+  <div class="diamond diamond-left-1"></div>
+  <div class="diamond diamond-left-2"></div>
+  <div class="diamond diamond-left-3"></div>
+  <div class="diamond diamond-right-1"></div>
+  <div class="diamond diamond-right-2"></div>
+  <div class="diamond diamond-right-3"></div>
+  
+  <!-- Top and bottom borders -->
+  <div class="border-decoration top-border"></div>
+  <div class="border-decoration bottom-border"></div>
+
+  <div class="card-wrapper">
+    <img class="suit" [src]="item.imagePath" alt="Image de la carte" />
+    <div class="card-name">{{item.name}}</div>
+    <div class="card-description">{{item.description}}</div>
+  </div>
+  <div class="corner letter-reversed">{{ item.name[0] }}</div>
+</div> 

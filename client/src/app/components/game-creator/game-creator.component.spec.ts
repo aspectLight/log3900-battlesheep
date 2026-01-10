@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { CommonModule } from '@angular/common';
 import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -8,7 +9,7 @@ import { GameListComponent } from '@app/components/game-list/game-list.component
 import { ROUTES } from '@app/constants/routes.constants';
 import { GameCreationService } from '@app/services/game-creation.service';
 import { GameListService } from '@app/services/game-list.service';
-import { SocketService } from '@app/services/socket.service';
+import { RoomSocketService } from '@app/services/socket/room-socket.service';
 
 describe('CreateGamePageComponent', () => {
     let component: GameCreatorComponent;
@@ -17,14 +18,14 @@ describe('CreateGamePageComponent', () => {
     let mockActivatedRoute: Partial<ActivatedRoute>;
     let mockGameListService: jasmine.SpyObj<GameListService>;
     let mockGameCreationService: jasmine.SpyObj<GameCreationService>;
-    let mockSocketService: jasmine.SpyObj<SocketService>;
+    let mockSocketService: jasmine.SpyObj<RoomSocketService>;
 
     beforeEach(async () => {
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
         mockActivatedRoute = {};
         mockGameListService = jasmine.createSpyObj('GameListService', ['fetchGameById']);
         mockGameCreationService = jasmine.createSpyObj('GameCreationService', ['setSelectedGame', 'setGameCode']);
-        mockSocketService = jasmine.createSpyObj('SocketService', ['generateCode']);
+        mockSocketService = jasmine.createSpyObj('RoomSocketService', ['generateCode']);
 
         await TestBed.configureTestingModule({
             imports: [CommonModule, GameListComponent, GameCreatorComponent, RouterLink],
@@ -34,7 +35,7 @@ describe('CreateGamePageComponent', () => {
                 { provide: ActivatedRoute, useValue: mockActivatedRoute },
                 { provide: GameListService, useValue: mockGameListService },
                 { provide: GameCreationService, useValue: mockGameCreationService },
-                { provide: SocketService, useValue: mockSocketService },
+                { provide: RoomSocketService, useValue: mockSocketService },
             ],
         }).compileComponents();
 
@@ -58,12 +59,14 @@ describe('CreateGamePageComponent', () => {
     });
 
     it('should disable the button if no game is selected', () => {
+        component.hasGames = true;
         fixture.detectChanges();
         const button = fixture.nativeElement.querySelector('.square-button');
         expect(button.disabled).toBeTrue();
     });
 
     it('should enable the button when a game is selected', () => {
+        component.hasGames = true;
         component.selectedGame = { _id: '123', name: 'Test Game' } as Game;
         fixture.detectChanges();
         const button = fixture.nativeElement.querySelector('.square-button');
@@ -105,5 +108,16 @@ describe('CreateGamePageComponent', () => {
     it('should remove popUp when the button is clicked', () => {
         component.handlePopUp();
         expect(component.gameModified).toBeFalse();
+    });
+
+    it('should update hasGames based on games length', () => {
+        component.onGamesLengthChange(0);
+        expect(component.hasGames).toBeFalse();
+
+        component.onGamesLengthChange(1);
+        expect(component.hasGames).toBeTrue();
+
+        component.onGamesLengthChange(5);
+        expect(component.hasGames).toBeTrue();
     });
 });
