@@ -1,0 +1,24 @@
+<div class="container">
+    <div class="cards-container">
+        @for (playerCard of playerCardList; track playerCard.player.id; let idx = $index) {
+            <div class="card" (click)="toggleCard(idx)" [class.active]="playerCard.isActive" [class.isDisconnected]="playerCard.isDisconnected">
+                <div class="card-content">
+                    <p class="action-wins"> {{playerCard.player.fightsWon}} </p>
+                    @if (playerCard.isActive) {
+                        
+                        <p class="action-description" > Joue... </p>
+
+                    }
+                    @if (playerCard.isHost) {
+                        <img class="host-img" src="./assets/ui/host.png">
+                    }
+                    <div class="player-circle" [ngStyle]="{'background-color': playerCard.playerColor}"></div>
+                    <div class="card-name">{{ playerCard.player.name }}</div>
+                    <div class="card-image">
+                        <img [src]="playerCard.player.avatar?.avatarFull" alt="Card Image">
+                    </div>     
+                </div>
+            </div>
+        }
+    </div>
+</div>

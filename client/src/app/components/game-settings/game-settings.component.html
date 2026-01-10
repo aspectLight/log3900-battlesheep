@@ -1,0 +1,12 @@
+<button class="settings-button" (click)="toggleSettings()">
+    <img src="./assets/ui/settings.png">
+</button>
+@if (isSettingsClicked) {
+    <app-pop-up [popUpMessage]="title" 
+    [description]="description"
+    [showSecondButton]="true" 
+    (confirm)="toggleSettings()"
+    (cancel)="quitGame()"
+    firstOption="continuer"
+    secondOption="quitter"></app-pop-up>
+}

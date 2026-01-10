@@ -1,0 +1,26 @@
+<div class="save-game">
+    <button (click)="onSaveGame()">
+        <img src="./assets/ui/save.png" alt="Save Game" class="save-icon" />
+    </button>
+
+    @if (errors.length > 0) {
+    <div class="dialogue">
+        <div class="errors">
+            <h2>Le jeu ne peut pas être sauvegardé en raison des erreurs suivantes :</h2>
+            <ul>
+                @for (error of errors; track error) {
+                <li>{{ error.message }}</li>
+                }
+            </ul>
+            <button (click)="closeDialogue()">Fermer</button>
+        </div>
+    </div>
+    }
+    @if (showError === true) {
+        <app-pop-up
+            popUpMessage="{{errorMessage}}"
+            (confirm)="closeDialogue()"
+            [showSecondButton]="false">
+        </app-pop-up>
+    }
+</div>

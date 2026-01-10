@@ -1,0 +1,345 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 25px;
+  margin: 10px;
+  margin-left: 10px;
+  width: 86%;
+}
+
+.player-info {
+  background: linear-gradient(135deg, #2b2b2b, #3b3b3b);
+  box-shadow:
+    0 0 0 2px #111111,
+    0 0 0 8px #333333;
+  border-radius: 5px;
+  display: flex;
+  gap: 30px;
+  padding: 15px;
+  z-index: 2;
+}
+
+.right-side,
+.left-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.player-name,
+.stats-title {
+  color: #e0e0e0;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.player-img {
+  border: 4px solid #660000;
+  border-radius: 50%;
+  overflow: hidden;
+  width: 70%;
+  height: 70%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #1a1a1a;
+  margin-bottom: 5px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.ingame-points {
+  font-size: 0.8rem;
+}
+
+.dice {
+  width: 30px;
+  height: auto;
+}
+
+.stats-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-left: -.6em;
+}
+
+.stat-points{
+  display: flex;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stat-label {
+  color: #cccccc;
+  width: 70px;
+  text-align: right;
+  font-size: 0.9rem;
+}
+
+.stat-bar {
+  display: flex;
+  gap: 4px;
+  width: 60%;
+  overflow: hidden;
+}
+
+.stat-value {
+  color: #aaaaaa;
+  font-size: 0.8rem;
+  width: 10%;
+  text-align: left;
+}
+
+.point {
+  margin: -2px;
+  width: 25px; 
+  height: auto;
+}
+
+progress {
+  height: 8px;
+  width: 150px;
+  background-color: #444444;
+  border-radius: 10px;
+  border: none;
+}
+
+progress::-webkit-progress-bar {
+  background-color: #444444;
+  border-radius: 10px;
+}
+
+progress::-webkit-progress-value {
+  background-color: #990000;
+  border-radius: 10px;
+}
+
+progress::-moz-progress-bar {
+  background-color: #990000;
+  border-radius: 10px;
+}
+.cards-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 30px;
+  margin-bottom: -180px;
+  z-index: 0;
+}
+
+.card {
+  background: linear-gradient(135deg, #edebe9, #d3cbc6);
+  width: 150px;
+  height: 220px;
+  border-radius: 10px;
+  overflow: visible;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.corner-decoration {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background-size: contain;
+  z-index: 1;
+}
+
+.top-left {
+  top: -2px;
+  left: -2px;
+  background-image: 
+    radial-gradient(
+      circle at center,
+      transparent 10px,
+      rgba(153, 0, 0, 0.6) 10px,
+      rgba(153, 0, 0, 0.6) 12px,
+      transparent 12px
+    );
+}
+
+.top-right {
+  top: -2px;
+  right: -2px;
+  background-image: 
+    radial-gradient(
+      circle at center,
+      transparent 10px,
+      rgba(153, 0, 0, 0.6) 10px,
+      rgba(153, 0, 0, 0.6) 12px,
+      transparent 12px
+    );
+}
+
+.bottom-left {
+  bottom: -2px;
+  left: -2px;
+  background-image: 
+    radial-gradient(
+      circle at center,
+      transparent 10px,
+      rgba(153, 0, 0, 0.6) 10px,
+      rgba(153, 0, 0, 0.6) 12px,
+      transparent 12px
+    );
+}
+
+.bottom-right {
+  bottom: -2px;
+  right: -2px;
+  background-image: 
+    radial-gradient(
+      circle at center,
+      transparent 10px,
+      rgba(153, 0, 0, 0.6) 10px,
+      rgba(153, 0, 0, 0.6) 12px,
+      transparent 12px
+    );
+}
+
+/* Side Decorations */
+.side-decoration {
+  position: absolute;
+  width: 4px;
+  background-color: rgba(153, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.left-side {
+  left: 8px;
+  top: 15px;
+  bottom: 15px;
+  border-radius: 2px;
+}
+
+.right-side {
+  right: 8px;
+  top: 15px;
+  bottom: 15px;
+  border-radius: 2px;
+}
+
+/* Diamond Accents */
+.diamond {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: rgba(153, 0, 0, 0.6);
+  transform: rotate(45deg);
+  z-index: 2;
+}
+
+/* Left side diamonds - evenly spaced */
+.diamond-left-1 { left: 6px; top: 40px; }
+.diamond-left-2 { left: 6px; top: 110px; }
+.diamond-left-3 { left: 6px; top: 180px; }
+
+/* Right side diamonds - evenly spaced */
+.diamond-right-1 { right: 6px; top: 40px; }
+.diamond-right-2 { right: 6px; top: 110px; }
+.diamond-right-3 { right: 6px; top: 180px; }
+
+/* Top and bottom linear designs */
+.border-decoration {
+  position: absolute;
+  height: 4px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(153, 0, 0, 0.3) 20%,
+    rgba(153, 0, 0, 0.6) 50%,
+    rgba(153, 0, 0, 0.3) 80%,
+    transparent
+  );
+  left: 25px;
+  right: 25px;
+  z-index: 1;
+}
+
+.top-border {
+  top: 8px;
+}
+
+.bottom-border {
+  bottom: 8px;
+}
+
+.card:hover {
+  transform: translateY(-180px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+}
+
+.corner {
+  position: absolute;
+  font-size: 20px;
+  font-weight: bold;
+  color: #660000;
+  z-index: 2;
+}
+
+.letter {
+  top: 0.3em;
+  left: 0.4em;
+}
+
+.letter-reversed {
+  bottom: 0.3em;
+  right: 0.4em;
+  transform: rotate(180deg);
+}
+
+.suit {
+  width: auto;
+  height: 80px;
+  align-self: center;
+  margin: 1em;
+  border-radius: 5px;
+}
+
+.card-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 80%;
+  height: 70%;
+  position: relative;
+  z-index: 3;
+}
+
+.card-description {
+  color: #000000;
+  font-size: 0.7rem;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.card-name {
+  color: #000000;
+  font-size: 0.9rem;
+}

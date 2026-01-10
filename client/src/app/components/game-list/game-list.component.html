@@ -1,0 +1,60 @@
+<div class="game-list">
+    <li class="header">
+        <span>Prévisualisation</span>
+        <span>Nom</span>
+        <span>Taille</span>
+        <span>Mode de jeu</span>
+        <span>Dernière modification</span>
+        @if (isModifierVisible) {
+        <span>Visibilité</span>
+        <span>Modifier</span>
+        <span>Supprimer</span>
+        }
+    </li>
+    <div class="list">
+        <div class="games">
+            @for (game of games; track game._id) { @if (isModifierVisible || game.isVisible) {
+            <li
+                [attr.id]="game._id"
+                [class.selected]="!isModifierVisible && game._id === selectedGameId"
+                (click)="!isModifierVisible ? onSelectGame(game) : null"
+            >
+                <span class="preview-image" [title]="game.description">
+                    <app-board [board]="game.board" mode="view"></app-board>
+                </span>
+                <span>{{ game.name }}</span>
+                <span>{{ game.board.size }}</span>
+                <span>{{ game.mode }}</span>
+                <span>{{ game.modificationDate | date: 'short' }}</span>
+                @if (isModifierVisible) {
+                <span>
+                    <input type="checkbox" [checked]="game.isVisible" (click)="onCheckboxClick(game)" />
+                </span>
+                <span>
+                    <button (click)="onModifyClick(game)" routerLink="/edit-game">
+                        <img src="./assets/ui/edit_icon.png" style="width: 15px; height: auto" />
+                    </button>
+                </span>
+                <span>
+                    <button (click)="onDeleteClick(game)">
+                        <img src="./assets/ui/delete.png" style="width: 25px; height: auto" />
+                    </button>
+                </span>
+                }
+            </li>
+            } }
+        </div>
+        @if (isAddBoardVisible) {
+        <li routerLink="/configure-game" class="add-board">
+            <img src="./assets/ui/add.png" />
+        </li>
+        }
+    </div>
+    @if (showError) {
+        <app-pop-up
+            popUpMessage="{{errorMessage}}"
+            [showSecondButton]="false"
+            (confirm)="this.showError = false">
+        </app-pop-up>
+    }
+</div>

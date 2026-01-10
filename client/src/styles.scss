@@ -1,0 +1,49 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+@font-face {
+    font-family: 'CustomFont';
+    src: url('./assets/ui/customfont.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: 'CustomFont';
+    font-size: 1.5em;
+    color: white;
+    position: relative;
+    
+    &::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 200%;
+        height: 100%;
+        background-image: url('./assets/ui/16.png');
+        background-repeat: repeat-x;
+        background-size: 50% 100%; 
+        z-index: -1;
+        animation: seamlessScroll 20s linear infinite;
+    }
+}
+
+@keyframes seamlessScroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+button {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
+    background-color: transparent;
+    border: none;
+    position: relative;
+}

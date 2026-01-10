@@ -1,0 +1,19 @@
+<div class="save-game">
+    <button (click)="onRestartGame()">
+        <img src="./assets/ui/restart.png" alt="Save Game" class="save-icon" />
+    </button>
+
+    @if (isToggled) {
+    <div class="dialogue">
+        <div class="errors">
+            <h2>Êtes-vous sûr de vouloir recommencer l'édition ?</h2>
+            <h3>Toute modification non sauvegardée sera perdue.</h3>
+
+            <div class="options">
+                <button (click)="onConfirmRestart()">Oui</button>
+                <button (click)="onCancelRestart()">Non</button>
+            </div>
+        </div>
+    </div>
+    }
+</div>

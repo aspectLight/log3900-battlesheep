@@ -1,0 +1,100 @@
+.board {
+    display: flex;
+    flex-direction: column;
+}
+.row {
+    display: flex;
+}
+
+.cell {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    flex: 1;
+    aspect-ratio: 1;
+}
+.tile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0; 
+}
+.overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 0; 
+}
+.item {
+    position: absolute; 
+    z-index: 2; 
+    width: 70%; 
+    height: 70%;
+    object-fit: contain;
+}
+.selected {
+    position: absolute;
+}
+
+.path {
+  position: absolute;
+  z-index: 10;
+  background-color: transparent;
+}
+
+.path.vertical {
+  width: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-image: repeating-linear-gradient(
+      to bottom,
+      rgb(180, 180, 180),
+      rgb(180, 180, 180) 4px,
+      transparent 4px,
+      transparent 8px
+  );
+}
+
+.path.horizontal {
+  height: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-image: repeating-linear-gradient(
+      to right,
+      rgb(180, 180, 180),
+      rgb(180, 180, 180) 4px,
+      transparent 4px,
+      transparent 8px
+  );
+}
+
+.path.top {
+  height: 50%;
+  top: 0;
+}
+
+.path.bottom {
+  height: 50%;
+  bottom: 0;
+}
+
+.path.left {
+  width: 50%;
+  left: 0;
+}
+
+.path.right {
+  width: 50%;
+  right: 0;
+}
+
+.isAvailable .tile-image {
+  filter: brightness(0.6) sepia(1) hue-rotate(-50deg) saturate(1.5);
+}
+
+.isAvailable .overlay {
+  background-color: rgba(255, 0, 0, 0.4);
+  mix-blend-mode: multiply;
+}

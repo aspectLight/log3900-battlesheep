@@ -1,0 +1,29 @@
+<div class="chatbox">
+    <!-- En-tête -->
+    <div class="chatbox-header">
+      <h3>Chat</h3>
+      <button class="close-btn">&times;</button>
+    </div>
+  
+    <!-- Conteneur des messages -->
+    <div class="chatbox-messages">
+      @for (msg of messages; track msg) {
+        <div class="message" [ngClass]="msg.type">
+          <div class="message-content">{{ msg.content }}</div>
+          <div class="message-time">{{ msg.time }}</div>
+        </div>
+      }
+
+    </div>
+  
+    <!-- Zone de saisie -->
+    <div class="chatbox-input">
+      <input 
+        type="text" 
+        placeholder="Écrire un message..." 
+        [(ngModel)]="newMessage"
+        (keydown.enter)="sendMessage()"
+      />
+      <button (click)="sendMessage()">Envoyer</button>
+    </div>
+  </div>

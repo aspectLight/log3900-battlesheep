@@ -1,0 +1,47 @@
+<div class="game-creation-container">
+    <h1>Créer un nouveau jeu</h1>
+
+    <div class="mode-selection">
+        <h2>Mode de jeu</h2>
+        <div class="mode-selection-buttons">
+            <label>
+                <input type="radio" name="mode" value="classique" (change)="onModeChange('classique')" checked />
+                Classique
+            </label>
+            <label class="ctf-label">
+                <input type="radio" name="mode" value="ctf" (change)="onModeChange('ctf')" disabled />
+                CTF
+            </label>
+        </div>
+        <span class="mode-description">{{ modeDescription }}</span>
+    </div>
+    
+    <div class="size-selection">
+        <h2>Taille de la carte</h2>
+        <div class="size-selection-buttons">
+            <label>
+                <input type="radio" name="size" value="petite" (change)="onSizeChange('petite')" />
+                Petite
+            </label>
+            <label>
+                <input type="radio" name="size" value="moyenne" (change)="onSizeChange('moyenne')" checked />
+                Moyenne
+            </label>
+            <label>
+                <input type="radio" name="size" value="grande" (change)="onSizeChange('grande')" />
+                Grande
+            </label>
+        </div>
+        <div class="size-description">
+            <span><strong>Grille: </strong>{{ board }}x{{ board }}</span> 
+            <span><strong>Joueurs: </strong>{{ players }}</span> 
+            <span><strong>Items: </strong>{{ items }}</span>
+        </div>
+    </div>
+    
+    <div class="actions">
+        <br>
+        <button class="cancel-btn" (click)="cancel()">Annuler</button>
+        <button class="create-btn" (click)="createGame()">Créer</button>
+    </div>
+</div>

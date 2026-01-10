@@ -1,0 +1,16 @@
+<div class="dialogue">
+    <div class="errors">
+        <h2>{{ popUpMessage }}</h2>
+        @if(description) {
+            <h3> {{description}}</h3>
+        }
+        <div class="buttons">
+            @if(showSecondButton) {
+                <button (click)="onCancel()">{{secondOption}}</button>
+            }
+            <button (click)="onConfirm()">{{firstOption}}</button>
+
+        </div>
+
+    </div>
+</div>

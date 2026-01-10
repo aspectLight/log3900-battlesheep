@@ -1,0 +1,29 @@
+<div class="header">
+    <button class="return-button" routerLink="/home">
+        <img src="./assets/ui/left.png">
+        Page d'accueil
+    </button>
+    <h3> Créer une partie </h3>
+</div>
+
+<app-game-list 
+    [isAddBoardVisible]="false" 
+    [isModifierVisible]="false" 
+    (selectedGame)="onSelectGame($event)" 
+    class="game-list">
+</app-game-list>
+
+<button 
+    class="square-button" 
+    [disabled]="!selectedGame" 
+    (click)="createGame()">
+    Créer une partie
+</button>
+
+@if (gameModified===true) {
+    <app-pop-up
+        popUpMessage="Le jeu sélectionné est caché ou supprimé."
+        [showSecondButton]="false"
+        (confirm)="handlePopUp()">
+    </app-pop-up>
+}

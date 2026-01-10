@@ -1,0 +1,120 @@
+<div class="container">
+    <div class="combat-view">
+        <img class="placeholder" [src]="cellReference" />
+
+
+        @if (enemy && isCombatMode ) {
+        <div class="enemy-container">
+            <div class="notification" (click)="isWinLossNotification ? resetCombat() : null" [class.show]="showNotification" [class.success]="notificationSuccess" [class.error]="!notificationSuccess" [class.clickable]="isWinLossNotification">         
+                <div class="notification-content">             
+                    <h3>{{ notificationTitle }}</h3>             
+                    <p>{{ notificationMessage }}</p>         
+                </div>     
+            </div>
+            <div class="stats-container">
+                <div class="atk-stat">
+                    <img src="./assets/stats/attack.png" />
+                    {{ getEnemyStat('attack') }}
+                </div>
+                <div class="def-stat">
+                    <img src="./assets/stats/defense.png" />
+                    {{ getEnemyStat('defense') }}
+                </div>
+                <div class="speed-stat">
+                    <img src="./assets/stats/speed.png" />
+                    {{ getEnemyStat('speed') }}
+                </div>
+                <div class="health-stat">
+                    <img src="./assets/stats/health.png" />
+                    {{ getEnemyStat('health') }}
+                </div>
+                <div class="d6-choice">
+                    <img src="./assets/items/D6.png" />
+                    {{ enemy.d6Choice === 'attack' ? 'A' : 'D' }}
+                </div>
+                <div class="d4-choice">
+                    <img src="./assets/items/D4.png" />
+                    {{ enemy.d4Choice === 'attack' ? 'A' : 'D' }}
+                </div>
+            </div>
+            <div class="enemy-name">{{ enemy.name }}</div>
+            <img class="enemy" [class]="combatState" [src]="enemy!.avatar?.avatarFull" />
+        </div>
+        } 
+        
+        @else {
+            @if (isSelectionActive && selectedCell && selectedCell.player && !isCombatMode) {
+                <div class="enemy-container">
+                    <div class="enemy-name">{{ selectedCell.player.name }}</div>
+                    <img class="enemy" [src]="selectedCell.player.avatar?.avatarFull" />
+                </div>
+            }
+
+            @if (isSelectionActive && selectedCell && !selectedCell.player && selectedCell.tile.type !== 'door' && !isCombatMode) {
+                <div class="cell-container">
+                    <div class="cell">
+                        <div class="image">
+                            <img class="cell-image" [src]="selectedCell.tile.imagePath" alt="Tile Image" />
+                        </div>
+                        <div class="cell-description">
+                            <div class="name">{{ selectedCell.tile.type | titlecase }}</div>
+                            <div class="description">{{ selectedCell.tile.description }}</div>
+                            @if (selectedCell.tile.moveModifier > 0) {
+                                <div class="move-modifier">Modificateur de mouvement: {{ selectedCell.tile.moveModifier }}</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="actions">
+        @if (isPlayerTurn && !isCombatMode) {
+            @if (canAct && !canFight) {
+                <button (click)="toggleSelection()">Agir</button>
+            }
+            <button (click)="endTurn()">Fin de tour</button>
+            @if (canFight) {
+                <button (click)="startCombat()">Combattre!</button>
+            }  
+        }
+
+        @if (isCombatMode) {
+            @if (hasFlightAttempts) {
+                <button (click)="flight()">Fuir !</button>
+            }
+                <button (click)="attack()">Attaquer</button>
+        }
+    </div>
+
+    <div class="dice-combat-container" [class.show]="showResults">
+        @if (isCombatPlayerTurn){
+        <div class="dice-value">
+            Attaque Adverse:
+            <p class="value">{{ attackValue }}</p>
+        </div>
+        <div class="dice-value">
+            Votre Défense:
+            <p class="value">{{ defenseValue }}</p>
+        </div>
+        } @else {
+        <div class="dice-value">
+            Votre Attaque:
+            <p class="value">{{ attackValue }}</p>
+        </div>
+        <div class="dice-value">
+            Defense Adverse:
+            <p class="value">{{ defenseValue }}</p>
+        </div>
+        }
+    </div>
+
+        <!-- Notification component -->
+    <!-- <div class="notification" [class.show]="showNotification" [class.success]="notificationSuccess" [class.error]="!notificationSuccess">
+        <div class="notification-content">
+            <h3>{{ notificationTitle }}</h3>
+            <p>{{ notificationMessage }}</p>
+        </div>
+    </div> -->
+</div>
