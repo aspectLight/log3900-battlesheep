@@ -1,20 +1,20 @@
-import { Board } from '@app/model/schema/board.schema';
+import { Board } from '@app/interfaces/board';
 import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class UpdateGameDto {
     @IsOptional()
     @IsString()
-    name: string;
+    name?: string;
 
     @IsOptional()
     @IsString()
-    description: string;
+    description?: string;
 
     @IsOptional()
     @IsBoolean()
-    isVisible: boolean;
+    isVisible?: boolean;
 
     @IsOptional()
     @IsNotEmpty()
-    board: Board;
+    board?: Board;
 }

@@ -1,3 +1,5 @@
+import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
+import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 import { Game, GameDocument } from '@app/model/schema/game.schema';
 import { DateService } from '@app/services/date/date.service';
 import { ErrorMessages } from '@common/error-messages.constants';
@@ -12,10 +14,13 @@ export class GameService {
         private readonly dateService: DateService,
     ) {}
 
-    async createGame(gameData: Partial<Game>): Promise<void> {
+    async createGame(gameData: CreateGameDto): Promise<void> {
         await this.gameWithSameName(gameData.name);
-        gameData.modificationDate = this.dateService.currentTime();
-        await this.gameModel.create(gameData);
+        const gameWithDate = {
+            ...gameData,
+            modificationDate: this.dateService.currentTime(),
+        };
+        await this.gameModel.create(gameWithDate);
     }
 
     async getAllGames(): Promise<Game[]> {
@@ -40,7 +45,7 @@ export class GameService {
         return game;
     }
 
-    async updateGame(gameId: string, updates: Partial<Game>): Promise<Game> {
+    async updateGame(gameId: string, updates: UpdateGameDto): Promise<Game> {
         if (!isValidObjectId(gameId)) {
             throw new BadRequestException(ErrorMessages.InvalidIdFormat);
         }
@@ -49,10 +54,11 @@ export class GameService {
             throw new BadRequestException(ErrorMessages.EmptyRequestBody);
         }
 
+        const updateData: UpdateGameDto & { modificationDate?: string } = { ...updates };
         if (updates.board) {
-            updates.modificationDate = this.dateService.currentTime();
+            updateData.modificationDate = this.dateService.currentTime();
         }
-        const updatedGame = await this.gameModel.findByIdAndUpdate(gameId, updates, { new: true }).exec();
+        const updatedGame = await this.gameModel.findByIdAndUpdate(gameId, updateData, { new: true }).exec();
         if (!updatedGame) {
             throw new NotFoundException(ErrorMessages.GameDoesNotExist);
         }

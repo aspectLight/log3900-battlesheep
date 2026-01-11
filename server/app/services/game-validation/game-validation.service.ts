@@ -1,6 +1,3 @@
-import { Injectable } from '@angular/core';
-import { Board } from '@app/classes/board';
-import { Cell } from '@app/classes/cell';
 import {
     ACCESSIBLE_TILES,
     REQUIRED_OBJECTS,
@@ -9,16 +6,18 @@ import {
     WALL_TYPE_TILES,
 } from '@app/constants/game-validation.constants';
 import { ITEM_TYPES } from '@app/constants/item.constants';
+import { Board } from '@app/interfaces/board';
+import { Cell } from '@app/interfaces/cell';
 import { Coords } from '@app/interfaces/coords';
-import { SaveValidationResult } from '@app/interfaces/save-validation-result';
+import { GameValidationResult } from '@app/interfaces/game-validation-result';
 import { ErrorMessages, SPECIFIC_ERROR } from '@common/error-messages.constants';
+import { Injectable } from '@nestjs/common';
+
 export const ITEMS = Object.keys(ITEM_TYPES).filter((key) => key !== 'spawnPoint');
 
-@Injectable({
-    providedIn: 'root',
-})
+@Injectable()
 export class GameValidationService {
-    validateGame(name: string, description: string, board: Board, isCTF: boolean): SaveValidationResult[] {
+    validateGame(name: string, description: string, board: Board, isCTF: boolean): GameValidationResult[] {
         const nameValidation = this.validateName(name);
         const descriptionValidation = this.validateDescription(description);
         const coverageValidation = this.validateTerrainTilesCoverage(board);
@@ -27,7 +26,7 @@ export class GameValidationService {
         const accessibilityValidation = this.validateTerrainTilesAccessibility(board);
         const doorsValidation = this.validateDoors(board);
 
-        return [
+        const errors = [
             nameValidation,
             descriptionValidation,
             coverageValidation,
@@ -36,14 +35,16 @@ export class GameValidationService {
             itemsValidation,
             ...doorsValidation,
         ].filter((validation) => !validation.isValid);
+
+        return errors;
     }
 
     /**
      * Validates the name of the game by checking if it is not empty.
      * @param name The name of the game.
-     * @returns A SaveValidationResult object.
+     * @returns A GameValidationResult object.
      */
-    validateName(name: string): SaveValidationResult {
+    validateName(name: string): GameValidationResult {
         const isValidName = name.trim().length > 0;
         return isValidName ? { isValid: true } : { isValid: false, message: ErrorMessages.GameShouldHaveName };
     }
@@ -51,9 +52,9 @@ export class GameValidationService {
     /**
      * Validates the description of the game by checking if it is not empty.
      * @param description The description of the game.
-     * @returns A SaveValidationResult object.
+     * @returns A GameValidationResult object.
      */
-    validateDescription(description: string): SaveValidationResult {
+    validateDescription(description: string): GameValidationResult {
         const isValidDescription = description.trim().length > 0;
         return isValidDescription ? { isValid: true } : { isValid: false, message: ErrorMessages.GameShouldHaveDescription };
     }
@@ -61,33 +62,33 @@ export class GameValidationService {
     /**
      * Validates the terrain tiles coverage of the board by checking if it is greater than the required percentage.
      * @param board The board to validate.
-     * @returns A SaveValidationResult object.
+     * @returns A GameValidationResult object.
      */
-    validateTerrainTilesCoverage(board: Board): SaveValidationResult {
-        const totalTiles = board.size * board.size;
-        const basicTiles = board.matrix.reduce((total, row) => {
+    validateTerrainTilesCoverage(board: Board): GameValidationResult {
+        const totalTilesCount = board.size * board.size;
+        const basicTilesCount = board.matrix.reduce((total, row) => {
             return total + row.filter((cell) => TERRAIN_TILES.includes(cell.tile.type)).length;
         }, 0);
 
-        const isValidCoverage = basicTiles / totalTiles > TILES_COVERAGE_PERCENTAGE;
+        const isValidCoverage = basicTilesCount / totalTilesCount > TILES_COVERAGE_PERCENTAGE;
 
         return isValidCoverage ? { isValid: true } : { isValid: false, message: ErrorMessages.HalfTilesCoverage };
     }
 
     /**
-     * Validates the spawn points of the board by checking if they are within the required range.
+     * Validates the spawn points of the board by checking if they are equal to the required number.
      * @param board The board to validate.
-     * @returns A SaveValidationResult object.
+     * @returns A GameValidationResult object.
      */
-    validateSpawnPoints(board: Board): SaveValidationResult {
-        const spawnPoints = board.matrix.reduce((total, row) => {
+    validateSpawnPoints(board: Board): GameValidationResult {
+        const spawnPointsCount = board.matrix.reduce((total, row) => {
             return total + row.filter((cell) => cell.item?.type === 'spawnPoint').length;
         }, 0);
 
-        const requiredPoints = REQUIRED_OBJECTS.spawnPoints[board.size];
+        const requiredPointsCount = REQUIRED_OBJECTS.spawnPoints[board.size];
 
-        if (spawnPoints < requiredPoints.min || spawnPoints > requiredPoints.max) {
-            return { isValid: false, message: SPECIFIC_ERROR.spawnPoints(requiredPoints) };
+        if (spawnPointsCount < requiredPointsCount.min || spawnPointsCount > requiredPointsCount.max) {
+            return { isValid: false, message: SPECIFIC_ERROR.spawnPoints(requiredPointsCount) };
         }
 
         return { isValid: true };
@@ -97,39 +98,39 @@ export class GameValidationService {
      * Validates the items of the board by checking if they are equal to the required number.
      * @param board The board to validate.
      * @param isCTF Whether the game is in CTF mode or not.
-     * @returns A SaveValidationResult object.
+     * @returns A GameValidationResult object.
      */
-    validateItems(board: Board, isCTF: boolean): SaveValidationResult {
-        const items = board.matrix.reduce((total, row) => {
+    validateItems(board: Board, isCTF: boolean): GameValidationResult {
+        const itemsCount = board.matrix.reduce((total, row) => {
             return total + row.filter((cell) => cell.item?.type && ITEMS.includes(cell.item.type)).length;
         }, 0);
 
         const hasFlag = board.matrix.some((row) => row.some((cell) => cell.item?.type === 'flag'));
 
-        const requiredItems = REQUIRED_OBJECTS.items[board.size];
+        const requiredItemsCount = REQUIRED_OBJECTS.items[board.size];
 
         if (isCTF) {
-            if (items === requiredItems && hasFlag) {
+            if (itemsCount === requiredItemsCount && hasFlag) {
                 return { isValid: true };
             }
             if (!hasFlag) {
                 return { isValid: false, message: ErrorMessages.GameShouldHaveFlag };
             }
-            return { isValid: false, message: SPECIFIC_ERROR.items(requiredItems) };
+            return { isValid: false, message: SPECIFIC_ERROR.items(requiredItemsCount) };
         }
 
-        if (items === requiredItems) {
+        if (itemsCount === requiredItemsCount) {
             return { isValid: true };
         }
-        return { isValid: false, message: SPECIFIC_ERROR.items(requiredItems) };
+        return { isValid: false, message: SPECIFIC_ERROR.items(requiredItemsCount) };
     }
 
     /**
      * Validates the accessibility of the terrain tiles by checking if they are all accessible.
      * @param board The board to validate.
-     * @returns A SaveValidationResult object.
+     * @returns A GameValidationResult object.
      */
-    validateTerrainTilesAccessibility(board: Board): SaveValidationResult {
+    validateTerrainTilesAccessibility(board: Board): GameValidationResult {
         const visited = board.matrix.map((row) => row.map(() => false));
         const startingTile = this.findStartingTile(board);
 
@@ -146,10 +147,10 @@ export class GameValidationService {
     /**
      * Validates the doors on the board by checking if they are on the edge, surrounded by walls and surrounded by terrain.
      * @param board The board to validate.
-     * @returns An array of SaveValidationResult objects.
+     * @returns An array of GameValidationResult objects.
      */
-    validateDoors(board: Board): SaveValidationResult[] {
-        const errors: SaveValidationResult[] = [];
+    validateDoors(board: Board): GameValidationResult[] {
+        const errors: GameValidationResult[] = [];
         const matrix = board.matrix;
         const rows = matrix.length;
         const cols = matrix[0].length;
@@ -277,9 +278,9 @@ export class GameValidationService {
      * @param x The x position of the door.
      * @param y The y position of the door.
      * @param boardSize The size of the board.
-     * @returns A SaveValidationResult object indicating if the door is on the edge (invalid) or not (valid).
+     * @returns A GameValidationResult object indicating if the door is on the edge (invalid) or not (valid).
      */
-    private isOnEdge(x: number, y: number, boardSize: number): SaveValidationResult {
+    private isOnEdge(x: number, y: number, boardSize: number): GameValidationResult {
         const isOnEdge = x === 0 || x === boardSize - 1 || y === 0 || y === boardSize - 1;
         return isOnEdge ? { isValid: false, message: SPECIFIC_ERROR.notOnEdge(x, y) } : { isValid: true };
     }
@@ -289,12 +290,11 @@ export class GameValidationService {
      * @param matrix The matrix of cells to validate.
      * @param x The x position of the door.
      * @param y The y position of the door.
-     * @returns A SaveValidationResult object indicating if the door is surrounded by walls (valid) or not (invalid).
+     * @returns A GameValidationResult object indicating if the door is surrounded by walls (valid) or not (invalid).
      */
-    private isSurroundedByWalls(matrix: Cell[][], x: number, y: number): SaveValidationResult {
+    private isSurroundedByWalls(matrix: Cell[][], x: number, y: number): GameValidationResult {
         const areWallsOnXAxis = WALL_TYPE_TILES.includes(matrix[x][y + 1].tile.type) && WALL_TYPE_TILES.includes(matrix[x][y - 1].tile.type);
         const areWallsOnYAxis = WALL_TYPE_TILES.includes(matrix[x + 1][y].tile.type) && WALL_TYPE_TILES.includes(matrix[x - 1][y].tile.type);
-
         const isSurroundedByWalls = areWallsOnXAxis || areWallsOnYAxis;
 
         return isSurroundedByWalls ? { isValid: true } : { isValid: false, message: SPECIFIC_ERROR.surroundedByWalls(x, y) };
@@ -305,12 +305,11 @@ export class GameValidationService {
      * @param matrix The matrix of cells to validate.
      * @param x The x position of the door.
      * @param y The y position of the door.
-     * @returns A SaveValidationResult object indicating if the door is surrounded by terrain (valid) or not (invalid).
+     * @returns A GameValidationResult object indicating if the door is surrounded by terrain (valid) or not (invalid).
      */
-    private isSurroundedByTerrain(matrix: Cell[][], x: number, y: number): SaveValidationResult {
+    private isSurroundedByTerrain(matrix: Cell[][], x: number, y: number): GameValidationResult {
         const isTerrainOnXAxis = TERRAIN_TILES.includes(matrix[x][y + 1].tile.type) && TERRAIN_TILES.includes(matrix[x][y - 1].tile.type);
         const isTerrainOnYAxis = TERRAIN_TILES.includes(matrix[x + 1][y].tile.type) && TERRAIN_TILES.includes(matrix[x - 1][y].tile.type);
-
         const isSurroundedByTerrain = isTerrainOnXAxis || isTerrainOnYAxis;
 
         return isSurroundedByTerrain ? { isValid: true } : { isValid: false, message: SPECIFIC_ERROR.surroundedByTerrain(x, y) };

@@ -13,6 +13,7 @@ import { GameMovementService } from './services/game-movement/game-movement.serv
 import { GameCombatService } from './services/game-combat/game-combat.service';
 import { GameMovementVPService } from './services/virtual-players/game-movement-vp.service';
 import { MovementAlgorithmsService } from './services/movement-algorithms/movement-algorithms.service';
+import { GameValidationService } from './services/game-validation/game-validation.service';
 
 @Module({
     imports: [
@@ -40,6 +41,7 @@ import { MovementAlgorithmsService } from './services/movement-algorithms/moveme
         GameCombatService,
         GameMovementVPService,
         MovementAlgorithmsService,
+        GameValidationService,
     ],
 })
 export class AppModule {}
