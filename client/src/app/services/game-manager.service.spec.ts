@@ -1,5 +1,4 @@
 /* eslint-disable max-lines */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { provideHttpClient, HttpClient } from '@angular/common/http';

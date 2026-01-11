@@ -118,14 +118,12 @@ describe('GameValidationService', () => {
         });
 
         it('should validate CTF game with required flag and items', () => {
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             board = configureBoard(10, 2, 2, true);
             const itemsTest = service.validateItems(board, true);
             expect(itemsTest.isValid).toBeTrue();
         });
 
         it('should invalidate CTF game without flag', () => {
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             board = configureBoard(10, 2, 2, false);
             const itemsTest = service.validateItems(board, true);
             expect(itemsTest.isValid).toBeFalse();
@@ -133,7 +131,6 @@ describe('GameValidationService', () => {
         });
 
         it('should invalidate CTF game with flag but wrong number of items', () => {
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             board = configureBoard(10, 2, 1, true);
             const itemsTest = service.validateItems(board, true);
             expect(itemsTest.isValid).toBeFalse();

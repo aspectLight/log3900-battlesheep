@@ -1,6 +1,5 @@
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Board } from '@app/interfaces/board';
 import { Cell } from '@app/interfaces/cell';
 import { Coords } from '@app/interfaces/coords';

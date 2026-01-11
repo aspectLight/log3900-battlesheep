@@ -32,9 +32,7 @@ describe('GameSettingsComponent', () => {
         isVisible = false;
         modificationDate = 'mockDate';
     }
-    /* eslint-disable @typescript-eslint/no-magic-numbers */
     const mockBoard = new Board(3);
-    /* eslint-enable @typescript-eslint/no-magic-numbers */
 
     beforeEach(async () => {
         socketServiceSpy = jasmine.createSpyObj('SocketService', ['abandonGame']);

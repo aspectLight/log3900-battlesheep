@@ -1,5 +1,4 @@
 /* eslint-disable max-lines */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { BonusType } from '@app/constants/bonus.constants';
 import {

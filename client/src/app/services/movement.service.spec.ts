@@ -6,7 +6,6 @@ import { Tile } from '@app/classes/tile';
 import { BonusType } from '@app/constants/bonus.constants';
 import { MovementService } from './movement.service';
 
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 describe('MovementService', () => {
     let service: MovementService;
     let mockPlayer: Player;

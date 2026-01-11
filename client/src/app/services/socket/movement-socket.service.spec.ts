@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
 import { Socket } from 'socket.io-client';

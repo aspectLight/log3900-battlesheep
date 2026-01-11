@@ -38,24 +38,20 @@ describe('BonusChoicesComponent', () => {
     });
 
     it('should select attack dice and set defense dice to the opposite value', () => {
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         component.selectAttackDice(4);
         expect(component.attackDice).toBe(BonusValue.DEFAULT);
         expect(component.defenseDice).toBe(BonusValue.BOOSTED);
 
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         component.selectAttackDice(6);
         expect(component.attackDice).toBe(BonusValue.BOOSTED);
         expect(component.defenseDice).toBe(BonusValue.DEFAULT);
     });
 
     it('should select defense dice and set attack dice to the opposite value', () => {
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         component.selectDefenseDice(4);
         expect(component.defenseDice).toBe(BonusValue.DEFAULT);
         expect(component.attackDice).toBe(BonusValue.BOOSTED);
 
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         component.selectDefenseDice(6);
         expect(component.defenseDice).toBe(BonusValue.BOOSTED);
         expect(component.attackDice).toBe(BonusValue.DEFAULT);

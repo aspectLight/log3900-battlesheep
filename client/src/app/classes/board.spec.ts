@@ -27,7 +27,6 @@ describe('Board', () => {
     });
 
     it('should get a cell at valid coordinates', () => {
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const cell = board.getCell(2, 3);
         expect(cell).toBeInstanceOf(Cell);
         expect(cell?.tile.type).toBe('snow');

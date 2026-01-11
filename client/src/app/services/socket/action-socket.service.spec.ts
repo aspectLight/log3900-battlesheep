@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
 import { Cell } from '@app/classes/cell';

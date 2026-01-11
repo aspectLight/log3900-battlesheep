@@ -17,7 +17,6 @@ import { MovementSocketService } from '@app/services/socket/movement-socket.serv
 import { Socket } from 'socket.io-client';
 import { ActionSocketService } from '@app/services/socket/action-socket.service';
 
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 describe('BoardComponent', () => {
     let component: BoardComponent;
     let fixture: ComponentFixture<BoardComponent>;

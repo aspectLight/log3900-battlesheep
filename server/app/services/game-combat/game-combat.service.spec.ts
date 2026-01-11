@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-lines */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable prettier/prettier */
 import { GameRoomEvents } from '@common/socket.constants';
 import { Player, VirtualPlayerType } from '@app/interfaces/player';

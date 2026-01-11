@@ -91,7 +91,6 @@ describe('ActionsHudComponent', () => {
 
         it('should initialize playerCardList correctly', () => {
             const list = component.playerCardList;
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             expect(list.length).toBe(4);
 
             expect(list[0].player).toBe(player1);
@@ -149,7 +148,6 @@ describe('ActionsHudComponent', () => {
 
         it('should compute playerCardList correctly from gameManager', () => {
             const list = component.playerCardList;
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             expect(list.length).toBe(4); // Should now have 4 players
 
             const activeCard = list[0];
