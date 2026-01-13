@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
-import { Socket } from 'socket.io-client';
+import { Cell } from '@app/classes/cell';
+import { Item } from '@app/classes/item';
+import { Player } from '@app/classes/player';
+import { Tile } from '@app/classes/tile';
+import { Coords } from '@app/interfaces/coords';
 import { GameManagerService } from '@app/services/game-manager.service';
 import { SocketService } from '@app/services/socket.service';
-import { MovementSocketService } from './movement-socket.service';
+import { MovementSocketService } from '@app/services/socket/movement/movement-socket.service';
 import { GameRoomEvents } from '@common/socket.constants';
-import { Player } from '@app/classes/player';
-import { Coords } from '@app/interfaces/coords';
-import { Item } from '@app/classes/item';
-import { Tile } from '@app/classes/tile';
-import { Cell } from '@app/classes/cell';
+import { Socket } from 'socket.io-client';
 
 describe('MovementSocketService', () => {
     let service: MovementSocketService;
@@ -117,7 +117,7 @@ describe('MovementSocketService', () => {
             expect(mockSocket.emit).toHaveBeenCalledWith(GameRoomEvents.PlayerGetMovements, {
                 roomId: 'testRoomId',
                 hasBoots: true,
-                hasCamo: true,
+                hasCamouflage: true,
                 hasAirStrike: true,
             });
         });
@@ -125,15 +125,13 @@ describe('MovementSocketService', () => {
         it('should emit PlayerMoved with correct data', () => {
             const roomId = 'testRoomId';
             const playerId = 'testPlayerId';
-            const map = new Map<Coords, Coords[]>();
             const selectedPath: Coords[] = [{ x: 0, y: 0 }];
 
-            service.movedPlayer({ roomId, playerId, map, selectedPath });
+            service.movedPlayer({ roomId, playerId, selectedPath });
 
             expect(mockSocket.emit).toHaveBeenCalledWith(GameRoomEvents.PlayerMoved, {
                 roomId,
                 playerId,
-                serializedMap: Array.from(map.entries()),
                 selectedPath,
             });
         });
@@ -141,7 +139,7 @@ describe('MovementSocketService', () => {
         it('should emit PlayerTeleported with correct data when there is no item at destination', () => {
             const destinationX = 5;
             const destinationY = 5;
-            const hasCamo = true;
+            const hasCamouflage = true;
 
             // Create a mock board with a getCell method returning a cell with no item
             const mockCell = new Cell(new Tile('snow'), destinationX, destinationY);
@@ -149,14 +147,14 @@ describe('MovementSocketService', () => {
             const mockBoard = { getCell: jasmine.createSpy('getCell').and.returnValue(mockCell) };
             mockGameManagerService.getBoard.and.returnValue(mockBoard as any);
 
-            service.teleportPlayer(destinationX, destinationY, hasCamo);
+            service.teleportPlayer(destinationX, destinationY, hasCamouflage);
 
             // Should emit PlayerTeleported but not ItemCollected
             expect(mockSocket.emit).toHaveBeenCalledWith(GameRoomEvents.PlayerTeleported, {
                 roomId: 'testRoomId',
                 playerId: mockSocket.id,
                 destination: { x: destinationX, y: destinationY },
-                hasCamo,
+                hasCamouflage,
             });
             expect(mockSocket.emit).not.toHaveBeenCalledWith(GameRoomEvents.ItemCollected, jasmine.any(Object));
         });
@@ -164,7 +162,7 @@ describe('MovementSocketService', () => {
         it('should emit both ItemCollected and PlayerTeleported when there is an item at destination', () => {
             const destinationX = 5;
             const destinationY = 5;
-            const hasCamo = true;
+            const hasCamouflage = true;
 
             // Create a mock item
             const mockItem = new Item('flag');
@@ -175,7 +173,7 @@ describe('MovementSocketService', () => {
             const mockBoard = { getCell: jasmine.createSpy('getCell').and.returnValue(mockCell) };
             mockGameManagerService.getBoard.and.returnValue(mockBoard as any);
 
-            service.teleportPlayer(destinationX, destinationY, hasCamo);
+            service.teleportPlayer(destinationX, destinationY, hasCamouflage);
 
             // Should emit both ItemCollected and PlayerTeleported
             expect(mockSocket.emit).toHaveBeenCalledWith(GameRoomEvents.ItemCollected, {
@@ -188,14 +186,14 @@ describe('MovementSocketService', () => {
                 roomId: 'testRoomId',
                 playerId: mockSocket.id,
                 destination: { x: destinationX, y: destinationY },
-                hasCamo,
+                hasCamouflage,
             });
         });
 
         it('should not emit ItemCollected when the item at destination is a spawnPoint', () => {
             const destinationX = 5;
             const destinationY = 5;
-            const hasCamo = true;
+            const hasCamouflage = true;
 
             // Create a mock spawnPoint item
             const mockItem = new Item('spawnPoint');
@@ -206,7 +204,7 @@ describe('MovementSocketService', () => {
             const mockBoard = { getCell: jasmine.createSpy('getCell').and.returnValue(mockCell) };
             mockGameManagerService.getBoard.and.returnValue(mockBoard as any);
 
-            service.teleportPlayer(destinationX, destinationY, hasCamo);
+            service.teleportPlayer(destinationX, destinationY, hasCamouflage);
 
             // Should emit PlayerTeleported but not ItemCollected
             expect(mockSocket.emit).not.toHaveBeenCalledWith(GameRoomEvents.ItemCollected, jasmine.any(Object));
@@ -214,7 +212,7 @@ describe('MovementSocketService', () => {
                 roomId: 'testRoomId',
                 playerId: mockSocket.id,
                 destination: { x: destinationX, y: destinationY },
-                hasCamo,
+                hasCamouflage,
             });
         });
 

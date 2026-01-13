@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { SocketService } from '@app/services/socket.service';
-import { Socket } from 'socket.io-client';
-import { GameManagerService } from '@app/services/game-manager.service';
-import { ISocketService } from '@app/interfaces/socket-service.interface';
-import { Coords } from '@app/interfaces/coords';
 import { Item } from '@app/classes/item';
-import { GameRoomEvents } from '@common/socket.constants';
 import { Player } from '@app/classes/player';
+import { Coords } from '@app/interfaces/coords';
+import { ISocketService } from '@app/interfaces/socket-service.interface';
+import { GameManagerService } from '@app/services/game-manager.service';
+import { SocketService } from '@app/services/socket.service';
+import { GameRoomEvents } from '@common/socket.constants';
+import { Socket } from 'socket.io-client';
 interface MoveInfo {
     roomId: string;
     playerId: string;
@@ -40,12 +40,31 @@ export class MovementSocketService implements ISocketService {
         this.setUpListeners();
     }
 
-    getPlayerMovements() {
-        this.socket.emit(GameRoomEvents.PlayerGetMovements, {
-            roomId: this.socketService.getRoomId(),
-            hasBoots: this.gameManagerService.getMainPlayer()?.hasItem('waterproofBoots'),
-            hasCamo: this.gameManagerService.getMainPlayer()?.hasItem('camouflage'),
-            hasAirStrike: this.gameManagerService.getMainPlayer()?.hasItem('airStrike'),
+    async getPlayerMovements(): Promise<{ success: boolean; paths?: [Coords, Coords[]][]; error?: string }> {
+        return new Promise((resolve) => {
+            this.socket.emit(
+                GameRoomEvents.PlayerGetMovements,
+                {
+                    roomId: this.socketService.getRoomId(),
+                    hasBoots: this.gameManagerService.getMainPlayer()?.hasItem('waterproofBoots'),
+                    hasCamouflage: this.gameManagerService.getMainPlayer()?.hasItem('camouflage'),
+                    hasAirStrike: this.gameManagerService.getMainPlayer()?.hasItem('airStrike'),
+                },
+                (response: { success: boolean; paths?: [Coords, Coords[]][]; error?: string }) => {
+                    if (response.success && response.paths) {
+                        const pathsMap = new Map<Coords, Coords[]>(response.paths);
+                        if (!this.gameManagerService.isDebugMode) {
+                            this.gameManagerService.setPaths(pathsMap);
+                        } else {
+                            this.gameManagerService.clearPaths();
+                        }
+                    } else if (response.error) {
+                        // eslint-disable-next-line no-console
+                        console.error('Error getting player movements:', response.error);
+                    }
+                    resolve(response);
+                },
+            );
         });
     }
 
@@ -65,12 +84,32 @@ export class MovementSocketService implements ISocketService {
         return true;
     }
 
-    movedPlayer({ roomId, playerId, map, selectedPath }: MoveInfo): void {
-        const serializedMap = Array.from(map.entries());
-        this.socket.emit(GameRoomEvents.PlayerMoved, { roomId, playerId, serializedMap, selectedPath });
+    async movedPlayer({
+        roomId,
+        playerId,
+        selectedPath,
+    }: Omit<MoveInfo, 'map'>): Promise<{ success: boolean; error?: string; movementPoints?: number }> {
+        return new Promise((resolve) => {
+            this.socket.emit(
+                GameRoomEvents.PlayerMoved,
+                { roomId, playerId, selectedPath },
+                (response: { success: boolean; error?: string; movementPoints?: number }) => {
+                    if (!response.success && response.error) {
+                        // Server rejected the movement - show error to user
+                        // eslint-disable-next-line no-console
+                        console.error('Movement rejected by server:', response.error);
+                        // TODO: Show user-friendly error message via toast/snackbar
+                        // The movement will not be executed since server rejected it
+                    }
+                    // Note: If successful, the server will broadcast PlayerMoved event
+                    // which will be handled by the existing listener
+                    resolve(response);
+                },
+            );
+        });
     }
 
-    teleportPlayer(destinationX: number, destinationY: number, hasCamo?: boolean): void {
+    teleportPlayer(destinationX: number, destinationY: number, hasCamouflage?: boolean): void {
         const roomId = this.gameManagerService.room.roomId;
         const playerId = this.socket.id;
         const destination = { x: destinationX, y: destinationY };
@@ -78,7 +117,7 @@ export class MovementSocketService implements ISocketService {
         if (item && item.type !== 'spawnPoint') {
             this.socket.emit(GameRoomEvents.ItemCollected, { roomId, playerId, item, position: destination });
         }
-        this.socket.emit(GameRoomEvents.PlayerTeleported, { roomId, playerId, destination, hasCamo });
+        this.socket.emit(GameRoomEvents.PlayerTeleported, { roomId, playerId, destination, hasCamouflage });
     }
 
     synchronizeMovement(playerId: string, destinationX: number, destinationY: number): void {
@@ -104,11 +143,7 @@ export class MovementSocketService implements ISocketService {
             console.warn('Erreur depuis le socket serveur de GameRoomGateway : \n', error);
         });
 
-        this.socket.on(GameRoomEvents.PlayerMovements, (paths) => {
-            const pathsMap = new Map<Coords, Coords[]>(paths);
-            if (!this.gameManagerService.isDebugMode) this.gameManagerService.setPaths(pathsMap);
-            else this.gameManagerService.clearPaths();
-        });
+        // Note: PlayerMovements listener removed - now handled via ACK in getPlayerMovements()
 
         this.socket.on(GameRoomEvents.PlayerMoved, (data) => {
             const player = this.gameManagerService.getBoard().getPlayerById(data.playerId);

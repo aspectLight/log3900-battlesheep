@@ -332,21 +332,21 @@ describe('GameValidationService', () => {
 
             describe('Private methods', () => {
                 const BOARD_SIZE = 5;
-                it('should return false for a door not on the edge', () => {
+                it('should return true for a door not on the edge', () => {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const result = (service as any).isNotOnEdge(2, 2, BOARD_SIZE);
+                    const result = (service as any).isOnEdge(2, 2, BOARD_SIZE);
                     expect(result.isValid).toBeTrue();
                 });
 
                 it('should return false for a door on the top edge', () => {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const result = (service as any).isNotOnEdge(0, 2, BOARD_SIZE);
+                    const result = (service as any).isOnEdge(0, 2, BOARD_SIZE);
                     expect(result).toEqual({ isValid: false, message: 'La porte à (0, 2) est sur le bord du plateau.' });
                 });
 
                 it('should return false for a door on the left edge', () => {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const result = (service as any).isNotOnEdge(1, 0, BOARD_SIZE);
+                    const result = (service as any).isOnEdge(1, 0, BOARD_SIZE);
                     expect(result).toEqual({ isValid: false, message: 'La porte à (1, 0) est sur le bord du plateau.' });
                 });
 

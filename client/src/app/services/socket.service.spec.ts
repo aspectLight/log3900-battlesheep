@@ -213,7 +213,7 @@ describe('SocketService', () => {
         expect(mockSocket.emit).toHaveBeenCalledWith('playerGetMovements', {
             roomId: 'testRoomId',
             hasBoots: false,
-            hasCamo: false,
+            hasCamouflage: false,
             hasAirStrike: false,
         });
     });
@@ -224,7 +224,7 @@ describe('SocketService', () => {
             roomId: 'testRoomId',
             playerId: 'testSocketId',
             destination: { x: POSITION_X, y: POSITION_Y },
-            hasCamo: undefined,
+            hasCamouflage: undefined,
         });
     });
 
@@ -338,7 +338,7 @@ describe('SocketService', () => {
         expect(mockSocket.emit).toHaveBeenCalledWith('playerGetMovements', {
             roomId: 'testRoomId',
             hasBoots: false,
-            hasCamo: false,
+            hasCamouflage: false,
             hasAirStrike: false,
         });
     });

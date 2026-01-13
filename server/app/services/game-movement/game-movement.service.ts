@@ -6,7 +6,7 @@ import { Item, ItemType } from '@app/interfaces/item';
 import { Player } from '@app/interfaces/player';
 import { MoveCosts, TileType } from '@app/interfaces/tile';
 import { GameService } from '@app/services/game/game.service';
-import { ErrorMessages } from '@common/error-messages.constants';
+import { ErrorMessages, SPECIFIC_ERROR } from '@common/error-messages.constants';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class GameMovementService {
@@ -50,6 +50,60 @@ export class GameMovementService {
         }
 
         return paths;
+    }
+
+    /**
+     * Validates if a path is legal for a player
+     * @param playerId - Player attempting to move
+     * @param path - Full path from start to destination
+     * @param players - All players in the game
+     * @returns Validation result with cost or error
+     */
+    validatePath(playerId: string, path: Coords[], players: Player[]): { isValid: true; cost: number } | { isValid: false; error: string } {
+        const player = players.find((p) => p.id === playerId);
+        if (!player) {
+            return { isValid: false, error: ErrorMessages.PlayerNotFound };
+        }
+
+        if (path.length === 0) {
+            return { isValid: true, cost: 0 };
+        }
+
+        if (path[0].x !== player.position.x || path[0].y !== player.position.y) {
+            return { isValid: false, error: ErrorMessages.PathStartInvalid };
+        }
+
+        if (path.length === 1) {
+            return { isValid: true, cost: 0 };
+        }
+
+        for (let i = 0; i < path.length - 1; i++) {
+            const distance = this.getDistance(path[i], path[i + 1]);
+            if (distance !== 1) {
+                return { isValid: false, error: ErrorMessages.PathNotAdjacent };
+            }
+        }
+
+        let totalCost = 0;
+        for (let i = 1; i < path.length; i++) {
+            const cell = this.getCell(path[i].x, path[i].y);
+            if (!cell) {
+                return { isValid: false, error: ErrorMessages.CellNotFound };
+            }
+            if (!this.isCellReachable(cell)) {
+                return { isValid: false, error: SPECIFIC_ERROR.cellNotReachable(path[i].x, path[i].y) };
+            }
+            if (!this.isCellFree(cell, playerId)) {
+                return { isValid: false, error: ErrorMessages.CellOccupied };
+            }
+            totalCost += this.determineCellCost(cell, player);
+        }
+
+        if (totalCost > player.movementPoints) {
+            return { isValid: false, error: ErrorMessages.InsufficientMovementPoints };
+        }
+
+        return { isValid: true, cost: totalCost };
     }
 
     movePlayer(playerId: string, players: Player[], destination: Coords, isTeleport?: boolean) {

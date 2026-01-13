@@ -6,7 +6,7 @@ import { BonusType } from '@app/constants/bonus.constants';
 import { ActionService } from '@app/services/action.service';
 import { CombatService } from '@app/services/combat.service';
 import { GameManagerService } from '@app/services/game-manager.service';
-import { ActionSocketService } from '@app/services/socket/action-socket.service';
+import { ActionSocketService } from '@app/services/socket/action/action-socket.service';
 import { SocketService } from '@app/services/socket.service';
 import { Subscription } from 'rxjs';
 import { FEEDBACK_DURATION, NOTIFICATION_DURATION, CombatState } from '@app/constants/combat.constants';

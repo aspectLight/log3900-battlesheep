@@ -1,21 +1,21 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { BoardComponent } from './board.component';
-import { PaintService } from '@app/services/paint.service';
-import { DragDropService } from '@app/services/drag-drop.service';
-import { ActionService } from '@app/services/action.service';
-import { GameManagerService } from '@app/services/game-manager.service';
-import { SocketService } from '@app/services/socket.service';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Board } from '@app/classes/board';
 import { Cell } from '@app/classes/cell';
-import { Tile } from '@app/classes/tile';
 import { Item } from '@app/classes/item';
 import { Player } from '@app/classes/player';
+import { Tile } from '@app/classes/tile';
 import { Room } from '@app/interfaces/room';
+import { ActionService } from '@app/services/action.service';
+import { DragDropService } from '@app/services/drag-drop.service';
+import { GameManagerService } from '@app/services/game-manager.service';
+import { PaintService } from '@app/services/paint.service';
+import { SocketService } from '@app/services/socket.service';
+import { ActionSocketService } from '@app/services/socket/action/action-socket.service';
+import { MovementSocketService } from '@app/services/socket/movement/movement-socket.service';
 import { BehaviorSubject } from 'rxjs';
-import { MovementSocketService } from '@app/services/socket/movement-socket.service';
 import { Socket } from 'socket.io-client';
-import { ActionSocketService } from '@app/services/socket/action-socket.service';
+import { BoardComponent } from './board.component';
 
 describe('BoardComponent', () => {
     let component: BoardComponent;

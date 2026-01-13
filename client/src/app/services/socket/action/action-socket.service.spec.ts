@@ -13,8 +13,8 @@ import { GameRoomService } from '@app/services/game-room.service';
 import { SocketService } from '@app/services/socket.service';
 import { GameRoomEvents } from '@common/socket.constants';
 import { Socket } from 'socket.io-client';
-import { ActionSocketService } from './action-socket.service';
-import { MovementSocketService } from './movement-socket.service';
+import { ActionSocketService } from '@app/services/socket/action/action-socket.service';
+import { MovementSocketService } from '@app/services/socket/movement/movement-socket.service';
 
 describe('ActionSocketService', () => {
     let service: ActionSocketService;

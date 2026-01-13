@@ -8,7 +8,7 @@ import { AttackPayload, AttackResult, CombatPayload, FlightResult } from '@app/i
 import { CombatService } from '@app/services/combat.service';
 import { GameRoomService } from '@app/services/game-room.service';
 import { GameRoomEvents } from '@common/socket.constants';
-import { MovementSocketService } from './movement-socket.service';
+import { MovementSocketService } from '@app/services/socket/movement/movement-socket.service';
 import { Player } from '@app/classes/player';
 @Injectable({
     providedIn: 'root',

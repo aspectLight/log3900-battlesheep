@@ -12,7 +12,7 @@ import { ActionService } from '@app/services/action.service';
 import { CombatService } from '@app/services/combat.service';
 import { GameManagerService } from '@app/services/game-manager.service';
 import { SocketService } from '@app/services/socket.service';
-import { ActionSocketService } from '@app/services/socket/action-socket.service';
+import { ActionSocketService } from '@app/services/socket/action/action-socket.service';
 import { of, Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';
 import { CombatComponent } from './combat.component';

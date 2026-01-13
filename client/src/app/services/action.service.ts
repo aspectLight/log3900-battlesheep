@@ -6,7 +6,7 @@ import { CombatService } from './combat.service';
 import { Player } from '@app/classes/player';
 import { SocketService } from './socket.service';
 import { MovementService } from './movement.service';
-import { ActionSocketService } from './socket/action-socket.service';
+import { ActionSocketService } from '@app/services/socket/action/action-socket.service';
 @Injectable({
     providedIn: 'root',
 })
@@ -119,11 +119,11 @@ export class ActionService {
         const cell = this.selectedCell.value;
         if (!cell) return;
 
-        const hasCamo = this.player.hasItem('camouflage');
+        const hasCamouflage = this.player.hasItem('camouflage');
         const hasAirStrike = this.player.hasItem('airStrike');
 
         if (!this.isCellCloseToPlayer()) {
-            this.handleRemoteAction(cell, hasAirStrike, hasCamo);
+            this.handleRemoteAction(cell, hasAirStrike, hasCamouflage);
             return;
         }
 
@@ -202,13 +202,13 @@ export class ActionService {
         return (cell.tile.type === 'door' && (cell.tile.state === 'closed' || cell.tile.state === 'opened') && !cell.player) || cell.player !== null;
     }
 
-    private handleRemoteAction(cell: Cell, hasAirStrike: boolean, hasCamo: boolean): void {
+    private handleRemoteAction(cell: Cell, hasAirStrike: boolean, hasCamouflage: boolean): void {
         if (cell.player && hasAirStrike) {
             this.startCombat(cell);
             this.removeActionPoints();
-        } else if (cell && hasCamo && this.movementService.isCellFree(cell)) {
+        } else if (cell && hasCamouflage && this.movementService.isCellFree(cell)) {
             const playerId = cell.player?.id || '';
-            this.socketService.teleportPlayer(cell.x, cell.y, playerId, hasCamo);
+            this.socketService.teleportPlayer(cell.x, cell.y, playerId, hasCamouflage);
             this.removeActionPoints();
         }
     }

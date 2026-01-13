@@ -8,8 +8,8 @@ import { ActionService } from './action.service';
 import { CombatService } from './combat.service';
 import { GameManagerService } from './game-manager.service';
 import { SocketService } from './socket.service';
-import { ActionSocketService } from './socket/action-socket.service';
-import { MovementSocketService } from './socket/movement-socket.service';
+import { ActionSocketService } from '@app/services/socket/action/action-socket.service';
+import { MovementSocketService } from '@app/services/socket/movement/movement-socket.service';
 describe('ActionService', () => {
     let service: ActionService;
     let gameManagerServiceMock: jasmine.SpyObj<GameManagerService>;

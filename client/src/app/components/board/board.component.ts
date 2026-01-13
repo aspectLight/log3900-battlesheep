@@ -3,12 +3,12 @@ import { Board } from '@app/classes/board';
 import { Cell } from '@app/classes/cell';
 import { Item } from '@app/classes/item';
 import { PlayerComponent } from '@app/components/player/player.component';
-import { DragDropService } from '@app/services/drag-drop.service';
-import { PaintService } from '@app/services/paint.service';
 import { ActionService } from '@app/services/action.service';
-import { Subscription } from 'rxjs';
+import { DragDropService } from '@app/services/drag-drop.service';
 import { GameManagerService } from '@app/services/game-manager.service';
-import { MovementSocketService } from '@app/services/socket/movement-socket.service';
+import { PaintService } from '@app/services/paint.service';
+import { MovementSocketService } from '@app/services/socket/movement/movement-socket.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-board',
@@ -91,6 +91,7 @@ export class BoardComponent implements OnInit, OnDestroy {
                     return;
                 } else {
                     if (!this.isSelectionActive) return;
+                    this.gameManagerService.setPathFromCoord({ x: cell.x, y: cell.y });
                     this.movePlayerFromPath();
                 }
             }
@@ -144,11 +145,20 @@ export class BoardComponent implements OnInit, OnDestroy {
         event.preventDefault();
     }
 
-    private movePlayerFromPath(): void {
+    private async movePlayerFromPath(): Promise<void> {
         const moveInfo = this.gameManagerService.getMoveInfo();
 
-        if (moveInfo) {
-            this.movementSocketService.movedPlayer(moveInfo);
+        if (!moveInfo?.selectedPath?.length) return;
+
+        if (this.gameManagerService.movementService.isMoving()) {
+            return;
+        }
+
+        const response = await this.movementSocketService.movedPlayer(moveInfo);
+
+        if (!response.success && response.error) {
+            // eslint-disable-next-line no-console
+            console.warn('Movement rejected:', response.error);
         }
     }
 }

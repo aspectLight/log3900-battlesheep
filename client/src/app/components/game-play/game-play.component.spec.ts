@@ -8,7 +8,7 @@ import { SocketService } from '@app/services/socket.service';
 import { of, Subject } from 'rxjs';
 import { GamePlayComponent } from './game-play.component';
 import { Item } from '@app/classes/item';
-import { ActionSocketService } from '@app/services/socket/action-socket.service';
+import { ActionSocketService } from '@app/services/socket/action/action-socket.service';
 const countDownValue = 10;
 const notificationDuration = 5000;
 

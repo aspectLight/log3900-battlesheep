@@ -27,6 +27,8 @@ export const enum ErrorMessages {
     NotEnoughSpawnPoints = 'Il doit y avoir au moins un point de départ.',
     PathNotFound = 'Chemin non trouvé',
     InvalidGame = 'La partie contient des erreurs de validation.',
+    PathStartInvalid = 'Le chemin doit commencer à la position actuelle du joueur.',
+    PathNotAdjacent = 'Les segments du chemin doivent être adjacents.',
     PlayerNotFound = "Le joueur n'existe pas",
     InsufficientMovementPoints = 'Points de déplacement insuffisants',
     UnreachableDestination = 'Destination inatteignable',
@@ -47,8 +49,10 @@ export const enum ErrorMessages {
 }
 
 export const SPECIFIC_ERROR = {
-    spawnPoints: (requiredPoints: { min: number; max: number }): string => `Il doit y avoir entre ${requiredPoints.min} et ${requiredPoints.max} points de départ.`,
+    spawnPoints: (requiredPoints: { min: number; max: number }): string =>
+        `Il doit y avoir entre ${requiredPoints.min} et ${requiredPoints.max} points de départ.`,
     items: (requiredItems: number): string => `Il doit y avoir ${requiredItems} items.`,
+    cellNotReachable: (x: number, y: number): string => `La cellule à (${x},${y}) n'est pas accessible.`,
     notOnEdge: (x: number, y: number): string => `La porte à (${x}, ${y}) est sur le bord du plateau.`,
     surroundedByWalls: (x: number, y: number): string => `La porte à (${x}, ${y}) n'est pas entourée par des murs sur le même axe.`,
     surroundedByTerrain: (x: number, y: number): string => `La porte à (${x}, ${y}) n'est pas entourée par des tuiles de terrain sur l'axe opposé.`,

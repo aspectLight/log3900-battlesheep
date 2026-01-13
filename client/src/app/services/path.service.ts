@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
+import { Board } from '@app/classes/board';
 import { Cell } from '@app/classes/cell';
 import { Coords } from '@app/interfaces/coords';
-import { Board } from '@app/classes/board';
 
 @Injectable({
     providedIn: 'root',

@@ -14,7 +14,7 @@ import { SocketService } from '@app/services/socket.service';
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { Item } from '@app/classes/item';
 import { LoadingScreenComponent } from '@app/components/loading-screen/loading-screen.component';
-import { ActionSocketService } from '@app/services/socket/action-socket.service';
+import { ActionSocketService } from '@app/services/socket/action/action-socket.service';
 import { ROUTES } from '@app/constants/routes.constants';
 import { GAME_RESULT_MESSAGES, MODES, OUTCOME } from '@app/constants/game.constants';
 @Component({
