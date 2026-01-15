@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -29,9 +31,9 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   List<Map<String, String>> messages = [];
+  String roomId = '';
 
   MyAppState() {
-    print('MyAppState CONSTRUCTED');
     initSocket();
   }
 
@@ -39,7 +41,7 @@ class MyAppState extends ChangeNotifier {
     socket = IO.io(
       'http://10.0.2.2:3000',
       IO.OptionBuilder()
-          .setTransports(['websocket'])
+          .setTransports(['websocket', 'polling'])
           .enableAutoConnect()
           .build(),
     );
@@ -47,20 +49,39 @@ class MyAppState extends ChangeNotifier {
     socket.connect();
 
     socket.onConnect((_) {
-      print('Connecté au serveur');
+      log('Connecté au serveur');
     });
 
     socket.on('getMessagesResponse', (data) {
-      messages = data;
+      log('Messages de la salle d\'attente reçus: $data');
+      for (var msg in data) {
+        messages.add({
+          'type': 'received',
+          'name': msg['name'],
+          'content': msg['content'],
+          'time': msg['time'],
+        });
+      }
+      notifyListeners();
+    });
+
+    socket.on('massMessage', (message) {
+      log('Nouveau message dans la salle d\'attente: $message');
+      messages.add({
+        'type': 'received',
+        'name': message['name'],
+        'content': message['content'],
+        'time': message['time'],
+      });
       notifyListeners();
     });
 
     socket.onDisconnect((_) {
-      print('Déconnecté');
+      log('Déconnecté');
     });
 
     socket.onError((err) {
-      print('Erreur socket: $err');
+      log('Erreur socket générale: $err');
     });
   }
 
@@ -74,9 +95,29 @@ class MyAppState extends ChangeNotifier {
       'time': _now(),
     });
 
-    socket.emit('sendMessage', content.trim());
+    var data = {
+      'message': content.trim(),
+      'playerName': 'Joueur 2',
+      'roomId': roomId,
+    };
+
+    log('Envoi du message: $data');
+
+    socket.emit('sendMessageToWaitingRoom', data);
 
     notifyListeners();
+  }
+
+  void joinRoom(String content, BuildContext context) {
+    socket.emit('leaveWaitingRoom', roomId);
+
+    if (content.trim().isEmpty) return;
+
+    roomId = content.trim();
+    log('Rejoindre la salle: $roomId');
+
+    socket.emit('getMessagesFromWaitingRoom', roomId);
+    socket.emit('joinWaitingRoom', roomId);
   }
 
   @override
@@ -166,9 +207,11 @@ class MessagesPage extends StatefulWidget {
 
 class _MessagesPageState extends State<MessagesPage> {
   final TextEditingController _controller = TextEditingController();
+  final TextEditingController _roomController = TextEditingController();
 
   @override
   void dispose() {
+    _roomController.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -177,66 +220,55 @@ class _MessagesPageState extends State<MessagesPage> {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
 
-    if (appState.messages.isEmpty) {
-      return const Center(child: Text('No messages yet.'));
-    }
-
     return Column(
       children: [
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            children: [
-              for (var message in appState.messages)
-                Align(
-                  alignment: message['type'] == 'received'
-                      ? Alignment.centerLeft
-                      : Alignment.centerRight,
-                  child: Column(
-                    crossAxisAlignment: message['type'] == 'received'
-                        ? CrossAxisAlignment.start
-                        : CrossAxisAlignment.end,
-                    children: [
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 250),
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(
-                            vertical: 5,
-                            horizontal: 10,
-                          ),
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                              topLeft: const Radius.circular(15),
-                              topRight: const Radius.circular(15),
-                              bottomLeft: message['type'] == 'received'
-                                  ? Radius.zero
-                                  : const Radius.circular(15),
-                              bottomRight: message['type'] == 'sent'
-                                  ? Radius.zero
-                                  : const Radius.circular(15),
-                            ),
-                          ),
-                          child: Text(message['content']!),
-                        ),
+        TextField(controller: _roomController, onSubmitted: _joinRoom),
+        for (var message in appState.messages)
+          Align(
+            alignment: message['type'] == 'received'
+                ? Alignment.centerLeft
+                : Alignment.centerRight,
+            child: Column(
+              crossAxisAlignment: message['type'] == 'received'
+                  ? CrossAxisAlignment.start
+                  : CrossAxisAlignment.end,
+              children: [
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 250),
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 5,
+                      horizontal: 10,
+                    ),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: const Radius.circular(15),
+                        topRight: const Radius.circular(15),
+                        bottomLeft: message['type'] == 'received'
+                            ? Radius.zero
+                            : const Radius.circular(15),
+                        bottomRight: message['type'] == 'sent'
+                            ? Radius.zero
+                            : const Radius.circular(15),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14),
-                        child: Text(
-                          '${message['name']} - ${message['time']!}',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
+                    child: Text(message['content']!),
                   ),
                 ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  child: Text(
+                    '${message['name']} - ${message['time']!}',
+                    style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+
+        Spacer(),
 
         Container(
           color: Colors.white,
@@ -260,6 +292,13 @@ class _MessagesPageState extends State<MessagesPage> {
 
     context.read<MyAppState>().sendMessage(value, context);
     _controller.clear();
+  }
+
+  void _joinRoom(String value) {
+    if (value.trim().isEmpty) return;
+
+    context.read<MyAppState>().joinRoom(value, context);
+    _roomController.clear();
   }
 }
 
