@@ -266,7 +266,7 @@ export class CombatComponent implements OnInit, OnDestroy {
                     duration = NOTIFICATION_DURATION;
                 } else {
                     title = 'Victoire!';
-                    message = `${this.player.name} a gagné le combat!`;
+                    message = 'Vous avez gagné le combat!';
                     isSuccess = true;
                     duration = NOTIFICATION_DURATION;
                 }

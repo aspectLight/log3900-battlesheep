@@ -193,7 +193,7 @@ export class GameCombatService {
             // Ajouter l'entrée de journal
             const entry = {
                 type: 'COMBAT',
-                content: `${currentPlayer.name} à ${attackResult > 0 ? 'réussi' : 'échoue'} a attaquer ${
+                content: `${currentPlayer.name} a ${attackResult > 0 ? 'réussi' : 'échoué'} à attaquer ${
                     currentOpponent.name
                 } ! ${attackValue} contre ${defenseValue} !`,
                 time: new Date().toLocaleTimeString('en-GB', {
@@ -246,7 +246,7 @@ export class GameCombatService {
             const flightSuccess = Math.random() <= FLIGHT_CHANCES;
             const entry = {
                 type: 'COMBAT',
-                content: `Tentative de fuite ! ${currentPlayer.name} à ${flightSuccess ? 'réussi' : 'échoue'} à s'échapper!`,
+                content: `Tentative de fuite ! ${currentPlayer.name} a ${flightSuccess ? 'réussi' : 'échoué'} à s'échapper!`,
                 time: new Date().toLocaleTimeString('en-GB', {
                     hour: '2-digit',
                     minute: '2-digit',
