@@ -182,14 +182,14 @@ export class GameRoomGateway implements OnGatewayConnection, OnGatewayDisconnect
             const opponentSocket = this.server.sockets.sockets.get(data.opponentId);
             const opponent = generalRoom.players.find((player) => player.id === data.opponentId);
             const playersFighting = [combatStarter, opponent];
-            generalRoom.playersStats.forEach((player) => {
-                if (player.name === combatStarter.name) player.combats++;
-                if (player.name === opponent.name) player.combats++;
-            });
             if (opponent.isVirtual) {
                 this.gameCombatService.startVirtualCombat(data.roomId, data.opponentId, socket.id, false);
                 return { success: true };
             }
+            const starterStats = generalRoom.playersStats.find((p) => p.name === combatStarter.name);
+            const opponentStats = generalRoom.playersStats.find((p) => p.name === opponent.name);
+            if (starterStats) starterStats.combats++;
+            if (opponentStats) opponentStats.combats++;
             this.gameRoomService.pauseTimer(data.roomId);
             socket.join(combatRoom);
             opponentSocket.join(combatRoom);

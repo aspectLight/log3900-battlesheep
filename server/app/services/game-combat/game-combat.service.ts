@@ -185,13 +185,10 @@ export class GameCombatService {
             }
 
             const room = this.gameRoomService.findRoomById(currentRoom.associatedRoomId);
-            room.playersStats.forEach((player) => {
-                if (player.name === currentPlayer.name) {
-                    player.damage += damage;
-                } else if (player.name === currentOpponent.name) {
-                    player.healthLost += damage;
-                }
-            });
+            const attackerStats = room.playersStats.find((p) => p.name === currentPlayer.name);
+            const opponentStats = room.playersStats.find((p) => p.name === currentOpponent.name);
+            if (attackerStats) attackerStats.damage += damage;
+            if (opponentStats) opponentStats.healthLost += damage;
 
             // Ajouter l'entrée de journal
             const entry = {
@@ -261,11 +258,8 @@ export class GameCombatService {
             this.server.to(currentRoom.combatRoomId).emit(GameRoomEvents.AddJournalEntry, entry);
             if (flightSuccess) {
                 const room = this.gameRoomService.findRoomById(currentRoom.associatedRoomId);
-                room.playersStats.forEach((player) => {
-                    if (player.name === currentPlayer.name) {
-                        player.evasions++;
-                    }
-                });
+                const playerStats = room.playersStats.find((p) => p.name === currentPlayer.name);
+                if (playerStats) playerStats.evasions++;
                 this.server
                     .to(currentRoom.combatRoomId)
                     .emit(GameRoomEvents.FlightAttemptResult, { isSuccess: true, attackerEvasionPoints: currentPlayer.evasionPoints });
@@ -327,13 +321,12 @@ export class GameCombatService {
         const room = this.gameRoomService.findRoomById(currentRoom.associatedRoomId);
         const winner = currentRoom.players.find((player) => player.id === currentRoom.currentPlayerId);
         const loser = currentRoom.players.find((player) => player.id === currentRoom.currentOpponentId);
-        room.playersStats.forEach((player) => {
-            if (player.name === winner.name) {
-                player.victories++;
-            } else if (player.name === loser.name) {
-                player.defeats++;
-            }
-        });
+        if (!isByFlight) {
+            const winnerStats = room.playersStats.find((p) => p.name === winner.name);
+            const loserStats = room.playersStats.find((p) => p.name === loser.name);
+            if (winnerStats) winnerStats.victories++;
+            if (loserStats) loserStats.defeats++;
+        }
     }
 
     abandonCombat(combatId: string, isByDeath: boolean): void {
@@ -349,13 +342,10 @@ export class GameCombatService {
         const room = this.gameRoomService.findRoomById(currentRoom.associatedRoomId);
         const winner = currentRoom.players.find((player) => player.id === currentRoom.currentPlayerId);
         const loser = currentRoom.players.find((player) => player.id === currentRoom.currentOpponentId);
-        room.playersStats.forEach((player) => {
-            if (player.name === winner.name) {
-                player.victories++;
-            } else if (player.name === loser.name) {
-                player.defeats++;
-            }
-        });
+        const winnerStats = room.playersStats.find((p) => p.name === winner.name);
+        const loserStats = room.playersStats.find((p) => p.name === loser.name);
+        if (winnerStats) winnerStats.victories++;
+        if (loserStats) loserStats.defeats++;
         this.updateScore(combatId, currentRoom.currentOpponentId, currentRoom.attackerId, isByDeath);
     }
 
@@ -406,6 +396,10 @@ export class GameCombatService {
         }
         const combatRoom = `combat_${roomId}`;
         const playersFighting = [attacker, defender];
+        const attackerStats = this.generalRoom.playersStats.find((p) => p.name === attacker.name);
+        const defenderStats = this.generalRoom.playersStats.find((p) => p.name === defender.name);
+        if (attackerStats) attackerStats.combats++;
+        if (defenderStats) defenderStats.combats++;
         if (!opponent.isVirtual) {
             const opponentSocket = this.server.sockets.sockets.get(opponentId);
             if (!opponentSocket) {
