@@ -2,16 +2,15 @@ import { TitleCasePipe } from '@angular/common';
 import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { Cell } from '@app/classes/cell';
 import { Player } from '@app/classes/player';
+import { ItemCardComponent } from '@app/components/item-card/item-card.component';
 import { BonusType } from '@app/constants/bonus.constants';
+import { CombatState, FEEDBACK_DURATION, NOTIFICATION_DURATION } from '@app/constants/combat.constants';
 import { ActionService } from '@app/services/action.service';
 import { CombatService } from '@app/services/combat.service';
 import { GameManagerService } from '@app/services/game-manager.service';
-import { ActionSocketService } from '@app/services/socket/action-socket.service';
 import { SocketService } from '@app/services/socket.service';
+import { ActionSocketService } from '@app/services/socket/action-socket.service';
 import { Subscription } from 'rxjs';
-import { FEEDBACK_DURATION, NOTIFICATION_DURATION, CombatState } from '@app/constants/combat.constants';
-import { AttackPayload } from '@app/interfaces/payload';
-import { ItemCardComponent } from '@app/components/item-card/item-card.component';
 @Component({
     selector: 'app-combat',
     imports: [TitleCasePipe, ItemCardComponent],
@@ -124,12 +123,6 @@ export class CombatComponent implements OnInit, OnDestroy {
             }),
         );
         this.subscriptions.push(
-            this.actionSocketService.attackTrigger.subscribe(() => {
-                if (this.isCombatPlayerTurn) this.attack();
-                else this.getVirtualPlayerAttack();
-            }),
-        );
-        this.subscriptions.push(
             this.combatService.combatStateChange.subscribe((state) => {
                 this.showCombatNotification(state);
             }),
@@ -164,28 +157,12 @@ export class CombatComponent implements OnInit, OnDestroy {
 
     attack() {
         if (this.enemy && this.player) {
-            const isDebugging = this.gameManager.room.isDebugging;
-            this.defenseValue = isDebugging ? this.enemy.rollStatDebug(BonusType.Defense) : this.enemy.rollStat(BonusType.Defense);
-            this.attackValue = isDebugging ? this.player.rollStatDebug(BonusType.Attack) : this.player.rollStat(BonusType.Attack);
-            const attackInfo = this.combatService.attack(this.attackValue, this.defenseValue);
+            const attackInfo = this.combatService.attack();
             if (!attackInfo) return;
             this.actionSocketService.attack(attackInfo);
         }
     }
 
-    getVirtualPlayerAttack() {
-        if (this.enemy && this.player) {
-            const isDebugging = this.gameManager.room.isDebugging;
-            const defenseValue = isDebugging ? this.player.rollStatDebug(BonusType.Defense) : this.player.rollStat(BonusType.Defense);
-            const attackValue = isDebugging ? this.enemy.rollStatDebug(BonusType.Attack) : this.enemy.rollStat(BonusType.Attack);
-            const attackInfo: AttackPayload = {
-                roomId: this.combatService.combatRoomId,
-                attackValue,
-                defenseValue,
-            };
-            this.actionSocketService.attack(attackInfo);
-        }
-    }
     flight() {
         if (this.enemy?.hasItem('barbedWire') && !this.isCombatInitiator) {
             this.displayNotification('Barbed wire', "La fuite est empêché par l'adversaire", false);

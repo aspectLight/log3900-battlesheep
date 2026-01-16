@@ -6,3 +6,5 @@ export const EVASION_PTS = 2;
 export const MIN_TIME = 3;
 export const MAX_TIME = 4;
 export const MAX_TIME_WITHOUT_EVASION = 2;
+export const D6_VALUE = 6;
+export const D4_VALUE = 4;

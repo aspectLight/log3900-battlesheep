@@ -1,22 +1,18 @@
 import { Injectable } from '@angular/core';
-import { SocketService } from '@app/services/socket.service';
-import { Observable, Subject } from 'rxjs';
-import { Socket } from 'socket.io-client';
-import { GameManagerService } from '@app/services/game-manager.service';
-import { ISocketService } from '@app/interfaces/socket-service.interface';
 import { AttackPayload, AttackResult, CombatPayload, FlightResult } from '@app/interfaces/payload';
+import { ISocketService } from '@app/interfaces/socket-service.interface';
 import { CombatService } from '@app/services/combat.service';
+import { GameManagerService } from '@app/services/game-manager.service';
 import { GameRoomService } from '@app/services/game-room.service';
+import { SocketService } from '@app/services/socket.service';
 import { GameRoomEvents } from '@common/socket.constants';
+import { Socket } from 'socket.io-client';
 import { MovementSocketService } from './movement-socket.service';
-import { Player } from '@app/classes/player';
 @Injectable({
     providedIn: 'root',
 })
 export class ActionSocketService implements ISocketService {
     socket: Socket;
-    attackTrigger: Observable<void>;
-    private attackTriggerSubject: Subject<void> = new Subject<void>();
 
     constructor(
         private socketService: SocketService,
@@ -31,7 +27,6 @@ export class ActionSocketService implements ISocketService {
 
     setUpConnection(): void {
         this.socket = this.socketService.socket;
-        this.attackTrigger = this.attackTriggerSubject.asObservable();
         this.setUpListeners();
     }
 
@@ -43,15 +38,27 @@ export class ActionSocketService implements ISocketService {
     }
 
     startCombat(combatPayload: CombatPayload) {
-        this.socket.emit(GameRoomEvents.StartCombat, combatPayload);
+        this.socket.emit(GameRoomEvents.StartCombat, combatPayload, (ack: { success: boolean; error?: string }) => {
+            if (!ack?.success) {
+                return;
+            }
+        });
     }
 
     flightAttempt(combatPayload: CombatPayload) {
-        this.socket.emit(GameRoomEvents.FlightAttempt, combatPayload.roomId);
+        this.socket.emit(GameRoomEvents.FlightAttempt, combatPayload.roomId, (ack: { success: boolean; error?: string }) => {
+            if (!ack?.success) {
+                return;
+            }
+        });
     }
 
     attack(attackPayload: AttackPayload) {
-        this.socket.emit(GameRoomEvents.Attack, attackPayload);
+        this.socket.emit(GameRoomEvents.Attack, attackPayload, (ack: { success: boolean; error?: string }) => {
+            if (!ack?.success) {
+                return;
+            }
+        });
     }
 
     toggleDoor(x: number, y: number) {
@@ -65,10 +72,6 @@ export class ActionSocketService implements ISocketService {
     }
 
     private setUpListeners(): void {
-        this.socket.on(GameRoomEvents.PerformAttack, () => {
-            this.attackTriggerSubject.next();
-        });
-
         this.socket.on(GameRoomEvents.AttackResult, (data: AttackResult) => {
             this.combatService.handleAttackResult(data);
         });
@@ -87,20 +90,6 @@ export class ActionSocketService implements ISocketService {
                 this.combatService.setCombatRoom(combatRoom);
             }
         });
-
-        this.socket.on(
-            GameRoomEvents.CalculateVirtualPlayerAttack,
-            (isVirtualCombatOnly: boolean, playerAttackingId: string, playerDefendingId: string, combatRoomId: string) => {
-                const playerAttacking = this.gameManagerService.getPlayerById(playerAttackingId) as Player;
-                const playerDefending = this.gameManagerService.getPlayerById(playerDefendingId) as Player;
-                if (isVirtualCombatOnly) {
-                    const attackInfos = this.combatService.getVirtualPlayerAttack(playerAttacking, playerDefending, combatRoomId);
-                    this.attack(attackInfos);
-                } else {
-                    this.attackTriggerSubject.next();
-                }
-            },
-        );
 
         this.socket.on(GameRoomEvents.EndCombat, (winnerId, loserId) => {
             this.combatService.handleEnd(winnerId, loserId);

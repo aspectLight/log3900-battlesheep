@@ -33,6 +33,4 @@ export interface FlightResult {
 
 export interface AttackPayload {
     roomId: string;
-    attackValue: number;
-    defenseValue: number;
 }
