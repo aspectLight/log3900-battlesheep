@@ -320,7 +320,7 @@ export class GameCombatService {
         this.updateHealthPoints(combatId);
         const rooms = this.gameRoomService.findRoomsByPlayerId(currentRoom.currentPlayerId);
         const gameRoomId = rooms[0].roomId;
-        this.server.to(gameRoomId).emit(GameRoomEvents.EndCombat, currentRoom.currentPlayerId, currentRoom.currentOpponentId);
+        this.server.to(gameRoomId).emit(GameRoomEvents.EndCombat, currentRoom.currentPlayerId, currentRoom.currentOpponentId, isByFlight);
         if (!this.isVirtualCombatOnly(combatId)) this.server.socketsLeave(currentRoom.combatRoomId);
         this.updateScore(combatId, currentRoom.currentPlayerId, currentRoom.attackerId, isByFlight);
 
@@ -344,7 +344,7 @@ export class GameCombatService {
             currentRoom.turnTimer = undefined;
         }
 
-        this.server.to(currentRoom.combatRoomId).emit(GameRoomEvents.EndCombat, currentRoom.currentPlayerId);
+        this.server.to(currentRoom.combatRoomId).emit(GameRoomEvents.EndCombat, currentRoom.currentPlayerId, currentRoom.currentOpponentId, false);
         this.server.socketsLeave(currentRoom.combatRoomId);
         const room = this.gameRoomService.findRoomById(currentRoom.associatedRoomId);
         const winner = currentRoom.players.find((player) => player.id === currentRoom.currentPlayerId);

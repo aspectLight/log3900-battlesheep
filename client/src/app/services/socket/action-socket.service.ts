@@ -91,7 +91,7 @@ export class ActionSocketService implements ISocketService {
             }
         });
 
-        this.socket.on(GameRoomEvents.EndCombat, (winnerId, loserId) => {
+        this.socket.on(GameRoomEvents.EndCombat, (winnerId, loserId, isByFlight) => {
             this.combatService.handleEnd(winnerId, loserId);
             const loser = this.gameManagerService.room.players.find((p) => p.id === loserId);
             const organisatorId = this.gameManagerService.room.organisatorId;
@@ -100,7 +100,9 @@ export class ActionSocketService implements ISocketService {
                 this.combatService.loserId = '';
                 this.addToJournal({
                     type: 'TOUS',
-                    content: `Fin du combat ! ${this.gameManagerService.getPlayerById(winnerId)?.name} a battu ${loser?.name}.`,
+                    content: isByFlight
+                        ? `Fin du combat! ${this.gameManagerService.getPlayerById(winnerId)?.name} a fuit devant ${loser?.name}.`
+                        : `Fin du combat ! ${this.gameManagerService.getPlayerById(winnerId)?.name} a battu ${loser?.name}.`,
                 });
             }
         });
