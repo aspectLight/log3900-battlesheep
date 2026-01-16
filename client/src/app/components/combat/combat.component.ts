@@ -261,7 +261,7 @@ export class CombatComponent implements OnInit, OnDestroy {
             case CombatState.Won: {
                 if (this.wasFlightEnd) {
                     title = 'Tentative de fuite réussie!';
-                    message = `${this.player.name} a réussi à fuir!`;
+                    message = 'Vous avez réussi à fuir!';
                     isSuccess = true;
                     duration = NOTIFICATION_DURATION;
                 } else {
@@ -276,7 +276,7 @@ export class CombatComponent implements OnInit, OnDestroy {
             case CombatState.Lost: {
                 if (this.wasFlightEnd) {
                     title = 'Tentative de fuite réussie!';
-                    message = `${this.player.name} a réussi à fuir!`;
+                    message = `${this.enemy.name} a réussi à fuir!`;
                     isSuccess = false;
                     duration = NOTIFICATION_DURATION;
                 } else {
