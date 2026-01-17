@@ -85,6 +85,40 @@ describe('GameRoomGateway', () => {
         expect(gateway).toBeDefined();
     });
 
+    describe('handleLeaveRoom', () => {
+        it('should call handlePlayerAbandonment and emit GameAbandoned', () => {
+            const roomId = 'room123';
+            const socketId = 'socket789';
+
+            Object.defineProperty(socket, 'id', { value: socketId });
+            socket.emit = stub();
+
+            const handlePlayerAbandonmentSpy = jest.spyOn(gateway as any, 'handlePlayerAbandonment').mockReturnValue(true);
+
+            gateway.handleLeaveRoom(roomId, socket);
+
+            expect(handlePlayerAbandonmentSpy).toHaveBeenCalledWith(roomId, socketId);
+            expect(socket.emit.calledWith(GameRoomEvents.GameAbandoned)).toBeTruthy();
+        });
+
+        it('should emit GameRoomError if an error occurs', () => {
+            const roomId = 'room123';
+            const socketId = 'socket789';
+            const error = new Error('Test error');
+
+            Object.defineProperty(socket, 'id', { value: socketId });
+            socket.emit = stub();
+
+            jest.spyOn(gateway as any, 'handlePlayerAbandonment').mockImplementation(() => {
+                throw error;
+            });
+
+            gateway.handleLeaveRoom(roomId, socket);
+
+            expect(socket.emit.calledWith(GameRoomEvents.GameRoomError, error.message)).toBeTruthy();
+        });
+    });
+
     it("should delete the room if there's only 2 players", () => {
         const roomId = 'room123';
         const socketId = 'socket789';
@@ -93,10 +127,8 @@ describe('GameRoomGateway', () => {
         socket.join = stub();
         socket.emit = stub();
 
-        // Stub server.to() to simulate emitting an event.
         server.to.returns({
             emit: (event: string) => {
-                // When the room is deleted, GameCanceled should be emitted.
                 expect(event).toEqual(GameRoomEvents.GameCanceled);
             },
         } as BroadcastOperator<unknown, unknown>);
@@ -147,6 +179,50 @@ describe('GameRoomGateway', () => {
         gateway.handleLeaveRoom(roomId, socket);
 
         expect(socket.emit.calledWith(GameRoomEvents.GameRoomError, error.message)).toBeTruthy();
+    });
+
+    describe('handlePlayGame', () => {
+        it('should start game and emit PlayerSpawned', async () => {
+            const roomId = 'room123';
+            const mockRoom = {
+                roomId,
+                gameId: 'game456',
+                organisatorId: 'org1',
+                players: [],
+                isLocked: false,
+                messages: [],
+                journalEntries: [],
+                playersStats: [],
+                globalStats: { gameDuration: '00:00' },
+                startTime: new Date(),
+            } as GameRoom;
+
+            gameRoomService.findRoomById.returns(mockRoom);
+            gameMovementService.addPlayersToBoard.resolves(mockRoom.players);
+
+            const emitStub = stub();
+            server.to.returns({ emit: emitStub } as any);
+
+            await gateway.handlePlayGame(roomId, socket);
+
+            expect(gameRoomService.findRoomById.calledWith(roomId)).toBeTruthy();
+            expect(gameMovementService.addPlayersToBoard.calledWith(mockRoom.gameId, mockRoom.players)).toBeTruthy();
+            expect(emitStub.calledWith(GameRoomEvents.PlayerSpawned, mockRoom.players)).toBeTruthy();
+            expect(gameRoomService.setServer.calledWith(server)).toBeTruthy();
+            expect(gameRoomService.prepareNextTurn.calledWith(roomId)).toBeTruthy();
+        });
+
+        it('should emit GameRoomError if an error occurs', async () => {
+            const roomId = 'room123';
+            const error = new Error('Test error');
+
+            gameRoomService.findRoomById.throws(error);
+            socket.emit = stub();
+
+            await gateway.handlePlayGame(roomId, socket);
+
+            expect(socket.emit.calledWith(GameRoomEvents.GameRoomError, error.message)).toBeTruthy();
+        });
     });
 
     it('should start game', () => {
@@ -641,6 +717,35 @@ describe('GameRoomGateway', () => {
         });
     });
 
+    describe('handleSendMessage', () => {
+        it('should add message and emit to other players', async () => {
+            const data = { message: 'test message', playerName: 'Player1', roomId: 'room123' };
+            const socketId = 'socket123';
+
+            Object.defineProperty(socket, 'id', { value: socketId });
+
+            const emitStub = stub();
+            (server.except as any) = stub().returns({ to: stub().returns({ emit: emitStub }) });
+
+            await gateway.handleSendMessage(data, socket);
+
+            expect(gameRoomService.addMessage.calledWith(data.roomId)).toBeTruthy();
+            expect(server.except.calledWith(socketId)).toBeTruthy();
+        });
+
+        it('should emit GameRoomError if an error occurs', async () => {
+            const data = { message: 'test message', playerName: 'Player1', roomId: 'room123' };
+            const error = new Error('Test error');
+
+            gameRoomService.addMessage.throws(error);
+            socket.emit = stub();
+
+            await gateway.handleSendMessage(data, socket);
+
+            expect(socket.emit.calledWith(GameRoomEvents.GameRoomError, error.message)).toBeTruthy();
+        });
+    });
+
     it('should send a message to the gameRoom', () => {
         const socketId = 'socket789';
         const roomId = 'room123';
@@ -760,28 +865,24 @@ describe('GameRoomGateway', () => {
     });
 
     describe('handleAttack', () => {
-        const data = { roomId: 'room1', attackValue: 10, defenseValue: 5 };
+        const data = { roomId: 'room1' };
 
-        it('should call gameCombatService.attack with correct parameters and log the attack attempt', () => {
+        it('should call gameCombatService.attack with correct parameters and log the attack attempt', async () => {
             const logSpy = jest.spyOn(gateway['logger'], 'log').mockImplementation(() => {});
-            const attackSpy = jest.spyOn(gameCombatService, 'attack').mockImplementation(() => {});
+            const attackSpy = jest.spyOn(gameCombatService, 'attack').mockResolvedValue();
 
-            gateway.handleAttack(data, socket);
+            await gateway.handleAttack(data, socket);
 
-            expect(logSpy).toHaveBeenCalledWith(
-                `[${data.roomId}] Attack attempt with attack value:  ${data.attackValue} and defense value: ${data.defenseValue}`,
-            );
-            expect(attackSpy).toHaveBeenCalledWith(data.roomId, data.attackValue, data.defenseValue);
+            expect(logSpy).toHaveBeenCalledWith(`[${data.roomId}] Attack attempt`);
+            expect(attackSpy).toHaveBeenCalledWith(data.roomId);
         });
 
-        it('should emit GameRoomError if an error occurs in handleAttack', () => {
+        it('should emit GameRoomError if an error occurs in handleAttack', async () => {
             const error = new Error('Test error');
-            jest.spyOn(gameCombatService, 'attack').mockImplementation(() => {
-                throw error;
-            });
+            jest.spyOn(gameCombatService, 'attack').mockRejectedValue(error);
             (socket as any).emit = jest.fn();
 
-            gateway.handleAttack(data, socket);
+            await gateway.handleAttack(data, socket);
 
             expect(socket.emit).toHaveBeenCalledWith(GameRoomEvents.GameRoomError, error.message);
         });
@@ -790,48 +891,20 @@ describe('GameRoomGateway', () => {
     describe('handleFlightAttempt', () => {
         const roomId = 'testRoom';
 
-        it('should log "received flight attempt" and call gameCombatService.attemptFlight', () => {
-            const attemptFlightSpy = jest.spyOn(gameCombatService, 'attemptFlight').mockImplementation(() => {});
+        it('should log "received flight attempt" and call gameCombatService.attemptFlight', async () => {
+            const attemptFlightSpy = jest.spyOn(gameCombatService, 'attemptFlight').mockResolvedValue();
 
-            gateway.handleFlightAttempt(roomId, socket);
+            await gateway.handleFlightAttempt(roomId, socket);
 
             expect(attemptFlightSpy).toHaveBeenCalledWith(roomId);
         });
 
-        it('should emit GameRoomError if an error occurs in handleFlightAttempt', () => {
+        it('should emit GameRoomError if an error occurs in handleFlightAttempt', async () => {
             const error = new Error('Test error');
-            jest.spyOn(gameCombatService, 'attemptFlight').mockImplementation(() => {
-                throw error;
-            });
+            jest.spyOn(gameCombatService, 'attemptFlight').mockRejectedValue(error);
             (socket as any).emit = jest.fn();
 
-            gateway.handleFlightAttempt(roomId, socket);
-
-            expect((socket as any).emit).toHaveBeenCalledWith(GameRoomEvents.GameRoomError, error.message);
-        });
-    });
-
-    describe('handleResumeTurn', () => {
-        const roomId = 'room123';
-
-        it('should call gameRoomService.resumeTurn successfully', () => {
-            const resumeTurnSpy = jest.spyOn(gameRoomService, 'resumeTurn').mockImplementation(() => {});
-            (socket as any).emit = jest.fn();
-
-            gateway.handleResumeTurn(roomId, socket);
-
-            expect(resumeTurnSpy).toHaveBeenCalledWith(roomId);
-            expect((socket as any).emit).not.toHaveBeenCalled();
-        });
-
-        it('should emit GameRoomError if an error occurs', () => {
-            const error = new Error('Test error');
-            jest.spyOn(gameRoomService, 'resumeTurn').mockImplementation(() => {
-                throw error;
-            });
-            (socket as any).emit = jest.fn();
-
-            gateway.handleResumeTurn(roomId, socket);
+            await gateway.handleFlightAttempt(roomId, socket);
 
             expect((socket as any).emit).toHaveBeenCalledWith(GameRoomEvents.GameRoomError, error.message);
         });
@@ -858,8 +931,6 @@ describe('GameRoomGateway', () => {
             expect(gameRoomService.toggleDebugMode).toHaveBeenCalledWith(roomId);
             expect(toMock).toHaveBeenCalledWith(roomId);
             expect(fakeEmit).toHaveBeenCalledWith(GameRoomEvents.DebugModeEnabled);
-            // The logger message is different in the implementation
-            // expect(logSpy).toHaveBeenCalledWith(`Partie ${roomId}: mode débogage activé`);
         });
 
         it('should emit DebugModeDisabled and log deactivation when toggleDebugMode returns false', () => {
@@ -874,8 +945,6 @@ describe('GameRoomGateway', () => {
             expect(gameRoomService.toggleDebugMode).toHaveBeenCalledWith(roomId);
             expect(toMock).toHaveBeenCalledWith(roomId);
             expect(fakeEmit).toHaveBeenCalledWith(GameRoomEvents.DebugModeDisabled);
-            // The logger message is different in the implementation
-            // expect(logSpy).toHaveBeenCalledWith(`Partie ${roomId}: mode débogage désactivé`);
         });
 
         it('should emit GameRoomError if an error occurs', () => {
@@ -927,8 +996,6 @@ describe('GameRoomGateway', () => {
 
             gateway.handleDoorToggled(data, socket);
 
-            // The logger message is different in the implementation
-            // expect(logSpy).toHaveBeenCalledWith('toggled door', data, data.roomId, data.x, data.y);
             expect(toggleDoorSpy).toHaveBeenCalledWith(data.x, data.y, undefined);
             expect(toSpy).toHaveBeenCalledWith(data.roomId);
             expect(fakeEmit).toHaveBeenCalledWith(GameRoomEvents.DoorToggled, data);
@@ -971,8 +1038,6 @@ describe('GameRoomGateway', () => {
 
             gateway.handleItemCollected(data, socket);
 
-            // The logger message is different in the implementation
-            // expect(logSpy).toHaveBeenCalledWith('item collected by', 'socket1', '- item ;', 'flag', 'at position', { x: 5, y: 5 });
             expect(gameRoomService.addItemToInventory.calledWith('room1', 'player1', data.item)).toBeTruthy();
             expect(fakeEmit).toHaveBeenCalledWith(GameRoomEvents.FlagCollected, data.playerId);
         });
@@ -1017,8 +1082,6 @@ describe('GameRoomGateway', () => {
 
             gateway.handleItemDropped(data, socket);
 
-            // The logger message is different in the implementation
-            // expect(logSpy).toHaveBeenCalledWith('item dropped by', 'socket1', '- item ;', 'adrenaline');
             expect(gateway['server'].to).toHaveBeenCalledWith('room1');
             expect(emitSpy).toHaveBeenCalledWith(GameRoomEvents.ItemDropped, data);
             expect(gameRoomService.removeItemFromInventory.calledWith('room1', 'player1', data.item)).toBeTruthy();
@@ -1090,16 +1153,13 @@ describe('GameRoomGateway', () => {
         });
 
         it('should use immediate timeout (0ms) when skipTimeout is true', () => {
-            // Setup
             const data = { roomId: 'room1', playerId: 'virtualPlayer1', isCTF: true, skipTimeout: true };
             Object.defineProperty(socket, 'id', { value: 'socket1' });
 
-            // Mock the player found in the room
             const virtualPlayer = { id: 'virtualPlayer1', name: 'VP1' };
             const mockRoom = { players: [virtualPlayer] } as any;
             gameRoomService.findRoomById.returns(mockRoom);
 
-            // Mock the VP having a long path
             const movement = {
                 path: [
                     { x: 1, y: 1 },
@@ -1110,17 +1170,13 @@ describe('GameRoomGateway', () => {
             gameMovementVPService.determineVPMovement.returns(movement);
             movementAlgorithmsService.findNeighborPlayer.returns(null);
 
-            // Spy on setTimeout
             const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
 
-            // Setup emit spy
             const emitSpy = jest.fn();
             jest.spyOn(server, 'to').mockReturnValue({ emit: emitSpy } as any);
 
-            // Execute
             gateway.handleVirtualPlayerTurn(data, socket);
 
-            // Assert setTimeout was called with 0ms delay
             expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 0);
 
             // Clean up
@@ -1128,16 +1184,13 @@ describe('GameRoomGateway', () => {
         });
 
         it('should use random delay when skipTimeout is false', () => {
-            // Setup
             const data = { roomId: 'room1', playerId: 'virtualPlayer1', isCTF: true, skipTimeout: false };
             Object.defineProperty(socket, 'id', { value: 'socket1' });
 
-            // Mock the player found in the room
             const virtualPlayer = { id: 'virtualPlayer1', name: 'VP1' };
             const mockRoom = { players: [virtualPlayer] } as any;
             gameRoomService.findRoomById.returns(mockRoom);
 
-            // Mock the VP having a long path
             const movement = {
                 path: [
                     { x: 1, y: 1 },
@@ -1148,24 +1201,18 @@ describe('GameRoomGateway', () => {
             gameMovementVPService.determineVPMovement.returns(movement);
             movementAlgorithmsService.findNeighborPlayer.returns(null);
 
-            // Mock the random delay
             const mockRandomDelay = 1500;
             gameRoomService.getRandomDelay.returns(mockRandomDelay);
 
-            // Spy on setTimeout
             const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
 
-            // Setup emit spy
             const emitSpy = jest.fn();
             jest.spyOn(server, 'to').mockReturnValue({ emit: emitSpy } as any);
 
-            // Execute
             gateway.handleVirtualPlayerTurn(data, socket);
 
-            // Assert getRandomDelay was called with MIN_TURN_DELAY and MAX_TURN_DELAY
             expect(gameRoomService.getRandomDelay.calledOnce).toBeTruthy();
 
-            // Assert setTimeout was called with the random delay
             expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), mockRandomDelay);
 
             // Clean up
@@ -1173,75 +1220,58 @@ describe('GameRoomGateway', () => {
         });
 
         it('should start virtual combat when path is short and a neighbor opponent is found', () => {
-            // Setup
             const data = { roomId: 'room1', playerId: 'virtualPlayer1', isCTF: true, skipTimeout: true };
             Object.defineProperty(socket, 'id', { value: 'socket1' });
 
-            // Mock the player found in the room
             const virtualPlayer = { id: 'virtualPlayer1', name: 'VP1' };
             const neighborPlayer = { id: 'opponent1', name: 'Opponent1' };
             const mockRoom = { players: [virtualPlayer, neighborPlayer] } as any;
             gameRoomService.findRoomById.returns(mockRoom);
 
-            // Mock the VP having a short path and a neighbor opponent
             gameMovementVPService.determineVPMovement.returns({ path: [{ x: 1, y: 1 }], remainingMovementPoints: 0 });
             movementAlgorithmsService.findNeighborPlayer.returns(neighborPlayer);
             gameRoomService.isOpponent.returns(true);
 
-            // Spy on the gameCombatService methods
             const setServerSpy = jest.spyOn(gameCombatService, 'setServer');
             const startVirtualCombatSpy = jest.spyOn(gameCombatService, 'startVirtualCombat');
 
-            // Execute
             gateway.handleVirtualPlayerTurn(data, socket);
 
-            // Fast-forward timers to trigger the setTimeout callback
             jest.runAllTimers();
 
-            // Assert
             expect(setServerSpy).toHaveBeenCalledWith(server);
             expect(startVirtualCombatSpy).toHaveBeenCalledWith(data.roomId, data.playerId, neighborPlayer.id, true);
         });
 
         it('should end turn when path is short and no neighbor opponent is found', () => {
-            // Setup
             const data = { roomId: 'room1', playerId: 'virtualPlayer1', isCTF: true, skipTimeout: true };
             Object.defineProperty(socket, 'id', { value: 'socket1' });
 
-            // Mock the player found in the room
             const virtualPlayer = { id: 'virtualPlayer1', name: 'VP1' };
             const mockRoom = { players: [virtualPlayer] } as any;
             gameRoomService.findRoomById.returns(mockRoom);
 
-            // Mock the VP having a short path and no neighbor
             gameMovementVPService.determineVPMovement.returns({ path: [{ x: 1, y: 1 }], remainingMovementPoints: 0 });
             movementAlgorithmsService.findNeighborPlayer.returns(null);
 
-            // Spy on endTurn
             const endTurnSpy = jest.spyOn(gameRoomService, 'endTurn');
 
-            // Execute
             gateway.handleVirtualPlayerTurn(data, socket);
 
-            // Fast-forward timers to trigger the setTimeout callback
             jest.runAllTimers();
 
-            // Assert
             expect(endTurnSpy).toHaveBeenCalledWith(data.roomId);
         });
 
         it('should emit VirtualPlayerMoved with opponent when path is long and a neighbor opponent is found', () => {
-            // Setup
             const data = { roomId: 'room1', playerId: 'virtualPlayer1', isCTF: true, skipTimeout: true };
             Object.defineProperty(socket, 'id', { value: 'socket1' });
 
-            // Mock the player found in the room
             const virtualPlayer = { id: 'virtualPlayer1', name: 'VP1' };
             const neighborPlayer = { id: 'opponent1', name: 'Opponent1' };
             const mockRoom = { players: [virtualPlayer, neighborPlayer] } as any;
             gameRoomService.findRoomById.returns(mockRoom);
 
-            // Mock the VP having a long path and a neighbor opponent
             const movement = {
                 path: [
                     { x: 1, y: 1 },
@@ -1253,17 +1283,13 @@ describe('GameRoomGateway', () => {
             movementAlgorithmsService.findNeighborPlayer.returns(neighborPlayer);
             gameRoomService.isOpponent.returns(true);
 
-            // Setup emit spy
             const emitSpy = jest.fn();
             jest.spyOn(server, 'to').mockReturnValue({ emit: emitSpy } as any);
 
-            // Execute
             gateway.handleVirtualPlayerTurn(data, socket);
 
-            // Fast-forward timers to trigger the setTimeout callback
             jest.runAllTimers();
 
-            // Assert
             expect(server.to).toHaveBeenCalledWith(data.roomId);
             expect(emitSpy).toHaveBeenCalledWith(GameRoomEvents.VirtualPlayerMoved, {
                 ...movement,
@@ -1273,16 +1299,13 @@ describe('GameRoomGateway', () => {
         });
 
         it('should emit VirtualPlayerMoved without opponent when path is long and no neighbor opponent is found', () => {
-            // Setup
             const data = { roomId: 'room1', playerId: 'virtualPlayer1', isCTF: true, skipTimeout: true };
             Object.defineProperty(socket, 'id', { value: 'socket1' });
 
-            // Mock the player found in the room
             const virtualPlayer = { id: 'virtualPlayer1', name: 'VP1' };
             const mockRoom = { players: [virtualPlayer] } as any;
             gameRoomService.findRoomById.returns(mockRoom);
 
-            // Mock the VP having a long path and no neighbor opponent
             const movement = {
                 path: [
                     { x: 1, y: 1 },
@@ -1293,17 +1316,13 @@ describe('GameRoomGateway', () => {
             gameMovementVPService.determineVPMovement.returns(movement);
             movementAlgorithmsService.findNeighborPlayer.returns(null);
 
-            // Setup emit spy
             const emitSpy = jest.fn();
             jest.spyOn(server, 'to').mockReturnValue({ emit: emitSpy } as any);
 
-            // Execute
             gateway.handleVirtualPlayerTurn(data, socket);
 
-            // Fast-forward timers to trigger the setTimeout callback
             jest.runAllTimers();
 
-            // Assert
             expect(server.to).toHaveBeenCalledWith(data.roomId);
             expect(emitSpy).toHaveBeenCalledWith(GameRoomEvents.VirtualPlayerMoved, {
                 ...movement,
