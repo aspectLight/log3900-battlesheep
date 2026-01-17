@@ -31,7 +31,6 @@ export const ITEM_TYPES: { [key: string]: ItemType } = {
         imagePath: './assets/items/barbed_wire.png',
     },
 
-    // Category 3
     camouflage: {
         name: 'Camouflage',
         description: "Permet de se déplacer vers n'importe quelle case pour 1 point d'action",
@@ -56,6 +55,7 @@ export const ITEM_TYPES: { [key: string]: ItemType } = {
         description: 'Un item aléatoire qui sera révélé en pleine partie',
         imagePath: './assets/items/dice.png',
     },
+
     flag: {
         name: 'Flag',
         description: 'Un drapeau à ramener à la base',

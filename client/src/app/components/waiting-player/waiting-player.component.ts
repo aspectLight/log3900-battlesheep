@@ -5,15 +5,15 @@ import { Player } from '@app/classes/player';
 import { ChatboxComponent } from '@app/components/chatbox/chatbox.component';
 import { PlayerCardComponent } from '@app/components/player-card/player-card.component';
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
-import { ErrorMessages, WaitRoomWelcomeMessage } from '@common/error-messages.constants';
+import { VirtualPlayerType } from '@app/constants/player.constants';
 import { ROUTES } from '@app/constants/routes.constants';
 import { Room } from '@app/interfaces/room';
 import { GameCreationService } from '@app/services/game-creation.service';
 import { RoomSocketService } from '@app/services/socket/room-socket.service';
-import { WaitingRoomService } from '@app/services/waiting-room.service';
 import { VirtualPlayerService } from '@app/services/virtual-player.service';
+import { WaitingRoomService } from '@app/services/waiting-room.service';
+import { ErrorMessages, WaitRoomWelcomeMessage } from '@common/error-messages.constants';
 import { Subscription } from 'rxjs';
-import { VirtualPlayerType } from '@app/constants/player.constants';
 
 @Component({
     imports: [CommonModule, PlayerCardComponent, PopUpComponent, ChatboxComponent],
@@ -93,9 +93,14 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
         }
     }
 
-    startGame() {
+    async startGame(): Promise<void> {
         if (this.isStartValid) {
-            this.socketService.startGame(this.code);
+            try {
+                await this.socketService.startGame(this.code);
+            } catch (error) {
+                this.errorMessage = error instanceof Error ? error.message : 'Failed to start game';
+                this.showError = true;
+            }
         }
     }
 
@@ -175,10 +180,15 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
         this.closeProfileSection();
     }
 
-    private addVirtualPlayer(profile: string) {
+    private async addVirtualPlayer(profile: string): Promise<void> {
         const newVPlayer = this.virtualPlayerService.generateVirtualPlayer(profile);
-        this.socketService.reserveAvatar(this.gameCreationService.gameCode, newVPlayer.avatar?.name || '', newVPlayer.id);
-        this.socketService.createPlayer(this.gameCreationService.gameCode, newVPlayer);
+        try {
+            await this.socketService.reserveAvatar(this.gameCreationService.gameCode, newVPlayer.avatar?.name || '', newVPlayer.id);
+            this.socketService.createPlayer(this.gameCreationService.gameCode, newVPlayer);
+        } catch (error) {
+            this.errorMessage = error instanceof Error ? error.message : 'Failed to reserve avatar';
+            this.showError = true;
+        }
     }
 
     private closeProfileSection(): void {

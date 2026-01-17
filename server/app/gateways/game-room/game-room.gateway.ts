@@ -196,14 +196,48 @@ export class GameRoomGateway implements OnGatewayConnection, OnGatewayDisconnect
     @SubscribeMessage(GameRoomEvents.PlayerTeleported)
     async handlePlayerTeleported(
         @MessageBody() data: { roomId: string; playerId: string; destination: Coords; hasCamouflage?: boolean },
-        @ConnectedSocket() socket: Socket,
-    ) {
+    ): Promise<{ success: boolean; error?: string }> {
         try {
             const room = this.gameRoomService.findRoomById(data.roomId);
+            if (!room) {
+                throw new Error(ErrorMessages.RoomDoesNotExist);
+            }
+
+            const player = room.players.find((p) => p.id === data.playerId);
+            if (!player) {
+                throw new Error(ErrorMessages.PlayerNotFound);
+            }
+
+            if (data.destination.x < 0 || data.destination.y < 0) {
+                throw new Error('Invalid destination coordinates');
+            }
+
+            const destinationCell = this.gameMovementService.getCell(data.destination.x, data.destination.y);
+            const item = destinationCell?.item;
+            const hasCollectableItem = item && item.type !== 'spawnPoint';
+
             this.gameMovementService.movePlayer(data.playerId, room.players, data.destination, true);
+
+            if (hasCollectableItem) {
+                this.gameRoomService.addItemToInventory(data.roomId, data.playerId, item, data.destination);
+                this.server.to(data.roomId).emit(GameRoomEvents.ItemCollected, {
+                    roomId: data.roomId,
+                    playerId: data.playerId,
+                    item,
+                    position: data.destination,
+                });
+
+                if (item.type === 'flag') {
+                    this.server.to(data.roomId).emit(GameRoomEvents.FlagCollected, data.playerId);
+                }
+            }
+
             this.server.to(data.roomId).emit(GameRoomEvents.PlayerTeleported, data);
+
+            return { success: true };
         } catch (error) {
-            socket.emit(GameRoomEvents.GameRoomError, error.message);
+            this.logger.error(`Erreur téléportation: ${error.message}`);
+            return { success: false, error: error.message };
         }
     }
 

@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
+import { Player } from '@app/classes/player';
+import { AttackPayload, AttackResult, CombatPayload, FlightResult } from '@app/interfaces/payload';
+import { ISocketService } from '@app/interfaces/socket-service.interface';
+import { CombatService } from '@app/services/combat.service';
+import { GameManagerService } from '@app/services/game-manager.service';
+import { GameRoomService } from '@app/services/game-room.service';
 import { SocketService } from '@app/services/socket.service';
+import { MovementSocketService } from '@app/services/socket/movement/movement-socket.service';
+import { GameRoomEvents } from '@common/socket.constants';
 import { Observable, Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';
-import { GameManagerService } from '@app/services/game-manager.service';
-import { ISocketService } from '@app/interfaces/socket-service.interface';
-import { AttackPayload, AttackResult, CombatPayload, FlightResult } from '@app/interfaces/payload';
-import { CombatService } from '@app/services/combat.service';
-import { GameRoomService } from '@app/services/game-room.service';
-import { GameRoomEvents } from '@common/socket.constants';
-import { MovementSocketService } from '@app/services/socket/movement/movement-socket.service';
-import { Player } from '@app/classes/player';
 @Injectable({
     providedIn: 'root',
 })
@@ -64,6 +64,11 @@ export class ActionSocketService implements ISocketService {
         this.socket.emit(GameRoomEvents.AddJournalEntry, { roomId, entry });
     }
 
+    endPlayerTurn(): void {
+        const roomId = this.gameManagerService.room.roomId;
+        this.socketService.endPlayerTurn(roomId);
+    }
+
     private setUpListeners(): void {
         this.socket.on(GameRoomEvents.PerformAttack, () => {
             this.attackTriggerSubject.next();
@@ -107,7 +112,9 @@ export class ActionSocketService implements ISocketService {
             const loser = this.gameManagerService.room.players.find((p) => p.id === loserId);
             const organisatorId = this.gameManagerService.room.organisatorId;
             if (this.socket.id === this.combatService.loserId || (loser?.isVirtual && this.socket.id === organisatorId)) {
-                if (loser) this.socketService.teleportPlayer(loser?.spawnPoint.x, loser?.spawnPoint.y, loser?.id);
+                if (loser) {
+                    this.movementSocketService.teleportPlayer(loser.spawnPoint.x, loser.spawnPoint.y, { playerId: loser.id });
+                }
                 this.combatService.loserId = '';
                 this.addToJournal({
                     type: 'TOUS',

@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Board } from '@app/classes/board';
 import { Cell } from '@app/classes/cell';
 import { Player } from '@app/classes/player';
-import { Coords } from '@app/interfaces/coords';
 import { DELAY } from '@app/constants/player.constants';
+import { Coords } from '@app/interfaces/coords';
 
 @Injectable({
     providedIn: 'root',
@@ -50,13 +50,15 @@ export class MovementService {
         return { success: true, cell: targetCell };
     }
 
-    teleportPlayer(board: Board, destinationX: number, destinationY: number): boolean {
-        const player = this.selectedPlayer;
-        if (!player) return false;
+    teleportPlayer(board: Board, player: Player, destinationX: number, destinationY: number): boolean {
+        if (!player) {
+            return false;
+        }
 
         const targetCell = board.getCell(destinationX, destinationY);
-        if (!targetCell) return false;
-        if (!this.isCellFree(targetCell)) return false;
+        if (!targetCell) {
+            return false;
+        }
 
         if (player.cell) {
             const oldCell = board.getCell(player.cell.x, player.cell.y);

@@ -72,8 +72,11 @@ export class RoomSocketService implements ISocketService {
         return this.socket.id;
     }
 
-    createRoom(roomId: string, gameId: string, organisator: Player) {
-        this.socket.emit(WaitingRoomEvents.CreateWaitingRoom, { roomId, gameId, organisator });
+    async createRoom(roomId: string, gameId: string, organisator: Player): Promise<void> {
+        const result = await this.socket.emitWithAck(WaitingRoomEvents.CreateWaitingRoom, { roomId, gameId, organisator });
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to create waiting room');
+        }
     }
 
     joinRoom(roomId: string, callback: (success: boolean, error?: string) => void): void {
@@ -115,30 +118,36 @@ export class RoomSocketService implements ISocketService {
         this.socket.emit(WaitingRoomEvents.KickPlayer, { roomId, player });
     }
 
-    reserveAvatar(roomId: string, chosenAvatar: string, playerId: string): void {
+    async reserveAvatar(roomId: string, chosenAvatar: string, playerId: string): Promise<void> {
         const currentRoom = this.waitingPlayerService.currentRoom.getValue();
         if (!currentRoom.organisatorId) return;
         if (!this.socket.id) {
             throw new Error(ErrorMessages.SocketIdNotDefined);
         }
 
+        const result = await this.socket.emitWithAck(WaitingRoomEvents.ReserveAvatar, { roomId, chosenAvatar, playerId });
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to reserve avatar');
+        }
+
         const updatedReservations = this.reservedAvatarsSubject.value.concat([{ reservorId: this.socket.id, chosenAvatar }]);
         this.reservedAvatarsSubject.next(updatedReservations);
-
-        this.socket.emit(WaitingRoomEvents.ReserveAvatar, { roomId, chosenAvatar, playerId });
     }
 
     getReservedAvatars(roomId: string): void {
         this.socket.emit(WaitingRoomEvents.GetReservedAvatars, { roomId });
     }
 
-    startGame(roomId: string): void {
+    async startGame(roomId: string): Promise<void> {
         if (
             this.room.players.length <= SIZE_LIMITS[this.gameCreationService.selectedGame.board.size].max &&
             this.room.players.length >= SIZE_LIMITS[this.gameCreationService.selectedGame.board.size].min &&
             this.roomLocked$
         ) {
-            this.socket.emit(WaitingRoomEvents.StartGame, roomId);
+            const result = await this.socket.emitWithAck(WaitingRoomEvents.StartGame, roomId);
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to start game');
+            }
         }
     }
 

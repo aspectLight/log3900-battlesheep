@@ -1,6 +1,8 @@
 import { Player } from '@app/interfaces/player';
 import { GameRoomService } from '@app/services/game-room/game-room.service';
 import { WaitingRoomService } from '@app/services/waiting-room/waiting-room.service';
+import { ErrorMessages } from '@common/error-messages.constants';
+import { GameRoomEvents, WaitingRoomEvents } from '@common/socket.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import {
     ConnectedSocket,
@@ -12,8 +14,6 @@ import {
     WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { WaitingRoomEvents, GameRoomEvents } from '@common/socket.constants';
-import { ErrorMessages } from '@common/error-messages.constants';
 @WebSocketGateway({ cors: { origin: '*' } })
 @Injectable()
 export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -26,7 +26,10 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
     ) {}
 
     @SubscribeMessage(WaitingRoomEvents.CreateWaitingRoom)
-    handleCreateRoom(@MessageBody() data: { roomId: string; gameId: string; organisator: Player }, @ConnectedSocket() socket: Socket) {
+    handleCreateRoom(
+        @MessageBody() data: { roomId: string; gameId: string; organisator: Player },
+        @ConnectedSocket() socket: Socket,
+    ): { success: boolean; error?: string } {
         try {
             data.organisator.inventory = [];
             const room = this.waitingRoomService.createRoom(data.roomId, data.gameId, data.organisator, socket.id);
@@ -34,8 +37,10 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
             socket.join(data.roomId);
             this.server.to(socket.id).emit(WaitingRoomEvents.WaitingRoomCreated, room);
             this.server.to(data.roomId).emit(WaitingRoomEvents.UpdateAvatarReserved, { reservedAvatars: room.reservedAvatars });
+            return { success: true };
         } catch (error) {
-            socket.emit(WaitingRoomEvents.WaitingRoomError, error.message);
+            this.logger.error(`Erreur création room: ${error.message}`);
+            return { success: false, error: error.message };
         }
     }
 
@@ -85,7 +90,10 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
     }
 
     @SubscribeMessage(WaitingRoomEvents.ReserveAvatar)
-    handleReserveAvatar(@MessageBody() data: { roomId: string; chosenAvatar: string; playerId: string }, @ConnectedSocket() socket: Socket) {
+    handleReserveAvatar(
+        @MessageBody() data: { roomId: string; chosenAvatar: string; playerId: string },
+        @ConnectedSocket() socket: Socket,
+    ): { success: boolean; error?: string } {
         try {
             this.waitingRoomService.reserveCharacter(data.roomId, data.playerId, data.chosenAvatar);
             const room = this.waitingRoomService.findRoomById(data.roomId);
@@ -93,8 +101,10 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
                 this.server.to(data.roomId).emit(WaitingRoomEvents.UpdateAvatarReserved, { reservedAvatars: room.reservedAvatars });
                 this.logger.log(`Joueur ${socket.id} a réservé l'avatar ${data.chosenAvatar}`);
             }
+            return { success: true };
         } catch (error) {
-            socket.emit(WaitingRoomEvents.WaitingRoomError, error.message);
+            this.logger.error(`Erreur réservation avatar: ${error.message}`);
+            return { success: false, error: error.message };
         }
     }
 
@@ -167,14 +177,13 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
     }
 
     @SubscribeMessage(WaitingRoomEvents.StartGame)
-    async handleStartGame(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
+    async handleStartGame(@MessageBody() roomId: string): Promise<{ success: boolean; error?: string }> {
         try {
             const waitingRoom = this.waitingRoomService.findRoomById(roomId);
             if (!waitingRoom.isLocked) {
                 throw new Error(ErrorMessages.RoomNotLocked);
             }
             const gameRoom = await this.gameRoomService.createRoom(waitingRoom);
-
             const sockets = await this.server.in(roomId).fetchSockets();
 
             for (const playerSocket of sockets) {
@@ -185,8 +194,10 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
             this.waitingRoomService.deleteRoom(roomId);
             this.server.to(gameRoom.roomId).emit(GameRoomEvents.GameRoomCreated, gameRoom);
             this.logger.log(`Lancement de la partie liée à la salle ${roomId}`);
+            return { success: true };
         } catch (error) {
-            socket.emit(GameRoomEvents.GameRoomError, error.message);
+            this.logger.error(`Erreur démarrage partie: ${error.message}`);
+            return { success: false, error: error.message };
         }
     }
 

@@ -6,6 +6,7 @@ import { PlayerComponent } from '@app/components/player/player.component';
 import { ActionService } from '@app/services/action.service';
 import { DragDropService } from '@app/services/drag-drop.service';
 import { GameManagerService } from '@app/services/game-manager.service';
+import { MovementService } from '@app/services/movement.service';
 import { PaintService } from '@app/services/paint.service';
 import { MovementSocketService } from '@app/services/socket/movement/movement-socket.service';
 import { Subscription } from 'rxjs';
@@ -33,12 +34,14 @@ export class BoardComponent implements OnInit, OnDestroy {
     selectedCell: Cell | null = null;
     private subscriptions: Subscription[] = [];
 
+    // eslint-disable-next-line max-params
     constructor(
         private paintService: PaintService,
         private dragDropService: DragDropService,
         private actionService: ActionService,
         public gameManagerService: GameManagerService,
-        public movementSocketService: MovementSocketService,
+        private movementSocketService: MovementSocketService,
+        private movementService: MovementService,
     ) {}
 
     get selectedPath() {
@@ -80,6 +83,9 @@ export class BoardComponent implements OnInit, OnDestroy {
 
             if (event.button === 2) {
                 if (this.gameManagerService.room.isDebugging && this.gameManagerService.isPlayerTurn) {
+                    if (!this.movementService.isCellFree(cell)) {
+                        return;
+                    }
                     this.movementSocketService.teleportPlayer(cell.x, cell.y);
                     return;
                 }

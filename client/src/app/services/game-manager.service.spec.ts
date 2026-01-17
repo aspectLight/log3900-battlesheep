@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { provideHttpClient, HttpClient } from '@angular/common/http';
+import { HttpClient, provideHttpClient } from '@angular/common/http';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { GameManagerService } from './game-manager.service';
@@ -13,13 +13,13 @@ import { Game } from '@app/classes/game';
 import { Item } from '@app/classes/item';
 import { Player } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
+import { BonusType } from '@app/constants/bonus.constants';
+import { ITEM_TYPES } from '@app/constants/item.constants';
 import { Room } from '@app/interfaces/room';
 import { of, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { GameRoomService } from './game-room.service';
 import { PathService } from './path.service';
-import { BonusType } from '@app/constants/bonus.constants';
-import { ITEM_TYPES } from '@app/constants/item.constants';
 
 // Constants to avoid magic numbers
 const BOARD_SIZE = 10;
@@ -971,9 +971,10 @@ describe('GameManagerService', () => {
     describe('teleportPlayer', () => {
         it('should call movementService.teleportPlayer with board and destination', () => {
             spyOn(service, 'resetPlayerSelection');
+            movementServiceSpy.selectedPlayer = dummyPlayer;
             service.teleportPlayer(1, 2);
 
-            expect(movementServiceSpy.teleportPlayer).toHaveBeenCalledWith(dummyBoard, 1, 2);
+            expect(movementServiceSpy.teleportPlayer).toHaveBeenCalledWith(dummyBoard, dummyPlayer, 1, 2);
             expect(service.resetPlayerSelection).toHaveBeenCalled();
         });
 

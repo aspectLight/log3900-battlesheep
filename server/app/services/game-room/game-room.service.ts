@@ -14,6 +14,7 @@ export class GameRoomService {
     private gameRooms: GameRoom[] = [];
     private server: Server;
     private turnTimeouts: Map<string, NodeJS.Timeout> = new Map();
+    private roomsEndingTurn: Set<string> = new Set();
 
     constructor(
         private gameService: GameService,
@@ -130,6 +131,12 @@ export class GameRoomService {
             throw new Error(ErrorMessages.GameDoesNotExist);
         }
 
+        // Clear any existing timer first to prevent having multiple timers running at the same time
+        if (room.turnTimer) {
+            clearInterval(room.turnTimer);
+            room.turnTimer = undefined;
+        }
+
         for (const player of room.players) {
             player.movementPoints = player.stats['speed'].value;
         }
@@ -159,6 +166,12 @@ export class GameRoomService {
         const room = this.findRoomById(roomId);
         if (!room) throw new Error(ErrorMessages.GameDoesNotExist);
 
+        // Clear any existing timer first to prevent having multiple timers running at the same time
+        if (room.turnTimer) {
+            clearInterval(room.turnTimer);
+            room.turnTimer = undefined;
+        }
+
         let countdown = TURN_DURATION;
         room.timeRemaining = countdown;
 
@@ -179,11 +192,23 @@ export class GameRoomService {
         if (!room) {
             throw new Error(ErrorMessages.GameDoesNotExist);
         }
-        clearInterval(room.turnTimer);
-        room.globalStats.turns++;
-        room.players.push(room.players.shift());
 
-        this.prepareNextTurn(roomId);
+        if (this.roomsEndingTurn.has(roomId)) {
+            return;
+        }
+
+        this.roomsEndingTurn.add(roomId);
+
+        try {
+            clearInterval(room.turnTimer);
+            room.turnTimer = undefined;
+            room.globalStats.turns++;
+            room.players.push(room.players.shift());
+
+            this.prepareNextTurn(roomId);
+        } finally {
+            this.roomsEndingTurn.delete(roomId);
+        }
     }
 
     isPlayerTurn(roomId: string, playerId: string): boolean {
@@ -274,9 +299,7 @@ export class GameRoomService {
     }
 
     removeItemFromInventory(roomId: string, playerId: string, item: Item, position: Coords) {
-        if (!playerId) {
-            return;
-        }
+        if (!playerId) return;
         const room = this.findRoomById(roomId);
         const player: Player = room.players.find((p) => p.id === playerId);
         const index = player.inventory.findIndex((i) => i.type === item.type);
@@ -366,14 +389,12 @@ export class GameRoomService {
 
     private assignTeam(players: Player[]): Player[] {
         const shuffled = [...players];
-
         for (let i = shuffled.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
 
         const half = shuffled.length / 2;
-
         for (let i = 0; i < shuffled.length; i++) {
             shuffled[i].team = i < half ? 1 : 2;
         }

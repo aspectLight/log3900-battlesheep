@@ -11,10 +11,10 @@ import { CombatService } from '@app/services/combat.service';
 import { GameManagerService } from '@app/services/game-manager.service';
 import { GameRoomService } from '@app/services/game-room.service';
 import { SocketService } from '@app/services/socket.service';
-import { GameRoomEvents } from '@common/socket.constants';
-import { Socket } from 'socket.io-client';
 import { ActionSocketService } from '@app/services/socket/action/action-socket.service';
 import { MovementSocketService } from '@app/services/socket/movement/movement-socket.service';
+import { GameRoomEvents } from '@common/socket.constants';
+import { Socket } from 'socket.io-client';
 
 describe('ActionSocketService', () => {
     let service: ActionSocketService;
@@ -75,13 +75,7 @@ describe('ActionSocketService', () => {
         });
 
         // Create mock socket service with all required methods
-        mockSocketService = jasmine.createSpyObj('SocketService', [
-            'registerSocketService',
-            'getId',
-            'getPlayerMovements',
-            'teleportPlayer',
-            'endPlayerTurn',
-        ]);
+        mockSocketService = jasmine.createSpyObj('SocketService', ['registerSocketService', 'getId', 'getPlayerMovements', 'endPlayerTurn']);
 
         // Set up the socket property in the socket service
         Object.defineProperty(mockSocketService, 'socket', {
@@ -108,8 +102,9 @@ describe('ActionSocketService', () => {
 
         mockGameRoomService = jasmine.createSpyObj('GameRoomService', ['toggleDebugMode', 'setDebugMode']);
 
-        mockMovementSocketService = jasmine.createSpyObj('MovementSocketService', ['getPlayerMovements']);
+        mockMovementSocketService = jasmine.createSpyObj('MovementSocketService', ['getPlayerMovements', 'teleportPlayer']);
         mockMovementSocketService.getPlayerMovements.and.stub();
+        mockMovementSocketService.teleportPlayer.and.returnValue(Promise.resolve());
 
         TestBed.configureTestingModule({
             providers: [
@@ -370,7 +365,7 @@ describe('ActionSocketService', () => {
         it('should handle EndCombat event when current player is not the loser', () => {
             const winnerId = 'opponentId';
             const loserId = 'differentSocketId';
-            
+
             // Set up the loserId property in the mockCombatService
             Object.defineProperty(mockCombatService, 'loserId', {
                 get: () => loserId,
@@ -379,13 +374,13 @@ describe('ActionSocketService', () => {
             triggerSocketEvent(GameRoomEvents.EndCombat, winnerId, loserId);
 
             expect(mockCombatService.handleEnd).toHaveBeenCalledWith(winnerId, loserId);
-            expect(mockSocketService.teleportPlayer).not.toHaveBeenCalled();
+            expect(mockMovementSocketService.teleportPlayer).not.toHaveBeenCalled();
         });
 
         it('should handle EndCombat event when current player is the loser', () => {
             const winnerId = 'opponentId';
             const loserId = 'testSocketId';
-            
+
             // Set up the loserId property in the mockCombatService
             Object.defineProperty(mockCombatService, 'loserId', {
                 get: () => loserId,
@@ -408,14 +403,14 @@ describe('ActionSocketService', () => {
             triggerSocketEvent(GameRoomEvents.EndCombat, winnerId, loserId);
 
             expect(mockCombatService.handleEnd).toHaveBeenCalledWith(winnerId, loserId);
-            expect(mockSocketService.teleportPlayer).toHaveBeenCalledWith(0, 0, loserId);
+            expect(mockMovementSocketService.teleportPlayer).toHaveBeenCalledWith(0, 0, { playerId: loserId });
         });
 
         it('should handle EndCombat event when socket ID matches organizer ID and loser is a virtual player', () => {
             const winnerId = 'opponentId';
             const loserId = 'virtualPlayerId';
             const organisatorId = 'testSocketId';
-            
+
             // Set up the loserId property in the mockCombatService
             Object.defineProperty(mockCombatService, 'loserId', {
                 get: () => loserId,
@@ -448,7 +443,7 @@ describe('ActionSocketService', () => {
             triggerSocketEvent(GameRoomEvents.EndCombat, winnerId, loserId);
 
             expect(mockCombatService.handleEnd).toHaveBeenCalledWith(winnerId, loserId);
-            expect(mockSocketService.teleportPlayer).toHaveBeenCalledWith(10, 20, loserId);
+            expect(mockMovementSocketService.teleportPlayer).toHaveBeenCalledWith(10, 20, { playerId: loserId });
             expect(mockCombatService.loserId).toBe('virtualPlayerId');
             expect(mockSocket.emit).toHaveBeenCalledWith(GameRoomEvents.AddJournalEntry, {
                 roomId: 'testRoomId',
@@ -664,7 +659,7 @@ describe('ActionSocketService', () => {
             const mockAttackPayload = {
                 roomId: combatRoomId,
                 attackValue: 5,
-                defenseValue: 3
+                defenseValue: 3,
             };
             mockCombatService.getVirtualPlayerAttack.and.returnValue(mockAttackPayload);
 

@@ -77,7 +77,6 @@ describe('BoardComponent', () => {
             'getMoveInfo',
         ]);
         socketServiceSpy = jasmine.createSpyObj('SocketService', [
-            'teleportPlayer',
             'movedPlayer',
             'registerSocketService',
             'setUpConnection',
@@ -233,7 +232,6 @@ describe('BoardComponent', () => {
             actionServiceSpy.selectCell.calls.reset();
             actionServiceSpy.toggleSelection.calls.reset();
             actionServiceSpy.interact.calls.reset();
-            socketServiceSpy.teleportPlayer.calls.reset();
             movementSocketServiceSpy.teleportPlayer.calls.reset();
             fixture.detectChanges();
         });

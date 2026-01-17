@@ -86,12 +86,6 @@ export class SocketService implements ISocketService {
         this.gameManagerService.canEndTurn = false;
     }
 
-    teleportPlayer(destinationX: number, destinationY: number, playerId: string, hasCamouflage?: boolean): void {
-        const roomId = this.getRoomId();
-        const destination = { x: destinationX, y: destinationY };
-        this.socket.emit(GameRoomEvents.PlayerTeleported, { roomId, playerId, destination, hasCamouflage });
-    }
-
     finishGame(winnerId: string) {
         const roomId = this.gameManagerService.room.roomId;
         this.socket.emit(GameRoomEvents.FinishGame, { roomId, winnerId });
