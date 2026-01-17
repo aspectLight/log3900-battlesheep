@@ -1,21 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
-import { Socket } from 'socket.io-client';
-import { GameManagerService } from '@app/services/game-manager.service';
-import { SocketService } from '@app/services/socket.service';
-import { MovementSocketService } from './movement-socket.service';
-import { GameRoomEvents } from '@common/socket.constants';
-import { Player } from '@app/classes/player';
-import { Coords } from '@app/interfaces/coords';
-import { Item } from '@app/classes/item';
-import { Tile } from '@app/classes/tile';
 import { Cell } from '@app/classes/cell';
+import { Item } from '@app/classes/item';
+import { Player } from '@app/classes/player';
+import { Tile } from '@app/classes/tile';
+import { Coords } from '@app/interfaces/coords';
+import { GameManagerService } from '@app/services/game-manager.service';
+import { MovementService } from '@app/services/movement.service';
+import { SocketService } from '@app/services/socket.service';
+import { MovementSocketService } from '@app/services/socket/movement-socket.service';
+import { GameRoomEvents } from '@common/socket.constants';
+import { Socket } from 'socket.io-client';
 
 describe('MovementSocketService', () => {
     let service: MovementSocketService;
     let mockGameManagerService: jasmine.SpyObj<GameManagerService>;
+    let mockMovementService: jasmine.SpyObj<MovementService>;
     let mockSocket: jasmine.SpyObj<Socket>;
     let mockSocketService: jasmine.SpyObj<SocketService>;
 
@@ -39,12 +40,15 @@ describe('MovementSocketService', () => {
             'setPaths',
             'setSelectedPathFromCoords',
             'movePlayerFromPath',
-            'teleportPlayer',
             'getRoomId',
             'clearPaths',
             'dropItem',
             'disconnectPlayer',
+            'resetPlayerSelection',
         ]);
+
+        mockMovementService = jasmine.createSpyObj('MovementService', ['teleportPlayer', 'isCellFree']);
+        mockMovementService.isCellFree.and.returnValue(true);
 
         // Add the room property
         Object.defineProperty(mockGameManagerService, 'room', {
@@ -75,6 +79,7 @@ describe('MovementSocketService', () => {
             providers: [
                 MovementSocketService,
                 { provide: GameManagerService, useValue: mockGameManagerService },
+                { provide: MovementService, useValue: mockMovementService },
                 { provide: SocketService, useValue: mockSocketService },
             ],
         });
@@ -118,7 +123,7 @@ describe('MovementSocketService', () => {
             expect(mockSocket.emit).toHaveBeenCalledWith(GameRoomEvents.PlayerGetMovements, {
                 roomId: 'testRoomId',
                 hasBoots: true,
-                hasCamo: true,
+                hasCamouflage: true,
                 hasAirStrike: true,
             });
         });
@@ -126,23 +131,21 @@ describe('MovementSocketService', () => {
         it('should emit PlayerMoved with correct data', () => {
             const roomId = 'testRoomId';
             const playerId = 'testPlayerId';
-            const map = new Map<Coords, Coords[]>();
             const selectedPath: Coords[] = [{ x: 0, y: 0 }];
 
-            service.movedPlayer({ roomId, playerId, map, selectedPath });
+            service.movedPlayer({ roomId, playerId, selectedPath });
 
             expect(mockSocket.emit).toHaveBeenCalledWith(GameRoomEvents.PlayerMoved, {
                 roomId,
                 playerId,
-                serializedMap: Array.from(map.entries()),
                 selectedPath,
             });
         });
 
-        it('should emit PlayerTeleported with correct data when there is no item at destination', () => {
+        it('should emit PlayerTeleported with correct data when there is no item at destination', async () => {
             const destinationX = 5;
             const destinationY = 5;
-            const hasCamo = true;
+            const hasCamouflage = true;
 
             // Create a mock board with a getCell method returning a cell with no item
             const mockCell = new Cell(new Tile('snow'), destinationX, destinationY);
@@ -150,22 +153,25 @@ describe('MovementSocketService', () => {
             const mockBoard = { getCell: jasmine.createSpy('getCell').and.returnValue(mockCell) };
             mockGameManagerService.getBoard.and.returnValue(mockBoard as any);
 
-            service.teleportPlayer(destinationX, destinationY, hasCamo);
+            // Mock emitWithAck to return success
+            mockSocket.emitWithAck = jasmine.createSpy('emitWithAck').and.returnValue(Promise.resolve({ success: true }));
+
+            await service.teleportPlayer(destinationX, destinationY, { hasCamouflage });
 
             // Should emit PlayerTeleported but not ItemCollected
-            expect(mockSocket.emit).toHaveBeenCalledWith(GameRoomEvents.PlayerTeleported, {
+            expect(mockSocket.emitWithAck).toHaveBeenCalledWith(GameRoomEvents.PlayerTeleported, {
                 roomId: 'testRoomId',
                 playerId: mockSocket.id,
                 destination: { x: destinationX, y: destinationY },
-                hasCamo,
+                hasCamouflage,
             });
             expect(mockSocket.emit).not.toHaveBeenCalledWith(GameRoomEvents.ItemCollected, jasmine.any(Object));
         });
 
-        it('should emit both ItemCollected and PlayerTeleported when there is an item at destination', () => {
+        it('should only emit PlayerTeleported when there is an item at destination (item collection handled by server)', async () => {
             const destinationX = 5;
             const destinationY = 5;
-            const hasCamo = true;
+            const hasCamouflage = true;
 
             // Create a mock item
             const mockItem = new Item('flag');
@@ -176,27 +182,25 @@ describe('MovementSocketService', () => {
             const mockBoard = { getCell: jasmine.createSpy('getCell').and.returnValue(mockCell) };
             mockGameManagerService.getBoard.and.returnValue(mockBoard as any);
 
-            service.teleportPlayer(destinationX, destinationY, hasCamo);
+            // Mock emitWithAck to return success
+            mockSocket.emitWithAck = jasmine.createSpy('emitWithAck').and.returnValue(Promise.resolve({ success: true }));
 
-            // Should emit both ItemCollected and PlayerTeleported
-            expect(mockSocket.emit).toHaveBeenCalledWith(GameRoomEvents.ItemCollected, {
-                roomId: 'testRoomId',
-                playerId: mockSocket.id,
-                item: mockItem,
-                position: { x: destinationX, y: destinationY },
-            });
-            expect(mockSocket.emit).toHaveBeenCalledWith(GameRoomEvents.PlayerTeleported, {
+            await service.teleportPlayer(destinationX, destinationY, { hasCamouflage });
+
+            // Should emit PlayerTeleported but not ItemCollected
+            expect(mockSocket.emit).not.toHaveBeenCalledWith(GameRoomEvents.ItemCollected, jasmine.any(Object));
+            expect(mockSocket.emitWithAck).toHaveBeenCalledWith(GameRoomEvents.PlayerTeleported, {
                 roomId: 'testRoomId',
                 playerId: mockSocket.id,
                 destination: { x: destinationX, y: destinationY },
-                hasCamo,
+                hasCamouflage,
             });
         });
 
-        it('should not emit ItemCollected when the item at destination is a spawnPoint', () => {
+        it('should not emit ItemCollected when the item at destination is a spawnPoint', async () => {
             const destinationX = 5;
             const destinationY = 5;
-            const hasCamo = true;
+            const hasCamouflage = true;
 
             // Create a mock spawnPoint item
             const mockItem = new Item('spawnPoint');
@@ -207,15 +211,18 @@ describe('MovementSocketService', () => {
             const mockBoard = { getCell: jasmine.createSpy('getCell').and.returnValue(mockCell) };
             mockGameManagerService.getBoard.and.returnValue(mockBoard as any);
 
-            service.teleportPlayer(destinationX, destinationY, hasCamo);
+            // Mock emitWithAck to return success
+            mockSocket.emitWithAck = jasmine.createSpy('emitWithAck').and.returnValue(Promise.resolve({ success: true }));
+
+            await service.teleportPlayer(destinationX, destinationY, { hasCamouflage });
 
             // Should emit PlayerTeleported but not ItemCollected
             expect(mockSocket.emit).not.toHaveBeenCalledWith(GameRoomEvents.ItemCollected, jasmine.any(Object));
-            expect(mockSocket.emit).toHaveBeenCalledWith(GameRoomEvents.PlayerTeleported, {
+            expect(mockSocket.emitWithAck).toHaveBeenCalledWith(GameRoomEvents.PlayerTeleported, {
                 roomId: 'testRoomId',
                 playerId: mockSocket.id,
                 destination: { x: destinationX, y: destinationY },
-                hasCamo,
+                hasCamouflage,
             });
         });
 
@@ -287,32 +294,6 @@ describe('MovementSocketService', () => {
 
             // eslint-disable-next-line no-console
             expect(console.warn).toHaveBeenCalledWith('Erreur depuis le socket serveur de GameRoomGateway : \n', error);
-        });
-
-        it('should handle PlayerMovements event when not in debug mode', () => {
-            const paths = new Map<Coords, Coords[]>();
-            // Set isDebugging to false in the mock room
-            Object.defineProperty(mockGameManagerService.room, 'isDebugging', {
-                get: () => false,
-            });
-
-            triggerSocketEvent(GameRoomEvents.PlayerMovements, paths);
-
-            expect(mockGameManagerService.setPaths).toHaveBeenCalledWith(paths);
-            expect(mockGameManagerService.clearPaths).not.toHaveBeenCalled();
-        });
-
-        it('should clear paths in debug mode', () => {
-            const paths = new Map<Coords, Coords[]>();
-            // Set isDebugging to true in the mock room
-            Object.defineProperty(mockGameManagerService.room, 'isDebugging', {
-                get: () => true,
-            });
-
-            triggerSocketEvent(GameRoomEvents.PlayerMovements, paths);
-
-            expect(mockGameManagerService.setPaths).not.toHaveBeenCalled();
-            expect(mockGameManagerService.clearPaths).toHaveBeenCalled();
         });
 
         it('should handle PlayerMoved event', () => {
@@ -626,7 +607,10 @@ describe('MovementSocketService', () => {
             mockPlayer.cell = mockCell;
             mockPlayer.spawnPoint = { x: 5, y: 5 };
             mockPlayer.hasItem = jasmine.createSpy('hasItem').and.returnValue(false);
-            const mockBoard = { getPlayerById: jasmine.createSpy('getPlayerById').and.returnValue(mockPlayer) };
+            const mockBoard = {
+                getPlayerById: jasmine.createSpy('getPlayerById').and.returnValue(mockPlayer),
+                getCell: jasmine.createSpy('getCell').and.returnValue(mockCell),
+            };
             mockGameManagerService.getBoard.and.returnValue(mockBoard as any);
 
             // Set isDebugging to false in the mock room
@@ -641,8 +625,7 @@ describe('MovementSocketService', () => {
 
             triggerSocketEvent(GameRoomEvents.PlayerTeleported, data);
 
-            expect(mockGameManagerService.setPlayer).toHaveBeenCalledWith(mockPlayer);
-            expect(mockGameManagerService.teleportPlayer).toHaveBeenCalledWith(data.destination.x, data.destination.y);
+            expect(mockMovementService.teleportPlayer).toHaveBeenCalledWith(mockBoard as any, mockPlayer, data.destination.x, data.destination.y);
         });
 
         it('should return early when player is not found in PlayerTeleported event', () => {
@@ -661,8 +644,7 @@ describe('MovementSocketService', () => {
 
             triggerSocketEvent(GameRoomEvents.PlayerTeleported, data);
 
-            expect(mockGameManagerService.setPlayer).not.toHaveBeenCalled();
-            expect(mockGameManagerService.teleportPlayer).not.toHaveBeenCalled();
+            expect(mockMovementService.teleportPlayer).not.toHaveBeenCalled();
         });
 
         it('should handle VirtualPlayerMoved event', () => {
@@ -783,7 +765,11 @@ describe('MovementSocketService', () => {
 
         it('should handle SynchronizeMovement event when player is found', () => {
             const mockPlayer = new Player();
-            const mockBoard = { getPlayerById: jasmine.createSpy('getPlayerById').and.returnValue(mockPlayer) };
+            const mockCell = new Cell(new Tile('snow'), 10, 15);
+            const mockBoard = {
+                getPlayerById: jasmine.createSpy('getPlayerById').and.returnValue(mockPlayer),
+                getCell: jasmine.createSpy('getCell').and.returnValue(mockCell),
+            };
             mockGameManagerService.getBoard.and.returnValue(mockBoard as any);
 
             const data = {
@@ -793,11 +779,8 @@ describe('MovementSocketService', () => {
 
             triggerSocketEvent(GameRoomEvents.SynchronizeMovement, data);
 
-            // Verify that setPlayer was called with the correct player
-            expect(mockGameManagerService.setPlayer).toHaveBeenCalledWith(mockPlayer);
-
-            // Verify that teleportPlayer was called with the correct coordinates
-            expect(mockGameManagerService.teleportPlayer).toHaveBeenCalledWith(data.destination.x, data.destination.y);
+            // Verify that teleportPlayer was called with the correct parameters
+            expect(mockMovementService.teleportPlayer).toHaveBeenCalledWith(mockBoard as any, mockPlayer, data.destination.x, data.destination.y);
         });
 
         it('should handle SynchronizeMovement event when player is not found', () => {
@@ -811,11 +794,8 @@ describe('MovementSocketService', () => {
 
             triggerSocketEvent(GameRoomEvents.SynchronizeMovement, data);
 
-            // Verify that setPlayer was not called
-            expect(mockGameManagerService.setPlayer).not.toHaveBeenCalled();
-
             // Verify that teleportPlayer was not called
-            expect(mockGameManagerService.teleportPlayer).not.toHaveBeenCalled();
+            expect(mockMovementService.teleportPlayer).not.toHaveBeenCalled();
         });
 
         it('should call finishGame when player has flag and is at spawn point', () => {

@@ -1,22 +1,22 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Board } from '@app/classes/board';
+import { Item } from '@app/classes/item';
 import { ActionsHudComponent } from '@app/components/actions-hud/actions-hud.component';
 import { BoardComponent } from '@app/components/board/board.component';
 import { ChatboxComponent } from '@app/components/chatbox/chatbox.component';
 import { CombatComponent } from '@app/components/combat/combat.component';
 import { GameSettingsComponent } from '@app/components/game-settings/game-settings.component';
+import { LoadingScreenComponent } from '@app/components/loading-screen/loading-screen.component';
 import { NotificationComponent } from '@app/components/notification/notification.component';
 import { PlayerHudComponent } from '@app/components/player-hud/player-hud.component';
+import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
+import { GAME_RESULT_MESSAGES, MODES, OUTCOME } from '@app/constants/game.constants';
+import { ROUTES } from '@app/constants/routes.constants';
 import { CombatService } from '@app/services/combat.service';
 import { GameManagerService } from '@app/services/game-manager.service';
 import { SocketService } from '@app/services/socket.service';
-import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
-import { Item } from '@app/classes/item';
-import { LoadingScreenComponent } from '@app/components/loading-screen/loading-screen.component';
 import { ActionSocketService } from '@app/services/socket/action-socket.service';
-import { ROUTES } from '@app/constants/routes.constants';
-import { GAME_RESULT_MESSAGES, MODES, OUTCOME } from '@app/constants/game.constants';
 @Component({
     selector: 'app-game-play',
     imports: [

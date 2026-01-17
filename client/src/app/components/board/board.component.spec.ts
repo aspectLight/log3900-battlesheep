@@ -1,23 +1,22 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { BoardComponent } from './board.component';
-import { PaintService } from '@app/services/paint.service';
-import { DragDropService } from '@app/services/drag-drop.service';
-import { ActionService } from '@app/services/action.service';
-import { GameManagerService } from '@app/services/game-manager.service';
-import { SocketService } from '@app/services/socket.service';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Board } from '@app/classes/board';
 import { Cell } from '@app/classes/cell';
-import { Tile } from '@app/classes/tile';
 import { Item } from '@app/classes/item';
 import { Player } from '@app/classes/player';
+import { Tile } from '@app/classes/tile';
 import { Room } from '@app/interfaces/room';
-import { BehaviorSubject } from 'rxjs';
-import { MovementSocketService } from '@app/services/socket/movement-socket.service';
-import { Socket } from 'socket.io-client';
+import { ActionService } from '@app/services/action.service';
+import { DragDropService } from '@app/services/drag-drop.service';
+import { GameManagerService } from '@app/services/game-manager.service';
+import { PaintService } from '@app/services/paint.service';
+import { SocketService } from '@app/services/socket.service';
 import { ActionSocketService } from '@app/services/socket/action-socket.service';
+import { MovementSocketService } from '@app/services/socket/movement-socket.service';
+import { BehaviorSubject } from 'rxjs';
+import { Socket } from 'socket.io-client';
+import { BoardComponent } from './board.component';
 
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 describe('BoardComponent', () => {
     let component: BoardComponent;
     let fixture: ComponentFixture<BoardComponent>;
@@ -78,7 +77,6 @@ describe('BoardComponent', () => {
             'getMoveInfo',
         ]);
         socketServiceSpy = jasmine.createSpyObj('SocketService', [
-            'teleportPlayer',
             'movedPlayer',
             'registerSocketService',
             'setUpConnection',
@@ -234,7 +232,6 @@ describe('BoardComponent', () => {
             actionServiceSpy.selectCell.calls.reset();
             actionServiceSpy.toggleSelection.calls.reset();
             actionServiceSpy.interact.calls.reset();
-            socketServiceSpy.teleportPlayer.calls.reset();
             movementSocketServiceSpy.teleportPlayer.calls.reset();
             fixture.detectChanges();
         });

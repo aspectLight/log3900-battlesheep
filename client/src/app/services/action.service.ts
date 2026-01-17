@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Cell } from '@app/classes/cell';
-import { BehaviorSubject } from 'rxjs';
-import { GameManagerService } from './game-manager.service';
-import { CombatService } from './combat.service';
 import { Player } from '@app/classes/player';
-import { SocketService } from './socket.service';
-import { MovementService } from './movement.service';
-import { ActionSocketService } from './socket/action-socket.service';
+import { ActionSocketService } from '@app/services/socket/action-socket.service';
+import { MovementSocketService } from '@app/services/socket/movement-socket.service';
+import { BehaviorSubject } from 'rxjs';
+import { CombatService } from './combat.service';
+import { GameManagerService } from './game-manager.service';
 @Injectable({
     providedIn: 'root',
 })
@@ -23,8 +22,7 @@ export class ActionService {
     constructor(
         private gameManager: GameManagerService,
         private combatService: CombatService,
-        private socketService: SocketService,
-        private movementService: MovementService,
+        private movementSocketService: MovementSocketService,
         private actionSocketService: ActionSocketService,
     ) {}
 
@@ -113,17 +111,17 @@ export class ActionService {
         this.canAct = this.canPlayerAct();
     }
 
-    interact(): void {
+    async interact(): Promise<void> {
         if (!this.player || this.player.actionPoints <= 0 || !this.gameManager.isPlayerTurn) return;
 
         const cell = this.selectedCell.value;
         if (!cell) return;
 
-        const hasCamo = this.player.hasItem('camouflage');
+        const hasCamouflage = this.player.hasItem('camouflage');
         const hasAirStrike = this.player.hasItem('airStrike');
 
         if (!this.isCellCloseToPlayer()) {
-            this.handleRemoteAction(cell, hasAirStrike, hasCamo);
+            await this.handleRemoteAction(cell, hasAirStrike, hasCamouflage);
             return;
         }
 
@@ -202,14 +200,23 @@ export class ActionService {
         return (cell.tile.type === 'door' && (cell.tile.state === 'closed' || cell.tile.state === 'opened') && !cell.player) || cell.player !== null;
     }
 
-    private handleRemoteAction(cell: Cell, hasAirStrike: boolean, hasCamo: boolean): void {
+    private async handleRemoteAction(cell: Cell, hasAirStrike: boolean, hasCamouflage: boolean): Promise<void> {
         if (cell.player && hasAirStrike) {
             this.startCombat(cell);
             this.removeActionPoints();
-        } else if (cell && hasCamo && this.movementService.isCellFree(cell)) {
-            const playerId = cell.player?.id || '';
-            this.socketService.teleportPlayer(cell.x, cell.y, playerId, hasCamo);
-            this.removeActionPoints();
+        } else if (cell && hasCamouflage) {
+            const playerId = this.player?.id || '';
+            try {
+                await this.movementSocketService.teleportPlayer(cell.x, cell.y, { playerId, hasCamouflage });
+                this.removeActionPoints();
+
+                if (this.player && this.player.movementPoints <= 0 && this.player.actionPoints <= 0) {
+                    this.actionSocketService.endPlayerTurn();
+                }
+            } catch (error) {
+                // eslint-disable-next-line no-console
+                console.log('Teleport failed:', error);
+            }
         }
     }
 

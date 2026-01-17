@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Player } from '@app/interfaces/player';
 import { Test, TestingModule } from '@nestjs/testing';
 import { WaitingRoomService } from './waiting-room.service';

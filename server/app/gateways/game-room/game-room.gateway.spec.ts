@@ -453,12 +453,13 @@ describe('GameRoomGateway', () => {
         expect(socket.emit.calledWith(GameRoomEvents.GameRoomError, error.message)).toBeTruthy();
     });
 
-    it('should emit PlayerMovements on success', async () => {
+    it('should return paths via ACK on success', async () => {
         const roomId = 'roomId123';
         const socketId = 'socketXYZ';
         Object.defineProperty(socket, 'id', { value: socketId });
 
-        const mockRoom = { players: [{ id: 'p1' }, { id: 'p2' }] } as Room;
+        const mockPlayer = { id: socketId, hasBoots: false };
+        const mockRoom = { players: [mockPlayer, { id: 'p2' }] } as Room;
         gameRoomService.findRoomById.returns(mockRoom);
 
         const mockPaths = new Map();
@@ -466,18 +467,36 @@ describe('GameRoomGateway', () => {
             { x: 1, y: 1 },
             { x: 1, y: 2 },
         ]);
-        gameMovementService.getAllPaths.resolves(mockPaths);
+        gameMovementService.getAllPaths.returns(mockPaths);
 
-        const emitStub = stub();
-        server.to.returns({ emit: emitStub } as any);
+        const result = await gateway.handlePlayerGetMovements({ roomId, hasBoots: false }, socket);
 
-        await gateway.handlePlayerGetMovements({ roomId, hasBoots: false }, socket);
+        // Verify ACK response
+        expect(result.success).toBe(true);
+        expect(result.paths).toEqual(Array.from(mockPaths.entries()));
+        expect(result.error).toBeUndefined();
 
         expect(gameRoomService.findRoomById.calledWith(roomId)).toBeTruthy();
         expect(gameMovementService.getAllPaths.calledWith(socketId, mockRoom.players)).toBeTruthy();
     });
 
-    it('should emit GameRoomError if an error occurs', async () => {
+    it('should return error ACK if player not found', async () => {
+        const roomId = 'roomId123';
+        const socketId = 'socketXYZ';
+        Object.defineProperty(socket, 'id', { value: socketId });
+
+        const mockRoom = { players: [{ id: 'otherPlayer' }] } as Room;
+        gameRoomService.findRoomById.returns(mockRoom);
+
+        const result = await gateway.handlePlayerGetMovements({ roomId, hasBoots: false }, socket);
+
+        // Verify ACK response
+        expect(result.success).toBe(false);
+        expect(result.error).toBe(ErrorMessages.PlayerNotFound);
+        expect(result.paths).toBeUndefined();
+    });
+
+    it('should return error ACK if an error occurs', async () => {
         const roomId = 'roomId123';
         const socketId = 'socketXYZ';
         Object.defineProperty(socket, 'id', { value: socketId });
@@ -485,11 +504,11 @@ describe('GameRoomGateway', () => {
         const error = new Error('Test error');
         gameRoomService.findRoomById.throws(error);
 
-        socket.emit = stub();
+        const result = await gateway.handlePlayerGetMovements({ roomId, hasBoots: false }, socket);
 
-        await gateway.handlePlayerGetMovements({ roomId, hasBoots: false }, socket);
-
-        expect(socket.emit.calledWith(GameRoomEvents.GameRoomError, error.message)).toBeTruthy();
+        // Verify ACK response
+        expect(result.success).toBe(false);
+        expect(result.error).toBe(error.message);
     });
 
     describe('handlePlayerMoved', () => {
@@ -502,7 +521,7 @@ describe('GameRoomGateway', () => {
         const serializedMap = new Map(); // For simplicity, an empty map
         const data = { roomId, playerId, serializedMap, selectedPath };
 
-        it('should emit PlayerMoved with movementPoints on success', async () => {
+        it('should return success ACK and emit PlayerMoved when validation passes', async () => {
             const fakeRoom = {
                 players: [
                     { id: 'player123', name: 'Player 123' },
@@ -516,29 +535,81 @@ describe('GameRoomGateway', () => {
             } as any;
             gameRoomService.findRoomById.returns(fakeRoom);
 
+            // Mock validation to succeed
+            gameMovementService.validatePath.returns({ isValid: true, cost: 2 });
+
             const expectedMovementPoints = 3;
             gameMovementService.movePlayer.returns(expectedMovementPoints);
 
             const emitStub = stub();
             server.to.returns({ emit: emitStub } as any);
 
-            await gateway.handlePlayerMoved(data, socket);
+            const result = await gateway.handlePlayerMoved(data);
 
-            expect(gameRoomService.findRoomById.calledWith(roomId)).toBeTruthy();
-            expect(gameMovementService.movePlayer.calledWith(socket.id, fakeRoom.players, selectedPath[selectedPath.length - 1])).toBeTruthy();
-            expect(fakeRoom.playersStats[0].tilesVisited.length).toEqual(2);
+            // Verify ACK response
+            expect(result.success).toBe(true);
+            expect(result.movementPoints).toBe(expectedMovementPoints);
+            expect(result.error).toBeUndefined();
+
+            // Verify validation was called
+            expect(gameMovementService.validatePath.calledWith(playerId, selectedPath, fakeRoom.players)).toBeTruthy();
+
+            // Verify movement was executed
+            expect(gameMovementService.movePlayer.calledWith(playerId, fakeRoom.players, selectedPath[selectedPath.length - 1])).toBeTruthy();
+
+            // Verify broadcast
             expect(emitStub.calledWith(GameRoomEvents.PlayerMoved, { ...data, movementPoints: expectedMovementPoints })).toBeTruthy();
         });
 
-        it('should emit GameRoomError if an error occurs', async () => {
-            const error = new Error('Test error');
+        it('should return error ACK when path validation fails', async () => {
+            const fakeRoom = {
+                players: [{ id: 'player123', name: 'Player 123' }],
+                roomId,
+                playersStats: [{ name: 'Player 123', tilesVisited: [] }],
+            } as any;
+            gameRoomService.findRoomById.returns(fakeRoom);
+
+            // Mock validation to fail
+            const validationError = 'Le chemin doit commencer à la position actuelle du joueur.';
+            gameMovementService.validatePath.returns({ isValid: false, error: validationError });
+
+            const result = await gateway.handlePlayerMoved(data);
+
+            // Verify ACK response
+            expect(result.success).toBe(false);
+            expect(result.error).toBe(validationError);
+            expect(result.movementPoints).toBeUndefined();
+            // Verify movePlayer was NOT called
+            expect(gameMovementService.movePlayer.called).toBeFalsy();
+        });
+
+        it('should return error ACK on service exception', async () => {
+            const error = new Error('Service error');
             gameRoomService.findRoomById.throws(error);
 
-            socket.emit = stub();
+            const result = await gateway.handlePlayerMoved(data);
 
-            await gateway.handlePlayerMoved(data, socket);
+            // Verify ACK response
+            expect(result.success).toBe(false);
+            expect(result.error).toBe(error.message);
+        });
 
-            expect(socket.emit.calledWith(GameRoomEvents.GameRoomError, error.message)).toBeTruthy();
+        it('should return error ACK when player is not found in room', async () => {
+            const fakeRoom = {
+                players: [{ id: 'otherPlayer123', name: 'Other Player' }], // Different ID
+                roomId,
+                playersStats: [],
+            } as any;
+            gameRoomService.findRoomById.returns(fakeRoom);
+
+            const result = await gateway.handlePlayerMoved(data);
+
+            // Verify ACK response
+            expect(result.success).toBe(false);
+            expect(result.error).toBe(ErrorMessages.PlayerNotFound);
+
+            // Verify validatePath was NOT called since player check happens first
+            expect(gameMovementService.validatePath.called).toBeFalsy();
         });
     });
 

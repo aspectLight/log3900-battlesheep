@@ -5,7 +5,6 @@ import { Item } from '@app/classes/item';
 import { Tile } from '@app/classes/tile';
 import { AutoTileService } from './auto-tile.service';
 
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 describe('AutoTileService', () => {
     let service: AutoTileService;
     let board: Board;
@@ -15,7 +14,6 @@ describe('AutoTileService', () => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(AutoTileService);
 
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         board = new Board(3);
         wall = new Tile('wall');
     });
@@ -26,7 +24,6 @@ describe('AutoTileService', () => {
 
     it('should not apply if out of bound', () => {
         spyOn(board, 'setTile');
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         service.updateSurroundingTiles(10, 10, board);
         expect(board.setTile).not.toHaveBeenCalled();
     });

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 import { Cell } from '@app/interfaces/cell';
 import { Coords } from '@app/interfaces/coords';

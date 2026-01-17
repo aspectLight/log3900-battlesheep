@@ -118,14 +118,12 @@ describe('GameValidationService', () => {
         });
 
         it('should validate CTF game with required flag and items', () => {
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             board = configureBoard(10, 2, 2, true);
             const itemsTest = service.validateItems(board, true);
             expect(itemsTest.isValid).toBeTrue();
         });
 
         it('should invalidate CTF game without flag', () => {
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             board = configureBoard(10, 2, 2, false);
             const itemsTest = service.validateItems(board, true);
             expect(itemsTest.isValid).toBeFalse();
@@ -133,7 +131,6 @@ describe('GameValidationService', () => {
         });
 
         it('should invalidate CTF game with flag but wrong number of items', () => {
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             board = configureBoard(10, 2, 1, true);
             const itemsTest = service.validateItems(board, true);
             expect(itemsTest.isValid).toBeFalse();
@@ -335,21 +332,21 @@ describe('GameValidationService', () => {
 
             describe('Private methods', () => {
                 const BOARD_SIZE = 5;
-                it('should return false for a door not on the edge', () => {
+                it('should return true for a door not on the edge', () => {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const result = (service as any).isNotOnEdge(2, 2, BOARD_SIZE);
+                    const result = (service as any).isOnEdge(2, 2, BOARD_SIZE);
                     expect(result.isValid).toBeTrue();
                 });
 
                 it('should return false for a door on the top edge', () => {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const result = (service as any).isNotOnEdge(0, 2, BOARD_SIZE);
+                    const result = (service as any).isOnEdge(0, 2, BOARD_SIZE);
                     expect(result).toEqual({ isValid: false, message: 'La porte à (0, 2) est sur le bord du plateau.' });
                 });
 
                 it('should return false for a door on the left edge', () => {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const result = (service as any).isNotOnEdge(1, 0, BOARD_SIZE);
+                    const result = (service as any).isOnEdge(1, 0, BOARD_SIZE);
                     expect(result).toEqual({ isValid: false, message: 'La porte à (1, 0) est sur le bord du plateau.' });
                 });
 

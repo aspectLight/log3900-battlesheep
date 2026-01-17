@@ -71,6 +71,11 @@ export class ActionSocketService implements ISocketService {
         this.socket.emit(GameRoomEvents.AddJournalEntry, { roomId, entry });
     }
 
+    endPlayerTurn(): void {
+        const roomId = this.gameManagerService.room.roomId;
+        this.socketService.endPlayerTurn(roomId);
+    }
+
     private setUpListeners(): void {
         this.socket.on(GameRoomEvents.AttackResult, (data: AttackResult) => {
             this.combatService.handleAttackResult(data);
@@ -96,7 +101,9 @@ export class ActionSocketService implements ISocketService {
             const loser = this.gameManagerService.room.players.find((p) => p.id === loserId);
             const organisatorId = this.gameManagerService.room.organisatorId;
             if (this.socket.id === this.combatService.loserId || (loser?.isVirtual && this.socket.id === organisatorId)) {
-                if (loser) this.socketService.teleportPlayer(loser?.spawnPoint.x, loser?.spawnPoint.y, loser?.id);
+                if (loser) {
+                    this.movementSocketService.teleportPlayer(loser.spawnPoint.x, loser.spawnPoint.y, { playerId: loser.id });
+                }
                 this.combatService.loserId = '';
                 this.addToJournal({
                     type: 'TOUS',

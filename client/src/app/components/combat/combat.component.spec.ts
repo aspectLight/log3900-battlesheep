@@ -16,7 +16,7 @@ import { ActionSocketService } from '@app/services/socket/action-socket.service'
 import { of, Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';
 import { CombatComponent } from './combat.component';
-/* eslint-disable @typescript-eslint/no-magic-numbers */
+
 describe('CombatComponent', () => {
     let component: CombatComponent;
     let fixture: ComponentFixture<CombatComponent>;

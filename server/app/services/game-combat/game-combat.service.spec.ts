@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-lines */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable prettier/prettier */
 import { MAX_TIME, MAX_TIME_WITHOUT_EVASION, MIN_TIME } from '@app/constants/game-combat.constants';
 import { GameRoom } from '@app/interfaces/game-room';

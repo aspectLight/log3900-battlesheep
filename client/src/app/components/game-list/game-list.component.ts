@@ -44,7 +44,7 @@ export class GameListComponent implements OnInit {
         event.stopPropagation();
 
         this.pendingGame = game;
-        this.errorMessage = WARNING_MESSAGES.VisbilityWarning;
+        this.errorMessage = WARNING_MESSAGES.VisibilityWarning;
         this.showError = true;
         this.onConfirm = this.onConfirmVisibility;
     }

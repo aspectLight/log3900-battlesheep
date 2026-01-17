@@ -13,6 +13,7 @@ import { environment } from 'src/environments/environment';
 import { CombatService } from './combat.service';
 import { GameManagerService } from './game-manager.service';
 import { GameRoomService } from './game-room.service';
+import { MovementSocketService } from './socket/movement-socket.service';
 
 @Injectable({
     providedIn: 'root',
@@ -20,6 +21,8 @@ import { GameRoomService } from './game-room.service';
 export class SocketService implements ISocketService {
     socket: Socket;
     private socketServices: ISocketService[] = [];
+
+    private movementSocketService!: MovementSocketService;
 
     constructor(
         private gameRoomService: GameRoomService,
@@ -48,6 +51,9 @@ export class SocketService implements ISocketService {
 
     registerSocketService(service: ISocketService) {
         this.socketServices.push(service);
+        if (service.constructor.name === 'MovementSocketService') {
+            this.movementSocketService = service as MovementSocketService;
+        }
     }
 
     connect() {
@@ -78,12 +84,6 @@ export class SocketService implements ISocketService {
     endPlayerTurn(roomId: string): void {
         this.socket.emit(GameRoomEvents.EndTurn, roomId);
         this.gameManagerService.canEndTurn = false;
-    }
-
-    teleportPlayer(destinationX: number, destinationY: number, playerId: string, hasCamo?: boolean): void {
-        const roomId = this.getRoomId();
-        const destination = { x: destinationX, y: destinationY };
-        this.socket.emit(GameRoomEvents.PlayerTeleported, { roomId, playerId, destination, hasCamo });
     }
 
     finishGame(winnerId: string) {
@@ -284,12 +284,32 @@ export class SocketService implements ISocketService {
     }
 
     private getPlayerMovements() {
-        this.socket.emit(GameRoomEvents.PlayerGetMovements, {
-            roomId: this.getRoomId(),
-            hasBoots: this.gameManagerService.getMainPlayer()?.hasItem('waterproofBoots'),
-            hasCamo: this.gameManagerService.getMainPlayer()?.hasItem('camouflage'),
-            hasAirStrike: this.gameManagerService.getMainPlayer()?.hasItem('airStrike'),
-        });
+        if (this.movementSocketService) {
+            this.movementSocketService.getPlayerMovements();
+        } else {
+            this.socket.emit(
+                GameRoomEvents.PlayerGetMovements,
+                {
+                    roomId: this.getRoomId(),
+                    hasBoots: this.gameManagerService.getMainPlayer()?.hasItem('waterproofBoots'),
+                    hasCamouflage: this.gameManagerService.getMainPlayer()?.hasItem('camouflage'),
+                    hasAirStrike: this.gameManagerService.getMainPlayer()?.hasItem('airStrike'),
+                },
+                (response: { success: boolean; paths?: [Coords, Coords[]][]; error?: string }) => {
+                    if (response.success && response.paths) {
+                        const pathsMap = new Map<Coords, Coords[]>(response.paths);
+                        if (!this.gameManagerService.isDebugMode) {
+                            this.gameManagerService.setPaths(pathsMap);
+                        } else {
+                            this.gameManagerService.clearPaths();
+                        }
+                    } else if (response.error) {
+                        // eslint-disable-next-line no-console
+                        console.error('Error getting player movements:', response.error);
+                    }
+                },
+            );
+        }
     }
 
     private cleanup(): void {

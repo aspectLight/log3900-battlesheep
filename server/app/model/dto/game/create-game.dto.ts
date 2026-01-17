@@ -1,4 +1,4 @@
-import { Board } from '@app/model/schema/board.schema';
+import { Board } from '@app/interfaces/board';
 import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateGameDto {

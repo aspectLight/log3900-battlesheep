@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Player } from '@app/classes/player';

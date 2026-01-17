@@ -302,11 +302,18 @@ export class GameManagerService {
         this.pathService.clearPath();
     }
 
-    teleportPlayer(destinationX: number, destinationY: number) {
+    teleportPlayer(destinationX: number, destinationY: number): void {
         const cell = this.board.getCell(destinationX, destinationY);
-        if (!cell) return;
-        this.handleItemCollection(cell);
-        this.movementService.teleportPlayer(this.board, cell.x, cell.y);
+        if (!cell) {
+            return;
+        }
+
+        const player = this.movementService.selectedPlayer;
+        if (!player) {
+            return;
+        }
+
+        this.movementService.teleportPlayer(this.board, player, destinationX, destinationY);
         this.resetPlayerSelection();
     }
 

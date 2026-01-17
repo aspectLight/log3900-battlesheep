@@ -1,6 +1,5 @@
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Board } from '@app/interfaces/board';
 import { Cell } from '@app/interfaces/cell';
 import { Coords } from '@app/interfaces/coords';
@@ -551,6 +550,214 @@ describe('GameMovementService', () => {
 
     it('should get distance between two coords', () => {
         expect(service.getDistance({ x: 0, y: 0 }, { x: 0, y: 1 })).toEqual(1);
+    });
+
+    describe('validatePath', () => {
+        beforeEach(async () => {
+            const board = createMockBoard();
+            mockGameService.getGameById.mockResolvedValue({ board });
+            await service['loadBoard']('game1');
+        });
+
+        it('should return valid for a legal path with sufficient movement points', () => {
+            const players = createMockPlayers();
+            const path: Coords[] = [
+                { x: 0, y: 0 },
+                { x: 1, y: 0 },
+                { x: 2, y: 0 },
+            ];
+            const result = service.validatePath('player1', path, players);
+            expect(result.isValid).toBe(true);
+            if (result.isValid) {
+                expect(result.cost).toBeGreaterThan(0);
+            }
+        });
+
+        it('should return error if player not found', () => {
+            const players = createMockPlayers();
+            const path: Coords[] = [{ x: 0, y: 0 }];
+            const result = service.validatePath('nonexistent', path, players);
+            expect(result.isValid).toBe(false);
+            if (result.isValid === false) {
+                expect(result.error).toBe(ErrorMessages.PlayerNotFound);
+            }
+        });
+
+        it('should return valid with cost 0 for empty path', () => {
+            const players = createMockPlayers();
+            const path: Coords[] = [];
+            const result = service.validatePath('player1', path, players);
+            expect(result.isValid).toBe(true);
+            if (result.isValid) {
+                expect(result.cost).toBe(0);
+            }
+        });
+
+        it('should return valid with cost 0 for single cell path (no movement)', () => {
+            const players = createMockPlayers();
+            const path: Coords[] = [{ x: 0, y: 0 }];
+            const result = service.validatePath('player1', path, players);
+            expect(result.isValid).toBe(true);
+            if (result.isValid) {
+                expect(result.cost).toBe(0);
+            }
+        });
+
+        it('should return error if path does not start at player position', () => {
+            const players = createMockPlayers();
+            const path: Coords[] = [
+                { x: 1, y: 1 },
+                { x: 2, y: 1 },
+            ];
+            const result = service.validatePath('player1', path, players);
+            expect(result.isValid).toBe(false);
+            if (result.isValid === false) {
+                expect(result.error).toBe(ErrorMessages.PathStartInvalid);
+            }
+        });
+
+        it('should return error for non-adjacent segments (teleport attempt)', () => {
+            const players = createMockPlayers();
+            const path: Coords[] = [
+                { x: 0, y: 0 },
+                { x: 0, y: 1 },
+                { x: 0, y: 3 },
+            ];
+            const result = service.validatePath('player1', path, players);
+            expect(result.isValid).toBe(false);
+            if (result.isValid === false) {
+                expect(result.error).toBe(ErrorMessages.PathNotAdjacent);
+            }
+        });
+
+        it('should return error for path including out-of-bounds cell', () => {
+            const players = createMockPlayers();
+            const path: Coords[] = [
+                { x: 0, y: 0 },
+                { x: -1, y: 0 },
+            ];
+            const result = service.validatePath('player1', path, players);
+            expect(result.isValid).toBe(false);
+            if (result.isValid === false) {
+                expect(result.error).toBe(ErrorMessages.CellNotFound);
+            }
+        });
+
+        it('should return error for path including wall', () => {
+            const players = createMockPlayers();
+            const path: Coords[] = [
+                { x: 0, y: 0 },
+                { x: 0, y: 1 },
+            ];
+            const result = service.validatePath('player1', path, players);
+            expect(result.isValid).toBe(false);
+            if (result.isValid === false) {
+                expect(result.error).toContain("n'est pas accessible");
+            }
+        });
+
+        it('should return error for path including occupied cell', () => {
+            const players = createMockPlayers();
+            const cell = service['getCell'](2, 0);
+            cell.player = players[1];
+            const path: Coords[] = [
+                { x: 0, y: 0 },
+                { x: 1, y: 0 },
+                { x: 2, y: 0 },
+            ];
+            const result = service.validatePath('player1', path, players);
+            expect(result.isValid).toBe(false);
+            if (result.isValid === false) {
+                expect(result.error).toBe(ErrorMessages.CellOccupied);
+            }
+        });
+
+        it('should return error for insufficient movement points', () => {
+            const players = createMockPlayers();
+            players[0].movementPoints = 1;
+            const path: Coords[] = [
+                { x: 0, y: 0 },
+                { x: 1, y: 0 },
+                { x: 2, y: 0 },
+                { x: 3, y: 0 },
+            ];
+            const result = service.validatePath('player1', path, players);
+            expect(result.isValid).toBe(false);
+            if (result.isValid === false) {
+                expect(result.error).toBe(ErrorMessages.InsufficientMovementPoints);
+            }
+        });
+
+        it('should allow player to move to cell they currently occupy', () => {
+            const players = createMockPlayers();
+            const path: Coords[] = [
+                { x: 0, y: 0 },
+                { x: 1, y: 0 },
+                { x: 0, y: 0 },
+            ];
+            const result = service.validatePath('player1', path, players);
+            expect(result.isValid).toBe(true);
+        });
+
+        it('should calculate correct cost for path with different terrain types', () => {
+            const players = createMockPlayers();
+            const path: Coords[] = [
+                { x: 0, y: 0 },
+                { x: 1, y: 0 },
+                { x: 2, y: 0 },
+            ];
+            const result = service.validatePath('player1', path, players);
+            expect(result.isValid).toBe(true);
+            if (result.isValid) {
+                expect(result.cost).toBeGreaterThan(0);
+            }
+        });
+
+        it('should account for boots when calculating cost', () => {
+            const players = createMockPlayers();
+            players[0].hasBoots = true;
+            const board = service['board'];
+            board.matrix[1][0].tile.type = TileType.Water;
+            const path: Coords[] = [
+                { x: 0, y: 0 },
+                { x: 1, y: 0 },
+            ];
+            const result = service.validatePath('player1', path, players);
+            expect(result.isValid).toBe(true);
+            if (result.isValid) {
+                expect(result.cost).toBeLessThan(2);
+            }
+        });
+
+        it('should reject diagonal movement', () => {
+            const players = createMockPlayers();
+            const path: Coords[] = [
+                { x: 0, y: 0 },
+                { x: 1, y: 1 },
+            ];
+            const result = service.validatePath('player1', path, players);
+            expect(result.isValid).toBe(false);
+            if (result.isValid === false) {
+                expect(result.error).toBe(ErrorMessages.PathNotAdjacent);
+            }
+        });
+
+        it('should validate long path correctly', () => {
+            const players = createMockPlayers();
+            players[0].movementPoints = 10;
+            const path: Coords[] = [
+                { x: 0, y: 0 },
+                { x: 1, y: 0 },
+                { x: 2, y: 0 },
+                { x: 3, y: 0 },
+                { x: 4, y: 0 },
+            ];
+            const result = service.validatePath('player1', path, players);
+            expect(result.isValid).toBe(true);
+            if (result.isValid) {
+                expect(result.cost).toBeGreaterThan(0);
+            }
+        });
     });
 
     it('should get door number', () => {

@@ -1,5 +1,5 @@
 export const enum ErrorMessages {
-    RoomDoesNotExist = 'La salle n\'existe pas',
+    RoomDoesNotExist = "La salle n'existe pas",
     PlayerAlreadyInRoom = 'Le joueur est déjà dans la salle',
     HostOnlyLockRoom = "Seul l'organisteur de la partie peut verrouiller la partie",
     HostOnlyKickPlayer = "Seul l'organisteur de la partie peut exclure un joueur",
@@ -19,45 +19,49 @@ export const enum ErrorMessages {
     RoomLocked = 'La salle est verrouillée',
     QuitError = 'Erreur lors de la sortie de la salle',
     GameShouldHaveName = 'Le jeu doit avoir un nom.',
-    GameSoudlHaveDescription = 'Le jeu doit avoir une description.',
+    GameShouldHaveDescription = 'Le jeu doit avoir une description.',
     HalfTilesCoverage = 'Plus de 50% de la surface totale de la zone de jeu doit être occupée par des tuiles de terrain.',
     NoTerrainTiles = "Aucune tuile de terrain n'a été trouvée.",
     RoomAlreadyExists = 'La salle existe déjà',
-    GameDoesNotExist = 'Le jeu n\'existe pas',
+    GameDoesNotExist = "Le jeu n'existe pas",
     NotEnoughSpawnPoints = 'Il doit y avoir au moins un point de départ.',
     PathNotFound = 'Chemin non trouvé',
-    PlayerNotFound = 'Le joueur n\'existe pas',
+    InvalidGame = 'La partie contient des erreurs de validation.',
+    PathStartInvalid = 'Le chemin doit commencer à la position actuelle du joueur.',
+    PathNotAdjacent = 'Les segments du chemin doivent être adjacents.',
+    PlayerNotFound = "Le joueur n'existe pas",
     InsufficientMovementPoints = 'Points de déplacement insuffisants',
     UnreachableDestination = 'Destination inatteignable',
     PathCalculationError = 'Erreur lors du calcul du chemin',
     CellOccupied = 'La cellule est occupée',
-    CellNotFound = 'La cellule n\'existe pas',
-    GameShouldHaveFlag = 'Le jeu doit avoir au moins un drapeau.',
+    CellNotFound = "La cellule n'existe pas",
+    GameShouldHaveFlag = 'Le jeu doit contenir un drapeau.',
     PlainError = 'Une erreur est survenue. Veuillez réessayer.',
     GameAlreadyExists = 'Le jeu existe déjà',
-    InvalidIdFormat = 'Format d\'identifiant invalide',
+    InvalidIdFormat = "Format d'identifiant invalide",
     EmptyRequestBody = 'Le corps de la requête est vide',
     NoGamesFound = 'Aucun jeu trouvé',
-    CombatDoesNotExist = 'Le combat n\'existe pas',
-    RoomNotLocked = 'La salle n\'est pas verrouillée',
+    CombatDoesNotExist = "Le combat n'existe pas",
+    RoomNotLocked = "La salle n'est pas verrouillée",
     SocketIdNotDefined = 'Socket ID non défini !',
-    RoomLockedAddPlayer = 'La salle est verrouillée, impossible d\'ajouter un joueur virtuel.',
-    MaxPlayerLimitReached = 'Le nombre maximum de joueurs a été atteint, impossible de déverouiller la salle.'
+    RoomLockedAddPlayer = "La salle est verrouillée, impossible d'ajouter un joueur virtuel.",
+    MaxPlayerLimitReached = 'Le nombre maximum de joueurs a été atteint, impossible de déverouiller la salle.',
 }
 
 export const SPECIFIC_ERROR = {
-    minSpawnPoints: (requiredPoints: number): string => `Il doit y avoir ${requiredPoints} points de départ.`,
-    minItems: (requiredItems: number): string => `Il doit y avoir ${requiredItems} items.`,
+    spawnPoints: (requiredPoints: { min: number; max: number }): string =>
+        `Il doit y avoir entre ${requiredPoints.min} et ${requiredPoints.max} points de départ.`,
+    items: (requiredItems: number): string => `Il doit y avoir ${requiredItems} items.`,
+    cellNotReachable: (x: number, y: number): string => `La cellule à (${x},${y}) n'est pas accessible.`,
     notOnEdge: (x: number, y: number): string => `La porte à (${x}, ${y}) est sur le bord du plateau.`,
     surroundedByWalls: (x: number, y: number): string => `La porte à (${x}, ${y}) n'est pas entourée par des murs sur le même axe.`,
-    surroundedByTerrain: (x: number, y: number): string => `La porte à (${x}, ${y}) n'est pas entourée par des tuiles de terrain sur le même axe.`,
+    surroundedByTerrain: (x: number, y: number): string => `La porte à (${x}, ${y}) n'est pas entourée par des tuiles de terrain sur l'axe opposé.`,
 };
 
 export const enum WARNING_MESSAGES {
     DeleteWarning = 'Vous allez supprimer ce jeu, voulez vous continuer ?',
-    VisbilityWarning = 'Vous allez modifier la visibilité de ce jeu, voulez vous continuer ?',
+    VisibilityWarning = 'Vous allez modifier la visibilité de ce jeu, voulez vous continuer ?',
     SaveConfirmation = 'Voulez vous sauvegarder les mofification ?',
     QuitEdit = 'Attention, les modifications ne sont pas enregistrées, voulez-vous vraiment quitter ?',
 }
 export const WaitRoomWelcomeMessage = "Bienvenue dans la salle d'attente, partagez le code de la partie avec vos amis !";
-

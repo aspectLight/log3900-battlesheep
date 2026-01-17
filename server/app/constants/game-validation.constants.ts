@@ -1,9 +1,7 @@
-import { TILE_TYPES } from './tile.constants';
-
 export const TILES_COVERAGE_PERCENTAGE = 0.5;
-export const TERRAIN_TILES = Object.keys(TILE_TYPES).filter((key) => ['water', 'ice', 'snow'].includes(key));
-export const ACCESSIBLE_TILES = Object.keys(TILE_TYPES).filter((key) => ['water', 'ice', 'snow', 'door'].includes(key));
-export const WALL_TYPE_TILES = Object.keys(TILE_TYPES).filter((key) => ['wall', 'corner', 'intersection', 'stone', 'tree'].includes(key));
+export const TERRAIN_TILES = ['water', 'ice', 'snow'];
+export const ACCESSIBLE_TILES = ['water', 'ice', 'snow', 'door'];
+export const WALL_TYPE_TILES = ['wall', 'corner', 'intersection', 'stone', 'tree'];
 
 export const BOARD_SIZES = {
     small: 10,

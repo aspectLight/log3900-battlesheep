@@ -3,7 +3,7 @@ import { NotificationComponent } from './notification.component';
 import { provideHttpClient } from '@angular/common/http';
 import { GameManagerService } from '@app/services/game-manager.service';
 import { Subject } from 'rxjs';
-/* eslint-disable @typescript-eslint/no-magic-numbers */
+
 describe('NotificationComponent', () => {
     let component: NotificationComponent;
     let fixture: ComponentFixture<NotificationComponent>;

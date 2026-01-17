@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
+import { Player } from '@app/classes/player';
+import { Reservation } from '@app/interfaces/reservation';
 import { Room } from '@app/interfaces/room';
+import { ISocketService } from '@app/interfaces/socket-service.interface';
+import { GameCreationService } from '@app/services/game-creation.service';
+import { GameManagerService } from '@app/services/game-manager.service';
+import { GameRoomService } from '@app/services/game-room.service';
 import { SocketService } from '@app/services/socket.service';
 import { WaitingRoomService } from '@app/services/waiting-room.service';
+import { ErrorMessages } from '@common/error-messages.constants';
+import { GameRoomEvents, WaitingRoomEvents } from '@common/socket.constants';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Socket } from 'socket.io-client';
-import { Player } from '@app/classes/player';
-import { GameCreationService } from '@app/services/game-creation.service';
-import { GameRoomService } from '@app/services/game-room.service';
-import { GameManagerService } from '@app/services/game-manager.service';
-import { ISocketService } from '@app/interfaces/socket-service.interface';
-import { GameRoomEvents, WaitingRoomEvents } from '@common/socket.constants';
-import { Reservation } from '@app/interfaces/reservation';
-import { ErrorMessages } from '@common/error-messages.constants';
 /* eslint-disable @typescript-eslint/naming-convention */
 const SIZE_LIMITS: Record<number, { min: number; max: number }> = {
     10: { min: 2, max: 2 },
@@ -72,8 +72,11 @@ export class RoomSocketService implements ISocketService {
         return this.socket.id;
     }
 
-    createRoom(roomId: string, gameId: string, organisator: Player) {
-        this.socket.emit(WaitingRoomEvents.CreateWaitingRoom, { roomId, gameId, organisator });
+    async createRoom(roomId: string, gameId: string, organisator: Player): Promise<void> {
+        const result = await this.socket.emitWithAck(WaitingRoomEvents.CreateWaitingRoom, { roomId, gameId, organisator });
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to create waiting room');
+        }
     }
 
     joinRoom(roomId: string, callback: (success: boolean, error?: string) => void): void {
@@ -115,30 +118,36 @@ export class RoomSocketService implements ISocketService {
         this.socket.emit(WaitingRoomEvents.KickPlayer, { roomId, player });
     }
 
-    reserveAvatar(roomId: string, chosenAvatar: string, playerId: string): void {
+    async reserveAvatar(roomId: string, chosenAvatar: string, playerId: string): Promise<void> {
         const currentRoom = this.waitingPlayerService.currentRoom.getValue();
         if (!currentRoom.organisatorId) return;
         if (!this.socket.id) {
             throw new Error(ErrorMessages.SocketIdNotDefined);
         }
 
+        const result = await this.socket.emitWithAck(WaitingRoomEvents.ReserveAvatar, { roomId, chosenAvatar, playerId });
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to reserve avatar');
+        }
+
         const updatedReservations = this.reservedAvatarsSubject.value.concat([{ reservorId: this.socket.id, chosenAvatar }]);
         this.reservedAvatarsSubject.next(updatedReservations);
-
-        this.socket.emit(WaitingRoomEvents.ReserveAvatar, { roomId, chosenAvatar, playerId });
     }
 
     getReservedAvatars(roomId: string): void {
         this.socket.emit(WaitingRoomEvents.GetReservedAvatars, { roomId });
     }
 
-    startGame(roomId: string): void {
+    async startGame(roomId: string): Promise<void> {
         if (
             this.room.players.length <= SIZE_LIMITS[this.gameCreationService.selectedGame.board.size].max &&
             this.room.players.length >= SIZE_LIMITS[this.gameCreationService.selectedGame.board.size].min &&
             this.roomLocked$
         ) {
-            this.socket.emit(WaitingRoomEvents.StartGame, roomId);
+            const result = await this.socket.emitWithAck(WaitingRoomEvents.StartGame, roomId);
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to start game');
+            }
         }
     }
 

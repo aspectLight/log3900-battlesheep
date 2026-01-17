@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 import { GameRoomEvents } from '@app/gateways/game-room/game-room.gateway.events';
 import { WaitingRoomGateway } from '@app/gateways/waiting-room/waiting-room.gateway';
@@ -558,7 +557,6 @@ describe('WaitingRoomGateway', () => {
 
         expect(waitingRoomService.kickPlayer.calledWith(roomId, socketId, playerToKick)).toBeTruthy();
         expect(waitingRoomService.findRoomById.calledWith(roomId)).toBeTruthy();
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(emitStub.callCount).toEqual(3);
         expect(emitStub.firstCall.calledWith(WaitingRoomEvents.PlayerLeft, { playerId: playerToKick.id })).toBeTruthy();
         expect(emitStub.secondCall.calledWith(WaitingRoomEvents.UpdateAvatarReserved, { reservedAvatars })).toBeTruthy();

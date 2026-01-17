@@ -6,7 +6,6 @@ import { Tile } from '@app/classes/tile';
 import { BonusType } from '@app/constants/bonus.constants';
 import { MovementService } from './movement.service';
 
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 describe('MovementService', () => {
     let service: MovementService;
     let mockPlayer: Player;
@@ -84,7 +83,7 @@ describe('MovementService', () => {
         service.selectPlayer(mockPlayer);
         const targetCell = new Cell(new Tile('ice'), 1, 2);
         mockBoard.matrix[1][2] = targetCell;
-        expect(service.teleportPlayer(mockBoard, 1, 2)).toBe(true);
+        expect(service.teleportPlayer(mockBoard, mockPlayer, 1, 2)).toBe(true);
         expect(mockPlayer.cell).toEqual(targetCell);
     });
 
@@ -182,7 +181,7 @@ describe('MovementService', () => {
 
     it('should return false if target cell is not found', () => {
         service.selectPlayer(mockPlayer);
-        const result = service.teleportPlayer(mockBoard, 10, 10);
+        const result = service.teleportPlayer(mockBoard, mockPlayer, 10, 10);
         expect(result).toBeFalse();
     });
 
@@ -190,14 +189,14 @@ describe('MovementService', () => {
         service.selectPlayer(mockPlayer);
         const nonFreeCell = new Cell(new Tile('wall'), 1, 2);
         mockBoard.matrix[1][2] = nonFreeCell;
-        const result = service.teleportPlayer(mockBoard, 1, 2);
+        const result = service.teleportPlayer(mockBoard, mockPlayer, 1, 2);
         expect(result).toBeFalse();
     });
 
     it('should return false if no player is selected', () => {
         // Ensure no player is selected
         service.selectedPlayer = undefined as unknown as Player;
-        const result = service.teleportPlayer(mockBoard, 1, 2);
+        const result = service.teleportPlayer(mockBoard, undefined as unknown as Player, 1, 2);
         expect(result).toBeFalse();
     });
 
@@ -260,5 +259,21 @@ describe('MovementService', () => {
         expect(result).toEqual({ success: false });
         expect(service['isExecutingPath']).toBeFalse();
         expect(service['movingPlayer']).toBeNull();
+    });
+    it('should interrupt movement if the teleported player is currently moving', () => {
+        service.selectPlayer(mockPlayer);
+        // Simulate that the player is currently moving
+        service['movingPlayer'] = mockPlayer;
+        service['isExecutingPath'] = true;
+
+        const targetCell = new Cell(new Tile('ice'), 1, 2);
+        mockBoard.matrix[1][2] = targetCell;
+        // mockPlayer needs a cell to be teleported from
+        mockPlayer.cell = mockCell;
+
+        service.teleportPlayer(mockBoard, mockPlayer, 1, 2);
+
+        expect(service['movingPlayer']).toBeNull();
+        expect(service['isExecutingPath']).toBeFalse();
     });
 });

@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
-import { SocketService } from '@app/services/socket.service';
-import { Socket } from 'socket.io-client';
-import { GameManagerService } from '@app/services/game-manager.service';
-import { ISocketService } from '@app/interfaces/socket-service.interface';
-import { Coords } from '@app/interfaces/coords';
 import { Item } from '@app/classes/item';
-import { GameRoomEvents } from '@common/socket.constants';
 import { Player } from '@app/classes/player';
+import { Coords } from '@app/interfaces/coords';
+import { ISocketService } from '@app/interfaces/socket-service.interface';
+import { GameManagerService } from '@app/services/game-manager.service';
+import { MovementService } from '@app/services/movement.service';
+import { SocketService } from '@app/services/socket.service';
+import { GameRoomEvents } from '@common/socket.constants';
+import { Socket } from 'socket.io-client';
 interface MoveInfo {
     roomId: string;
     playerId: string;
@@ -23,6 +24,7 @@ export class MovementSocketService implements ISocketService {
     constructor(
         private socketService: SocketService,
         private gameManagerService: GameManagerService,
+        private movementService: MovementService,
     ) {
         this.socketService.registerSocketService(this);
         this.setUpConnection();
@@ -40,12 +42,31 @@ export class MovementSocketService implements ISocketService {
         this.setUpListeners();
     }
 
-    getPlayerMovements() {
-        this.socket.emit(GameRoomEvents.PlayerGetMovements, {
-            roomId: this.socketService.getRoomId(),
-            hasBoots: this.gameManagerService.getMainPlayer()?.hasItem('waterproofBoots'),
-            hasCamo: this.gameManagerService.getMainPlayer()?.hasItem('camouflage'),
-            hasAirStrike: this.gameManagerService.getMainPlayer()?.hasItem('airStrike'),
+    async getPlayerMovements(): Promise<{ success: boolean; paths?: [Coords, Coords[]][]; error?: string }> {
+        return new Promise((resolve) => {
+            this.socket.emit(
+                GameRoomEvents.PlayerGetMovements,
+                {
+                    roomId: this.socketService.getRoomId(),
+                    hasBoots: this.gameManagerService.getMainPlayer()?.hasItem('waterproofBoots'),
+                    hasCamouflage: this.gameManagerService.getMainPlayer()?.hasItem('camouflage'),
+                    hasAirStrike: this.gameManagerService.getMainPlayer()?.hasItem('airStrike'),
+                },
+                (response: { success: boolean; paths?: [Coords, Coords[]][]; error?: string }) => {
+                    if (response.success && response.paths) {
+                        const pathsMap = new Map<Coords, Coords[]>(response.paths);
+                        if (!this.gameManagerService.isDebugMode) {
+                            this.gameManagerService.setPaths(pathsMap);
+                        } else {
+                            this.gameManagerService.clearPaths();
+                        }
+                    } else if (response.error) {
+                        // eslint-disable-next-line no-console
+                        console.error('Error getting player movements:', response.error);
+                    }
+                    resolve(response);
+                },
+            );
         });
     }
 
@@ -65,20 +86,62 @@ export class MovementSocketService implements ISocketService {
         return true;
     }
 
-    movedPlayer({ roomId, playerId, map, selectedPath }: MoveInfo): void {
-        const serializedMap = Array.from(map.entries());
-        this.socket.emit(GameRoomEvents.PlayerMoved, { roomId, playerId, serializedMap, selectedPath });
+    async movedPlayer({
+        roomId,
+        playerId,
+        selectedPath,
+    }: Omit<MoveInfo, 'map'>): Promise<{ success: boolean; error?: string; movementPoints?: number }> {
+        return new Promise((resolve) => {
+            this.socket.emit(
+                GameRoomEvents.PlayerMoved,
+                { roomId, playerId, selectedPath },
+                (response: { success: boolean; error?: string; movementPoints?: number }) => {
+                    if (!response.success && response.error) {
+                        // Server rejected the movement - show error to user
+                        // eslint-disable-next-line no-console
+                        console.error('Movement rejected by server:', response.error);
+                        // TODO: Show user-friendly error message via toast/snackbar
+                        // The movement will not be executed since server rejected it
+                    }
+                    // Note: If successful, the server will broadcast PlayerMoved event
+                    // which will be handled by the existing listener
+                    resolve(response);
+                },
+            );
+        });
     }
 
-    teleportPlayer(destinationX: number, destinationY: number, hasCamo?: boolean): void {
+    async teleportPlayer(
+        destinationX: number,
+        destinationY: number,
+        options: {
+            playerId?: string;
+            hasCamouflage?: boolean;
+        } = {},
+    ): Promise<void> {
         const roomId = this.gameManagerService.room.roomId;
-        const playerId = this.socket.id;
+        const playerId = options.playerId || this.socket.id;
         const destination = { x: destinationX, y: destinationY };
-        const item = this.gameManagerService.getBoard().getCell(destinationX, destinationY)?.item;
-        if (item && item.type !== 'spawnPoint') {
-            this.socket.emit(GameRoomEvents.ItemCollected, { roomId, playerId, item, position: destination });
+
+        const destinationCell = this.gameManagerService.getBoard().getCell(destinationX, destinationY);
+        if (!destinationCell) {
+            throw new Error('Invalid destination cell');
         }
-        this.socket.emit(GameRoomEvents.PlayerTeleported, { roomId, playerId, destination, hasCamo });
+
+        if (!this.movementService.isCellFree(destinationCell)) {
+            throw new Error('Destination cell is not free');
+        }
+
+        const result = await this.socket.emitWithAck(GameRoomEvents.PlayerTeleported, {
+            roomId,
+            playerId,
+            destination,
+            hasCamouflage: options.hasCamouflage,
+        });
+
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to teleport player');
+        }
     }
 
     synchronizeMovement(playerId: string, destinationX: number, destinationY: number): void {
@@ -88,7 +151,7 @@ export class MovementSocketService implements ISocketService {
         if (this.gameManagerService.currentPlayerId === this.socket.id) {
             const player = this.gameManagerService.getBoard().getPlayerById(playerId);
             if (!player) return;
-            if (player.movementPoints > 0) this.gameManagerService.canEndTurn = true;
+            this.gameManagerService.canEndTurn = this.canMoveOrAct(player);
         }
     }
 
@@ -104,10 +167,21 @@ export class MovementSocketService implements ISocketService {
             console.warn('Erreur depuis le socket serveur de GameRoomGateway : \n', error);
         });
 
-        this.socket.on(GameRoomEvents.PlayerMovements, (paths) => {
-            const pathsMap = new Map<Coords, Coords[]>(paths);
-            if (!this.gameManagerService.isDebugMode) this.gameManagerService.setPaths(pathsMap);
-            else this.gameManagerService.clearPaths();
+        this.socket.on(GameRoomEvents.TurnStarting, (data) => {
+            const mainPlayer = this.gameManagerService.getMainPlayer();
+            if (mainPlayer && data.nextPlayer.id === mainPlayer.id) {
+                setTimeout(() => {
+                    const currentPlayer = this.gameManagerService.getMainPlayer();
+                    if (!currentPlayer) {
+                        return;
+                    }
+
+                    const canAct = this.canMoveOrAct(currentPlayer);
+                    if (!canAct) {
+                        this.socketService.endPlayerTurn(this.gameManagerService.getRoomId());
+                    }
+                }, 3100);
+            }
         });
 
         this.socket.on(GameRoomEvents.PlayerMoved, (data) => {
@@ -152,12 +226,29 @@ export class MovementSocketService implements ISocketService {
 
         this.socket.on(GameRoomEvents.PlayerTeleported, (data) => {
             const player = this.gameManagerService.getBoard().getPlayerById(data.playerId);
-            if (!player) return;
-            this.gameManagerService.setPlayer(player);
-            this.gameManagerService.teleportPlayer(data.destination.x, data.destination.y);
+            if (!player) {
+                return;
+            }
+
+            const cell = this.gameManagerService.getBoard().getCell(data.destination.x, data.destination.y);
+            if (!cell) return;
+
+            if (cell.item && cell.item.type !== 'spawnPoint') {
+                player.addItem(cell.item);
+                cell.removeItem();
+            }
+
+            this.movementService.teleportPlayer(this.gameManagerService.getBoard(), player, cell.x, cell.y);
+
+            this.gameManagerService.resetPlayerSelection();
 
             if (this.gameManagerService.currentPlayerId === this.socket.id && !this.gameManagerService.room.isDebugging) {
                 this.getPlayerMovements();
+
+                const mainPlayer = this.gameManagerService.getMainPlayer();
+                if (mainPlayer && !this.canMoveOrAct(mainPlayer)) {
+                    this.socketService.endPlayerTurn(this.gameManagerService.getRoomId());
+                }
             }
             this.checkForFlag(player);
         });
@@ -215,16 +306,26 @@ export class MovementSocketService implements ISocketService {
         this.socket.on(GameRoomEvents.SynchronizeMovement, (data) => {
             const player = this.gameManagerService.getBoard().getPlayerById(data.playerId);
             if (!player) return;
-            this.gameManagerService.setPlayer(player);
-            this.gameManagerService.teleportPlayer(data.destination.x, data.destination.y);
+
+            if (player.cell && player.cell.x === data.destination.x && player.cell.y === data.destination.y) {
+                return;
+            }
+
+            const cell = this.gameManagerService.getBoard().getCell(data.destination.x, data.destination.y);
+            if (!cell) return;
+
+            // Teleport player directly
+            this.movementService.teleportPlayer(this.gameManagerService.getBoard(), player, cell.x, cell.y);
         });
     }
 
     private canMoveOrAct(player: Player): boolean {
         if (player.movementPoints > 0) return true;
-        if (player.hasItem('airStrike') || player.hasItem('camouflage')) {
+        const hasActiveItem = player.hasItem('camouflage') || player.hasItem('airStrike');
+        if (player.actionPoints > 0 && hasActiveItem) {
             return true;
         }
+
         if (!player.cell) {
             return false;
         }
@@ -236,7 +337,7 @@ export class MovementSocketService implements ISocketService {
         ];
         for (const direction of directions) {
             const cell = this.gameManagerService.getBoard().getCell(player.cell.x + direction.x, player.cell.y + direction.y);
-            if (cell?.player || cell?.item) {
+            if (cell?.player) {
                 return true;
             }
             if (cell?.tile.type === 'door' && player.actionPoints > 0) {

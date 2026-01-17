@@ -120,54 +120,124 @@ export class GameRoomGateway implements OnGatewayConnection, OnGatewayDisconnect
         }
     }
 
+    /**
+     * Handles the player request for possible movements
+     * @param data The body of the request containing the room id and if the player has boots
+     * @param socket The socket of the player
+     * @returns A promise containing the possible movements
+     */
     @SubscribeMessage(GameRoomEvents.PlayerGetMovements)
-    async handlePlayerGetMovements(@MessageBody() data: { roomId: string; hasBoots: boolean }, @ConnectedSocket() socket: Socket) {
+    async handlePlayerGetMovements(
+        @MessageBody() data: { roomId: string; hasBoots: boolean },
+        @ConnectedSocket() socket: Socket,
+    ): Promise<{ success: boolean; paths?: [Coords, Coords[]][]; error?: string }> {
         try {
             const { roomId, hasBoots } = data;
             const room = this.gameRoomService.findRoomById(roomId);
             const player = room.players.find((p) => p.id === socket.id);
-            if (player) player.hasBoots = hasBoots;
+
+            if (!player) {
+                return { success: false, error: ErrorMessages.PlayerNotFound };
+            }
+
+            player.hasBoots = hasBoots;
             const paths = this.gameMovementService.getAllPaths(socket.id, room.players);
-            this.server.to(socket.id).emit(GameRoomEvents.PlayerMovements, Array.from(paths.entries()));
+
+            return {
+                success: true,
+                paths: Array.from(paths.entries()),
+            };
         } catch (error) {
-            socket.emit(GameRoomEvents.GameRoomError, error.message);
+            return { success: false, error: error.message };
         }
     }
 
+    /**
+     * Handles the player request for moving
+     * @param data The body of the request containing the room id, the player id and the selected path
+     * @returns A promise containing the success status and the movement points
+     */
     @SubscribeMessage(GameRoomEvents.PlayerMoved)
     async handlePlayerMoved(
-        @MessageBody() data: { roomId: string; playerId: string; serializedMap: Map<Coords, Coords[]>; selectedPath: Coords[] },
-        @ConnectedSocket() socket: Socket,
-    ) {
+        @MessageBody() data: { roomId: string; playerId: string; selectedPath: Coords[] },
+    ): Promise<{ success: boolean; error?: string; movementPoints?: number }> {
         try {
-            const room = this.gameRoomService.findRoomById(data.roomId);
-            room.playersStats.forEach((player) => {
-                if (player.name === room.players.find((p) => p.id === data.playerId).name) {
-                    for (const path of data.selectedPath) {
-                        const alreadyVisited = player.tilesVisited.some((tile) => tile.x === path.x && tile.y === path.y);
-                        if (!alreadyVisited) player.tilesVisited.push(path);
-                    }
-                }
-            });
-            const destination = data.selectedPath[data.selectedPath.length - 1];
-            const movementPoints = this.gameMovementService.movePlayer(socket.id, room.players, destination);
-            this.server.to(data.roomId).emit(GameRoomEvents.PlayerMoved, { ...data, movementPoints });
+            const { roomId, playerId, selectedPath } = data;
+            const room = this.gameRoomService.findRoomById(roomId);
+            const player = room.players.find((p) => p.id === playerId);
+
+            if (!player) {
+                return { success: false, error: ErrorMessages.PlayerNotFound };
+            }
+
+            const validation = this.gameMovementService.validatePath(playerId, selectedPath, room.players);
+
+            if (!validation.isValid) {
+                return { success: false, error: validation.isValid === false ? validation.error : '' };
+            }
+
+            const playerStats = room.playersStats.find((p) => p.name === player.name);
+            for (const path of selectedPath) {
+                const alreadyVisited = playerStats.tilesVisited.some((tile) => tile.x === path.x && tile.y === path.y);
+                if (!alreadyVisited) playerStats.tilesVisited.push(path);
+            }
+
+            const destination = selectedPath[selectedPath.length - 1];
+            const movementPoints = this.gameMovementService.movePlayer(playerId, room.players, destination);
+
+            this.server.to(roomId).emit(GameRoomEvents.PlayerMoved, { ...data, movementPoints });
+
+            return { success: true, movementPoints };
         } catch (error) {
-            socket.emit(GameRoomEvents.GameRoomError, error.message);
+            return { success: false, error: error.message };
         }
     }
 
     @SubscribeMessage(GameRoomEvents.PlayerTeleported)
     async handlePlayerTeleported(
-        @MessageBody() data: { roomId: string; playerId: string; destination: Coords; hasCamo?: boolean },
-        @ConnectedSocket() socket: Socket,
-    ) {
+        @MessageBody() data: { roomId: string; playerId: string; destination: Coords; hasCamouflage?: boolean },
+    ): Promise<{ success: boolean; error?: string }> {
         try {
             const room = this.gameRoomService.findRoomById(data.roomId);
+            if (!room) {
+                throw new Error(ErrorMessages.RoomDoesNotExist);
+            }
+
+            const player = room.players.find((p) => p.id === data.playerId);
+            if (!player) {
+                throw new Error(ErrorMessages.PlayerNotFound);
+            }
+
+            if (data.destination.x < 0 || data.destination.y < 0) {
+                throw new Error('Invalid destination coordinates');
+            }
+
+            const destinationCell = this.gameMovementService.getCell(data.destination.x, data.destination.y);
+            const item = destinationCell?.item;
+            const hasCollectableItem = item && item.type !== 'spawnPoint';
+
             this.gameMovementService.movePlayer(data.playerId, room.players, data.destination, true);
+
+            if (hasCollectableItem) {
+                this.gameRoomService.addItemToInventory(data.roomId, data.playerId, item, data.destination);
+                this.server.to(data.roomId).emit(GameRoomEvents.ItemCollected, {
+                    roomId: data.roomId,
+                    playerId: data.playerId,
+                    item,
+                    position: data.destination,
+                });
+
+                if (item.type === 'flag') {
+                    this.server.to(data.roomId).emit(GameRoomEvents.FlagCollected, data.playerId);
+                }
+            }
+
             this.server.to(data.roomId).emit(GameRoomEvents.PlayerTeleported, data);
+
+            return { success: true };
         } catch (error) {
-            socket.emit(GameRoomEvents.GameRoomError, error.message);
+            this.logger.error(`Erreur téléportation: ${error.message}`);
+            return { success: false, error: error.message };
         }
     }
 

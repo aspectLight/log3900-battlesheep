@@ -4,12 +4,12 @@ import { Board } from '@app/classes/board';
 import { Cell } from '@app/classes/cell';
 import { Player } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
+import { ActionSocketService } from '@app/services/socket/action-socket.service';
+import { MovementSocketService } from '@app/services/socket/movement-socket.service';
 import { ActionService } from './action.service';
 import { CombatService } from './combat.service';
 import { GameManagerService } from './game-manager.service';
 import { SocketService } from './socket.service';
-import { ActionSocketService } from './socket/action-socket.service';
-import { MovementSocketService } from './socket/movement-socket.service';
 describe('ActionService', () => {
     let service: ActionService;
     let gameManagerServiceMock: jasmine.SpyObj<GameManagerService>;
@@ -429,34 +429,37 @@ describe('ActionService', () => {
             expect(actionSocketServiceMock.toggleDoor).not.toHaveBeenCalled();
         });
 
-        it('should start combat with air strike when cell is not adjacent and player has air strike item', () => {
+        it('should start combat with air strike when cell is not adjacent and player has air strike item', async () => {
             // Override the spy for this test only
             (service.isCellCloseToPlayer as jasmine.Spy).and.returnValue(false);
 
-            // Add air strike item to player
-            spyOn(mockPlayer, 'hasItem').and.returnValue(true);
+            // Add air strike item to player (but NOT camouflage)
+            spyOn(mockPlayer, 'hasItem').and.callFake((item: string) => item === 'airStrike');
 
             const farCell = new Cell(new Tile('snow'), 2, 0);
             farCell.player = new Player('FarEnemy');
             service.selectSingleCell(farCell);
-            service.interact();
+            await service.interact();
 
             expect(combatServiceMock.startCombat).toHaveBeenCalled();
             expect(mockPlayer.actionPoints).toBe(0);
         });
 
-        it('should teleport player when cell is not adjacent and player has camouflage item', () => {
+        it('should teleport player when cell is not adjacent and player has camouflage item', async () => {
             // Override the spy for this test only
             (service.isCellCloseToPlayer as jasmine.Spy).and.returnValue(false);
 
-            // Add camouflage item to player
-            spyOn(mockPlayer, 'hasItem').and.returnValue(true);
+            // Add camouflage item to player (but NOT air strike)
+            spyOn(mockPlayer, 'hasItem').and.callFake((item: string) => item === 'camouflage');
 
             const farCell = new Cell(new Tile('snow'), 2, 0);
             service.selectSingleCell(farCell);
-            service.interact();
+            await service.interact();
 
-            expect(socketServiceMock.teleportPlayer).toHaveBeenCalledWith(farCell.x, farCell.y, '', true);
+            expect(movementSocketServiceMock.teleportPlayer).toHaveBeenCalledWith(farCell.x, farCell.y, {
+                playerId: mockPlayer.id,
+                hasCamouflage: true,
+            });
             expect(mockPlayer.actionPoints).toBe(0);
         });
 

@@ -13,6 +13,7 @@ import { GameMovementService } from './services/game-movement/game-movement.serv
 import { GameCombatService } from './services/game-combat/game-combat.service';
 import { GameMovementVPService } from './services/virtual-players/game-movement-vp.service';
 import { MovementAlgorithmsService } from './services/movement-algorithms/movement-algorithms.service';
+import { GameValidationService } from './services/game-validation/game-validation.service';
 import { DiceService } from './services/dice.service';
 
 @Module({
@@ -42,6 +43,7 @@ import { DiceService } from './services/dice.service';
         GameMovementVPService,
         MovementAlgorithmsService,
         DiceService,
+        GameValidationService,
     ],
 })
 export class AppModule {}

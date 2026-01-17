@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { TestBed } from '@angular/core/testing';
 import { PathService } from './path.service';
 import { Cell } from '@app/classes/cell';
@@ -197,9 +196,7 @@ describe('PathService', () => {
             expect(allCells).toContain(cellA);
             expect(allCells).toContain(cellB);
             expect(allCells).toContain(cellC);
-            /* eslint-disable @typescript-eslint/no-magic-numbers */
             expect(allCells.length).toBe(3);
-            /* eslint-enable @typescript-eslint/no-magic-numbers */
         });
 
         it('should not include duplicates in the returned array', () => {

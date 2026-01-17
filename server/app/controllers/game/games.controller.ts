@@ -1,12 +1,17 @@
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
+import { GameValidationService } from '@app/services/game-validation/game-validation.service';
 import { GameService } from '@app/services/game/game.service';
+import { ErrorMessages } from '@common/error-messages.constants';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
-import { ErrorMessages } from '@common/error-messages.constants';
+
 @Controller('games')
 export class GameController {
-    constructor(private readonly gameService: GameService) {}
+    constructor(
+        private readonly gameService: GameService,
+        private readonly gameValidationService: GameValidationService,
+    ) {}
 
     @Get()
     async findAllGames(@Res() response: Response) {
@@ -35,6 +40,16 @@ export class GameController {
     @Post()
     async createGame(@Body() createGameDto: CreateGameDto, @Res() response: Response) {
         try {
+            const isCTF = createGameDto.mode === 'ctf';
+            const errors = this.gameValidationService.validateGame(createGameDto.name, createGameDto.description, createGameDto.board, isCTF);
+
+            if (errors.length > 0) {
+                return response.status(HttpStatus.BAD_REQUEST).json({
+                    message: ErrorMessages.InvalidGame,
+                    errors: errors.map((e) => e.message),
+                });
+            }
+
             await this.gameService.createGame(createGameDto);
             return response.status(HttpStatus.CREATED).send();
         } catch (error) {
@@ -47,6 +62,25 @@ export class GameController {
     @Patch(':id')
     async updateGame(@Param('id') id: string, @Body() updateGameDto: UpdateGameDto, @Res() response: Response) {
         try {
+            if (updateGameDto.board !== undefined || updateGameDto.name !== undefined || updateGameDto.description !== undefined) {
+                const existingGame = await this.gameService.getGameById(id);
+
+                const isCTF = existingGame.mode === 'ctf';
+                const errors = this.gameValidationService.validateGame(
+                    updateGameDto.name !== undefined ? updateGameDto.name : existingGame.name,
+                    updateGameDto.description !== undefined ? updateGameDto.description : existingGame.description,
+                    updateGameDto.board !== undefined ? updateGameDto.board : existingGame.board,
+                    isCTF,
+                );
+
+                if (errors.length > 0) {
+                    return response.status(HttpStatus.BAD_REQUEST).json({
+                        message: ErrorMessages.InvalidGame,
+                        errors: errors.map((e) => e.message),
+                    });
+                }
+            }
+
             const updatedGame = await this.gameService.updateGame(id, updateGameDto);
             return response.status(HttpStatus.OK).json(updatedGame);
         } catch (error) {

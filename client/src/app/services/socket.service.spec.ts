@@ -15,9 +15,6 @@ import { CombatService } from './combat.service';
 import { GameCreationService } from './game-creation.service';
 import { GameRoomService } from './game-room.service';
 
-const POSITION_X = 5;
-const POSITION_Y = 10;
-
 /* eslint-disable max-lines */
 describe('SocketService', () => {
     let service: SocketService;
@@ -67,7 +64,6 @@ describe('SocketService', () => {
                 'setPlayer',
                 'setSelectedPathFromCoords',
                 'movePlayerFromPath',
-                'teleportPlayer',
                 'getMainPlayer',
                 'getRoomId',
                 'updateScore',
@@ -213,18 +209,8 @@ describe('SocketService', () => {
         expect(mockSocket.emit).toHaveBeenCalledWith('playerGetMovements', {
             roomId: 'testRoomId',
             hasBoots: false,
-            hasCamo: false,
+            hasCamouflage: false,
             hasAirStrike: false,
-        });
-    });
-
-    it('should emit playerTeleported when teleportPlayer is called', () => {
-        service.teleportPlayer(POSITION_X, POSITION_Y, 'testSocketId');
-        expect(mockSocket.emit).toHaveBeenCalledWith('playerTeleported', {
-            roomId: 'testRoomId',
-            playerId: 'testSocketId',
-            destination: { x: POSITION_X, y: POSITION_Y },
-            hasCamo: undefined,
         });
     });
 
@@ -338,7 +324,7 @@ describe('SocketService', () => {
         expect(mockSocket.emit).toHaveBeenCalledWith('playerGetMovements', {
             roomId: 'testRoomId',
             hasBoots: false,
-            hasCamo: false,
+            hasCamouflage: false,
             hasAirStrike: false,
         });
     });
