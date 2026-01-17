@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Cell } from '@app/classes/cell';
 import { Player } from '@app/classes/player';
-import { ActionSocketService } from '@app/services/socket/action/action-socket.service';
-import { MovementSocketService } from '@app/services/socket/movement/movement-socket.service';
+import { ActionSocketService } from '@app/services/socket/action-socket.service';
+import { MovementSocketService } from '@app/services/socket/movement-socket.service';
 import { BehaviorSubject } from 'rxjs';
 import { CombatService } from './combat.service';
 import { GameManagerService } from './game-manager.service';

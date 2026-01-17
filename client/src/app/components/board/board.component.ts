@@ -8,7 +8,7 @@ import { DragDropService } from '@app/services/drag-drop.service';
 import { GameManagerService } from '@app/services/game-manager.service';
 import { MovementService } from '@app/services/movement.service';
 import { PaintService } from '@app/services/paint.service';
-import { MovementSocketService } from '@app/services/socket/movement/movement-socket.service';
+import { MovementSocketService } from '@app/services/socket/movement-socket.service';
 import { Subscription } from 'rxjs';
 
 @Component({

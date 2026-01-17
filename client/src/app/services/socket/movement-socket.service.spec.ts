@@ -9,7 +9,7 @@ import { Coords } from '@app/interfaces/coords';
 import { GameManagerService } from '@app/services/game-manager.service';
 import { MovementService } from '@app/services/movement.service';
 import { SocketService } from '@app/services/socket.service';
-import { MovementSocketService } from '@app/services/socket/movement/movement-socket.service';
+import { MovementSocketService } from '@app/services/socket/movement-socket.service';
 import { GameRoomEvents } from '@common/socket.constants';
 import { Socket } from 'socket.io-client';
 

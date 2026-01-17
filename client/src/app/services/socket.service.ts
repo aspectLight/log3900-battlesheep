@@ -13,7 +13,7 @@ import { environment } from 'src/environments/environment';
 import { CombatService } from './combat.service';
 import { GameManagerService } from './game-manager.service';
 import { GameRoomService } from './game-room.service';
-import { MovementSocketService } from './socket/movement/movement-socket.service';
+import { MovementSocketService } from './socket/movement-socket.service';
 
 @Injectable({
     providedIn: 'root',

@@ -6,7 +6,7 @@ import { CombatService } from '@app/services/combat.service';
 import { GameManagerService } from '@app/services/game-manager.service';
 import { GameRoomService } from '@app/services/game-room.service';
 import { SocketService } from '@app/services/socket.service';
-import { MovementSocketService } from '@app/services/socket/movement/movement-socket.service';
+import { MovementSocketService } from '@app/services/socket/movement-socket.service';
 import { GameRoomEvents } from '@common/socket.constants';
 import { Observable, Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';

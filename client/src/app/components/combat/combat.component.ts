@@ -2,16 +2,16 @@ import { TitleCasePipe } from '@angular/common';
 import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { Cell } from '@app/classes/cell';
 import { Player } from '@app/classes/player';
+import { ItemCardComponent } from '@app/components/item-card/item-card.component';
 import { BonusType } from '@app/constants/bonus.constants';
+import { CombatState, FEEDBACK_DURATION, NOTIFICATION_DURATION } from '@app/constants/combat.constants';
+import { AttackPayload } from '@app/interfaces/payload';
 import { ActionService } from '@app/services/action.service';
 import { CombatService } from '@app/services/combat.service';
 import { GameManagerService } from '@app/services/game-manager.service';
-import { ActionSocketService } from '@app/services/socket/action/action-socket.service';
 import { SocketService } from '@app/services/socket.service';
+import { ActionSocketService } from '@app/services/socket/action-socket.service';
 import { Subscription } from 'rxjs';
-import { FEEDBACK_DURATION, NOTIFICATION_DURATION, CombatState } from '@app/constants/combat.constants';
-import { AttackPayload } from '@app/interfaces/payload';
-import { ItemCardComponent } from '@app/components/item-card/item-card.component';
 @Component({
     selector: 'app-combat',
     imports: [TitleCasePipe, ItemCardComponent],
