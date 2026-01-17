@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Player } from '@app/classes/player';
 import { BonusType } from '@app/constants/bonus.constants';
+import { ANIMATION_DURATION, CombatState, NOTIFICATION_DURATION } from '@app/constants/combat.constants';
+import { AttackPayload, AttackResult, CombatPayload, CombatRoom, FlightResult } from '@app/interfaces/payload';
 import { Subject } from 'rxjs';
 import { GameManagerService } from './game-manager.service';
-import { ANIMATION_DURATION, NOTIFICATION_DURATION, CombatState } from '@app/constants/combat.constants';
-import { CombatPayload, CombatRoom, AttackResult, AttackPayload, FlightResult } from '@app/interfaces/payload';
 
 @Injectable({
     providedIn: 'root',
@@ -169,15 +169,13 @@ export class CombatService {
         };
     }
 
-    attack(attackValue: number, defenseValue: number): AttackPayload | null {
+    attack(): AttackPayload | null {
         if (!this.isCombatPlayerTurn || !this.enemy) {
             return null;
         }
 
         return {
             roomId: this.combatRoomId,
-            attackValue,
-            defenseValue,
         };
     }
 
@@ -257,17 +255,5 @@ export class CombatService {
         this.isCombatMode = false;
         this.resetStats();
         this.isCombatInitiator = false;
-    }
-
-    getVirtualPlayerAttack(playerAttacking: Player, playerDefending: Player, combatRoomId: string): AttackPayload {
-        const isDebugging = this.gameManagerService.room.isDebugging;
-        const defenseValue = isDebugging ? playerDefending.rollStatDebug(BonusType.Defense) : playerDefending.rollStat(BonusType.Defense);
-        const attackValue = isDebugging ? playerAttacking.rollStatDebug(BonusType.Attack) : playerAttacking.rollStat(BonusType.Attack);
-        const attackInfo: AttackPayload = {
-            roomId: combatRoomId,
-            attackValue,
-            defenseValue,
-        };
-        return attackInfo;
     }
 }

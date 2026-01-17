@@ -62,13 +62,11 @@ export enum GameRoomEvents {
     TurnStarting = 'turnStarting',
     EndTurn = 'endTurn',
     UpdateCountdown = 'updateCountdown',
-    ResumeTurn = 'resumeTurn',
 
     UpdateStartingCountdown = 'updateStartingCountdown',
     StartCombat = 'startCombat',
     CombatTurnStarted = 'combatTurnStarted',
     Attack = 'attack',
-    PerformAttack = 'performAttack',
     AttackResult = 'attackResult',
     FlightAttempt = 'flightAttempt',
     FlightAttemptResult = 'flightAttemptResult',
@@ -97,7 +95,6 @@ export enum GameRoomEvents {
     VirtualPlayerMoved = 'virtualPlayerMoved',
 
     SynchronizeMovement = 'synchronizeMovement',
-    CalculateVirtualPlayerAttack = 'calculateVirtualPlayerAttack',
     VirtualPlayerAttack = 'virtualPlayerAttack',
     StartVirtualCombat = 'startVirtualCombat',
     OrganizatorChanged = 'organizatorChanged',

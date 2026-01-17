@@ -26,3 +26,10 @@ export interface Player {
     hasBoots?: boolean;
     team?: number;
 }
+
+export const enum BonusType {
+    Health = 'health',
+    Speed = 'speed',
+    Attack = 'attack',
+    Defense = 'defense',
+}

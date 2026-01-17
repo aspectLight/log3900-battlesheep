@@ -1,30 +1,39 @@
+/* eslint-disable max-lines */
 import {
     COUNTDOWN_INTERVAL,
     EVASION_PTS,
     FLIGHT_CHANCES,
-    TURN_DURATION,
-    TURN_DURATION_WITHOUT_EVASION,
-    MIN_TIME,
     MAX_TIME,
     MAX_TIME_WITHOUT_EVASION,
+    MIN_TIME,
+    TURN_DURATION,
+    TURN_DURATION_WITHOUT_EVASION,
 } from '@app/constants/game-combat.constants';
 import { Combat } from '@app/interfaces/combat';
 import { GameRoom } from '@app/interfaces/game-room';
-import { Player } from '@app/interfaces/player';
+import { BonusType, Player } from '@app/interfaces/player';
+import { DiceService } from '@app/services/dice.service';
+import { GameMovementService } from '@app/services/game-movement/game-movement.service';
 import { GameRoomService } from '@app/services/game-room/game-room.service';
 import { ErrorMessages } from '@common/error-messages.constants';
 import { GameRoomEvents } from '@common/socket.constants';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Server } from 'socket.io';
 @Injectable()
 export class GameCombatService {
+    private readonly logger = new Logger(GameCombatService.name);
     private attackerHealthPts: number;
     private defenderHealthPts: number;
     private activeCombats: Combat[] = [];
     private server: Server;
     private generalRoom: GameRoom;
+    private combatLocks: Map<string, boolean> = new Map();
 
-    constructor(private gameRoomService: GameRoomService) {}
+    constructor(
+        private gameRoomService: GameRoomService,
+        private diceService: DiceService,
+        private gameMovementService: GameMovementService,
+    ) {}
 
     setServer(server: Server) {
         this.server = server;
@@ -74,21 +83,36 @@ export class GameCombatService {
             throw new Error(ErrorMessages.CombatDoesNotExist);
         }
         const combatRoomId = currentRoom.combatRoomId;
-        const currentPlayerId = currentRoom.currentPlayerId;
-        const currentOpponentId = currentRoom.currentOpponentId;
         const currentPlayer = this.findPlayerById(combatId, currentRoom.currentPlayerId);
-        const isVirtualCombatOnly = this.isVirtualCombatOnly(combatId);
-        const virtualAttackCalculatorId = isVirtualCombatOnly ? this.generalRoom.organisatorId : currentOpponentId;
         const playerInitialHealth = this.isCurrentPlayerAttacker(combatId) ? this.attackerHealthPts : this.defenderHealthPts;
 
         const turnDuration = currentPlayer.evasionPoints > 0 ? TURN_DURATION : TURN_DURATION_WITHOUT_EVASION;
         let countdown = turnDuration;
         const randomDelay = currentPlayer.isVirtual && currentPlayer.evasionPoints > 0 ? this.getRandomDelay(true) : this.getRandomDelay(false);
         currentRoom.turnTimer = setInterval(() => {
+            const combat = this.findCombatRoomById(combatId);
+            if (!combat) {
+                this.logger.warn(`[${combatId}] 🔴 Timer callback - combat not found, clearing timer ${currentRoom.turnTimer}`);
+                clearInterval(currentRoom.turnTimer);
+                return;
+            }
+
+            this.logger.log(
+                `[${combatId}] ⏱️  Timer tick - countdown=${countdown}, turnTimer=${currentRoom.turnTimer}, ` +
+                    `player=${currentPlayer.name}, isVirtual=${currentPlayer.isVirtual}, randomDelay=${randomDelay}`,
+            );
             this.server.to(combatRoomId).emit(GameRoomEvents.UpdateCombatCountDown, countdown);
             countdown--;
             if (countdown < 0 || (currentPlayer.isVirtual && countdown === randomDelay)) {
+                this.logger.warn(
+                    `[${combatId}] 🛑 Timer stopping condition met - countdown=${countdown}, attempting to clear timer ${currentRoom.turnTimer}`,
+                );
                 clearInterval(currentRoom.turnTimer);
+
+                if (!this.findCombatRoomById(combatId)) {
+                    return;
+                }
+
                 if (currentPlayer.isVirtual) {
                     if (
                         currentPlayer.profile === 'defensive' &&
@@ -97,159 +121,231 @@ export class GameCombatService {
                     ) {
                         this.attemptFlight(combatId);
                     } else {
-                        this.server
-                            .to(virtualAttackCalculatorId)
-                            .emit(GameRoomEvents.CalculateVirtualPlayerAttack, isVirtualCombatOnly, currentPlayerId, currentOpponentId, combatRoomId);
+                        this.attack(combatId);
                     }
                 } else {
-                    this.server.to(currentPlayerId).emit(GameRoomEvents.PerformAttack, combatRoomId);
+                    this.attack(combatId);
                 }
             }
         }, COUNTDOWN_INTERVAL);
+        this.logger.log(`[${combatId}] ✅ Timer created: ${currentRoom.turnTimer} for player ${currentPlayer.name}`);
     }
 
-    attack(combatId: string, attackValue: number, defenseValue: number): void {
-        const currentRoom = this.findCombatRoomById(combatId);
-        const currentOpponent = this.findPlayerById(combatId, currentRoom.currentOpponentId);
-        const currentPlayer = this.findPlayerById(combatId, currentRoom.currentPlayerId);
-        const attackResult = attackValue - defenseValue;
-        const room = this.gameRoomService.findRoomById(currentRoom.associatedRoomId);
+    async attack(combatId: string): Promise<void> {
+        this.logger.log(`[${combatId}] ⚔️ ATTACK action requested - attempting to acquire lock`);
+        if (!this.acquireLock(combatId)) {
+            this.logger.error(`[${combatId}] ❌ ATTACK failed - lock acquisition refused`);
+            throw new Error('Combat action already in progress');
+        }
 
-        room.playersStats.forEach((player) => {
-            if (player.name === currentPlayer.name) {
-                player.damage += attackResult;
-            } else if (player.name === currentOpponent.name) {
-                player.healthLost += attackResult;
+        try {
+            const currentRoom = this.findCombatRoomById(combatId);
+
+            if (!currentRoom) {
+                return;
             }
-        });
 
-        const entry = {
-            type: 'COMBAT',
-            content: `${currentPlayer.name} à ${attackResult > 0 ? 'réussi' : 'échoue'} a attaquer ${
-                currentOpponent.name
-            } ! ${attackValue} contre ${defenseValue} !`,
-            time: new Date().toLocaleTimeString('en-GB', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false,
-            }),
-        };
-        this.gameRoomService.addJournalEntry(currentRoom.associatedRoomId, entry);
-        this.server.to(currentRoom.combatRoomId).emit(GameRoomEvents.AddJournalEntry, entry);
+            if (currentRoom.turnTimer) {
+                this.logger.log(`[${combatId}] 🔧 ATTACK clearing timer ${currentRoom.turnTimer}`);
+                clearInterval(currentRoom.turnTimer);
+                currentRoom.turnTimer = undefined;
+                this.logger.log(`[${combatId}] ✓ ATTACK cleared timer, now undefined`);
+            } else {
+                this.logger.warn(`[${combatId}] ⚠️  ATTACK called but turnTimer is already ${currentRoom.turnTimer}`);
+            }
 
-        if (attackResult > 0) {
-            currentOpponent.stats['health'].value -= attackResult;
+            const currentPlayer = this.findPlayerById(combatId, currentRoom.currentPlayerId);
+            const currentOpponent = this.findPlayerById(combatId, currentRoom.currentOpponentId);
+
+            const playerCell = currentPlayer.position ? this.gameMovementService.getCell(currentPlayer.position.x, currentPlayer.position.y) : null;
+
+            const opponentCell = currentOpponent.position
+                ? this.gameMovementService.getCell(currentOpponent.position.x, currentOpponent.position.y)
+                : null;
+
+            const playerTileType = playerCell?.tile?.type || 'snow';
+            const opponentTileType = opponentCell?.tile?.type || 'snow';
+
+            const rooms = this.gameRoomService.findRoomsByPlayerId(currentPlayer.id);
+            const isDebug = rooms.length > 0 ? rooms[0].isDebugging : false;
+
+            const attackValue = isDebug
+                ? this.diceService.rollStatDebug(currentPlayer, BonusType.Attack, playerTileType)
+                : this.diceService.rollStat(currentPlayer, BonusType.Attack, playerTileType);
+
+            const defenseValue = isDebug
+                ? this.diceService.rollStatDebug(currentOpponent, BonusType.Defense, opponentTileType)
+                : this.diceService.rollStat(currentOpponent, BonusType.Defense, opponentTileType);
+
+            const attackResult = attackValue - defenseValue;
+            const damage = Math.max(0, attackResult);
+
+            if (attackResult > 0) {
+                currentOpponent.stats['health'].value -= damage;
+            }
+
+            const room = this.gameRoomService.findRoomById(currentRoom.associatedRoomId);
+            const attackerStats = room.playersStats.find((p) => p.name === currentPlayer.name);
+            const opponentStats = room.playersStats.find((p) => p.name === currentOpponent.name);
+            if (attackerStats) attackerStats.damage += damage;
+            if (opponentStats) opponentStats.healthLost += damage;
+
+            // Ajouter l'entrée de journal
+            const entry = {
+                type: 'COMBAT',
+                content: `${currentPlayer.name} a ${attackResult > 0 ? 'réussi' : 'échoué'} à attaquer ${
+                    currentOpponent.name
+                } ! ${attackValue} contre ${defenseValue} !`,
+                time: new Date().toLocaleTimeString('en-GB', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false,
+                }),
+            };
+            this.gameRoomService.addJournalEntry(currentRoom.associatedRoomId, entry);
+            this.server.to(currentRoom.combatRoomId).emit(GameRoomEvents.AddJournalEntry, entry);
 
             this.server.to(currentRoom.combatRoomId).emit(GameRoomEvents.AttackResult, {
-                isAttackSuccess: true,
+                isAttackSuccess: attackResult > 0,
                 opponentHealthPoints: currentOpponent.stats['health'].value,
                 attackValue,
                 defenseValue,
             });
-        } else {
-            this.server.to(currentRoom.combatRoomId).emit(GameRoomEvents.AttackResult, {
-                isAttackSuccess: false,
-                opponentHealthPoints: currentOpponent.stats['health'].value,
-                attackValue,
-                defenseValue,
-            });
+
+            this.prepareNextTurn(combatId);
+        } finally {
+            this.releaseLock(combatId);
         }
-        this.prepareNextTurn(combatId);
     }
 
-    attemptFlight(combatId: string): void {
-        const currentRoom = this.findCombatRoomById(combatId);
-        const currentPlayer = this.findPlayerById(combatId, currentRoom.currentPlayerId);
-        const flightSuccess = Math.random() <= FLIGHT_CHANCES;
-        const entry = {
-            type: 'COMBAT',
-            content: `Tentative de fuite ! ${currentPlayer.name} à ${flightSuccess ? 'réussi' : 'échoue'} à s'échapper!`,
-            time: new Date().toLocaleTimeString('en-GB', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false,
-            }),
-        };
-        this.gameRoomService.addJournalEntry(currentRoom.associatedRoomId, entry);
-        this.server.to(currentRoom.combatRoomId).emit(GameRoomEvents.AddJournalEntry, entry);
-        if (flightSuccess) {
-            const room = this.gameRoomService.findRoomById(currentRoom.associatedRoomId);
-            room.playersStats.forEach((player) => {
-                if (player.name === currentPlayer.name) {
-                    player.evasions++;
-                }
-            });
-            this.server
-                .to(currentRoom.combatRoomId)
-                .emit(GameRoomEvents.FlightAttemptResult, { isSuccess: true, attackerEvasionPoints: currentPlayer.evasionPoints });
-            this.endCombat(combatId, true);
-            return;
-        } else {
-            currentPlayer.evasionPoints -= 1;
-            this.server
-                .to(currentRoom.combatRoomId)
-                .emit(GameRoomEvents.FlightAttemptResult, { isSuccess: false, attackerEvasionPoints: currentPlayer.evasionPoints });
+    async attemptFlight(combatId: string): Promise<void> {
+        this.logger.log(`[${combatId}] 🏃 FLIGHT action requested - attempting to acquire lock`);
+        if (!this.acquireLock(combatId)) {
+            this.logger.error(`[${combatId}] ❌ FLIGHT failed - lock acquisition refused`);
+            throw new Error('Combat action already in progress');
         }
 
-        this.prepareNextTurn(combatId);
+        try {
+            const currentRoom = this.findCombatRoomById(combatId);
+
+            if (!currentRoom) {
+                return;
+            }
+
+            if (currentRoom.turnTimer) {
+                this.logger.log(`[${combatId}] 🔧 FLIGHT clearing timer ${currentRoom.turnTimer}`);
+                clearInterval(currentRoom.turnTimer);
+                currentRoom.turnTimer = undefined;
+                this.logger.log(`[${combatId}] ✓ FLIGHT cleared timer, now undefined`);
+            } else {
+                this.logger.warn(`[${combatId}] ⚠️  FLIGHT called but turnTimer is already ${currentRoom.turnTimer}`);
+            }
+
+            const currentPlayer = this.findPlayerById(combatId, currentRoom.currentPlayerId);
+            const flightSuccess = Math.random() <= FLIGHT_CHANCES;
+            const entry = {
+                type: 'COMBAT',
+                content: `Tentative de fuite ! ${currentPlayer.name} a ${flightSuccess ? 'réussi' : 'échoué'} à s'échapper!`,
+                time: new Date().toLocaleTimeString('en-GB', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false,
+                }),
+            };
+            this.gameRoomService.addJournalEntry(currentRoom.associatedRoomId, entry);
+            this.server.to(currentRoom.combatRoomId).emit(GameRoomEvents.AddJournalEntry, entry);
+            if (flightSuccess) {
+                const room = this.gameRoomService.findRoomById(currentRoom.associatedRoomId);
+                const playerStats = room.playersStats.find((p) => p.name === currentPlayer.name);
+                if (playerStats) playerStats.evasions++;
+                this.server
+                    .to(currentRoom.combatRoomId)
+                    .emit(GameRoomEvents.FlightAttemptResult, { isSuccess: true, attackerEvasionPoints: currentPlayer.evasionPoints });
+                this.endCombat(combatId, true);
+                return;
+            } else {
+                currentPlayer.evasionPoints -= 1;
+                this.server
+                    .to(currentRoom.combatRoomId)
+                    .emit(GameRoomEvents.FlightAttemptResult, { isSuccess: false, attackerEvasionPoints: currentPlayer.evasionPoints });
+            }
+
+            this.prepareNextTurn(combatId);
+        } finally {
+            this.releaseLock(combatId);
+        }
     }
 
     prepareNextTurn(combatId: string): void {
         const currentRoom = this.findCombatRoomById(combatId);
         const currentOpponent = this.findPlayerById(combatId, currentRoom.currentOpponentId);
+        this.logger.log(`[${combatId}] 🔄 PREPARE_NEXT_TURN - current turnTimer=${currentRoom.turnTimer}`);
         if (currentRoom && currentRoom.turnTimer) {
+            this.logger.log(`[${combatId}] 🔧 PREPARE_NEXT_TURN clearing timer ${currentRoom.turnTimer}`);
             clearInterval(currentRoom.turnTimer);
             currentRoom.turnTimer = undefined;
+            this.logger.log(`[${combatId}] ✓ PREPARE_NEXT_TURN cleared timer`);
+        } else {
+            this.logger.warn(`[${combatId}] ⚠️  PREPARE_NEXT_TURN called but turnTimer is ${currentRoom.turnTimer}`);
         }
         if (currentOpponent.stats['health'].value <= 0) {
+            this.logger.log(`[${combatId}] 💀 Opponent defeated, ending combat`);
             this.endCombat(combatId, false);
             return;
         }
         const temp = currentRoom.currentPlayerId;
         currentRoom.currentPlayerId = currentRoom.currentOpponentId;
         currentRoom.currentOpponentId = temp;
-
+        this.logger.log(`[${combatId}] 🔄 Switching turns, emitting CombatTurnStarted, then starting new turn`);
         this.server.to(currentRoom.combatRoomId).emit(GameRoomEvents.CombatTurnStarted, currentRoom);
         this.startTurn(combatId);
     }
 
     endCombat(combatId: string, isByFlight: boolean): void {
-        this.updateHealthPoints(combatId);
         const currentRoom = this.findCombatRoomById(combatId);
+
+        if (currentRoom?.turnTimer) {
+            clearInterval(currentRoom.turnTimer);
+            currentRoom.turnTimer = undefined;
+        }
+
+        this.updateHealthPoints(combatId);
         const rooms = this.gameRoomService.findRoomsByPlayerId(currentRoom.currentPlayerId);
         const gameRoomId = rooms[0].roomId;
-        this.server.to(gameRoomId).emit(GameRoomEvents.EndCombat, currentRoom.currentPlayerId, currentRoom.currentOpponentId);
+        this.server.to(gameRoomId).emit(GameRoomEvents.EndCombat, currentRoom.currentPlayerId, currentRoom.currentOpponentId, isByFlight);
         if (!this.isVirtualCombatOnly(combatId)) this.server.socketsLeave(currentRoom.combatRoomId);
         this.updateScore(combatId, currentRoom.currentPlayerId, currentRoom.attackerId, isByFlight);
 
         const room = this.gameRoomService.findRoomById(currentRoom.associatedRoomId);
         const winner = currentRoom.players.find((player) => player.id === currentRoom.currentPlayerId);
         const loser = currentRoom.players.find((player) => player.id === currentRoom.currentOpponentId);
-        room.playersStats.forEach((player) => {
-            if (player.name === winner.name) {
-                player.victories++;
-            } else if (player.name === loser.name) {
-                player.defeats++;
-            }
-        });
+        if (!isByFlight) {
+            const winnerStats = room.playersStats.find((p) => p.name === winner.name);
+            const loserStats = room.playersStats.find((p) => p.name === loser.name);
+            if (winnerStats) winnerStats.victories++;
+            if (loserStats) loserStats.defeats++;
+        }
     }
 
     abandonCombat(combatId: string, isByDeath: boolean): void {
         const currentRoom = this.findCombatRoomById(combatId);
-        this.server.to(currentRoom.combatRoomId).emit(GameRoomEvents.EndCombat, currentRoom.currentPlayerId);
+
+        if (currentRoom?.turnTimer) {
+            clearInterval(currentRoom.turnTimer);
+            currentRoom.turnTimer = undefined;
+        }
+
+        this.server.to(currentRoom.combatRoomId).emit(GameRoomEvents.EndCombat, currentRoom.currentPlayerId, currentRoom.currentOpponentId, false);
         this.server.socketsLeave(currentRoom.combatRoomId);
         const room = this.gameRoomService.findRoomById(currentRoom.associatedRoomId);
         const winner = currentRoom.players.find((player) => player.id === currentRoom.currentPlayerId);
         const loser = currentRoom.players.find((player) => player.id === currentRoom.currentOpponentId);
-        room.playersStats.forEach((player) => {
-            if (player.name === winner.name) {
-                player.victories++;
-            } else if (player.name === loser.name) {
-                player.defeats++;
-            }
-        });
+        const winnerStats = room.playersStats.find((p) => p.name === winner.name);
+        const loserStats = room.playersStats.find((p) => p.name === loser.name);
+        if (winnerStats) winnerStats.victories++;
+        if (loserStats) loserStats.defeats++;
         this.updateScore(combatId, currentRoom.currentOpponentId, currentRoom.attackerId, isByDeath);
     }
 
@@ -274,7 +370,6 @@ export class GameCombatService {
         const currentRoom = this.findCombatRoomById(combatId);
         const attacker = this.findPlayerById(combatId, currentRoom.attackerId);
         attacker.stats['health'].value = this.attackerHealthPts;
-
         const defender = this.findPlayerById(combatId, currentRoom.defenderId);
         defender.stats['health'].value = this.defenderHealthPts;
     }
@@ -301,6 +396,10 @@ export class GameCombatService {
         }
         const combatRoom = `combat_${roomId}`;
         const playersFighting = [attacker, defender];
+        const attackerStats = this.generalRoom.playersStats.find((p) => p.name === attacker.name);
+        const defenderStats = this.generalRoom.playersStats.find((p) => p.name === defender.name);
+        if (attackerStats) attackerStats.combats++;
+        if (defenderStats) defenderStats.combats++;
         if (!opponent.isVirtual) {
             const opponentSocket = this.server.sockets.sockets.get(opponentId);
             if (!opponentSocket) {
@@ -341,5 +440,17 @@ export class GameCombatService {
             maxTime = MAX_TIME_WITHOUT_EVASION;
         }
         return Math.floor(Math.random() * (maxTime - minTime + 1));
+    }
+
+    private acquireLock(combatId: string): boolean {
+        if (this.combatLocks.get(combatId)) {
+            return false;
+        }
+        this.combatLocks.set(combatId, true);
+        return true;
+    }
+
+    private releaseLock(combatId: string): void {
+        this.combatLocks.delete(combatId);
     }
 }

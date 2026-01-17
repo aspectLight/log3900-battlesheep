@@ -275,7 +275,7 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
                                 .to(room.roomId)
                                 .emit(WaitingRoomEvents.UpdateAvatarReserved, { reservedAvatars: updatedRoom.reservedAvatars });
                         }
-                        this.logger.log(`Joueur ${socket.id} a quitté la salle ${room.roomId} suite à déconnexion`);
+                        this.logger.log(`Joueur ${socket.id} a quitté la salle ${room.roomId} suite à une déconnexion`);
                     }
                 });
             }

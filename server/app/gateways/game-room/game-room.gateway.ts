@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { MAX_TURN_DELAY, MIN_TURN_DELAY, MS_IN_SECOND, SECONDS_IN_MINUTE } from '@app/constants/game-room.constants';
 import { Coords } from '@app/interfaces/coords';
 import { Item } from '@app/interfaces/item';
@@ -181,45 +182,47 @@ export class GameRoomGateway implements OnGatewayConnection, OnGatewayDisconnect
             const opponentSocket = this.server.sockets.sockets.get(data.opponentId);
             const opponent = generalRoom.players.find((player) => player.id === data.opponentId);
             const playersFighting = [combatStarter, opponent];
-            generalRoom.playersStats.forEach((player) => {
-                if (player.name === combatStarter.name) player.combats++;
-                if (player.name === opponent.name) player.combats++;
-            });
-            if (opponent.isVirtual) return this.gameCombatService.startVirtualCombat(data.roomId, data.opponentId, socket.id, false);
+            if (opponent.isVirtual) {
+                this.gameCombatService.startVirtualCombat(data.roomId, data.opponentId, socket.id, false);
+                return { success: true };
+            }
+            const starterStats = generalRoom.playersStats.find((p) => p.name === combatStarter.name);
+            const opponentStats = generalRoom.playersStats.find((p) => p.name === opponent.name);
+            if (starterStats) starterStats.combats++;
+            if (opponentStats) opponentStats.combats++;
             this.gameRoomService.pauseTimer(data.roomId);
             socket.join(combatRoom);
             opponentSocket.join(combatRoom);
             this.gameCombatService.startCombat(data.roomId, combatRoom, playersFighting, socket.id, data.opponentId);
+            return { success: true };
         } catch (error) {
             socket.emit(GameRoomEvents.GameRoomError, error.message);
+            return { success: false, error: error.message };
         }
     }
 
     @SubscribeMessage(GameRoomEvents.Attack)
-    handleAttack(@MessageBody() data: { roomId: string; attackValue: number; defenseValue: number }, @ConnectedSocket() socket: Socket) {
+    async handleAttack(@MessageBody() data: { roomId: string }, @ConnectedSocket() socket: Socket) {
         try {
-            this.logger.log(`[${data.roomId}] Attack attempt with attack value:  ${data.attackValue} and defense value: ${data.defenseValue}`);
-            this.gameCombatService.attack(data.roomId, data.attackValue, data.defenseValue);
+            this.logger.log(`[${data.roomId}] Attack attempt`);
+            await this.gameCombatService.attack(data.roomId);
+            return { success: true };
         } catch (error) {
+            this.logger.error(`[${data.roomId}] Attack error: ${error.message}`);
             socket.emit(GameRoomEvents.GameRoomError, error.message);
+            return { success: false, error: error.message };
         }
     }
 
     @SubscribeMessage(GameRoomEvents.FlightAttempt)
-    handleFlightAttempt(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
+    async handleFlightAttempt(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
         try {
-            this.gameCombatService.attemptFlight(roomId);
+            await this.gameCombatService.attemptFlight(roomId);
+            return { success: true };
         } catch (error) {
+            this.logger.error(`[${roomId}] Flight error: ${error.message}`);
             socket.emit(GameRoomEvents.GameRoomError, error.message);
-        }
-    }
-
-    @SubscribeMessage(GameRoomEvents.ResumeTurn)
-    handleResumeTurn(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
-        try {
-            this.gameRoomService.resumeTurn(roomId);
-        } catch (error) {
-            socket.emit(GameRoomEvents.GameRoomError, error.message);
+            return { success: false, error: error.message };
         }
     }
 
@@ -359,10 +362,8 @@ export class GameRoomGateway implements OnGatewayConnection, OnGatewayDisconnect
     private handlePlayerAbandonment(roomId: string, playerId: string): boolean {
         const combatRooms = this.gameCombatService.findCombatsByPlayerId(playerId);
         if (combatRooms && combatRooms.length > 0) combatRooms.forEach((combat) => this.gameCombatService.endCombat(combat.combatRoomId, false));
-
         this.gameRoomService.dropItemsWhenDisconnected(roomId, playerId);
         this.gameMovementService.removePlayerFromBoard(playerId);
-
         if (this.gameRoomService.isHost(roomId, playerId)) {
             this.server.to(roomId).emit(GameRoomEvents.DebugModeDisabled);
             this.gameRoomService.changeOrganisator(roomId);

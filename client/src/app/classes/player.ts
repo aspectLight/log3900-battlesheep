@@ -1,10 +1,9 @@
 import { BonusType } from '@app/constants/bonus.constants';
+import { PROPAGANDA_ATTACK_BOOST, PROPAGANDA_DEFENSE_BOOST, VODKA_ATTACK_BOOST, VODKA_SPEED_REDUCTION } from '@app/constants/item.constants';
 import {
     AVATAR_TYPES,
     AvatarType,
     BONUS_VALUE,
-    D4_VALUE,
-    D6_VALUE,
     DEFAULT_ACTION_POINTS,
     DEFAULT_MOVEMENT_POINTS,
     PROPAGANDA_ATTACK_THRESHOLD,
@@ -15,7 +14,6 @@ import { Coords } from '@app/interfaces/coords';
 import { StatInfo } from '@app/interfaces/stat-info';
 import { Entity } from './entity';
 import { Item } from './item';
-import { PROPAGANDA_DEFENSE_BOOST, PROPAGANDA_ATTACK_BOOST, VODKA_ATTACK_BOOST, VODKA_SPEED_REDUCTION } from '@app/constants/item.constants';
 
 export type Orientation = 'up' | 'down' | 'left' | 'right';
 export type PlayerState = 'idle' | 'moving' | 'dead' | 'attacking';
@@ -129,29 +127,6 @@ export class Player extends Entity {
         return this.stats.health.value > 0;
     }
 
-    rollStat(stat: Stats): number {
-        const malus = this.cell?.tile.type === 'ice' ? 2 : 0;
-
-        if (stat === this.d6Choice) {
-            return this.generateDiceValue(D6_VALUE) + this.stats[stat].value - malus;
-        } else {
-            return this.generateDiceValue(D4_VALUE) + this.stats[stat].value - malus;
-        }
-    }
-
-    rollStatDebug(stat: Stats): number {
-        const malus = this.cell?.tile.type === 'ice' ? 2 : 0;
-
-        if (stat === BonusType.Attack) {
-            if (stat === this.d6Choice) return D6_VALUE + this.stats[stat].value - malus;
-            if (stat === this.d4Choice) return D4_VALUE + this.stats[stat].value - malus;
-        } else if (stat === BonusType.Defense) {
-            if (stat === this.d6Choice) return 1 + this.stats[stat].value - malus;
-            if (stat === this.d4Choice) return 1 + this.stats[stat].value - malus;
-        }
-        return 0;
-    }
-
     addItem(item: Item): boolean | (Item | null)[] {
         if (this.inventory[0] === null) {
             this.inventory[0] = item;
@@ -247,10 +222,6 @@ export class Player extends Entity {
 
     private findItem(itemType: string): Item | null {
         return this.inventory.find((item) => item?.type === itemType) || null;
-    }
-
-    private generateDiceValue(diceNumber: number) {
-        return Math.floor(Math.random() * diceNumber) + 1;
     }
 
     private applyBonus(): void {
