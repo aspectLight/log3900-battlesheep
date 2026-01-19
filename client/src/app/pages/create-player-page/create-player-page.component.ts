@@ -1,16 +1,16 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { BonusChoicesComponent } from '@app/components/bonus-choices/bonus-choices.component';
-import { CharacterGridComponent } from '@app/components/character-grid/character-grid.component';
-import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
+import { BonusChoicesComponent } from '@app/components/player/bonus-choices/bonus-choices.component';
+import { CharacterGridComponent } from '@app/components/player/character-grid/character-grid.component';
+import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ErrorMessages } from '@common/error-messages.constants';
 import { ROUTES } from '@app/constants/routes.constants';
-import { Bonus } from '@app/interfaces/character';
-import { GameCreationService } from '@app/services/game-creation.service';
-import { PlayerCreationService } from '@app/services/player-creation.service';
-import { RoomSocketService } from '@app/services/socket/room-socket.service';
-import { Reservation } from '@app/interfaces/reservation';
-import { Player } from '@app/classes/player';
+import { Bonus } from '@app/interfaces/character.interface';
+import { GameCreationService } from '@app/services/lobby/game-creation.service';
+import { PlayerCreationService } from '@app/services/lobby/player-creation.service';
+import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
+import { Reservation } from '@app/interfaces/reservation.interface';
+import { Player } from '@app/classes/entity/player';
 import { BonusType, STAT_WITH_BONUS } from '@app/constants/bonus.constants';
 
 @Component({

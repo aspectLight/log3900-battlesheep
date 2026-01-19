@@ -1,8 +1,6 @@
-export interface ItemType {
-    name: string;
-    description: string;
-    imagePath: string;
-}
+import { ItemType } from '@app/interfaces/item-type.interface';
+
+export { ItemType };
 
 export const ITEM_TYPES: { [key: string]: ItemType } = {
     // Category 1

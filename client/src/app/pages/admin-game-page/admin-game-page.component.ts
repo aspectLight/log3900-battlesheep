@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { GameListComponent } from '@app/components/game-list/game-list.component';
+import { GameListComponent } from '@app/components/editor/game-list/game-list.component';
 import { RouterLink } from '@angular/router';
 
 @Component({

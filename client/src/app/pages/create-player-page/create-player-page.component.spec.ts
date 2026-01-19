@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GameCreationService } from '@app/services/game-creation.service';
-import { PlayerCreationService } from '@app/services/player-creation.service';
+import { GameCreationService } from '@app/services/lobby/game-creation.service';
+import { PlayerCreationService } from '@app/services/lobby/player-creation.service';
 import { CreatePlayerPageComponent } from './create-player-page.component';
 
 import { ElementRef } from '@angular/core';
-import { Player } from '@app/classes/player';
+import { Player } from '@app/classes/entity/player';
 import { ErrorMessages } from '@common/error-messages.constants';
 import { DEFAULT_STATS_VALUE, AVATAR_TYPES } from '@app/constants/player.constants';
 import { ROUTES } from '@app/constants/routes.constants';
 import { Subject } from 'rxjs';
-import { RoomSocketService } from '@app/services/socket/room-socket.service';
+import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
 import { BonusType } from '@app/constants/bonus.constants';
 
 describe('CreatePlayerPageComponent', () => {

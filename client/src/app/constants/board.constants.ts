@@ -1,8 +1,6 @@
-export interface BoardConfig {
-    board: number;
-    players: string;
-    items: number;
-}
+import { BoardConfig } from '@app/interfaces/board-config.interface';
+
+export { BoardConfig };
 
 export enum BoardSizes {
     Petite = 'petite',

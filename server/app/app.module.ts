@@ -1,49 +1,33 @@
-import { GameController } from '@app/controllers/game/games.controller';
-import { Game, gameSchema } from '@app/model/schema/game.schema';
-import { GameService } from '@app/services/game/game.service';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { DateService } from './services/date/date.service';
-import { WaitingRoomGateway } from './gateways/waiting-room/waiting-room.gateway';
-import { WaitingRoomService } from './services/waiting-room/waiting-room.service';
-import { GameRoomGateway } from './gateways/game-room/game-room.gateway';
-import { GameRoomService } from './services/game-room/game-room.service';
-import { GameMovementService } from './services/game-movement/game-movement.service';
-import { GameCombatService } from './services/game-combat/game-combat.service';
-import { GameMovementVPService } from './services/virtual-players/game-movement-vp.service';
-import { MovementAlgorithmsService } from './services/movement-algorithms/movement-algorithms.service';
-import { GameValidationService } from './services/game-validation/game-validation.service';
-import { DiceService } from './services/dice.service';
+import configuration from './config/configuration';
+import { CombatModule } from './modules/combat/combat.module';
+import { GameModule } from './modules/game/game.module';
+import { MovementModule } from './modules/movement/movement.module';
+import { RoomModule } from './modules/room/room.module';
+import { VirtualPlayersModule } from './modules/virtual-players/virtual-players.module';
+import { SharedModule } from './shared/shared.module';
 
 @Module({
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
+            load: [configuration],
         }),
         MongooseModule.forRootAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
             useFactory: async (config: ConfigService) => ({
-                uri: config.get<string>('DATABASE_CONNECTION_STRING'), // Loaded from .env
+                uri: config.get<string>('DATABASE_CONNECTION_STRING'),
             }),
         }),
-        MongooseModule.forFeature([{ name: Game.name, schema: gameSchema }]),
-    ],
-    controllers: [GameController],
-    providers: [
-        GameService,
-        DateService,
-        WaitingRoomGateway,
-        WaitingRoomService,
-        GameRoomGateway,
-        GameRoomService,
-        GameMovementService,
-        GameCombatService,
-        GameMovementVPService,
-        MovementAlgorithmsService,
-        DiceService,
-        GameValidationService,
+        SharedModule,
+        GameModule,
+        CombatModule,
+        MovementModule,
+        RoomModule,
+        VirtualPlayersModule,
     ],
 })
 export class AppModule {}

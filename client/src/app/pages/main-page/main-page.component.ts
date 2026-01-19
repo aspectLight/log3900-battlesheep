@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
-import { GameManagerService } from '@app/services/game-manager.service';
-import { SocketService } from '@app/services/socket.service';
+import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
+import { GameManagerService } from '@app/services/state/game-manager.service';
+import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 
 @Component({
     selector: 'app-main-page',

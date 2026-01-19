@@ -1,3 +1,7 @@
+import { GameResult } from '@app/interfaces/game-result.interface';
+
+export { GameResult };
+
 export enum MODES {
     CLASSIQUE = 'classique',
     CTF = 'ctf',
@@ -11,11 +15,6 @@ export const MODE_DESCRIPTIONS: { [key in MODES]: string } = {
 export enum OUTCOME {
     WIN = 'win',
     LOSE = 'lose',
-}
-
-export interface GameResult {
-    outcome: OUTCOME;
-    victoryType: MODES;
 }
 
 export const GAME_RESULT_MESSAGES: {

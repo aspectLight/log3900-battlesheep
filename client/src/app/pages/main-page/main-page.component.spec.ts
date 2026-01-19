@@ -6,7 +6,7 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { CreateGamePageComponent } from '@app/pages/create-game-page/create-game-page.component';
 import { AdminGamePageComponent } from '@app/pages/admin-game-page/admin-game-page.component';
 import { ROUTES } from '@app/constants/routes.constants';
-import { GameManagerService } from '@app/services/game-manager.service';
+import { GameManagerService } from '@app/services/state/game-manager.service';
 
 const routes: Routes = [
     { path: 'game', component: GamePageComponent },
