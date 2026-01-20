@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
+import { AuthService } from '@app/services/communication/auth.service';
 
 type AvatarOption = { id: string; label: string };
 
@@ -18,15 +19,17 @@ export class SignUpPageComponent {
         { id: 'avatar_05', label: 'Avatar 5' },
     ];
 
-    form = this.fb.group({
-        firstName: ['', [Validators.required, Validators.minLength(2), Validators.pattern(/^[a-zA-Z]+$/)]],
-        lastName: ['', [Validators.required, Validators.minLength(2), Validators.pattern(/^[a-zA-Z]+$/)]],
+    form = this.fb.nonNullable.group({
+        username: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9]+$/)]],
         email: ['', [Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
         password: ['', [Validators.required, Validators.minLength(8)]],
         avatarId: ['', [Validators.required]],
     });
 
-    constructor(private fb: FormBuilder) {}
+    constructor(
+        private fb: FormBuilder,
+        private authService: AuthService,
+    ) {}
 
     get selectedAvatarId(): string {
         return this.form.controls.avatarId.value ?? '';
@@ -37,14 +40,31 @@ export class SignUpPageComponent {
         this.form.controls.avatarId.markAsTouched();
     }
 
-    submitForm() {
+    async submitForm() {
         this.form.markAllAsTouched();
 
         if (this.form.invalid) return;
 
-        const { firstName, lastName, email, password, avatarId } = this.form.getRawValue();
+        const { username, email, password, avatarId } = this.form.getRawValue();
 
         // eslint-disable-next-line no-console
-        console.log({ firstName, lastName, email, password, avatarId });
+        console.log({ username, email, password, avatarId });
+
+        try {
+            const res = await this.authService.register({
+                username,
+                email,
+                password,
+                avatarId,
+            });
+
+            // option: rediriger vers home / create-player / etc.
+            // eslint-disable-next-line no-console
+            console.log('Session créée:', res.sessionId, res.user);
+        } catch (e: unknown) {
+            // pour debug rapide
+            // eslint-disable-next-line no-console
+            console.error(e);
+        }
     }
 }

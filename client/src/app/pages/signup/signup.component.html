@@ -6,32 +6,14 @@
     <div class="content-wrapper">
         <form [formGroup]="form" (ngSubmit)="submitForm()" class="signup-form">
             <div class="field">
-              <label for="firstName">Prénom</label>
-              <input id="firstName" type="text" formControlName="firstName" autocomplete="given-name" />
+              <label for="username">Pseudonyme</label>
+              <input id="username" type="text" formControlName="username" autocomplete="given-name" />
           
-              @if (form.controls.firstName.touched && form.controls.firstName.errors?.['required']) {
+              @if (form.controls.username.touched && form.controls.username.errors?.['required']) {
                 <small class="error">Champ obligatoire</small>
               }
-              @if (form.controls.firstName.touched && form.controls.firstName.errors?.['minlength']) {
-                <small class="error">Minimum 2 caractères</small>
-              }
-              @if (form.controls.firstName.touched && form.controls.firstName.errors?.['pattern']) {
-                <small class="error">Lettres seulement</small>
-              }
-            </div>
-          
-            <div class="field">
-              <label for="lastName">Nom</label>
-              <input id="lastName" type="text" formControlName="lastName" autocomplete="family-name" />
-          
-              @if (form.controls.lastName.touched && form.controls.lastName.errors?.['required']) {
-                <small class="error">Champ obligatoire</small>
-              }
-              @if (form.controls.lastName.touched && form.controls.lastName.errors?.['minlength']) {
-                <small class="error">Minimum 2 caractères</small>
-              }
-              @if (form.controls.lastName.touched && form.controls.lastName.errors?.['pattern']) {
-                <small class="error">Lettres seulement</small>
+              @if (form.controls.username.touched && form.controls.username.errors?.['pattern']) {
+                <small class="error">Caractères spéciaux non autorisés</small>
               }
             </div>
           
