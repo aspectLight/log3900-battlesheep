@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import configuration from './config/configuration';
-import { CombatModule } from './modules/combat/combat.module';
-import { GameModule } from './modules/game/game.module';
-import { MovementModule } from './modules/movement/movement.module';
-import { RoomModule } from './modules/room/room.module';
-import { VirtualPlayersModule } from './modules/virtual-players/virtual-players.module';
-import { SharedModule } from './shared/shared.module';
+import configuration from '@app/config/configuration';
+import { AuthModule } from '@app/modules/auth/auth.module';
+import { CombatModule } from '@app/modules/combat/combat.module';
+import { GameModule } from '@app/modules/game/game.module';
+import { MovementModule } from '@app/modules/movement/movement.module';
+import { RoomModule } from '@app/modules/room/room.module';
+import { VirtualPlayersModule } from '@app/modules/virtual-players/virtual-players.module';
+import { SharedModule } from '@app/shared/shared.module';
 
 @Module({
     imports: [
@@ -23,6 +24,7 @@ import { SharedModule } from './shared/shared.module';
             }),
         }),
         SharedModule,
+        AuthModule,
         GameModule,
         CombatModule,
         MovementModule,
