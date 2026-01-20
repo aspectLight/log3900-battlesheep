@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { EndGameComponent } from '@app/components/end-game/end-game.component';
+import { EndGameComponent } from '@app/components/game/end-game/end-game.component';
 
 @Component({
     imports: [EndGameComponent],

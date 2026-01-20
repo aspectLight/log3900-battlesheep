@@ -1,9 +1,4 @@
-export interface AvatarType {
-    name: string;
-    id: number;
-    avatar: string;
-    avatarFull: string;
-}
+import { AvatarType } from '@app/interfaces/avatar.interface';
 
 export const AVATAR_TYPES: {
     [key: string]: AvatarType;

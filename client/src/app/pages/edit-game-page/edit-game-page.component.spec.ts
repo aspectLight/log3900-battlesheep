@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { EditGamePageComponent } from './edit-game-page.component';
-import { GameEditorComponent } from '@app/components/game-editor/game-editor.component';
+import { GameEditorComponent } from '@app/components/editor/game-editor/game-editor.component';
 import { CommonModule } from '@angular/common';
 import { provideHttpClient } from '@angular/common/http';
-import { GameService } from '@app/services/game.service';
+import { GameService } from '@app/services/editor/game.service';
 import { provideRouter, Router } from '@angular/router';
 import { WARNING_MESSAGES } from '@common/error-messages.constants';
 

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { WaitingPlayerComponent } from '@app/components/waiting-player/waiting-player.component';
+import { WaitingPlayerComponent } from '@app/components/lobby/waiting-player/waiting-player.component';
 
 @Component({
     imports: [WaitingPlayerComponent],

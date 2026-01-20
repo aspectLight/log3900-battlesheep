@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { GameCreatorComponent } from '@app/components/game-creator/game-creator.component';
+import { GameCreatorComponent } from '@app/components/editor/game-creator/game-creator.component';
 
 @Component({
     imports: [GameCreatorComponent],

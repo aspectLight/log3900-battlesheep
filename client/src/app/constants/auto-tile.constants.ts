@@ -8,9 +8,7 @@ export interface CategoryConfig {
     bitmaskMap: Record<number, BitmaskMapping>;
 }
 
-/* eslint-disable @typescript-eslint/no-magic-numbers, 
-                  no-bitwise, 
-                  @typescript-eslint/naming-convention */
+/* eslint-disable no-bitwise, @typescript-eslint/naming-convention */
 export const AUTO_TILE_CONFIG: Record<string, CategoryConfig> = {
     wall: {
         use8Directions: false,

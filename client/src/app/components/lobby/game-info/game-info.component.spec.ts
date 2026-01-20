@@ -1,0 +1,90 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
+import { Board } from '@app/classes/board/board';
+import { Player } from '@app/classes/entity/player';
+import { Game } from '@app/classes/game/game';
+import { Room } from '@app/interfaces/room.interface';
+import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
+import { GameManagerService } from '@app/services/state/game-manager.service';
+import { GameInfoComponent } from './game-info.component';
+
+describe('GameInfoComponent', () => {
+    let component: GameInfoComponent;
+    let fixture: ComponentFixture<GameInfoComponent>;
+    let socketServiceSpy: jasmine.SpyObj<SocketService>;
+    let gameManagerServiceSpy: jasmine.SpyObj<GameManagerService>;
+    let routerSpy: jasmine.SpyObj<Router>;
+
+    const mockRoom = {
+        roomId: 'roomId',
+        gameId: '1',
+        hostId: '0',
+        players: [new Player(), new Player(), new Player()],
+        isLocked: false,
+        isDebugging: false,
+    } as Room;
+
+    class MockGame {
+        _id = 'mockId';
+        name = 'mockGame';
+        description = 'mockDescription';
+        mode = 'mockMode';
+        isVisible = false;
+        modificationDate = 'mockDate';
+    }
+    const mockBoard = new Board(3);
+
+    beforeEach(async () => {
+        socketServiceSpy = jasmine.createSpyObj('SocketService', ['abandonGame']);
+        gameManagerServiceSpy = jasmine.createSpyObj('GameManagerService', ['getGame', 'getRoomId', 'getBoard']);
+        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+
+        await TestBed.configureTestingModule({
+            imports: [GameInfoComponent],
+            providers: [
+                { provide: Game, useClass: MockGame },
+                { provide: SocketService, useValue: socketServiceSpy },
+                { provide: GameManagerService, useValue: gameManagerServiceSpy },
+                { provide: Router, useValue: routerSpy },
+            ],
+        }).compileComponents();
+
+        gameManagerServiceSpy.getRoomId.and.returnValue('roomId');
+        gameManagerServiceSpy.getGame.and.returnValue(new MockGame() as Game);
+        gameManagerServiceSpy.getBoard.and.returnValue(mockBoard);
+        gameManagerServiceSpy.room = mockRoom; // Fix: Initialize room with players
+
+        fixture = TestBed.createComponent(GameInfoComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
+
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
+
+    it('should return the game title', () => {
+        expect(component.title).toBe('mockGame');
+    });
+
+    it('should return the game description with player count', () => {
+        expect(component.description).toBe('mockDescription\n\nJoueurs: 3\nJoueur actif: undefined\nTaille du plateau: 3x3');
+    });
+
+    it('should return the room ID', () => {
+        expect(component.roomId).toBe('roomId');
+    });
+
+    it('should toggle isSettingsClicked when toggleSettings is called', () => {
+        component.toggleSettings();
+        expect(component.isSettingsClicked).toBeTrue();
+        component.toggleSettings();
+        expect(component.isSettingsClicked).toBeFalse();
+    });
+
+    it('should call socketService.abandonGame and navigate to home when quitGame is called', () => {
+        component.quitGame();
+        expect(socketServiceSpy.abandonGame).toHaveBeenCalledWith('roomId');
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/home']);
+    });
+});
