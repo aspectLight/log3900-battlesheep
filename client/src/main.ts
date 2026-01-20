@@ -15,6 +15,8 @@ import { JoinGamePageComponent } from '@app/pages/join-game-page/join-game-page.
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { WaitingPlayerPageComponent } from '@app/pages/waiting-player-page/waiting-player-page.component';
 import { SignUpPageComponent } from '@app/pages/signup/signup.component';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideAuth, getAuth } from '@angular/fire/auth';
 import { environment } from './environments/environment';
 
 if (environment.production) {
@@ -38,5 +40,5 @@ const routes: Routes = [
 ];
 
 bootstrapApplication(AppComponent, {
-    providers: [provideHttpClient(), provideRouter(routes, withHashLocation(), withPreloading(PreloadAllModules)), provideAnimations()],
+    providers: [provideHttpClient(), provideRouter(routes, withHashLocation(), withPreloading(PreloadAllModules)), provideAnimations(), provideFirebaseApp(() => initializeApp(environment.firebase)), provideAuth(() => getAuth())],
 })
