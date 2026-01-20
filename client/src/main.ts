@@ -14,6 +14,7 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { JoinGamePageComponent } from '@app/pages/join-game-page/join-game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { WaitingPlayerPageComponent } from '@app/pages/waiting-player-page/waiting-player-page.component';
+import { SignUpPageComponent } from '@app/pages/signup/signup.component';
 import { environment } from './environments/environment';
 
 if (environment.production) {
@@ -32,6 +33,7 @@ const routes: Routes = [
     { path: 'edit-game', component: EditGamePageComponent },
     { path: 'game', component: GamePageComponent },
     { path: 'end-game', component: EndGamePageComponent },
+    { path: 'signup', component: SignUpPageComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
