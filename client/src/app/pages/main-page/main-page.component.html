@@ -1,26 +1,34 @@
 @if (isGameCanceled) {
-    <app-pop-up popUpMessage="Partie annulée par manque de joueurs" 
+<app-pop-up
+    popUpMessage="Partie annulée par manque de joueurs"
     description=""
-    [showSecondButton]="false" 
+    [showSecondButton]="false"
     (confirm)="understandError()"
-    firstOption="Compris"></app-pop-up>
-}
-
-@if (isGameFinished) {
-    <app-pop-up popUpMessage="Partie terminé, limite de 3 victoires atteintes par un personnage" 
+    firstOption="Compris"
+></app-pop-up>
+} @if (isGameFinished) {
+<app-pop-up
+    popUpMessage="Partie terminé, limite de 3 victoires atteintes par un personnage"
     description=""
-    [showSecondButton]="false" 
+    [showSecondButton]="false"
     (confirm)="understandMessage()"
-    firstOption="Compris"></app-pop-up>
+    firstOption="Compris"
+></app-pop-up>
 }
-
 
 <div class="container">
-    
+    <div class="settings-menu">
+        <button class="settings-button" (click)="toggleSettingsMenu()">⚙️</button>
+        <div class="settings-dropdown" [class.show]="showSettingsMenu">
+            <button class="settings-option" (click)="goToProfile()">Profil</button>
+            <button class="settings-option" (click)="logout()">Se déconnecter</button>
+        </div>
+    </div>
+
     <div class="content-wrapper">
         <h1 class="header-item"></h1>
         <img class="logo" src="./assets/ui/eastern_solace_logo-removebg-preview.png" alt="Logo Jeu" />
-        
+
         <section id="play-option" class="button-container">
             <button class="button" id="join-game-button" routerLink="/join-game">Joindre une partie</button>
             <button class="button" id="create-game-button" routerLink="/create-game">Créer une partie</button>
@@ -29,10 +37,10 @@
     </div>
 
     <footer class="footer-item">
-        <h4 class="team-name">Équipe 212</h4>
+        <h4 class="team-name">Équipe 105</h4>
         <p>
-            <span>Fares Laadjel</span>, <span>Anis Gadouche</span>, <span>Ayoub Marfouk</span>, 
-            <span>Pierre Carré</span>, <span>Chems-Eddine Kardoussi</span>, <span>Anas Chati</span>
+            <span>Ahmed Sami Benabbou</span>, <span>May Guessous</span>, <span>Ayoub Marfouk</span>, 
+            <span>Pierre Carré</span>, <span>Anis Gadouche</span>, <span>Djihed Benaiche</span>
         </p>
     </footer>
 </div>

@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 import { AuthService } from '@app/services/communication/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 type FirebaseAuthError = { code?: string; message?: string };
 
@@ -25,6 +26,7 @@ export class LoginPageComponent {
     constructor(
         private fb: FormBuilder,
         private authService: AuthService,
+        private router: Router,
     ) {}
 
     async submitForm() {
@@ -37,7 +39,7 @@ export class LoginPageComponent {
         this.isSubmitting = true;
         try {
             const res = await this.authService.login(email, password);
-
+            await this.router.navigate(['/home']);
             // debug
             // eslint-disable-next-line no-console
             console.log('Session créée:', res.sessionId, res.user);
@@ -73,21 +75,6 @@ export class LoginPageComponent {
             console.error(e);
         } finally {
             this.isSubmitting = false;
-        }
-    }
-
-    async logoutForTest() {
-        this.errorMessage = null;
-
-        try {
-            await this.authService.logout();
-            // eslint-disable-next-line no-console
-            console.log('Logout OK');
-            // eslint-disable-next-line no-console
-            console.log('sessionId localStorage:', localStorage.getItem('sessionId'));
-        } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error('Logout KO', e);
         }
     }
 }

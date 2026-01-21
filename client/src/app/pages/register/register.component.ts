@@ -1,16 +1,17 @@
 import { Component } from '@angular/core';
 import { ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 import { AuthService } from '@app/services/communication/auth.service';
+import { Router } from '@angular/router';
 
 type AvatarOption = { id: string; label: string };
 
 @Component({
     selector: 'app-signup-page',
     imports: [ReactiveFormsModule],
-    templateUrl: './signup.component.html',
-    styleUrl: './signup.component.scss',
+    templateUrl: './register.component.html',
+    styleUrl: './register.component.scss',
 })
-export class SignUpPageComponent {
+export class RegisterPageComponent {
     avatars: AvatarOption[] = [
         { id: 'avatar_01', label: 'Avatar 1' },
         { id: 'avatar_02', label: 'Avatar 2' },
@@ -29,6 +30,7 @@ export class SignUpPageComponent {
     constructor(
         private fb: FormBuilder,
         private authService: AuthService,
+        private router: Router,
     ) {}
 
     get selectedAvatarId(): string {
@@ -57,7 +59,7 @@ export class SignUpPageComponent {
                 password,
                 avatarId,
             });
-
+            await this.router.navigate(['/home']);
             // option: rediriger vers home / create-player / etc.
             // eslint-disable-next-line no-console
             console.log('Session créée:', res.sessionId, res.user);

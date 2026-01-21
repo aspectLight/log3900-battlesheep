@@ -1,8 +1,11 @@
 import { provideHttpClient } from '@angular/common/http';
 import { enableProdMode } from '@angular/core';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getAuth, provideAuth } from '@angular/fire/auth';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { PreloadAllModules, Routes, provideRouter, withHashLocation, withPreloading } from '@angular/router';
+import { authGuard } from '@app/guards/auth.gard';
 import { AdminGamePageComponent } from '@app/pages/admin-game-page/admin-game-page.component';
 import { AppComponent } from '@app/pages/app/app.component';
 import { ConfigureGamePageComponent } from '@app/pages/configure-game-page/configure-game-page.component';
@@ -12,12 +15,11 @@ import { EditGamePageComponent } from '@app/pages/edit-game-page/edit-game-page.
 import { EndGamePageComponent } from '@app/pages/end-game-page/end-game-page.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { JoinGamePageComponent } from '@app/pages/join-game-page/join-game-page.component';
-import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-import { WaitingPlayerPageComponent } from '@app/pages/waiting-player-page/waiting-player-page.component';
-import { SignUpPageComponent } from '@app/pages/signup/signup.component';
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { LoginPageComponent } from '@app/pages/login/login.component';
-import { provideAuth, getAuth } from '@angular/fire/auth';
+import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { RegisterPageComponent } from '@app/pages/register/register.component';
+import { AuthLandingPageComponent } from '@app/pages/auth-landing/auth-landing.component';
+import { WaitingPlayerPageComponent } from '@app/pages/waiting-player-page/waiting-player-page.component';
 import { environment } from './environments/environment';
 
 if (environment.production) {
@@ -26,21 +28,28 @@ if (environment.production) {
 
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
-    { path: 'home', component: MainPageComponent },
-    { path: 'join-game', component: JoinGamePageComponent },
-    { path: 'admin-game', component: AdminGamePageComponent },
-    { path: 'create-game', component: CreateGamePageComponent },
-    { path: 'create-player', component: CreatePlayerPageComponent },
-    { path: 'waiting-player', component: WaitingPlayerPageComponent },
-    { path: 'configure-game', component: ConfigureGamePageComponent },
-    { path: 'edit-game', component: EditGamePageComponent },
-    { path: 'game', component: GamePageComponent },
-    { path: 'end-game', component: EndGamePageComponent },
-    { path: 'signup', component: SignUpPageComponent },
+    { path: 'home', component: MainPageComponent, canActivate: [authGuard] },
+    { path: 'join-game', component: JoinGamePageComponent, canActivate: [authGuard] },
+    { path: 'admin-game', component: AdminGamePageComponent, canActivate: [authGuard] },
+    { path: 'create-game', component: CreateGamePageComponent, canActivate: [authGuard] },
+    { path: 'create-player', component: CreatePlayerPageComponent, canActivate: [authGuard] },
+    { path: 'waiting-player', component: WaitingPlayerPageComponent, canActivate: [authGuard] },
+    { path: 'configure-game', component: ConfigureGamePageComponent, canActivate: [authGuard] },
+    { path: 'edit-game', component: EditGamePageComponent, canActivate: [authGuard] },
+    { path: 'game', component: GamePageComponent, canActivate: [authGuard] },
+    { path: 'end-game', component: EndGamePageComponent, canActivate: [authGuard] },
+    { path: 'register', component: RegisterPageComponent },
     { path: 'login', component: LoginPageComponent },
+    { path: 'auth-landing', component: AuthLandingPageComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
 bootstrapApplication(AppComponent, {
-    providers: [provideHttpClient(), provideRouter(routes, withHashLocation(), withPreloading(PreloadAllModules)), provideAnimations(), provideFirebaseApp(() => initializeApp(environment.firebase)), provideAuth(() => getAuth())],
-})
+    providers: [
+        provideHttpClient(),
+        provideRouter(routes, withHashLocation(), withPreloading(PreloadAllModules)),
+        provideAnimations(),
+        provideFirebaseApp(() => initializeApp(environment.firebase)),
+        provideAuth(() => getAuth()),
+    ],
+});

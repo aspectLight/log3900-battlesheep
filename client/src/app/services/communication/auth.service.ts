@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Auth, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
+import { Auth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
 import { environment } from 'src/environments/environment';
 import { firstValueFrom } from 'rxjs';
 import { SessionService } from '@app/services/state/session.service';
@@ -26,12 +26,21 @@ type LoginResponse = {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
     private apiUrl = `${environment.serverUrl}/auth`;
-
+    private readyPromise: Promise<void>;
     constructor(
         private http: HttpClient,
         private auth: Auth,
         private session: SessionService,
-    ) {}
+    ) {
+        this.readyPromise = new Promise<void>((resolve) => {
+            const unsub = onAuthStateChanged(this.auth, (user) => {
+                if (!user) this.session.clear();
+
+                unsub();
+                resolve();
+            });
+        });
+    }
 
     get currentUser() {
         return this.auth.currentUser;
@@ -67,6 +76,16 @@ export class AuthService {
             await signOut(this.auth);
         }
     }
+
+    async isAuthenticatedAsync(): Promise<boolean> {
+        await this.readyPromise;
+        return this.isAuthenticatedSync();
+    }
+
+    isAuthenticatedSync(): boolean {
+        return this.auth.currentUser !== null && this.session.sessionId !== null;
+    }
+
     private async loginServerSession(): Promise<LoginResponse> {
         const token = await this.getIdTokenOrThrow();
 
