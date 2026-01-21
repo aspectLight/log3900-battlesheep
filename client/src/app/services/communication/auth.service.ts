@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Auth, signInWithEmailAndPassword } from '@angular/fire/auth';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Auth, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
 import { environment } from 'src/environments/environment';
 import { firstValueFrom } from 'rxjs';
 import { SessionService } from '@app/services/state/session.service';
@@ -33,6 +33,10 @@ export class AuthService {
         private session: SessionService,
     ) {}
 
+    get currentUser() {
+        return this.auth.currentUser;
+    }
+
     async register(payload: RegisterPayload): Promise<LoginResponse> {
         await firstValueFrom(this.http.post(`${this.apiUrl}/register`, payload));
 
@@ -47,6 +51,22 @@ export class AuthService {
         return await this.loginServerSession();
     }
 
+    async logout(): Promise<void> {
+        try {
+            const user = this.auth.currentUser;
+            const sessionId = this.session.sessionId;
+
+            if (user && sessionId) {
+                const token = await user.getIdToken();
+                const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`).set('x-session-id', sessionId);
+
+                await firstValueFrom(this.http.post(`${this.apiUrl}/logout`, {}, { headers }));
+            }
+        } finally {
+            this.session.clear();
+            await signOut(this.auth);
+        }
+    }
     private async loginServerSession(): Promise<LoginResponse> {
         const token = await this.getIdTokenOrThrow();
 

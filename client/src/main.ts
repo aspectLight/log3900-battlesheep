@@ -16,6 +16,7 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { WaitingPlayerPageComponent } from '@app/pages/waiting-player-page/waiting-player-page.component';
 import { SignUpPageComponent } from '@app/pages/signup/signup.component';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { LoginPageComponent } from '@app/pages/login/login.component';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { environment } from './environments/environment';
 
@@ -36,6 +37,7 @@ const routes: Routes = [
     { path: 'game', component: GamePageComponent },
     { path: 'end-game', component: EndGamePageComponent },
     { path: 'signup', component: SignUpPageComponent },
+    { path: 'login', component: LoginPageComponent },
     { path: '**', redirectTo: '/home' },
 ];
 

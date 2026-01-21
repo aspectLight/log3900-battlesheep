@@ -61,6 +61,10 @@ export class SignUpPageComponent {
             // option: rediriger vers home / create-player / etc.
             // eslint-disable-next-line no-console
             console.log('Session créée:', res.sessionId, res.user);
+            // eslint-disable-next-line no-console
+            console.log('sessionId localStorage:', localStorage.getItem('sessionId'));
+            // eslint-disable-next-line no-console
+            console.log('firebase currentUser:', this.authService.currentUser?.email);
         } catch (e: unknown) {
             // pour debug rapide
             // eslint-disable-next-line no-console
