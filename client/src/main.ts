@@ -21,6 +21,9 @@ import { RegisterPageComponent } from '@app/pages/register/register.component';
 import { AuthLandingPageComponent } from '@app/pages/auth-landing/auth-landing.component';
 import { WaitingPlayerPageComponent } from '@app/pages/waiting-player-page/waiting-player-page.component';
 import { environment } from './environments/environment';
+import { LogsHistoryComponent } from '@app/pages/logs-history/logs-history.component';
+import { GamesHistoryComponent } from '@app/pages/games-history/games-history.component';
+
 
 if (environment.production) {
     enableProdMode();
@@ -41,6 +44,8 @@ const routes: Routes = [
     { path: 'register', component: RegisterPageComponent },
     { path: 'login', component: LoginPageComponent },
     { path: 'auth-landing', component: AuthLandingPageComponent },
+    { path: 'logs-history', component: LogsHistoryComponent, canActivate: [authGuard]},
+    { path: 'games-history', component: GamesHistoryComponent, canActivate: [authGuard]},
     { path: '**', redirectTo: '/home' },
 ];
 
