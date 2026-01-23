@@ -240,6 +240,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.7"
+  total_lints:
+    dependency: "direct dev"
+    description:
+      name: total_lints
+      sha256: ae995463254cf3b792ae6f46a5a6ddd56235aa94b95207c77bde149d202b1718
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.10.0"
   vector_math:
     dependency: transitive
     description:
