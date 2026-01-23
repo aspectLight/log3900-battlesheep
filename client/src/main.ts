@@ -8,6 +8,7 @@ import { PreloadAllModules, Routes, provideRouter, withHashLocation, withPreload
 import { authGuard } from '@app/guards/auth.gard';
 import { AdminGamePageComponent } from '@app/pages/admin-game-page/admin-game-page.component';
 import { AppComponent } from '@app/pages/app/app.component';
+import { AuthLandingPageComponent } from '@app/pages/auth-landing/auth-landing.component';
 import { ConfigureGamePageComponent } from '@app/pages/configure-game-page/configure-game-page.component';
 import { CreateGamePageComponent } from '@app/pages/create-game-page/create-game-page.component';
 import { CreatePlayerPageComponent } from '@app/pages/create-player-page/create-player-page.component';
@@ -17,8 +18,8 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { JoinGamePageComponent } from '@app/pages/join-game-page/join-game-page.component';
 import { LoginPageComponent } from '@app/pages/login/login.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { ProfilePageComponent } from '@app/pages/profile-page/profile-page.component';
 import { RegisterPageComponent } from '@app/pages/register/register.component';
-import { AuthLandingPageComponent } from '@app/pages/auth-landing/auth-landing.component';
 import { WaitingPlayerPageComponent } from '@app/pages/waiting-player-page/waiting-player-page.component';
 import { environment } from './environments/environment';
 
@@ -41,6 +42,7 @@ const routes: Routes = [
     { path: 'register', component: RegisterPageComponent },
     { path: 'login', component: LoginPageComponent },
     { path: 'auth-landing', component: AuthLandingPageComponent },
+    { path: 'profile', component: ProfilePageComponent, canActivate: [authGuard] },
     { path: '**', redirectTo: '/home' },
 ];
 
