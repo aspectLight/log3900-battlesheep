@@ -35,11 +35,12 @@ export class HistoryService {
     );
   }
 
-  private async buildAuthHeaders(): Promise<HttpHeaders | undefined> {
+  private async buildAuthHeaders(): Promise<HttpHeaders> {
     const user = this.auth.currentUser;
     const sessionId = this.session.sessionId;
 
-    if (!user || !sessionId) return;
+    if (!user || !sessionId) 
+      throw new Error('User ou sessionId manquant');
 
     const token = await user.getIdToken();
 
