@@ -16,7 +16,6 @@ export enum WaitingRoomEvents {
     JoinRoomResponse = 'joinRoomResponse',
     CreatePlayer = 'createPlayer',
     PlayerCreated = 'playerCreated',
-    PlayerJoined = 'playerJoined',
     LeaveRoomResponse = 'leaveRoomResponse',
     PlayerLeft = 'playerLeft',
     KickPlayer = 'kickPlayer',

@@ -127,12 +127,6 @@ describe('WaitingRoomGateway', () => {
         socket.join = stub();
         socket.emit = stub();
 
-        server.to.returns({
-            emit: (event: string) => {
-                expect(event).toEqual(WaitingRoomEvents.PlayerJoined);
-            },
-        } as BroadcastOperator<unknown, unknown>);
-
         waitingRoomService.findRoomById.returns(mockRoom);
         waitingRoomService.joinRoom = stub();
 
