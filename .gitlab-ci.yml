@@ -35,6 +35,19 @@ cache:
             - server/node_modules/
         policy: pull
 
+.only-client-leger: &only-client-leger
+    only:
+        refs:
+            - master
+            - merge_requests
+        changes:
+            - client_leger/**/*
+    cache:
+        key: '${CI_COMMIT_REF_SLUG}-client-leger'
+        paths:
+            - client_leger/.pub-cache/
+        policy: pull
+
 stages:
     - install
     - lint
@@ -67,6 +80,20 @@ install:server:
             - server/.npm/
         policy: pull-push
 
+install:client_leger:
+    stage: install
+    image: ghcr.io/cirruslabs/flutter:stable
+    <<: *only-client-leger
+    script:
+        - cd client_leger
+        - export PUB_CACHE=$CI_PROJECT_DIR/client_leger/.pub-cache
+        - flutter pub get
+    cache:
+        key: '${CI_COMMIT_REF_SLUG}-client-leger'
+        paths:
+            - client_leger/.pub-cache/
+        policy: pull-push
+
 lint:client:
     stage: lint
     needs: ['install:client']
@@ -84,6 +111,18 @@ lint:server:
     script:
         - cd server
         - npm run lint
+
+lint:client_leger:
+    stage: lint
+    image: ghcr.io/cirruslabs/flutter:stable
+    needs: ['install:client_leger']
+    allow_failure: true
+    <<: *only-client-leger
+    script:
+        - cd client_leger
+        - export PUB_CACHE=$CI_PROJECT_DIR/client_leger/.pub-cache
+        - flutter pub get
+        - flutter analyze
 
 test:client:
     stage: test
@@ -111,6 +150,19 @@ test:server:
     artifacts:
         paths:
             - server/coverage/
+
+test:client_leger:
+    stage: test
+    image: ghcr.io/cirruslabs/flutter:stable
+    needs: ['install:client_leger']
+    <<: *only-client-leger
+    script:
+        - cd client_leger
+        - export PUB_CACHE=$CI_PROJECT_DIR/client_leger/.pub-cache
+        - flutter pub get
+        - flutter test
+    dependencies:
+        - install:client_leger
 
 pages:
     stage: deploy
