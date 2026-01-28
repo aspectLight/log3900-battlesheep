@@ -9,3 +9,9 @@ coverage/
 
 #Node Modules
 /node_modules
+
+# Firebase
+firebase-service-account.json
+
+# Agent
+.agent
