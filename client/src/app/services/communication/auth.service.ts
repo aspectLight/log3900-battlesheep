@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Auth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
-import { environment } from 'src/environments/environment';
-import { firstValueFrom } from 'rxjs';
 import { SessionService } from '@app/services/state/session.service';
+import { firstValueFrom } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 interface RegisterPayload {
     username: string;
@@ -55,6 +55,16 @@ export class AuthService {
     }
 
     async login(email: string, password: string): Promise<LoginResponse> {
+        await signInWithEmailAndPassword(this.auth, email, password);
+
+        return await this.loginServerSession();
+    }
+
+    async loginByUsername(username: string, password: string): Promise<LoginResponse> {
+        // 1. Get email from username via backend
+        const { email } = await firstValueFrom(this.http.post<{ email: string }>(`${this.apiUrl}/get-email-by-username`, { username }));
+
+        // 2. Login with Firebase using the email
         await signInWithEmailAndPassword(this.auth, email, password);
 
         return await this.loginServerSession();
