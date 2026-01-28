@@ -8,6 +8,8 @@ export const ROUTES: { [key: string]: string } = {
     game: '/game',
     join: '/join-game',
     endGame: '/end-game',
+    signin: '/signin',
+    signup: '/signup',
 };
 
 export const LOADING_SCREEN_DELAY = 800;

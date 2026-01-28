@@ -39,7 +39,10 @@ void _registerServices() {
   });
 
   getIt.registerLazySingleton<AuthService>(
-    () => HttpAuthService(dio: getIt<Dio>()),
+    () => HttpAuthService(
+      dio: getIt<Dio>(),
+      localService: getIt<AuthLocalService>(),
+    ),
   );
 
   getIt.registerLazySingleton<AuthLocalService>(AuthLocalServiceImpl.new);

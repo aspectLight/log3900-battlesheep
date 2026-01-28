@@ -1,28 +1,34 @@
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../core/enums/auth_validation_error.dart';
-import '../../core/exceptions/auth_exception.dart';
 import '../../domain/entities/auth_state.dart';
 import '../../domain/interfaces/auth_repository.dart';
 
 class LoginViewModel {
   final AuthRepository _authRepository;
 
+  static final _emailRegex = RegExp(
+    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+  );
+
   LoginViewModel({required AuthRepository authRepository})
     : _authRepository = authRepository;
 
-  final identifier = signal('');
+  final email = signal('');
   final password = signal('');
 
   final hasAttemptedSubmit = signal(false);
   final isLoading = signal(false);
   final authState = signal<AuthState>(const AuthStateInitial());
 
-  late final identifierError = computed<AuthValidationError?>(() {
-    if (identifier.value.isEmpty) {
+  late final emailError = computed<AuthValidationError?>(() {
+    if (email.value.isEmpty) {
       return hasAttemptedSubmit.value
-          ? AuthValidationError.identifierRequired
+          ? AuthValidationError.emailRequired
           : null;
+    }
+    if (!_emailRegex.hasMatch(email.value)) {
+      return hasAttemptedSubmit.value ? AuthValidationError.invalidEmail : null;
     }
     return null;
   });
@@ -37,10 +43,12 @@ class LoginViewModel {
   });
 
   late final isFormValid = computed(() {
-    return identifier.value.isNotEmpty && password.value.isNotEmpty;
+    return email.value.isNotEmpty &&
+        _emailRegex.hasMatch(email.value) &&
+        password.value.isNotEmpty;
   });
 
-  void updateIdentifier(String value) => identifier.value = value;
+  void updateEmail(String value) => email.value = value;
 
   void updatePassword(String value) => password.value = value;
 
@@ -48,9 +56,6 @@ class LoginViewModel {
     hasAttemptedSubmit.value = true;
 
     if (!isFormValid.value) {
-      authState.value = const AuthStateError(
-        UnknownAuthException('Please fill in all fields'),
-      );
       return;
     }
 
@@ -58,7 +63,7 @@ class LoginViewModel {
     authState.value = const AuthStateLoading();
 
     final result = await _authRepository
-        .signIn(identifier: identifier.value, password: password.value)
+        .signIn(identifier: email.value, password: password.value)
         .run();
 
     result.fold(
@@ -70,13 +75,11 @@ class LoginViewModel {
   }
 
   void resetForm() {
-    identifier.value = '';
+    email.value = '';
     password.value = '';
     hasAttemptedSubmit.value = false;
     authState.value = const AuthStateInitial();
   }
 
-  void dispose() {
-    // Clean up any resources if added in future
-  }
+  void dispose() {}
 }

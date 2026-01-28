@@ -1,34 +1,84 @@
 import 'package:dio/dio.dart';
 import 'package:fpdart/fpdart.dart';
 import '../../core/config/env_config.dart';
+import '../../core/constants/api_endpoints.dart';
 import '../../core/constants/http_status.dart';
 import '../../core/exceptions/auth_exception.dart';
+import '../../domain/interfaces/auth_local_service.dart';
 import '../../domain/interfaces/auth_service.dart';
 import '../models/user_dto.dart';
+import 'firebase_auth_service.dart';
 import 'log_service.dart';
 
 class HttpAuthService implements AuthService {
   final Dio _dio;
+  final AuthLocalService _localService;
+  final FirebaseAuthService _firebaseAuth;
 
-  HttpAuthService({Dio? dio})
-    : _dio = dio ?? Dio(BaseOptions(baseUrl: EnvConfig.baseUrl));
+  HttpAuthService({
+    required AuthLocalService localService,
+    FirebaseAuthService? firebaseAuth,
+    Dio? dio,
+  }) : _localService = localService,
+       _firebaseAuth = firebaseAuth ?? FirebaseAuthService(),
+       _dio = dio ?? Dio(BaseOptions(baseUrl: EnvConfig.baseUrl));
+
+  Future<void> _addAuthHeaders() async {
+    final token = await _localService.getToken();
+    final sessionId = await _localService.getSessionId();
+
+    if (token != null) {
+      _dio.options.headers['Authorization'] = 'Bearer $token';
+    }
+    if (sessionId != null) {
+      _dio.options.headers['x-session-id'] = sessionId;
+    }
+  }
+
+  Future<bool> hasStoredCredentials() async {
+    final token = await _localService.getToken();
+    final sessionId = await _localService.getSessionId();
+    return token != null && sessionId != null;
+  }
 
   @override
   TaskEither<AuthException, UserDto> signIn({
     required String identifier,
     required String password,
   }) => TaskEither.tryCatch(() async {
-    final response = await _dio.post(
-      '/auth/login',
-      data: {'identifier': identifier, 'password': password},
+    LogService.d('Signing in with identifier: $identifier');
+
+    final firebaseAuth = await _firebaseAuth.signInWithEmailPassword(
+      email: identifier,
+      password: password,
     );
+
+    final response = await _dio.post<Map<String, dynamic>>(
+      ApiEndpoints.login,
+      data: {'token': firebaseAuth.idToken},
+    );
+
     final data = response.data;
-    if (data is Map<String, dynamic>) {
-      return UserDto.fromJson(data);
+    if (data == null) {
+      throw const ServerException(devMessage: 'Server login response is null');
     }
-    throw const ServerException(
-      devMessage: 'Unexpected response format from server',
-    );
+
+    final sessionId = data['sessionId'] as String?;
+    if (sessionId == null) {
+      throw const ServerException(devMessage: 'Session ID not in response');
+    }
+
+    await _localService.saveToken(firebaseAuth.idToken);
+    await _localService.saveSessionId(sessionId);
+
+    if (data['user'] != null) {
+      final userDto = UserDto.fromJson(data['user']);
+      await _localService.saveUser(userDto);
+      LogService.d('Login successful: ${userDto.username}');
+      return userDto;
+    }
+
+    throw const ServerException(devMessage: 'User data not in response');
   }, _onError);
 
   @override
@@ -37,32 +87,48 @@ class HttpAuthService implements AuthService {
     required String email,
     required String password,
   }) => TaskEither.tryCatch(() async {
-    LogService.d(
-      'Trying to sign up with URL: ${_dio.options.baseUrl}/auth/register',
-    );
-    LogService.d(
-      'Data: ${{'username': username, 'email': email, 'password': password}}',
+    final url = '${_dio.options.baseUrl}${ApiEndpoints.register}';
+    LogService.d('Trying to sign up with URL: $url');
+
+    final requestData = {
+      'username': username,
+      'email': email,
+      'password': password,
+      'avatarId': 'default',
+    };
+    LogService.d('Data: $requestData');
+
+    final response = await _dio.post<Map<String, dynamic>>(
+      ApiEndpoints.register,
+      data: requestData,
     );
 
-    final response = await _dio.post(
-      '/auth/register',
-      data: {'username': username, 'email': email, 'password': password},
-    );
-    final data = response.data;
-    if (data is Map<String, dynamic>) {
-      return UserDto.fromJson(data);
+    if (response.data == null) {
+      throw const ServerException(devMessage: 'Registration response is null');
     }
-    throw const ServerException(
-      devMessage: 'Unexpected response format from server',
-    );
+
+    LogService.d('Registration successful, performing auto-login...');
+    final loginResult = await signIn(
+      identifier: email,
+      password: password,
+    ).run();
+
+    return loginResult.fold((error) => throw error, (user) => user);
   }, _onError);
 
   @override
   TaskEither<AuthException, UserDto> getCurrentUser() =>
       TaskEither.tryCatch(() async {
-        final response = await _dio.get('/auth/profile');
+        if (!await hasStoredCredentials()) {
+          throw const InvalidCredentialsException();
+        }
+
+        await _addAuthHeaders();
+        final response = await _dio.get<Map<String, dynamic>>(
+          ApiEndpoints.userProfile,
+        );
         final data = response.data;
-        if (data is Map<String, dynamic>) {
+        if (data != null) {
           return UserDto.fromJson(data);
         }
         throw const ServerException(
@@ -74,9 +140,13 @@ class HttpAuthService implements AuthService {
   TaskEither<AuthException, UserDto> updateProfile(
     Map<String, dynamic> updates,
   ) => TaskEither.tryCatch(() async {
-    final response = await _dio.patch('/auth/profile', data: updates);
+    await _addAuthHeaders();
+    final response = await _dio.patch<Map<String, dynamic>>(
+      ApiEndpoints.userProfile,
+      data: updates,
+    );
     final data = response.data;
-    if (data is Map<String, dynamic>) {
+    if (data != null) {
       return UserDto.fromJson(data);
     }
     throw const ServerException(
@@ -86,14 +156,18 @@ class HttpAuthService implements AuthService {
 
   @override
   TaskEither<AuthException, Unit> signOut() => TaskEither.tryCatch(() async {
-    await _dio.post('/auth/logout');
+    await _addAuthHeaders();
+    await _dio.post(ApiEndpoints.logout);
+    await _localService.clearAll();
     return unit;
   }, _onError);
 
   @override
   TaskEither<AuthException, Unit> deleteAccount() =>
       TaskEither.tryCatch(() async {
-        await _dio.delete('/auth/account');
+        await _addAuthHeaders();
+        await _dio.delete(ApiEndpoints.deleteAccount);
+        await _localService.clearAll();
         return unit;
       }, _onError);
 

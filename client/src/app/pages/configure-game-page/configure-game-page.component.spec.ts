@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ConfigureGamePageComponent } from './configure-game-page.component';
-import { GameConfiguratorComponent } from '@app/components/game-configurator/game-configurator.component';
+import { GameConfiguratorComponent } from '@app/components/editor/game-configurator/game-configurator.component';
 import { CommonModule } from '@angular/common';
 import { provideHttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { GameService } from '@app/services/game.service';
+import { GameService } from '@app/services/editor/game.service';
 
 describe('ConfigureGamePageComponent', () => {
     let component: ConfigureGamePageComponent;

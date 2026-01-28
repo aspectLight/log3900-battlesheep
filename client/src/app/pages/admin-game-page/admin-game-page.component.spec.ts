@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AdminGamePageComponent } from './admin-game-page.component';
-import { GameListComponent } from '@app/components/game-list/game-list.component';
+import { GameListComponent } from '@app/components/editor/game-list/game-list.component';
 import { CommonModule } from '@angular/common';
 import { provideHttpClient } from '@angular/common/http';
-import { GameService } from '@app/services/game.service';
+import { GameService } from '@app/services/editor/game.service';
 import { of } from 'rxjs';
-import { Game } from '@app/classes/game';
+import { Game } from '@app/classes/game/game';
 import { ActivatedRoute } from '@angular/router';
 
 describe('AdminGamePageComponent', () => {

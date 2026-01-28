@@ -7,6 +7,8 @@ import '../models/user_dto.dart';
 class AuthLocalServiceImpl implements AuthLocalService {
   final FlutterSecureStorage _storage;
   static const _userKey = 'cached_user';
+  static const _tokenKey = 'auth_token';
+  static const _sessionIdKey = 'session_id';
 
   AuthLocalServiceImpl({FlutterSecureStorage? storage})
     : _storage = storage ?? const FlutterSecureStorage();
@@ -32,5 +34,40 @@ class AuthLocalServiceImpl implements AuthLocalService {
   @override
   Future<void> deleteUser() async {
     await _storage.delete(key: _userKey);
+  }
+
+  @override
+  Future<void> saveToken(String token) async {
+    await _storage.write(key: _tokenKey, value: token);
+  }
+
+  @override
+  Future<String?> getToken() {
+    return _storage.read(key: _tokenKey);
+  }
+
+  @override
+  Future<void> deleteToken() async {
+    await _storage.delete(key: _tokenKey);
+  }
+
+  @override
+  Future<void> saveSessionId(String sessionId) async {
+    await _storage.write(key: _sessionIdKey, value: sessionId);
+  }
+
+  @override
+  Future<String?> getSessionId() {
+    return _storage.read(key: _sessionIdKey);
+  }
+
+  @override
+  Future<void> deleteSessionId() async {
+    await _storage.delete(key: _sessionIdKey);
+  }
+
+  @override
+  Future<void> clearAll() async {
+    await Future.wait([deleteUser(), deleteToken(), deleteSessionId()]);
   }
 }

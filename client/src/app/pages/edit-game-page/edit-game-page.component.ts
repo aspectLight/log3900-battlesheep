@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { GameEditorComponent } from '@app/components/game-editor/game-editor.component';
+import { GameEditorComponent } from '@app/components/editor/game-editor/game-editor.component';
 import { Router } from '@angular/router';
-import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
+import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { WARNING_MESSAGES } from '@common/error-messages.constants';
 
 @Component({

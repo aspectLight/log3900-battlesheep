@@ -1,7 +1,6 @@
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../core/enums/auth_validation_error.dart';
-import '../../core/exceptions/auth_exception.dart';
 import '../../core/helpers/email_validator.dart';
 import '../../core/helpers/password_validator.dart';
 import '../../core/helpers/username_validator.dart';
@@ -83,9 +82,6 @@ class SignUpViewModel {
     hasAttemptedSubmit.value = true;
 
     if (!isFormValid.value) {
-      authState.value = const AuthStateError(
-        UnknownAuthException('Please fix the form errors'),
-      );
       return;
     }
 
@@ -117,7 +113,5 @@ class SignUpViewModel {
     authState.value = const AuthStateInitial();
   }
 
-  void dispose() {
-    // Clean up any resources if added in future
-  }
+  void dispose() {}
 }

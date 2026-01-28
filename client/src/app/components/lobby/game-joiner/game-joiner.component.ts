@@ -1,0 +1,41 @@
+import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
+import { ROUTES } from '@app/constants/routes.constants';
+import { GameCreationService } from '@app/services/lobby/game-creation.service';
+import { MovementSocketService } from '@app/services/communication/socket-handlers/movement-socket.service';
+import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
+@Component({
+    selector: 'app-game-joiner',
+    templateUrl: './game-joiner.component.html',
+    imports: [RouterLink, PopUpComponent],
+    styleUrl: './game-joiner.component.scss',
+})
+export class GameJoinerComponent {
+    @ViewChild('gameCode') gameCodeInput!: ElementRef<HTMLInputElement>;
+    showError: boolean;
+    errorMessage: string;
+
+    constructor(
+        private socketService: RoomSocketService,
+        private movementSocketService: MovementSocketService,
+        private gameCreationService: GameCreationService,
+        private router: Router,
+    ) {
+        this.gameCreationService.isHost = false;
+        this.movementSocketService.sync();
+    }
+
+    joinGame() {
+        const gameCode = this.gameCodeInput.nativeElement.value;
+        this.socketService.joinRoom(gameCode, (success, error) => {
+            if (success) {
+                this.gameCreationService.gameCode = gameCode;
+                this.router.navigate([ROUTES.createPlayer]);
+            } else {
+                this.errorMessage = error || '';
+                this.showError = true;
+            }
+        });
+    }
+}

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NavigationEnd, NavigationStart, Router, RouterOutlet } from '@angular/router';
-import { LoadingScreenComponent } from '@app/components/loading-screen/loading-screen.component';
+import { LoadingScreenComponent } from '@app/components/shared/loading-screen/loading-screen.component';
 import { LOADING_SCREEN_DELAY } from '@app/constants/routes.constants';
 @Component({
     selector: 'app-root',

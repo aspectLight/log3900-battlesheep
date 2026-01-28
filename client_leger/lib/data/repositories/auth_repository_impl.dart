@@ -156,6 +156,6 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   Future<void> _clearLocalUser() async {
-    await _localService.deleteUser();
+    await _localService.clearAll();
   }
 }

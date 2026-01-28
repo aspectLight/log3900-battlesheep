@@ -8,4 +8,8 @@ class EnvConfig {
   static String get socketUrl {
     return dotenv.env['SOCKET_URL'] ?? 'ws://localhost:3000';
   }
+
+  static String get firebaseApiKey {
+    return dotenv.env['FIREBASE_API_KEY'] ?? '';
+  }
 }
