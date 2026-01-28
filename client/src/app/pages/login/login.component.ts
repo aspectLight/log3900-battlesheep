@@ -1,16 +1,16 @@
 /* eslint-disable no-console */
-import { Component } from '@angular/core';
-import { ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
-import { AuthService } from '@app/services/communication/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Component } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '@app/services/communication/auth.service';
 
 type FirebaseAuthError = { code?: string; message?: string };
 
 @Component({
     selector: 'app-login-page',
     standalone: true,
-    imports: [ReactiveFormsModule],
+    imports: [ReactiveFormsModule, RouterLink],
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss',
 })
@@ -19,8 +19,8 @@ export class LoginPageComponent {
     isSubmitting = false;
 
     form = this.fb.nonNullable.group({
-        email: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, Validators.minLength(8)]],
+        username: ['', [Validators.required]],
+        password: ['', [Validators.required]],
     });
 
     constructor(
@@ -34,15 +34,15 @@ export class LoginPageComponent {
         this.form.markAllAsTouched();
         if (this.form.invalid) return;
 
-        const { email, password } = this.form.getRawValue();
+        const { username, password } = this.form.getRawValue();
 
         this.isSubmitting = true;
         try {
-            const res = await this.authService.login(email, password);
+            const response = await this.authService.loginByUsername(username, password);
             await this.router.navigate(['/home']);
             // debug
             // eslint-disable-next-line no-console
-            console.log('Session créée:', res.sessionId, res.user);
+            console.log('Session créée:', response.sessionId, response.user);
             // eslint-disable-next-line no-console
             console.log('sessionId localStorage:', localStorage.getItem('sessionId'));
         } catch (e: unknown) {
@@ -65,9 +65,9 @@ export class LoginPageComponent {
             const code: string | undefined = anyErr?.code;
 
             if (code === 'auth/invalid-credential' || code === 'auth/wrong-password') {
-                this.errorMessage = 'Email ou mot de passe incorrect.';
+                this.errorMessage = 'Identifiant ou mot de passe incorrect.';
             } else if (code === 'auth/user-not-found') {
-                this.errorMessage = 'Aucun compte n’existe avec cet email.';
+                this.errorMessage = "Aucun compte n'existe avec cet identifiant.";
             } else {
                 this.errorMessage = 'Erreur de connexion.';
             }
