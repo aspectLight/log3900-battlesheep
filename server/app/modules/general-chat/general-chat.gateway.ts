@@ -72,7 +72,7 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         const username = this.socketIdToUsername.get(socket.id);
 
         if (username) {
-            // 45 seconds delay before logging out
+            // 15 seconds delay before logging out
             const timeout = setTimeout(async () => {
                 try {
                     const user = await this.authService.getUserByUsername(username);
@@ -83,7 +83,7 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
                 } catch (error) {
                     this.logger.error(`Erreur lors de la déconnexion automatique de ${username}: ${error.message}`);
                 }
-            }, 45000);
+            }, 15000);
 
             this.disconnectionTimeouts.set(username, timeout);
         }
