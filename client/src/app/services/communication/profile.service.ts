@@ -1,30 +1,10 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
+import { UpdateProfilePayload, UserProfile, UserStatistics } from '@app/interfaces/profile.interface';
 import { SessionService } from '@app/services/state/session.service';
 import { firstValueFrom } from 'rxjs';
 import { environment } from 'src/environments/environment';
-
-export interface UserProfile {
-    id: string;
-    email: string;
-    username: string;
-    avatarId: string;
-    preferences?: Record<string, unknown>;
-}
-
-export interface UserStatistics {
-    classicGamesPlayed: number;
-    ctfGamesPlayed: number;
-    totalGamesWon: number;
-    averagePlaytimePerGame: number;
-}
-
-export interface UpdateProfilePayload {
-    username?: string;
-    email?: string;
-    avatarId?: string;
-}
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService {

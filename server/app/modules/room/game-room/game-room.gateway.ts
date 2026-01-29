@@ -54,7 +54,7 @@ export class GameRoomGateway implements OnGatewayConnection, OnGatewayDisconnect
     }
 
     @SubscribeMessage(GameRoomEvents.FinishGame)
-    handleFinishGame(@MessageBody() data: { roomId: string; winnerId: string }, @ConnectedSocket() socket: Socket) {
+    async handleFinishGame(@MessageBody() data: { roomId: string; winnerId: string }, @ConnectedSocket() socket: Socket) {
         return this.gameLifecycleHandler.handleFinishGame(data, socket, this.server);
     }
 

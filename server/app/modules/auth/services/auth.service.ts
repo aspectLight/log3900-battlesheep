@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException, ForbiddenException, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { DecodedIdToken } from 'firebase-admin/auth';
-import { v4 as uuidv4 } from 'uuid';
-import { FirebaseAdminService } from '@app/modules/auth/services/firebase-admin.service';
-import { User, UserDocument } from '@app/modules/auth/schemas/user.schema';
 import { RegisterUserDto, UpdateUserDto } from '@app/modules/auth/dto/auth.dto';
+import { User, UserDocument } from '@app/modules/auth/schemas/user.schema';
+import { FirebaseAdminService } from '@app/modules/auth/services/firebase-admin.service';
+import { ConflictException, ForbiddenException, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { DecodedIdToken } from 'firebase-admin/auth';
+import { Model } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -202,5 +202,38 @@ export class AuthService {
 
     getGameHistory(user: UserDocument) {
         return user.gameHistory.sort((a, b) => b.startDate.getTime() - a.startDate.getTime()).slice(0, 100);
+    }
+
+    async updateUserStatistics(
+        firebaseUid: string,
+        gameMode: 'Classique' | 'CTF',
+        hasWon: boolean,
+        playtimeSeconds: number,
+        hasAbandoned: boolean = false,
+    ): Promise<void> {
+        const user = await this.getUserByUid(firebaseUid);
+
+        if (gameMode === 'Classique') {
+            user.statistics.classicGamesPlayed += 1;
+        } else if (gameMode === 'CTF') {
+            user.statistics.ctfGamesPlayed += 1;
+        }
+
+        if (hasWon) {
+            user.statistics.totalGamesWon += 1;
+        }
+
+        user.statistics.totalPlaytime += playtimeSeconds;
+
+        user.gameHistory.push({
+            startDate: new Date(Date.now() - playtimeSeconds * 1000),
+            endDate: new Date(),
+            mode: gameMode,
+            hasWon,
+            hasAbandoned,
+        });
+
+        await user.save();
+        this.logger.log(`Statistics updated for user ${firebaseUid}: ${gameMode} game, won: ${hasWon}, playtime: ${playtimeSeconds}s`);
     }
 }

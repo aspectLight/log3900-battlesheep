@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
-import { ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
-import { AuthService } from '@app/services/communication/auth.service';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-
-type AvatarOption = { id: string; label: string };
+import { AvatarOption } from '@app/interfaces/profile.interface';
+import { AuthService } from '@app/services/communication/auth.service';
 
 @Component({
     selector: 'app-signup-page',

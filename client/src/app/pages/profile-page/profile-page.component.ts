@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { ProfileService, UserProfile, UserStatistics } from '@app/services/communication/profile.service';
+import { AvatarOption, UserProfile, UserStatistics } from '@app/interfaces/profile.interface';
+import { ProfileService } from '@app/services/communication/profile.service';
 import { StatsService } from '@app/services/communication/stats.service';
-
-type AvatarOption = { id: string; label: string };
 
 @Component({
     selector: 'app-profile-page',

@@ -1,3 +1,4 @@
+import { AuthModule } from '@app/modules/auth/auth.module';
 import { CombatModule } from '@app/modules/combat/combat.module';
 import { GameModule } from '@app/modules/game/game.module';
 import { MovementModule } from '@app/modules/movement/movement.module';
@@ -21,7 +22,7 @@ import { WaitingRoomPlayerHandler } from './waiting-room/handlers/waiting-room-p
 import { WaitingRoomGateway } from './waiting-room/waiting-room.gateway';
 
 @Module({
-    imports: [SharedRoomModule, GameModule, CombatModule, MovementModule, VirtualPlayersModule],
+    imports: [SharedRoomModule, GameModule, CombatModule, MovementModule, VirtualPlayersModule, AuthModule],
     providers: [
         GameRoomGateway,
         WaitingRoomGateway,

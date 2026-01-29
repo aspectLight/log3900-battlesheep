@@ -2,9 +2,10 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Auth } from '@angular/fire/auth';
+import { UpdateProfilePayload, UserProfile, UserStatistics } from '@app/interfaces/profile.interface';
 import { SessionService } from '@app/services/state/session.service';
 import { environment } from 'src/environments/environment';
-import { ProfileService, UpdateProfilePayload, UserProfile, UserStatistics } from './profile.service';
+import { ProfileService } from './profile.service';
 
 describe('ProfileService', () => {
     let service: ProfileService;

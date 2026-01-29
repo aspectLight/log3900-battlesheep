@@ -57,6 +57,7 @@ export class Player extends Entity {
     onReplaceItem?: (newItem: Item, currentInventory: [Item | null, Item | null], cellCoords: Coords) => void;
 
     isVirtual: boolean = false;
+    firebaseUid?: string;
     private profile: VirtualPlayerType | undefined;
     private bonusChoice: Stats | null;
     private appliedItemEffects: { [itemId: string]: boolean } = {};

@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { provideRouter, Router, RouterLink } from '@angular/router';
-import { ProfileService, UserProfile, UserStatistics } from '@app/services/communication/profile.service';
+import { UserProfile, UserStatistics } from '@app/interfaces/profile.interface';
+import { ProfileService } from '@app/services/communication/profile.service';
 import { StatsService } from '@app/services/communication/stats.service';
 import { ProfilePageComponent } from './profile-page.component';
 

@@ -25,6 +25,7 @@ export interface Player {
     profile?: VirtualPlayerType;
     hasBoots?: boolean;
     team?: number;
+    firebaseUid?: string;
 }
 
 export const enum BonusType {
