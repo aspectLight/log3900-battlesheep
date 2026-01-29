@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -76,6 +77,23 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildMenuOptions() {
-    return Center(child: Text(AppLocalizations.of(context)!.gameContentSoon));
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+
+      children: [
+        Text(AppLocalizations.of(context)!.gameContentSoon),
+
+        const SizedBox(height: 16),
+        ElevatedButton.icon(
+          onPressed: () {
+            context.router.push(const ChatRoute());
+          },
+
+          icon: const Icon(Icons.chat),
+
+          label: Text(AppLocalizations.of(context)!.chat),
+        ),
+      ],
+    );
   }
 }

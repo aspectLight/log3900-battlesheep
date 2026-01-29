@@ -120,4 +120,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unknownError => 'An unknown error occurred';
+
+  @override
+  String get chat => 'Chat';
+
+  @override
+  String get noMessages => 'No messages yet. Start the conversation!';
+
+  @override
+  String get typeMessage => 'Type a message...';
 }

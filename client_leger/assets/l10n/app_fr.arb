@@ -34,5 +34,8 @@
   "userNotFound": "Utilisateur introuvable",
   "networkError": "Problème de connexion réseau",
   "serverError": "Erreur du serveur",
-  "unknownError": "Une erreur inconnue est survenue"
+  "unknownError": "Une erreur inconnue est survenue",
+  "chat": "Clavardage",
+  "noMessages": "Aucun message pour l'instant. Commencez la conversation !",
+  "typeMessage": "Tapez un message..."
 }

@@ -1,5 +1,9 @@
 import 'dart:async';
+
+import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
+
+import '../../data/services/chat_service.dart';
 import '../../domain/entities/auth_state.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/interfaces/auth_repository.dart';
@@ -35,14 +39,17 @@ class AuthViewModel {
       isLoading.value = false;
       if (user != null) {
         authState.value = AuthStateAuthenticated(user);
+        _connectToChat(user.username);
       } else {
         authState.value = const AuthStateUnauthenticated();
+        _disconnectFromChat();
       }
     });
   }
 
   Future<void> signOut() async {
     isLoading.value = true;
+    _disconnectFromChat();
     final result = await _authRepository.signOut().run();
 
     result.fold(
@@ -58,13 +65,33 @@ class AuthViewModel {
     final user = await _authRepository.currentUser;
     if (user != null) {
       authState.value = AuthStateAuthenticated(user);
+      _connectToChat(user.username);
     } else {
       authState.value = const AuthStateUnauthenticated();
     }
     isLoading.value = false;
   }
 
+  void _connectToChat(String username) {
+    try {
+      final chatService = GetIt.I<ChatService>();
+      chatService.connect(username);
+    } catch (e) {
+      print('Failed to connect to chat: $e');
+    }
+  }
+
+  void _disconnectFromChat() {
+    try {
+      final chatService = GetIt.I<ChatService>();
+      chatService.disconnect();
+    } catch (e) {
+      print('Failed to disconnect from chat: $e');
+    }
+  }
+
   void dispose() {
+    _disconnectFromChat();
     unawaited(_authSubscription?.cancel());
   }
 }
