@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Auth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
+import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { SessionService } from '@app/services/state/session.service';
 import { firstValueFrom } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -26,21 +27,12 @@ type LoginResponse = {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
     private apiUrl = `${environment.serverUrl}/auth`;
-    private readyPromise: Promise<void>;
     constructor(
         private http: HttpClient,
         private auth: Auth,
         private session: SessionService,
-    ) {
-        this.readyPromise = new Promise<void>((resolve) => {
-            const unsub = onAuthStateChanged(this.auth, (user) => {
-                if (!user) this.session.clear();
-
-                unsub();
-                resolve();
-            });
-        });
-    }
+        private socketService: SocketService,
+    ) {}
 
     get currentUser() {
         return this.auth.currentUser;
@@ -81,6 +73,7 @@ export class AuthService {
 
                 await firstValueFrom(this.http.post(`${this.apiUrl}/logout`, {}, { headers }));
             }
+            this.socketService.disconnect();
         } finally {
             this.session.clear();
             await signOut(this.auth);
@@ -88,12 +81,23 @@ export class AuthService {
     }
 
     async isAuthenticatedAsync(): Promise<boolean> {
-        await this.readyPromise;
+        // Wait for Firebase to confirm the current user state
+        await this.ensureAuthReady();
         return this.isAuthenticatedSync();
     }
 
     isAuthenticatedSync(): boolean {
         return this.auth.currentUser !== null && this.session.sessionId !== null;
+    }
+
+    private async ensureAuthReady(): Promise<void> {
+        return new Promise((resolve) => {
+            // Unsubscribe immediately after getting the first state
+            const unsub = onAuthStateChanged(this.auth, () => {
+                unsub();
+                resolve();
+            });
+        });
     }
 
     private async loginServerSession(): Promise<LoginResponse> {

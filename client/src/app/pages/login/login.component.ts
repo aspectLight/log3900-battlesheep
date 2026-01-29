@@ -44,7 +44,7 @@ export class LoginPageComponent {
             // eslint-disable-next-line no-console
             console.log('Session créée:', response.sessionId, response.user);
             // eslint-disable-next-line no-console
-            console.log('sessionId localStorage:', localStorage.getItem('sessionId'));
+            console.log('sessionId sessionStorage:', sessionStorage.getItem('sessionId'));
         } catch (e: unknown) {
             //  Erreurs backend (Nest)
             if (e instanceof HttpErrorResponse) {

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
+import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';
 import { GeneralChatEvents } from '@common/socket.constants';
 
@@ -44,6 +44,11 @@ export class ChatService {
                 this.triggerScroll();
             },
         );
+        this.socketService.on('connect', () => {
+            if (this.username) {
+                this.socketService.send(GeneralChatEvents.JoinGeneralChat, this.username);
+            }
+        });
     }
 
     getMessagesFromWaitingRoom() {

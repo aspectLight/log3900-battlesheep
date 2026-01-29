@@ -1,23 +1,36 @@
+import { AuthService } from '@app/modules/auth/services/auth.service';
 import { GENERAL_CHAT_ROOM } from '@app/modules/general-chat/constants/general-chat.constants';
 import { ChatMessage } from '@app/modules/general-chat/interfaces/chat';
 import { GeneralChatService } from '@app/modules/general-chat/services/general-chat.service';
 import { GeneralChatEvents } from '@common/socket.constants';
 import { Injectable, Logger } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
+import { Socket } from 'socket.io';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 @Injectable()
 export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-    @WebSocketServer()
-    private server: Server;
     private readonly logger = new Logger(GeneralChatGateway.name);
+    private socketIdToUsername = new Map<string, string>();
 
-    constructor(private readonly generalChatService: GeneralChatService) {}
+    private disconnectionTimeouts = new Map<string, NodeJS.Timeout>();
+
+    constructor(
+        private readonly generalChatService: GeneralChatService,
+        private readonly authService: AuthService,
+    ) {}
 
     @SubscribeMessage(GeneralChatEvents.JoinGeneralChat)
     handleJoinGeneralChat(socket: Socket, username: string): void {
+        const existingTimeout = this.disconnectionTimeouts.get(username);
+        if (existingTimeout) {
+            clearTimeout(existingTimeout);
+            this.disconnectionTimeouts.delete(username);
+            this.logger.log(`Déconnexion annulée pour ${username} (reconnexion rapide)`);
+        }
+
         socket.join(GENERAL_CHAT_ROOM);
+        this.socketIdToUsername.set(socket.id, username);
         this.logger.log(`${username} (${socket.id}) a rejoint le chat général`);
 
         const messages = this.generalChatService.getMessages();
@@ -54,7 +67,25 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         this.logger.log(`Client connecté: ${socket.id}`);
     }
 
-    handleDisconnect(socket: Socket): void {
+    async handleDisconnect(socket: Socket): Promise<void> {
         this.logger.log(`Client déconnecté: ${socket.id}`);
+        const username = this.socketIdToUsername.get(socket.id);
+
+        if (username) {
+            // 45 seconds delay before logging out
+            const timeout = setTimeout(async () => {
+                try {
+                    const user = await this.authService.getUserByUsername(username);
+                    await this.authService.logout(user.firebaseUid);
+                    this.socketIdToUsername.delete(socket.id);
+                    this.disconnectionTimeouts.delete(username);
+                    this.logger.log(`Déconnexion automatique effectuée pour ${username} suite à la fermeture du client.`);
+                } catch (error) {
+                    this.logger.error(`Erreur lors de la déconnexion automatique de ${username}: ${error.message}`);
+                }
+            }, 45000);
+
+            this.disconnectionTimeouts.set(username, timeout);
+        }
     }
 }
