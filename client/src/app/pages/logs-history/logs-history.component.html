@@ -1,0 +1,41 @@
+<div class="history-page">
+    <div class="top-bar">
+        <button class="return-button" routerLink="/home">
+            <img src="./assets/ui/left.png">
+            Page d'accueil
+        </button>
+  
+      <h1 class="title">Historique de connexion</h1>
+      <div class="spacer"></div>
+    </div>
+  
+    <div class="history-list">
+      <li class="header">
+        <span>Action</span>
+        <span>Date</span>
+        <span>Heure</span>
+      </li>
+  
+      <div class="list">
+          @if (items.length === 0) {
+            <div class="state empty">Aucune entrée.</div>
+          } @else {
+            <div class="rows">
+              @for (it of items; track it.date + '_' + it.type) {
+                <li class="row">
+                  <span class="action">
+                    <span class="badge" [class.login]="it.type === 'login'" [class.logout]="it.type === 'logout'">
+                      {{ it.type === 'login' ? 'Connexion' : 'Déconnexion' }}
+                    </span>
+                  </span>
+  
+                  <span class="date">{{ it.date | date: 'yyyy-MM-dd' }}</span>
+                  <span class="time">{{ it.date | date: 'HH:mm:ss' }}</span>
+                </li>
+              }
+            </div>
+          }
+
+      </div>
+    </div>
+  </div>

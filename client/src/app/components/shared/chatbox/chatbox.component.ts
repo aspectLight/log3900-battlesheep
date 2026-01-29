@@ -12,10 +12,10 @@ const MAX_MESSAGE_LENGTH = 200;
     styleUrl: './chatbox.component.scss',
 })
 export class ChatboxComponent implements OnInit, AfterViewInit {
-    @Input() roomType: 'WaitingRoom' | 'GameRoom' | 'EndRoom' = 'WaitingRoom';
+    @Input() roomType: 'GeneralChat' | 'WaitingRoom' | 'GameRoom' | 'EndRoom' = 'GeneralChat';
     @ViewChild('chatboxMessages') private messagesContainer!: ElementRef<HTMLDivElement>;
 
-    showMessages: boolean = false;
+    showMessages: boolean = true;
     withFilter: boolean = false;
     isCollapsed: boolean = false;
 
@@ -44,7 +44,10 @@ export class ChatboxComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
-        if (this.roomType === 'WaitingRoom') {
+        if (this.roomType === 'GeneralChat') {
+            this.chatService.clearMessages();
+            this.chatService.getGeneralChatMessages();
+        } else if (this.roomType === 'WaitingRoom') {
             this.chatService.clearMessages();
             this.chatService.getMessagesFromWaitingRoom();
         }
@@ -59,6 +62,9 @@ export class ChatboxComponent implements OnInit, AfterViewInit {
     sendMessage() {
         if (this.newMessage.trim() && this.newMessage.length <= MAX_MESSAGE_LENGTH) {
             switch (this.roomType) {
+                case 'GeneralChat':
+                    this.chatService.sendMessageToGeneralChat(this.newMessage);
+                    break;
                 case 'WaitingRoom':
                     this.chatService.sendMessageToWaitingRoom(this.newMessage);
                     break;
@@ -83,11 +89,12 @@ export class ChatboxComponent implements OnInit, AfterViewInit {
     }
 
     scrollToBottom() {
+        // add a timeout of 100ms to wait for the messages to be rendered
         setTimeout(() => {
             if (this.messagesContainer?.nativeElement) {
                 this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
             }
-        }, 0);
+        }, 100);
     }
 
     toggleChatbox() {

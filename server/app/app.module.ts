@@ -9,6 +9,7 @@ import { MovementModule } from '@app/modules/movement/movement.module';
 import { RoomModule } from '@app/modules/room/room.module';
 import { VirtualPlayersModule } from '@app/modules/virtual-players/virtual-players.module';
 import { SharedModule } from '@app/shared/shared.module';
+import { GeneralChatModule } from '@app/modules/general-chat/general-chat.module';
 
 @Module({
     imports: [
@@ -30,6 +31,7 @@ import { SharedModule } from '@app/shared/shared.module';
         MovementModule,
         RoomModule,
         VirtualPlayersModule,
+        GeneralChatModule,
     ],
 })
 export class AppModule {}

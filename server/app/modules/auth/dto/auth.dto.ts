@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { IsEmail, IsString, IsNotEmpty, MinLength, IsOptional, IsObject } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsObject, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class RegisterUserDto {
     @IsEmail({}, { message: 'Email Invalide' })
@@ -44,4 +44,10 @@ export class UpdateUserDto {
     @IsOptional()
     @IsObject()
     preferences?: Record<string, unknown>;
+}
+
+export class GetEmailByUsernameDto {
+    @IsString()
+    @IsNotEmpty({ message: "Le nom d'utilisateur est requis" })
+    username: string;
 }

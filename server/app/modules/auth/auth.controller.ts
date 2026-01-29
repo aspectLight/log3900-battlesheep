@@ -1,9 +1,9 @@
-import { Controller, Post, Get, Patch, Delete, Body, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
-import { AuthService } from '@app/modules/auth/services/auth.service';
-import { AuthGuard } from '@app/modules/auth/guards/auth.guard';
 import { CurrentUser } from '@app/modules/auth/decorators/current-user.decorator';
-import { RegisterUserDto, VerifyTokenDto, UpdateUserDto, LoginDto } from '@app/modules/auth/dto/auth.dto';
+import { GetEmailByUsernameDto, LoginDto, RegisterUserDto, UpdateUserDto, VerifyTokenDto } from '@app/modules/auth/dto/auth.dto';
+import { AuthGuard } from '@app/modules/auth/guards/auth.guard';
 import { UserDocument } from '@app/modules/auth/schemas/user.schema';
+import { AuthService } from '@app/modules/auth/services/auth.service';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Post, UseGuards } from '@nestjs/common';
 
 @Controller('auth')
 export class AuthController {
@@ -62,6 +62,14 @@ export class AuthController {
             uid: decodedToken.uid,
             email: decodedToken.email,
         };
+    }
+
+    // POST /auth/get-email-by-username
+    @Post('get-email-by-username')
+    @HttpCode(HttpStatus.OK)
+    async getEmailByUsername(@Body() dto: GetEmailByUsernameDto) {
+        const email = await this.authService.getEmailByUsername(dto.username);
+        return { email };
     }
 
     // GET /auth/profile
