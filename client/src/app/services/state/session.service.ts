@@ -5,12 +5,12 @@ const KEY = 'sessionId';
 @Injectable({ providedIn: 'root' })
 export class SessionService {
     get sessionId(): string | null {
-        return localStorage.getItem(KEY);
+        return sessionStorage.getItem(KEY);
     }
 
     set sessionId(value: string | null) {
-        if (!value) localStorage.removeItem(KEY);
-        else localStorage.setItem(KEY, value);
+        if (!value) sessionStorage.removeItem(KEY);
+        else sessionStorage.setItem(KEY, value);
     }
 
     clear() {

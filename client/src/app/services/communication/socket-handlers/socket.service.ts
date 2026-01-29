@@ -57,7 +57,7 @@ export class SocketService implements ISocketService {
     }
 
     connect() {
-        this.socket = io(environment.socketUrl);
+        this.socket = io(environment.socketUrl, { transports: ['websocket'], upgrade: false });
     }
 
     getId(): string | undefined {
@@ -124,11 +124,15 @@ export class SocketService implements ISocketService {
         this.socket.emit(GameRoomEvents.QuitEndGame, this.getRoomId());
     }
 
-    reconnect(): void {
+    disconnect(): void {
         if (this.socket) {
             this.cleanup();
             this.socket.disconnect();
         }
+    }
+
+    reconnect(): void {
+        this.disconnect();
         this.setUpConnection();
     }
 

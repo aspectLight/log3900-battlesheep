@@ -108,6 +108,22 @@ export class AuthService {
         return user;
     }
 
+    async getEmailByUsername(username: string): Promise<string> {
+        const user = await this.userModel.findOne({ username });
+        if (!user) {
+            throw new NotFoundException('Utilisateur non trouvé');
+        }
+        return user.email;
+    }
+
+    async getUserByUsername(username: string): Promise<UserDocument> {
+        const user = await this.userModel.findOne({ username });
+        if (!user) {
+            throw new NotFoundException('Utilisateur non trouvé');
+        }
+        return user;
+    }
+
     async updateUser(uid: string, updateDto: UpdateUserDto): Promise<UserDocument> {
         const user = await this.getUserByUid(uid);
 

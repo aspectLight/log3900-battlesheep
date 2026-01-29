@@ -16,7 +16,6 @@ export enum WaitingRoomEvents {
     JoinRoomResponse = 'joinRoomResponse',
     CreatePlayer = 'createPlayer',
     PlayerCreated = 'playerCreated',
-    PlayerJoined = 'playerJoined',
     LeaveRoomResponse = 'leaveRoomResponse',
     PlayerLeft = 'playerLeft',
     KickPlayer = 'kickPlayer',
@@ -111,4 +110,14 @@ export enum ChatEvents {
     MassMessage = 'massMessage',
     Hello = 'hello',
     Clock = 'clock',
+}
+
+export enum GeneralChatEvents {
+    JoinGeneralChat = 'joinGeneralChat',
+    LeaveGeneralChat = 'leaveGeneralChat',
+    SendMessageToGeneralChat = 'sendMessageToGeneralChat',
+    GeneralChatMessage = 'generalChatMessage',
+    GetGeneralChatMessages = 'getGeneralChatMessages',
+    GetGeneralChatMessagesResponse = 'getGeneralChatMessagesResponse',
+    GeneralChatError = 'generalChatError',
 }

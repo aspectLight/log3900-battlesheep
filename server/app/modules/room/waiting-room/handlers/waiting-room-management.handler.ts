@@ -34,7 +34,7 @@ export class WaitingRoomManagementHandler {
     /**
      * Handles player joining a room
      */
-    handleJoinRoom(roomId: string, socket: Socket, server: Server): void {
+    handleJoinRoom(roomId: string, socket: Socket): void {
         try {
             const room = this.waitingRoomService.findRoomById(roomId);
             if (!room) throw new Error('Room does not exist');
@@ -43,7 +43,6 @@ export class WaitingRoomManagementHandler {
             socket.emit(WaitingRoomEvents.JoinRoomResponse, { success: true, room });
             this.waitingRoomService.joinRoom(roomId, socket.id);
             socket.join(roomId);
-            server.to(roomId).emit(WaitingRoomEvents.PlayerJoined, { playerId: socket.id });
             this.logger.log(`Joueur ${socket.id} a rejoint la salle ${roomId}`);
         } catch (error) {
             socket.emit(WaitingRoomEvents.JoinRoomResponse, { success: false, error: error.message });

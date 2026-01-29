@@ -1,0 +1,30 @@
+import 'package:fpdart/fpdart.dart';
+import '../../core/exceptions/auth_exception.dart';
+import '../entities/user_entity.dart';
+
+abstract interface class AuthRepository {
+  Stream<UserEntity?> get authStateChanges;
+
+  Future<UserEntity?> get currentUser;
+
+  TaskEither<AuthException, UserEntity> signIn({
+    required String identifier,
+    required String password,
+  });
+
+  TaskEither<AuthException, UserEntity> signUp({
+    required String username,
+    required String email,
+    required String password,
+  });
+
+  TaskEither<AuthException, Unit> signOut();
+
+  TaskEither<AuthException, UserEntity> updateProfile({
+    String? username,
+    String? email,
+    String? avatarId,
+  });
+
+  TaskEither<AuthException, Unit> deleteAccount();
+}

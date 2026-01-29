@@ -45,7 +45,7 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
 
     @SubscribeMessage(WaitingRoomEvents.JoinWaitingRoom)
     handleJoinRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
-        return this.managementHandler.handleJoinRoom(roomId, socket, this.server);
+        return this.managementHandler.handleJoinRoom(roomId, socket);
     }
 
     @SubscribeMessage(WaitingRoomEvents.LeaveWaitingRoom)

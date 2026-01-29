@@ -1,0 +1,16 @@
+enum AuthValidationError {
+  usernameRequired,
+  identifierRequired,
+  usernameTooShort,
+  usernameTooLong,
+  usernameSpecialChars,
+  emailRequired,
+  invalidEmail,
+  passwordRequired,
+  passwordTooShort,
+  passwordLeastOneLetter,
+  passwordLeastOneDigit,
+  passwordNoSpaces,
+  confirmationRequired,
+  passwordsDoNotMatch,
+}
