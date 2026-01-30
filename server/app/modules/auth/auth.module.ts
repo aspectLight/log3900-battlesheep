@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AuthController } from '@app/modules/auth/auth.controller';
-import { AuthService } from '@app/modules/auth/services/auth.service';
-import { FirebaseAdminService } from '@app/modules/auth/services/firebase-admin.service';
-import { AuthGuard } from '@app/modules/auth/guards/auth.guard';
-import { User, UserSchema } from '@app/modules/auth/schemas/user.schema';
+import { AuthController } from './controllers/auth.controller';
+import { AuthGuard } from './guards/auth.guard';
+import { User, UserSchema } from './schemas/user.schema';
+import { AuthService } from './services/auth.service';
+import { FirebaseAdminService } from './services/firebase-admin.service';
 
 @Module({
     imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
