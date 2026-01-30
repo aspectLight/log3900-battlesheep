@@ -1,75 +1,113 @@
 <div class="container">
-    <div class="header">
-        <img class="logo" src="./assets/ui/eastern_solace_logo-removebg-preview.png" alt="Logo Jeu" />
-    </div>
+    <button class="return-button" routerLink="/auth-landing" type="button">
+        <img src="./assets/ui/left.png" alt="Back" />
+        Retour
+    </button>
 
     <div class="content-wrapper">
+        <img class="logo" src="./assets/ui/eastern_solace_logo-removebg-preview.png" alt="Logo Jeu" />
         <form [formGroup]="form" (ngSubmit)="submitForm()" class="signup-form">
-            <div class="field">
-              <label for="username">Pseudonyme</label>
-              <input id="username" type="text" formControlName="username" autocomplete="given-name" />
-          
-              @if (form.controls.username.touched && form.controls.username.errors?.['required']) {
-                <small class="error">Champ obligatoire</small>
-              }
-              @if (form.controls.username.touched && form.controls.username.errors?.['pattern']) {
-                <small class="error">Caractères spéciaux non autorisés</small>
-              }
-            </div>
-          
-            <div class="field">
-              <label for="email">Email</label>
-              <input id="email" type="email" formControlName="email" autocomplete="email" />
-          
-              @if (form.controls.email.touched && form.controls.email.errors?.['required']) {
-                <small class="error">Champ obligatoire</small>
-              }
-              @if (form.controls.email.touched && (form.controls.email.errors?.['email'] || form.controls.email.errors?.['pattern'])) {
-                <small class="error">Format email invalide</small>
-              }
+            <div class="form-columns">
+                <div class="form-column-left">
+                    <div class="field">
+                        <label for="username">Nom d'utilisateur</label>
+                        <input id="username" type="text" formControlName="username" autocomplete="username" placeholder="JohnDoe" />
 
-            </div>
-          
-            <div class="field">
-              <label for="password">Mot de passe</label>
-              <input
-                id="password"
-                type="password"
-                formControlName="password"
-                autocomplete="new-password"
-              />
-          
-              @if (form.controls.password.touched && form.controls.password.errors?.['required']) {
-                <small class="error">Champ obligatoire</small>
-              }
-              @if (form.controls.password.touched && form.controls.password.errors?.['minlength']) {
-                <small class="error">Minimum 8 caractères</small>
-              }
-            </div>
-            <div class="field">
-                <p class="label">Choisis un avatar</p>
-            
-                <div class="avatar-grid">
-                  @for (a of avatars; track a.id) {
-                    <button
-                      type="button"
-                      class="avatar-btn"
-                      [class.selected]="selectedAvatarId === a.id"
-                      (click)="selectAvatar(a.id)"
-                    >
-                      {{ a.label }}
-                    </button>
-                  }
+                        @if (form.controls.username.touched && form.controls.username.errors?.['required']) {
+                        <small class="error">Champ obligatoire</small>
+                        } @if (form.controls.username.touched && (form.controls.username.errors?.['minlength'] ||
+                        form.controls.username.errors?.['maxlength'])) {
+                        <small class="error">Le nom d'utilisateur doit contenir entre 3 et 15 caractères</small>
+                        } @if (form.controls.username.touched && form.controls.username.errors?.['pattern']) {
+                        <small class="error">Caractères spéciaux non autorisés</small>
+                        }
+                    </div>
+
+                    <div class="field">
+                        <label for="email">Adresse courriel</label>
+                        <input id="email" type="email" formControlName="email" autocomplete="email" placeholder="johndoe@exemple.com" />
+
+                        @if (form.controls.email.touched && form.controls.email.errors?.['required']) {
+                        <small class="error">Champ obligatoire</small>
+                        } @if (form.controls.email.touched && (form.controls.email.errors?.['email'] || form.controls.email.errors?.['pattern'])) {
+                        <small class="error">Format email invalide</small>
+                        }
+                    </div>
+
+                    <div class="field">
+                        <label for="password">Mot de passe</label>
+                        <input id="password" type="password" formControlName="password" autocomplete="new-password" placeholder="••••••••" />
+
+                        @if (form.controls.password.touched && form.controls.password.errors?.['required']) {
+                        <small class="error">Champ obligatoire</small>
+                        } @if (form.controls.password.touched && form.controls.password.errors?.['minlength']) {
+                        <small class="error">Minimum 8 caractères</small>
+                        } @if (form.controls.password.touched && form.controls.password.errors?.['noLetter']) {
+                        <small class="error">Le mot de passe doit contenir au moins une lettre</small>
+                        } @if (form.controls.password.touched && form.controls.password.errors?.['noDigit']) {
+                        <small class="error">Le mot de passe doit contenir au moins un chiffre</small>
+                        } @if (form.controls.password.touched && form.controls.password.errors?.['hasSpaces']) {
+                        <small class="error">Le mot de passe ne doit pas contenir d'espace</small>
+                        }
+                    </div>
+
+                    <div class="field">
+                        <label for="confirmPassword">Confirmer le mot de passe</label>
+                        <input
+                            id="confirmPassword"
+                            type="password"
+                            formControlName="confirmPassword"
+                            autocomplete="new-password"
+                            placeholder="••••••••"
+                        />
+
+                        @if (form.controls.confirmPassword.touched && form.controls.confirmPassword.errors?.['required']) {
+                        <small class="error">Champ obligatoire</small>
+                        } @if (form.controls.confirmPassword.touched && !form.controls.confirmPassword.errors?.['required'] &&
+                        form.errors?.['passwordMismatch']) {
+                        <small class="error">Les mots de passe ne correspondent pas</small>
+                        }
+                    </div>
                 </div>
-            
-                @if (form.controls.avatarId.touched && form.controls.avatarId.errors?.['required']) {
-                  <small class="error">Choisis un avatar</small>
+
+                <div class="form-column-right">
+                    <div class="field">
+                        <p class="label">Avatar</p>
+                        <div class="avatar-grid">
+                            @for (a of avatars; track a.id) {
+                            <button
+                                type="button"
+                                class="avatar-btn"
+                                [class.selected]="selectedAvatarId === a.id"
+                                (click)="selectAvatar(a.id)"
+                                [title]="a.label"
+                            >
+                                <img [src]="a.image" [alt]="a.label" class="avatar-img" />
+                            </button>
+                            }
+                        </div>
+
+                        @if (form.controls.avatarId.touched && form.controls.avatarId.errors?.['required']) {
+                        <small class="error">Sélectionnez un avatar</small>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                @if (errorMessage) {
+                <div class="form-error">{{ errorMessage }}</div>
                 }
-              </div>
-            <button type="submit" class="btn-primary">
-              Créer un compte
-            </button>
-          </form>
-          
+
+                <button type="submit" class="btn-primary" [disabled]="isSubmitting">
+                    {{ isSubmitting ? 'Création...' : 'Créer un compte' }}
+                </button>
+
+                <p class="login-link">
+                    Déjà un compte ?
+                    <a routerLink="/login">Se connecter</a>
+                </p>
+            </div>
+        </form>
     </div>
 </div>

@@ -34,5 +34,8 @@
   "userNotFound": "User not found",
   "networkError": "Network connection problem",
   "serverError": "Server error",
-  "unknownError": "An unknown error occurred"
+  "unknownError": "An unknown error occurred",
+  "chat": "Chat",
+  "noMessages": "No messages yet. Start the conversation!",
+  "typeMessage": "Type a message..."
 }

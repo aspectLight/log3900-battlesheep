@@ -7,28 +7,21 @@ import '../../domain/interfaces/repositories/auth_repository.dart';
 class LoginViewModel {
   final AuthRepository _authRepository;
 
-  static final _emailRegex = RegExp(
-    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-  );
-
   LoginViewModel({required AuthRepository authRepository})
     : _authRepository = authRepository;
 
-  final email = signal('');
+  final username = signal('');
   final password = signal('');
 
   final hasAttemptedSubmit = signal(false);
   final isLoading = signal(false);
   final authState = signal<AuthState>(const AuthStateInitial());
 
-  late final emailError = computed<AuthValidationError?>(() {
-    if (email.value.isEmpty) {
+  late final usernameError = computed<AuthValidationError?>(() {
+    if (username.value.isEmpty) {
       return hasAttemptedSubmit.value
-          ? AuthValidationError.emailRequired
+          ? AuthValidationError.usernameRequired
           : null;
-    }
-    if (!_emailRegex.hasMatch(email.value)) {
-      return hasAttemptedSubmit.value ? AuthValidationError.invalidEmail : null;
     }
     return null;
   });
@@ -43,12 +36,10 @@ class LoginViewModel {
   });
 
   late final isFormValid = computed(() {
-    return email.value.isNotEmpty &&
-        _emailRegex.hasMatch(email.value) &&
-        password.value.isNotEmpty;
+    return username.value.isNotEmpty && password.value.isNotEmpty;
   });
 
-  void updateEmail(String value) => email.value = value;
+  void updateUsername(String value) => username.value = value;
 
   void updatePassword(String value) => password.value = value;
 
@@ -63,7 +54,7 @@ class LoginViewModel {
     authState.value = const AuthStateLoading();
 
     final result = await _authRepository
-        .signIn(identifier: email.value, password: password.value)
+        .signIn(username: username.value, password: password.value)
         .run();
 
     result.fold(
@@ -75,7 +66,7 @@ class LoginViewModel {
   }
 
   void resetForm() {
-    email.value = '';
+    username.value = '';
     password.value = '';
     hasAttemptedSubmit.value = false;
     authState.value = const AuthStateInitial();

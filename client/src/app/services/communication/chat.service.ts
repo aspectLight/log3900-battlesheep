@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
+import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';
+import { GeneralChatEvents } from '@common/socket.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -9,6 +10,7 @@ import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';
 export class ChatService {
     messages: { type: string; name?: string | null; content: string; time: string }[] = [];
     playerName: string | null = null;
+    username: string | null = null;
     private scrollCallback: (() => void) | null = null;
 
     constructor(
@@ -16,13 +18,36 @@ export class ChatService {
         private roomSocketService: RoomSocketService,
         private waitingRoomService: WaitingRoomService,
     ) {
+        this.setupListeners();
+    }
+
+    setupListeners(): void {
         this.socketService.on('massMessage', (message: { type: string; content: string; time: string }) => {
             this.messages.push(message);
             this.triggerScroll();
         });
+
         this.socketService.on('getMessagesResponse', (messages: { type: string; content: string; time: string }[]) => {
             this.messages = messages;
             this.triggerScroll();
+        });
+
+        this.socketService.on(GeneralChatEvents.GeneralChatMessage, (message: { type: string; name: string; content: string; time: string }) => {
+            this.messages.push(message);
+            this.triggerScroll();
+        });
+
+        this.socketService.on(
+            GeneralChatEvents.GetGeneralChatMessagesResponse,
+            (messages: { type: string; name: string; content: string; time: string }[]) => {
+                this.messages = messages;
+                this.triggerScroll();
+            },
+        );
+        this.socketService.on('connect', () => {
+            if (this.username) {
+                this.socketService.send(GeneralChatEvents.JoinGeneralChat, this.username);
+            }
         });
     }
 
@@ -63,6 +88,31 @@ export class ChatService {
             }),
         });
         this.socketService.sendMessageToGameRoom(newMessage, this.playerName);
+    }
+
+    joinGeneralChat(username: string): void {
+        this.username = username;
+        this.socketService.send(GeneralChatEvents.JoinGeneralChat, username);
+    }
+
+    getGeneralChatMessages(): void {
+        this.socketService.send(GeneralChatEvents.GetGeneralChatMessages);
+        this.playerName = this.username;
+    }
+
+    sendMessageToGeneralChat(newMessage: string): void {
+        this.messages.push({
+            type: 'sent',
+            name: this.username,
+            content: newMessage,
+            time: new Date().toLocaleTimeString('en-GB', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+            }),
+        });
+        this.socketService.send(GeneralChatEvents.SendMessageToGeneralChat, { username: this.username, message: newMessage });
     }
 
     setScrollHandler(callback: () => void) {

@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -15,7 +16,10 @@ import 'routing/app_router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load();
+
+  const environment = const String.fromEnvironment('ENV', defaultValue: 'dev');
+  await dotenv.load(fileName: '.env.$environment');
+
   await setupDependencies();
 
   runApp(const MyApp());

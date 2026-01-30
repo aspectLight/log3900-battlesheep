@@ -73,23 +73,30 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   TaskEither<AuthException, UserEntity> signIn({
-    required String identifier,
+    required String username,
     required String password,
   }) {
     return TaskEither.tryCatch(
       () async {
+        // 1. Get email from username
+        final emailRes = await _authService.getEmailByUsername(username).run();
+        final email = emailRes.getOrElse((l) => throw l);
+
+        // 2. Authenticate with Firebase using email
         final firebaseResult = await _firebaseAuthService
-            .signInWithEmailPassword(email: identifier, password: password)
+            .signInWithEmailPassword(email: email, password: password)
             .run();
 
         final firebaseAuthResponse = firebaseResult.getOrElse((l) => throw l);
 
+        // 3. Send token to server
         final apiResult = await _authService
             .signInWithToken(firebaseToken: firebaseAuthResponse.idToken)
             .run();
 
         final userDto = apiResult.getOrElse((l) => throw l);
 
+        // 4. Save to Local
         await _localService.saveUser(userDto).run();
         final userEntity = userDto.toEntity();
         _updateState(userEntity);

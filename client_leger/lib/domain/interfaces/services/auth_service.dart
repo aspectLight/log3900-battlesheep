@@ -7,6 +7,8 @@ abstract interface class AuthService {
     required String firebaseToken,
   });
 
+  TaskEither<AuthException, String> getEmailByUsername(String username);
+
   TaskEither<AuthException, UserDto> signUp({
     required String username,
     required String email,

@@ -4,12 +4,14 @@ import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
 import { AuthService } from '@app/services/communication/auth.service';
+import { ChatService } from '@app/services/communication/chat.service';
+import { ChatboxComponent } from '@app/components/shared/chatbox/chatbox.component';
 
 @Component({
     selector: 'app-main-page',
     templateUrl: './main-page.component.html',
     styleUrls: ['./main-page.component.scss'],
-    imports: [RouterLink, PopUpComponent],
+    imports: [RouterLink, PopUpComponent, ChatboxComponent],
 })
 export class MainPageComponent implements OnInit {
     readonly title: string = 'Eastern Solace';
@@ -19,6 +21,7 @@ export class MainPageComponent implements OnInit {
         private gameManagerService: GameManagerService,
         private socketService: SocketService,
         private authService: AuthService,
+        private chatService: ChatService,
         private router: Router,
     ) {}
 
@@ -32,6 +35,9 @@ export class MainPageComponent implements OnInit {
 
     ngOnInit(): void {
         this.socketService.reconnect();
+        this.chatService.setupListeners();
+        const username = this.authService.currentUser?.displayName || 'Utilisateur';
+        this.chatService.joinGeneralChat(username);
     }
 
     understandError() {

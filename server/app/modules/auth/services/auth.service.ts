@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException, ForbiddenException, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { DecodedIdToken } from 'firebase-admin/auth';
-import { v4 as uuidv4 } from 'uuid';
-import { FirebaseAdminService } from '@app/modules/auth/services/firebase-admin.service';
-import { User, UserDocument } from '@app/modules/auth/schemas/user.schema';
 import { RegisterUserDto, UpdateUserDto } from '@app/modules/auth/dto/auth.dto';
+import { User, UserDocument } from '@app/modules/auth/schemas/user.schema';
+import { FirebaseAdminService } from '@app/modules/auth/services/firebase-admin.service';
+import { ConflictException, ForbiddenException, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { DecodedIdToken } from 'firebase-admin/auth';
+import { Model } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -102,6 +102,22 @@ export class AuthService {
 
     async getUserByUid(uid: string): Promise<UserDocument> {
         const user = await this.userModel.findOne({ firebaseUid: uid });
+        if (!user) {
+            throw new NotFoundException('Utilisateur non trouvé');
+        }
+        return user;
+    }
+
+    async getEmailByUsername(username: string): Promise<string> {
+        const user = await this.userModel.findOne({ username });
+        if (!user) {
+            throw new NotFoundException('Utilisateur non trouvé');
+        }
+        return user.email;
+    }
+
+    async getUserByUsername(username: string): Promise<UserDocument> {
+        const user = await this.userModel.findOne({ username });
         if (!user) {
             throw new NotFoundException('Utilisateur non trouvé');
         }

@@ -126,4 +126,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get unknownError => 'Une erreur inconnue est survenue';
+
+  @override
+  String get chat => 'Clavardage';
+
+  @override
+  String get noMessages =>
+      'Aucun message pour l\'instant. Commencez la conversation !';
+
+  @override
+  String get typeMessage => 'Tapez un message...';
 }

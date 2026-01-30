@@ -90,12 +90,12 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         Watch(
           (context) => AuthTextField(
-            label: l10n.email,
-            hintText: l10n.email,
-            errorText: _viewModel.emailError.value?.localize(l10n),
-            onChanged: _viewModel.updateEmail,
+            label: l10n.username,
+            hintText: l10n.username,
+            errorText: _viewModel.usernameError.value?.localize(l10n),
+            onChanged: _viewModel.updateUsername,
             enabled: !_viewModel.isLoading.value,
-            keyboardType: TextInputType.emailAddress,
+            keyboardType: TextInputType.text,
           ),
         ),
         Watch(

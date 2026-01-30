@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/services/auth_local_service.dart';
 import '../../data/services/firebase_auth_service.dart';
+import '../../data/services/chat_service.dart';
 import '../../data/services/http_auth_service.dart';
 import '../../domain/interfaces/repositories/auth_repository.dart';
 import '../../domain/interfaces/services/auth_local_service.dart';
@@ -50,6 +51,10 @@ void _registerServices() {
   getIt.registerLazySingleton<FirebaseAuthService>(FirebaseAuthServiceImpl.new);
 
   getIt.registerLazySingleton<AuthLocalService>(AuthLocalServiceImpl.new);
+
+  getIt.registerLazySingleton<ChatService>(
+    () => ChatService(serverUrl: EnvConfig.socketUrl),
+  );
 }
 
 void _registerRepositories() {
