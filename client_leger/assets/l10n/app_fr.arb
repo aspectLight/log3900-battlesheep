@@ -1,4 +1,5 @@
 {
+  "@@locale": "fr",
   "welcomeUser": "Bienvenue, {username}",
   "gameContentSoon": "Le contenu du jeu arrive bientôt...",
   "createAccount": "Créer un compte",

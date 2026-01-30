@@ -9,7 +9,7 @@ import '../../core/l10n/extensions/auth_exception_ext.dart';
 import '../../core/l10n/extensions/auth_validation_error_ext.dart';
 import '../../domain/entities/auth_state.dart';
 import '../../generated/l10n/app_localizations.dart';
-import '../../generated/routing/app_router.gr.dart';
+import '../../routing/app_router.dart';
 import '../view_models/sign_up_view_model.dart';
 import '../widgets/auth_submit_button.dart';
 import '../widgets/auth_text_field.dart';

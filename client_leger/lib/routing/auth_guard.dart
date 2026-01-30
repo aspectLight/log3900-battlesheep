@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 
 import '../domain/interfaces/repositories/auth_repository.dart';
-import '../generated/routing/app_router.gr.dart';
+import 'app_router.dart';
 
 class AuthGuard extends AutoRouteGuard {
   final AuthRepository _authRepository;

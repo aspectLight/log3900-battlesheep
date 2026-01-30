@@ -98,235 +98,235 @@ abstract class AppLocalizations {
     Locale('fr'),
   ];
 
-  /// No description provided for @welcomeUser.
+  /// Welcome message on the home screen
   ///
   /// In en, this message translates to:
   /// **'Welcome back, {username}'**
-  String welcomeUser(Object username);
+  String welcomeUser(String username);
 
-  /// No description provided for @gameContentSoon.
+  /// Placeholder text for upcoming game features
   ///
   /// In en, this message translates to:
   /// **'Game content coming soon...'**
   String get gameContentSoon;
 
-  /// No description provided for @createAccount.
+  /// Button text to create a new account
   ///
   /// In en, this message translates to:
   /// **'Create Account'**
   String get createAccount;
 
-  /// No description provided for @signUpToStart.
+  /// Subtitle text encouraging signup
   ///
   /// In en, this message translates to:
   /// **'Sign up to get started'**
   String get signUpToStart;
 
-  /// No description provided for @mainMenu.
+  /// Title for the main menu screen
   ///
   /// In en, this message translates to:
   /// **'Main Menu'**
   String get mainMenu;
 
-  /// No description provided for @usernameRequired.
+  /// Validation error when username is empty
   ///
   /// In en, this message translates to:
   /// **'Username is required'**
   String get usernameRequired;
 
-  /// No description provided for @identifierRequired.
+  /// Validation error when identifier is empty
   ///
   /// In en, this message translates to:
   /// **'Username or Email is required'**
   String get identifierRequired;
 
-  /// No description provided for @invalidEmail.
+  /// Validation error for invalid email format
   ///
   /// In en, this message translates to:
   /// **'Please enter a valid email address'**
   String get invalidEmail;
 
-  /// No description provided for @usernameTooShort.
+  /// Validation error for short username
   ///
   /// In en, this message translates to:
   /// **'Username must be at least 3 characters'**
   String get usernameTooShort;
 
-  /// No description provided for @usernameTooLong.
+  /// Validation error for long username
   ///
   /// In en, this message translates to:
   /// **'Username must be at most 15 characters'**
   String get usernameTooLong;
 
-  /// No description provided for @usernameSpecialChars.
+  /// Validation error for special characters in username
   ///
   /// In en, this message translates to:
   /// **'Username must not contain special characters'**
   String get usernameSpecialChars;
 
-  /// No description provided for @passwordRequired.
+  /// Validation error when password is empty
   ///
   /// In en, this message translates to:
   /// **'Password is required'**
   String get passwordRequired;
 
-  /// No description provided for @passwordTooShort.
+  /// Validation error for short password
   ///
   /// In en, this message translates to:
   /// **'Password must be at least 8 characters'**
   String get passwordTooShort;
 
-  /// No description provided for @passwordLeastOneLetter.
+  /// Validation error for missing letter in password
   ///
   /// In en, this message translates to:
   /// **'Password must contain at least one letter'**
   String get passwordLeastOneLetter;
 
-  /// No description provided for @passwordLeastOneDigit.
+  /// Validation error for missing digit in password
   ///
   /// In en, this message translates to:
   /// **'Password must contain at least one digit'**
   String get passwordLeastOneDigit;
 
-  /// No description provided for @passwordNoSpaces.
+  /// Validation error for spaces in password
   ///
   /// In en, this message translates to:
   /// **'Password must not contain spaces'**
   String get passwordNoSpaces;
 
-  /// No description provided for @confirmationRequired.
+  /// Validation error when confirmation is missing
   ///
   /// In en, this message translates to:
   /// **'Confirmation is required'**
   String get confirmationRequired;
 
-  /// No description provided for @passwordsDoNotMatch.
+  /// Validation error when passwords differ
   ///
   /// In en, this message translates to:
   /// **'Passwords do not match'**
   String get passwordsDoNotMatch;
 
-  /// No description provided for @emailRequired.
+  /// Validation error when email is empty
   ///
   /// In en, this message translates to:
   /// **'Email is required'**
   String get emailRequired;
 
-  /// No description provided for @welcomeBack.
+  /// Title or greeting for returning users
   ///
   /// In en, this message translates to:
   /// **'Welcome Back'**
   String get welcomeBack;
 
-  /// No description provided for @signInToContinue.
+  /// Subtitle text encouraging sign in
   ///
   /// In en, this message translates to:
   /// **'Sign in to continue'**
   String get signInToContinue;
 
-  /// No description provided for @usernameOrEmail.
+  /// Label for username or email input field
   ///
   /// In en, this message translates to:
   /// **'Username or Email'**
   String get usernameOrEmail;
 
-  /// No description provided for @username.
+  /// Label for username input field
   ///
   /// In en, this message translates to:
   /// **'Username'**
   String get username;
 
-  /// No description provided for @email.
+  /// Label for email input field
   ///
   /// In en, this message translates to:
   /// **'Email'**
   String get email;
 
-  /// No description provided for @password.
+  /// Label for password input field
   ///
   /// In en, this message translates to:
   /// **'Password'**
   String get password;
 
-  /// No description provided for @confirmPassword.
+  /// Label for confirm password input field
   ///
   /// In en, this message translates to:
   /// **'Confirm Password'**
   String get confirmPassword;
 
-  /// No description provided for @signIn.
+  /// Button text to sign in
   ///
   /// In en, this message translates to:
   /// **'Sign In'**
   String get signIn;
 
-  /// No description provided for @signUp.
+  /// Button text to sign up
   ///
   /// In en, this message translates to:
   /// **'Sign Up'**
   String get signUp;
 
-  /// No description provided for @noAccount.
+  /// Text asking if user has no account
   ///
   /// In en, this message translates to:
   /// **'Don\'t have an account? '**
   String get noAccount;
 
-  /// No description provided for @alreadyHaveAccount.
+  /// Text asking if user already has an account
   ///
   /// In en, this message translates to:
   /// **'Already have an account? '**
   String get alreadyHaveAccount;
 
-  /// No description provided for @invalidCredentials.
+  /// Error message for invalid login credentials
   ///
   /// In en, this message translates to:
   /// **'Invalid username or password'**
   String get invalidCredentials;
 
-  /// No description provided for @emailAlreadyInUse.
+  /// Error message when registering with existing email
   ///
   /// In en, this message translates to:
   /// **'This email is already in use'**
   String get emailAlreadyInUse;
 
-  /// No description provided for @userNotFound.
+  /// Error message when user is not found
   ///
   /// In en, this message translates to:
   /// **'User not found'**
   String get userNotFound;
 
-  /// No description provided for @networkError.
+  /// Error message for network issues
   ///
   /// In en, this message translates to:
   /// **'Network connection problem'**
   String get networkError;
 
-  /// No description provided for @serverError.
+  /// Error message for server issues
   ///
   /// In en, this message translates to:
   /// **'Server error'**
   String get serverError;
 
-  /// No description provided for @unknownError.
+  /// Error message for unknown issues
   ///
   /// In en, this message translates to:
   /// **'An unknown error occurred'**
   String get unknownError;
 
-  /// No description provided for @chat.
+  /// Title or label for the chat feature
   ///
   /// In en, this message translates to:
   /// **'Chat'**
   String get chat;
 
-  /// No description provided for @noMessages.
+  /// Placeholder text when chat is empty
   ///
   /// In en, this message translates to:
   /// **'No messages yet. Start the conversation!'**
   String get noMessages;
 
-  /// No description provided for @typeMessage.
+  /// Placeholder text for message input field
   ///
   /// In en, this message translates to:
   /// **'Type a message...'**

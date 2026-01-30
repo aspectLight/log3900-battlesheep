@@ -71,7 +71,6 @@ class HttpAuthService implements AuthService {
   }) => TaskEither.tryCatch(() async {
     LogService.d('Signing in with token');
 
-    // Send token to server
     final response = await _dio.post<Map<String, dynamic>>(
       ApiEndpoints.login,
       data: {'token': firebaseToken},
