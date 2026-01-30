@@ -8,7 +8,7 @@ abstract interface class AuthRepository {
   Future<UserEntity?> get currentUser;
 
   TaskEither<AuthException, UserEntity> signIn({
-    required String identifier,
+    required String username,
     required String password,
   });
 
