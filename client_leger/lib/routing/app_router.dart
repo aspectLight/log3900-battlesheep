@@ -13,6 +13,7 @@ class AppRouter extends RootStackRouter {
   List<AutoRoute> get routes => [
     AutoRoute(page: LoginRoute.page, path: '/login'),
     AutoRoute(page: SignUpRoute.page, path: '/signup'),
+    AutoRoute(page: ChatRoute.page, path: '/chat', guards: [authGuard]),
     AutoRoute(page: MainRoute.page, path: '/main', guards: [authGuard]),
   ];
 

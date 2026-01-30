@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/services/auth_local_service.dart';
+import '../../data/services/chat_service.dart';
 import '../../data/services/http_auth_service.dart';
 import '../../domain/interfaces/auth_local_service.dart';
 import '../../domain/interfaces/auth_repository.dart';
@@ -46,6 +47,10 @@ void _registerServices() {
   );
 
   getIt.registerLazySingleton<AuthLocalService>(AuthLocalServiceImpl.new);
+
+  getIt.registerLazySingleton<ChatService>(
+    () => ChatService(serverUrl: EnvConfig.baseUrl),
+  );
 }
 
 void _registerRepositories() {
