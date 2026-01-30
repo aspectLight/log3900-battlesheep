@@ -5,7 +5,7 @@ import '../../core/helpers/email_validator.dart';
 import '../../core/helpers/password_validator.dart';
 import '../../core/helpers/username_validator.dart';
 import '../../domain/entities/auth_state.dart';
-import '../../domain/interfaces/auth_repository.dart';
+import '../../domain/interfaces/repositories/auth_repository.dart';
 
 class SignUpViewModel {
   final AuthRepository _authRepository;

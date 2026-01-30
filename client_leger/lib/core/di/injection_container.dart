@@ -6,10 +6,12 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/services/auth_local_service.dart';
+import '../../data/services/firebase_auth_service.dart';
 import '../../data/services/http_auth_service.dart';
-import '../../domain/interfaces/auth_local_service.dart';
-import '../../domain/interfaces/auth_repository.dart';
-import '../../domain/interfaces/auth_service.dart';
+import '../../domain/interfaces/repositories/auth_repository.dart';
+import '../../domain/interfaces/services/auth_local_service.dart';
+import '../../domain/interfaces/services/auth_service.dart';
+import '../../domain/interfaces/services/firebase_auth_service.dart';
 import '../../presentation/view_models/auth_view_model.dart';
 import '../../presentation/view_models/login_view_model.dart';
 import '../../presentation/view_models/sign_up_view_model.dart';
@@ -45,6 +47,8 @@ void _registerServices() {
     ),
   );
 
+  getIt.registerLazySingleton<FirebaseAuthService>(FirebaseAuthServiceImpl.new);
+
   getIt.registerLazySingleton<AuthLocalService>(AuthLocalServiceImpl.new);
 }
 
@@ -53,6 +57,7 @@ void _registerRepositories() {
     () => AuthRepositoryImpl(
       authService: getIt<AuthService>(),
       localService: getIt<AuthLocalService>(),
+      firebaseAuthService: getIt<FirebaseAuthService>(),
     ),
   );
 }

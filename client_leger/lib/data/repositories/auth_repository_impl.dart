@@ -2,15 +2,17 @@ import 'dart:async';
 import 'package:fpdart/fpdart.dart';
 
 import '../../core/exceptions/auth_exception.dart';
-import '../../data/models/user_dto.dart';
+
 import '../../domain/entities/user_entity.dart';
-import '../../domain/interfaces/auth_local_service.dart';
-import '../../domain/interfaces/auth_repository.dart';
-import '../../domain/interfaces/auth_service.dart';
+import '../../domain/interfaces/repositories/auth_repository.dart';
+import '../../domain/interfaces/services/auth_local_service.dart';
+import '../../domain/interfaces/services/auth_service.dart';
+import '../../domain/interfaces/services/firebase_auth_service.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthService _authService;
   final AuthLocalService _localService;
+  final FirebaseAuthService _firebaseAuthService;
   final _authStateController = StreamController<UserEntity?>.broadcast();
 
   UserEntity? _currentUser;
@@ -18,41 +20,53 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({
     required AuthService authService,
     required AuthLocalService localService,
+    required FirebaseAuthService firebaseAuthService,
   }) : _authService = authService,
-       _localService = localService;
+       _localService = localService,
+       _firebaseAuthService = firebaseAuthService;
 
   @override
   Stream<UserEntity?> get authStateChanges => _authStateController.stream;
 
   @override
-  Future<UserEntity?> get currentUser async {
-    if (_currentUser != null) return _currentUser;
+  TaskEither<AuthException, Option<UserEntity>> getCurrentUser() {
+    return TaskEither.tryCatch(
+      () async {
+        if (_currentUser != null) return some(_currentUser!);
 
-    final localUserDto = await _localService.getUser();
-    if (localUserDto != null) {
-      _updateState(localUserDto.toEntity());
-    }
+        final localUserRes = await _localService.getUser().run();
+        final localUserDto = localUserRes.getOrElse((_) => none()).toNullable();
 
-    final result = await _authService.getCurrentUser().run();
-
-    return result.fold(
-      (error) {
         if (localUserDto != null) {
-          if (error is InvalidCredentialsException ||
-              error is UserNotFoundException) {
-            unawaited(_clearLocalUser());
-            _updateState(null);
-            return null;
-          }
-          return localUserDto.toEntity();
+          _updateState(localUserDto.toEntity());
         }
-        return null;
+
+        final result = await _authService.getCurrentUser().run();
+
+        return result.fold(
+          (error) async {
+            if (localUserDto != null) {
+              if (error is InvalidCredentialsException ||
+                  error is UserNotFoundException) {
+                await _localService.clearAll().run();
+                _updateState(null);
+                return none();
+              }
+              return some(localUserDto.toEntity());
+            }
+            return none();
+          },
+          (serverDto) async {
+            await _localService.saveUser(serverDto).run();
+            final user = serverDto.toEntity();
+            _updateState(user);
+            return some(user);
+          },
+        );
       },
-      (serverDto) {
-        unawaited(_saveUserToLocal(serverDto));
-        final user = serverDto.toEntity();
-        _updateState(user);
-        return user;
+      (error, stack) {
+        if (error is AuthException) return error;
+        return UnknownAuthException(error.toString());
       },
     );
   }
@@ -62,19 +76,31 @@ class AuthRepositoryImpl implements AuthRepository {
     required String identifier,
     required String password,
   }) {
-    return _authService
-        .signIn(identifier: identifier, password: password)
-        .chainFirst(
-          (dto) => TaskEither.tryCatch(
-            () => _saveUserToLocal(dto),
-            (e, s) => const UnknownAuthException('Failed to save user'),
-          ),
-        )
-        .map((dto) => dto.toEntity())
-        .chainFirst((user) {
-          _updateState(user);
-          return TaskEither.right(unit);
-        });
+    return TaskEither.tryCatch(
+      () async {
+        final firebaseResult = await _firebaseAuthService
+            .signInWithEmailPassword(email: identifier, password: password)
+            .run();
+
+        final firebaseAuthResponse = firebaseResult.getOrElse((l) => throw l);
+
+        final apiResult = await _authService
+            .signInWithToken(firebaseToken: firebaseAuthResponse.idToken)
+            .run();
+
+        final userDto = apiResult.getOrElse((l) => throw l);
+
+        await _localService.saveUser(userDto).run();
+        final userEntity = userDto.toEntity();
+        _updateState(userEntity);
+
+        return userEntity;
+      },
+      (error, stack) {
+        if (error is AuthException) return error;
+        return UnknownAuthException(error.toString());
+      },
+    );
   }
 
   @override
@@ -83,29 +109,45 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String password,
   }) {
-    return _authService
-        .signUp(username: username, email: email, password: password)
-        .chainFirst(
-          (dto) => TaskEither.tryCatch(
-            () => _saveUserToLocal(dto),
-            (e, s) => const UnknownAuthException('Failed to save user'),
-          ),
-        )
-        .map((dto) => dto.toEntity())
-        .chainFirst((user) {
-          _updateState(user);
-          return TaskEither.right(unit);
-        });
+    return TaskEither.tryCatch(
+      () async {
+        final signUpResult = await _authService
+            .signUp(username: username, email: email, password: password)
+            .run();
+
+        if (signUpResult.isLeft()) {
+          throw signUpResult.getLeft().toNullable()!;
+        }
+
+        final signInResult = await signIn(
+          identifier: email,
+          password: password,
+        ).run();
+
+        return signInResult.getOrElse((l) => throw l);
+      },
+      (error, stack) {
+        if (error is AuthException) return error;
+        return UnknownAuthException(error.toString());
+      },
+    );
   }
 
   @override
   TaskEither<AuthException, Unit> signOut() {
-    return _authService.signOut().chainFirst(
-      (_) => TaskEither.tryCatch(() async {
-        await _clearLocalUser();
+    return TaskEither.tryCatch(
+      () async {
+        final result = await _authService.signOut().run();
+        if (result.isLeft()) throw result.getLeft().toNullable()!;
+
+        await _localService.clearAll().run();
         _updateState(null);
         return unit;
-      }, (e, s) => const UnknownAuthException('Failed to clear local user')),
+      },
+      (error, stack) {
+        if (error is AuthException) return error;
+        return UnknownAuthException(error.toString());
+      },
     );
   }
 
@@ -115,47 +157,49 @@ class AuthRepositoryImpl implements AuthRepository {
     String? email,
     String? avatarId,
   }) {
-    final updates = <String, dynamic>{};
-    if (username != null) updates['username'] = username;
-    if (email != null) updates['email'] = email;
-    if (avatarId != null) updates['avatarId'] = avatarId;
+    return TaskEither.tryCatch(
+      () async {
+        final updates = <String, dynamic>{};
+        if (username != null) updates['username'] = username;
+        if (email != null) updates['email'] = email;
+        if (avatarId != null) updates['avatarId'] = avatarId;
 
-    return _authService
-        .updateProfile(updates)
-        .chainFirst(
-          (dto) => TaskEither.tryCatch(
-            () => _saveUserToLocal(dto),
-            (e, s) => const UnknownAuthException('Failed to save user'),
-          ),
-        )
-        .map((dto) => dto.toEntity())
-        .chainFirst((user) {
-          _updateState(user);
-          return TaskEither.right(unit);
-        });
+        final result = await _authService.updateProfile(updates).run();
+        final userDto = result.getOrElse((l) => throw l);
+
+        await _localService.saveUser(userDto).run();
+        final userEntity = userDto.toEntity();
+        _updateState(userEntity);
+
+        return userEntity;
+      },
+      (error, stack) {
+        if (error is AuthException) return error;
+        return UnknownAuthException(error.toString());
+      },
+    );
   }
 
   @override
   TaskEither<AuthException, Unit> deleteAccount() {
-    return _authService.deleteAccount().chainFirst(
-      (_) => TaskEither.tryCatch(() async {
-        await _clearLocalUser();
+    return TaskEither.tryCatch(
+      () async {
+        final result = await _authService.deleteAccount().run();
+        if (result.isLeft()) throw result.getLeft().toNullable()!;
+
+        await _localService.clearAll().run();
         _updateState(null);
         return unit;
-      }, (e, s) => const UnknownAuthException('Failed to clear local user')),
+      },
+      (error, stack) {
+        if (error is AuthException) return error;
+        return UnknownAuthException(error.toString());
+      },
     );
   }
 
   void _updateState(UserEntity? user) {
     _currentUser = user;
     _authStateController.add(user);
-  }
-
-  Future<void> _saveUserToLocal(UserDto user) async {
-    await _localService.saveUser(user);
-  }
-
-  Future<void> _clearLocalUser() async {
-    await _localService.clearAll();
   }
 }

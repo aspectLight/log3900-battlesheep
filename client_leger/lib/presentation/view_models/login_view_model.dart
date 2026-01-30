@@ -2,7 +2,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../core/enums/auth_validation_error.dart';
 import '../../domain/entities/auth_state.dart';
-import '../../domain/interfaces/auth_repository.dart';
+import '../../domain/interfaces/repositories/auth_repository.dart';
 
 class LoginViewModel {
   final AuthRepository _authRepository;

@@ -1,11 +1,10 @@
 import 'package:fpdart/fpdart.dart';
-import '../../core/exceptions/auth_exception.dart';
-import '../../data/models/user_dto.dart';
+import '../../../core/exceptions/auth_exception.dart';
+import '../../../data/models/user_dto.dart';
 
 abstract interface class AuthService {
-  TaskEither<AuthException, UserDto> signIn({
-    required String identifier,
-    required String password,
+  TaskEither<AuthException, UserDto> signInWithToken({
+    required String firebaseToken,
   });
 
   TaskEither<AuthException, UserDto> signUp({

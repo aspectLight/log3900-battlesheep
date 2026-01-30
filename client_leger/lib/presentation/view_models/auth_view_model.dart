@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:signals_flutter/signals_flutter.dart';
 import '../../domain/entities/auth_state.dart';
 import '../../domain/entities/user_entity.dart';
-import '../../domain/interfaces/auth_repository.dart';
+import '../../domain/interfaces/repositories/auth_repository.dart';
 
 class AuthViewModel {
   final AuthRepository _authRepository;
@@ -55,12 +55,15 @@ class AuthViewModel {
 
   Future<void> checkAuthStatus() async {
     isLoading.value = true;
-    final user = await _authRepository.currentUser;
-    if (user != null) {
-      authState.value = AuthStateAuthenticated(user);
-    } else {
-      authState.value = const AuthStateUnauthenticated();
-    }
+    final result = await _authRepository.getCurrentUser().run();
+
+    result.fold(
+      (error) => authState.value = const AuthStateUnauthenticated(),
+      (option) => option.fold(
+        () => authState.value = const AuthStateUnauthenticated(),
+        (user) => authState.value = AuthStateAuthenticated(user),
+      ),
+    );
     isLoading.value = false;
   }
 

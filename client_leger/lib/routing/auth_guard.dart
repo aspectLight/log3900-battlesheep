@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 
-import '../domain/interfaces/auth_repository.dart';
+import '../domain/interfaces/repositories/auth_repository.dart';
 import '../generated/routing/app_router.gr.dart';
 
 class AuthGuard extends AutoRouteGuard {
@@ -14,9 +14,10 @@ class AuthGuard extends AutoRouteGuard {
     NavigationResolver resolver,
     StackRouter router,
   ) async {
-    final user = await _authRepository.currentUser;
+    final result = await _authRepository.getCurrentUser().run();
+    final isAuthenticated = result.fold((l) => false, (opt) => opt.isSome());
 
-    if (user != null) {
+    if (isAuthenticated) {
       resolver.next();
       return;
     }
