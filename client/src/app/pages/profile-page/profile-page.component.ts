@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { AvatarOption, UserProfile, UserStatistics } from '@app/interfaces/profile.interface';
+import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
+import { PROFILE_AVATARS } from '@app/constants/profile.constants';
+import { UserProfile, UserStatistics } from '@app/interfaces/profile.interface';
 import { ProfileService } from '@app/services/communication/profile.service';
 import { StatsService } from '@app/services/communication/stats.service';
 
@@ -9,16 +11,10 @@ import { StatsService } from '@app/services/communication/stats.service';
     selector: 'app-profile-page',
     templateUrl: './profile-page.component.html',
     styleUrls: ['./profile-page.component.scss'],
-    imports: [ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink, PopUpComponent],
 })
 export class ProfilePageComponent implements OnInit {
-    avatars: AvatarOption[] = [
-        { id: 'avatar_01', label: 'Avatar 1' },
-        { id: 'avatar_02', label: 'Avatar 2' },
-        { id: 'avatar_03', label: 'Avatar 3' },
-        { id: 'avatar_04', label: 'Avatar 4' },
-        { id: 'avatar_05', label: 'Avatar 5' },
-    ];
+    avatars = PROFILE_AVATARS;
 
     profile: UserProfile | null = null;
     statistics: UserStatistics | null = null;
@@ -100,9 +96,14 @@ export class ProfilePageComponent implements OnInit {
     showError(message: string) {
         this.errorMessage = message;
         this.showErrorMessage = true;
-        setTimeout(() => {
-            this.showErrorMessage = false;
-        }, 5000);
+    }
+
+    onErrorConfirm() {
+        this.showErrorMessage = false;
+    }
+
+    onSuccessConfirm() {
+        this.showSuccessMessage = false;
     }
 
     formatTime(seconds: number): string {

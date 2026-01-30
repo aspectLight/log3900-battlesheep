@@ -12,97 +12,116 @@
         </div>
 
         <div class="content-wrapper">
-            <h1 class="page-title">Paramètres de compte</h1>
+            <div class="header-section">
+                <h1 class="page-title">Paramètres de compte</h1>
+            </div>
 
             @if (showSuccessMessage) {
-                <div class="success-message">
-                    Profil mis à jour avec succès !
-                </div>
+                <app-pop-up
+                    [popUpMessage]="'Succès'"
+                    [description]="'Profil mis à jour avec succès !'"
+                    [firstOption]="'Ok'"
+                    (confirm)="onSuccessConfirm()"
+                ></app-pop-up>
             }
 
             @if (showErrorMessage) {
-                <div class="error-message">
-                    {{ errorMessage }}
-                </div>
+                <app-pop-up
+                    [popUpMessage]="'Erreur'"
+                    [description]="errorMessage"
+                    [firstOption]="'Ok'"
+                    (confirm)="onErrorConfirm()"
+                ></app-pop-up>
             }
 
-            <form [formGroup]="form" (ngSubmit)="submitForm()" class="profile-form">
-                <div class="field">
-                    <label for="username">Pseudonyme</label>
-                    <input id="username" type="text" formControlName="username" autocomplete="username" />
-                    @if (form.controls.username.touched && form.controls.username.errors?.['required']) {
-                        <small class="error">Champ obligatoire</small>
-                    }
-                    @if (form.controls.username.touched && form.controls.username.errors?.['pattern']) {
-                        <small class="error">Caractères spéciaux non autorisés</small>
-                    }
-                </div>
+            <div class="main-content">
+                <form [formGroup]="form" (ngSubmit)="submitForm()" class="profile-form">
+                    <div class="form-columns">
+                        <div class="form-column-left">
+                            <div class="field">
+                                <label for="username">Pseudonyme</label>
+                                <input id="username" type="text" formControlName="username" autocomplete="username" />
+                                @if (form.controls.username.touched && form.controls.username.errors?.['required']) {
+                                    <small class="error">Champ obligatoire</small>
+                                }
+                                @if (form.controls.username.touched && form.controls.username.errors?.['pattern']) {
+                                    <small class="error">Caractères spéciaux non autorisés</small>
+                                }
+                            </div>
 
-                <div class="field">
-                    <label for="email">Email</label>
-                    <input id="email" type="email" formControlName="email" autocomplete="email" />
-                    @if (form.controls.email.touched && form.controls.email.errors?.['required']) {
-                        <small class="error">Champ obligatoire</small>
-                    }
-                    @if (form.controls.email.touched && (form.controls.email.errors?.['email'] || form.controls.email.errors?.['pattern'])) {
-                        <small class="error">Format email invalide</small>
-                    }
-                </div>
+                            <div class="field">
+                                <label for="email">Email</label>
+                                <input id="email" type="email" formControlName="email" autocomplete="email" />
+                                @if (form.controls.email.touched && form.controls.email.errors?.['required']) {
+                                    <small class="error">Champ obligatoire</small>
+                                }
+                                @if (form.controls.email.touched && (form.controls.email.errors?.['email'] || form.controls.email.errors?.['pattern'])) {
+                                    <small class="error">Format email invalide</small>
+                                }
+                            </div>
 
-                <div class="field">
-                    <p class="label">Choisis un avatar</p>
-                    <div class="avatar-grid">
-                        @for (a of avatars; track a.id) {
-                            <button
-                                type="button"
-                                class="avatar-btn"
-                                [class.selected]="selectedAvatarId === a.id"
-                                (click)="selectAvatar(a.id)"
-                            >
-                                {{ a.label }}
-                            </button>
-                        }
-                    </div>
-                    @if (form.controls.avatarId.touched && form.controls.avatarId.errors?.['required']) {
-                        <small class="error">Choisis un avatar</small>
-                    }
-                </div>
+                            <div class="field">
+                                <p class="label">Avatar</p>
+                                <div class="avatar-grid">
+                                    @for (a of avatars; track a.id) {
+                                        <button
+                                            type="button"
+                                            class="avatar-btn"
+                                            [class.selected]="selectedAvatarId === a.id"
+                                            (click)="selectAvatar(a.id)"
+                                            [title]="a.label"
+                                        >
+                                            <img [src]="a.image" [alt]="a.label" class="avatar-img" />
+                                        </button>
+                                    }
+                                </div>
+                                @if (form.controls.avatarId.touched && form.controls.avatarId.errors?.['required']) {
+                                    <small class="error">Avatar</small>
+                                }
+                            </div>
+                        </div>
 
-                <button type="submit" class="btn-primary" [disabled]="isSaving">
-                    @if (isSaving) {
-                        Enregistrement...
-                    } @else {
-                        Enregistrer les modifications
-                    }
-                </button>
-            </form>
+                        <div class="form-column-right">
+                            <div class="statistics-section">
+                                <h2 class="section-title">Statistiques</h2>
+                                <div class="statistics-grid">
+                                    <div class="stat-card">
+                                        <h3 class="stat-label">Parties Classiques</h3>
+                                        <p class="stat-value">{{ statistics?.classicGamesPlayed ?? 0 }}</p>
+                                    </div>
+                                    <div class="stat-card">
+                                        <h3 class="stat-label">Parties CTF</h3>
+                                        <p class="stat-value">{{ statistics?.ctfGamesPlayed ?? 0 }}</p>
+                                    </div>
+                                    <div class="stat-card">
+                                        <h3 class="stat-label">Parties gagnées</h3>
+                                        <p class="stat-value">{{ statistics?.totalGamesWon ?? 0 }}</p>
+                                    </div>
+                                    <div class="stat-card">
+                                        <h3 class="stat-label">Temps moyen par partie</h3>
+                                        <p class="stat-value">
+                                            @if (statistics) {
+                                                {{ formatTime(statistics.averagePlaytimePerGame) }}
+                                            } @else {
+                                                0s
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="statistics-section">
-                <h2 class="section-title">Statistiques</h2>
-                <div class="statistics-grid">
-                    <div class="stat-card">
-                        <h3 class="stat-label">Parties Classiques</h3>
-                        <p class="stat-value">{{ statistics?.classicGamesPlayed ?? 0 }}</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3 class="stat-label">Parties CTF</h3>
-                        <p class="stat-value">{{ statistics?.ctfGamesPlayed ?? 0 }}</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3 class="stat-label">Parties gagnées</h3>
-                        <p class="stat-value">{{ statistics?.totalGamesWon ?? 0 }}</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3 class="stat-label">Temps moyen par partie</h3>
-                        <p class="stat-value">
-                            @if (statistics) {
-                                {{ formatTime(statistics.averagePlaytimePerGame) }}
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary" [disabled]="isSaving">
+                            @if (isSaving) {
+                                Enregistrement...
                             } @else {
-                                0s
+                                Enregistrer les modifications
                             }
-                        </p>
+                        </button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>

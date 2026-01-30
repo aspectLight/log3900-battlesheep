@@ -22,4 +22,5 @@ export interface UpdateProfilePayload {
 export interface AvatarOption {
     id: string;
     label: string;
+    image: string;
 }
