@@ -49,7 +49,7 @@ void _registerServices() {
   getIt.registerLazySingleton<AuthLocalService>(AuthLocalServiceImpl.new);
 
   getIt.registerLazySingleton<ChatService>(
-    () => ChatService(serverUrl: EnvConfig.baseUrl),
+    () => ChatService(serverUrl: EnvConfig.socketUrl),
   );
 }
 
