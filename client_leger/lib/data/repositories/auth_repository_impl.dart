@@ -59,11 +59,11 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   TaskEither<AuthException, UserEntity> signIn({
-    required String identifier,
+    required String username,
     required String password,
   }) {
     return _authService
-        .signIn(identifier: identifier, password: password)
+        .signIn(username: username, password: password)
         .chainFirst(
           (dto) => TaskEither.tryCatch(
             () => _saveUserToLocal(dto),

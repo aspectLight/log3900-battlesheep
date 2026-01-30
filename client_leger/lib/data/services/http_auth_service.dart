@@ -43,16 +43,32 @@ class HttpAuthService implements AuthService {
 
   @override
   TaskEither<AuthException, UserDto> signIn({
-    required String identifier,
+    required String username,
     required String password,
   }) => TaskEither.tryCatch(() async {
-    LogService.d('Signing in with identifier: $identifier');
+    LogService.d('Attempting login for username: $username');
 
+    // 1. Get email from username
+    final emailResponse = await _dio.post<Map<String, dynamic>>(
+      ApiEndpoints.getEmailByUsername,
+      data: {'username': username},
+    );
+
+    final emailData = emailResponse.data;
+    if (emailData == null || emailData['email'] == null) {
+      throw const UserNotFoundException();
+    }
+    final email = emailData['email'] as String;
+
+    LogService.d('Retrieved email for $username: $email');
+
+    // 2. Authenticate with Firebase using email
     final firebaseAuth = await _firebaseAuth.signInWithEmailPassword(
-      email: identifier,
+      email: email,
       password: password,
     );
 
+    // 3. Send token to server
     final response = await _dio.post<Map<String, dynamic>>(
       ApiEndpoints.login,
       data: {'token': firebaseAuth.idToken},
@@ -109,7 +125,7 @@ class HttpAuthService implements AuthService {
 
     LogService.d('Registration successful, performing auto-login...');
     final loginResult = await signIn(
-      identifier: email,
+      username: username,
       password: password,
     ).run();
 

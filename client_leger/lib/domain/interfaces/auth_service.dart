@@ -4,7 +4,7 @@ import '../../data/models/user_dto.dart';
 
 abstract interface class AuthService {
   TaskEither<AuthException, UserDto> signIn({
-    required String identifier,
+    required String username,
     required String password,
   });
 
