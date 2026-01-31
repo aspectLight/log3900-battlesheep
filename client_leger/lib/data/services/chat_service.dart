@@ -1,16 +1,20 @@
 import 'dart:async';
 
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart' as io;
+
+import '../models/chat_message_dto.dart';
+import '../models/chat_socket_events.dart';
 
 class ChatService {
   final String serverUrl;
-  IO.Socket? _socket;
-  final List<ChatMessage> _messages = [];
+  io.Socket? _socket;
+  final List<ChatMessageDto> _messages = [];
 
-  final _messagesController = StreamController<List<ChatMessage>>.broadcast();
-  Stream<List<ChatMessage>> get messagesStream => _messagesController.stream;
+  final _messagesController =
+      StreamController<List<ChatMessageDto>>.broadcast();
+  Stream<List<ChatMessageDto>> get messagesStream => _messagesController.stream;
 
-  List<ChatMessage> get messages => List.unmodifiable(_messages);
+  List<ChatMessageDto> get messages => List.unmodifiable(_messages);
 
   String? _username;
   bool _isConnected = false;
@@ -28,7 +32,7 @@ class ChatService {
 
     _username = username;
 
-    _socket = IO.io(serverUrl, <String, dynamic>{
+    _socket = io.io(serverUrl, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
@@ -65,12 +69,13 @@ class ChatService {
     });
 
     _socket!.on(GeneralChatEvents.generalChatMessage, (data) {
-      final message = ChatMessage(
-        type: data['type'],
-        name: data['name'],
-        content: data['content'],
-        time: data['time'],
-        isMe: data['name'] == _username,
+      final messageData = data as Map<String, dynamic>;
+      final message = ChatMessageDto(
+        type: messageData['type'],
+        name: messageData['name'],
+        content: messageData['content'],
+        time: messageData['time'],
+        isMe: messageData['name'] == _username,
       );
       _messages.add(message);
       _messagesController.add(_messages);
@@ -78,13 +83,15 @@ class ChatService {
 
     _socket!.on(GeneralChatEvents.getGeneralChatMessagesResponse, (data) {
       _messages.clear();
-      for (final messageData in data) {
-        final message = ChatMessage(
-          type: messageData['type'],
-          name: messageData['name'],
-          content: messageData['content'],
-          time: messageData['time'],
-          isMe: messageData['name'] == _username,
+      final messageList = data as List<dynamic>;
+      for (final messageData in messageList) {
+        final messageMap = messageData as Map<String, dynamic>;
+        final message = ChatMessageDto(
+          type: messageMap['type'],
+          name: messageMap['name'],
+          content: messageMap['content'],
+          time: messageMap['time'],
+          isMe: messageMap['name'] == _username,
         );
         _messages.add(message);
       }
@@ -105,7 +112,7 @@ class ChatService {
   void sendMessageToGeneralChat(String message) {
     if (!_isConnected) return;
 
-    final newMessage = ChatMessage(
+    final newMessage = ChatMessageDto(
       type: 'sent',
       name: _username,
       content: message,
@@ -133,35 +140,8 @@ class ChatService {
     _messagesController.add(_messages);
   }
 
-  void dispose() {
+  Future<void> dispose() async {
     disconnect();
-    _messagesController.close();
+    await _messagesController.close();
   }
-}
-
-// Constantes pour les événements Socket.IO
-class GeneralChatEvents {
-  static const String joinGeneralChat = 'joinGeneralChat';
-  static const String getGeneralChatMessages = 'getGeneralChatMessages';
-  static const String getGeneralChatMessagesResponse =
-      'getGeneralChatMessagesResponse';
-  static const String sendMessageToGeneralChat = 'sendMessageToGeneralChat';
-  static const String generalChatMessage = 'generalChatMessage';
-}
-
-// Modèle de message
-class ChatMessage {
-  final String type;
-  final String? name;
-  final String content;
-  final String time;
-  final bool isMe;
-
-  ChatMessage({
-    required this.type,
-    this.name,
-    required this.content,
-    required this.time,
-    required this.isMe,
-  });
 }

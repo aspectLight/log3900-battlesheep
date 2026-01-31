@@ -10,14 +10,13 @@ import 'package:signals_flutter/signals_flutter.dart';
 import 'core/di/injection_container.dart';
 import 'domain/entities/auth_state.dart';
 import 'generated/l10n/app_localizations.dart';
-
 import 'presentation/view_models/auth_view_model.dart';
 import 'routing/app_router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  const environment = const String.fromEnvironment('ENV', defaultValue: 'dev');
+  final environment = dotenv.env['ENV'] ?? 'dev';
   await dotenv.load(fileName: '.env.$environment');
 
   await setupDependencies();

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../data/services/chat_service.dart';
+import '../../data/models/chat_message_dto.dart';
 import '../../generated/l10n/app_localizations.dart';
 
 @RoutePage()
@@ -45,7 +46,7 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: [
           Expanded(
-            child: StreamBuilder<List<ChatMessage>>(
+            child: StreamBuilder<List<ChatMessageDto>>(
               stream: _chatService.messagesStream,
               initialData: _chatService.messages,
               builder: (context, snapshot) {
@@ -79,7 +80,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _buildMessageBubble(ChatMessage message) {
+  Widget _buildMessageBubble(ChatMessageDto message) {
     return Align(
       alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -131,7 +132,7 @@ class _ChatScreenState extends State<ChatScreen> {
         color: Theme.of(context).colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, -2),
           ),
