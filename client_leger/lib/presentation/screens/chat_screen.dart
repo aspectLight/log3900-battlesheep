@@ -2,27 +2,27 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-import '../../../data/services/chat_service.dart';
 import '../../data/models/chat_message_dto.dart';
 import '../../generated/l10n/app_localizations.dart';
+import '../view_models/chat_view_model.dart';
 
 @RoutePage()
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
+
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
-  late final ChatService _chatService;
+  late final ChatViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _chatService = GetIt.I<ChatService>();
-
-    _chatService.getGeneralChatMessages();
+    _viewModel = GetIt.I<ChatViewModel>();
+    _viewModel.loadMessages();
   }
 
   @override
@@ -35,20 +35,39 @@ class _ChatScreenState extends State<ChatScreen> {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
-    _chatService.sendMessageToGeneralChat(text);
+    _viewModel.sendMessage(text);
     _messageController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.chat)),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.chat),
+        actions: [
+          StreamBuilder<bool>(
+            stream: _viewModel.connectionStatusStream,
+            initialData: _viewModel.isConnected,
+            builder: (context, snapshot) {
+              final isConnected = snapshot.data ?? false;
+              return Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: Icon(
+                  isConnected ? Icons.circle : Icons.circle_outlined,
+                  color: isConnected ? Colors.green : Colors.red,
+                  size: 12,
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Expanded(
             child: StreamBuilder<List<ChatMessageDto>>(
-              stream: _chatService.messagesStream,
-              initialData: _chatService.messages,
+              stream: _viewModel.messagesStream,
+              initialData: _viewModel.messages,
               builder: (context, snapshot) {
                 final messages = snapshot.data ?? [];
 

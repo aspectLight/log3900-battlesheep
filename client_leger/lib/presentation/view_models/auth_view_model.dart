@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
-import '../../data/services/chat_service.dart';
+import '../../data/services/socket_chat_service.dart';
 import '../../domain/entities/auth_state.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/interfaces/repositories/auth_repository.dart';
@@ -82,18 +82,18 @@ class AuthViewModel {
 
   void _connectToChat(String username) {
     try {
-      final chatService = GetIt.I<ChatService>();
-      chatService.connect(username);
-    } catch (e) {
+      final socketChatService = GetIt.I<SocketChatServiceImpl>();
+      socketChatService.connect(username);
+    } on Exception catch (e) {
       print('Failed to connect to chat: $e');
     }
   }
 
   void _disconnectFromChat() {
     try {
-      final chatService = GetIt.I<ChatService>();
-      chatService.disconnect();
-    } catch (e) {
+      final socketChatService = GetIt.I<SocketChatServiceImpl>();
+      socketChatService.disconnect();
+    } on Exception catch (e) {
       print('Failed to disconnect from chat: $e');
     }
   }

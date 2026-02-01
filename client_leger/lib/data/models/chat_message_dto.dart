@@ -1,4 +1,4 @@
-import './chat_message_entity.dart';
+import '../../domain/entities/chat_message_entity.dart';
 
 class ChatMessageDto {
   final String type;
@@ -33,16 +33,6 @@ class ChatMessageDto {
       'time': time,
       'isMe': isMe,
     };
-  }
-
-  ChatMessageEntity toEntity() {
-    return ChatMessageEntity(
-      type: type,
-      name: name,
-      content: content,
-      time: time,
-      isMe: isMe,
-    );
   }
 
   factory ChatMessageDto.fromEntity(ChatMessageEntity entity) {
