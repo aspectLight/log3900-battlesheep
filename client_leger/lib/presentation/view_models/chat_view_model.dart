@@ -1,18 +1,16 @@
-import 'package:flutter/foundation.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
-import '../../data/models/chat_message_dto.dart';
+import '../../domain/entities/chat_message_entity.dart';
 import '../../domain/interfaces/repositories/chat_repository.dart';
 
-class ChatViewModel extends ChangeNotifier {
+class ChatViewModel {
   final ChatRepository _repository;
 
   ChatViewModel(this._repository);
 
-  Stream<List<ChatMessageDto>> get messagesStream => _repository.messagesStream;
-  Stream<bool> get connectionStatusStream => _repository.connectionStatusStream;
-  List<ChatMessageDto> get messages => _repository.messages;
-  bool get isConnected => _repository.isConnected;
-  String? get currentUsername => _repository.currentUsername;
+  Signal<List<ChatMessageEntity>> get messages => _repository.messages;
+  Signal<bool> get isConnected => _repository.isConnected;
+  Signal<String?> get currentUsername => _repository.currentUsername;
 
   void loadMessages() {
     _repository.loadMessages();
@@ -25,12 +23,9 @@ class ChatViewModel extends ChangeNotifier {
 
   void clearMessages() {
     _repository.clearMessages();
-    notifyListeners();
   }
 
-  @override
   void dispose() {
-    // Ne pas disposer le repository ici car il peut être partagé
-    super.dispose();
+    // Le repository sera disposé par le container d'injection de dépendances
   }
 }

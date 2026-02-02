@@ -7,8 +7,7 @@ import '../models/chat_socket_events.dart';
 import 'log_service.dart';
 
 class SocketChatServiceImpl implements SocketChatService {
-  final String serverUrl;
-  io.Socket? _socket;
+  io.Socket? socket;
   bool _isConnected = false;
 
   final _connectionController = StreamController<bool>.broadcast();
@@ -35,64 +34,49 @@ class SocketChatServiceImpl implements SocketChatService {
   @override
   bool get isConnected => _isConnected;
 
-  SocketChatServiceImpl({required this.serverUrl});
+  SocketChatServiceImpl();
 
-  @override
-  void connect(String username) {
-    if (_isConnected) {
-      LogService.i('Already connected, disconnecting first');
-      disconnect();
-    }
-
-    LogService.i('Initiating connection to chat server as $username');
-
-    _socket = io.io(serverUrl, <String, dynamic>{
-      'transports': ['websocket'],
-      'autoConnect': false,
-    });
-
-    _socket!.connect();
+  void initializeSocket(io.Socket socket) {
+    this.socket = socket;
     _setupListeners();
-    joinGeneralChat(username);
   }
 
-  @override
-  void disconnect() {
-    if (!_isConnected) return;
+  void updateConnectionStatus(bool status) {
+    _isConnected = status;
+    _connectionController.add(status);
+  }
 
-    _socket?.disconnect();
-    _socket?.dispose();
-    _socket = null;
+  void clearSocket() {
+    socket = null;
     _isConnected = false;
-    LogService.i('Disconnected from chat server');
     _connectionController.add(false);
   }
 
   void _setupListeners() {
-    _socket!.on('connect', (_) {
+    socket!.on('connect', (_) {
       LogService.i('Connected to chat server');
       _isConnected = true;
       _connectionController.add(true);
     });
 
-    _socket!.on('disconnect', (_) {
+    socket!.on('disconnect', (_) {
       LogService.w('Disconnected from chat server');
       _isConnected = false;
       _connectionController.add(false);
     });
 
-    _socket!.on('error', (error) {
+    socket!.on('error', (error) {
       LogService.e('Chat socket error', error);
       _errorController.add(error);
     });
 
-    _socket!.on(GeneralChatEvents.generalChatMessage, (data) {
+    socket!.on(GeneralChatEvents.generalChatMessage, (data) {
       final messageData = data as Map<String, dynamic>;
       LogService.d('Received message from ${messageData['name']}');
       _messageReceivedController.add(messageData);
     });
 
-    _socket!.on(GeneralChatEvents.getGeneralChatMessagesResponse, (data) {
+    socket!.on(GeneralChatEvents.getGeneralChatMessagesResponse, (data) {
       final messageList = data as List<dynamic>;
       LogService.i('Loaded ${messageList.length} chat messages');
       _messagesHistoryController.add(messageList);
@@ -100,31 +84,23 @@ class SocketChatServiceImpl implements SocketChatService {
   }
 
   @override
-  void joinGeneralChat(String username) {
-    if (!_isConnected && _socket != null) {
-      _socket!.emit(GeneralChatEvents.joinGeneralChat, username);
-      LogService.i('Joining general chat as $username');
-    }
-  }
-
-  @override
   void getGeneralChatMessages() {
-    if (!_isConnected) {
+    if (!_isConnected || socket == null) {
       LogService.w('Cannot get messages: not connected');
       return;
     }
-    _socket!.emit(GeneralChatEvents.getGeneralChatMessages);
+    socket!.emit(GeneralChatEvents.getGeneralChatMessages);
     LogService.d('Requesting general chat messages');
   }
 
   @override
   void sendMessage({required String username, required String message}) {
-    if (!_isConnected) {
+    if (!_isConnected || socket == null) {
       LogService.w('Cannot send message: not connected');
       return;
     }
 
-    _socket!.emit(GeneralChatEvents.sendMessageToGeneralChat, {
+    socket!.emit(GeneralChatEvents.sendMessageToGeneralChat, {
       'username': username,
       'message': message,
     });
@@ -133,7 +109,6 @@ class SocketChatServiceImpl implements SocketChatService {
 
   @override
   Future<void> dispose() async {
-    disconnect();
     await _connectionController.close();
     await _messageReceivedController.close();
     await _messagesHistoryController.close();

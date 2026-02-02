@@ -44,4 +44,14 @@ class ChatMessageDto {
       isMe: entity.isMe,
     );
   }
+
+  ChatMessageEntity toEntity() {
+    return ChatMessageEntity(
+      type: type,
+      name: name,
+      content: content,
+      time: time,
+      isMe: isMe,
+    );
+  }
 }

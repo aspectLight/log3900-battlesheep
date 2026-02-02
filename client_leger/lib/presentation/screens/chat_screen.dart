@@ -1,8 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
-import '../../data/models/chat_message_dto.dart';
+import '../../domain/entities/chat_message_entity.dart';
 import '../../generated/l10n/app_localizations.dart';
 import '../view_models/chat_view_model.dart';
 
@@ -45,53 +46,45 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.chat),
         actions: [
-          StreamBuilder<bool>(
-            stream: _viewModel.connectionStatusStream,
-            initialData: _viewModel.isConnected,
-            builder: (context, snapshot) {
-              final isConnected = snapshot.data ?? false;
-              return Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: Icon(
-                  isConnected ? Icons.circle : Icons.circle_outlined,
-                  color: isConnected ? Colors.green : Colors.red,
-                  size: 12,
-                ),
-              );
-            },
-          ),
+          Watch((context) {
+            final isConnected = _viewModel.isConnected.value;
+            return Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: Icon(
+                isConnected ? Icons.circle : Icons.circle_outlined,
+                color: isConnected ? Colors.green : Colors.red,
+                size: 12,
+              ),
+            );
+          }),
         ],
       ),
       body: Column(
         children: [
           Expanded(
-            child: StreamBuilder<List<ChatMessageDto>>(
-              stream: _viewModel.messagesStream,
-              initialData: _viewModel.messages,
-              builder: (context, snapshot) {
-                final messages = snapshot.data ?? [];
+            child: Watch((context) {
+              final messages = _viewModel.messages.value;
 
-                if (messages.isEmpty) {
-                  return Center(
-                    child: Text(
-                      AppLocalizations.of(context)!.noMessages,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
-                    ),
-                  );
-                }
-
-                return ListView.builder(
-                  reverse: true,
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    final message = messages[messages.length - 1 - index];
-                    return _buildMessageBubble(message);
-                  },
+              if (messages.isEmpty) {
+                return Center(
+                  child: Text(
+                    AppLocalizations.of(context)!.noMessages,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
+                  ),
                 );
-              },
-            ),
+              }
+
+              return ListView.builder(
+                reverse: true,
+                itemCount: messages.length,
+                itemBuilder: (context, index) {
+                  final message = messages[messages.length - 1 - index];
+                  return _buildMessageBubble(message);
+                },
+              );
+            }),
           ),
           _buildMessageInput(),
         ],
@@ -99,7 +92,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _buildMessageBubble(ChatMessageDto message) {
+  Widget _buildMessageBubble(ChatMessageEntity message) {
     return Align(
       alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(

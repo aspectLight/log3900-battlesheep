@@ -5,7 +5,7 @@ class ChatMessageEntity {
   final String time;
   final bool isMe;
 
-  ChatMessageEntity({
+  const ChatMessageEntity({
     required this.type,
     this.name,
     required this.content,

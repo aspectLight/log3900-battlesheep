@@ -11,6 +11,7 @@ import 'core/di/injection_container.dart';
 import 'domain/entities/auth_state.dart';
 import 'generated/l10n/app_localizations.dart';
 import 'presentation/view_models/auth_view_model.dart';
+import 'presentation/view_models/socket_connection_view_model.dart';
 import 'routing/app_router.dart';
 
 Future<void> main() async {
@@ -34,6 +35,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   late final AppRouter _appRouter;
   late final AuthViewModel _authViewModel;
+  late final SocketConnectionViewModel _socketConnectionViewModel;
   EffectCleanup? _authStateCleanup;
 
   @override
@@ -41,6 +43,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _appRouter = GetIt.I<AppRouter>();
     _authViewModel = GetIt.I<AuthViewModel>();
+    _socketConnectionViewModel = GetIt.I<SocketConnectionViewModel>();
     _setupAuthListener();
   }
 
@@ -57,6 +60,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void dispose() {
     _authStateCleanup?.call();
+    _socketConnectionViewModel.dispose();
     _authViewModel.dispose();
     super.dispose();
   }

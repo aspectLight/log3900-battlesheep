@@ -9,16 +9,19 @@ import '../../data/services/auth_local_service.dart';
 import '../../data/services/firebase_auth_service.dart';
 import '../../data/services/http_auth_service.dart';
 import '../../data/services/socket_chat_service.dart';
+import '../../data/services/socket_connection_service.dart';
 import '../../domain/interfaces/repositories/auth_repository.dart';
 import '../../domain/interfaces/repositories/chat_repository.dart';
 import '../../domain/interfaces/services/auth_local_service.dart';
 import '../../domain/interfaces/services/auth_service.dart';
 import '../../domain/interfaces/services/firebase_auth_service.dart';
 import '../../domain/interfaces/services/socket_chat_service.dart';
+import '../../domain/interfaces/services/socket_connection_service.dart';
 import '../../presentation/view_models/auth_view_model.dart';
 import '../../presentation/view_models/chat_view_model.dart';
 import '../../presentation/view_models/login_view_model.dart';
 import '../../presentation/view_models/sign_up_view_model.dart';
+import '../../presentation/view_models/socket_connection_view_model.dart';
 import '../../routing/app_router.dart';
 import '../../routing/auth_guard.dart';
 import '../config/env_config.dart';
@@ -55,9 +58,20 @@ void _registerServices() {
 
   getIt.registerLazySingleton<AuthLocalService>(AuthLocalServiceImpl.new);
 
-  getIt.registerLazySingleton<SocketChatService>(
-    () => SocketChatServiceImpl(serverUrl: EnvConfig.socketUrl),
+  final socketChatServiceImpl = SocketChatServiceImpl();
+
+  getIt.registerLazySingleton<SocketChatServiceImpl>(
+    () => socketChatServiceImpl,
   );
+
+  getIt.registerLazySingleton<SocketConnectionService>(
+    () => SocketConnectionServiceImpl(
+      serverUrl: EnvConfig.socketUrl,
+      chatService: getIt<SocketChatServiceImpl>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<SocketChatService>(() => socketChatServiceImpl);
 }
 
 void _registerRepositories() {
@@ -67,10 +81,6 @@ void _registerRepositories() {
       localService: getIt<AuthLocalService>(),
       firebaseAuthService: getIt<FirebaseAuthService>(),
     ),
-  );
-
-  getIt.registerLazySingleton<ChatRepository>(
-    () => ChatRepository(getIt<SocketChatServiceImpl>()),
   );
 }
 
@@ -85,6 +95,13 @@ void _registerViewModels() {
 
   getIt.registerFactory<SignUpViewModel>(
     () => SignUpViewModel(authRepository: getIt<AuthRepository>()),
+  );
+
+  getIt.registerLazySingleton<SocketConnectionViewModel>(
+    () => SocketConnectionViewModel(
+      connectionService: getIt<SocketConnectionService>(),
+      authViewModel: getIt<AuthViewModel>(),
+    ),
   );
 
   getIt.registerFactory<ChatViewModel>(
