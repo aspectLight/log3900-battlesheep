@@ -12,6 +12,8 @@ class LoginViewModel {
 
   final username = signal('');
   final password = signal('');
+  final usernameTouched = signal(false);
+  final passwordTouched = signal(false);
 
   final hasAttemptedSubmit = signal(false);
   final isLoading = signal(false);
@@ -19,7 +21,7 @@ class LoginViewModel {
 
   late final usernameError = computed<AuthValidationError?>(() {
     if (username.value.isEmpty) {
-      return hasAttemptedSubmit.value
+      return hasAttemptedSubmit.value || usernameTouched.value
           ? AuthValidationError.usernameRequired
           : null;
     }
@@ -28,7 +30,7 @@ class LoginViewModel {
 
   late final passwordError = computed<AuthValidationError?>(() {
     if (password.value.isEmpty) {
-      return hasAttemptedSubmit.value
+      return hasAttemptedSubmit.value || passwordTouched.value
           ? AuthValidationError.passwordRequired
           : null;
     }
@@ -42,6 +44,9 @@ class LoginViewModel {
   void updateUsername(String value) => username.value = value;
 
   void updatePassword(String value) => password.value = value;
+
+  void markUsernameTouched() => usernameTouched.value = true;
+  void markPasswordTouched() => passwordTouched.value = true;
 
   Future<void> submit() async {
     hasAttemptedSubmit.value = true;
@@ -68,6 +73,8 @@ class LoginViewModel {
   void resetForm() {
     username.value = '';
     password.value = '';
+    usernameTouched.value = false;
+    passwordTouched.value = false;
     hasAttemptedSubmit.value = false;
     authState.value = const AuthStateInitial();
   }

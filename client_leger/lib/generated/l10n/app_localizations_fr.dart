@@ -26,7 +26,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get mainMenu => 'Menu Principal';
 
   @override
-  String get usernameRequired => 'Le nom d\'utilisateur est requis';
+  String get usernameRequired => 'Champ obligatoire';
 
   @override
   String get identifierRequired =>
@@ -48,7 +48,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Le nom d\'utilisateur ne doit pas contenir de caractères spéciaux';
 
   @override
-  String get passwordRequired => 'Le mot de passe est requis';
+  String get passwordRequired => 'Champ obligatoire';
 
   @override
   String get passwordTooShort =>
@@ -85,7 +85,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get usernameOrEmail => 'Nom d\'utilisateur ou Courriel';
 
   @override
-  String get username => 'Nom d\'utilisateur';
+  String get username => 'Pseudonyme';
 
   @override
   String get email => 'Courriel';
@@ -103,7 +103,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get signUp => 'S\'inscrire';
 
   @override
-  String get noAccount => 'Vous n\'avez pas de compte ? ';
+  String get noAccount => 'Pas encore de compte ? ';
 
   @override
   String get alreadyHaveAccount => 'Vous avez déjà un compte ? ';
