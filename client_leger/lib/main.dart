@@ -78,6 +78,7 @@ class _MyAppState extends State<MyApp> {
       return MaterialApp.router(
         title: 'Client Leger',
         debugShowCheckedModeBanner: false,
+        locale: const Locale('fr'),
         routerConfig: _appRouter.config(
           deepLinkBuilder: (_) => DeepLink([initialRoute]),
         ),
