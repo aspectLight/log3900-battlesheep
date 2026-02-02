@@ -1,14 +1,13 @@
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
 import '../../domain/interfaces/services/socket_connection_service.dart';
-import '../models/chat_socket_events.dart';
 import './log_service.dart';
 import './socket_chat_service.dart';
 
 class SocketConnectionServiceImpl implements SocketConnectionService {
   final String serverUrl;
   final SocketChatServiceImpl _chatService;
-  
+
   io.Socket? _socket;
   String? _currentUsername;
 
@@ -39,10 +38,8 @@ class SocketConnectionServiceImpl implements SocketConnectionService {
     });
 
     _socket!.connect();
-    
+
     _chatService.initializeSocket(_socket!);
-    
-    _joinGeneralChat(username);
   }
 
   @override
@@ -53,17 +50,10 @@ class SocketConnectionServiceImpl implements SocketConnectionService {
     _socket?.dispose();
     _socket = null;
     _currentUsername = null;
-    
-    _chatService.clearSocket();
-    
-    LogService.i('Disconnected from chat server');
-  }
 
-  void _joinGeneralChat(String username) {
-    if (_socket != null) {
-      _socket!.emit(GeneralChatEvents.joinGeneralChat, username);
-      LogService.i('Joining general chat as $username');
-    }
+    _chatService.clearSocket();
+
+    LogService.i('Disconnected from server');
   }
 
   @override

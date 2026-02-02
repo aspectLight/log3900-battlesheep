@@ -5,7 +5,9 @@ import 'package:get_it/get_it.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../data/repositories/auth_repository_impl.dart';
+import '../../data/repositories/chat_repository_impl.dart';
 import '../../data/services/auth_local_service.dart';
+import '../../data/services/chat_service_impl.dart';
 import '../../data/services/firebase_auth_service.dart';
 import '../../data/services/http_auth_service.dart';
 import '../../data/services/socket_chat_service.dart';
@@ -14,9 +16,12 @@ import '../../domain/interfaces/repositories/auth_repository.dart';
 import '../../domain/interfaces/repositories/chat_repository.dart';
 import '../../domain/interfaces/services/auth_local_service.dart';
 import '../../domain/interfaces/services/auth_service.dart';
+import '../../domain/interfaces/services/chat_service.dart';
 import '../../domain/interfaces/services/firebase_auth_service.dart';
 import '../../domain/interfaces/services/socket_chat_service.dart';
 import '../../domain/interfaces/services/socket_connection_service.dart';
+import '../../domain/managers/chat_connection_manager.dart';
+import '../../domain/managers/socket_connection_manager.dart';
 import '../../presentation/view_models/auth_view_model.dart';
 import '../../presentation/view_models/chat_view_model.dart';
 import '../../presentation/view_models/login_view_model.dart';
@@ -33,6 +38,7 @@ Future<void> setupDependencies() async {
   _registerRepositories();
   _registerViewModels();
   _registerRouting();
+  _registerManagers();
   await getIt.allReady();
 }
 
@@ -72,6 +78,10 @@ void _registerServices() {
   );
 
   getIt.registerLazySingleton<SocketChatService>(() => socketChatServiceImpl);
+
+  getIt.registerLazySingleton<ChatService>(
+    () => ChatServiceImpl(chatService: socketChatServiceImpl),
+  );
 }
 
 void _registerRepositories() {
@@ -80,6 +90,13 @@ void _registerRepositories() {
       authService: getIt<AuthService>(),
       localService: getIt<AuthLocalService>(),
       firebaseAuthService: getIt<FirebaseAuthService>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<ChatRepository>(
+    () => ChatRepositoryImpl(
+      chatService: getIt<SocketChatService>(),
+      connectionService: getIt<SocketConnectionService>(),
     ),
   );
 }
@@ -106,6 +123,22 @@ void _registerViewModels() {
 
   getIt.registerFactory<ChatViewModel>(
     () => ChatViewModel(getIt<ChatRepository>()),
+  );
+}
+
+void _registerManagers() {
+  getIt.registerLazySingleton<SocketConnectionManager>(
+    () => SocketConnectionManager(
+      connectionService: getIt<SocketConnectionService>(),
+      authViewModel: getIt<AuthViewModel>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<ChatConnectionManager>(
+    () => ChatConnectionManager(
+      chatService: getIt<ChatService>(),
+      authViewModel: getIt<AuthViewModel>(),
+    ),
   );
 }
 

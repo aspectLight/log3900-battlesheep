@@ -40,11 +40,10 @@ class ChatRepositoryImpl implements ChatRepository {
   void _setupSubscriptions() {
     _messageReceivedSub = _chatService.messageReceivedStream.listen((data) {
       final dto = ChatMessageDto(
-        type: data['type'],
-        name: data['name'],
-        content: data['content'],
-        time: data['time'],
-        isMe: data['name'] == currentUsername.value,
+        type: data['type'] as String,
+        name: data['name'] as String?,
+        content: data['content'] as String,
+        time: data['time'] as String,
       );
       _addMessage(dto.toEntity());
     });
@@ -56,11 +55,10 @@ class ChatRepositoryImpl implements ChatRepository {
       for (final messageData in messageList) {
         final messageMap = messageData as Map<String, dynamic>;
         final dto = ChatMessageDto(
-          type: messageMap['type'],
-          name: messageMap['name'],
-          content: messageMap['content'],
-          time: messageMap['time'],
-          isMe: messageMap['name'] == currentUsername.value,
+          type: messageMap['type'] as String,
+          name: messageMap['name'] as String?,
+          content: messageMap['content'] as String,
+          time: messageMap['time'] as String,
         );
         newMessages.add(dto.toEntity());
       }
@@ -109,7 +107,6 @@ class ChatRepositoryImpl implements ChatRepository {
       name: currentUsername.value,
       content: content,
       time: Formatter.formatTime(DateTime.now()),
-      isMe: true,
     );
     _addMessage(newEntity);
 

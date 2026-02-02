@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
-import '../../domain/entities/chat_message_entity.dart';
+import '../../data/models/ui_chat_message.dart';
 import '../../generated/l10n/app_localizations.dart';
 import '../view_models/chat_view_model.dart';
 
@@ -92,7 +92,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _buildMessageBubble(ChatMessageEntity message) {
+  Widget _buildMessageBubble(UiChatMessage message) {
     return Align(
       alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(

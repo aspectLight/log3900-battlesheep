@@ -5,14 +5,12 @@ class ChatMessageDto {
   final String? name;
   final String content;
   final String time;
-  final bool isMe;
 
-  ChatMessageDto({
+  const ChatMessageDto({
     required this.type,
     this.name,
     required this.content,
     required this.time,
-    required this.isMe,
   });
 
   factory ChatMessageDto.fromJson(Map<String, dynamic> json) {
@@ -21,7 +19,6 @@ class ChatMessageDto {
       name: json['name'] as String?,
       content: json['content'] as String,
       time: json['time'] as String,
-      isMe: json['isMe'] as bool? ?? false,
     );
   }
 
@@ -31,7 +28,6 @@ class ChatMessageDto {
       if (name != null) 'name': name,
       'content': content,
       'time': time,
-      'isMe': isMe,
     };
   }
 
@@ -41,7 +37,6 @@ class ChatMessageDto {
       name: entity.name,
       content: entity.content,
       time: entity.time,
-      isMe: entity.isMe,
     );
   }
 
@@ -51,7 +46,6 @@ class ChatMessageDto {
       name: name,
       content: content,
       time: time,
-      isMe: isMe,
     );
   }
 }
