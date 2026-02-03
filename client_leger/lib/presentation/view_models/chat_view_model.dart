@@ -12,6 +12,8 @@ class ChatViewModel {
   Signal<bool> get isConnected => _repository.isConnected;
   Signal<String?> get currentUsername => _repository.currentUsername;
 
+  final Signal<String?> lastSentMessage = signal(null);
+
   void loadMessages() {
     _repository.loadMessages();
   }
@@ -19,6 +21,7 @@ class ChatViewModel {
   void sendMessage(String content) {
     if (content.trim().isEmpty) return;
     _repository.sendMessage(content);
+    lastSentMessage.value = content;
   }
 
   void clearMessages() {
@@ -27,6 +30,13 @@ class ChatViewModel {
 
   void sendEmoji(String emoji) {
     _repository.sendEmoji(emoji);
+  }
+
+  void resendLastMessage() {
+    final lastMessage = lastSentMessage.value;
+    if (lastMessage != null) {
+      _repository.sendMessage(lastMessage);
+    }
   }
 
   void dispose() {

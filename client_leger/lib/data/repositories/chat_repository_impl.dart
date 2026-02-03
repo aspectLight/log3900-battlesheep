@@ -119,10 +119,6 @@ class ChatRepositoryImpl implements ChatRepository {
     );
   }
 
-  void _addMessage(ChatMessageEntity message) {
-    messages.value = [...messages.value, message];
-  }
-
   @override
   void sendEmoji(String emoji) {
     if (currentUsername.value == null) {
@@ -140,6 +136,10 @@ class ChatRepositoryImpl implements ChatRepository {
     _addMessage(newEntity);
 
     _chatService.sendEmoji(username: currentUsername.value!, emoji: emoji);
+  }
+
+  void _addMessage(ChatMessageEntity message) {
+    messages.value = [...messages.value, message];
   }
 
   @override

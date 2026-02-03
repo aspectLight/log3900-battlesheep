@@ -41,9 +41,9 @@ class SocketChatServiceImpl implements SocketChatService {
     _setupListeners();
   }
 
-  void updateConnectionStatus(bool status) {
-    _isConnected = status;
-    _connectionController.add(status);
+  void updateConnectionStatus({required bool isConnected}) {
+    _isConnected = isConnected;
+    _connectionController.add(isConnected);
   }
 
   void clearSocket() {

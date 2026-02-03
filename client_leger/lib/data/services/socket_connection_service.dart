@@ -8,7 +8,7 @@ import './socket_chat_service.dart';
 class SocketConnectionServiceImpl implements SocketConnectionService {
   final String serverUrl;
   final SocketChatServiceImpl _chatService;
-  
+
   io.Socket? _socket;
   String? _currentUsername;
 
@@ -39,9 +39,9 @@ class SocketConnectionServiceImpl implements SocketConnectionService {
     });
 
     _socket!.connect();
-    
+
     _chatService.initializeSocket(_socket!);
-    
+
     _joinGeneralChat(username);
   }
 
@@ -53,9 +53,9 @@ class SocketConnectionServiceImpl implements SocketConnectionService {
     _socket?.dispose();
     _socket = null;
     _currentUsername = null;
-    
+
     _chatService.clearSocket();
-    
+
     LogService.i('Disconnected from chat server');
   }
 

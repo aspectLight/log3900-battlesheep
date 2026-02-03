@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../domain/entities/chat_message_entity.dart';
@@ -22,18 +25,52 @@ class _ChatScreenState extends State<ChatScreen> {
 
   final List<String> _emojis = ['👍', '❤️', '😂'];
 
+  StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
+  DateTime? _lastShakeTime;
+
+  static const double _shakeThresholdVertical = 15;
+  static const double _shakeThresholdHorizontal = 15;
+  static const int _shakeCooldownMs = 1000;
+
   @override
   void initState() {
     super.initState();
     _viewModel = GetIt.I<ChatViewModel>();
     _messageFocusNode = FocusNode();
     _viewModel.loadMessages();
+    _setupShakeDetection();
+  }
+
+  void _setupShakeDetection() {
+    _accelerometerSubscription = accelerometerEventStream().listen(
+      _detectShake,
+    );
+  }
+
+  void _detectShake(AccelerometerEvent event) {
+    final now = DateTime.now();
+
+    if (_lastShakeTime != null &&
+        now.difference(_lastShakeTime!).inMilliseconds < _shakeCooldownMs) {
+      return;
+    }
+
+    if (event.y.abs() > _shakeThresholdVertical && event.x.abs() < 10) {
+      _lastShakeTime = now;
+      _viewModel.sendEmoji(_emojis[0]);
+    } else if (event.x.abs() > _shakeThresholdHorizontal &&
+        event.y.abs() < 10) {
+      _lastShakeTime = now;
+      _viewModel.resendLastMessage();
+    }
   }
 
   @override
-  void dispose() {
+  Future<void> dispose() async {
     _messageController.dispose();
     _messageFocusNode.dispose();
+    await _accelerometerSubscription?.cancel();
+    _viewModel.dispose();
     super.dispose();
   }
 
@@ -206,7 +243,6 @@ class _ChatScreenState extends State<ChatScreen> {
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: Colors.grey.withValues(alpha: 0.3),
-                      width: 1,
                     ),
                   ),
                   child: Text(emoji, style: const TextStyle(fontSize: 20)),
