@@ -12,13 +12,15 @@ import 'domain/entities/auth_state.dart';
 import 'generated/l10n/app_localizations.dart';
 
 import 'presentation/view_models/auth_view_model.dart';
+import 'presentation/view_models/navigation_view_model.dart';
+import 'presentation/widgets/loading_overlay.dart';
 import 'routing/app_router.dart';
+import 'routing/app_router_observer.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  const environment = const String.fromEnvironment('ENV', defaultValue: 'dev');
-  await dotenv.load(fileName: '.env.$environment');
+  await dotenv.load(fileName: '.env.dev');
 
   await setupDependencies();
 
@@ -50,7 +52,7 @@ class _MyAppState extends State<MyApp> {
       final state = _authViewModel.authState.value;
 
       if (state is AuthStateUnauthenticated) {
-        unawaited(_appRouter.replaceAll([const LoginRoute()]));
+        unawaited(_appRouter.replaceAll([const AuthLandingRoute()]));
       }
     });
   }
@@ -64,10 +66,13 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
-      final isLoading = _authViewModel.isLoading.value;
+    final navigationViewModel = GetIt.I<NavigationViewModel>();
 
-      if (isLoading) {
+    return Watch((context) {
+      final isInitialLoading = _authViewModel.isLoading.value;
+      final isNavigating = navigationViewModel.isNavigating.value;
+
+      if (isInitialLoading) {
         return const MaterialApp(
           home: Scaffold(body: Center(child: CircularProgressIndicator())),
         );
@@ -81,6 +86,9 @@ class _MyAppState extends State<MyApp> {
         locale: const Locale('fr'),
         routerConfig: _appRouter.config(
           deepLinkBuilder: (_) => DeepLink([initialRoute]),
+          navigatorObservers: () => [
+            AppRouterObserver(navigationViewModel: navigationViewModel),
+          ],
         ),
         localizationsDelegates: const [
           AppLocalizations.delegate,
@@ -89,6 +97,14 @@ class _MyAppState extends State<MyApp> {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: AppLocalizations.supportedLocales,
+        builder: (context, child) {
+          return Stack(
+            children: [
+              child ?? const SizedBox.shrink(),
+              if (isNavigating) const Positioned.fill(child: LoadingOverlay()),
+            ],
+          );
+        },
       );
     });
   }
@@ -98,6 +114,6 @@ class _MyAppState extends State<MyApp> {
     if (state is AuthStateAuthenticated) {
       return const MainRoute();
     }
-    return const LoginRoute();
+    return const AuthLandingRoute();
   }
 }

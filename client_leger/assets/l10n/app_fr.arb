@@ -7,36 +7,70 @@
   "mainMenu": "Menu Principal",
   "usernameRequired": "Champ obligatoire",
   "identifierRequired": "Le nom d'utilisateur ou le courriel est requis",
-  "invalidEmail": "Veuillez entrer une adresse courriel valide",
+  "invalidEmail": "Format email invalide",
   "usernameTooShort": "Le nom d'utilisateur doit comporter au moins 3 caractères",
   "usernameTooLong": "Le nom d'utilisateur doit comporter au plus 15 caractères",
-  "usernameSpecialChars": "Le nom d'utilisateur ne doit pas contenir de caractères spéciaux",
+  "usernameSpecialChars": "Caractères spéciaux non autorisés",
+  "usernameInvalidLength": "Le nom d'utilisateur doit contenir entre 3 et 15 caractères",
   "passwordRequired": "Champ obligatoire",
-  "passwordTooShort": "Le mot de passe doit comporter au moins 8 caractères",
+  "passwordTooShort": "Minimum 8 caractères",
   "passwordLeastOneLetter": "Le mot de passe doit contenir au moins une lettre",
   "passwordLeastOneDigit": "Le mot de passe doit contenir au moins un chiffre",
-  "passwordNoSpaces": "Le mot de passe ne doit pas contenir d'espaces",
-  "confirmationRequired": "La confirmation est requise",
+  "passwordNoSpaces": "Le mot de passe ne doit pas contenir d'espace",
+  "confirmationRequired": "Champ obligatoire",
   "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
-  "emailRequired": "Le courriel est requis",
+  "emailRequired": "Champ obligatoire",
   "welcomeBack": "Bon retour",
   "signInToContinue": "Connectez-vous pour continuer",
   "usernameOrEmail": "Nom d'utilisateur ou Courriel",
-  "username": "Pseudonyme",
-  "email": "Courriel",
+  "username": "Nom d'utilisateur",
+  "email": "Adresse courriel",
   "password": "Mot de passe",
   "confirmPassword": "Confirmer le mot de passe",
   "signIn": "Se connecter",
+  "signingIn": "Connexion...",
   "signUp": "S'inscrire",
+  "signingUp": "Création...",
   "noAccount": "Pas encore de compte ? ",
-  "alreadyHaveAccount": "Vous avez déjà un compte ? ",
-  "invalidCredentials": "Nom d'utilisateur ou mot de passe invalide",
+  "alreadyHaveAccount": "Déjà un compte ? ",
+  "invalidCredentials": "Identifiant ou mot de passe incorrect.",
   "emailAlreadyInUse": "Ce courriel est déjà utilisé",
-  "userNotFound": "Utilisateur introuvable",
+  "usernameAlreadyInUse": "Ce nom d'utilisateur est déjà utilisé",
+  "accountAlreadyConnected": "Ce compte est déjà connecté sur un autre appareil.",
+  "userNotFound": "Aucun compte n'existe avec cet identifiant.",
   "networkError": "Problème de connexion réseau",
   "serverError": "Erreur du serveur",
   "unknownError": "Une erreur inconnue est survenue",
   "chat": "Clavardage",
   "noMessages": "Aucun message pour l'instant. Commencez la conversation !",
-  "typeMessage": "Tapez un message..."
+  "typeMessage": "Tapez un message...",
+  "back": "Retour",
+  "avatarTitle": "Avatar",
+  "@avatarTitle": {
+    "description": "Titre de la section de sélection d'avatar"
+  },
+  "usernamePlaceholder": "JohnDoe",
+  "@usernamePlaceholder": {
+    "description": "Texte d'espace réservé pour le champ de nom d'utilisateur"
+  },
+  "emailPlaceholder": "johndoe@example.com",
+  "@emailPlaceholder": {
+    "description": "Texte d'espace réservé pour le champ de courriel"
+  },
+  "passwordPlaceholder": "••••••••",
+  "@passwordPlaceholder": {
+    "description": "Texte d'espace réservé pour le champ de mot de passe"
+  },
+  "teamName": "Équipe 105",
+  "@teamName": {
+    "description": "Nom de l'équipe affiché dans le pied de page"
+  },
+  "avatarRequired": "Sélectionnez un avatar",
+  "@avatarRequired": {
+    "description": "Erreur de validation lorsque l'avatar n'est pas sélectionné"
+  },
+  "teamMembers": "Ahmed Sami Benabbou, May Guessous, Ayoub Marfouk, Pierre Carré, Anis Gadouche, Djihed Benaiche",
+  "@teamMembers": {
+    "description": "Liste des membres de l'équipe affichée dans le pied de page"
+  }
 }

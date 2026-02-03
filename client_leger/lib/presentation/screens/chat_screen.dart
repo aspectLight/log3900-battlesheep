@@ -1,8 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 
-import '../../../data/services/chat_service.dart';
+import '../../core/constants/input_limits.dart';
+import '../../data/services/chat_service.dart';
 import '../../generated/l10n/app_localizations.dart';
 
 @RoutePage()
@@ -42,39 +44,44 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.chat)),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder<List<ChatMessage>>(
-              stream: _chatService.messagesStream,
-              initialData: _chatService.messages,
-              builder: (context, snapshot) {
-                final messages = snapshot.data ?? [];
+      body: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: Column(
+            children: [
+              Expanded(
+                child: StreamBuilder<List<ChatMessage>>(
+                  stream: _chatService.messagesStream,
+                  initialData: _chatService.messages,
+                  builder: (context, snapshot) {
+                    final messages = snapshot.data ?? [];
 
-                if (messages.isEmpty) {
-                  return Center(
-                    child: Text(
-                      AppLocalizations.of(context)!.noMessages,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
-                    ),
-                  );
-                }
+                    if (messages.isEmpty) {
+                      return Center(
+                        child: Text(
+                          AppLocalizations.of(context)!.noMessages,
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
+                        ),
+                      );
+                    }
 
-                return ListView.builder(
-                  reverse: true,
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    final message = messages[messages.length - 1 - index];
-                    return _buildMessageBubble(message);
+                    return ListView.builder(
+                      reverse: true,
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) {
+                        final message = messages[messages.length - 1 - index];
+                        return _buildMessageBubble(message);
+                      },
+                    );
                   },
-                );
-              },
-            ),
+                ),
+              ),
+              _buildMessageInput(),
+            ],
           ),
-          _buildMessageInput(),
-        ],
+        ),
       ),
     );
   }
@@ -94,9 +101,9 @@ class _ChatScreenState extends State<ChatScreen> {
               Text(
                 message.name!,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Colors.grey[600],
+                  color: Colors.grey[400],
                 ),
               ),
             Container(
@@ -111,12 +118,13 @@ class _ChatScreenState extends State<ChatScreen> {
                 message.content,
                 style: TextStyle(
                   color: message.isMe ? Colors.white : Colors.black87,
+                  fontSize: 16,
                 ),
               ),
             ),
             Text(
               message.time,
-              style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 12, color: Colors.grey[500]),
             ),
           ],
         ),
@@ -142,17 +150,31 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: TextField(
               controller: _messageController,
+              style: const TextStyle(fontSize: 16),
               decoration: InputDecoration(
                 hintText: AppLocalizations.of(context)!.typeMessage,
+                hintStyle: const TextStyle(fontSize: 16),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
-                  vertical: 10,
+                  vertical: 14,
                 ),
               ),
               onSubmitted: (_) => _sendMessage(),
+              maxLength: InputLimits.chatMessage,
+              maxLengthEnforcement: MaxLengthEnforcement.enforced,
+              buildCounter:
+                  (
+                    context, {
+                    required currentLength,
+                    required isFocused,
+                    required maxLength,
+                  }) => null,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(InputLimits.chatMessage),
+              ],
             ),
           ),
           const SizedBox(width: 8),

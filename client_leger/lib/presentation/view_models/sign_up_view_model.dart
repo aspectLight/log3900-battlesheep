@@ -17,57 +17,73 @@ class SignUpViewModel {
   final email = signal('');
   final password = signal('');
   final confirmPassword = signal('');
+  final avatarId = signal<String?>(null);
 
   final hasAttemptedSubmit = signal(false);
   final isLoading = signal(false);
   final authState = signal<AuthState>(const AuthStateInitial());
 
-  late final usernameError = computed<AuthValidationError?>(() {
-    final error = UsernameValidator.validate(username.value);
-    if (error != null && username.value.isEmpty && !hasAttemptedSubmit.value) {
-      return null;
+  late final usernameErrors = computed<List<AuthValidationError>>(() {
+    final errors = UsernameValidator.validateAll(username.value);
+    if (errors.isNotEmpty &&
+        errors.first == AuthValidationError.usernameRequired &&
+        !hasAttemptedSubmit.value) {
+      return [];
     }
-    return error;
+    return errors;
   });
 
-  late final emailError = computed<AuthValidationError?>(() {
-    final error = EmailValidator.validate(email.value);
-    if (error != null && email.value.isEmpty && !hasAttemptedSubmit.value) {
-      return null;
+  late final emailErrors = computed<List<AuthValidationError>>(() {
+    final errors = EmailValidator.validateAll(email.value);
+    if (errors.isNotEmpty &&
+        errors.first == AuthValidationError.emailRequired &&
+        !hasAttemptedSubmit.value) {
+      return [];
     }
-    return error;
+    return errors;
   });
 
-  late final passwordError = computed<AuthValidationError?>(() {
-    final error = PasswordValidator.validate(password.value);
-    if (error != null && password.value.isEmpty && !hasAttemptedSubmit.value) {
-      return null;
+  late final passwordErrors = computed<List<AuthValidationError>>(() {
+    final errors = PasswordValidator.validateAll(password.value);
+    if (errors.isNotEmpty &&
+        errors.first == AuthValidationError.passwordRequired &&
+        !hasAttemptedSubmit.value) {
+      return [];
     }
-    return error;
+    return errors;
   });
 
-  late final confirmPasswordError = computed<AuthValidationError?>(() {
-    final error = PasswordValidator.validateConfirmation(
+  late final confirmPasswordErrors = computed<List<AuthValidationError>>(() {
+    final errors = PasswordValidator.validateConfirmationAll(
       password.value,
       confirmPassword.value,
     );
-    if (error != null &&
-        confirmPassword.value.isEmpty &&
+    if (errors.isNotEmpty &&
+        errors.first == AuthValidationError.confirmationRequired &&
         !hasAttemptedSubmit.value) {
-      return null;
+      return [];
     }
-    return error;
+    return errors;
+  });
+
+  late final avatarError = computed<AuthValidationError?>(() {
+    if (avatarId.value == null && hasAttemptedSubmit.value) {
+      return AuthValidationError.avatarRequired;
+    }
+    return null;
   });
 
   late final isFormValid = computed(() {
-    return usernameError.value == null &&
-        emailError.value == null &&
-        passwordError.value == null &&
-        confirmPasswordError.value == null &&
+    return usernameErrors.value.isEmpty &&
+        emailErrors.value.isEmpty &&
+        passwordErrors.value.isEmpty &&
+        confirmPasswordErrors.value.isEmpty &&
+        avatarError.value == null &&
         username.value.isNotEmpty &&
         email.value.isNotEmpty &&
         password.value.isNotEmpty &&
-        confirmPassword.value.isNotEmpty;
+        confirmPassword.value.isNotEmpty &&
+        avatarId.value != null;
   });
 
   void updateUsername(String value) => username.value = value;
@@ -78,10 +94,12 @@ class SignUpViewModel {
 
   void updateConfirmPassword(String value) => confirmPassword.value = value;
 
+  void updateAvatar(String? value) => avatarId.value = value;
+
   Future<void> submit() async {
     hasAttemptedSubmit.value = true;
 
-    if (!isFormValid.value) {
+    if (!isFormValid.value || avatarId.value == null) {
       return;
     }
 
@@ -93,6 +111,7 @@ class SignUpViewModel {
           username: username.value,
           email: email.value,
           password: password.value,
+          avatarId: avatarId.value!,
         )
         .run();
 
@@ -109,9 +128,25 @@ class SignUpViewModel {
     email.value = '';
     password.value = '';
     confirmPassword.value = '';
+    avatarId.value = null;
     hasAttemptedSubmit.value = false;
     authState.value = const AuthStateInitial();
   }
 
-  void dispose() {}
+  void dispose() {
+    username.dispose();
+    email.dispose();
+    password.dispose();
+    confirmPassword.dispose();
+    hasAttemptedSubmit.dispose();
+    isLoading.dispose();
+    authState.dispose();
+    usernameErrors.dispose();
+    emailErrors.dispose();
+    passwordErrors.dispose();
+    confirmPasswordErrors.dispose();
+    avatarError.dispose();
+    isFormValid.dispose();
+    avatarId.dispose();
+  }
 }

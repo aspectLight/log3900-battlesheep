@@ -14,28 +14,28 @@ class AuthSubmitButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFE34B4B)),
-      );
-    }
     return SizedBox(
       width: double.infinity,
       child: FilledButton(
-        onPressed: onPressed,
+        onPressed: isLoading ? null : onPressed,
         style: FilledButton.styleFrom(
-          backgroundColor: const Color(0xFF550000),
+          backgroundColor: const Color(0xFF6B0000),
           foregroundColor: const Color(0xFFF5E6E6),
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 32),
-          side: const BorderSide(color: Color(0xFF7F1F1F), width: 2),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-          textStyle: const TextStyle(
-            fontSize: 19.2, // 1.2rem
-            fontWeight: FontWeight.w600,
+          disabledBackgroundColor: const Color(0xFF4A0000),
+          disabledForegroundColor: Colors.white54,
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+          side: const BorderSide(color: Color(0xFF4A0000), width: 1.5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
             fontFamily: 'CustomFont',
+            letterSpacing: 0.5,
           ),
         ),
-        child: Text(label),
       ),
     );
   }

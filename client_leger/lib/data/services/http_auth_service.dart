@@ -109,6 +109,7 @@ class HttpAuthService implements AuthService {
     required String username,
     required String email,
     required String password,
+    required String avatarId,
   }) => TaskEither.tryCatch(() async {
     final url = '${_dio.options.baseUrl}${ApiEndpoints.register}';
     LogService.d('Trying to sign up with URL: $url');
@@ -117,7 +118,7 @@ class HttpAuthService implements AuthService {
       'username': username,
       'email': email,
       'password': password,
-      'avatarId': 'default',
+      'avatarId': avatarId,
     };
     LogService.d('Data: $requestData');
 
@@ -136,7 +137,7 @@ class HttpAuthService implements AuthService {
       id: '',
       username: username,
       email: email,
-      avatarId: 'default',
+      avatarId: avatarId,
     );
   }, _onError);
 
@@ -233,10 +234,18 @@ class HttpAuthService implements AuthService {
       if (statusCode == HttpStatus.unauthorized) {
         return const InvalidCredentialsException();
       }
+      if (statusCode == HttpStatus.forbidden) {
+        return const AccountAlreadyConnectedException();
+      }
       if (statusCode == HttpStatus.notFound) {
         return const UserNotFoundException();
       }
       if (statusCode == HttpStatus.conflict) {
+        if ((errorMessage?.toLowerCase().contains('nom d\'utilisateur') ??
+                false) ||
+            (errorMessage?.toLowerCase().contains('username') ?? false)) {
+          return const UsernameAlreadyInUseException();
+        }
         return const EmailAlreadyInUseException();
       }
 

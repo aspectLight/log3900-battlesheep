@@ -58,7 +58,17 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
-      body: Column(children: [_buildWelcomeCard(), _buildMenuOptions()]),
+      body: Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          children: [
+            _buildWelcomeCard(),
+            const SizedBox(height: 48),
+            _buildMenuOptions(),
+          ],
+        ),
+      ),
     );
   }
 
@@ -70,7 +80,14 @@ class _MainScreenState extends State<MainScreen> {
       return Column(
         children: [
           Text(username.isNotEmpty ? username[0].toUpperCase() : 'P'),
-          Text(AppLocalizations.of(context)!.welcomeUser(username)),
+          Text(
+            AppLocalizations.of(context)!.welcomeUser(username),
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'CustomFont',
+            ),
+          ),
         ],
       );
     });
@@ -79,19 +96,24 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildMenuOptions() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-
       children: [
-        Text(AppLocalizations.of(context)!.gameContentSoon),
-
+        Text(
+          AppLocalizations.of(context)!.gameContentSoon,
+          style: const TextStyle(fontSize: 16),
+        ),
         const SizedBox(height: 16),
-        ElevatedButton.icon(
-          onPressed: () {
-            context.router.push(const ChatRoute());
-          },
-
-          icon: const Icon(Icons.chat),
-
-          label: Text(AppLocalizations.of(context)!.chat),
+        SizedBox(
+          height: 56,
+          child: ElevatedButton.icon(
+            onPressed: () {
+              context.router.push(const ChatRoute());
+            },
+            icon: const Icon(Icons.chat),
+            label: Text(
+              AppLocalizations.of(context)!.chat,
+              style: const TextStyle(fontSize: 18),
+            ),
+          ),
         ),
       ],
     );

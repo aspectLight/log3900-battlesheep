@@ -5,12 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../core/constants/asset_constants.dart';
+import '../../core/constants/input_limits.dart';
 import '../../core/l10n/extensions/auth_exception_ext.dart';
 import '../../core/l10n/extensions/auth_validation_error_ext.dart';
 import '../../domain/entities/auth_state.dart';
 import '../../generated/l10n/app_localizations.dart';
 import '../../routing/app_router.dart';
 import '../view_models/login_view_model.dart';
+import '../widgets/app_background.dart';
+import '../widgets/auth_error_box.dart';
 import '../widgets/auth_submit_button.dart';
 import '../widgets/auth_text_field.dart';
 import '../widgets/password_text_field.dart';
@@ -42,19 +46,8 @@ class _LoginScreenState extends State<LoginScreen> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           unawaited(context.router.replace(const MainRoute()));
         });
-      } else if (state is AuthStateError) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          final l10n = AppLocalizations.of(context)!;
-          _showErrorSnackBar(state.exception.localize(l10n));
-        });
       }
     });
-  }
-
-  void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -66,27 +59,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
+    return AppBackground(
+      child: Stack(
         children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/background.gif',
-              fit: BoxFit.cover,
-              opacity: const AlwaysStoppedAnimation(0.5),
-            ),
-          ),
           Center(
             child: SingleChildScrollView(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 350),
+                constraints: const BoxConstraints(maxWidth: 450),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset(
-                      'assets/images/logo.png',
-                      width: 200,
+                      AssetConstants.logo,
+                      width: 450,
                       fit: BoxFit.contain,
                     ),
                     const SizedBox(height: 32),
@@ -97,17 +82,21 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         Text(
                           AppLocalizations.of(context)!.noAccount,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7),
+                          style: const TextStyle(
+                            color: Colors.white70,
                             fontFamily: 'CustomFont',
-                            fontSize: 14,
+                            fontSize: 16,
                           ),
                         ),
-                        MouseRegion(
-                          cursor: SystemMouseCursors.click,
-                          child: GestureDetector(
-                            onTap: () => unawaited(
-                              context.router.push(const SignUpRoute()),
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => unawaited(
+                            context.router.push(const SignUpRoute()),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 12,
                             ),
                             child: Text(
                               AppLocalizations.of(context)!.signUp,
@@ -115,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Color(0xFFE34B4B),
                                 fontFamily: 'CustomFont',
                                 fontWeight: FontWeight.bold,
-                                fontSize: 14,
+                                fontSize: 16,
                                 decoration: TextDecoration.underline,
                                 decorationColor: Color(0xFFE34B4B),
                               ),
@@ -129,7 +118,42 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
+          _buildBackButton(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBackButton() {
+    return Positioned(
+      top: 40,
+      left: 20,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () =>
+              unawaited(context.router.replaceAll([const AuthLandingRoute()])),
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.chevron_left, color: Colors.white, size: 32),
+                const SizedBox(width: 4),
+                Text(
+                  AppLocalizations.of(context)!.back,
+                  style: const TextStyle(
+                    color: Color(0xFFE34B4B),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'CustomFont',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -141,30 +165,45 @@ class _LoginScreenState extends State<LoginScreen> {
         Watch(
           (context) => AuthTextField(
             label: l10n.username,
-            hintText: 'JohnDoe',
+            hintText: l10n.usernamePlaceholder,
             errorText: _viewModel.usernameError.value?.localize(l10n),
             onChanged: _viewModel.updateUsername,
             onFocusLost: _viewModel.markUsernameTouched,
             enabled: !_viewModel.isLoading.value,
+            maxLength: InputLimits.username,
           ),
         ),
         const SizedBox(height: 20),
         Watch(
           (context) => PasswordTextField(
             label: l10n.password,
-            hintText: '••••••••',
+            hintText: l10n.passwordPlaceholder,
             errorText: _viewModel.passwordError.value?.localize(l10n),
             onChanged: _viewModel.updatePassword,
             onFocusLost: _viewModel.markPasswordTouched,
             enabled: !_viewModel.isLoading.value,
             textInputAction: TextInputAction.done,
             onEditingComplete: _viewModel.submit,
+            maxLength: InputLimits.password,
           ),
         ),
         const SizedBox(height: 20),
+        Watch((context) {
+          final state = _viewModel.authState.value;
+          final errorMessage = state is AuthStateError
+              ? state.exception.localize(l10n)
+              : null;
+          if (errorMessage == null) return const SizedBox.shrink();
+          return Column(
+            children: [
+              AuthErrorBox(errorMessage: errorMessage),
+              const SizedBox(height: 12),
+            ],
+          );
+        }),
         Watch(
           (context) => AuthSubmitButton(
-            label: l10n.signIn,
+            label: _viewModel.isLoading.value ? l10n.signingIn : l10n.signIn,
             isLoading: _viewModel.isLoading.value,
             onPressed: _viewModel.submit,
           ),

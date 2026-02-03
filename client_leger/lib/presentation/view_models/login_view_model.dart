@@ -79,5 +79,16 @@ class LoginViewModel {
     authState.value = const AuthStateInitial();
   }
 
-  void dispose() {}
+  void dispose() {
+    username.dispose();
+    password.dispose();
+    usernameTouched.dispose();
+    passwordTouched.dispose();
+    hasAttemptedSubmit.dispose();
+    isLoading.dispose();
+    authState.dispose();
+    usernameError.dispose();
+    passwordError.dispose();
+    isFormValid.dispose();
+  }
 }

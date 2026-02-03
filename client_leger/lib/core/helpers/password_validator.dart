@@ -6,42 +6,48 @@ class PasswordValidator {
   static final RegExp hasDigit = RegExp(r'\d');
   static final RegExp hasSpace = RegExp(r'\s');
 
-  static AuthValidationError? validate(String? value) {
+  static List<AuthValidationError> validateAll(String? value) {
+    final errors = <AuthValidationError>[];
+
     if (value == null || value.isEmpty) {
-      return AuthValidationError.passwordRequired;
+      errors.add(AuthValidationError.passwordRequired);
+      return errors;
     }
 
     if (value.length < minLength) {
-      return AuthValidationError.passwordTooShort;
+      errors.add(AuthValidationError.passwordTooShort);
     }
 
     if (!hasLetter.hasMatch(value)) {
-      return AuthValidationError.passwordLeastOneLetter;
+      errors.add(AuthValidationError.passwordLeastOneLetter);
     }
 
     if (!hasDigit.hasMatch(value)) {
-      return AuthValidationError.passwordLeastOneDigit;
+      errors.add(AuthValidationError.passwordLeastOneDigit);
     }
 
     if (hasSpace.hasMatch(value)) {
-      return AuthValidationError.passwordNoSpaces;
+      errors.add(AuthValidationError.passwordNoSpaces);
     }
 
-    return null;
+    return errors;
   }
 
-  static AuthValidationError? validateConfirmation(
+  static List<AuthValidationError> validateConfirmationAll(
     String? password,
     String? confirmation,
   ) {
+    final errors = <AuthValidationError>[];
+
     if (confirmation == null || confirmation.isEmpty) {
-      return AuthValidationError.confirmationRequired;
+      errors.add(AuthValidationError.confirmationRequired);
+      return errors;
     }
 
     if (password != confirmation) {
-      return AuthValidationError.passwordsDoNotMatch;
+      errors.add(AuthValidationError.passwordsDoNotMatch);
     }
 
-    return null;
+    return errors;
   }
 }

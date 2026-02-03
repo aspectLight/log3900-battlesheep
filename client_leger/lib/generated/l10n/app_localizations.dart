@@ -131,7 +131,7 @@ abstract class AppLocalizations {
   /// Validation error when username is empty
   ///
   /// In en, this message translates to:
-  /// **'Username is required'**
+  /// **'Required field'**
   String get usernameRequired;
 
   /// Validation error when identifier is empty
@@ -143,7 +143,7 @@ abstract class AppLocalizations {
   /// Validation error for invalid email format
   ///
   /// In en, this message translates to:
-  /// **'Please enter a valid email address'**
+  /// **'Invalid email format'**
   String get invalidEmail;
 
   /// Validation error for short username
@@ -161,19 +161,25 @@ abstract class AppLocalizations {
   /// Validation error for special characters in username
   ///
   /// In en, this message translates to:
-  /// **'Username must not contain special characters'**
+  /// **'Special characters not allowed'**
   String get usernameSpecialChars;
+
+  /// Validation error for username length not within range
+  ///
+  /// In en, this message translates to:
+  /// **'Username must be between 3 and 15 characters'**
+  String get usernameInvalidLength;
 
   /// Validation error when password is empty
   ///
   /// In en, this message translates to:
-  /// **'Password is required'**
+  /// **'Required field'**
   String get passwordRequired;
 
   /// Validation error for short password
   ///
   /// In en, this message translates to:
-  /// **'Password must be at least 8 characters'**
+  /// **'Minimum 8 characters'**
   String get passwordTooShort;
 
   /// Validation error for missing letter in password
@@ -197,7 +203,7 @@ abstract class AppLocalizations {
   /// Validation error when confirmation is missing
   ///
   /// In en, this message translates to:
-  /// **'Confirmation is required'**
+  /// **'Required field'**
   String get confirmationRequired;
 
   /// Validation error when passwords differ
@@ -209,7 +215,7 @@ abstract class AppLocalizations {
   /// Validation error when email is empty
   ///
   /// In en, this message translates to:
-  /// **'Email is required'**
+  /// **'Required field'**
   String get emailRequired;
 
   /// Title or greeting for returning users
@@ -260,11 +266,23 @@ abstract class AppLocalizations {
   /// **'Sign In'**
   String get signIn;
 
+  /// Button text while signing in
+  ///
+  /// In en, this message translates to:
+  /// **'Signing In...'**
+  String get signingIn;
+
   /// Button text to sign up
   ///
   /// In en, this message translates to:
   /// **'Sign Up'**
   String get signUp;
+
+  /// Button text while creating an account
+  ///
+  /// In en, this message translates to:
+  /// **'Creating Account...'**
+  String get signingUp;
 
   /// Text asking if user has no account
   ///
@@ -281,7 +299,7 @@ abstract class AppLocalizations {
   /// Error message for invalid login credentials
   ///
   /// In en, this message translates to:
-  /// **'Invalid username or password'**
+  /// **'Incorrect username or password'**
   String get invalidCredentials;
 
   /// Error message when registering with existing email
@@ -290,10 +308,22 @@ abstract class AppLocalizations {
   /// **'This email is already in use'**
   String get emailAlreadyInUse;
 
+  /// Error message when registering with existing username
+  ///
+  /// In en, this message translates to:
+  /// **'This username is already in use'**
+  String get usernameAlreadyInUse;
+
+  /// Error message when user is already logged in elsewhere
+  ///
+  /// In en, this message translates to:
+  /// **'This account is already connected on another device.'**
+  String get accountAlreadyConnected;
+
   /// Error message when user is not found
   ///
   /// In en, this message translates to:
-  /// **'User not found'**
+  /// **'No account exists with this identifier'**
   String get userNotFound;
 
   /// Error message for network issues
@@ -331,6 +361,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Type a message...'**
   String get typeMessage;
+
+  /// Label for back button
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// Title for the avatar selection section
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar'**
+  String get avatarTitle;
+
+  /// Placeholder text for the username input field
+  ///
+  /// In en, this message translates to:
+  /// **'JohnDoe'**
+  String get usernamePlaceholder;
+
+  /// Placeholder text for the email input field
+  ///
+  /// In en, this message translates to:
+  /// **'johndoe@example.com'**
+  String get emailPlaceholder;
+
+  /// Placeholder text for the password input field
+  ///
+  /// In en, this message translates to:
+  /// **'••••••••'**
+  String get passwordPlaceholder;
+
+  /// Team name displayed in the footer
+  ///
+  /// In en, this message translates to:
+  /// **'Team 105'**
+  String get teamName;
+
+  /// Validation error when avatar is not selected
+  ///
+  /// In en, this message translates to:
+  /// **'Select an avatar'**
+  String get avatarRequired;
+
+  /// List of team members displayed in the footer
+  ///
+  /// In en, this message translates to:
+  /// **'Ahmed Sami Benabbou, May Guessous, Ayoub Marfouk, Pierre Carré, Anis Gadouche, Djihed Benaiche'**
+  String get teamMembers;
 }
 
 class _AppLocalizationsDelegate

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AuthTextField extends StatefulWidget {
   final String label;
@@ -13,6 +14,7 @@ class AuthTextField extends StatefulWidget {
   final TextEditingController? controller;
   final Widget? suffixIcon;
   final bool enabled;
+  final int? maxLength;
 
   const AuthTextField({
     super.key,
@@ -28,6 +30,7 @@ class AuthTextField extends StatefulWidget {
     this.controller,
     this.suffixIcon,
     this.enabled = true,
+    this.maxLength,
   });
 
   @override
@@ -67,30 +70,32 @@ class _AuthTextFieldState extends State<AuthTextField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          widget.label,
-          style: const TextStyle(
-            color: Color(0xFFF5E6E6),
-            fontSize: 14,
-            fontFamily: 'CustomFont',
-            fontWeight: FontWeight.bold,
+        if (widget.label.isNotEmpty) ...[
+          Text(
+            widget.label,
+            style: const TextStyle(
+              color: Color(0xFFF5E6E6),
+              fontSize: 20,
+              fontFamily: 'CustomFont',
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
+          const SizedBox(height: 8),
+        ],
         Stack(
           children: [
             Container(
-              height: 48,
+              height: 44,
               decoration: BoxDecoration(
-                color: const Color(0xFF2B2B2B),
-                borderRadius: BorderRadius.circular(5),
+                color: const Color(0xFF1A1A1A),
+                borderRadius: BorderRadius.circular(4),
                 border: Border.all(
                   color: hasError
                       ? const Color(0xFFDC3545)
                       : (isFocused
-                            ? const Color(0xFF7F1F1F)
-                            : const Color(0xFF444444)),
-                  width: 2,
+                            ? const Color(0xFFC60D0D)
+                            : const Color(0xFF333333)),
+                  width: 1.5,
                 ),
               ),
             ),
@@ -122,10 +127,24 @@ class _AuthTextFieldState extends State<AuthTextField> {
               onChanged: widget.onChanged,
               onEditingComplete: widget.onEditingComplete,
               enabled: widget.enabled,
+              maxLength: widget.maxLength,
+              maxLengthEnforcement: widget.maxLength != null
+                  ? MaxLengthEnforcement.enforced
+                  : MaxLengthEnforcement.none,
+              buildCounter:
+                  (
+                    context, {
+                    required currentLength,
+                    required isFocused,
+                    required maxLength,
+                  }) => null,
+              inputFormatters: widget.maxLength != null
+                  ? [LengthLimitingTextInputFormatter(widget.maxLength)]
+                  : null,
               style: const TextStyle(
                 color: Color(0xFFF5E6E6),
                 fontFamily: 'CustomFont',
-                fontSize: 16,
+                fontSize: 18,
               ),
               cursorColor: const Color(0xFFF5E6E6),
               decoration: InputDecoration(
@@ -152,7 +171,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
             style: const TextStyle(
               color: Color(0xFFDC3545),
               fontFamily: 'CustomFont',
-              fontSize: 12,
+              fontSize: 14,
             ),
           ),
         ],

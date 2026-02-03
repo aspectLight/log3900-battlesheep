@@ -111,11 +111,17 @@ class AuthRepositoryImpl implements AuthRepository {
     required String username,
     required String email,
     required String password,
+    required String avatarId,
   }) {
     return TaskEither.tryCatch(
       () async {
         final signUpResult = await _authService
-            .signUp(username: username, email: email, password: password)
+            .signUp(
+              username: username,
+              email: email,
+              password: password,
+              avatarId: avatarId,
+            )
             .run();
 
         if (signUpResult.isLeft()) {

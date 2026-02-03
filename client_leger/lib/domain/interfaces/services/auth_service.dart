@@ -13,6 +13,7 @@ abstract interface class AuthService {
     required String username,
     required String email,
     required String password,
+    required String avatarId,
   });
 
   TaskEither<AuthException, UserDto> getCurrentUser();

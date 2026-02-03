@@ -11,6 +11,22 @@
 part of 'app_router.dart';
 
 /// generated route for
+/// [AuthLandingScreen]
+class AuthLandingRoute extends PageRouteInfo<void> {
+  const AuthLandingRoute({List<PageRouteInfo>? children})
+    : super(AuthLandingRoute.name, initialChildren: children);
+
+  static const String name = 'AuthLandingRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AuthLandingScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [ChatScreen]
 class ChatRoute extends PageRouteInfo<void> {
   const ChatRoute({List<PageRouteInfo>? children})
