@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -6,7 +7,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../domain/entities/auth_state.dart';
 import '../../generated/l10n/app_localizations.dart';
-import '../../generated/routing/app_router.gr.dart';
+import '../../routing/app_router.dart';
 import '../view_models/auth_view_model.dart';
 
 @RoutePage()
@@ -57,7 +58,17 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
-      body: Column(children: [_buildWelcomeCard(), _buildMenuOptions()]),
+      body: Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          children: [
+            _buildWelcomeCard(),
+            const SizedBox(height: 48),
+            _buildMenuOptions(),
+          ],
+        ),
+      ),
     );
   }
 
@@ -69,13 +80,42 @@ class _MainScreenState extends State<MainScreen> {
       return Column(
         children: [
           Text(username.isNotEmpty ? username[0].toUpperCase() : 'P'),
-          Text(AppLocalizations.of(context)!.welcomeUser(username)),
+          Text(
+            AppLocalizations.of(context)!.welcomeUser(username),
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'CustomFont',
+            ),
+          ),
         ],
       );
     });
   }
 
   Widget _buildMenuOptions() {
-    return Center(child: Text(AppLocalizations.of(context)!.gameContentSoon));
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          AppLocalizations.of(context)!.gameContentSoon,
+          style: const TextStyle(fontSize: 16),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 56,
+          child: ElevatedButton.icon(
+            onPressed: () async {
+              await context.router.push(const ChatRoute());
+            },
+            icon: const Icon(Icons.chat),
+            label: Text(
+              AppLocalizations.of(context)!.chat,
+              style: const TextStyle(fontSize: 18),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

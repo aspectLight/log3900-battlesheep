@@ -9,7 +9,7 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
-  String welcomeUser(Object username) {
+  String welcomeUser(String username) {
     return 'Bienvenue, $username';
   }
 
@@ -26,14 +26,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get mainMenu => 'Menu Principal';
 
   @override
-  String get usernameRequired => 'Le nom d\'utilisateur est requis';
+  String get usernameRequired => 'Champ obligatoire';
 
   @override
   String get identifierRequired =>
       'Le nom d\'utilisateur ou le courriel est requis';
 
   @override
-  String get invalidEmail => 'Veuillez entrer une adresse courriel valide';
+  String get invalidEmail => 'Format email invalide';
 
   @override
   String get usernameTooShort =>
@@ -44,15 +44,17 @@ class AppLocalizationsFr extends AppLocalizations {
       'Le nom d\'utilisateur doit comporter au plus 15 caractères';
 
   @override
-  String get usernameSpecialChars =>
-      'Le nom d\'utilisateur ne doit pas contenir de caractères spéciaux';
+  String get usernameSpecialChars => 'Caractères spéciaux non autorisés';
 
   @override
-  String get passwordRequired => 'Le mot de passe est requis';
+  String get usernameInvalidLength =>
+      'Le nom d\'utilisateur doit contenir entre 3 et 15 caractères';
 
   @override
-  String get passwordTooShort =>
-      'Le mot de passe doit comporter au moins 8 caractères';
+  String get passwordRequired => 'Champ obligatoire';
+
+  @override
+  String get passwordTooShort => 'Minimum 8 caractères';
 
   @override
   String get passwordLeastOneLetter =>
@@ -64,16 +66,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get passwordNoSpaces =>
-      'Le mot de passe ne doit pas contenir d\'espaces';
+      'Le mot de passe ne doit pas contenir d\'espace';
 
   @override
-  String get confirmationRequired => 'La confirmation est requise';
+  String get confirmationRequired => 'Champ obligatoire';
 
   @override
   String get passwordsDoNotMatch => 'Les mots de passe ne correspondent pas';
 
   @override
-  String get emailRequired => 'Le courriel est requis';
+  String get emailRequired => 'Champ obligatoire';
 
   @override
   String get welcomeBack => 'Bon retour';
@@ -88,7 +90,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get username => 'Nom d\'utilisateur';
 
   @override
-  String get email => 'Courriel';
+  String get email => 'Adresse courriel';
 
   @override
   String get password => 'Mot de passe';
@@ -100,23 +102,35 @@ class AppLocalizationsFr extends AppLocalizations {
   String get signIn => 'Se connecter';
 
   @override
+  String get signingIn => 'Connexion...';
+
+  @override
   String get signUp => 'S\'inscrire';
 
   @override
-  String get noAccount => 'Vous n\'avez pas de compte ? ';
+  String get signingUp => 'Création...';
 
   @override
-  String get alreadyHaveAccount => 'Vous avez déjà un compte ? ';
+  String get noAccount => 'Pas encore de compte ? ';
 
   @override
-  String get invalidCredentials =>
-      'Nom d\'utilisateur ou mot de passe invalide';
+  String get alreadyHaveAccount => 'Déjà un compte ? ';
+
+  @override
+  String get invalidCredentials => 'Identifiant ou mot de passe incorrect.';
 
   @override
   String get emailAlreadyInUse => 'Ce courriel est déjà utilisé';
 
   @override
-  String get userNotFound => 'Utilisateur introuvable';
+  String get usernameAlreadyInUse => 'Ce nom d\'utilisateur est déjà utilisé';
+
+  @override
+  String get accountAlreadyConnected =>
+      'Ce compte est déjà connecté sur un autre appareil.';
+
+  @override
+  String get userNotFound => 'Aucun compte n\'existe avec cet identifiant.';
 
   @override
   String get networkError => 'Problème de connexion réseau';
@@ -126,4 +140,39 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get unknownError => 'Une erreur inconnue est survenue';
+
+  @override
+  String get chat => 'Clavardage';
+
+  @override
+  String get noMessages =>
+      'Aucun message pour l\'instant. Commencez la conversation !';
+
+  @override
+  String get typeMessage => 'Tapez un message...';
+
+  @override
+  String get back => 'Retour';
+
+  @override
+  String get avatarTitle => 'Avatar';
+
+  @override
+  String get usernamePlaceholder => 'JohnDoe';
+
+  @override
+  String get emailPlaceholder => 'johndoe@example.com';
+
+  @override
+  String get passwordPlaceholder => '••••••••';
+
+  @override
+  String get teamName => 'Équipe 105';
+
+  @override
+  String get avatarRequired => 'Sélectionnez un avatar';
+
+  @override
+  String get teamMembers =>
+      'Ahmed Sami Benabbou, May Guessous, Ayoub Marfouk, Pierre Carré, Anis Gadouche, Djihed Benaiche';
 }

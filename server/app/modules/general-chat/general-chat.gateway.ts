@@ -57,6 +57,27 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         this.logger.log(`Message de ${data.username}: ${data.message}`);
     }
 
+    @SubscribeMessage(GeneralChatEvents.SendEmojiToGeneralChat)
+    handleSendEmoji(socket: Socket, data: { username: string; emoji: string }): void {
+        const chatEmoji: ChatMessage = {
+            type: 'emoji-received',
+            name: data.username,
+            content: data.emoji,
+            time: new Date().toLocaleTimeString('en-GB', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+            }),
+        };
+        this.generalChatService.addMessage(chatEmoji);
+
+        // Send emoji to all except sender
+        socket.to(GENERAL_CHAT_ROOM).emit(GeneralChatEvents.GeneralChatEmoji, chatEmoji);
+        this.logger.log(`Emoji de ${data.username}: ${data.emoji}`);
+    }
+
+
     @SubscribeMessage(GeneralChatEvents.GetGeneralChatMessages)
     handleGetMessages(socket: Socket): void {
         const messages = this.generalChatService.getMessages();
@@ -72,7 +93,7 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         const username = this.socketIdToUsername.get(socket.id);
 
         if (username) {
-            // 45 seconds delay before logging out
+            // 15 seconds delay before logging out
             const timeout = setTimeout(async () => {
                 try {
                     const user = await this.authService.getUserByUsername(username);
@@ -83,7 +104,7 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
                 } catch (error) {
                     this.logger.error(`Erreur lors de la déconnexion automatique de ${username}: ${error.message}`);
                 }
-            }, 45000);
+            }, 15000);
 
             this.disconnectionTimeouts.set(username, timeout);
         }

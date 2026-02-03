@@ -2,40 +2,35 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../core/enums/auth_validation_error.dart';
 import '../../domain/entities/auth_state.dart';
-import '../../domain/interfaces/auth_repository.dart';
+import '../../domain/interfaces/repositories/auth_repository.dart';
 
 class LoginViewModel {
   final AuthRepository _authRepository;
 
-  static final _emailRegex = RegExp(
-    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-  );
-
   LoginViewModel({required AuthRepository authRepository})
     : _authRepository = authRepository;
 
-  final email = signal('');
+  final username = signal('');
   final password = signal('');
+  final usernameTouched = signal(false);
+  final passwordTouched = signal(false);
 
   final hasAttemptedSubmit = signal(false);
   final isLoading = signal(false);
   final authState = signal<AuthState>(const AuthStateInitial());
 
-  late final emailError = computed<AuthValidationError?>(() {
-    if (email.value.isEmpty) {
-      return hasAttemptedSubmit.value
-          ? AuthValidationError.emailRequired
+  late final usernameError = computed<AuthValidationError?>(() {
+    if (username.value.isEmpty) {
+      return hasAttemptedSubmit.value || usernameTouched.value
+          ? AuthValidationError.usernameRequired
           : null;
-    }
-    if (!_emailRegex.hasMatch(email.value)) {
-      return hasAttemptedSubmit.value ? AuthValidationError.invalidEmail : null;
     }
     return null;
   });
 
   late final passwordError = computed<AuthValidationError?>(() {
     if (password.value.isEmpty) {
-      return hasAttemptedSubmit.value
+      return hasAttemptedSubmit.value || passwordTouched.value
           ? AuthValidationError.passwordRequired
           : null;
     }
@@ -43,14 +38,15 @@ class LoginViewModel {
   });
 
   late final isFormValid = computed(() {
-    return email.value.isNotEmpty &&
-        _emailRegex.hasMatch(email.value) &&
-        password.value.isNotEmpty;
+    return username.value.isNotEmpty && password.value.isNotEmpty;
   });
 
-  void updateEmail(String value) => email.value = value;
+  void updateUsername(String value) => username.value = value;
 
   void updatePassword(String value) => password.value = value;
+
+  void markUsernameTouched() => usernameTouched.value = true;
+  void markPasswordTouched() => passwordTouched.value = true;
 
   Future<void> submit() async {
     hasAttemptedSubmit.value = true;
@@ -63,7 +59,7 @@ class LoginViewModel {
     authState.value = const AuthStateLoading();
 
     final result = await _authRepository
-        .signIn(identifier: email.value, password: password.value)
+        .signIn(username: username.value, password: password.value)
         .run();
 
     result.fold(
@@ -75,11 +71,24 @@ class LoginViewModel {
   }
 
   void resetForm() {
-    email.value = '';
+    username.value = '';
     password.value = '';
+    usernameTouched.value = false;
+    passwordTouched.value = false;
     hasAttemptedSubmit.value = false;
     authState.value = const AuthStateInitial();
   }
 
-  void dispose() {}
+  void dispose() {
+    username.dispose();
+    password.dispose();
+    usernameTouched.dispose();
+    passwordTouched.dispose();
+    hasAttemptedSubmit.dispose();
+    isLoading.dispose();
+    authState.dispose();
+    usernameError.dispose();
+    passwordError.dispose();
+    isFormValid.dispose();
+  }
 }

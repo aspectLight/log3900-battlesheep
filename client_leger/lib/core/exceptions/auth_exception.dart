@@ -15,6 +15,14 @@ class EmailAlreadyInUseException extends AuthException {
   const EmailAlreadyInUseException() : super('Email already in use');
 }
 
+class UsernameAlreadyInUseException extends AuthException {
+  const UsernameAlreadyInUseException() : super('Username already in use');
+}
+
+class AccountAlreadyConnectedException extends AuthException {
+  const AccountAlreadyConnectedException() : super('Account already connected');
+}
+
 class UserNotFoundException extends AuthException {
   const UserNotFoundException() : super('User not found');
 }

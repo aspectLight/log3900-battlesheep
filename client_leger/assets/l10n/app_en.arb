@@ -1,38 +1,217 @@
 {
+  "@@locale": "en",
   "welcomeUser": "Welcome back, {username}",
+  "@welcomeUser": {
+    "description": "Welcome message on the home screen",
+    "placeholders": {
+      "username": {
+        "type": "String",
+        "example": "JohnDoe"
+      }
+    }
+  },
   "gameContentSoon": "Game content coming soon...",
+  "@gameContentSoon": {
+    "description": "Placeholder text for upcoming game features"
+  },
   "createAccount": "Create Account",
+  "@createAccount": {
+    "description": "Button text to create a new account"
+  },
   "signUpToStart": "Sign up to get started",
+  "@signUpToStart": {
+    "description": "Subtitle text encouraging signup"
+  },
   "mainMenu": "Main Menu",
-  "usernameRequired": "Username is required",
+  "@mainMenu": {
+    "description": "Title for the main menu screen"
+  },
+  "usernameRequired": "Required field",
+  "@usernameRequired": {
+    "description": "Validation error when username is empty"
+  },
   "identifierRequired": "Username or Email is required",
-  "invalidEmail": "Please enter a valid email address",
+  "@identifierRequired": {
+    "description": "Validation error when identifier is empty"
+  },
+  "invalidEmail": "Invalid email format",
+  "@invalidEmail": {
+    "description": "Validation error for invalid email format"
+  },
   "usernameTooShort": "Username must be at least 3 characters",
+  "@usernameTooShort": {
+    "description": "Validation error for short username"
+  },
   "usernameTooLong": "Username must be at most 15 characters",
-  "usernameSpecialChars": "Username must not contain special characters",
-  "passwordRequired": "Password is required",
-  "passwordTooShort": "Password must be at least 8 characters",
+  "@usernameTooLong": {
+    "description": "Validation error for long username"
+  },
+  "usernameSpecialChars": "Special characters not allowed",
+  "@usernameSpecialChars": {
+    "description": "Validation error for special characters in username"
+  },
+  "usernameInvalidLength": "Username must be between 3 and 15 characters",
+  "@usernameInvalidLength": {
+    "description": "Validation error for username length not within range"
+  },
+  "passwordRequired": "Required field",
+  "@passwordRequired": {
+    "description": "Validation error when password is empty"
+  },
+  "passwordTooShort": "Minimum 8 characters",
+  "@passwordTooShort": {
+    "description": "Validation error for short password"
+  },
   "passwordLeastOneLetter": "Password must contain at least one letter",
+  "@passwordLeastOneLetter": {
+    "description": "Validation error for missing letter in password"
+  },
   "passwordLeastOneDigit": "Password must contain at least one digit",
+  "@passwordLeastOneDigit": {
+    "description": "Validation error for missing digit in password"
+  },
   "passwordNoSpaces": "Password must not contain spaces",
-  "confirmationRequired": "Confirmation is required",
+  "@passwordNoSpaces": {
+    "description": "Validation error for spaces in password"
+  },
+  "confirmationRequired": "Required field",
+  "@confirmationRequired": {
+    "description": "Validation error when confirmation is missing"
+  },
   "passwordsDoNotMatch": "Passwords do not match",
-  "emailRequired": "Email is required",
+  "@passwordsDoNotMatch": {
+    "description": "Validation error when passwords differ"
+  },
+  "emailRequired": "Required field",
+  "@emailRequired": {
+    "description": "Validation error when email is empty"
+  },
   "welcomeBack": "Welcome Back",
+  "@welcomeBack": {
+    "description": "Title or greeting for returning users"
+  },
   "signInToContinue": "Sign in to continue",
+  "@signInToContinue": {
+    "description": "Subtitle text encouraging sign in"
+  },
   "usernameOrEmail": "Username or Email",
+  "@usernameOrEmail": {
+    "description": "Label for username or email input field"
+  },
   "username": "Username",
+  "@username": {
+    "description": "Label for username input field"
+  },
   "email": "Email",
+  "@email": {
+    "description": "Label for email input field"
+  },
   "password": "Password",
+  "@password": {
+    "description": "Label for password input field"
+  },
   "confirmPassword": "Confirm Password",
+  "@confirmPassword": {
+    "description": "Label for confirm password input field"
+  },
   "signIn": "Sign In",
+  "@signIn": {
+    "description": "Button text to sign in"
+  },
+  "signingIn": "Signing In...",
+  "@signingIn": {
+    "description": "Button text while signing in"
+  },
   "signUp": "Sign Up",
+  "@signUp": {
+    "description": "Button text to sign up"
+  },
+  "signingUp": "Creating Account...",
+  "@signingUp": {
+    "description": "Button text while creating an account"
+  },
   "noAccount": "Don't have an account? ",
+  "@noAccount": {
+    "description": "Text asking if user has no account"
+  },
   "alreadyHaveAccount": "Already have an account? ",
-  "invalidCredentials": "Invalid username or password",
+  "@alreadyHaveAccount": {
+    "description": "Text asking if user already has an account"
+  },
+  "invalidCredentials": "Incorrect username or password",
+  "@invalidCredentials": {
+    "description": "Error message for invalid login credentials"
+  },
   "emailAlreadyInUse": "This email is already in use",
-  "userNotFound": "User not found",
+  "@emailAlreadyInUse": {
+    "description": "Error message when registering with existing email"
+  },
+  "usernameAlreadyInUse": "This username is already in use",
+  "@usernameAlreadyInUse": {
+    "description": "Error message when registering with existing username"
+  },
+  "accountAlreadyConnected": "This account is already connected on another device.",
+  "@accountAlreadyConnected": {
+    "description": "Error message when user is already logged in elsewhere"
+  },
+  "userNotFound": "No account exists with this identifier",
+  "@userNotFound": {
+    "description": "Error message when user is not found"
+  },
   "networkError": "Network connection problem",
+  "@networkError": {
+    "description": "Error message for network issues"
+  },
   "serverError": "Server error",
-  "unknownError": "An unknown error occurred"
+  "@serverError": {
+    "description": "Error message for server issues"
+  },
+  "unknownError": "An unknown error occurred",
+  "@unknownError": {
+    "description": "Error message for unknown issues"
+  },
+  "chat": "Chat",
+  "@chat": {
+    "description": "Title or label for the chat feature"
+  },
+  "noMessages": "No messages yet. Start the conversation!",
+  "@noMessages": {
+    "description": "Placeholder text when chat is empty"
+  },
+  "typeMessage": "Type a message...",
+  "@typeMessage": {
+    "description": "Placeholder text for message input field"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Label for back button"
+  },
+  "avatarTitle": "Avatar",
+  "@avatarTitle": {
+    "description": "Title for the avatar selection section"
+  },
+  "usernamePlaceholder": "JohnDoe",
+  "@usernamePlaceholder": {
+    "description": "Placeholder text for the username input field"
+  },
+  "emailPlaceholder": "johndoe@example.com",
+  "@emailPlaceholder": {
+    "description": "Placeholder text for the email input field"
+  },
+  "passwordPlaceholder": "••••••••",
+  "@passwordPlaceholder": {
+    "description": "Placeholder text for the password input field"
+  },
+  "teamName": "Team 105",
+  "@teamName": {
+    "description": "Team name displayed in the footer"
+  },
+  "avatarRequired": "Select an avatar",
+  "@avatarRequired": {
+    "description": "Validation error when avatar is not selected"
+  },
+  "teamMembers": "Ahmed Sami Benabbou, May Guessous, Ayoub Marfouk, Pierre Carré, Anis Gadouche, Djihed Benaiche",
+  "@teamMembers": {
+    "description": "List of team members displayed in the footer"
+  }
 }
