@@ -12,6 +12,7 @@ abstract class ChatRepository {
 
   void loadMessages();
   void sendMessage(String content);
+  void sendEmoji(String emoji);
   void clearMessages();
 
   Future<void> dispose();

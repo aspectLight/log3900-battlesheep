@@ -18,17 +18,22 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   late final ChatViewModel _viewModel;
+  late final FocusNode _messageFocusNode;
+
+  final List<String> _emojis = ['👍', '❤️', '😂'];
 
   @override
   void initState() {
     super.initState();
     _viewModel = GetIt.I<ChatViewModel>();
+    _messageFocusNode = FocusNode();
     _viewModel.loadMessages();
   }
 
   @override
   void dispose() {
     _messageController.dispose();
+    _messageFocusNode.dispose();
     super.dispose();
   }
 
@@ -38,6 +43,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
     _viewModel.sendMessage(text);
     _messageController.clear();
+    _messageFocusNode.requestFocus();
+  }
+
+  void _sendEmoji(String emoji) {
+    _viewModel.sendEmoji(emoji);
   }
 
   @override
@@ -113,16 +123,29 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: message.isMe
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.grey[300],
-                borderRadius: BorderRadius.circular(20),
-              ),
+              padding:
+                  (message.type == 'emoji-received' ||
+                      message.type == 'emoji-sent')
+                  ? EdgeInsets.zero
+                  : const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration:
+                  (message.type == 'emoji-received' ||
+                      message.type == 'emoji-sent')
+                  ? null
+                  : BoxDecoration(
+                      color: message.isMe
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.grey[300],
+                      borderRadius: BorderRadius.circular(20),
+                    ),
               child: Text(
                 message.content,
                 style: TextStyle(
+                  fontSize:
+                      (message.type == 'emoji-received' ||
+                          message.type == 'emoji-sent')
+                      ? 32
+                      : 16,
                   color: message.isMe ? Colors.white : Colors.black87,
                 ),
               ),
@@ -155,6 +178,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: TextField(
               controller: _messageController,
+              focusNode: _messageFocusNode,
               decoration: InputDecoration(
                 hintText: AppLocalizations.of(context)!.typeMessage,
                 border: OutlineInputBorder(
@@ -168,6 +192,28 @@ class _ChatScreenState extends State<ChatScreen> {
               onSubmitted: (_) => _sendMessage(),
             ),
           ),
+          const SizedBox(width: 8),
+          ..._emojis.map((emoji) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: InkWell(
+                onTap: () => _sendEmoji(emoji),
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Colors.grey.withValues(alpha: 0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(emoji, style: const TextStyle(fontSize: 20)),
+                ),
+              ),
+            );
+          }),
           const SizedBox(width: 8),
           IconButton(
             icon: const Icon(Icons.send),

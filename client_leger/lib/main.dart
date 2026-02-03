@@ -17,8 +17,7 @@ import 'routing/app_router.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final environment = dotenv.env['ENV'] ?? 'dev';
-  await dotenv.load(fileName: '.env.$environment');
+  await dotenv.load(fileName: '.env.dev');
 
   await setupDependencies();
 

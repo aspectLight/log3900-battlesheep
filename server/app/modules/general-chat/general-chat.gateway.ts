@@ -57,6 +57,27 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         this.logger.log(`Message de ${data.username}: ${data.message}`);
     }
 
+    @SubscribeMessage(GeneralChatEvents.SendEmojiToGeneralChat)
+    handleSendEmoji(socket: Socket, data: { username: string; emoji: string }): void {
+        const chatEmoji: ChatMessage = {
+            type: 'emoji-received',
+            name: data.username,
+            content: data.emoji,
+            time: new Date().toLocaleTimeString('en-GB', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+            }),
+        };
+        this.generalChatService.addMessage(chatEmoji);
+
+        // Send emoji to all except sender
+        socket.to(GENERAL_CHAT_ROOM).emit(GeneralChatEvents.GeneralChatEmoji, chatEmoji);
+        this.logger.log(`Emoji de ${data.username}: ${data.emoji}`);
+    }
+
+
     @SubscribeMessage(GeneralChatEvents.GetGeneralChatMessages)
     handleGetMessages(socket: Socket): void {
         const messages = this.generalChatService.getMessages();

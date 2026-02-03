@@ -53,6 +53,14 @@ class SocketChatServiceImpl implements SocketChatService {
   }
 
   void _setupListeners() {
+    socket!
+      ..off('connect')
+      ..off('disconnect')
+      ..off('error')
+      ..off(GeneralChatEvents.generalChatMessage)
+      ..off(GeneralChatEvents.generalChatEmoji)
+      ..off(GeneralChatEvents.getGeneralChatMessagesResponse);
+
     socket!.on('connect', (_) {
       LogService.i('Connected to chat server');
       _isConnected = true;
@@ -73,6 +81,12 @@ class SocketChatServiceImpl implements SocketChatService {
     socket!.on(GeneralChatEvents.generalChatMessage, (data) {
       final messageData = data as Map<String, dynamic>;
       LogService.d('Received message from ${messageData['name']}');
+      _messageReceivedController.add(messageData);
+    });
+
+    socket!.on(GeneralChatEvents.generalChatEmoji, (data) {
+      final messageData = data as Map<String, dynamic>;
+      LogService.d('Received emoji from ${messageData['name']}');
       _messageReceivedController.add(messageData);
     });
 
@@ -105,6 +119,20 @@ class SocketChatServiceImpl implements SocketChatService {
       'message': message,
     });
     LogService.d('Sent message to general chat');
+  }
+
+  @override
+  void sendEmoji({required String username, required String emoji}) {
+    if (!_isConnected || socket == null) {
+      LogService.w('Cannot send emoji: not connected');
+      return;
+    }
+
+    socket!.emit(GeneralChatEvents.sendEmojiToGeneralChat, {
+      'username': username,
+      'emoji': emoji,
+    });
+    LogService.d('Sent emoji to general chat');
   }
 
   @override

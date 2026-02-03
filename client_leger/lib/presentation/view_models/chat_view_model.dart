@@ -25,6 +25,10 @@ class ChatViewModel {
     _repository.clearMessages();
   }
 
+  void sendEmoji(String emoji) {
+    _repository.sendEmoji(emoji);
+  }
+
   void dispose() {
     // Le repository sera disposé par le container d'injection de dépendances
   }

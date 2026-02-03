@@ -10,6 +10,7 @@ abstract class SocketChatService {
 
   void getGeneralChatMessages();
   void sendMessage({required String username, required String message});
+  void sendEmoji({required String username, required String emoji});
 
   Future<void> dispose();
 }

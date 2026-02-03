@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../data/repositories/auth_repository_impl.dart';
+import '../../data/repositories/chat_repository_impl.dart';
 import '../../data/services/auth_local_service.dart';
 import '../../data/services/firebase_auth_service.dart';
 import '../../data/services/http_auth_service.dart';
@@ -82,6 +83,13 @@ void _registerRepositories() {
       firebaseAuthService: getIt<FirebaseAuthService>(),
     ),
   );
+
+  getIt.registerLazySingleton<ChatRepository>(
+    () => ChatRepositoryImpl(
+      chatService: getIt<SocketChatService>(),
+      connectionService: getIt<SocketConnectionService>(),
+    ),
+  );
 }
 
 void _registerViewModels() {
@@ -101,6 +109,7 @@ void _registerViewModels() {
     () => SocketConnectionViewModel(
       connectionService: getIt<SocketConnectionService>(),
       authViewModel: getIt<AuthViewModel>(),
+      chatRepository: getIt<ChatRepository>(),
     ),
   );
 

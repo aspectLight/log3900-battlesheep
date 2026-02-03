@@ -124,6 +124,25 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
+  void sendEmoji(String emoji) {
+    if (currentUsername.value == null) {
+      LogService.w('Cannot send emoji: invalid username');
+      return;
+    }
+
+    final newEntity = ChatMessageEntity(
+      type: 'emoji-sent',
+      name: currentUsername.value,
+      content: emoji,
+      time: Formatter.formatTime(DateTime.now()),
+      isMe: true,
+    );
+    _addMessage(newEntity);
+
+    _chatService.sendEmoji(username: currentUsername.value!, emoji: emoji);
+  }
+
+  @override
   void clearMessages() {
     messages.value = [];
     LogService.d('Cleared all messages');
