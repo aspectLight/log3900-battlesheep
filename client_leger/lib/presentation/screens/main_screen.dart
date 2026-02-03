@@ -105,8 +105,8 @@ class _MainScreenState extends State<MainScreen> {
         SizedBox(
           height: 56,
           child: ElevatedButton.icon(
-            onPressed: () {
-              context.router.push(const ChatRoute());
+            onPressed: () async {
+              await context.router.push(const ChatRoute());
             },
             icon: const Icon(Icons.chat),
             label: Text(

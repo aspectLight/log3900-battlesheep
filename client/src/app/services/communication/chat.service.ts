@@ -37,6 +37,11 @@ export class ChatService {
             this.triggerScroll();
         });
 
+        this.socketService.on(GeneralChatEvents.GeneralChatEmoji, (emoji: { type: string; name: string; content: string; time: string }) => {
+            this.messages.push(emoji);
+            this.triggerScroll();
+        });
+
         this.socketService.on(
             GeneralChatEvents.GetGeneralChatMessagesResponse,
             (messages: { type: string; name: string; content: string; time: string }[]) => {

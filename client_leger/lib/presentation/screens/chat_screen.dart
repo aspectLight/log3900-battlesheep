@@ -1,34 +1,78 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
+import 'package:sensors_plus/sensors_plus.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../core/constants/input_limits.dart';
-import '../../data/services/chat_service.dart';
+import '../../domain/entities/chat_message_entity.dart';
 import '../../generated/l10n/app_localizations.dart';
+import '../view_models/chat_view_model.dart';
 
 @RoutePage()
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
+
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
-  late final ChatService _chatService;
+  late final ChatViewModel _viewModel;
+  late final FocusNode _messageFocusNode;
+
+  final List<String> _emojis = ['👍', '❤️', '😂'];
+
+  StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
+  DateTime? _lastShakeTime;
+
+  static const double _shakeThresholdVertical = 15;
+  static const double _shakeThresholdHorizontal = 15;
+  static const int _shakeCooldownMs = 1000;
 
   @override
   void initState() {
     super.initState();
-    _chatService = GetIt.I<ChatService>();
+    _viewModel = GetIt.I<ChatViewModel>();
+    _messageFocusNode = FocusNode();
+    _viewModel.loadMessages();
+    _setupShakeDetection();
+  }
 
-    _chatService.getGeneralChatMessages();
+  void _setupShakeDetection() {
+    _accelerometerSubscription = accelerometerEventStream().listen(
+      _detectShake,
+    );
+  }
+
+  void _detectShake(AccelerometerEvent event) {
+    final now = DateTime.now();
+
+    if (_lastShakeTime != null &&
+        now.difference(_lastShakeTime!).inMilliseconds < _shakeCooldownMs) {
+      return;
+    }
+
+    if (event.y.abs() > _shakeThresholdVertical && event.x.abs() < 10) {
+      _lastShakeTime = now;
+      _viewModel.sendEmoji(_emojis[0]);
+    } else if (event.x.abs() > _shakeThresholdHorizontal &&
+        event.y.abs() < 10) {
+      _lastShakeTime = now;
+      _viewModel.resendLastMessage();
+    }
   }
 
   @override
-  void dispose() {
+  Future<void> dispose() async {
     _messageController.dispose();
+    _messageFocusNode.dispose();
+    await _accelerometerSubscription?.cancel();
+    _viewModel.dispose();
     super.dispose();
   }
 
@@ -36,57 +80,68 @@ class _ChatScreenState extends State<ChatScreen> {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
-    _chatService.sendMessageToGeneralChat(text);
+    _viewModel.sendMessage(text);
     _messageController.clear();
+    _messageFocusNode.requestFocus();
+  }
+
+  void _sendEmoji(String emoji) {
+    _viewModel.sendEmoji(emoji);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.chat)),
-      body: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 800),
-          child: Column(
-            children: [
-              Expanded(
-                child: StreamBuilder<List<ChatMessage>>(
-                  stream: _chatService.messagesStream,
-                  initialData: _chatService.messages,
-                  builder: (context, snapshot) {
-                    final messages = snapshot.data ?? [];
-
-                    if (messages.isEmpty) {
-                      return Center(
-                        child: Text(
-                          AppLocalizations.of(context)!.noMessages,
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
-                        ),
-                      );
-                    }
-
-                    return ListView.builder(
-                      reverse: true,
-                      itemCount: messages.length,
-                      itemBuilder: (context, index) {
-                        final message = messages[messages.length - 1 - index];
-                        return _buildMessageBubble(message);
-                      },
-                    );
-                  },
-                ),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.chat),
+        actions: [
+          Watch((context) {
+            final isConnected = _viewModel.isConnected.value;
+            return Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: Icon(
+                isConnected ? Icons.circle : Icons.circle_outlined,
+                color: isConnected ? Colors.green : Colors.red,
+                size: 12,
               ),
-              _buildMessageInput(),
-            ],
+            );
+          }),
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Watch((context) {
+              final messages = _viewModel.messages.value;
+
+              if (messages.isEmpty) {
+                return Center(
+                  child: Text(
+                    AppLocalizations.of(context)!.noMessages,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                reverse: true,
+                itemCount: messages.length,
+                itemBuilder: (context, index) {
+                  final message = messages[messages.length - 1 - index];
+                  return _buildMessageBubble(message);
+                },
+              );
+            }),
           ),
-        ),
+          _buildMessageInput(),
+        ],
       ),
     );
   }
 
-  Widget _buildMessageBubble(ChatMessage message) {
+  Widget _buildMessageBubble(ChatMessageEntity message) {
     return Align(
       alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -107,18 +162,30 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: message.isMe
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.grey[300],
-                borderRadius: BorderRadius.circular(20),
-              ),
+              padding:
+                  (message.type == 'emoji-received' ||
+                      message.type == 'emoji-sent')
+                  ? EdgeInsets.zero
+                  : const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration:
+                  (message.type == 'emoji-received' ||
+                      message.type == 'emoji-sent')
+                  ? null
+                  : BoxDecoration(
+                      color: message.isMe
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.grey[300],
+                      borderRadius: BorderRadius.circular(20),
+                    ),
               child: Text(
                 message.content,
                 style: TextStyle(
+                  fontSize:
+                      (message.type == 'emoji-received' ||
+                          message.type == 'emoji-sent')
+                      ? 32
+                      : 16,
                   color: message.isMe ? Colors.white : Colors.black87,
-                  fontSize: 16,
                 ),
               ),
             ),
@@ -139,7 +206,7 @@ class _ChatScreenState extends State<ChatScreen> {
         color: Theme.of(context).colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, -2),
           ),
@@ -150,6 +217,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: TextField(
               controller: _messageController,
+              focusNode: _messageFocusNode,
               style: const TextStyle(fontSize: 16),
               decoration: InputDecoration(
                 hintText: AppLocalizations.of(context)!.typeMessage,
@@ -177,6 +245,27 @@ class _ChatScreenState extends State<ChatScreen> {
               ],
             ),
           ),
+          const SizedBox(width: 8),
+          ..._emojis.map((emoji) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: InkWell(
+                onTap: () => _sendEmoji(emoji),
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Colors.grey.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Text(emoji, style: const TextStyle(fontSize: 20)),
+                ),
+              ),
+            );
+          }),
           const SizedBox(width: 8),
           IconButton(
             icon: const Icon(Icons.send),
