@@ -14,3 +14,19 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+## Code Generation
+
+This project relies on code generation for localization and routing.
+
+### Localization
+To generate localization files (l10n), run:
+```bash
+flutter gen-l10n
+```
+
+### Routing & Built Value
+To generate routing code (auto_route) and other built values, run:
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```

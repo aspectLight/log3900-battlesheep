@@ -5,15 +5,18 @@ class EmailValidator {
     r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
   );
 
-  static AuthValidationError? validate(String? value) {
+  static List<AuthValidationError> validateAll(String? value) {
+    final errors = <AuthValidationError>[];
+
     if (value == null || value.isEmpty) {
-      return AuthValidationError.emailRequired;
+      errors.add(AuthValidationError.emailRequired);
+      return errors;
     }
 
     if (!emailPattern.hasMatch(value)) {
-      return AuthValidationError.invalidEmail;
+      errors.add(AuthValidationError.invalidEmail);
     }
 
-    return null;
+    return errors;
   }
 }

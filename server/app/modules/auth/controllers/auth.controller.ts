@@ -9,6 +9,9 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Post, UseGu
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
+    @Get('ping')
+    ping() { return "pong"; }
+
     // POST /auth/register
     @Post('register')
     async register(@Body() registerDto: RegisterUserDto) {

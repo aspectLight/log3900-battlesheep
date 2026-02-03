@@ -1,14 +1,14 @@
 import 'package:fpdart/fpdart.dart';
-import '../../core/exceptions/auth_exception.dart';
-import '../entities/user_entity.dart';
+import '../../../core/exceptions/auth_exception.dart';
+import '../../entities/user_entity.dart';
 
 abstract interface class AuthRepository {
   Stream<UserEntity?> get authStateChanges;
 
-  Future<UserEntity?> get currentUser;
+  TaskEither<AuthException, Option<UserEntity>> getCurrentUser();
 
   TaskEither<AuthException, UserEntity> signIn({
-    required String identifier,
+    required String username,
     required String password,
   });
 
@@ -16,6 +16,7 @@ abstract interface class AuthRepository {
     required String username,
     required String email,
     required String password,
+    required String avatarId,
   });
 
   TaskEither<AuthException, Unit> signOut();

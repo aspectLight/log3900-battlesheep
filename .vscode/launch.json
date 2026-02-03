@@ -5,9 +5,7 @@
             "name": "Debug server (Attach)",
             "port": 9229,
             "request": "attach",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
+            "skipFiles": ["<node_internals>/**"],
             "restart": true,
             "sourceMaps": true,
             "localRoot": "${workspaceFolder}/server",
@@ -33,6 +31,6 @@
             "type": "chrome",
             "url": "http://localhost:9876",
             "webRoot": "${workspaceFolder}/client"
-        },
+        }
     ]
 }

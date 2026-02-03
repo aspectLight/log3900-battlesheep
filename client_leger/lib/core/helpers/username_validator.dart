@@ -5,23 +5,22 @@ class UsernameValidator {
   static const int maxLength = 15;
   static final RegExp validPattern = RegExp(r'^[a-zA-Z0-9]+$');
 
-  static AuthValidationError? validate(String? value) {
+  static List<AuthValidationError> validateAll(String? value) {
+    final errors = <AuthValidationError>[];
+
     if (value == null || value.isEmpty) {
-      return AuthValidationError.usernameRequired;
+      errors.add(AuthValidationError.usernameRequired);
+      return errors;
     }
 
-    if (value.length < minLength) {
-      return AuthValidationError.usernameTooShort;
-    }
-
-    if (value.length > maxLength) {
-      return AuthValidationError.usernameTooLong;
+    if (value.length < minLength || value.length > maxLength) {
+      errors.add(AuthValidationError.usernameInvalidLength);
     }
 
     if (!validPattern.hasMatch(value)) {
-      return AuthValidationError.usernameSpecialChars;
+      errors.add(AuthValidationError.usernameSpecialChars);
     }
 
-    return null;
+    return errors;
   }
 }

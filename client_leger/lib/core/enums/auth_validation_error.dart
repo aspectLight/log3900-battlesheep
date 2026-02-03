@@ -3,6 +3,7 @@ enum AuthValidationError {
   identifierRequired,
   usernameTooShort,
   usernameTooLong,
+  usernameInvalidLength,
   usernameSpecialChars,
   emailRequired,
   invalidEmail,
@@ -13,4 +14,5 @@ enum AuthValidationError {
   passwordNoSpaces,
   confirmationRequired,
   passwordsDoNotMatch,
+  avatarRequired,
 }

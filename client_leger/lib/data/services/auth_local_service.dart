@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../../domain/interfaces/auth_local_service.dart';
+import 'package:fpdart/fpdart.dart';
+import '../../domain/interfaces/services/auth_local_service.dart';
 
 import '../models/user_dto.dart';
 
@@ -14,60 +15,93 @@ class AuthLocalServiceImpl implements AuthLocalService {
     : _storage = storage ?? const FlutterSecureStorage();
 
   @override
-  Future<void> saveUser(UserDto user) async {
-    final jsonString = jsonEncode(user.toJson());
-    await _storage.write(key: _userKey, value: jsonString);
+  TaskEither<Exception, Unit> saveUser(UserDto user) {
+    return TaskEither.tryCatch(() async {
+      final jsonString = jsonEncode(user.toJson());
+      await _storage.write(key: _userKey, value: jsonString);
+      return unit;
+    }, (error, stackTrace) => error is Exception ? error : Exception(error));
   }
 
   @override
-  Future<UserDto?> getUser() async {
-    final jsonString = await _storage.read(key: _userKey);
-    if (jsonString == null) return null;
-    try {
-      final jsonMap = jsonDecode(jsonString) as Map<String, dynamic>;
-      return UserDto.fromJson(jsonMap);
-    } on Object catch (_) {
-      return null;
-    }
+  TaskEither<Exception, Option<UserDto>> getUser() {
+    return TaskEither.tryCatch(() async {
+      final jsonString = await _storage.read(key: _userKey);
+      if (jsonString == null) return none();
+      try {
+        final jsonMap = jsonDecode(jsonString) as Map<String, dynamic>;
+        return some(UserDto.fromJson(jsonMap));
+      } on Object catch (_) {
+        return none();
+      }
+    }, (error, stackTrace) => error is Exception ? error : Exception(error));
   }
 
   @override
-  Future<void> deleteUser() async {
-    await _storage.delete(key: _userKey);
+  TaskEither<Exception, Unit> deleteUser() {
+    return TaskEither.tryCatch(() async {
+      await _storage.delete(key: _userKey);
+      return unit;
+    }, (error, stackTrace) => error is Exception ? error : Exception(error));
   }
 
   @override
-  Future<void> saveToken(String token) async {
-    await _storage.write(key: _tokenKey, value: token);
+  TaskEither<Exception, Unit> saveToken(String token) {
+    return TaskEither.tryCatch(() async {
+      await _storage.write(key: _tokenKey, value: token);
+      return unit;
+    }, (error, stackTrace) => error is Exception ? error : Exception(error));
   }
 
   @override
-  Future<String?> getToken() {
-    return _storage.read(key: _tokenKey);
+  TaskEither<Exception, Option<String>> getToken() {
+    return TaskEither.tryCatch(() async {
+      final token = await _storage.read(key: _tokenKey);
+      return optionOf(token);
+    }, (error, stackTrace) => error is Exception ? error : Exception(error));
   }
 
   @override
-  Future<void> deleteToken() async {
-    await _storage.delete(key: _tokenKey);
+  TaskEither<Exception, Unit> deleteToken() {
+    return TaskEither.tryCatch(() async {
+      await _storage.delete(key: _tokenKey);
+      return unit;
+    }, (error, stackTrace) => error is Exception ? error : Exception(error));
   }
 
   @override
-  Future<void> saveSessionId(String sessionId) async {
-    await _storage.write(key: _sessionIdKey, value: sessionId);
+  TaskEither<Exception, Unit> saveSessionId(String sessionId) {
+    return TaskEither.tryCatch(() async {
+      await _storage.write(key: _sessionIdKey, value: sessionId);
+      return unit;
+    }, (error, stackTrace) => error is Exception ? error : Exception(error));
   }
 
   @override
-  Future<String?> getSessionId() {
-    return _storage.read(key: _sessionIdKey);
+  TaskEither<Exception, Option<String>> getSessionId() {
+    return TaskEither.tryCatch(() async {
+      final sessionId = await _storage.read(key: _sessionIdKey);
+      return optionOf(sessionId);
+    }, (error, stackTrace) => error is Exception ? error : Exception(error));
   }
 
   @override
-  Future<void> deleteSessionId() async {
-    await _storage.delete(key: _sessionIdKey);
+  TaskEither<Exception, Unit> deleteSessionId() {
+    return TaskEither.tryCatch(() async {
+      await _storage.delete(key: _sessionIdKey);
+      return unit;
+    }, (error, stackTrace) => error is Exception ? error : Exception(error));
   }
 
   @override
-  Future<void> clearAll() async {
-    await Future.wait([deleteUser(), deleteToken(), deleteSessionId()]);
+  TaskEither<Exception, Unit> clearAll() {
+    return TaskEither.tryCatch(() async {
+      await Future.wait([
+        deleteUser().run(),
+        deleteToken().run(),
+        deleteSessionId().run(),
+      ]);
+      return unit;
+    }, (error, stackTrace) => error is Exception ? error : Exception(error));
   }
 }
