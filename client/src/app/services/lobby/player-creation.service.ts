@@ -3,6 +3,7 @@ import { Player } from '@app/classes/entity/player';
 import { BonusType } from '@app/constants/bonus.constants';
 import { AVATAR_TYPES, BONUS_VALUE, D4_VALUE, DEFAULT_STATS_VALUE } from '@app/constants/player.constants';
 import { Bonus, Character } from '@app/interfaces/character.interface';
+import { AuthService } from '@app/services/communication/auth.service';
 
 @Injectable({
     providedIn: 'root',
@@ -12,6 +13,8 @@ export class PlayerCreationService {
 
     private _selectedCharacter: Character = this.defaultCharacter();
     private _player: Player;
+
+    constructor(private readonly authService: AuthService) {}
 
     get selectedCharacter(): Character {
         return this._selectedCharacter;
@@ -35,6 +38,9 @@ export class PlayerCreationService {
     createPlayer(playerName: string): Player | null {
         if (!this.isCharacterValid(playerName)) return null;
         this._player = this.buildNewPlayer(playerName);
+        if (this.authService.currentUser?.uid) {
+            this._player.firebaseUid = this.authService.currentUser.uid;
+        }
         return this._player;
     }
 

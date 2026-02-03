@@ -20,6 +20,7 @@ import { JoinGamePageComponent } from '@app/pages/join-game-page/join-game-page.
 import { LoginPageComponent } from '@app/pages/login/login.component';
 import { LogsHistoryComponent } from '@app/pages/logs-history/logs-history.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { ProfilePageComponent } from '@app/pages/profile-page/profile-page.component';
 import { RegisterPageComponent } from '@app/pages/register/register.component';
 import { WaitingPlayerPageComponent } from '@app/pages/waiting-player-page/waiting-player-page.component';
 import { environment } from './environments/environment';
@@ -45,6 +46,7 @@ const routes: Routes = [
     { path: 'auth-landing', component: AuthLandingPageComponent },
     { path: 'logs-history', component: LogsHistoryComponent, canActivate: [authGuard] },
     { path: 'games-history', component: GamesHistoryComponent, canActivate: [authGuard] },
+    { path: 'profile', component: ProfilePageComponent, canActivate: [authGuard] },
     { path: '**', redirectTo: '/home' },
 ];
 
