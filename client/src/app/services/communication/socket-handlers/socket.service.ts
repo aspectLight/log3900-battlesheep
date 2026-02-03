@@ -14,6 +14,8 @@ import { GameRoomService } from '@app/services/state/game-room.service';
 import { GameRoomEvents } from '@common/socket.constants';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
+import { Auth } from '@angular/fire/auth';
+import { SessionService } from '@app/services/state/session.service';
 
 @Injectable({
     providedIn: 'root',
@@ -29,8 +31,10 @@ export class SocketService implements ISocketService {
         private gameManagerService: GameManagerService,
         private combatService: CombatService,
         private router: Router,
+        private auth: Auth,
+        private session: SessionService,
     ) {
-        this.setUpConnection();
+        void this.setUpConnection();
     }
 
     get playerName() {
@@ -41,11 +45,11 @@ export class SocketService implements ISocketService {
         this.router.navigate([ROUTES.home]);
     }
 
-    setUpConnection() {
-        this.connect();
+    async setUpConnection() {
+        await this.connect();
         this.setUpListeners();
         for (const service of this.socketServices) {
-            service.setUpConnection();
+          service.setUpConnection();
         }
     }
 
@@ -56,8 +60,21 @@ export class SocketService implements ISocketService {
         }
     }
 
-    connect() {
-        this.socket = io(environment.socketUrl, { transports: ['websocket'], upgrade: false });
+    async connect() {
+    
+        const user = this.auth.currentUser;
+        const sessionId = this.session.sessionId;
+      
+        if (!user || !sessionId) {
+          this.socket = io(environment.socketUrl);
+          return;
+        }
+      
+        const token = await user.getIdToken();
+      
+       
+        this.socket = io(environment.socketUrl, { auth: { token, sessionId }, transports: ['websocket'], upgrade: false });
+
     }
 
     getId(): string | undefined {
@@ -183,11 +200,18 @@ export class SocketService implements ISocketService {
             this.router.navigate([ROUTES.home]);
         });
 
-        this.socket.on(GameRoomEvents.GameCanceled, () => {
-            this.gameManagerService.cancelGame();
+        this.socket.on(GameRoomEvents.GameCanceled, (data: { playerId: string }) => {
+            const iAbandoned = data.playerId === this.socket.id;
+          
+            if (iAbandoned) {
+              this.gameManagerService.cancelGame();
+            } else {
+              this.gameManagerService.endCanceledGame();
+            }
+          
             this.router.navigate([ROUTES.home]);
         });
-
+        
         this.socket.on(GameRoomEvents.PlayerAbandoned, (playerId) => {
             const player = this.gameManagerService.getPlayerById(playerId);
             this.addToJournal({

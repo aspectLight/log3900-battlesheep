@@ -1,1 +1,58 @@
-<p>games-history works!</p>
+<div class="history-page">
+  <div class="header">
+    <button class="return-button" routerLink="/home">
+      <img src="./assets/ui/left.png" />
+      Page d'accueil
+    </button>
+
+    <h1>Historique des parties</h1>
+  </div>
+
+  <div class="history-list">
+    <li class="header-row">
+      <span>Date</span>
+      <span>Heure</span>
+      <span>Résultat</span>
+      <span>Abandonnée</span>
+    </li>
+
+    <div class="list">
+      @if (loading()) {
+        <div class="state">Chargement...</div>
+      } @else if (error()) {
+        <div class="state">{{ error() }}</div>
+      } @else if (games().length === 0) {
+        <div class="state empty">Aucune entrée.</div>
+      } @else {
+        <div class="rows">
+          @for (it of games(); track it.startDate) {
+            <li class="row">
+              <span class="date">{{ it.startDate | date: 'yyyy-MM-dd' }}</span>
+              <span class="time">{{ it.startDate | date: 'HH:mm:ss' }}</span>
+
+              <span class="won">
+                <span
+                  class="badge"
+                  [class.yes]="it.hasWon && !it.hasAbandoned"
+                  [class.no]="!it.hasWon || it.hasAbandoned"
+                >
+                  {{ (it.hasWon && !it.hasAbandoned) ? 'Gagnée' : 'Perdue' }}
+                </span>
+              </span>
+
+              <span class="abandoned">
+                <span
+                  class="badge"
+                  [class.abandonedYes]="it.hasAbandoned"
+                  [class.abandonedNo]="!it.hasAbandoned"
+                >
+                  {{ it.hasAbandoned ? 'Oui' : 'Non' }}
+                </span>
+              </span>
+            </li>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { RouterModule } from '@angular/router';
-import { HistoryService } from '@app/services/communication/history.service';
+import { HistoryService } from '@app/services/history/history.service';
 import { LogsHistoryItem } from '@app/interfaces/history/logs-history.interface';
 
 @Component({
