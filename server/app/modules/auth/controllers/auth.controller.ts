@@ -132,4 +132,37 @@ export class AuthController {
     async deleteAccount(@CurrentUser('firebaseUid') uid: string) {
         await this.authService.deleteUser(uid);
     }
+
+    // POST /auth/history/games/start
+    @Post('history/games/start')
+    @UseGuards(AuthGuard)
+    @HttpCode(HttpStatus.OK)
+    async startGameHistory(
+        @CurrentUser('firebaseUid') uid: string,
+        @Body() body: { mode: 'Classique' | 'CTF' },
+    ) {
+        return await this.authService.startGameHistory(uid, body.mode);
+    }
+
+    // POST /auth/history/games/end
+    @Post('history/games/end')
+    @UseGuards(AuthGuard)
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async endGameHistory(
+        @CurrentUser('firebaseUid') uid: string,
+        @Body() body: { startDate: string; hasWon: boolean },
+    ) {
+        await this.authService.endGameHistory(uid, body.startDate, body.hasWon);
+    }
+
+    // POST /auth/history/games/abandon
+    @Post('history/games/abandon')
+    @UseGuards(AuthGuard)
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async abandonGameHistory(
+        @CurrentUser('firebaseUid') uid: string,
+        @Body() body: { startDate: string },
+    ) {
+        await this.authService.abandonGameHistory(uid, body.startDate);
+    }
 }

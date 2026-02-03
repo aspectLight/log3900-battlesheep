@@ -48,4 +48,37 @@ export class HistoryService {
       .set('Authorization', `Bearer ${token}`)
       .set('x-session-id', sessionId);
   }
+
+  async startGameHistory(mode: 'Classique' | 'CTF'): Promise<{ startDate: string }> {
+    const headers = await this.buildAuthHeaders();
+    return await firstValueFrom(
+      this.http.post<{ startDate: string }>(
+        `${environment.serverUrl}/auth/history/games/start`,
+        { mode },
+        { headers },
+      ),
+    );
+  }
+  
+  async endGameHistory(startDate: string, hasWon: boolean): Promise<void> {
+    const headers = await this.buildAuthHeaders();
+    await firstValueFrom(
+      this.http.post<void>(
+        `${environment.serverUrl}/auth/history/games/end`,
+        { startDate, hasWon },
+        { headers },
+      ),
+    );
+  }
+  
+  async abandonGameHistory(startDate: string): Promise<void> {
+    const headers = await this.buildAuthHeaders();
+    await firstValueFrom(
+      this.http.post<void>(
+        `${environment.serverUrl}/auth/history/games/abandon`,
+        { startDate },
+        { headers },
+      ),
+    );
+  }
 }

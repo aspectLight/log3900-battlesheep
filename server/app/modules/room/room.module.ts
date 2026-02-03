@@ -22,7 +22,7 @@ import { WaitingRoomPlayerHandler } from './waiting-room/handlers/waiting-room-p
 import { WaitingRoomGateway } from './waiting-room/waiting-room.gateway';
 
 @Module({
-    imports: [SharedRoomModule, GameModule, CombatModule, MovementModule, VirtualPlayersModule, AuthModule],
+    imports: [SharedRoomModule, GameModule, CombatModule, MovementModule, VirtualPlayersModule, AuthModule, AuthModule],
     providers: [
         GameRoomGateway,
         WaitingRoomGateway,

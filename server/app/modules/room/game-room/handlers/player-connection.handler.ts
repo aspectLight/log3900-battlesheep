@@ -79,7 +79,7 @@ export class PlayerConnectionHandler {
 
         const isRoomDeleted = this.gameRoomService.abandonGame(roomId, playerId);
         if (isRoomDeleted) {
-            server.to(roomId).emit(GameRoomEvents.GameCanceled);
+            server.to(roomId).emit(GameRoomEvents.GameCanceled,  { playerId });
         } else {
             server.to(roomId).emit(GameRoomEvents.PlayerAbandoned, playerId);
         }

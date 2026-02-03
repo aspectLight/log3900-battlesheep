@@ -18,6 +18,7 @@ import { environment } from 'src/environments/environment';
 import { GameRoomService } from '@app/services/state/game-room.service';
 import { MovementService } from '@app/services/gameplay/movement.service';
 import { PathService } from '@app/services/gameplay/path.service';
+import { HistoryService } from '@app/services/history/history.service';
 
 @Injectable({
     providedIn: 'root',
@@ -27,7 +28,7 @@ export class GameManagerService {
 
     notificationTime: number;
     isNotificationVisible: boolean = false;
-
+    
     isGameCanceled: boolean = false;
     isGameFinished: boolean = false;
     isGameLoaded: boolean = false;
@@ -53,7 +54,7 @@ export class GameManagerService {
 
     private game: Game;
     private board: Board;
-
+    private historyStartDateIso: string | null = null;
     private mainPlayerId: string = '';
     private currentPlayerSubject = new BehaviorSubject<Player>(new Player());
     private currentPlayer: Observable<Player> = this.currentPlayerSubject.asObservable();
@@ -63,6 +64,7 @@ export class GameManagerService {
         private gameRoomService: GameRoomService,
         private pathService: PathService,
         private router: Router,
+        private historyService: HistoryService,
     ) {
         this.movementService = new MovementService();
         this.gameRoomService.room$.subscribe((room) => {
@@ -114,12 +116,25 @@ export class GameManagerService {
 
     cancelGame() {
         this.isGameCanceled = true;
+        const startDate = this.historyStartDateIso;
+        if (startDate) {
+            this.historyService.abandonGameHistory(startDate).catch((e) => console.warn('abandonGameHistory failed', e));            
+            this.historyStartDateIso = null;
+        }
     }
 
     finishGame(winnerId: string) {
         const delay = 5000;
         this.isGameFinished = true;
         this.winner = winnerId;
+        const startDate = this.historyStartDateIso;
+
+        if (startDate) {
+            const won = this.hasWon();
+            this.historyService.endGameHistory(startDate, won).catch((e) => console.warn('endGameHistory failed', e));            
+            this.historyStartDateIso = null;
+        }
+
         setTimeout(() => {
             this.router.navigate([ROUTES.endGame]);
             this.isGameFinished = false;
@@ -131,17 +146,30 @@ export class GameManagerService {
 
     loadGame(): Observable<Game> {
         const subject = new Subject<Game>();
+      
         if (this.room.gameId) {
-            this.fetchGame(this.room.gameId).subscribe((game) => {
-                this.game = new Game(game);
-                this.board = this.game.board;
-                this.isGameLoaded = true;
-                subject.next(game);
-                subject.complete();
-            });
+          this.fetchGame(this.room.gameId).subscribe(async (game) => {
+            this.game = new Game(game);
+            this.board = this.game.board;
+            this.isGameLoaded = true;
+      
+            if (!this.historyStartDateIso) {
+              const mode: 'Classique' | 'CTF' = this.game.isCTF ? 'CTF' : 'Classique';
+              try {
+                const res = await this.historyService.startGameHistory(mode);
+                this.historyStartDateIso = res.startDate;
+              } catch (e) {
+                console.warn('Impossible de créer l’historique de partie:', e);
+              }
+            }
+      
+            subject.next(game);
+            subject.complete();
+          });
         }
+      
         return subject.asObservable();
-    }
+      }
 
     fetchGame(gameId: string): Observable<Game> {
         return this.http.get<Game>(environment.serverUrl + API_ENDPOINTS.games + gameId);
@@ -457,5 +485,16 @@ export class GameManagerService {
     private updateCurrentPlayer(player: Player): void {
         this.currentPlayerSubject.next(player);
         this.turnChangeSubject.next();
+    }
+
+    endCanceledGame() {
+        this.isGameCanceled = true;
+        const startDate = this.historyStartDateIso;
+      
+        if (startDate) {
+          this.historyService.endGameHistory(startDate, false)
+            .catch((e) => console.warn('endGameHistory failed', e));
+          this.historyStartDateIso = null;
+        }
     }
 }
