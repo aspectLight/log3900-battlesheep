@@ -22,7 +22,7 @@ import { PlayerConnectionHandler } from './handlers/player-connection.handler';
 import { StatisticsHandler } from './handlers/statistics.handler';
 import { TurnHandler } from './handlers/turn.handler';
 import { VirtualPlayerHandler } from './handlers/virtual-player.handler';
-
+import { AuthService } from '@app/modules/auth/services/auth.service';
 /**
  * Gateway for game room WebSocket events
  * Acts as a pure event router - all business logic delegated to handlers
@@ -35,6 +35,7 @@ export class GameRoomGateway implements OnGatewayConnection, OnGatewayDisconnect
 
     // eslint-disable-next-line max-params
     constructor(
+        private readonly authService: AuthService,
         private readonly movementHandler: MovementHandler,
         private readonly combatHandler: CombatHandler,
         private readonly itemsHandler: ItemsHandler,
@@ -54,7 +55,7 @@ export class GameRoomGateway implements OnGatewayConnection, OnGatewayDisconnect
     }
 
     @SubscribeMessage(GameRoomEvents.FinishGame)
-    handleFinishGame(@MessageBody() data: { roomId: string; winnerId: string }, @ConnectedSocket() socket: Socket) {
+    async handleFinishGame(@MessageBody() data: { roomId: string; winnerId: string }, @ConnectedSocket() socket: Socket) {
         return this.gameLifecycleHandler.handleFinishGame(data, socket, this.server);
     }
 
@@ -176,8 +177,33 @@ export class GameRoomGateway implements OnGatewayConnection, OnGatewayDisconnect
 
     // ===== WebSocket Lifecycle Events =====
 
-    handleConnection(@ConnectedSocket() socket: Socket) {
-        this.logger.log(`socket connecté: ${socket.id}`);
+    async handleConnection(@ConnectedSocket() socket: Socket) {
+        try {
+          const { token, sessionId } = socket.handshake.auth as { token?: string; sessionId?: string };
+      
+          if (!token || !sessionId) {
+            this.logger.warn(`Socket ${socket.id} missing token/sessionId`);
+            socket.disconnect();
+            return;
+          }
+      
+          const decoded = await this.authService.verifyToken(token);
+          const ok = await this.authService.validateSession(decoded.uid, sessionId);
+      
+          if (!ok) {
+            this.logger.warn(`Socket ${socket.id} invalid session for uid=${decoded.uid}`);
+            socket.disconnect();
+            return;
+          }
+      
+          socket.data.uid = decoded.uid;
+          socket.data.sessionId = sessionId;
+      
+          this.logger.log(`socket connecté: ${socket.id} uid=${decoded.uid}`);
+        } catch (e) {
+          this.logger.warn(`Socket ${socket.id} auth failed`);
+          socket.disconnect();
+        }
     }
 
     handleDisconnect(@ConnectedSocket() socket: Socket) {

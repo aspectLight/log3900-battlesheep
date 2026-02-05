@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { ChatboxComponent } from '@app/components/shared/chatbox/chatbox.component';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
-import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
-import { GameManagerService } from '@app/services/state/game-manager.service';
 import { AuthService } from '@app/services/communication/auth.service';
 import { ChatService } from '@app/services/communication/chat.service';
-import { ChatboxComponent } from '@app/components/shared/chatbox/chatbox.component';
+import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
+import { GameManagerService } from '@app/services/state/game-manager.service';
 
 @Component({
     selector: 'app-main-page',
@@ -54,6 +54,7 @@ export class MainPageComponent implements OnInit {
 
     goToProfile() {
         this.showSettingsMenu = false;
+        this.router.navigate(['/profile']);
     }
 
     async logout() {

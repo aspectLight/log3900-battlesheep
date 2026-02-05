@@ -219,4 +219,81 @@ export class AuthService {
     getGameHistory(user: UserDocument) {
         return user.gameHistory.sort((a, b) => b.startDate.getTime() - a.startDate.getTime()).slice(0, 100);
     }
+    async startGameHistory(uid: string, mode: 'Classique' | 'CTF'): Promise<{ startDate: string }> {
+        const user = await this.getUserByUid(uid);
+
+        const startDate = new Date();
+        user.gameHistory.push({
+            startDate,
+            mode,
+            hasWon: false,
+            hasAbandoned: false,
+        });
+
+        await user.save();
+        return { startDate: startDate.toISOString() };
+    }
+
+    async endGameHistory(uid: string, startDateIso: string, hasWon: boolean): Promise<void> {
+        const user = await this.getUserByUid(uid);
+
+        const startMs = new Date(startDateIso).getTime();
+        const entry = user.gameHistory.find((g) => g.startDate.getTime() === startMs && !g.endDate);
+
+        if (!entry) throw new NotFoundException("Entrée d'historique introuvable (ou déjà terminée)");
+
+        entry.endDate = new Date();
+        entry.hasWon = hasWon;
+        entry.hasAbandoned = false;
+
+        await user.save();
+    }
+
+    async abandonGameHistory(uid: string, startDateIso: string): Promise<void> {
+        const user = await this.getUserByUid(uid);
+
+        const startMs = new Date(startDateIso).getTime();
+        const entry = user.gameHistory.find((g) => g.startDate.getTime() === startMs && !g.endDate);
+
+        if (!entry) throw new NotFoundException("Entrée d'historique introuvable (ou déjà terminée)");
+
+        entry.endDate = new Date();
+        entry.hasAbandoned = true;
+        entry.hasWon = false;
+
+        await user.save();
+    }
+
+    async updateUserStatistics(
+        firebaseUid: string,
+        gameMode: 'Classique' | 'CTF',
+        hasWon: boolean,
+        playtimeSeconds: number,
+        hasAbandoned: boolean = false,
+    ): Promise<void> {
+        const user = await this.getUserByUid(firebaseUid);
+
+        if (gameMode === 'Classique') {
+            user.statistics.classicGamesPlayed += 1;
+        } else if (gameMode === 'CTF') {
+            user.statistics.ctfGamesPlayed += 1;
+        }
+
+        if (hasWon) {
+            user.statistics.totalGamesWon += 1;
+        }
+
+        user.statistics.totalPlaytime += playtimeSeconds;
+
+        user.gameHistory.push({
+            startDate: new Date(Date.now() - playtimeSeconds * 1000),
+            endDate: new Date(),
+            mode: gameMode,
+            hasWon,
+            hasAbandoned,
+        });
+
+        await user.save();
+        this.logger.log(`Statistics updated for user ${firebaseUid}: ${gameMode} game, won: ${hasWon}, playtime: ${playtimeSeconds}s`);
+    }
 }

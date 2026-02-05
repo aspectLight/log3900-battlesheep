@@ -46,6 +46,7 @@ export class GameInfoComponent {
     }
 
     quitGame() {
+        this.gameManagerService.cancelGame();
         this.socketService.abandonGame(this.roomId);
         this.router.navigate([ROUTES.home]);
     }

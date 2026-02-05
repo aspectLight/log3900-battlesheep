@@ -1,5 +1,8 @@
+import { AuthService } from '@app/modules/auth/services/auth.service';
+import { GameService } from '@app/modules/game/services/game.service';
 import { GameMovementService } from '@app/modules/movement/services/game-movement.service';
 import { MS_IN_SECOND, SECONDS_IN_MINUTE } from '@app/modules/shared-room/constants/game-room.constants';
+import { GameRoom } from '@app/modules/shared-room/interfaces/game-room';
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
 import { GameRoomEvents } from '@common/socket.constants';
 import { Injectable, Logger } from '@nestjs/common';
@@ -15,6 +18,8 @@ export class GameLifecycleHandler {
     constructor(
         private readonly gameRoomService: GameRoomService,
         private readonly gameMovementService: GameMovementService,
+        private readonly gameService: GameService,
+        private readonly authService: AuthService,
     ) {}
 
     /**
@@ -35,7 +40,7 @@ export class GameLifecycleHandler {
     /**
      * Handles game completion - calculates duration and notifies players
      */
-    handleFinishGame(data: { roomId: string; winnerId: string }, socket: Socket, server: Server): void {
+    async handleFinishGame(data: { roomId: string; winnerId: string }, socket: Socket, server: Server): Promise<void> {
         try {
             const room = this.gameRoomService.findRoomById(data.roomId);
             const diffSeconds = Math.floor((Date.now() - room.startTime.getTime()) / MS_IN_SECOND);
@@ -43,8 +48,12 @@ export class GameLifecycleHandler {
                 diffSeconds % SECONDS_IN_MINUTE,
             ).padStart(2, '0')}`;
             this.gameRoomService.pauseTimer(data.roomId);
+
+            await this.updatePlayerStatistics(room, data.winnerId, diffSeconds);
+
             server.to(data.roomId).emit(GameRoomEvents.FinishGame, data.winnerId);
         } catch (error) {
+            this.logger.error(`Error finishing game: ${error.message}`);
             socket.emit(GameRoomEvents.GameRoomError, error.message);
         }
     }
@@ -76,6 +85,30 @@ export class GameLifecycleHandler {
             }
         } catch (error) {
             socket.emit(GameRoomEvents.GameRoomError, error.message);
+        }
+    }
+
+    private async updatePlayerStatistics(room: GameRoom, winnerId: string, playtimeSeconds: number): Promise<void> {
+        try {
+            const game = await this.gameService.getGameById(room.gameId);
+            const gameMode: 'Classique' | 'CTF' = game.mode === 'ctf' ? 'CTF' : 'Classique';
+
+            const updatePromises = room.players
+                .filter((player) => !player.isVirtual && player.firebaseUid)
+                .map(async (player) => {
+                    const hasWon = player.id === winnerId;
+                    if (!player.firebaseUid) return;
+                    try {
+                        await this.authService.updateUserStatistics(player.firebaseUid, gameMode, hasWon, playtimeSeconds, false);
+                    } catch (error) {
+                        this.logger.warn(`Failed to update statistics for player ${player.firebaseUid}: ${error.message}`);
+                    }
+                });
+
+            await Promise.all(updatePromises);
+            this.logger.log(`Statistics updated for ${updatePromises.length} players in game ${room.roomId}`);
+        } catch (error) {
+            this.logger.error(`Error updating player statistics: ${error.message}`);
         }
     }
 }
