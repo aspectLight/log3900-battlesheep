@@ -1,11 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import '../presentation/view_models/navigation_view_model.dart';
+
+import '../presentation/widgets/loading_overlay/loading_overlay_view_model.dart';
 
 class AppRouterObserver extends AutoRouteObserver {
-  AppRouterObserver({required this.navigationViewModel});
+  AppRouterObserver({required this.loadingOverlayViewModel});
 
-  final NavigationViewModel navigationViewModel;
+  final LoadingOverlayViewModel loadingOverlayViewModel;
 
   @override
   void didPush(Route route, Route? previousRoute) {
@@ -26,7 +27,7 @@ class AppRouterObserver extends AutoRouteObserver {
   }
 
   void _handleNavigation() {
-    navigationViewModel.startNavigation();
-    navigationViewModel.stopNavigation();
+    loadingOverlayViewModel.startNavigation();
+    loadingOverlayViewModel.stopNavigation();
   }
 }

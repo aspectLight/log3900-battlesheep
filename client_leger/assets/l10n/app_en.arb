@@ -213,5 +213,57 @@
   "teamMembers": "Ahmed Sami Benabbou, May Guessous, Ayoub Marfouk, Pierre Carré, Anis Gadouche, Djihed Benaiche",
   "@teamMembers": {
     "description": "List of team members displayed in the footer"
+  },
+  "joinGame": "Join Game",
+  "@joinGame": {
+    "description": "Button text to join a game"
+  },
+  "createGame": "Create Game",
+  "@createGame": {
+    "description": "Button text to create a game"
+  },
+  "administerGames": "Administer Games",
+  "@administerGames": {
+    "description": "Button text to administer games"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Tooltip for the settings button"
+  },
+  "profile": "Profile",
+  "@profile": {
+    "description": "Menu option to view profile"
+  },
+  "signOut": "Sign Out",
+  "@signOut": {
+    "description": "Menu option to sign out"
+  },
+  "connectionHistory": "Connection History",
+  "@connectionHistory": {
+    "description": "Menu option to view connection history"
+  },
+  "gameHistory": "Games History",
+  "@gameHistory": {
+    "description": "Menu option to view games history"
+  },
+  "journal": "Journal",
+  "@journal": {
+    "description": "Title of the Journal tab in the chatbox"
+  },
+  "emptyJournal": "The journal is empty for now",
+  "@emptyJournal": {
+    "description": "Message displayed when the journal is empty"
+  },
+  "filter": "Filter",
+  "@filter": {
+    "description": "Text for filtering"
+  },
+  "none": "None",
+  "@none": {
+    "description": "Option for no filter"
+  },
+  "send": "Send",
+  "@send": {
+    "description": "Text for the send message button"
   }
 }

@@ -170,4 +170,43 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get teamMembers =>
       'Ahmed Sami Benabbou, May Guessous, Ayoub Marfouk, Pierre Carré, Anis Gadouche, Djihed Benaiche';
+
+  @override
+  String get joinGame => 'Join Game';
+
+  @override
+  String get createGame => 'Create Game';
+
+  @override
+  String get administerGames => 'Administer Games';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get profile => 'Profile';
+
+  @override
+  String get signOut => 'Sign Out';
+
+  @override
+  String get connectionHistory => 'Connection History';
+
+  @override
+  String get gameHistory => 'Games History';
+
+  @override
+  String get journal => 'Journal';
+
+  @override
+  String get emptyJournal => 'The journal is empty for now';
+
+  @override
+  String get filter => 'Filter';
+
+  @override
+  String get none => 'None';
+
+  @override
+  String get send => 'Send';
 }

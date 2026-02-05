@@ -7,34 +7,6 @@ cache:
         - server/node_modules/
     policy: pull
 
-.only-client: &only-client
-    only:
-        refs:
-            - master
-            - merge_requests
-        changes:
-            - client/**/*
-            - common/**/*
-    cache:
-        key: '${CI_COMMIT_REF_SLUG}-client'
-        paths:
-            - client/node_modules/
-        policy: pull
-
-.only-server: &only-server
-    only:
-        refs:
-            - master
-            - merge_requests
-        changes:
-            - server/**/*
-            - common/**/*
-    cache:
-        key: '${CI_COMMIT_REF_SLUG}-server'
-        paths:
-            - server/node_modules/
-        policy: pull
-
 .only-client-leger: &only-client-leger
     only:
         refs:
@@ -54,32 +26,6 @@ stages:
     - test
     - deploy
 
-install:client:
-    stage: install
-    <<: *only-client
-    script:
-        - cd client
-        - npm ci --cache .npm --prefer-offline
-    cache:
-        key: '${CI_COMMIT_REF_SLUG}-client'
-        paths:
-            - client/node_modules/
-            - client/.npm/
-        policy: pull-push
-
-install:server:
-    stage: install
-    <<: *only-server
-    script:
-        - cd server
-        - npm ci --cache .npm --prefer-offline
-    cache:
-        key: '${CI_COMMIT_REF_SLUG}-server'
-        paths:
-            - server/node_modules/
-            - server/.npm/
-        policy: pull-push
-
 install:client_leger:
     stage: install
     image: ghcr.io/cirruslabs/flutter:stable
@@ -94,24 +40,6 @@ install:client_leger:
             - client_leger/.pub-cache/
         policy: pull-push
 
-lint:client:
-    stage: lint
-    needs: ['install:client']
-    allow_failure: true
-    <<: *only-client
-    script:
-        - cd client
-        - npm run lint
-
-lint:server:
-    stage: lint
-    needs: ['install:server']
-    allow_failure: true
-    <<: *only-server
-    script:
-        - cd server
-        - npm run lint
-
 lint:client_leger:
     stage: lint
     image: ghcr.io/cirruslabs/flutter:stable
@@ -123,33 +51,6 @@ lint:client_leger:
         - export PUB_CACHE=$CI_PROJECT_DIR/client_leger/.pub-cache
         - flutter pub get
         - flutter analyze
-
-test:client:
-    stage: test
-    needs: ['install:client']
-    <<: *only-client
-    script:
-        - Xvfb :99 -ac -screen 0 1920x1080x24 &
-        - cd client
-        - npm run coverage -- --browsers=ChromeHeadlessNoSandbox --watch=false
-    dependencies:
-        - install:client
-    artifacts:
-        paths:
-            - client/coverage/
-
-test:server:
-    stage: test
-    needs: ['install:server']
-    <<: *only-server
-    script:
-        - cd server
-        - npm run coverage
-    dependencies:
-        - install:server
-    artifacts:
-        paths:
-            - server/coverage/
 
 test:client_leger:
     stage: test

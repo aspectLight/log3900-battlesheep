@@ -1,17 +1,15 @@
 import 'dart:async';
+
 import 'package:fpdart/fpdart.dart';
 
 import '../../core/exceptions/auth_exception.dart';
-
 import '../../domain/entities/user_entity.dart';
 import '../../domain/interfaces/repositories/auth_repository.dart';
-import '../../domain/interfaces/services/auth_local_service.dart';
 import '../../domain/interfaces/services/auth_service.dart';
 import '../../domain/interfaces/services/firebase_auth_service.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthService _authService;
-  final AuthLocalService _localService;
   final FirebaseAuthService _firebaseAuthService;
   final _authStateController = StreamController<UserEntity?>.broadcast();
 
@@ -19,10 +17,8 @@ class AuthRepositoryImpl implements AuthRepository {
 
   AuthRepositoryImpl({
     required AuthService authService,
-    required AuthLocalService localService,
     required FirebaseAuthService firebaseAuthService,
   }) : _authService = authService,
-       _localService = localService,
        _firebaseAuthService = firebaseAuthService;
 
   @override
@@ -34,35 +30,13 @@ class AuthRepositoryImpl implements AuthRepository {
       () async {
         if (_currentUser != null) return some(_currentUser!);
 
-        final localUserRes = await _localService.getUser().run();
-        final localUserDto = localUserRes.getOrElse((_) => none()).toNullable();
-
-        if (localUserDto != null) {
-          _updateState(localUserDto.toEntity());
-        }
-
         final result = await _authService.getCurrentUser().run();
 
-        return result.fold(
-          (error) async {
-            if (localUserDto != null) {
-              if (error is InvalidCredentialsException ||
-                  error is UserNotFoundException) {
-                await _localService.clearAll().run();
-                _updateState(null);
-                return none();
-              }
-              return some(localUserDto.toEntity());
-            }
-            return none();
-          },
-          (serverDto) async {
-            await _localService.saveUser(serverDto).run();
-            final user = serverDto.toEntity();
-            _updateState(user);
-            return some(user);
-          },
-        );
+        return result.fold((error) => none(), (serverDto) {
+          final user = serverDto.toEntity();
+          _updateState(user);
+          return some(user);
+        });
       },
       (error, stack) {
         if (error is AuthException) return error;
@@ -92,8 +66,6 @@ class AuthRepositoryImpl implements AuthRepository {
             .run();
 
         final userDto = apiResult.getOrElse((l) => throw l);
-
-        await _localService.saveUser(userDto).run();
         final userEntity = userDto.toEntity();
         _updateState(userEntity);
 
@@ -149,7 +121,6 @@ class AuthRepositoryImpl implements AuthRepository {
         final result = await _authService.signOut().run();
         if (result.isLeft()) throw result.getLeft().toNullable()!;
 
-        await _localService.clearAll().run();
         _updateState(null);
         return unit;
       },
@@ -176,7 +147,6 @@ class AuthRepositoryImpl implements AuthRepository {
         final result = await _authService.updateProfile(updates).run();
         final userDto = result.getOrElse((l) => throw l);
 
-        await _localService.saveUser(userDto).run();
         final userEntity = userDto.toEntity();
         _updateState(userEntity);
 
@@ -196,7 +166,6 @@ class AuthRepositoryImpl implements AuthRepository {
         final result = await _authService.deleteAccount().run();
         if (result.isLeft()) throw result.getLeft().toNullable()!;
 
-        await _localService.clearAll().run();
         _updateState(null);
         return unit;
       },

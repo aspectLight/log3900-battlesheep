@@ -1,50 +1,34 @@
 import 'package:dio/dio.dart';
 import 'package:fpdart/fpdart.dart';
+
 import '../../core/config/env_config.dart';
 import '../../core/constants/api_endpoints.dart';
 import '../../core/constants/http_status.dart';
 import '../../core/exceptions/auth_exception.dart';
-import '../../domain/interfaces/services/auth_local_service.dart';
+import '../../core/session/session_credentials.dart';
 import '../../domain/interfaces/services/auth_service.dart';
 import '../models/user_dto.dart';
 import 'log_service.dart';
 
 class HttpAuthService implements AuthService {
   final Dio _dio;
-  final AuthLocalService _localService;
+  final SessionCredentials _credentials;
 
-  HttpAuthService({required AuthLocalService localService, Dio? dio})
-    : _localService = localService,
+  HttpAuthService({required SessionCredentials credentials, Dio? dio})
+    : _credentials = credentials,
       _dio = dio ?? Dio(BaseOptions(baseUrl: EnvConfig.baseUrl));
 
-  Future<Options> _getAuthOptions() async {
-    final tokenRes = await _localService.getToken().run();
-    final token = tokenRes.getOrElse((_) => none()).toNullable();
-
-    final sessionIdRes = await _localService.getSessionId().run();
-    final sessionId = sessionIdRes.getOrElse((_) => none()).toNullable();
-
+  Options _getAuthOptions() {
     final headers = <String, dynamic>{};
-    if (token != null) {
-      headers['Authorization'] = 'Bearer $token';
+    if (_credentials.token != null) {
+      headers['Authorization'] = 'Bearer ${_credentials.token}';
     }
-    if (sessionId != null) {
-      headers['x-session-id'] = sessionId;
+    if (_credentials.sessionId != null) {
+      headers['x-session-id'] = _credentials.sessionId;
     }
     return Options(headers: headers);
   }
 
-  Future<bool> _hasStoredCredentials() async {
-    final tokenRes = await _localService.getToken().run();
-    final token = tokenRes.getOrElse((_) => none()).toNullable();
-
-    final sessionIdRes = await _localService.getSessionId().run();
-    final sessionId = sessionIdRes.getOrElse((_) => none()).toNullable();
-
-    return token != null && sessionId != null;
-  }
-
-  @override
   @override
   TaskEither<AuthException, String> getEmailByUsername(String username) =>
       TaskEither.tryCatch(() async {
@@ -86,17 +70,10 @@ class HttpAuthService implements AuthService {
       throw const ServerException(devMessage: 'Session ID not in response');
     }
 
-    final saveTokenRes = await _localService.saveToken(firebaseToken).run();
-    if (saveTokenRes.isLeft()) throw saveTokenRes.getLeft().toNullable()!;
-
-    final saveSessionRes = await _localService.saveSessionId(sessionId).run();
-    if (saveSessionRes.isLeft()) throw saveSessionRes.getLeft().toNullable()!;
+    _credentials.save(token: firebaseToken, sessionId: sessionId);
 
     if (data['user'] != null) {
       final userDto = UserDto.fromJson(data['user']);
-      final saveUserRes = await _localService.saveUser(userDto).run();
-      if (saveUserRes.isLeft()) throw saveUserRes.getLeft().toNullable()!;
-
       LogService.d('Login successful: ${userDto.username}');
       return userDto;
     }
@@ -144,11 +121,11 @@ class HttpAuthService implements AuthService {
   @override
   TaskEither<AuthException, UserDto> getCurrentUser() =>
       TaskEither.tryCatch(() async {
-        if (!await _hasStoredCredentials()) {
+        if (!_credentials.hasCredentials) {
           throw const InvalidCredentialsException();
         }
 
-        final options = await _getAuthOptions();
+        final options = _getAuthOptions();
         final response = await _dio.get<Map<String, dynamic>>(
           ApiEndpoints.userProfile,
           options: options,
@@ -166,7 +143,7 @@ class HttpAuthService implements AuthService {
   TaskEither<AuthException, UserDto> updateProfile(
     Map<String, dynamic> updates,
   ) => TaskEither.tryCatch(() async {
-    final options = await _getAuthOptions();
+    final options = _getAuthOptions();
     final response = await _dio.patch<Map<String, dynamic>>(
       ApiEndpoints.userProfile,
       data: updates,
@@ -183,20 +160,18 @@ class HttpAuthService implements AuthService {
 
   @override
   TaskEither<AuthException, Unit> signOut() => TaskEither.tryCatch(() async {
-    final options = await _getAuthOptions();
+    final options = _getAuthOptions();
     await _dio.post(ApiEndpoints.logout, options: options);
-    final result = await _localService.clearAll().run();
-    if (result.isLeft()) throw result.getLeft().toNullable()!;
+    _credentials.clear();
     return unit;
   }, _onError);
 
   @override
   TaskEither<AuthException, Unit> deleteAccount() =>
       TaskEither.tryCatch(() async {
-        final options = await _getAuthOptions();
+        final options = _getAuthOptions();
         await _dio.delete(ApiEndpoints.deleteAccount, options: options);
-        final result = await _localService.clearAll().run();
-        if (result.isLeft()) throw result.getLeft().toNullable()!;
+        _credentials.clear();
         return unit;
       }, _onError);
 
@@ -241,7 +216,7 @@ class HttpAuthService implements AuthService {
         return const UserNotFoundException();
       }
       if (statusCode == HttpStatus.conflict) {
-        if ((errorMessage?.toLowerCase().contains('nom d\'utilisateur') ??
+        if ((errorMessage?.toLowerCase().contains("nom d'utilisateur") ??
                 false) ||
             (errorMessage?.toLowerCase().contains('username') ?? false)) {
           return const UsernameAlreadyInUseException();

@@ -1,0 +1,3 @@
+class PasswordTextFieldViewModel {
+  const PasswordTextFieldViewModel();
+}

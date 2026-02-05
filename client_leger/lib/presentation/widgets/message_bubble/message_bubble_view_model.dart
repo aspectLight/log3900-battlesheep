@@ -1,0 +1,3 @@
+class MessageBubbleViewModel {
+  const MessageBubbleViewModel();
+}

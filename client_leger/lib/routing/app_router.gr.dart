@@ -27,22 +27,6 @@ class AuthLandingRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [ChatScreen]
-class ChatRoute extends PageRouteInfo<void> {
-  const ChatRoute({List<PageRouteInfo>? children})
-    : super(ChatRoute.name, initialChildren: children);
-
-  static const String name = 'ChatRoute';
-
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const ChatScreen();
-    },
-  );
-}
-
-/// generated route for
 /// [LoginScreen]
 class LoginRoute extends PageRouteInfo<void> {
   const LoginRoute({List<PageRouteInfo>? children})
@@ -59,17 +43,17 @@ class LoginRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [MainScreen]
-class MainRoute extends PageRouteInfo<void> {
-  const MainRoute({List<PageRouteInfo>? children})
-    : super(MainRoute.name, initialChildren: children);
+/// [MainMenuScreen]
+class MainMenuRoute extends PageRouteInfo<void> {
+  const MainMenuRoute({List<PageRouteInfo>? children})
+    : super(MainMenuRoute.name, initialChildren: children);
 
-  static const String name = 'MainRoute';
+  static const String name = 'MainMenuRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const MainScreen();
+      return const MainMenuScreen();
     },
   );
 }

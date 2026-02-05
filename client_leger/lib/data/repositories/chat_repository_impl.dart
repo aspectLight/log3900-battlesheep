@@ -3,139 +3,136 @@ import 'dart:async';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../core/helpers/formatter.dart';
+import '../../core/session/user_session.dart';
 import '../../domain/entities/chat_message_entity.dart';
 import '../../domain/interfaces/repositories/chat_repository.dart';
-import '../../domain/interfaces/services/socket_chat_service.dart';
-import '../../domain/interfaces/services/socket_connection_service.dart';
+import '../../domain/interfaces/services/socket_service.dart';
 import '../models/chat_message_dto.dart';
+import '../models/chat_socket_events.dart';
 import '../services/log_service.dart';
 
 class ChatRepositoryImpl implements ChatRepository {
-  final SocketChatService _chatService;
-  final SocketConnectionService _connectionService;
+  final SocketService _socketService;
+  final UserSession _userSession;
 
   @override
   final Signal<List<ChatMessageEntity>> messages = signal([]);
 
   @override
-  late final Signal<bool> isConnected;
+  final Signal<bool> isConnected = signal(false);
 
-  @override
-  final Signal<String?> currentUsername = signal(null);
-
-  late final StreamSubscription _messageReceivedSub;
-  late final StreamSubscription _messagesHistorySub;
-  late final StreamSubscription _connectionSub;
-  late final StreamSubscription _errorSub;
+  StreamSubscription? _connectionSub;
+  StreamSubscription? _messageSub;
+  StreamSubscription? _emojiSub;
+  StreamSubscription? _historySub;
+  StreamSubscription? _socketErrorSub;
 
   ChatRepositoryImpl({
-    required SocketChatService chatService,
-    required SocketConnectionService connectionService,
-  }) : _chatService = chatService,
-       _connectionService = connectionService {
-    isConnected = signal(_chatService.isConnected);
-    _setupSubscriptions();
+    required SocketService socketService,
+    required UserSession userSession,
+  }) : _socketService = socketService,
+       _userSession = userSession {
+    _setupConnectionListener();
   }
 
-  void _setupSubscriptions() {
-    _messageReceivedSub = _chatService.messageReceivedStream.listen((data) {
-      final dto = ChatMessageDto(
-        type: data['type'],
-        name: data['name'],
-        content: data['content'],
-        time: data['time'],
-        isMe: data['name'] == currentUsername.value,
-      );
-      _addMessage(dto.toEntity());
-    });
-
-    _messagesHistorySub = _chatService.messagesHistoryStream.listen((
-      messageList,
-    ) {
-      final newMessages = <ChatMessageEntity>[];
-      for (final messageData in messageList) {
-        final messageMap = messageData as Map<String, dynamic>;
-        final dto = ChatMessageDto(
-          type: messageMap['type'],
-          name: messageMap['name'],
-          content: messageMap['content'],
-          time: messageMap['time'],
-          isMe: messageMap['name'] == currentUsername.value,
-        );
-        newMessages.add(dto.toEntity());
-      }
-      messages.value = newMessages;
-    });
-
-    _connectionSub = _chatService.connectionStream.listen((connected) {
+  void _setupConnectionListener() {
+    _connectionSub = _socketService.connectionStream.listen((connected) {
       isConnected.value = connected;
-      if (!connected) {
-        LogService.w('Connection lost, clearing messages');
+      if (connected) {
+        _setupChatListeners();
+        final username = _userSession.currentUsername;
+        if (username != null) {
+          _joinChat(username);
+        }
+        loadMessages();
       }
     });
-
-    _errorSub = _chatService.errorStream.listen((error) {
-      LogService.e('Socket error in repository', error);
-    });
+    _socketErrorSub = _socketService.errorStream.listen(
+      (e) => LogService.e('Socket error', e),
+    );
   }
 
-  @override
-  void connect(String username) {
-    currentUsername.value = username;
-    _connectionService.connect(username);
+  void _setupChatListeners() {
+    _cancelChatSubscriptions();
+    _messageSub = _socketService
+        .on(GeneralChatEvents.generalChatMessage)
+        .listen(_handleMessage);
+    _emojiSub = _socketService
+        .on(GeneralChatEvents.generalChatEmoji)
+        .listen(_handleMessage);
+    _historySub = _socketService
+        .on(GeneralChatEvents.getGeneralChatMessagesResponse)
+        .listen(_handleHistory);
   }
 
-  @override
-  void disconnect() {
-    _connectionService.disconnect();
-    currentUsername.value = null;
-    clearMessages();
+  void _cancelChatSubscriptions() {
+    unawaited(_messageSub?.cancel());
+    unawaited(_emojiSub?.cancel());
+    unawaited(_historySub?.cancel());
+  }
+
+  void _handleMessage(dynamic data) {
+    final dto = ChatMessageDto.fromSocketData(data as Map<String, dynamic>);
+    _addMessage(dto.toEntity());
+  }
+
+  void _handleHistory(dynamic data) {
+    final list = data as List<dynamic>;
+    messages.value = list
+        .map(
+          (item) => ChatMessageDto.fromSocketData(
+            item as Map<String, dynamic>,
+          ).toEntity(),
+        )
+        .toList();
+    LogService.i('Loaded ${messages.value.length} messages');
+  }
+
+  void _joinChat(String username) {
+    if (!_socketService.isConnected) return;
+    _socketService.emit(GeneralChatEvents.joinGeneralChat, username);
+    LogService.i('Joined general chat as $username');
   }
 
   @override
   void loadMessages() {
-    _chatService.getGeneralChatMessages();
+    if (!_socketService.isConnected) {
+      LogService.w('Cannot load messages: not connected');
+      return;
+    }
+    LogService.d('Emitted event: ${GeneralChatEvents.getGeneralChatMessages}');
+    _socketService.emit(GeneralChatEvents.getGeneralChatMessages);
   }
 
   @override
-  void sendMessage(String content) {
-    if (currentUsername.value == null || content.trim().isEmpty) {
-      LogService.w('Cannot send message: invalid username or empty content');
-      return;
-    }
-
-    final newEntity = ChatMessageEntity(
+  void sendMessage({required String username, required String content}) {
+    if (content.trim().isEmpty) return;
+    final optimisticEntity = ChatMessageEntity(
       type: 'sent',
-      name: currentUsername.value,
+      name: username,
       content: content,
       time: Formatter.formatTime(DateTime.now()),
-      isMe: true,
     );
-    _addMessage(newEntity);
-
-    _chatService.sendMessage(
-      username: currentUsername.value!,
-      message: content,
-    );
+    _addMessage(optimisticEntity);
+    _socketService.emit(GeneralChatEvents.sendMessageToGeneralChat, {
+      'username': username,
+      'message': content,
+    });
   }
 
   @override
-  void sendEmoji(String emoji) {
-    if (currentUsername.value == null) {
-      LogService.w('Cannot send emoji: invalid username');
-      return;
-    }
-
-    final newEntity = ChatMessageEntity(
+  void sendEmoji({required String username, required String emoji}) {
+    final optimisticEntity = ChatMessageEntity(
       type: 'emoji-sent',
-      name: currentUsername.value,
+      name: username,
       content: emoji,
       time: Formatter.formatTime(DateTime.now()),
-      isMe: true,
     );
-    _addMessage(newEntity);
-
-    _chatService.sendEmoji(username: currentUsername.value!, emoji: emoji);
+    _addMessage(optimisticEntity);
+    _socketService.emit(GeneralChatEvents.sendEmojiToGeneralChat, {
+      'username': username,
+      'emoji': emoji,
+    });
   }
 
   void _addMessage(ChatMessageEntity message) {
@@ -150,18 +147,13 @@ class ChatRepositoryImpl implements ChatRepository {
 
   @override
   Future<void> dispose() async {
-    await _messageReceivedSub.cancel();
-    await _messagesHistorySub.cancel();
-    await _connectionSub.cancel();
-    await _errorSub.cancel();
-
+    await _connectionSub?.cancel();
+    await _messageSub?.cancel();
+    await _emojiSub?.cancel();
+    await _historySub?.cancel();
+    await _socketErrorSub?.cancel();
     messages.dispose();
     isConnected.dispose();
-    currentUsername.dispose();
-
-    await _chatService.dispose();
-    _connectionService.dispose();
-
     LogService.i('ChatRepository disposed');
   }
 }
