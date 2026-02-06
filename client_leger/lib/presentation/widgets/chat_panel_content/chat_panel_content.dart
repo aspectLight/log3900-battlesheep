@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:signals_flutter/signals_flutter.dart';
+
 import '../../../core/constants/chat_constants.dart';
 import '../../../core/constants/input_limits.dart';
 import '../../../generated/l10n/app_localizations.dart';
@@ -219,6 +221,7 @@ class _ChatPanelContentState extends State<ChatPanelContent> {
                     return ChatLine(
                       key: ValueKey('${message.time}-${message.content}'),
                       message: message,
+                      index: index,
                     );
                   },
                 );
