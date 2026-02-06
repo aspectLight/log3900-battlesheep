@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
+
 import '../chat_header/chat_header.dart';
 import '../chat_panel_content/chat_panel_content.dart';
 import 'sliding_chat_box_view_model.dart';
@@ -25,8 +26,12 @@ class _SlidingChatBoxState extends State<SlidingChatBox> {
   Widget build(BuildContext context) {
     final isExpanded = _viewModel.isExpanded.watch(context);
     final activeTab = _viewModel.activeTab.watch(context);
-    final width = MediaQuery.of(context).size.width * 0.35;
+    final width = (MediaQuery.of(context).size.width * 0.35).clamp(
+      400.0,
+      double.infinity,
+    );
     final screenHeight = MediaQuery.of(context).size.height;
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
     return Material(
       type: MaterialType.transparency,
@@ -49,7 +54,7 @@ class _SlidingChatBoxState extends State<SlidingChatBox> {
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
             top: 100,
-            bottom: 100,
+            bottom: 100 + keyboardHeight,
             left: isExpanded ? 0 : -width,
             width: width,
             child: DecoratedBox(
@@ -88,7 +93,7 @@ class _SlidingChatBoxState extends State<SlidingChatBox> {
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
             left: isExpanded ? width - 10.0 : -10.0,
-            top: screenHeight / 2.0 - 24.0,
+            top: screenHeight / 2.0 - 24.0 - (keyboardHeight / 2),
             child: GestureDetector(
               onTap: _viewModel.toggleExpanded,
               child: Container(

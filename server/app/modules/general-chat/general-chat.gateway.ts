@@ -52,7 +52,6 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         };
         this.generalChatService.addMessage(chatMessage);
 
-        // Send message to all except sender
         socket.to(GENERAL_CHAT_ROOM).emit(GeneralChatEvents.GeneralChatMessage, chatMessage);
         socket.emit(GeneralChatEvents.GeneralChatMessage, chatMessage);
         this.logger.log(`Message de ${data.username}: ${data.message}`);
