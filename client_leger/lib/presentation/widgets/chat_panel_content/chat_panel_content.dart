@@ -32,6 +32,7 @@ class _ChatPanelContentState extends State<ChatPanelContent> {
   bool _isFiltered = false;
 
   final List<String> _emojis = ChatConstants.defaultEmojis;
+  int _selectedEmojiIndex = 0;
 
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
   DateTime? _lastShakeTime;
@@ -79,11 +80,11 @@ class _ChatPanelContentState extends State<ChatPanelContent> {
     if (event.y.abs() > ChatConstants.shakeThresholdVertical &&
         event.x.abs() < ChatConstants.shakeDeadZone) {
       _lastShakeTime = now;
-      _sendEmoji(_emojis[0]);
+      _viewModel.resendLastMessage();
     } else if (event.x.abs() > ChatConstants.shakeThresholdHorizontal &&
         event.y.abs() < ChatConstants.shakeDeadZone) {
       _lastShakeTime = now;
-      _viewModel.resendLastMessage();
+      _sendEmoji(_emojis[_selectedEmojiIndex]);
     }
   }
 
@@ -107,6 +108,12 @@ class _ChatPanelContentState extends State<ChatPanelContent> {
 
   void _sendEmoji(String emoji) {
     _viewModel.sendEmoji(emoji);
+  }
+
+  void _selectEmoji(int index) {
+    setState(() {
+      _selectedEmojiIndex = index;
+    });
   }
 
   @override
@@ -267,17 +274,27 @@ class _ChatPanelContentState extends State<ChatPanelContent> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                ..._emojis.map((emoji) {
+                ..._emojis.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final emoji = entry.value;
+                  final isSelected = index == _selectedEmojiIndex;
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 2),
                     child: GestureDetector(
-                      onTap: () => _sendEmoji(emoji),
+                      onTap: () => _selectEmoji(index),
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF2B2B2B),
+                          color: isSelected
+                              ? const Color(0xFF550000)
+                              : const Color(0xFF2B2B2B),
                           borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: const Color(0xFF444444)),
+                          border: Border.all(
+                            color: isSelected
+                                ? const Color(0xFF7F1F1F)
+                                : const Color(0xFF444444),
+                            width: isSelected ? 2 : 1,
+                          ),
                         ),
                         child: Text(
                           emoji,
