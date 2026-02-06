@@ -6,34 +6,34 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/repositories/chat_repository_impl.dart';
-import '../../data/services/auth_local_service.dart';
 import '../../data/services/firebase_auth_service.dart';
 import '../../data/services/http_auth_service.dart';
-import '../../data/services/socket_chat_service.dart';
-import '../../data/services/socket_connection_service.dart';
+import '../../data/services/socket_service.dart';
 import '../../domain/interfaces/repositories/auth_repository.dart';
 import '../../domain/interfaces/repositories/chat_repository.dart';
-import '../../domain/interfaces/services/auth_local_service.dart';
 import '../../domain/interfaces/services/auth_service.dart';
 import '../../domain/interfaces/services/firebase_auth_service.dart';
-import '../../domain/interfaces/services/socket_chat_service.dart';
-import '../../domain/interfaces/services/socket_connection_service.dart';
-import '../../presentation/view_models/auth_view_model.dart';
-import '../../presentation/view_models/avatar_picker_view_model.dart';
-import '../../presentation/view_models/chat_view_model.dart';
-import '../../presentation/view_models/login_view_model.dart';
-import '../../presentation/view_models/navigation_view_model.dart';
-import '../../presentation/view_models/sign_up_view_model.dart';
-import '../../presentation/view_models/socket_connection_view_model.dart';
+import '../../domain/interfaces/services/socket_service.dart';
+import '../../presentation/screens/login/login_view_model.dart';
+import '../../presentation/screens/main_menu/main_menu_view_model.dart';
+import '../../presentation/screens/sign_up/sign_up_view_model.dart';
+import '../../presentation/widgets/avatar_picker/avatar_picker_view_model.dart';
+import '../../presentation/widgets/chat_line/chat_line_view_model.dart';
+import '../../presentation/widgets/chat_panel_content/chat_panel_content_view_model.dart';
+import '../../presentation/widgets/loading_overlay/loading_overlay_view_model.dart';
+import '../../presentation/widgets/sliding_chat_box/sliding_chat_box_view_model.dart';
 import '../../routing/app_router.dart';
 import '../../routing/auth_guard.dart';
 import '../config/env_config.dart';
+import '../session/session_credentials.dart';
+import '../session/user_session.dart';
 
 final getIt = GetIt.instance;
 
 Future<void> setupDependencies() async {
   _registerServices();
   _registerRepositories();
+  _registerSession();
   _registerViewModels();
   _registerRouting();
   await getIt.allReady();
@@ -50,53 +50,55 @@ void _registerServices() {
     return dio;
   });
 
+  getIt.registerLazySingleton<SessionCredentials>(SessionCredentials.new);
+
   getIt.registerLazySingleton<AuthService>(
     () => HttpAuthService(
+      credentials: getIt<SessionCredentials>(),
       dio: getIt<Dio>(),
-      localService: getIt<AuthLocalService>(),
     ),
   );
 
   getIt.registerLazySingleton<FirebaseAuthService>(FirebaseAuthServiceImpl.new);
 
-  getIt.registerLazySingleton<AuthLocalService>(AuthLocalServiceImpl.new);
-
-  final socketChatServiceImpl = SocketChatServiceImpl();
-
-  getIt.registerLazySingleton<SocketChatServiceImpl>(
-    () => socketChatServiceImpl,
-  );
-
-  getIt.registerLazySingleton<SocketConnectionService>(
-    () => SocketConnectionServiceImpl(
-      serverUrl: EnvConfig.socketUrl,
-      chatService: getIt<SocketChatServiceImpl>(),
-    ),
-  );
-
-  getIt.registerLazySingleton<SocketChatService>(() => socketChatServiceImpl);
+  getIt.registerLazySingleton<SocketService>(SocketServiceImpl.new);
 }
 
 void _registerRepositories() {
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(
       authService: getIt<AuthService>(),
-      localService: getIt<AuthLocalService>(),
       firebaseAuthService: getIt<FirebaseAuthService>(),
     ),
   );
 
   getIt.registerLazySingleton<ChatRepository>(
     () => ChatRepositoryImpl(
-      chatService: getIt<SocketChatService>(),
-      connectionService: getIt<SocketConnectionService>(),
+      socketService: getIt<SocketService>(),
+      userSession: getIt<UserSession>(),
+    ),
+  );
+}
+
+void _registerSession() {
+  getIt.registerLazySingleton<UserSession>(
+    () => UserSession(
+      socketService: getIt<SocketService>(),
+      authRepository: getIt<AuthRepository>(),
     ),
   );
 }
 
 void _registerViewModels() {
-  getIt.registerFactory<AuthViewModel>(
-    () => AuthViewModel(authRepository: getIt<AuthRepository>()),
+  getIt.registerLazySingleton<LoadingOverlayViewModel>(
+    LoadingOverlayViewModel.new,
+  );
+
+  getIt.registerFactory<MainMenuViewModel>(
+    () => MainMenuViewModel(
+      userSession: getIt<UserSession>(),
+      authRepository: getIt<AuthRepository>(),
+    ),
   );
 
   getIt.registerFactory<LoginViewModel>(
@@ -109,19 +111,16 @@ void _registerViewModels() {
 
   getIt.registerFactory<AvatarPickerViewModel>(AvatarPickerViewModel.new);
 
-  getIt.registerLazySingleton<NavigationViewModel>(NavigationViewModel.new);
-
-  getIt.registerLazySingleton<SocketConnectionViewModel>(
-    () => SocketConnectionViewModel(
-      connectionService: getIt<SocketConnectionService>(),
-      authViewModel: getIt<AuthViewModel>(),
-      chatRepository: getIt<ChatRepository>(),
+  getIt.registerLazySingleton<SlidingChatBoxViewModel>(
+    SlidingChatBoxViewModel.new,
+  );
+  getIt.registerLazySingleton<ChatPanelContentViewModel>(
+    () => ChatPanelContentViewModel(
+      repository: getIt<ChatRepository>(),
+      userSession: getIt<UserSession>(),
     ),
   );
-
-  getIt.registerFactory<ChatViewModel>(
-    () => ChatViewModel(getIt<ChatRepository>()),
-  );
+  getIt.registerLazySingleton<ChatLineViewModel>(ChatLineViewModel.new);
 }
 
 void _registerRouting() {

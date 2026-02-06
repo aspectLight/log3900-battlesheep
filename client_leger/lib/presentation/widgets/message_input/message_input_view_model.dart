@@ -1,0 +1,3 @@
+class MessageInputViewModel {
+  const MessageInputViewModel();
+}

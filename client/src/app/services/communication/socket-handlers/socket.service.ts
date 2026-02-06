@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Auth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { Item } from '@app/classes/entity/item';
 import { Player } from '@app/classes/entity/player';
@@ -11,11 +12,10 @@ import { MovementSocketService } from '@app/services/communication/socket-handle
 import { CombatService } from '@app/services/gameplay/combat.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
 import { GameRoomService } from '@app/services/state/game-room.service';
+import { SessionService } from '@app/services/state/session.service';
 import { GameRoomEvents } from '@common/socket.constants';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { Auth } from '@angular/fire/auth';
-import { SessionService } from '@app/services/state/session.service';
 
 @Injectable({
     providedIn: 'root',
@@ -26,6 +26,7 @@ export class SocketService implements ISocketService {
 
     private movementSocketService!: MovementSocketService;
 
+    // eslint-disable-next-line max-params
     constructor(
         private gameRoomService: GameRoomService,
         private gameManagerService: GameManagerService,
@@ -49,7 +50,7 @@ export class SocketService implements ISocketService {
         await this.connect();
         this.setUpListeners();
         for (const service of this.socketServices) {
-          service.setUpConnection();
+            service.setUpConnection();
         }
     }
 
@@ -61,20 +62,17 @@ export class SocketService implements ISocketService {
     }
 
     async connect() {
-    
         const user = this.auth.currentUser;
         const sessionId = this.session.sessionId;
-      
-        if (!user || !sessionId) {
-          this.socket = io(environment.socketUrl);
-          return;
-        }
-      
-        const token = await user.getIdToken();
-      
-       
-        this.socket = io(environment.socketUrl, { auth: { token, sessionId }, transports: ['websocket'], upgrade: false });
 
+        if (!user || !sessionId) {
+            this.socket = io(environment.socketUrl);
+            return;
+        }
+
+        const token = await user.getIdToken();
+
+        this.socket = io(environment.socketUrl, { auth: { token, sessionId }, transports: ['websocket'], upgrade: false });
     }
 
     getId(): string | undefined {
@@ -148,9 +146,9 @@ export class SocketService implements ISocketService {
         }
     }
 
-    reconnect(): void {
+    async reconnect(): Promise<void> {
         this.disconnect();
-        this.setUpConnection();
+        await this.setUpConnection();
     }
 
     private setUpListeners(): void {
@@ -202,16 +200,16 @@ export class SocketService implements ISocketService {
 
         this.socket.on(GameRoomEvents.GameCanceled, (data: { playerId: string }) => {
             const iAbandoned = data.playerId === this.socket.id;
-          
+
             if (iAbandoned) {
-              this.gameManagerService.cancelGame();
+                this.gameManagerService.cancelGame();
             } else {
-              this.gameManagerService.endCanceledGame();
+                this.gameManagerService.endCanceledGame();
             }
-          
+
             this.router.navigate([ROUTES.home]);
         });
-        
+
         this.socket.on(GameRoomEvents.PlayerAbandoned, (playerId) => {
             const player = this.gameManagerService.getPlayerById(playerId);
             this.addToJournal({

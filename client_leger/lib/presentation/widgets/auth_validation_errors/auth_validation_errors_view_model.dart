@@ -1,0 +1,3 @@
+class AuthValidationErrorsViewModel {
+  const AuthValidationErrorsViewModel();
+}

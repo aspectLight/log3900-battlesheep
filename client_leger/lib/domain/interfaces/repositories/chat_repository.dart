@@ -5,15 +5,10 @@ import '../../entities/chat_message_entity.dart';
 abstract class ChatRepository {
   Signal<List<ChatMessageEntity>> get messages;
   Signal<bool> get isConnected;
-  Signal<String?> get currentUsername;
 
-  void connect(String username);
-  void disconnect();
-
+  void sendMessage({required String username, required String content});
+  void sendEmoji({required String username, required String emoji});
   void loadMessages();
-  void sendMessage(String content);
-  void sendEmoji(String emoji);
   void clearMessages();
-
   Future<void> dispose();
 }

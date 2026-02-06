@@ -1,10 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 
-import '../presentation/screens/auth_landing_screen.dart';
-import '../presentation/screens/chat_screen.dart';
-import '../presentation/screens/login_screen.dart';
-import '../presentation/screens/main_screen.dart';
-import '../presentation/screens/sign_up_screen.dart';
+import '../presentation/screens/auth_landing/auth_landing_screen.dart';
+import '../presentation/screens/login/login_screen.dart';
+import '../presentation/screens/main_menu/main_menu_screen.dart';
+import '../presentation/screens/sign_up/sign_up_screen.dart';
 import 'auth_guard.dart';
 
 part 'app_router.gr.dart';
@@ -34,13 +33,7 @@ class AppRouter extends RootStackRouter {
       transitionsBuilder: TransitionsBuilders.fadeIn,
     ),
     CustomRoute(
-      page: ChatRoute.page,
-      path: '/chat',
-      guards: [authGuard],
-      transitionsBuilder: TransitionsBuilders.fadeIn,
-    ),
-    CustomRoute(
-      page: MainRoute.page,
+      page: MainMenuRoute.page,
       path: '/main',
       guards: [authGuard],
       transitionsBuilder: TransitionsBuilders.fadeIn,

@@ -16,8 +16,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: auto;
 }
 
 .container::before {
@@ -42,36 +41,42 @@
     font-size: 1.2em;
 }
 
-.header {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    padding: 10px 15px;
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
-}
-
 .return-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: transparent;
-    border: none;
-    color: white;
+    gap: 15px;
     cursor: pointer;
-    font-size: 1em;
-    padding: 8px 12px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    z-index: 10;
+
+    &:active {
+        color: darkred;
+    }
 
     &:hover {
-        background: rgba(255, 255, 255, 0.1);
+        color: red;
     }
 
     img {
-        width: 20px;
-        height: 20px;
+        width: 15px;
+        max-width: 15px;
+        filter: brightness(0) invert(1);
     }
+}
+
+.page-title {
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .content-wrapper {
@@ -79,19 +84,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 10px 15px;
-    gap: 10px;
-    width: 100%;
-    box-sizing: border-box;
-    overflow-y: auto;
-}
-
-.header-section {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
+    justify-content: center;
+    padding: 20px;
 }
 
 .main-content {
@@ -104,91 +98,51 @@
 
 .form-columns {
     display: flex;
-    gap: 30px;
+    gap: 40px;
     align-items: stretch;
     width: 100%;
-    min-height: 0;
 }
 
 .form-column-left {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    min-height: 100%;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    padding: 20px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-sizing: border-box;
+    gap: 16px;
 }
 
 .form-column-right {
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-height: 100%;
-    align-items: stretch;
+}
+
+.form-column-right .field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .form-actions {
     display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
     gap: 12px;
-    width: calc((100% - 30px) / 2);
-    margin-top: 0;
-    padding-top: 0;
-    margin-left: 0;
-    margin-right: auto;
-}
-
-.page-title {
-    color: white;
-    font-size: 1.5em;
-    font-weight: 600;
-    margin: 0;
-    text-align: center;
-}
-
-.success-message {
-    background: rgba(40, 167, 69, 0.9);
-    color: white;
-    padding: 8px 15px;
-    border-radius: 5px;
-    text-align: center;
+    margin-top: 16px;
     width: 100%;
-    font-size: 0.9em;
-}
-
-.error-message {
-    background: rgba(220, 53, 69, 0.9);
-    color: white;
-    padding: 8px 15px;
-    border-radius: 5px;
-    text-align: center;
-    width: 100%;
-    font-size: 0.9em;
 }
 
 .profile-form {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 900px;
-    gap: 15px;
-    background: transparent;
-    padding: 0;
-    box-sizing: border-box;
-    min-height: 0;
+    max-width: 750px;
+    gap: 20px;
 }
 
 .profile-form .field {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 4px;
 }
 
 .profile-form label,
@@ -223,7 +177,7 @@
 }
 
 .profile-form .error {
-    color: #ff6b6b;
+    color: #dc3545;
     font-size: 0.875em;
     margin-top: 4px;
 }
@@ -231,36 +185,32 @@
 .avatar-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    gap: 10px;
     flex: 1;
-    min-height: 0;
-    align-content: start;
-    grid-auto-rows: min-content;
 }
 
 .avatar-btn {
-    padding: 3px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
+    padding: 8px;
+    border: 2px solid #444444;
+    border-radius: 10px;
+    background: #2b2b2b;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition:
+        border-color 0.3s,
+        box-shadow 0.3s;
     aspect-ratio: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 0;
 
     &:hover {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.5);
+        border-color: #7f1f1f;
     }
 }
 
 .avatar-btn.selected {
-    border-color: #ff6b6b;
-    background: rgba(255, 107, 107, 0.2);
-    box-shadow: 0 0 8px 2px rgba(255, 107, 107, 0.7);
+    border-color: #7f1f1f;
+    box-shadow: 0 0 8px 2px rgba(227, 75, 75, 0.7);
 }
 
 .avatar-img {
@@ -283,8 +233,7 @@
         background-color 0.3s,
         box-shadow 0.3s,
         color 0.3s;
-    width: auto;
-    min-width: 200px;
+    width: 100%;
     font-size: 1.2rem;
     font-weight: 600;
 
@@ -348,6 +297,16 @@
     margin: 0;
 }
 
+.form-error {
+    background-color: rgba(220, 53, 69, 0.2);
+    border: 1px solid #dc3545;
+    border-radius: 5px;
+    padding: 0.5rem;
+    color: #dc3545;
+    text-align: center;
+    font-size: 1rem;
+}
+
 @keyframes scaleBackground {
     from {
         transform: scale(1);
@@ -357,34 +316,14 @@
     }
 }
 
-
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 700px) {
     .form-columns {
         flex-direction: column;
         gap: 20px;
     }
 
     .profile-form {
-        max-width: 100%;
-    }
-
-    .form-column-left {
-        padding: 15px;
-    }
-}
-
-@media screen and (max-width: 600px) {
-    .statistics-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .content-wrapper {
-        padding: 10px;
-    }
-
-    .form-column-left,
-    .statistics-section {
-        padding: 15px;
+        max-width: 350px;
     }
 
     .avatar-grid {
@@ -392,3 +331,9 @@
     }
 }
 
+@media screen and (max-height: 600px) {
+    .page-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+}

@@ -70,6 +70,37 @@
     "description": "Erreur de validation lorsque l'avatar n'est pas sélectionné"
   },
   "teamMembers": "Ahmed Sami Benabbou, May Guessous, Ayoub Marfouk, Pierre Carré, Anis Gadouche, Djihed Benaiche",
+  "joinGame": "Joindre une partie",
+  "createGame": "Créer une partie",
+  "administerGames": "Administrer les jeux",
+  "settings": "Paramètres",
+  "profile": "Profil",
+  "signOut": "Se déconnecter",
+  "connectionHistory": "Historique de connexion",
+  "gameHistory": "Historique des parties",
+  "@gameHistory": {
+    "description": "Option du menu pour voir l'historique des parties"
+  },
+  "journal": "Journal",
+  "@journal": {
+    "description": "Titre de l'onglet Journal dans le clavardage"
+  },
+  "emptyJournal": "Le journal est vide pour le moment",
+  "@emptyJournal": {
+    "description": "Message affiché lorsque le journal est vide"
+  },
+  "filter": "Filtrer",
+  "@filter": {
+    "description": "Texte pour le filtrage"
+  },
+  "none": "Aucun",
+  "@none": {
+    "description": "Option pour aucun filtre"
+  },
+  "send": "Envoyer",
+  "@send": {
+    "description": "Texte du bouton d'envoi de message"
+  },
   "@teamMembers": {
     "description": "Liste des membres de l'équipe affichée dans le pied de page"
   }

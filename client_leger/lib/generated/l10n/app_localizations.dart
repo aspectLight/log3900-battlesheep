@@ -409,6 +409,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ahmed Sami Benabbou, May Guessous, Ayoub Marfouk, Pierre Carré, Anis Gadouche, Djihed Benaiche'**
   String get teamMembers;
+
+  /// Button text to join a game
+  ///
+  /// In en, this message translates to:
+  /// **'Join Game'**
+  String get joinGame;
+
+  /// Button text to create a game
+  ///
+  /// In en, this message translates to:
+  /// **'Create Game'**
+  String get createGame;
+
+  /// Button text to administer games
+  ///
+  /// In en, this message translates to:
+  /// **'Administer Games'**
+  String get administerGames;
+
+  /// Tooltip for the settings button
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// Menu option to view profile
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profile;
+
+  /// Menu option to sign out
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Out'**
+  String get signOut;
+
+  /// Menu option to view connection history
+  ///
+  /// In en, this message translates to:
+  /// **'Connection History'**
+  String get connectionHistory;
+
+  /// Menu option to view games history
+  ///
+  /// In en, this message translates to:
+  /// **'Games History'**
+  String get gameHistory;
+
+  /// Title of the Journal tab in the chatbox
+  ///
+  /// In en, this message translates to:
+  /// **'Journal'**
+  String get journal;
+
+  /// Message displayed when the journal is empty
+  ///
+  /// In en, this message translates to:
+  /// **'The journal is empty for now'**
+  String get emptyJournal;
+
+  /// Text for filtering
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get filter;
+
+  /// Option for no filter
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get none;
+
+  /// Text for the send message button
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get send;
 }
 
 class _AppLocalizationsDelegate

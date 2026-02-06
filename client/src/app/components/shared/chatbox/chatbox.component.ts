@@ -14,6 +14,7 @@ const MAX_MESSAGE_LENGTH = 200;
 export class ChatboxComponent implements OnInit, AfterViewInit {
     @Input() roomType: 'GeneralChat' | 'WaitingRoom' | 'GameRoom' | 'EndRoom' = 'GeneralChat';
     @ViewChild('chatboxMessages') private messagesContainer!: ElementRef<HTMLDivElement>;
+    @ViewChild('messageInput') private messageInput!: ElementRef<HTMLInputElement>;
 
     showMessages: boolean = true;
     withFilter: boolean = false;
@@ -77,6 +78,7 @@ export class ChatboxComponent implements OnInit, AfterViewInit {
             }
             this.newMessage = '';
             this.scrollToBottom();
+            this.messageInput?.nativeElement?.focus();
         }
     }
 
@@ -89,7 +91,6 @@ export class ChatboxComponent implements OnInit, AfterViewInit {
     }
 
     scrollToBottom() {
-        // add a timeout of 100ms to wait for the messages to be rendered
         setTimeout(() => {
             if (this.messagesContainer?.nativeElement) {
                 this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;

@@ -12,7 +12,6 @@ import { Socket } from 'socket.io';
 export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly logger = new Logger(GeneralChatGateway.name);
     private socketIdToUsername = new Map<string, string>();
-
     private disconnectionTimeouts = new Map<string, NodeJS.Timeout>();
 
     constructor(
@@ -21,18 +20,8 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
     ) {}
 
     @SubscribeMessage(GeneralChatEvents.JoinGeneralChat)
-    handleJoinGeneralChat(socket: Socket, username: string): void {
-        const existingTimeout = this.disconnectionTimeouts.get(username);
-        if (existingTimeout) {
-            clearTimeout(existingTimeout);
-            this.disconnectionTimeouts.delete(username);
-            this.logger.log(`Déconnexion annulée pour ${username} (reconnexion rapide)`);
-        }
-
+    handleJoinGeneralChat(socket: Socket): void {
         socket.join(GENERAL_CHAT_ROOM);
-        this.socketIdToUsername.set(socket.id, username);
-        this.logger.log(`${username} (${socket.id}) a rejoint le chat général`);
-
         const messages = this.generalChatService.getMessages();
         socket.emit(GeneralChatEvents.GetGeneralChatMessagesResponse, messages);
     }
@@ -52,8 +41,8 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         };
         this.generalChatService.addMessage(chatMessage);
 
-        // Send message to all except sender
         socket.to(GENERAL_CHAT_ROOM).emit(GeneralChatEvents.GeneralChatMessage, chatMessage);
+        socket.emit(GeneralChatEvents.GeneralChatMessage, chatMessage);
         this.logger.log(`Message de ${data.username}: ${data.message}`);
     }
 
@@ -72,11 +61,8 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         };
         this.generalChatService.addMessage(chatEmoji);
 
-        // Send emoji to all except sender
         socket.to(GENERAL_CHAT_ROOM).emit(GeneralChatEvents.GeneralChatEmoji, chatEmoji);
-        this.logger.log(`Emoji de ${data.username}: ${data.emoji}`);
     }
-
 
     @SubscribeMessage(GeneralChatEvents.GetGeneralChatMessages)
     handleGetMessages(socket: Socket): void {
@@ -84,12 +70,32 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         socket.emit(GeneralChatEvents.GetGeneralChatMessagesResponse, messages);
     }
 
-    handleConnection(socket: Socket) {
-        this.logger.log(`Client connecté: ${socket.id}`);
+    async handleConnection(socket: Socket): Promise<void> {
+        // Identify user with token
+        const { token } = socket.handshake.auth as { token?: string };
+        if (token) {
+            try {
+                const decodedToken = await this.authService.verifyToken(token);
+                const user = await this.authService.getUserByUid(decodedToken.uid);
+                if (user?.username) {
+                    this.socketIdToUsername.set(socket.id, user.username);
+                    this.logger.log(`Utilisateur ${user.username} authentifié sur socket ${socket.id}`);
+
+                    // Cancel disconnection timeout if user reconnects (moving through pages)
+                    const existingTimeout = this.disconnectionTimeouts.get(user.username);
+                    if (existingTimeout) {
+                        clearTimeout(existingTimeout);
+                        this.disconnectionTimeouts.delete(user.username);
+                        this.logger.log(`Déconnexion annulée pour ${user.username} (reconnexion rapide)`);
+                    }
+                }
+            } catch (error) {
+                this.logger.warn(`Échec de l'authentification pour socket ${socket.id}: ${error.message}`);
+            }
+        }
     }
 
     async handleDisconnect(socket: Socket): Promise<void> {
-        this.logger.log(`Client déconnecté: ${socket.id}`);
         const username = this.socketIdToUsername.get(socket.id);
 
         if (username) {
@@ -104,7 +110,7 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
                 } catch (error) {
                     this.logger.error(`Erreur lors de la déconnexion automatique de ${username}: ${error.message}`);
                 }
-            }, 15000);
+            }, 10000);
 
             this.disconnectionTimeouts.set(username, timeout);
         }

@@ -1,0 +1,3 @@
+class SignUpFormViewModel {
+  const SignUpFormViewModel();
+}

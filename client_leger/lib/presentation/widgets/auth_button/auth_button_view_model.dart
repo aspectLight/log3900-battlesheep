@@ -1,0 +1,3 @@
+class AuthButtonViewModel {
+  const AuthButtonViewModel();
+}
