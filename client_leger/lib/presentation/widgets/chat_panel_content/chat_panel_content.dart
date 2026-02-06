@@ -23,7 +23,8 @@ class ChatPanelContent extends StatefulWidget {
   State<ChatPanelContent> createState() => _ChatPanelContentState();
 }
 
-class _ChatPanelContentState extends State<ChatPanelContent> {
+class _ChatPanelContentState extends State<ChatPanelContent>
+    with WidgetsBindingObserver {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
@@ -37,9 +38,12 @@ class _ChatPanelContentState extends State<ChatPanelContent> {
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
   DateTime? _lastShakeTime;
 
+  double _previousKeyboardHeight = 0;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _viewModel = GetIt.I<ChatPanelContentViewModel>();
     _viewModel.loadMessages();
     _setupShakeDetection();
@@ -59,6 +63,23 @@ class _ChatPanelContentState extends State<ChatPanelContent> {
         }
       });
     });
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+
+    final currentKeyboardHeight =
+        // ignore: deprecated_member_use
+        WidgetsBinding.instance.window.viewInsets.bottom;
+
+    if (_previousKeyboardHeight > 0 && currentKeyboardHeight == 0) {
+      if (_focusNode.hasFocus) {
+        _focusNode.unfocus();
+      }
+    }
+
+    _previousKeyboardHeight = currentKeyboardHeight;
   }
 
   void _setupShakeDetection() {
@@ -340,6 +361,7 @@ class _ChatPanelContentState extends State<ChatPanelContent> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _scrollEffectDispose();
     unawaited(_accelerometerSubscription?.cancel());
     _messageController.dispose();
