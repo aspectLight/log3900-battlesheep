@@ -66,11 +66,6 @@ export class ActionSocketService implements ISocketService {
         this.socket.emit(GameRoomEvents.DoorToggled, { roomId, x, y });
     }
 
-    addToJournal(entry: { type: string; content: string }): void {
-        const roomId = this.gameManagerService.room.roomId;
-        this.socket.emit(GameRoomEvents.AddJournalEntry, { roomId, entry });
-    }
-
     endPlayerTurn(): void {
         const roomId = this.gameManagerService.room.roomId;
         this.socketService.endPlayerTurn(roomId);
@@ -105,12 +100,6 @@ export class ActionSocketService implements ISocketService {
                     this.movementSocketService.teleportPlayer(loser.spawnPoint.x, loser.spawnPoint.y, { playerId: loser.id });
                 }
                 this.combatService.loserId = '';
-                this.addToJournal({
-                    type: 'TOUS',
-                    content: isByFlight
-                        ? `Fin du combat! ${this.gameManagerService.getPlayerById(winnerId)?.name} a fuit devant ${loser?.name}.`
-                        : `Fin du combat ! ${this.gameManagerService.getPlayerById(winnerId)?.name} a battu ${loser?.name}.`,
-                });
             }
         });
 
@@ -118,38 +107,18 @@ export class ActionSocketService implements ISocketService {
             this.gameRoomService.setDebugMode(true);
             this.gameManagerService.clearPaths();
             this.gameManagerService.setActionPoints(1);
-            if (this.socket.id === this.gameManagerService.currentPlayerId) {
-                this.addToJournal({
-                    type: 'TOUS',
-                    content: `Mode deboggage activé par ${this.gameManagerService.getPlayerById(this.socket.id)?.name} !`,
-                });
-            }
         });
 
         this.socket.on(GameRoomEvents.DebugModeDisabled, () => {
             this.gameRoomService.setDebugMode(false);
 
             this.movementSocketService.getPlayerMovements();
-            if (this.socket.id === this.gameManagerService.currentPlayerId) {
-                this.addToJournal({
-                    type: 'TOUS',
-                    content: `Mode deboggage désactivé par ${this.gameManagerService.getPlayerById(this.socket.id)?.name} !`,
-                });
-            }
         });
 
         this.socket.on(GameRoomEvents.DoorToggled, (coords) => {
             const door = this.gameManagerService.getBoard().getCell(coords.x, coords.y);
             if (door?.tile.type === 'door') {
                 door.tile.toggleState();
-                if (this.socket.id === this.gameManagerService.currentPlayerId) {
-                    this.addToJournal({
-                        type: 'TOUS',
-                        content: `La porte (${coords.x}, ${coords.y}) a été ${
-                            door?.tile.state === 'opened' ? 'ouverte' : 'fermee'
-                        } par ${this.gameManagerService.getPlayerById(this.socket.id)?.name} !`,
-                    });
-                }
             }
             this.movementSocketService.getPlayerMovements();
             if (this.gameManagerService.isDebugMode) this.gameManagerService.clearPaths();

@@ -10,11 +10,11 @@ import {
     TURN_DURATION_WITHOUT_EVASION,
 } from '@app/modules/combat/constants/game-combat.constants';
 import { Combat } from '@app/modules/combat/interfaces/combat';
+import { GameMovementService } from '@app/modules/movement/services/game-movement.service';
 import { GameRoom } from '@app/modules/shared-room/interfaces/game-room';
+import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
 import { BonusType, Player } from '@app/shared/interfaces/player';
 import { DiceService } from '@app/shared/services/dice.service';
-import { GameMovementService } from '@app/modules/movement/services/game-movement.service';
-import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
 import { ErrorMessages } from '@common/error-messages.constants';
 import { GameRoomEvents } from '@common/socket.constants';
 import { Injectable, Logger } from '@nestjs/common';
@@ -57,18 +57,6 @@ export class GameCombatService {
             currentOpponentId,
             turnTimer: undefined,
         };
-        const entry = {
-            type: 'TOUS',
-            content: `Début du combat ! ${defender.name} a été attaqué par ${attacker.name} !`,
-            time: new Date().toLocaleTimeString('en-GB', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false,
-            }),
-        };
-        this.gameRoomService.addJournalEntry(associatedRoomId, entry);
-        this.server.to(associatedRoomId).emit(GameRoomEvents.AddJournalEntry, entry);
         newCombat.players.forEach((player) => (player.evasionPoints = EVASION_PTS));
         this.activeCombats.push(newCombat);
         if (!(attacker.isVirtual && defender.isVirtual)) {
@@ -190,22 +178,6 @@ export class GameCombatService {
             if (attackerStats) attackerStats.damage += damage;
             if (opponentStats) opponentStats.healthLost += damage;
 
-            // Ajouter l'entrée de journal
-            const entry = {
-                type: 'COMBAT',
-                content: `${currentPlayer.name} a ${attackResult > 0 ? 'réussi' : 'échoué'} à attaquer ${
-                    currentOpponent.name
-                } ! ${attackValue} contre ${defenseValue} !`,
-                time: new Date().toLocaleTimeString('en-GB', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: false,
-                }),
-            };
-            this.gameRoomService.addJournalEntry(currentRoom.associatedRoomId, entry);
-            this.server.to(currentRoom.combatRoomId).emit(GameRoomEvents.AddJournalEntry, entry);
-
             this.server.to(currentRoom.combatRoomId).emit(GameRoomEvents.AttackResult, {
                 isAttackSuccess: attackResult > 0,
                 opponentHealthPoints: currentOpponent.stats['health'].value,
@@ -244,18 +216,6 @@ export class GameCombatService {
 
             const currentPlayer = this.findPlayerById(combatId, currentRoom.currentPlayerId);
             const flightSuccess = Math.random() <= FLIGHT_CHANCES;
-            const entry = {
-                type: 'COMBAT',
-                content: `Tentative de fuite ! ${currentPlayer.name} a ${flightSuccess ? 'réussi' : 'échoué'} à s'échapper!`,
-                time: new Date().toLocaleTimeString('en-GB', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: false,
-                }),
-            };
-            this.gameRoomService.addJournalEntry(currentRoom.associatedRoomId, entry);
-            this.server.to(currentRoom.combatRoomId).emit(GameRoomEvents.AddJournalEntry, entry);
             if (flightSuccess) {
                 const room = this.gameRoomService.findRoomById(currentRoom.associatedRoomId);
                 const playerStats = room.playersStats.find((p) => p.name === currentPlayer.name);

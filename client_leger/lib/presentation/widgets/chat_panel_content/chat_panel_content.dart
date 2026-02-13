@@ -9,15 +9,11 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../core/constants/chat_constants.dart';
 import '../../../core/constants/input_limits.dart';
-import '../../../generated/l10n/app_localizations.dart';
 import '../chat_line/chat_line.dart';
-import '../sliding_chat_box/sliding_chat_box_view_model.dart';
 import 'chat_panel_content_view_model.dart';
 
 class ChatPanelContent extends StatefulWidget {
-  final ChatTab activeTab;
-
-  const ChatPanelContent({required this.activeTab, super.key});
+  const ChatPanelContent({super.key});
 
   @override
   State<ChatPanelContent> createState() => _ChatPanelContentState();
@@ -30,7 +26,6 @@ class _ChatPanelContentState extends State<ChatPanelContent>
   final FocusNode _focusNode = FocusNode();
   late final ChatPanelContentViewModel _viewModel;
   late final VoidCallback _scrollEffectDispose;
-  bool _isFiltered = false;
 
   final List<String> _emojis = ChatConstants.defaultEmojis;
   int _selectedEmojiIndex = 0;
@@ -139,100 +134,6 @@ class _ChatPanelContentState extends State<ChatPanelContent>
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
-    if (widget.activeTab == ChatTab.journal) {
-      return Expanded(
-        child: Column(
-          children: [
-            Expanded(
-              child: Center(
-                child: Text(
-                  l10n.emptyJournal,
-                  style: const TextStyle(
-                    color: Color(0xFFAAAAAA),
-                    fontStyle: FontStyle.italic,
-                    fontSize: 16,
-                    fontFamily: 'CustomFont',
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: const BoxDecoration(
-                color: Color(0xFF1E0707),
-                border: Border(top: BorderSide(color: Color(0xFF3A1212))),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => _isFiltered = true),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          color: _isFiltered
-                              ? const Color(0xFF550000)
-                              : const Color(0xFF2B2B2B),
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(
-                            color: _isFiltered
-                                ? const Color(0xFF7F1F1F)
-                                : const Color(0xFF444444),
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            l10n.filter,
-                            style: const TextStyle(
-                              color: Color(0xFFF5E6E6),
-                              fontSize: 14,
-                              fontFamily: 'CustomFont',
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => _isFiltered = false),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          color: !_isFiltered
-                              ? const Color(0xFF550000)
-                              : const Color(0xFF2B2B2B),
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(
-                            color: !_isFiltered
-                                ? const Color(0xFF7F1F1F)
-                                : const Color(0xFF444444),
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            l10n.none,
-                            style: const TextStyle(
-                              color: Color(0xFFF5E6E6),
-                              fontSize: 14,
-                              fontFamily: 'CustomFont',
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
     return Expanded(
       child: Column(
         children: [

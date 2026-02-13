@@ -1,5 +1,5 @@
 import { Player } from '@app/shared/interfaces/player';
-import { GameRoomEvents, WaitingRoomEvents } from '@common/socket.constants';
+import { WaitingRoomEvents } from '@common/socket.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import {
     ConnectedSocket,
@@ -105,14 +105,6 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
     @SubscribeMessage(WaitingRoomEvents.GetMessagesFromWaitingRoom)
     async handleGetMessagesFromWaitingRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
         return this.chatHandler.handleGetMessagesFromWaitingRoom(roomId, socket);
-    }
-
-    @SubscribeMessage(GameRoomEvents.AddJournalEntry)
-    async handleAddJournalEntry(
-        @MessageBody() data: { roomId: string; entry: { type: string; content: string } },
-        @ConnectedSocket() socket: Socket,
-    ) {
-        return this.chatHandler.handleAddJournalEntry(data, socket, this.server);
     }
 
     // ===== WebSocket Lifecycle Events =====

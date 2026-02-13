@@ -25,7 +25,6 @@ class _SlidingChatBoxState extends State<SlidingChatBox> {
   @override
   Widget build(BuildContext context) {
     final isExpanded = _viewModel.isExpanded.watch(context);
-    final activeTab = _viewModel.activeTab.watch(context);
     final width = (MediaQuery.of(context).size.width * 0.35).clamp(
       400.0,
       double.infinity,
@@ -72,20 +71,12 @@ class _SlidingChatBoxState extends State<SlidingChatBox> {
                   ),
                 ],
               ),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
+              child: const ClipRRect(
+                borderRadius: BorderRadius.only(
                   topRight: Radius.circular(6),
                   bottomRight: Radius.circular(6),
                 ),
-                child: Column(
-                  children: [
-                    ChatHeader(
-                      activeTab: activeTab,
-                      onTabChange: _viewModel.setTab,
-                    ),
-                    ChatPanelContent(activeTab: activeTab),
-                  ],
-                ),
+                child: Column(children: [ChatHeader(), ChatPanelContent()]),
               ),
             ),
           ),
@@ -107,10 +98,7 @@ class _SlidingChatBoxState extends State<SlidingChatBox> {
                   ),
                   border: Border.all(color: const Color(0xFF3A1212), width: 2),
                 ),
-                child: Icon(
-                  isExpanded ? Icons.chevron_left : Icons.chevron_right,
-                  color: Colors.white,
-                ),
+                child: const Icon(Icons.chat_bubble, color: Colors.white),
               ),
             ),
           ),

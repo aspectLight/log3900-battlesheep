@@ -17,7 +17,6 @@ export class WaitingRoomService {
             futurePlayers: [],
             isLocked: false,
             messages: [],
-            journalEntries: [],
         };
         newRoom.reservedAvatars = [{ reservorId: host.id, chosenAvatar: host.avatar.name }];
         this.waitingRooms.push(newRoom);

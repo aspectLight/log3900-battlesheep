@@ -79,8 +79,6 @@ export enum GameRoomEvents {
 
     SendMessageToGameRoom = 'sendMessageToGameRoom',
     MassMessage = 'massMessage',
-    AddJournalEntry = 'addJournalEntry',
-    GetJournalEntriesFromGameRoom = 'getJournalEntriesFromGameRoom',
 
     GetStatistics = 'getStatistics',
     GetStatisticsResponse = 'getStatisticsResponse',

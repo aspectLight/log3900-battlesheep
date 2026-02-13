@@ -9,7 +9,6 @@ export interface Room {
     reservedAvatars?: Reservation[];
     isLocked: boolean;
     messages: { type: string; content: string; time: string }[];
-    journalEntries: { type: string; content: string; time: string }[];
 }
 
 export interface Reservation {

@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
+
 import '../../../generated/l10n/app_localizations.dart';
-import '../sliding_chat_box/sliding_chat_box_view_model.dart';
 
 class ChatHeader extends StatelessWidget {
-  final ChatTab activeTab;
-  final void Function(ChatTab) onTabChange;
-
-  const ChatHeader({
-    required this.activeTab,
-    required this.onTabChange,
-    super.key,
-  });
+  const ChatHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,24 +19,12 @@ class ChatHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            activeTab == ChatTab.chat ? l10n.chat : l10n.journal,
+            l10n.chat,
             style: const TextStyle(
               color: Color(0xFFE0E0FF),
               fontSize: 18,
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
-            ),
-          ),
-          GestureDetector(
-            onTap: () => onTabChange(
-              activeTab == ChatTab.chat ? ChatTab.journal : ChatTab.chat,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: Text(
-                activeTab == ChatTab.chat ? '⊷' : '⊶',
-                style: const TextStyle(fontSize: 18, color: Colors.white),
-              ),
             ),
           ),
         ],

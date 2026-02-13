@@ -35,7 +35,6 @@ export class GameRoomService {
             turnTimer: undefined,
             timeRemaining: undefined,
             messages: waitingRoom.messages,
-            journalEntries: [],
             playersStats: [],
             globalStats: {
                 gameDuration: '00:00',
@@ -110,14 +109,6 @@ export class GameRoomService {
             throw new Error("La salle n'existe pas");
         }
         room.messages.push(message);
-    }
-
-    addJournalEntry(roomId: string, entry: { type: string; content: string; time: string }) {
-        const room = this.findRoomById(roomId);
-        if (!room) {
-            throw new Error("La salle n'existe pas");
-        }
-        room.journalEntries.push(entry);
     }
 
     prepareNextTurn(roomId: string): void {

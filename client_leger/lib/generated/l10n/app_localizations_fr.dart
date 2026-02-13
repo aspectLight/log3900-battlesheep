@@ -201,12 +201,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gameHistory => 'Historique des parties';
 
   @override
-  String get journal => 'Journal';
-
-  @override
-  String get emptyJournal => 'Le journal est vide pour le moment';
-
-  @override
   String get filter => 'Filtrer';
 
   @override

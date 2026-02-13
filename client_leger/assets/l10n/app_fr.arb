@@ -81,14 +81,6 @@
   "@gameHistory": {
     "description": "Option du menu pour voir l'historique des parties"
   },
-  "journal": "Journal",
-  "@journal": {
-    "description": "Titre de l'onglet Journal dans le clavardage"
-  },
-  "emptyJournal": "Le journal est vide pour le moment",
-  "@emptyJournal": {
-    "description": "Message affiché lorsque le journal est vide"
-  },
   "filter": "Filtrer",
   "@filter": {
     "description": "Texte pour le filtrage"

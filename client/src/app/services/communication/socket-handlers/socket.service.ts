@@ -114,25 +114,11 @@ export class SocketService implements ISocketService {
     virtualPlayerTurn(playerId: string, skipTimeout?: boolean): void {
         const roomId = this.gameManagerService.room.roomId;
         const isCTF = this.gameManagerService.isCTF;
-        if (!skipTimeout) {
-            const entry = {
-                type: 'TOUS',
-                content: ` ${this.gameManagerService.getPlayerById(playerId)?.name} commence son tour.`,
-            };
-            this.socket.emit(GameRoomEvents.AddJournalEntry, { roomId, entry });
-        }
         this.socket.emit(GameRoomEvents.VirtualPlayerTurn, { roomId, playerId, isCTF, skipTimeout });
     }
 
     sendMessageToGameRoom(message: string, playerName: string | null): void {
         this.socket.emit(GameRoomEvents.SendMessageToGameRoom, { message, playerName, roomId: this.getRoomId() });
-    }
-
-    addToJournal(entry: { type: string; content: string }): void {
-        if (this.gameManagerService.currentPlayerId === this.socket.id) {
-            const roomId = this.gameManagerService.room.roomId;
-            this.socket.emit(GameRoomEvents.AddJournalEntry, { roomId, entry });
-        }
     }
 
     quitEndGame(): void {
@@ -165,10 +151,6 @@ export class SocketService implements ISocketService {
 
         this.socket.on(GameRoomEvents.TurnStarting, (data) => {
             this.handleTurnStart(data);
-            this.addToJournal({
-                type: 'TOUS',
-                content: ` ${data.nextPlayer.name} commence son tour.`,
-            });
         });
 
         this.socket.on(GameRoomEvents.UpdateCountdown, (countdown: number) => {
@@ -211,11 +193,6 @@ export class SocketService implements ISocketService {
         });
 
         this.socket.on(GameRoomEvents.PlayerAbandoned, (playerId) => {
-            const player = this.gameManagerService.getPlayerById(playerId);
-            this.addToJournal({
-                type: 'TOUS',
-                content: ` ${player?.name} a abandonné la partie.`,
-            });
             this.gameManagerService.disconnectPlayer(playerId);
         });
 
@@ -224,10 +201,6 @@ export class SocketService implements ISocketService {
             for (const player of this.gameManagerService.room.players) {
                 playersName.push(player.name);
             }
-            this.addToJournal({
-                type: 'TOUS',
-                content: ` La partie est terminée. Les joueurs encore actifs sont : ${playersName.toLocaleString()}.`,
-            });
             this.gameManagerService.finishGame(data);
         });
 

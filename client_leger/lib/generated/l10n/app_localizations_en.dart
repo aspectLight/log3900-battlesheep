@@ -196,12 +196,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gameHistory => 'Games History';
 
   @override
-  String get journal => 'Journal';
-
-  @override
-  String get emptyJournal => 'The journal is empty for now';
-
-  @override
   String get filter => 'Filter';
 
   @override

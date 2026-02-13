@@ -196,12 +196,7 @@ export class MovementSocketService implements ISocketService {
             this.gameManagerService.movePlayerFromPath((item, cell) => {
                 if (this.gameManagerService.currentPlayerId === this.socket.id) {
                     if (item && cell) {
-                        const entry = {
-                            type: 'TOUS',
-                            content: `${player.name} a ramassé ${item.name}`,
-                        };
                         const roomId = this.socketService.getRoomId();
-                        this.socket.emit(GameRoomEvents.AddJournalEntry, { roomId, entry });
                         this.socket.emit(GameRoomEvents.ItemCollected, {
                             roomId,
                             playerId: this.socket.id,
@@ -268,12 +263,7 @@ export class MovementSocketService implements ISocketService {
             this.gameManagerService.movePlayerFromPath((item, cell) => {
                 if (this.gameManagerService.room.hostId === this.socket.id) {
                     if (item && cell) {
-                        const entry = {
-                            type: 'TOUS',
-                            content: `${player.name} a ramassé ${item.name}`,
-                        };
                         const roomId = this.socketService.getRoomId();
-                        this.socket.emit(GameRoomEvents.AddJournalEntry, { roomId, entry });
                         this.socket.emit(GameRoomEvents.ItemCollected, {
                             roomId,
                             playerId: data.playerId,

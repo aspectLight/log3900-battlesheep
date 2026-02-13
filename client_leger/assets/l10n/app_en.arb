@@ -246,14 +246,6 @@
   "@gameHistory": {
     "description": "Menu option to view games history"
   },
-  "journal": "Journal",
-  "@journal": {
-    "description": "Title of the Journal tab in the chatbox"
-  },
-  "emptyJournal": "The journal is empty for now",
-  "@emptyJournal": {
-    "description": "Message displayed when the journal is empty"
-  },
   "filter": "Filter",
   "@filter": {
     "description": "Text for filtering"

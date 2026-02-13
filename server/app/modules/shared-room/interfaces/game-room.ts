@@ -11,7 +11,6 @@ export interface GameRoom {
     turnTimer?: NodeJS.Timeout;
     timeRemaining?: number;
     messages: { type: string; content: string; time: string }[];
-    journalEntries: { type: string; content: string; time: string }[];
     playersStats?: PlayerStats[];
     globalStats?: GlobalStats;
     startTime?: Date;
