@@ -17,6 +17,7 @@ type FirebaseAuthError = { code?: string; message?: string };
 export class LoginPageComponent {
     errorMessage: string | null = null;
     isSubmitting = false;
+    showPassword = false;
 
     form = this.fb.nonNullable.group({
         username: ['', [Validators.required]],
@@ -28,6 +29,10 @@ export class LoginPageComponent {
         private authService: AuthService,
         private router: Router,
     ) {}
+
+    togglePasswordVisibility() {
+        this.showPassword = !this.showPassword;
+    }
 
     async submitForm() {
         this.errorMessage = null;

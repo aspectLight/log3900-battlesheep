@@ -17,13 +17,15 @@
 }
 
 <div class="container">
-    <div class="settings-menu">
-        <button class="settings-button" (click)="toggleSettingsMenu()">⚙️</button>
+    <div class="settings-menu" #settingsMenu>
+        <button class="settings-button" (click)="toggleSettingsMenu()">
+            <img src="./assets/ui/profile.png" alt="Profil" class="settings-icon" />
+        </button>
         <div class="settings-dropdown" [class.show]="showSettingsMenu">
-            <button class="settings-option" (click)="goToProfile()">Profil</button>
-            <button class="settings-option" (click)="logout()">Se déconnecter</button>
-            <button class="settings-option" routerLink="/logs-history">Historique de connexion</button>
+            <button class="settings-option" routerLink="/profile">Profil</button>
             <button class="settings-option" routerLink="/games-history">Historique des parties</button>
+            <button class="settings-option" routerLink="/logs-history">Historique de connexion</button>
+            <button class="settings-option" (click)="logout()">Se déconnecter</button>
         </div>
     </div>
 
@@ -41,8 +43,8 @@
     <footer class="footer-item">
         <h4 class="team-name">Équipe 105</h4>
         <p>
-            <span>Ahmed Sami Benabbou</span>, <span>May Guessous</span>, <span>Ayoub Marfouk</span>, 
-            <span>Pierre Carré</span>, <span>Anis Gadouche</span>, <span>Djihed Benaiche</span>
+            <span>Ahmed Sami Benabbou</span>, <span>May Guessous</span>, <span>Ayoub Marfouk</span>, <span>Pierre Carré</span>,
+            <span>Anis Gadouche</span>, <span>Djihed Benaiche</span>
         </p>
     </footer>
 

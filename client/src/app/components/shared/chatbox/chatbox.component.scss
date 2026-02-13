@@ -44,20 +44,6 @@
   gap: 12px;
 }
 
-.change-btn {
-  background: none;
-  border: none;
-  color: #ffffff;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: color 0.2s ease;
-  padding: 0;
-}
-
-.change-btn:hover {
-  color: #ff9e9e;
-}
-
 .chatbox-messages {
   flex: 1 1 auto;
   padding: 0;
@@ -149,50 +135,6 @@
 
 .square-button:hover {
   background-color: #7f1f1f;
-}
-
-.filter {
-  display: flex;
-  padding: 0;
-  background-color: rgba(30, 7, 7, 0.8);
-  border-top: 1px solid #3a1212;
-  gap: 0;
-  flex: 0 0 auto;
-}
-
-.filter-btn {
-  flex: 1;
-  padding: 12px;
-  font-size: 0.9rem;
-  border-radius: 0;
-  background-color: #2a0e0e;
-  color: #fff;
-  border: none;
-  border-right: 1px solid #3a1212;
-}
-
-.filter-btn:last-child {
-  border-right: none;
-}
-
-.filter-btn.active {
-  background-color: #a30202;
-  color: white;
-}
-
-.journal {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-height: 0;
-}
-
-.journalEntry {
-  padding: 15px;
-  color: #aaa;
-  text-align: center;
-  font-style: italic;
 }
 
 .toggle-button {

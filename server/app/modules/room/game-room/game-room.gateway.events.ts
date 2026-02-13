@@ -42,9 +42,6 @@ export enum GameRoomEvents {
     GetMessagesFromGameRoom = 'getMessagesFromGameRoom',
     GetMessagesResponse = 'getMessagesResponse',
 
-    AddJournalEntry = 'addJournalEntry',
-    GetJournalEntriesFromGameRoom = 'getJournalEntriesFromGameRoom',
-    GetJournalEntriesResponse = 'getJournalEntriesResponse',
     GetStatistics = 'getStatistics',
     GetStatisticsResponse = 'getStatisticsResponse',
     QuitEndGame = 'quitEndGame',

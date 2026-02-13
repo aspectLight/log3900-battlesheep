@@ -107,13 +107,6 @@ class ChatRepositoryImpl implements ChatRepository {
   @override
   void sendMessage({required String username, required String content}) {
     if (content.trim().isEmpty) return;
-    final optimisticEntity = ChatMessageEntity(
-      type: 'sent',
-      name: username,
-      content: content,
-      time: Formatter.formatTime(DateTime.now()),
-    );
-    _addMessage(optimisticEntity);
     _socketService.emit(GeneralChatEvents.sendMessageToGeneralChat, {
       'username': username,
       'message': content,

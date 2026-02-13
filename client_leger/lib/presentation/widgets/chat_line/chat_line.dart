@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+
 import '../../ui_models/chat_ui_message.dart';
 
 class ChatLine extends StatelessWidget {
   final ChatUiMessage message;
+  final int index;
 
-  const ChatLine({super.key, required this.message});
+  const ChatLine({super.key, required this.message, required this.index});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: message.isMe ? const Color(0xFF220808) : const Color(0xFF180505),
+        color: index.isEven ? const Color(0xFF180505) : const Color(0xFF220808),
         border: const Border(bottom: BorderSide(color: Color(0xFF250808))),
       ),
       child: RichText(

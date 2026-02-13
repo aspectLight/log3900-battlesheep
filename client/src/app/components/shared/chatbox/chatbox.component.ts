@@ -1,21 +1,19 @@
-import { NgClass } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '@app/services/communication/chat.service';
-import { JournalService } from '@app/services/communication/journal.service';
 const MAX_MESSAGE_LENGTH = 200;
 
 @Component({
     selector: 'app-chatbox',
-    imports: [NgClass, FormsModule],
+    imports: [FormsModule],
     templateUrl: './chatbox.component.html',
     styleUrl: './chatbox.component.scss',
 })
 export class ChatboxComponent implements OnInit, AfterViewInit {
     @Input() roomType: 'GeneralChat' | 'WaitingRoom' | 'GameRoom' | 'EndRoom' = 'GeneralChat';
     @ViewChild('chatboxMessages') private messagesContainer!: ElementRef<HTMLDivElement>;
+    @ViewChild('messageInput') private messageInput!: ElementRef<HTMLInputElement>;
 
-    showMessages: boolean = true;
     withFilter: boolean = false;
     isCollapsed: boolean = false;
 
@@ -23,20 +21,12 @@ export class ChatboxComponent implements OnInit, AfterViewInit {
 
     constructor(
         private chatService: ChatService,
-        private journalService: JournalService,
     ) {
         this.scrollToBottom();
     }
 
     get messages() {
         return this.chatService.messages;
-    }
-
-    get journal() {
-        if (this.withFilter) {
-            return this.journalService.filteredEntries;
-        }
-        return this.journalService.journalEntries;
     }
 
     get name() {
@@ -55,7 +45,6 @@ export class ChatboxComponent implements OnInit, AfterViewInit {
 
     ngAfterViewInit() {
         this.chatService.setScrollHandler(() => this.scrollToBottom());
-        this.journalService.setScrollHandler(() => this.scrollToBottom());
         this.scrollToBottom();
     }
 
@@ -77,6 +66,7 @@ export class ChatboxComponent implements OnInit, AfterViewInit {
             }
             this.newMessage = '';
             this.scrollToBottom();
+            this.messageInput?.nativeElement?.focus();
         }
     }
 
@@ -89,7 +79,6 @@ export class ChatboxComponent implements OnInit, AfterViewInit {
     }
 
     scrollToBottom() {
-        // add a timeout of 100ms to wait for the messages to be rendered
         setTimeout(() => {
             if (this.messagesContainer?.nativeElement) {
                 this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;

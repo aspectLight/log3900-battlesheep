@@ -458,18 +458,6 @@ abstract class AppLocalizations {
   /// **'Games History'**
   String get gameHistory;
 
-  /// Title of the Journal tab in the chatbox
-  ///
-  /// In en, this message translates to:
-  /// **'Journal'**
-  String get journal;
-
-  /// Message displayed when the journal is empty
-  ///
-  /// In en, this message translates to:
-  /// **'The journal is empty for now'**
-  String get emptyJournal;
-
   /// Text for filtering
   ///
   /// In en, this message translates to:

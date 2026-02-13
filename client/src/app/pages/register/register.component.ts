@@ -33,6 +33,8 @@ const passwordMatchValidator: ValidatorFn = (group: AbstractControl): Validation
 export class RegisterPageComponent {
     errorMessage: string | null = null;
     isSubmitting = false;
+    showPassword = false;
+    showConfirmPassword = false;
 
     avatars = PROFILE_AVATARS;
 
@@ -60,6 +62,14 @@ export class RegisterPageComponent {
     selectAvatar(id: string) {
         this.form.controls.avatarId.setValue(id);
         this.form.controls.avatarId.markAsTouched();
+    }
+
+    togglePasswordVisibility() {
+        this.showPassword = !this.showPassword;
+    }
+
+    toggleConfirmPasswordVisibility() {
+        this.showConfirmPassword = !this.showConfirmPassword;
     }
 
     async submitForm() {

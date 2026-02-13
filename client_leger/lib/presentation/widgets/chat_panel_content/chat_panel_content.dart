@@ -1,42 +1,44 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:signals_flutter/signals_flutter.dart';
+
 import '../../../core/constants/chat_constants.dart';
 import '../../../core/constants/input_limits.dart';
-import '../../../generated/l10n/app_localizations.dart';
 import '../chat_line/chat_line.dart';
-import '../sliding_chat_box/sliding_chat_box_view_model.dart';
 import 'chat_panel_content_view_model.dart';
 
 class ChatPanelContent extends StatefulWidget {
-  final ChatTab activeTab;
-
-  const ChatPanelContent({required this.activeTab, super.key});
+  const ChatPanelContent({super.key});
 
   @override
   State<ChatPanelContent> createState() => _ChatPanelContentState();
 }
 
-class _ChatPanelContentState extends State<ChatPanelContent> {
+class _ChatPanelContentState extends State<ChatPanelContent>
+    with WidgetsBindingObserver {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
   late final ChatPanelContentViewModel _viewModel;
   late final VoidCallback _scrollEffectDispose;
-  bool _isFiltered = false;
 
   final List<String> _emojis = ChatConstants.defaultEmojis;
+  int _selectedEmojiIndex = 0;
 
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
   DateTime? _lastShakeTime;
 
+  double _previousKeyboardHeight = 0;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _viewModel = GetIt.I<ChatPanelContentViewModel>();
     _viewModel.loadMessages();
     _setupShakeDetection();
@@ -58,6 +60,23 @@ class _ChatPanelContentState extends State<ChatPanelContent> {
     });
   }
 
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+
+    final currentKeyboardHeight =
+        // ignore: deprecated_member_use
+        WidgetsBinding.instance.window.viewInsets.bottom;
+
+    if (_previousKeyboardHeight > 0 && currentKeyboardHeight == 0) {
+      if (_focusNode.hasFocus) {
+        _focusNode.unfocus();
+      }
+    }
+
+    _previousKeyboardHeight = currentKeyboardHeight;
+  }
+
   void _setupShakeDetection() {
     if (!Platform.isAndroid && !Platform.isIOS) return;
     _accelerometerSubscription = accelerometerEventStream().listen(
@@ -77,11 +96,11 @@ class _ChatPanelContentState extends State<ChatPanelContent> {
     if (event.y.abs() > ChatConstants.shakeThresholdVertical &&
         event.x.abs() < ChatConstants.shakeDeadZone) {
       _lastShakeTime = now;
-      _sendEmoji(_emojis[0]);
+      _viewModel.resendLastMessage();
     } else if (event.x.abs() > ChatConstants.shakeThresholdHorizontal &&
         event.y.abs() < ChatConstants.shakeDeadZone) {
       _lastShakeTime = now;
-      _viewModel.resendLastMessage();
+      _sendEmoji(_emojis[_selectedEmojiIndex]);
     }
   }
 
@@ -107,102 +126,14 @@ class _ChatPanelContentState extends State<ChatPanelContent> {
     _viewModel.sendEmoji(emoji);
   }
 
+  void _selectEmoji(int index) {
+    setState(() {
+      _selectedEmojiIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
-    if (widget.activeTab == ChatTab.journal) {
-      return Expanded(
-        child: Column(
-          children: [
-            Expanded(
-              child: Center(
-                child: Text(
-                  l10n.emptyJournal,
-                  style: const TextStyle(
-                    color: Color(0xFFAAAAAA),
-                    fontStyle: FontStyle.italic,
-                    fontSize: 16,
-                    fontFamily: 'CustomFont',
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: const BoxDecoration(
-                color: Color(0xFF1E0707),
-                border: Border(top: BorderSide(color: Color(0xFF3A1212))),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => _isFiltered = true),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          color: _isFiltered
-                              ? const Color(0xFF550000)
-                              : const Color(0xFF2B2B2B),
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(
-                            color: _isFiltered
-                                ? const Color(0xFF7F1F1F)
-                                : const Color(0xFF444444),
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            l10n.filter,
-                            style: const TextStyle(
-                              color: Color(0xFFF5E6E6),
-                              fontSize: 14,
-                              fontFamily: 'CustomFont',
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => _isFiltered = false),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          color: !_isFiltered
-                              ? const Color(0xFF550000)
-                              : const Color(0xFF2B2B2B),
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(
-                            color: !_isFiltered
-                                ? const Color(0xFF7F1F1F)
-                                : const Color(0xFF444444),
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            l10n.none,
-                            style: const TextStyle(
-                              color: Color(0xFFF5E6E6),
-                              fontSize: 14,
-                              fontFamily: 'CustomFont',
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
     return Expanded(
       child: Column(
         children: [
@@ -219,6 +150,7 @@ class _ChatPanelContentState extends State<ChatPanelContent> {
                     return ChatLine(
                       key: ValueKey('${message.time}-${message.content}'),
                       message: message,
+                      index: index,
                     );
                   },
                 );
@@ -264,17 +196,27 @@ class _ChatPanelContentState extends State<ChatPanelContent> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                ..._emojis.map((emoji) {
+                ..._emojis.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final emoji = entry.value;
+                  final isSelected = index == _selectedEmojiIndex;
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 2),
                     child: GestureDetector(
-                      onTap: () => _sendEmoji(emoji),
+                      onTap: () => _selectEmoji(index),
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF2B2B2B),
+                          color: isSelected
+                              ? const Color(0xFF550000)
+                              : const Color(0xFF2B2B2B),
                           borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: const Color(0xFF444444)),
+                          border: Border.all(
+                            color: isSelected
+                                ? const Color(0xFF7F1F1F)
+                                : const Color(0xFF444444),
+                            width: isSelected ? 2 : 1,
+                          ),
                         ),
                         child: Text(
                           emoji,
@@ -320,6 +262,7 @@ class _ChatPanelContentState extends State<ChatPanelContent> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _scrollEffectDispose();
     unawaited(_accelerometerSubscription?.cancel());
     _messageController.dispose();

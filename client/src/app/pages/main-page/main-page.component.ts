@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ChatboxComponent } from '@app/components/shared/chatbox/chatbox.component';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
@@ -14,6 +14,7 @@ import { GameManagerService } from '@app/services/state/game-manager.service';
     imports: [RouterLink, PopUpComponent, ChatboxComponent],
 })
 export class MainPageComponent implements OnInit {
+    @ViewChild('settingsMenu') settingsMenu!: ElementRef;
     readonly title: string = 'Eastern Solace';
     showSettingsMenu = false;
 
@@ -33,10 +34,19 @@ export class MainPageComponent implements OnInit {
         return this.gameManagerService.isGameFinished;
     }
 
-    ngOnInit(): void {
-        this.socketService.reconnect();
-        this.chatService.setupListeners();
+    @HostListener('document:click', ['$event'])
+    onDocumentClick(event: MouseEvent) {
+        if (this.showSettingsMenu && this.settingsMenu && !this.settingsMenu.nativeElement.contains(event.target)) {
+            this.showSettingsMenu = false;
+        }
+    }
+
+    async ngOnInit(): Promise<void> {
         const username = this.authService.currentUser?.displayName || 'Utilisateur';
+        // Wait for the socket to be fully reconnected
+        await this.socketService.reconnect();
+        // Then, configure listeners and join the chat
+        this.chatService.setupListeners();
         this.chatService.joinGeneralChat(username);
     }
 
@@ -50,11 +60,6 @@ export class MainPageComponent implements OnInit {
 
     toggleSettingsMenu() {
         this.showSettingsMenu = !this.showSettingsMenu;
-    }
-
-    goToProfile() {
-        this.showSettingsMenu = false;
-        this.router.navigate(['/profile']);
     }
 
     async logout() {
