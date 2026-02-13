@@ -13,9 +13,6 @@ export class GameController {
         private readonly gameValidationService: GameValidationService,
     ) {}
 
-    @Get('ping')
-    ping() { return "pong"; }
-
     @Get()
     async findAllGames(@Res() response: Response) {
         try {
