@@ -1,0 +1,150 @@
+.room-list {
+    display: flex;
+    flex-direction: column;
+    max-width: 100vw;
+    margin: auto;
+    padding: 20px;
+}
+
+@keyframes dropIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    70% {
+        opacity: 1;
+        transform: translateY(5px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+li {
+    cursor: pointer;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: #2b2b2b;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100px;
+    color: white;
+    letter-spacing: 1px;
+    border: 1px solid #3a3a3a;
+    animation: dropIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+li:first-child {
+    border-radius: 8px 8px 0 0;
+}
+
+li:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
+li.header {
+    background-color: #3c3c3c;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-weight: bold;
+    height: auto;
+    padding: 15px;
+    text-transform: uppercase;
+    border-radius: 8px 8px 0 0;
+}
+
+li span {
+    flex: 1;
+    text-align: center;
+    min-width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    transition: all 0.3s ease;
+}
+
+li.header span {
+    color: #e0d8c0;
+}
+
+li.selected span {
+    font-weight: bold;
+    font-size: 20px;
+    color: #fff0f0;
+}
+
+li:not(.header, .selected, .full):hover {
+    background-color: #333333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border-color: #7f1f1f;
+}
+
+li.selected {
+    background-color: #550000;
+    box-shadow: 0 6px 12px rgba(85, 0, 0, 0.2);
+    border-color: #7f1f1f;
+}
+
+li.full {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+app-board {
+    pointer-events: none;
+    width: 100px;
+    height: 100px;
+}
+
+.preview-image {
+    display: inline-block;
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.rooms {
+    width: 100%;
+}
+
+.room-code {
+    font-family: monospace;
+    font-size: 22px;
+    letter-spacing: 3px;
+}
+
+.no-rooms {
+    color: #aaa;
+    text-align: center;
+    padding: 40px;
+    font-size: 18px;
+}
+
+li:nth-child(n + 2) {
+    animation-delay: calc(0.1s * var(--i, 0));
+}
+
+.drop-in-badge {
+    color: #4caf50 !important;
+    font-weight: bold !important;
+}

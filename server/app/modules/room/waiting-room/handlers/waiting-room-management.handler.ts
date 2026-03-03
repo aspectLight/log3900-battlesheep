@@ -1,5 +1,9 @@
+import { GameService } from '@app/modules/game/services/game.service';
+import { SIZE_LIMITS } from '@app/modules/shared-room/constants/waiting-room.constants';
+import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
 import { WaitingRoomService } from '@app/modules/shared-room/services/waiting-room.service';
 import { Player } from '@app/shared/interfaces/player';
+import { RoomInfo } from '@app/shared/interfaces/room-info';
 import { WaitingRoomEvents } from '@common/socket.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
@@ -11,7 +15,11 @@ import { Server, Socket } from 'socket.io';
 export class WaitingRoomManagementHandler {
     private readonly logger = new Logger(WaitingRoomManagementHandler.name);
 
-    constructor(private readonly waitingRoomService: WaitingRoomService) {}
+    constructor(
+        private readonly waitingRoomService: WaitingRoomService,
+        private readonly gameRoomService: GameRoomService,
+        private readonly gameService: GameService,
+    ) {}
 
     /**
      * Handles room creation
@@ -37,8 +45,8 @@ export class WaitingRoomManagementHandler {
     handleJoinRoom(roomId: string, socket: Socket): void {
         try {
             const room = this.waitingRoomService.findRoomById(roomId);
-            if (!room) throw new Error('Room does not exist');
-            if (room.isLocked) throw new Error('Room is locked');
+            if (!room) throw new Error("La salle n'existe pas");
+            if (room.isLocked) throw new Error('La salle est verrouillée');
 
             socket.emit(WaitingRoomEvents.JoinRoomResponse, { success: true, room });
             this.waitingRoomService.joinRoom(roomId, socket.id);
@@ -94,6 +102,19 @@ export class WaitingRoomManagementHandler {
     }
 
     /**
+     * Handles drop-in/drop-out toggle
+     */
+    handleToggleDropInDropOut(roomId: string, socket: Socket, server: Server): void {
+        try {
+            const isEnabled = this.waitingRoomService.toggleDropInDropOut(roomId, socket.id);
+            server.to(roomId).emit(WaitingRoomEvents.DropInDropOutToggled, { dropInDropOut: isEnabled });
+            this.logger.log(`Salle ${roomId} drop-in/drop-out ${isEnabled ? 'activé' : 'désactivé'} par ${socket.id}`);
+        } catch (error) {
+            socket.emit(WaitingRoomEvents.WaitingRoomError, error.message);
+        }
+    }
+
+    /**
      * Handles player disconnection
      */
     handleDisconnect(socket: Socket, server: Server): void {
@@ -120,6 +141,65 @@ export class WaitingRoomManagementHandler {
             }
         } catch (error) {
             this.logger.error(`Erreur lors du traitement de la déconnexion du joueur ${socket.id}: ${error.message}`);
+        }
+    }
+
+    async handleGetAvailableRooms(socket: Socket): Promise<void> {
+        try {
+            const waitingRooms = this.waitingRoomService.getAvailableRooms();
+            const gameRooms = this.gameRoomService.getAvailableRooms();
+
+            const roomInfos: RoomInfo[] = [];
+
+            for (const room of waitingRooms) {
+                try {
+                    const game = await this.gameService.getGameById(room.gameId);
+                    const maxPlayers = SIZE_LIMITS[game.board.size] || 2;
+                    roomInfos.push({
+                        roomId: room.roomId,
+                        gameName: game.name,
+                        boardSize: game.board.size,
+                        board: game.board,
+                        mode: game.mode,
+                        playerCount: room.players.length,
+                        maxPlayers,
+                        status: 'waiting',
+                        isLocked: room.isLocked,
+                        dropInDropOut: room.dropInDropOut || false,
+                    });
+                } catch {
+                    this.logger.warn(`Jeu introuvable pour la salle ${room.roomId}`);
+                }
+            }
+
+            for (const room of gameRooms) {
+                try {
+                    const game = await this.gameService.getGameById(room.gameId);
+                    const maxPlayers = SIZE_LIMITS[game.board.size] || 2;
+                    roomInfos.push({
+                        roomId: room.roomId,
+                        gameName: game.name,
+                        boardSize: game.board.size,
+                        board: game.board,
+                        mode: game.mode,
+                        playerCount: room.players.length,
+                        maxPlayers,
+                        status: 'playing',
+                        isLocked: room.isLocked,
+                        dropInDropOut: room.dropInDropOut || false,
+                        abandonedPlayerFirebaseIds: room.abandonedPlayers
+                            .map((ap) => ap.firebaseUid)
+                            .filter((uid): uid is string => !!uid),
+                    });
+                } catch {
+                    this.logger.warn(`Jeu introuvable pour la game room ${room.roomId}`);
+                }
+            }
+
+            socket.emit(WaitingRoomEvents.AvailableRoomsResponse, roomInfos);
+        } catch (error) {
+            this.logger.error(`Erreur lors de la récupération des salles disponibles: ${error.message}`);
+            socket.emit(WaitingRoomEvents.AvailableRoomsResponse, []);
         }
     }
 }

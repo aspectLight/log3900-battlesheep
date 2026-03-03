@@ -43,6 +43,10 @@
         </div>
         @if(isHost) {
         <div class="host-options">
+            <label class="drop-in-toggle">
+                <input type="checkbox" [checked]="room?.dropInDropOut" (change)="toggleDropInDropOut()" />
+                Drop-in/Drop-out
+            </label>
             <button class="lock-btn" (click)="confirmAction('lock')">
                 {{ room?.isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
             </button>

@@ -1,17 +1,18 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { Player } from '@app/classes/entity/player';
 import { BonusChoicesComponent } from '@app/components/player/bonus-choices/bonus-choices.component';
 import { CharacterGridComponent } from '@app/components/player/character-grid/character-grid.component';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
-import { ErrorMessages } from '@common/error-messages.constants';
+import { BonusType, STAT_WITH_BONUS } from '@app/constants/bonus.constants';
 import { ROUTES } from '@app/constants/routes.constants';
 import { Bonus } from '@app/interfaces/character.interface';
+import { Reservation } from '@app/interfaces/reservation.interface';
+import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
 import { GameCreationService } from '@app/services/lobby/game-creation.service';
 import { PlayerCreationService } from '@app/services/lobby/player-creation.service';
-import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
-import { Reservation } from '@app/interfaces/reservation.interface';
-import { Player } from '@app/classes/entity/player';
-import { BonusType, STAT_WITH_BONUS } from '@app/constants/bonus.constants';
+import { ErrorMessages } from '@common/error-messages.constants';
+import { ProfileService } from '@app/services/communication/profile.service';
 
 @Component({
     selector: 'app-create-player-page',
@@ -20,8 +21,6 @@ import { BonusType, STAT_WITH_BONUS } from '@app/constants/bonus.constants';
     imports: [CharacterGridComponent, BonusChoicesComponent, PopUpComponent, RouterLink],
 })
 export class CreatePlayerPageComponent implements OnInit {
-    // ViewChild to remove
-    @ViewChild('playerName') playerNameInput!: ElementRef<HTMLInputElement>;
     showError: boolean;
     errorMessage: string;
     validCharacter: boolean = true;
@@ -36,8 +35,8 @@ export class CreatePlayerPageComponent implements OnInit {
         public gameCreationService: GameCreationService,
         public socketService: RoomSocketService,
         public router: Router,
-
         public roomSocketService: RoomSocketService,
+        public profileService: ProfileService,
     ) {
         this.isHost = this.gameCreationService.isHost;
         this.socketService.getReservedAvatars(this.gameCreationService.gameCode);
@@ -86,17 +85,28 @@ export class CreatePlayerPageComponent implements OnInit {
         this.playerCreationService.selectedBonus = chosenBonus;
     }
 
-    createPlayer() {
+    async createPlayer() {
         if (this.gameModified) return;
-        const playerName = this.playerNameInput.nativeElement.value;
+
+        const playerName = (await this.profileService.getProfile()).username;
         const newPlayer = this.playerCreationService.createPlayer(playerName);
         if (newPlayer) {
-            if (this.isHost) {
+            if (this.gameCreationService.isDropIn) {
+                // Drop-in flow: join a game in progress
+                this.socketService.joinGameRoom(this.gameCreationService.gameCode, newPlayer, (success, error) => {
+                    if (!success) {
+                        this.errorMessage = error || 'Impossible de rejoindre la partie';
+                        this.showError = true;
+                    }
+                    // On success, joinGameRoom callback handles the redirect via gameManagerService
+                });
+            } else if (this.isHost) {
                 this.socketService.createRoom(this.gameCreationService.gameCode, this.gameCreationService.selectedGame._id, newPlayer);
+                this.router.navigate([ROUTES.waiting]);
             } else {
                 this.socketService.createPlayer(this.gameCreationService.gameCode, newPlayer);
+                this.router.navigate([ROUTES.waiting]);
             }
-            this.router.navigate([ROUTES.waiting]);
         } else {
             this.validCharacter = false;
         }

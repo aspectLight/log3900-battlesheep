@@ -8,6 +8,7 @@ import { MODES } from '@app/constants/game.constants';
 export class GameCreationService {
     selectedGame: Game;
     gameCode: string;
+    isDropIn: boolean = false;
 
     private _isHost: boolean = false;
 

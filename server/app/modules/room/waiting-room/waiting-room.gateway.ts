@@ -58,6 +58,11 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
         return this.managementHandler.handleLockRoom(roomId, socket, this.server);
     }
 
+    @SubscribeMessage(WaitingRoomEvents.ToggleDropInDropOut)
+    handleToggleDropInDropOut(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
+        return this.managementHandler.handleToggleDropInDropOut(roomId, socket, this.server);
+    }
+
     // ===== Player Management Events =====
 
     @SubscribeMessage(WaitingRoomEvents.CreatePlayer)
@@ -105,6 +110,13 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
     @SubscribeMessage(WaitingRoomEvents.GetMessagesFromWaitingRoom)
     async handleGetMessagesFromWaitingRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
         return this.chatHandler.handleGetMessagesFromWaitingRoom(roomId, socket);
+    }
+
+    // ===== Room Listing Events =====
+
+    @SubscribeMessage(WaitingRoomEvents.GetAvailableRooms)
+    async handleGetAvailableRooms(@ConnectedSocket() socket: Socket) {
+        return this.managementHandler.handleGetAvailableRooms(socket);
     }
 
     // ===== WebSocket Lifecycle Events =====

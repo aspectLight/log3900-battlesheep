@@ -2,15 +2,15 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Player } from '@app/classes/entity/player';
-import { ChatboxComponent } from '@app/components/shared/chatbox/chatbox.component';
 import { PlayerCardComponent } from '@app/components/player/player-card/player-card.component';
+import { ChatboxComponent } from '@app/components/shared/chatbox/chatbox.component';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { VirtualPlayerType } from '@app/constants/player.constants';
 import { ROUTES } from '@app/constants/routes.constants';
 import { Room } from '@app/interfaces/room.interface';
-import { GameCreationService } from '@app/services/lobby/game-creation.service';
 import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
 import { VirtualPlayerService } from '@app/services/gameplay/virtual-player.service';
+import { GameCreationService } from '@app/services/lobby/game-creation.service';
 import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';
 import { ErrorMessages, WaitRoomWelcomeMessage } from '@common/error-messages.constants';
 import { Subscription } from 'rxjs';
@@ -56,7 +56,7 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
         const isCTF = this.gameCreationService.isCTF;
         const playerCount = this.room.players.length;
 
-        return this.room.isLocked && playerCount > 1 && (!isCTF || (isCTF && playerCount % 2 === 0));
+        return playerCount > 1 && (!isCTF || (isCTF && playerCount % 2 === 0));
     }
 
     get showErrorFromService(): boolean {
@@ -107,6 +107,10 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
     toggleLockRoom() {
         this.socketService.toggleLockRoom(this.code);
         this.resetMessages();
+    }
+
+    toggleDropInDropOut() {
+        this.socketService.toggleDropInDropOut(this.code);
     }
 
     disableUnlockError() {

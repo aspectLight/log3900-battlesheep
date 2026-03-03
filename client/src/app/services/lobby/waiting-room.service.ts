@@ -56,6 +56,12 @@ export class WaitingRoomService {
         this.updateRoom(room);
     }
 
+    toggleDropInDropOut(dropInDropOut: boolean) {
+        const room = this.currentRoom.getValue();
+        room.dropInDropOut = dropInDropOut;
+        this.updateRoom(room);
+    }
+
     maxPlayerLimitReached() {
         this.isError = true;
         this.errorMessage = ErrorMessages.MaxPlayerLimitReached;
