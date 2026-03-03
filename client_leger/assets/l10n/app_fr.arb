@@ -77,6 +77,7 @@
   "profile": "Profil",
   "signOut": "Se déconnecter",
   "connectionHistory": "Historique de connexion",
+  "leaveGame": "Quitter la partie",
   "gameHistory": "Historique des parties",
   "@gameHistory": {
     "description": "Option du menu pour voir l'historique des parties"
@@ -95,5 +96,11 @@
   },
   "@teamMembers": {
     "description": "Liste des membres de l'équipe affichée dans le pied de page"
-  }
+  },
+  "action" : "Action",
+  "date" : "Date",
+  "time" : "Heure",
+  "noEntries" : "Aucune entrée",
+  "result" : "Résultat",
+  "abandoned" : "Abandonnée"
 }

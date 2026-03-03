@@ -63,11 +63,6 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                           label: AppLocalizations.of(context)!.createGame,
                           onPressed: null,
                         ),
-                        const SizedBox(height: 15),
-                        _buildMenuButton(
-                          label: AppLocalizations.of(context)!.administerGames,
-                          onPressed: null,
-                        ),
                       ],
                     ),
                   ),
@@ -158,12 +153,14 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                           label: AppLocalizations.of(
                             context,
                           )!.connectionHistory,
-                          onTap: null,
+                          onTap: () =>
+                              context.router.push(const LogsHistoryRoute()),
                         ),
                         const Divider(height: 1),
                         _buildSettingsOption(
                           label: AppLocalizations.of(context)!.gameHistory,
-                          onTap: null,
+                          onTap: () =>
+                              context.router.push(const GameHistoryRoute()),
                         ),
                       ],
                     ),
