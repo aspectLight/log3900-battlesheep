@@ -13,29 +13,15 @@ export class ActionsHudComponent {
     constructor(private gameManager: GameManagerService) {}
 
     get playerCardList(): PlayerCard[] {
-        const activePlayers = this.gameManager.getPlayers();
-        const disconnectedPlayers = this.gameManager.disconnectedPlayer;
-        const allPlayers = [
-            ...activePlayers.map((player) => ({
-                player,
-                isActive: this.gameManager.currentPlayerId === player.id,
-                isHost: this.gameManager.room.hostId === player.id,
-                playerColor: player.color,
-                isDisconnected: false,
-                playerTeam: player.team ? player.team : null,
-                hasFlag: this.gameManager.playerWithFlag === player.id,
-            })),
-            ...disconnectedPlayers.map((player) => ({
-                player,
-                isActive: false,
-                isHost: false,
-                playerColor: player.color,
-                isDisconnected: true,
-                playerTeam: player.team ? player.team : null,
-            })),
-        ];
-
-        return allPlayers;
+        return this.gameManager.getPlayers().map((player) => ({
+            player,
+            isActive: this.gameManager.currentPlayerId === player.id,
+            isHost: this.gameManager.room.hostId === player.id,
+            playerColor: player.color,
+            isDisconnected: false,
+            playerTeam: player.team ? player.team : null,
+            hasFlag: this.gameManager.playerWithFlag === player.id,
+        }));
     }
 
     toggleCard(index: number) {

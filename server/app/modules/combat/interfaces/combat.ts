@@ -9,4 +9,6 @@ export interface Combat {
     currentPlayerId: string;
     currentOpponentId: string;
     turnTimer?: NodeJS.Timeout;
+    attackerHealthPts: number;
+    defenderHealthPts: number;
 }

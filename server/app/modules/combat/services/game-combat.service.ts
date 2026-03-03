@@ -22,8 +22,6 @@ import { Server } from 'socket.io';
 @Injectable()
 export class GameCombatService {
     private readonly logger = new Logger(GameCombatService.name);
-    private attackerHealthPts: number;
-    private defenderHealthPts: number;
     private activeCombats: Combat[] = [];
     private server: Server;
     private generalRoom: GameRoom;
@@ -45,8 +43,6 @@ export class GameCombatService {
 
         const currentPlayerId = attacker.stats['speed'].value >= defender.stats['speed'].value ? attacker.id : defender.id;
         const currentOpponentId = currentPlayerId === attackerId ? defender.id : attacker.id;
-        this.attackerHealthPts = attacker.stats['health'].value;
-        this.defenderHealthPts = defender.stats['health'].value;
         const newCombat: Combat = {
             associatedRoomId,
             combatRoomId,
@@ -56,6 +52,8 @@ export class GameCombatService {
             currentPlayerId,
             currentOpponentId,
             turnTimer: undefined,
+            attackerHealthPts: attacker.stats['health'].value,
+            defenderHealthPts: defender.stats['health'].value,
         };
         newCombat.players.forEach((player) => (player.evasionPoints = EVASION_PTS));
         this.activeCombats.push(newCombat);
@@ -72,16 +70,31 @@ export class GameCombatService {
         }
         const combatRoomId = currentRoom.combatRoomId;
         const currentPlayer = this.findPlayerById(combatId, currentRoom.currentPlayerId);
-        const playerInitialHealth = this.isCurrentPlayerAttacker(combatId) ? this.attackerHealthPts : this.defenderHealthPts;
+        const playerInitialHealth = this.isCurrentPlayerAttacker(combatId) ? currentRoom.attackerHealthPts : currentRoom.defenderHealthPts;
 
         const turnDuration = currentPlayer.evasionPoints > 0 ? TURN_DURATION : TURN_DURATION_WITHOUT_EVASION;
         let countdown = turnDuration;
         const randomDelay = currentPlayer.isVirtual && currentPlayer.evasionPoints > 0 ? this.getRandomDelay(true) : this.getRandomDelay(false);
-        currentRoom.turnTimer = setInterval(() => {
+
+        // Capture currentTimerId locally so the closure can verify it is still the active timer.
+        // This prevents ghost timers from interfering when a new turn starts before this one
+        // is fully cleaned up (race condition with setInterval callbacks).
+        let currentTimerId: ReturnType<typeof setInterval> | undefined;
+        currentTimerId = setInterval(() => {
             const combat = this.findCombatRoomById(combatId);
             if (!combat) {
-                this.logger.warn(`[${combatId}] 🔴 Timer callback - combat not found, clearing timer ${currentRoom.turnTimer}`);
-                clearInterval(currentRoom.turnTimer);
+                this.logger.warn(`[${combatId}] 🔴 Timer callback - combat not found, clearing timer ${currentTimerId}`);
+                clearInterval(currentTimerId);
+                return;
+            }
+
+            // Guard: if currentRoom.turnTimer no longer points to this timer, we are a stale
+            // ghost callback — self-terminate without touching the active timer.
+            if (currentRoom.turnTimer !== currentTimerId) {
+                this.logger.warn(
+                    `[${combatId}] 👻 Ghost timer detected - currentTimerId=${currentTimerId}, active turnTimer=${currentRoom.turnTimer}. Stopping ghost.`,
+                );
+                clearInterval(currentTimerId);
                 return;
             }
 
@@ -92,10 +105,9 @@ export class GameCombatService {
             this.server.to(combatRoomId).emit(GameRoomEvents.UpdateCombatCountDown, countdown);
             countdown--;
             if (countdown < 0 || (currentPlayer.isVirtual && countdown === randomDelay)) {
-                this.logger.warn(
-                    `[${combatId}] 🛑 Timer stopping condition met - countdown=${countdown}, attempting to clear timer ${currentRoom.turnTimer}`,
-                );
-                clearInterval(currentRoom.turnTimer);
+                this.logger.warn(`[${combatId}] 🛑 Timer stopping condition met - countdown=${countdown}, clearing own timer ${currentTimerId}`);
+                clearInterval(currentTimerId);
+                currentRoom.turnTimer = undefined;
 
                 if (!this.findCombatRoomById(combatId)) {
                     return;
@@ -112,10 +124,12 @@ export class GameCombatService {
                         this.attack(combatId);
                     }
                 } else {
+                    // Real player did not act in time — auto-attack on their behalf
                     this.attack(combatId);
                 }
             }
         }, COUNTDOWN_INTERVAL);
+        currentRoom.turnTimer = currentTimerId;
         this.logger.log(`[${combatId}] ✅ Timer created: ${currentRoom.turnTimer} for player ${currentPlayer.name}`);
     }
 
@@ -145,10 +159,15 @@ export class GameCombatService {
             const currentPlayer = this.findPlayerById(combatId, currentRoom.currentPlayerId);
             const currentOpponent = this.findPlayerById(combatId, currentRoom.currentOpponentId);
 
-            const playerCell = currentPlayer.position ? this.gameMovementService.getCell(currentPlayer.position.x, currentPlayer.position.y) : null;
+            const associatedRoom = this.gameRoomService.findRoomById(currentRoom.associatedRoomId);
+            const gameId = associatedRoom.gameId;
+
+            const playerCell = currentPlayer.position
+                ? this.gameMovementService.getCell(currentRoom.associatedRoomId, currentPlayer.position.x, currentPlayer.position.y)
+                : null;
 
             const opponentCell = currentOpponent.position
-                ? this.gameMovementService.getCell(currentOpponent.position.x, currentOpponent.position.y)
+                ? this.gameMovementService.getCell(currentRoom.associatedRoomId, currentOpponent.position.x, currentOpponent.position.y)
                 : null;
 
             const playerTileType = playerCell?.tile?.type || 'snow';
@@ -170,6 +189,8 @@ export class GameCombatService {
 
             if (attackResult > 0) {
                 currentOpponent.stats['health'].value -= damage;
+                // Re-evaluate propaganda: the buff activates when health drops below the threshold
+                this.gameRoomService.reevaluatePropaganda(currentOpponent);
             }
 
             const room = this.gameRoomService.findRoomById(currentRoom.associatedRoomId);
@@ -215,6 +236,21 @@ export class GameCombatService {
             }
 
             const currentPlayer = this.findPlayerById(combatId, currentRoom.currentPlayerId);
+
+            // Barbed wire: if the attacker (instigator) has barbed wire, the defender cannot flee
+            if (currentPlayer.id !== currentRoom.attackerId) {
+                const attacker = this.findPlayerById(combatId, currentRoom.attackerId);
+                const attackerHasBarbedWire = attacker.inventory?.some((i) => i?.type === 'barbedWire');
+                if (attackerHasBarbedWire) {
+                    currentPlayer.evasionPoints -= 1;
+                    this.server
+                        .to(currentRoom.combatRoomId)
+                        .emit(GameRoomEvents.FlightAttemptResult, { isSuccess: false, attackerEvasionPoints: currentPlayer.evasionPoints });
+                    this.prepareNextTurn(combatId);
+                    return;
+                }
+            }
+
             const flightSuccess = Math.random() <= FLIGHT_CHANCES;
             if (flightSuccess) {
                 const room = this.gameRoomService.findRoomById(currentRoom.associatedRoomId);
@@ -329,9 +365,12 @@ export class GameCombatService {
     updateHealthPoints(combatId: string) {
         const currentRoom = this.findCombatRoomById(combatId);
         const attacker = this.findPlayerById(combatId, currentRoom.attackerId);
-        attacker.stats['health'].value = this.attackerHealthPts;
+        attacker.stats['health'].value = currentRoom.attackerHealthPts;
         const defender = this.findPlayerById(combatId, currentRoom.defenderId);
-        defender.stats['health'].value = this.defenderHealthPts;
+        defender.stats['health'].value = currentRoom.defenderHealthPts;
+        // After health is restored to pre-combat values, deactivate propaganda if health is now above threshold
+        this.gameRoomService.reevaluatePropaganda(attacker);
+        this.gameRoomService.reevaluatePropaganda(defender);
     }
 
     findCombatsByPlayerId(playerId: string): Combat[] {
