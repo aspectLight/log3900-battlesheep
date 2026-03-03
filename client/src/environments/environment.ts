@@ -13,7 +13,8 @@ export const environment = {
         appId: '1:93329584718:web:5e214b2f3b60e64e68491f',
         measurementId: 'G-Y2307NYVWE',
     },
-    baseUrl: 'http://35.182.177.104:3000',
+    // baseUrl: 'http://35.182.177.104:3000',
+    baseUrl: 'http://localhost:3000',
     get serverUrl() {
         return `${this.baseUrl}/api`;
     },
