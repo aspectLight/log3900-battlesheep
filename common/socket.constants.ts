@@ -32,6 +32,12 @@ export enum WaitingRoomEvents {
     GetMessagesResponse = 'getMessagesResponse',
 
     WaitingRoomError = 'waitingRoomError',
+
+    GetAvailableRooms = 'getAvailableRooms',
+    AvailableRoomsResponse = 'availableRoomsResponse',
+
+    ToggleDropInDropOut = 'toggleDropInDropOut',
+    DropInDropOutToggled = 'dropInDropOutToggled',
 }
 
 export enum GameRoomEvents {
@@ -95,6 +101,10 @@ export enum GameRoomEvents {
     VirtualPlayerAttack = 'virtualPlayerAttack',
     StartVirtualCombat = 'startVirtualCombat',
     OrganizatorChanged = 'organizatorChanged',
+
+    JoinGameRoom = 'joinGameRoom',
+    JoinGameRoomResponse = 'joinGameRoomResponse',
+    PlayerJoinedGame = 'playerJoinedGame',
 }
 
 export enum ChatEvents {

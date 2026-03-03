@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Auth } from '@angular/fire/auth';
+import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { Item } from '@app/classes/entity/item';
 import { Player } from '@app/classes/entity/player';
@@ -62,6 +62,14 @@ export class SocketService implements ISocketService {
     }
 
     async connect() {
+        // Wait for Firebase Auth to restore user state after page refresh
+        await new Promise<void>((resolve) => {
+            const unsub = onAuthStateChanged(this.auth, () => {
+                unsub();
+                resolve();
+            });
+        });
+
         const user = this.auth.currentUser;
         const sessionId = this.session.sessionId;
 

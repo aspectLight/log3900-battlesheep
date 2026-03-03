@@ -8,6 +8,7 @@ export interface Room {
     futurePlayers?: string[];
     reservedAvatars?: Reservation[];
     isLocked: boolean;
+    dropInDropOut: boolean;
     messages: { type: string; content: string; time: string }[];
 }
 

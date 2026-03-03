@@ -4,21 +4,21 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Board } from '@app/classes/board/board';
 import { Cell } from '@app/classes/board/cell';
-import { Game } from '@app/classes/game/game';
 import { Item } from '@app/classes/entity/item';
 import { Player } from '@app/classes/entity/player';
+import { Game } from '@app/classes/game/game';
 import { BonusType } from '@app/constants/bonus.constants';
 import { ITEM_TYPES } from '@app/constants/item.constants';
 import { ROUTES } from '@app/constants/routes.constants';
 import { Coords } from '@app/interfaces/coords.interface';
 import { Room } from '@app/interfaces/room.interface';
-import { API_ENDPOINTS } from '@common/api-endpoints.constants';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { environment } from 'src/environments/environment';
-import { GameRoomService } from '@app/services/state/game-room.service';
 import { MovementService } from '@app/services/gameplay/movement.service';
 import { PathService } from '@app/services/gameplay/path.service';
 import { HistoryService } from '@app/services/history/history.service';
+import { GameRoomService } from '@app/services/state/game-room.service';
+import { API_ENDPOINTS } from '@common/api-endpoints.constants';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root',
@@ -28,7 +28,7 @@ export class GameManagerService {
 
     notificationTime: number;
     isNotificationVisible: boolean = false;
-    
+
     isGameCanceled: boolean = false;
     isGameFinished: boolean = false;
     isGameLoaded: boolean = false;
@@ -112,13 +112,14 @@ export class GameManagerService {
         this.isGameFinished = false;
         this.isGameLoaded = false;
         this.disconnectedPlayer = [];
+        this.clearPaths();
     }
 
     cancelGame() {
         this.isGameCanceled = true;
         const startDate = this.historyStartDateIso;
         if (startDate) {
-            this.historyService.abandonGameHistory(startDate).catch((e) => console.warn('abandonGameHistory failed', e));            
+            this.historyService.abandonGameHistory(startDate).catch((e) => console.warn('abandonGameHistory failed', e));
             this.historyStartDateIso = null;
         }
     }
@@ -131,7 +132,7 @@ export class GameManagerService {
 
         if (startDate) {
             const won = this.hasWon();
-            this.historyService.endGameHistory(startDate, won).catch((e) => console.warn('endGameHistory failed', e));            
+            this.historyService.endGameHistory(startDate, won).catch((e) => console.warn('endGameHistory failed', e));
             this.historyStartDateIso = null;
         }
 
@@ -144,32 +145,32 @@ export class GameManagerService {
         }
     }
 
-    loadGame(): Observable<Game> {
+    loadGame(currentBoard?: any): Observable<Game> {
         const subject = new Subject<Game>();
-      
+
         if (this.room.gameId) {
-          this.fetchGame(this.room.gameId).subscribe(async (game) => {
-            this.game = new Game(game);
-            this.board = this.game.board;
-            this.isGameLoaded = true;
-      
-            if (!this.historyStartDateIso) {
-              const mode: 'Classique' | 'CTF' = this.game.isCTF ? 'CTF' : 'Classique';
-              try {
-                const res = await this.historyService.startGameHistory(mode);
-                this.historyStartDateIso = res.startDate;
-              } catch (e) {
-                console.warn('Impossible de créer l’historique de partie:', e);
-              }
-            }
-      
-            subject.next(game);
-            subject.complete();
-          });
+            this.fetchGame(this.room.gameId).subscribe(async (game) => {
+                this.game = new Game(game);
+                this.board = currentBoard ? new Board(currentBoard) : this.game.board;
+                this.isGameLoaded = true;
+
+                if (!this.historyStartDateIso) {
+                    const mode: 'Classique' | 'CTF' = this.game.isCTF ? 'CTF' : 'Classique';
+                    try {
+                        const res = await this.historyService.startGameHistory(mode);
+                        this.historyStartDateIso = res.startDate;
+                    } catch (e) {
+                        console.warn("Impossible de créer l'historique de partie:", e);
+                    }
+                }
+
+                subject.next(game);
+                subject.complete();
+            });
         }
-      
+
         return subject.asObservable();
-      }
+    }
 
     fetchGame(gameId: string): Observable<Game> {
         return this.http.get<Game>(environment.serverUrl + API_ENDPOINTS.games + gameId);
@@ -183,12 +184,14 @@ export class GameManagerService {
         return this.board;
     }
 
-    addPlayersToBoard(players: Player[]): boolean {
+    addPlayersToBoard(players: Player[], useCurrentPosition = false): boolean {
         const uniqueItems = { ...ITEM_TYPES };
 
         for (const p of players) {
             const player = Player.fromObject(p);
-            const cell = this.board.getCell(player.spawnPoint.x, player.spawnPoint.y);
+            const currentPosition = (p as any).position as Coords | undefined;
+            const coords = useCurrentPosition && currentPosition ? currentPosition : player.spawnPoint;
+            const cell = this.board.getCell(coords.x, coords.y);
             if (!cell) {
                 return false;
             }
@@ -200,12 +203,26 @@ export class GameManagerService {
             cell.addEntity(player);
         }
 
+        const spawnPointColorMap = new Map<string, string>();
+        for (const p of players) {
+            const sp = (p as any).spawnPoint as Coords | undefined;
+            if (sp) {
+                spawnPointColorMap.set(`${sp.x},${sp.y}`, (p as any).color ?? 'yellow');
+            }
+        }
+
         const matrix = this.board.matrix;
         for (const row of matrix) {
             for (const cell of row) {
                 if (cell.item && !cell.player) {
                     if (cell.item.type === 'spawnPoint') {
-                        cell.item = null;
+                        const key = `${cell.x},${cell.y}`;
+                        const color = spawnPointColorMap.get(key);
+                        if (!color) {
+                            cell.item = null;
+                        } else {
+                            cell.item.imagePath = `assets/items/${color}_spawn.gif`;
+                        }
                     } else if (cell.item.type === 'random') {
                         const seed = this.room.roomId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
                         const availableItems = Object.keys(uniqueItems).filter(
@@ -273,7 +290,12 @@ export class GameManagerService {
         if (playerIndex !== -1) {
             const [disconnected] = this.room.players.splice(playerIndex, 1);
             this.disconnectedPlayer.push(disconnected);
-            this.getPlayerById(playerId)?.clearInfo();
+            const boardPlayer = this.getPlayerById(playerId);
+            if (boardPlayer?.spawnPoint) {
+                const spawnCell = this.board.getCell(boardPlayer.spawnPoint.x, boardPlayer.spawnPoint.y);
+                if (spawnCell) spawnCell.item = null;
+            }
+            boardPlayer?.clearInfo();
             this.removePlayer(playerId);
         }
     }
@@ -322,10 +344,14 @@ export class GameManagerService {
         this.resetPlayerSelection();
 
         if (result.success && result.cell) {
-            const collectedItem = this.handleItemCollection(result.cell);
+            // Only detect the item — don't mutate the board or inventory.
+            // The server will broadcast ItemCollected after validation.
+            const detected = this.detectItemOnCell(result.cell);
             if (callback) {
-                callback(collectedItem?.item, collectedItem?.cell);
+                callback(detected?.item, detected?.cell);
             }
+        } else if (callback) {
+            callback(undefined, undefined);
         }
         this.pathService.clearPath();
     }
@@ -438,13 +464,28 @@ export class GameManagerService {
         if (!playerCoords) {
             return;
         }
-        const emptyCells = this.board.getTwoNearestEmptyCells(playerCoords);
+
+        loser.updateItemsEffect(-1);
+
+        // Collect distinct items to drop
+        const itemsToDrop: Item[] = [];
         for (let i = 0; i < 2; i++) {
-            if (loser.inventory[i]) {
-                loser.updateItemsEffect(-1);
-                this.dropItem(loser.inventory[i] as Item, emptyCells[i]);
+            const item = loser.inventory[i];
+            if (item && !itemsToDrop.includes(item)) {
+                itemsToDrop.push(item);
             }
         }
+
+        const emptyCells = this.board.getTwoNearestEmptyCells(playerCoords);
+
+        for (let i = 0; i < itemsToDrop.length; i++) {
+            const targetCell = emptyCells[i];
+            if (!targetCell) break;
+            this.dropItem(itemsToDrop[i], targetCell);
+            // Update the local board immediately so the next BFS (if any) sees this cell as occupied.
+            this.addItemToBoard(itemsToDrop[i], targetCell);
+        }
+
         loser.inventory = [null, null];
     }
 
@@ -456,29 +497,52 @@ export class GameManagerService {
         this.router.navigate([ROUTES.game]);
     }
 
-    private handleItemCollection(cell: Cell): { item: Item; cell: Cell } | undefined {
+    /**
+     * Server-authoritative item collection. Called when the server broadcasts
+     * ItemCollected to confirm that a player has picked up an item.
+     */
+    collectItem(playerId: string, item: Item, position: Coords, inventoryFull: boolean): void {
+        // Remove the item from the board cell — the server has already removed it
+        const cell = this.board.getCell(position.x, position.y);
+        if (cell?.item) {
+            cell.removeItem();
+        }
+
+        const player = this.board.getPlayerById(playerId);
+        if (!player) return;
+
+        // The server's Item only has { type: string }. Reconstruct a full client-side
+        // Item instance with name, description, imagePath from ITEM_TYPES.
+        let fullItem: Item;
+        try {
+            fullItem = new Item(item.type);
+        } catch {
+            return; // Unknown item type : ignore
+        }
+
+        if (inventoryFull) {
+            if (playerId === this.mainPlayerId) {
+                player.replaceItem(fullItem, position);
+            }
+            return;
+        }
+
+        player.addItem(fullItem);
+    }
+
+    /**
+     * Detects if there is a collectable item on a cell WITHOUT modifying the board.
+     * Used after movement animation to decide whether to emit ItemCollected to the server.
+     */
+    private detectItemOnCell(cell: Cell): { item: Item; cell: Cell } | undefined {
         if (!cell.item) {
             return undefined;
         }
+
         const item = cell.item;
         if (item.type === 'spawnPoint') {
             return undefined;
         }
-
-        let playerToUpdate: Player | null;
-        if (this.isPlayerTurn && this.mainPlayer) {
-            playerToUpdate = this.mainPlayer;
-        }
-        playerToUpdate = this.getBoard().getPlayerById(this.currentPlayerId);
-
-        if (!playerToUpdate) {
-            return undefined;
-        }
-        if (playerToUpdate.addItem(item) !== true) {
-            playerToUpdate.replaceItem(item, { x: cell.x, y: cell.y });
-        }
-
-        cell.removeItem();
         return { item, cell };
     }
 
@@ -490,11 +554,10 @@ export class GameManagerService {
     endCanceledGame() {
         this.isGameCanceled = true;
         const startDate = this.historyStartDateIso;
-      
+
         if (startDate) {
-          this.historyService.endGameHistory(startDate, false)
-            .catch((e) => console.warn('endGameHistory failed', e));
-          this.historyStartDateIso = null;
+            this.historyService.endGameHistory(startDate, false).catch((e) => console.warn('endGameHistory failed', e));
+            this.historyStartDateIso = null;
         }
     }
 }

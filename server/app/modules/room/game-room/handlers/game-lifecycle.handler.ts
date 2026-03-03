@@ -28,7 +28,7 @@ export class GameLifecycleHandler {
     async handlePlayGame(roomId: string, socket: Socket, server: Server): Promise<void> {
         try {
             const room = this.gameRoomService.findRoomById(roomId);
-            room.players = await this.gameMovementService.addPlayersToBoard(room.gameId, room.players);
+            room.players = await this.gameMovementService.addPlayersToBoard(roomId, room.gameId, room.players);
             server.to(roomId).emit(GameRoomEvents.PlayerSpawned, room.players);
             this.gameRoomService.setServer(server);
             this.gameRoomService.prepareNextTurn(roomId);
@@ -63,8 +63,10 @@ export class GameLifecycleHandler {
      */
     async handleLeaveEndGame(roomId: string, socket: Socket, server: Server): Promise<void> {
         try {
+            const room = this.gameRoomService.findRoomById(roomId);
             socket.leave(roomId);
             if ((await server.in(roomId).fetchSockets()).length === 0) {
+                if (room) this.gameMovementService.removeBoard(roomId);
                 this.gameRoomService.deleteRoomById(roomId);
             }
         } catch (error) {
