@@ -4,6 +4,13 @@ export interface ItemType {
     imagePath: string;
 }
 
+export const ADRENALINE_HEALTH_BOOST = 2;
+export const VODKA_ATTACK_BOOST = 2;
+export const VODKA_SPEED_REDUCTION = 1;
+export const PROPAGANDA_ATTACK_BOOST = 5;
+export const PROPAGANDA_DEFENSE_BOOST = 5;
+export const PROPAGANDA_HEALTH_THRESHOLD = 3;
+
 export const ITEM_TYPES: { [key: string]: ItemType } = {
     adrenaline: {
         name: 'Adrenaline',
