@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '@app/services/communication/chat.service';
+import { PROFILE_AVATARS } from '@app/constants/profile.constants';
 const MAX_MESSAGE_LENGTH = 200;
 
 @Component({
@@ -19,9 +20,7 @@ export class ChatboxComponent implements OnInit, AfterViewInit {
 
     newMessage: string = '';
 
-    constructor(
-        private chatService: ChatService,
-    ) {
+    constructor(private chatService: ChatService) {
         this.scrollToBottom();
     }
 
@@ -31,6 +30,12 @@ export class ChatboxComponent implements OnInit, AfterViewInit {
 
     get name() {
         return this.chatService.playerName;
+    }
+
+    getAvatarImage(avatarId?: string | null): string | null {
+        if (!avatarId) return null;
+        const avatar = PROFILE_AVATARS.find((a) => a.id === avatarId);
+        return avatar ? avatar.image : null;
     }
 
     ngOnInit() {

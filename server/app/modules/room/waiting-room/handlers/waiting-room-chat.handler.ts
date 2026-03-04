@@ -21,6 +21,10 @@ export class WaitingRoomChatHandler {
      */
     async handleSendMessage(data: { message: string; playerName: string | null; roomId: string }, socket: Socket, server: Server): Promise<void> {
         try {
+            const room = this.waitingRoomService.findRoomById(data.roomId);
+            const player = room?.players.find((p) => p.name === data.playerName);
+            const avatarId = player?.avatar?.name ? player.avatar.name.toLowerCase() : undefined;
+
             const message = {
                 type: 'received',
                 name: data.playerName,
@@ -31,6 +35,7 @@ export class WaitingRoomChatHandler {
                     second: '2-digit',
                     hour12: false,
                 }),
+                avatarId,
             };
 
             this.waitingRoomService.addMessage(data.roomId, message);

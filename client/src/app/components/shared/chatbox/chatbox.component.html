@@ -16,7 +16,15 @@
         <div class="chatbox-messages" #chatboxMessages>
             @for (msg of messages; track $index) {
             <div class="message">
-                <div class="message-content">{{ msg.time }} - {{ msg.name }}: {{ msg.content }}</div>
+                @if (getAvatarImage(msg.avatarId)) {
+                <div class="message-avatar">
+                    <img [src]="getAvatarImage(msg.avatarId)" alt="Avatar" class="avatar-icon" />
+                </div>
+                }
+                <div class="message-content">
+                    <span class="message-meta">{{ msg.time }} - {{ msg.name }}:</span>
+                    <span class="message-text"> {{ msg.content }} </span>
+                </div>
             </div>
             }
         </div>
