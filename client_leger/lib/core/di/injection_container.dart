@@ -6,15 +6,23 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/repositories/chat_repository_impl.dart';
+import '../../data/repositories/game_history_repository_impl.dart';
+import '../../data/repositories/logs_history_repository_impl.dart';
 import '../../data/services/firebase_auth_service.dart';
 import '../../data/services/http_auth_service.dart';
+import '../../data/services/http_history_service.dart';
 import '../../data/services/socket_service.dart';
 import '../../domain/interfaces/repositories/auth_repository.dart';
 import '../../domain/interfaces/repositories/chat_repository.dart';
+import '../../domain/interfaces/repositories/game_history_repository.dart';
+import '../../domain/interfaces/repositories/logs_history_repository.dart';
 import '../../domain/interfaces/services/auth_service.dart';
 import '../../domain/interfaces/services/firebase_auth_service.dart';
+import '../../domain/interfaces/services/history_service.dart';
 import '../../domain/interfaces/services/socket_service.dart';
+import '../../presentation/screens/game_history/game_history_view_model.dart';
 import '../../presentation/screens/login/login_view_model.dart';
+import '../../presentation/screens/logs_history/logs_history_view_model.dart';
 import '../../presentation/screens/main_menu/main_menu_view_model.dart';
 import '../../presentation/screens/sign_up/sign_up_view_model.dart';
 import '../../presentation/widgets/avatar_picker/avatar_picker_view_model.dart';
@@ -62,6 +70,10 @@ void _registerServices() {
   getIt.registerLazySingleton<FirebaseAuthService>(FirebaseAuthServiceImpl.new);
 
   getIt.registerLazySingleton<SocketService>(SocketServiceImpl.new);
+
+  getIt.registerLazySingleton<HistoryService>(
+    () => HttpHistoryService(credentials: getIt<SessionCredentials>()),
+  );
 }
 
 void _registerRepositories() {
@@ -70,6 +82,14 @@ void _registerRepositories() {
       authService: getIt<AuthService>(),
       firebaseAuthService: getIt<FirebaseAuthService>(),
     ),
+  );
+
+  getIt.registerLazySingleton<LogsHistoryRepository>(
+    () => LogsHistoryRepositoryImpl(getIt<HistoryService>()),
+  );
+
+  getIt.registerLazySingleton<GameHistoryRepository>(
+    () => GameHistoryRepositoryImpl(getIt<HistoryService>()),
   );
 
   getIt.registerLazySingleton<ChatRepository>(
@@ -121,6 +141,14 @@ void _registerViewModels() {
     ),
   );
   getIt.registerLazySingleton<ChatLineViewModel>(ChatLineViewModel.new);
+
+  getIt.registerFactory<LogsHistoryViewModel>(
+    () => LogsHistoryViewModel(getIt<LogsHistoryRepository>()),
+  );
+
+  getIt.registerFactory<GameHistoryViewModel>(
+    () => GameHistoryViewModel(getIt<GameHistoryRepository>()),
+  );
 }
 
 void _registerRouting() {

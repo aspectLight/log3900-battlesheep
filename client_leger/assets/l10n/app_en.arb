@@ -257,5 +257,15 @@
   "send": "Send",
   "@send": {
     "description": "Text for the send message button"
-  }
+  },
+  "leaveGame": "Leave Game",
+  "@send": {
+    "description": "Text for the leave game button"
+  },
+  "action" : "Action",
+  "date" : "Date",
+  "time" : "Time",
+  "noEntries" : "No entry",
+  "result" : "Result",
+  "abandoned" : "Abandonned"
 }

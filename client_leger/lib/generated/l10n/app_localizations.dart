@@ -470,11 +470,53 @@ abstract class AppLocalizations {
   /// **'None'**
   String get none;
 
-  /// Text for the send message button
+  /// Text for the leave game button
   ///
   /// In en, this message translates to:
   /// **'Send'**
   String get send;
+
+  /// No description provided for @leaveGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave Game'**
+  String get leaveGame;
+
+  /// No description provided for @action.
+  ///
+  /// In en, this message translates to:
+  /// **'Action'**
+  String get action;
+
+  /// No description provided for @date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// No description provided for @time.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get time;
+
+  /// No description provided for @noEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'No entry'**
+  String get noEntries;
+
+  /// No description provided for @result.
+  ///
+  /// In en, this message translates to:
+  /// **'Result'**
+  String get result;
+
+  /// No description provided for @abandoned.
+  ///
+  /// In en, this message translates to:
+  /// **'Abandonned'**
+  String get abandoned;
 }
 
 class _AppLocalizationsDelegate

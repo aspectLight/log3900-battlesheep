@@ -6,4 +6,9 @@ class ApiEndpoints {
   static const String logout = '/auth/logout';
   static const String deleteAccount = '/auth/account';
   static const String getEmailByUsername = '/auth/get-email-by-username';
+  static const String loginHistory = '/auth/history/logins';
+  static const String gameHistory = '/auth/history/games';
+  static const String startGameHistory = '/auth/history/games/start';
+  static const String endGameHistory = '/auth/history/games/end';
+  static const String abandonGameHistory = '/auth/history/games/abandon';
 }
