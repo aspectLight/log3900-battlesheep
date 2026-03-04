@@ -63,5 +63,6 @@ export const enum WARNING_MESSAGES {
     VisibilityWarning = 'Vous allez modifier la visibilité de ce jeu, voulez vous continuer ?',
     SaveConfirmation = 'Voulez vous sauvegarder les mofification ?',
     QuitEdit = 'Attention, les modifications ne sont pas enregistrées, voulez-vous vraiment quitter ?',
+    QuitChannel = 'Voulez-vous vraiment supprimer ce canal ?',
 }
 export const WaitRoomWelcomeMessage = "Bienvenue dans la salle d'attente, partagez le code de la partie avec vos amis !";
