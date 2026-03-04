@@ -3,11 +3,15 @@ import { GetEmailByUsernameDto, LoginDto, RegisterUserDto, UpdateUserDto, Verify
 import { AuthGuard } from '@app/modules/auth/guards/auth.guard';
 import { UserDocument } from '@app/modules/auth/schemas/user.schema';
 import { AuthService } from '@app/modules/auth/services/auth.service';
+import { GeneralChatGateway } from '@app/modules/general-chat/general-chat.gateway';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Post, UseGuards } from '@nestjs/common';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(
+        private readonly authService: AuthService,
+        private readonly generalChatGateway: GeneralChatGateway,
+    ) {}
 
     // POST /auth/register
     @Post('register')
@@ -126,8 +130,9 @@ export class AuthController {
     @Delete('account')
     @UseGuards(AuthGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
-    async deleteAccount(@CurrentUser('firebaseUid') uid: string) {
-        await this.authService.deleteUser(uid);
+    async deleteAccount(@CurrentUser() user: UserDocument) {
+        await this.generalChatGateway.forceDisconnectUser(user.username);
+        await this.authService.deleteUser(user.firebaseUid);
     }
 
     // POST /auth/history/games/start

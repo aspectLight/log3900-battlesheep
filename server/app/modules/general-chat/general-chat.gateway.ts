@@ -274,11 +274,44 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         }
     }
 
+    async forceDisconnectUser(username: string): Promise<void> {
+        // Cancel any pending disconnection timeout
+        const existingTimeout = this.disconnectionTimeouts.get(username);
+        if (existingTimeout) {
+            clearTimeout(existingTimeout);
+            this.disconnectionTimeouts.delete(username);
+        }
+
+        // Find all sockets for this user and remove them from the map before disconnecting,
+        // so that handleDisconnect won't create new timeouts for the deleted user
+        const socketsToDisconnect: Socket[] = [];
+        for (const [socketId, socketUsername] of this.socketIdToUsername.entries()) {
+            if (socketUsername === username) {
+                const socket = this.server.sockets.sockets.get(socketId);
+                if (socket) {
+                    socketsToDisconnect.push(socket);
+                }
+                this.socketIdToUsername.delete(socketId);
+            }
+        }
+
+        for (const socket of socketsToDisconnect) {
+            socket.disconnect(true);
+        }
+
+        this.logger.log(`Déconnexion forcée effectuée pour ${username}`);
+    }
+
     async handleDisconnect(socket: Socket): Promise<void> {
         const username = this.socketIdToUsername.get(socket.id);
 
         if (username) {
             const timeout = setTimeout(async () => {
+                // Skip if the timeout was cancelled
+                if (!this.disconnectionTimeouts.has(username)) {
+                    return;
+                }
+
                 try {
                     const user = await this.authService.getUserByUsername(username);
                     await this.authService.logout(user.firebaseUid);

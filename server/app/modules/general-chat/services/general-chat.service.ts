@@ -42,4 +42,13 @@ export class GeneralChatService implements OnModuleInit {
         const doc = await this.historyModel.findOne({ roomId: GENERAL_ROOM_ID }, { messages: 1 });
         return (doc?.messages as unknown as ChatMessage[]) ?? [];
     }
+
+    /** Remplace un nom d'utilisateur par un placeholder dans tous les messages. */
+    async replaceUsername(oldName: string, newName: string): Promise<void> {
+        await this.historyModel.updateOne(
+            { roomId: GENERAL_ROOM_ID },
+            { $set: { 'messages.$[elem].name': newName } },
+            { arrayFilters: [{ 'elem.name': oldName }] },
+        );
+    }
 }

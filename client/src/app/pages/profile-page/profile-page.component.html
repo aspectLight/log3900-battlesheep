@@ -21,6 +21,16 @@
         ></app-pop-up>
         } @if (showErrorMessage) {
         <app-pop-up [popUpMessage]="'Erreur'" [description]="errorMessage" [firstOption]="'Ok'" (confirm)="onErrorConfirm()"></app-pop-up>
+        } @if (showDeleteConfirm) {
+        <app-pop-up
+            [popUpMessage]="'Supprimer le compte'"
+            [description]="'Cette action est irréversible. Voulez-vous vraiment supprimer votre compte ?'"
+            [firstOption]="'Annuler'"
+            [showSecondButton]="true"
+            [secondOption]="'Supprimer'"
+            (confirm)="onDeleteCancel()"
+            (cancel)="onDeleteConfirm()"
+        ></app-pop-up>
         }
 
         <form [formGroup]="form" (ngSubmit)="submitForm()" class="profile-form">
@@ -69,6 +79,9 @@
                     <div class="form-actions">
                         <button type="submit" class="btn-primary" [disabled]="isSaving">
                             @if (isSaving) { Enregistrement... } @else { Enregistrer les modifications }
+                        </button>
+                        <button type="button" class="btn-danger" (click)="deleteAccount()" [disabled]="isDeleting">
+                            @if (isDeleting) { Suppression... } @else { Supprimer le compte }
                         </button>
                     </div>
                 </div>

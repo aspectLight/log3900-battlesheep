@@ -2,11 +2,15 @@
 import { RegisterUserDto, UpdateUserDto } from '@app/modules/auth/dto/auth.dto';
 import { User, UserDocument } from '@app/modules/auth/schemas/user.schema';
 import { FirebaseAdminService } from '@app/modules/auth/services/firebase-admin.service';
-import { ConflictException, ForbiddenException, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { CustomChannelService } from '@app/modules/general-chat/services/custom-channel.service';
+import { GeneralChatService } from '@app/modules/general-chat/services/general-chat.service';
+import { ConflictException, ForbiddenException, Inject, Injectable, Logger, NotFoundException, UnauthorizedException, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { DecodedIdToken } from 'firebase-admin/auth';
 import { Model } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
+
+const DELETED_USER_PLACEHOLDER = '[supprimé]';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +19,8 @@ export class AuthService {
     constructor(
         private readonly firebaseAdminService: FirebaseAdminService,
         @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+        @Inject(forwardRef(() => GeneralChatService)) private readonly generalChatService: GeneralChatService,
+        @Inject(forwardRef(() => CustomChannelService)) private readonly customChannelService: CustomChannelService,
     ) {}
 
     async verifyToken(idToken: string): Promise<DecodedIdToken> {
@@ -161,17 +167,23 @@ export class AuthService {
 
     async deleteUser(uid: string): Promise<void> {
         try {
-            // TODO: Cascade delete user when services are ready
-            // -> Delete user from friends list
-            // -> Replace username by "[supprimé]" in games and messages
+            const user = await this.getUserByUid(uid);
+            const { username } = user;
 
-            // 1. Delete user from Firebase Auth
+            // 1. Log out user
+            await this.logout(uid);
+
+            // 2. Replace username by "[supprimé]" in chat history
+            await this.generalChatService.replaceUsername(username, DELETED_USER_PLACEHOLDER);
+            await this.customChannelService.replaceUsername(username, DELETED_USER_PLACEHOLDER);
+
+            // 3. Delete user from Firebase Auth
             await this.firebaseAdminService.getAuth().deleteUser(uid);
-            this.logger.log(`Firebase user deleted: ${uid}`);
 
-            // 2. Delete user from MongoDB
+            // 4. Delete user from MongoDB
             await this.userModel.deleteOne({ firebaseUid: uid });
-            this.logger.log(`MongoDB user deleted: ${uid}`);
+
+            this.logger.log(`User deleted: ${uid}`);
         } catch (error) {
             this.logger.error(`User deletion failed: ${error.message}`);
             throw error;
@@ -219,6 +231,7 @@ export class AuthService {
     getGameHistory(user: UserDocument) {
         return user.gameHistory.sort((a, b) => b.startDate.getTime() - a.startDate.getTime()).slice(0, 100);
     }
+
     async startGameHistory(uid: string, mode: 'Classique' | 'CTF'): Promise<{ startDate: string }> {
         const user = await this.getUserByUid(uid);
 

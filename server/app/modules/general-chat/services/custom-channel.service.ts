@@ -151,6 +151,19 @@ export class CustomChannelService {
         return channels.map((c) => ({ channelId: c.channelId, name: c.name }));
     }
 
+    async replaceUsername(oldName: string, newName: string): Promise<void> {
+        // Remplacer le nom dans les messages de tous les canaux
+        await this.channelModel.updateMany(
+            { 'messages.name': oldName },
+            { $set: { 'messages.$[elem].name': newName } },
+            { arrayFilters: [{ 'elem.name': oldName }] },
+        );
+
+        await this.channelModel.updateMany({ members: oldName }, { $pull: { members: oldName } });
+        await this.channelModel.updateMany({ creator: oldName }, { $set: { creator: newName } });
+        await this.channelModel.deleteMany({ members: { $size: 0 } });
+    }
+
     private generateChannelId(name: string): string {
         return name
             .toLowerCase()
