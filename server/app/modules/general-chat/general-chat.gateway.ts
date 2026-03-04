@@ -189,12 +189,16 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         @MessageBody() data: { channelId: string; username: string; message: string },
     ): Promise<void> {
         try {
-            const isMember = await this.customChannelService.isMember(data.channelId, data.username);
-            if (!isMember) {
-                socket.emit(CustomChannelEvents.CustomChannelError, {
-                    message: 'Vous devez être membre du canal pour envoyer des messages',
-                });
-                return;
+            // Les canaux de partie n'ont pas de membres en BD — on skippe la vérification
+            const isGame = await this.customChannelService.checkIsGameChannel(data.channelId);
+            if (!isGame) {
+                const isMember = await this.customChannelService.isMember(data.channelId, data.username);
+                if (!isMember) {
+                    socket.emit(CustomChannelEvents.CustomChannelError, {
+                        message: 'Vous devez être membre du canal pour envoyer des messages',
+                    });
+                    return;
+                }
             }
 
             const chatMessage: ChatMessage = {

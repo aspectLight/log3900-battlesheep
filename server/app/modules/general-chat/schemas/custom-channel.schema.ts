@@ -40,6 +40,9 @@ export class CustomChannel {
 
     @Prop({ default: true })
     isActive: boolean; // Pour soft delete
+
+    @Prop({ default: false })
+    isGameChannel: boolean; // Vrai pour les canaux éphémères liés à une partie
 }
 
 export const CustomChannelSchema = SchemaFactory.createForClass(CustomChannel);

@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Player } from '@app/classes/entity/player';
-import { ChatboxComponent } from '@app/components/shared/chatbox/chatbox.component';
 import { PlayerCardComponent } from '@app/components/player/player-card/player-card.component';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { VirtualPlayerType } from '@app/constants/player.constants';
@@ -16,7 +15,7 @@ import { ErrorMessages, WaitRoomWelcomeMessage } from '@common/error-messages.co
 import { Subscription } from 'rxjs';
 
 @Component({
-    imports: [CommonModule, PlayerCardComponent, PopUpComponent, ChatboxComponent],
+    imports: [CommonModule, PlayerCardComponent, PopUpComponent],
     selector: 'app-waiting-player',
     templateUrl: './waiting-player.component.html',
     styleUrl: './waiting-player.component.scss',

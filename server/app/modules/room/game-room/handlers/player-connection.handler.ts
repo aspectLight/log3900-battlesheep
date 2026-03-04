@@ -1,7 +1,7 @@
 import { GameCombatService } from '@app/modules/combat/services/game-combat.service';
 import { GameMovementService } from '@app/modules/movement/services/game-movement.service';
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
-import { GameRoomEvents } from '@common/socket.constants';
+import { CustomChannelEvents, GameRoomEvents } from '@common/socket.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 
@@ -26,6 +26,11 @@ export class PlayerConnectionHandler {
         try {
             this.handlePlayerAbandonment(roomId, socket.id, server);
             socket.emit(GameRoomEvents.GameAbandoned);
+
+            // Faire quitter le canal de partie (roomId = "game_XXX", canal = "XXX")
+            const channelId = roomId.startsWith('game_') ? roomId.slice(5) : roomId;
+            socket.leave(`custom-channel-${channelId}`);
+            socket.emit(CustomChannelEvents.CustomChannelLeft, { channelId });
         } catch (error) {
             socket.emit(GameRoomEvents.GameRoomError, error.message);
         }
@@ -49,6 +54,10 @@ export class PlayerConnectionHandler {
             rooms.forEach((room) => {
                 if (room && room.roomId) {
                     this.handlePlayerAbandonment(room.roomId, socket.id, server);
+                    // Faire quitter le canal de partie (roomId = "game_XXX", canal = "XXX")
+                    const channelId = room.roomId.startsWith('game_') ? room.roomId.slice(5) : room.roomId;
+                    socket.leave(`custom-channel-${channelId}`);
+                    socket.emit(CustomChannelEvents.CustomChannelLeft, { channelId });
                 }
             });
         } catch (error) {
@@ -79,7 +88,7 @@ export class PlayerConnectionHandler {
 
         const isRoomDeleted = this.gameRoomService.abandonGame(roomId, playerId);
         if (isRoomDeleted) {
-            server.to(roomId).emit(GameRoomEvents.GameCanceled,  { playerId });
+            server.to(roomId).emit(GameRoomEvents.GameCanceled, { playerId });
         } else {
             server.to(roomId).emit(GameRoomEvents.PlayerAbandoned, playerId);
         }
