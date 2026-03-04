@@ -1,0 +1,49 @@
+/* eslint-disable max-classes-per-file */
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
+
+export type CustomChannelDocument = CustomChannel & Document;
+
+@Schema({ _id: false })
+class ChannelMessage {
+    @Prop({ required: true })
+    type: string;
+
+    @Prop()
+    name: string;
+
+    @Prop({ required: true })
+    content: string;
+
+    @Prop({ required: true })
+    time: string;
+}
+
+const ChannelMessageSchema = SchemaFactory.createForClass(ChannelMessage);
+
+@Schema({ timestamps: true })
+export class CustomChannel {
+    @Prop({ required: true, unique: true, index: true })
+    channelId: string; // ID normalisé (ex: "abc" pour "ABC")
+
+    @Prop({ required: true })
+    name: string; // Nom original (ex: "ABC")
+
+    @Prop({ required: true, index: true })
+    creator: string; // username du créateur
+
+    @Prop({ type: [String], default: [] })
+    members: string[]; // array de usernames
+
+    @Prop({ type: [ChannelMessageSchema], default: [] })
+    messages: ChannelMessage[]; // Historique des messages (100 derniers)
+
+    @Prop({ default: true })
+    isActive: boolean; // Pour soft delete
+}
+
+export const CustomChannelSchema = SchemaFactory.createForClass(CustomChannel);
+
+// Index pour recherche rapide
+CustomChannelSchema.index({ isActive: 1, createdAt: -1 });
+CustomChannelSchema.index({ members: 1 });

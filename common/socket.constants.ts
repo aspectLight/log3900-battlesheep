@@ -121,3 +121,25 @@ export enum GeneralChatEvents {
     GetGeneralChatMessagesResponse = 'getGeneralChatMessagesResponse',
     GeneralChatError = 'generalChatError',
 }
+
+export enum CustomChannelEvents {
+    // Émis par le client
+    CreateCustomChannel = 'createCustomChannel',
+    JoinCustomChannel = 'joinCustomChannel',
+    LeaveCustomChannel = 'leaveCustomChannel',
+    DeleteCustomChannel = 'deleteCustomChannel',
+    SendMessageToCustomChannel = 'sendMessageToCustomChannel',
+    GetCustomChannelMessages = 'getCustomChannelMessages',
+    ListCustomChannels = 'listCustomChannels',
+
+    // Émis par le serveur
+    CustomChannelCreated = 'customChannelCreated',
+    CustomChannelMessage = 'customChannelMessage',
+    CustomChannelMessagesResponse = 'customChannelMessagesResponse',
+    CustomChannelsListResponse = 'customChannelsListResponse',
+    CustomChannelJoined = 'customChannelJoined',
+    CustomChannelLeft = 'customChannelLeft',
+    CustomChannelDeleted = 'customChannelDeleted',
+    CustomChannelError = 'customChannelError',
+    UserChannelsRestored = 'userChannelsRestored', // Envoyé à la reconnexion pour restaurer les canaux rejoints
+}

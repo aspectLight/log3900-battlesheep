@@ -23,6 +23,7 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { ProfilePageComponent } from '@app/pages/profile-page/profile-page.component';
 import { RegisterPageComponent } from '@app/pages/register/register.component';
 import { WaitingPlayerPageComponent } from '@app/pages/waiting-player-page/waiting-player-page.component';
+import { ChannelsPageComponent } from '@app/pages/channels-page/channels-page.component';
 import { environment } from './environments/environment';
 
 if (environment.production) {
@@ -47,6 +48,7 @@ const routes: Routes = [
     { path: 'logs-history', component: LogsHistoryComponent, canActivate: [authGuard] },
     { path: 'games-history', component: GamesHistoryComponent, canActivate: [authGuard] },
     { path: 'profile', component: ProfilePageComponent, canActivate: [authGuard] },
+    { path: 'channels', component: ChannelsPageComponent, canActivate: [authGuard] },
     { path: '**', redirectTo: '/home' },
 ];
 
