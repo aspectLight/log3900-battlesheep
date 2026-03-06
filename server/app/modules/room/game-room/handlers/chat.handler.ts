@@ -1,3 +1,4 @@
+import { ChatModerationService } from '@app/modules/general-chat/services/chat-moderation.service';
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
 import { GameRoomEvents } from '@common/socket.constants';
 import { Injectable } from '@nestjs/common';
@@ -8,17 +9,23 @@ import { Server, Socket } from 'socket.io';
  */
 @Injectable()
 export class ChatHandler {
-    constructor(private readonly gameRoomService: GameRoomService) {}
+    constructor(
+        private readonly gameRoomService: GameRoomService,
+        private readonly chatModerationService: ChatModerationService,
+    ) {}
 
     /**
      * Handles sending messages to the game room
      */
     async handleSendMessage(data: { message: string; playerName: string | null; roomId: string }, socket: Socket, server: Server): Promise<void> {
         try {
+            // Censurer le message avant de le diffuser
+            const censoredMessage = this.chatModerationService.censor(data.message);
+
             const message = {
                 type: 'received',
                 name: data.playerName,
-                content: data.message,
+                content: censoredMessage,
                 time: new Date().toLocaleTimeString('en-GB', {
                     hour: '2-digit',
                     minute: '2-digit',
