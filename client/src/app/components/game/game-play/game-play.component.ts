@@ -4,6 +4,7 @@ import { Board } from '@app/classes/board/board';
 import { Item } from '@app/classes/entity/item';
 import { ActionsHudComponent } from '@app/components/shared/actions-hud/actions-hud.component';
 import { BoardComponent } from '@app/components/shared/board/board.component';
+import { ChatboxComponent } from '@app/components/shared/chatbox/chatbox.component';
 import { CombatComponent } from '@app/components/game/combat/combat.component';
 import { GameInfoComponent } from '@app/components/lobby/game-info/game-info.component';
 import { LoadingScreenComponent } from '@app/components/shared/loading-screen/loading-screen.component';
@@ -27,6 +28,7 @@ import { ActionSocketService } from '@app/services/communication/socket-handlers
         NotificationComponent,
         PopUpComponent,
         LoadingScreenComponent,
+        ChatboxComponent,
     ],
     templateUrl: './game-play.component.html',
     styleUrl: './game-play.component.scss',

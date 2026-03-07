@@ -5,7 +5,7 @@ import { LoadingScreenComponent } from '@app/components/shared/loading-screen/lo
 import { LOADING_SCREEN_DELAY } from '@app/constants/routes.constants';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 
-const ROUTES_WITHOUT_GENERAL_CHAT = ['/login', '/register', '/auth-landing'];
+const ROUTES_WITHOUT_GENERAL_CHAT = ['/login', '/register', '/auth-landing', '/game'];
 
 @Component({
     selector: 'app-root',

@@ -46,6 +46,7 @@
     <div class="right-side">
         <app-actions-hud></app-actions-hud>
         <p class="flightinfos">{{flightAttemptsLeft}} tentatives d'évasion restantes</p>
+        <app-chatbox></app-chatbox>
     </div>
 </div>
 
@@ -70,6 +71,7 @@
         @if (isDebugging) {
             <div class="debug-info">Game is in debug mode</div>
         }
+        <app-chatbox></app-chatbox>
     </div>
 </div>
 } } @else {
