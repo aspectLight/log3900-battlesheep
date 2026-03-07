@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { BannedWord, BannedWordDocument } from '@app/modules/general-chat/schemas/banned-words.schema';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -61,19 +62,22 @@ export class ChatModerationService implements OnModuleInit {
 
         // Regex pour tokeniser les mots complets (lettres, chiffres, accents FR)
         // Supporte: A-Z, a-z, À-Ö, Ø-ö, ø-ÿ (accents français), 0-9
-        const wordRegex = /[A-Za-zÀ-ÖØ-öø-ÿ0-9]+/g;
+        const wordRegex = /[A-Za-zÀ-ÖØ-öø-ÿ0-9@$]+/g;
         let wasCensored = false;
 
         const censoredMessage = message.replace(wordRegex, (token) => {
             const normalizedToken = this.normalizeWord(token);
 
-            // Match EXACT uniquement (pas de substring)
-            if (this.bannedWordsSet.has(normalizedToken)) {
+            // Retire les chiffres ajoutés au début ou à la fin AVANT normalisation
+            const tokenWithoutEdgeDigits = token.replace(/^\d+|\d+$/g, '');
+            const normalizedTokenWithoutEdgeDigits = this.normalizeWord(tokenWithoutEdgeDigits);
+            if (
+                this.bannedWordsSet.has(normalizedToken) ||
+                (tokenWithoutEdgeDigits.length > 0 && this.bannedWordsSet.has(normalizedTokenWithoutEdgeDigits))
+            ) {
                 wasCensored = true;
-                // Remplacer par le même nombre d'astérisques que la longueur du token original
                 return '*'.repeat(token.length);
             }
-
             return token;
         });
 
@@ -84,25 +88,30 @@ export class ChatModerationService implements OnModuleInit {
         return censoredMessage;
     }
 
-    /**
-     * Normalise un mot pour la comparaison:
-     * 1. Convertit en lowercase
-     * 2. Applique la décomposition NFKD (Normalization Form Compatibility Decomposition)
-     * 3. Supprime les diacritiques (accents, cédilles, etc.)
-     *
-     * Exemple: "Café" -> "cafe", "Français" -> "francais"
-     *
-     * @param word Le mot à normaliser
-     * @returns Le mot normalisé
-     */
     private normalizeWord(word: string): string {
         if (!word) {
             return '';
         }
 
-        return word
+        const leetMap: Record<string, string> = {
+            '@': 'a',
+            '4': 'a',
+            '3': 'e',
+            '1': 'i',
+            '0': 'o',
+            '$': 's',
+            '5': 's',
+            '7': 't',
+        };
+
+        const leetNormalized = word
+            .split('')
+            .map((char) => leetMap[char] ?? char)
+            .join('');
+
+        return leetNormalized
             .toLowerCase()
             .normalize('NFKD')
-            .replace(/[\u0300-\u036f]/g, ''); // Supprime les diacritiques (combining diacritical marks)
+            .replace(/[\u0300-\u036f]/g, '');
     }
 }
