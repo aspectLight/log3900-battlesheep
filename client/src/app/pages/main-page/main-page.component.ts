@@ -1,6 +1,5 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { ChatboxComponent } from '@app/components/shared/chatbox/chatbox.component';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { AuthService } from '@app/services/communication/auth.service';
 import { ChatService } from '@app/services/communication/chat.service';
@@ -12,7 +11,7 @@ import { GameManagerService } from '@app/services/state/game-manager.service';
     selector: 'app-main-page',
     templateUrl: './main-page.component.html',
     styleUrls: ['./main-page.component.scss'],
-    imports: [RouterLink, PopUpComponent, ChatboxComponent],
+    imports: [RouterLink, PopUpComponent],
 })
 export class MainPageComponent implements OnInit {
     @ViewChild('settingsMenu') settingsMenu!: ElementRef;

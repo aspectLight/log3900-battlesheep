@@ -19,7 +19,7 @@ class ChannelMessage {
     time: string;
 }
 
-const ChannelMessageSchema = SchemaFactory.createForClass(ChannelMessage);
+const channelMessageSchema = SchemaFactory.createForClass(ChannelMessage);
 
 @Schema({ timestamps: true })
 export class CustomChannel {
@@ -35,15 +35,18 @@ export class CustomChannel {
     @Prop({ type: [String], default: [] })
     members: string[]; // array de usernames
 
-    @Prop({ type: [ChannelMessageSchema], default: [] })
+    @Prop({ type: [channelMessageSchema], default: [] })
     messages: ChannelMessage[]; // Historique des messages (100 derniers)
 
     @Prop({ default: true })
     isActive: boolean; // Pour soft delete
+
+    @Prop({ default: false })
+    isGameChannel: boolean; // Vrai pour les canaux éphémères liés à une partie
 }
 
-export const CustomChannelSchema = SchemaFactory.createForClass(CustomChannel);
+export const customChannelSchema = SchemaFactory.createForClass(CustomChannel);
 
 // Index pour recherche rapide
-CustomChannelSchema.index({ isActive: 1, createdAt: -1 });
-CustomChannelSchema.index({ members: 1 });
+customChannelSchema.index({ isActive: 1, createdAt: -1 });
+customChannelSchema.index({ members: 1 });

@@ -1,10 +1,11 @@
 import { AuthService } from '@app/modules/auth/services/auth.service';
 import { GameService } from '@app/modules/game/services/game.service';
+import { CustomChannelService } from '@app/modules/general-chat/services/custom-channel.service';
 import { GameMovementService } from '@app/modules/movement/services/game-movement.service';
 import { MS_IN_SECOND, SECONDS_IN_MINUTE } from '@app/modules/shared-room/constants/game-room.constants';
 import { GameRoom } from '@app/modules/shared-room/interfaces/game-room';
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
-import { GameRoomEvents } from '@common/socket.constants';
+import { CustomChannelEvents, GameRoomEvents } from '@common/socket.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 
@@ -20,6 +21,7 @@ export class GameLifecycleHandler {
         private readonly gameMovementService: GameMovementService,
         private readonly gameService: GameService,
         private readonly authService: AuthService,
+        private readonly customChannelService: CustomChannelService,
     ) {}
 
     /**
@@ -65,9 +67,23 @@ export class GameLifecycleHandler {
         try {
             const room = this.gameRoomService.findRoomById(roomId);
             socket.leave(roomId);
+
+            // Faire quitter le canal de partie à ce joueur (channelId = roomId sans le préfixe "game_")
+            const channelId = roomId.startsWith('game_') ? roomId.slice(5) : roomId;
+            socket.leave(`custom-channel-${channelId}`);
+            socket.emit(CustomChannelEvents.CustomChannelLeft, { channelId });
+
             if ((await server.in(roomId).fetchSockets()).length === 0) {
                 if (room) this.gameMovementService.removeBoard(roomId);
                 this.gameRoomService.deleteRoomById(roomId);
+
+                // Supprimer définitivement le canal de partie
+                try {
+                    server.to(`custom-channel-${channelId}`).emit(CustomChannelEvents.CustomChannelDeleted, { channelId });
+                    await this.customChannelService.deleteGameChannel(channelId);
+                } catch (channelError) {
+                    this.logger.error(`Erreur suppression canal de partie ${channelId}: ${channelError.message}`);
+                }
             }
         } catch (error) {
             socket.emit(GameRoomEvents.GameRoomError, error.message);

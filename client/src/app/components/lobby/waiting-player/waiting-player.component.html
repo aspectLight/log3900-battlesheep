@@ -20,10 +20,6 @@
 </div>
 
 <div class="waiting-room-container">
-    <div class="chat-container">
-        <app-chatbox roomType="WaitingRoom"></app-chatbox>
-    </div>
-
     <div class="players-container">
         @for (player of room?.players; track player.id) {
         <app-player-card

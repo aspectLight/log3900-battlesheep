@@ -39,12 +39,12 @@ export class CustomChannelService {
             members: [creator],
             messages: [],
             isActive: true,
+            isGameChannel: false,
         });
 
         try {
             await channel.save();
         } catch (error) {
-            // L'index unique MongoDB peut déclencher une erreur E11000 en cas de race condition
             if (error instanceof MongoServerError && error.code === 11000) {
                 throw new ConflictException('Le nom du canal est déjà pris, veuillez en choisir un autre');
             }
@@ -54,13 +54,45 @@ export class CustomChannelService {
         return channel;
     }
 
+    /** Crée un canal éphémère lié à une partie (non visible dans la liste publique). */
+    async createGameChannel(channelId: string, name: string): Promise<void> {
+        const existing = await this.channelModel.findOne({ channelId });
+        if (existing) {
+            // Le canal existe déjà (ex: reconnexion rapide) — rien à faire
+            return;
+        }
+        const channel = new this.channelModel({
+            channelId,
+            name,
+            creator: 'system',
+            members: [],
+            messages: [],
+            isActive: true,
+            isGameChannel: true,
+        });
+        await channel.save();
+        this.logger.log(`Canal de partie créé: ${channelId}`);
+    }
+
+    /** Supprime définitivement un canal de partie (sans vérifier le créateur). */
+    async deleteGameChannel(channelId: string): Promise<void> {
+        await this.channelModel.deleteOne({ channelId });
+        this.logger.log(`Canal de partie supprimé: ${channelId}`);
+    }
+
+    /** Retourne vrai si le canal est un canal de partie. */
+    async checkIsGameChannel(channelId: string): Promise<boolean> {
+        const channel = await this.channelModel.findOne({ channelId }, { isGameChannel: 1 });
+        return channel?.isGameChannel ?? false;
+    }
+
     async getChannel(channelId: string): Promise<CustomChannelDocument | null> {
-        return this.channelModel.findOne({ channelId, isActive: true });
+        return this.channelModel.findOne({ channelId });
     }
 
     async getAllChannels(): Promise<CustomChannelDocument[]> {
-        // On exclut les messages pour ne pas surcharger la réponse de liste
-        return this.channelModel.find({ isActive: true }, { messages: 0 }).sort({ createdAt: -1 });
+        // Exclut les messages et les canaux de partie (éphémères)
+        return this.channelModel.find({ isActive: true, isGameChannel: { $ne: true } }, { messages: 0 }).sort({ createdAt: -1 });
     }
 
     async joinChannel(channelId: string, username: string): Promise<void> {
@@ -85,7 +117,6 @@ export class CustomChannelService {
         channel.members = channel.members.filter((m) => m !== username);
 
         if (channel.members.length === 0) {
-            // Plus aucun membre : suppression définitive
             await this.channelModel.deleteOne({ channelId });
             this.logger.log(`Canal ${channel.name} supprimé définitivement (plus de membres)`);
         } else {
@@ -109,14 +140,13 @@ export class CustomChannelService {
     }
 
     async addMessage(channelId: string, message: ChatMessage): Promise<void> {
-        // $push avec $slice pour garder seulement les N derniers messages
         await this.channelModel.updateOne(
             { channelId },
             {
                 $push: {
                     messages: {
                         $each: [message],
-                        $slice: -GENERAL_CHAT_MESSAGES_LIMIT, // Garde les 100 derniers
+                        $slice: -GENERAL_CHAT_MESSAGES_LIMIT,
                     },
                 },
             },
@@ -124,10 +154,7 @@ export class CustomChannelService {
     }
 
     async getMessages(channelId: string): Promise<ChatMessage[]> {
-        const channel = await this.channelModel.findOne(
-            { channelId, isActive: true },
-            { messages: 1 }, // Projeter seulement les messages
-        );
+        const channel = await this.channelModel.findOne({ channelId }, { messages: 1 });
         if (!channel) {
             throw new NotFoundException('Canal introuvable');
         }
@@ -140,14 +167,11 @@ export class CustomChannelService {
     }
 
     /**
-     * Retourne tous les canaux actifs dont l'utilisateur est membre.
+     * Retourne tous les canaux non-partie dont l'utilisateur est membre.
      * Utilisé lors de la reconnexion pour restaurer les canaux rejoints.
      */
     async getChannelsForUser(username: string): Promise<{ channelId: string; name: string }[]> {
-        const channels = await this.channelModel.find(
-            { isActive: true, members: username },
-            { channelId: 1, name: 1 }, // Projeter seulement les champs nécessaires
-        );
+        const channels = await this.channelModel.find({ isActive: true, isGameChannel: { $ne: true }, members: username }, { channelId: 1, name: 1 });
         return channels.map((c) => ({ channelId: c.channelId, name: c.name }));
     }
 

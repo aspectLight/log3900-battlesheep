@@ -3,6 +3,7 @@ import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChi
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '@app/services/communication/chat.service';
 import { CustomChannelService } from '@app/services/communication/custom-channel.service';
+import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';
 import { Subscription } from 'rxjs';
 
 const MAX_MESSAGE_LENGTH = 200;
@@ -18,20 +19,20 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('chatboxMessages') private messagesContainer!: ElementRef<HTMLDivElement>;
     @ViewChild('messageInput') private messageInput!: ElementRef<HTMLInputElement>;
 
-    withFilter: boolean = false;
     isCollapsed: boolean = false;
     newMessage: string = '';
 
-    /** null = général, string = channelId du canal custom actif */
+    /** null = général, string = channelId du canal custom/partie actif */
     activeChannelId: string | null = null;
-    /** Liste des canaux rejoints (pour le dropdown, visible uniquement en mode GeneralChat) */
-    joinedChannelInfos: { id: string; name: string }[] = [];
+    /** Tous les canaux rejoints (custom + partie), pour le dropdown */
+    joinedChannelInfos: { id: string; name: string; isGameChannel: boolean }[] = [];
 
     private subscriptions = new Subscription();
 
     constructor(
         private chatService: ChatService,
         private customChannelService: CustomChannelService,
+        private waitingRoomService: WaitingRoomService,
     ) {
         this.scrollToBottom();
     }
@@ -44,7 +45,7 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
         return this.chatService.messages;
     }
 
-    /** Libellé affiché dans le sélecteur */
+    /** Libellé du canal actif pour le placeholder */
     get activeChannelLabel(): string {
         if (!this.activeChannelId) return 'Général';
         return this.joinedChannelInfos.find((c) => c.id === this.activeChannelId)?.name ?? this.activeChannelId;
@@ -55,37 +56,51 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnInit() {
-        if (this.roomType === 'GeneralChat') {
-            this.chatService.clearMessages();
-            this.chatService.getGeneralChatMessages();
-        } else if (this.roomType === 'WaitingRoom') {
-            this.chatService.clearMessages();
-            this.chatService.getMessagesFromWaitingRoom();
+        // Charger le chat général
+        this.chatService.clearMessages();
+        this.chatService.getGeneralChatMessages();
+
+        // Initialiser le dropdown avec les canaux déjà rejoints
+        this.joinedChannelInfos = this.customChannelService.getJoinedChannelInfos();
+
+        // Auto-sélectionner le canal de partie s'il est déjà disponible (ex: reconnexion)
+        const gameChannelId = this.waitingRoomService.gameChannelId;
+        if (gameChannelId && this.customChannelService.isJoined(gameChannelId)) {
+            this.activeChannelId = gameChannelId;
+            this.customChannelService.fetchMessages(gameChannelId);
         }
 
-        // Le sélecteur de canaux n'est disponible qu'en mode GeneralChat
-        if (this.roomType === 'GeneralChat') {
-            this.joinedChannelInfos = this.customChannelService.getJoinedChannelInfos();
+        // Mettre à jour le dropdown quand les canaux changent
+        this.subscriptions.add(
+            this.customChannelService.joinedChannels$.subscribe(() => {
+                this.joinedChannelInfos = this.customChannelService.getJoinedChannelInfos();
 
-            this.subscriptions.add(
-                this.customChannelService.joinedChannels$.subscribe(() => {
-                    this.joinedChannelInfos = this.customChannelService.getJoinedChannelInfos();
-                    // Si le canal actif a été quitté/supprimé, revenir au général
-                    if (this.activeChannelId && !this.joinedChannelInfos.some((c) => c.id === this.activeChannelId)) {
-                        this.switchChannel(null);
-                    }
-                }),
-            );
+                // Si le canal actif a disparu, revenir au général
+                if (this.activeChannelId && !this.joinedChannelInfos.some((c) => c.id === this.activeChannelId)) {
+                    this.switchChannel(null);
+                }
 
-            // Scroll automatique quand de nouveaux messages arrivent sur le canal actif
-            this.subscriptions.add(
-                this.customChannelService.messagesUpdated$.subscribe(({ channelId }) => {
-                    if (this.activeChannelId === channelId) {
-                        this.scrollToBottom();
-                    }
-                }),
-            );
-        }
+                // Auto-sélectionner le canal de partie dès qu'il est rejoint
+                const currentGameChannelId = this.waitingRoomService.gameChannelId;
+                if (
+                    currentGameChannelId &&
+                    this.customChannelService.isJoined(currentGameChannelId) &&
+                    this.activeChannelId !== currentGameChannelId
+                ) {
+                    this.activeChannelId = currentGameChannelId;
+                    this.customChannelService.fetchMessages(currentGameChannelId);
+                }
+            }),
+        );
+
+        // Scroll automatique sur nouveaux messages du canal actif
+        this.subscriptions.add(
+            this.customChannelService.messagesUpdated$.subscribe(({ channelId }) => {
+                if (channelId === this.activeChannelId) {
+                    this.scrollToBottom();
+                }
+            }),
+        );
     }
 
     ngAfterViewInit() {
@@ -101,11 +116,9 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
     switchChannel(channelId: string | null): void {
         this.activeChannelId = channelId;
         if (!channelId) {
-            // Recharger le général
             this.chatService.clearMessages();
             this.chatService.getGeneralChatMessages();
         } else {
-            // S'assurer que l'historique est disponible
             this.customChannelService.fetchMessages(channelId);
         }
         this.scrollToBottom();
@@ -113,36 +126,15 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
 
     sendMessage() {
         if (this.newMessage.trim() && this.newMessage.length <= MAX_MESSAGE_LENGTH) {
-            if (this.activeChannelId && this.roomType === 'GeneralChat') {
+            if (this.activeChannelId) {
                 this.customChannelService.sendMessage(this.activeChannelId, this.newMessage);
             } else {
-                switch (this.roomType) {
-                    case 'GeneralChat':
-                        this.chatService.sendMessageToGeneralChat(this.newMessage);
-                        break;
-                    case 'WaitingRoom':
-                        this.chatService.sendMessageToWaitingRoom(this.newMessage);
-                        break;
-                    case 'GameRoom':
-                        this.chatService.sendMessageToGameRoom(this.newMessage);
-                        break;
-                    case 'EndRoom':
-                        this.chatService.sendMessageToGameRoom(this.newMessage);
-                        break;
-                }
+                this.chatService.sendMessageToGeneralChat(this.newMessage);
             }
             this.newMessage = '';
             this.scrollToBottom();
             this.messageInput?.nativeElement?.focus();
         }
-    }
-
-    filterByName() {
-        this.withFilter = true;
-    }
-
-    resetFilter() {
-        this.withFilter = false;
     }
 
     scrollToBottom() {

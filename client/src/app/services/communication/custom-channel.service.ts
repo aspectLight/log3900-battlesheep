@@ -34,6 +34,7 @@ export class CustomChannelService {
 
     private joinedChannelIds = new Set<string>();
     private joinedChannelNames = new Map<string, string>(); // channelId → display name
+    private gameChannelIds = new Set<string>(); // canaux éphémères de partie (exclus du dropdown)
     private messagesByChannel: Record<string, ChannelMessage[]> = {};
 
     constructor(
@@ -49,11 +50,21 @@ export class CustomChannelService {
         const socket = this.socketService.socket;
         if (!socket) return;
 
+        // Vider les canaux de partie éphémères à chaque reconnexion (ils ne sont pas restaurés)
+        for (const id of this.gameChannelIds) {
+            this.joinedChannelIds.delete(id);
+            this.joinedChannelNames.delete(id);
+            delete this.messagesByChannel[id];
+        }
+        this.gameChannelIds.clear();
+        this.joinedChannels$.next([...this.joinedChannelIds]);
+
         socket.on(CustomChannelEvents.CustomChannelsListResponse, (channels: ChannelInfo[]) => {
             const incomingIds = new Set(channels.map((c) => c.id));
 
-            // Détecter les canaux qu'on croyait avoir rejoint mais qui n'existent plus sur le serveur
-            const removedIds = [...this.joinedChannelIds].filter((id) => !incomingIds.has(id));
+            // Détecter les canaux custom (non-partie) qui n'existent plus sur le serveur
+            // Les canaux de partie sont exclus de getAllChannels() — ne pas les supprimer ici
+            const removedIds = [...this.joinedChannelIds].filter((id) => !incomingIds.has(id) && !this.gameChannelIds.has(id));
             for (const id of removedIds) {
                 this.joinedChannelIds.delete(id);
                 this.joinedChannelNames.delete(id);
@@ -79,6 +90,7 @@ export class CustomChannelService {
             this.channels = this.channels.filter((c) => c.id !== data.channelId);
             this.joinedChannelIds.delete(data.channelId);
             this.joinedChannelNames.delete(data.channelId);
+            this.gameChannelIds.delete(data.channelId);
             delete this.messagesByChannel[data.channelId];
 
             this.channelDeleted$.next(data);
@@ -92,17 +104,20 @@ export class CustomChannelService {
             this.channelError$.next(data.message);
         });
 
-        socket.on(CustomChannelEvents.CustomChannelJoined, (data: { channelId: string; channelName: string }) => {
+        socket.on(CustomChannelEvents.CustomChannelJoined, (data: { channelId: string; channelName: string; isGameChannel?: boolean }) => {
             this.joinedChannelIds.add(data.channelId);
-            // Use the name sent by the server; fall back to channels list if available
             const name = data.channelName ?? this.channels.find((c) => c.id === data.channelId)?.name ?? data.channelId;
             this.joinedChannelNames.set(data.channelId, name);
+            if (data.isGameChannel) {
+                this.gameChannelIds.add(data.channelId);
+            }
             this.joinedChannels$.next([...this.joinedChannelIds]);
         });
 
         socket.on(CustomChannelEvents.CustomChannelLeft, (data: { channelId: string }) => {
             this.joinedChannelIds.delete(data.channelId);
             this.joinedChannelNames.delete(data.channelId);
+            this.gameChannelIds.delete(data.channelId);
             this.joinedChannels$.next([...this.joinedChannelIds]);
         });
 
@@ -177,11 +192,12 @@ export class CustomChannelService {
         return this.messagesByChannel[channelId] ?? [];
     }
 
-    /** Retourne la liste des canaux rejoints avec leur nom d'affichage (pour le dropdown du chatbox). */
-    getJoinedChannelInfos(): { id: string; name: string }[] {
+    /** Retourne tous les canaux rejoints (custom + partie) pour le dropdown du chatbox. */
+    getJoinedChannelInfos(): { id: string; name: string; isGameChannel: boolean }[] {
         return [...this.joinedChannelIds].map((id) => ({
             id,
             name: this.joinedChannelNames.get(id) ?? id,
+            isGameChannel: this.gameChannelIds.has(id),
         }));
     }
 

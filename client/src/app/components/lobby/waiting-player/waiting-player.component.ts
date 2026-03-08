@@ -16,7 +16,7 @@ import { ErrorMessages, WaitRoomWelcomeMessage } from '@common/error-messages.co
 import { Subscription } from 'rxjs';
 
 @Component({
-    imports: [CommonModule, PlayerCardComponent, PopUpComponent, ChatboxComponent],
+    imports: [CommonModule, PlayerCardComponent, PopUpComponent],
     selector: 'app-waiting-player',
     templateUrl: './waiting-player.component.html',
     styleUrl: './waiting-player.component.scss',
