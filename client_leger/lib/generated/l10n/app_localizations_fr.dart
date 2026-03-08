@@ -208,4 +208,25 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get send => 'Envoyer';
+
+  @override
+  String get leaveGame => 'Quitter la partie';
+
+  @override
+  String get action => 'Action';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get time => 'Heure';
+
+  @override
+  String get noEntries => 'Aucune entrée';
+
+  @override
+  String get result => 'Résultat';
+
+  @override
+  String get abandoned => 'Abandonnée';
 }

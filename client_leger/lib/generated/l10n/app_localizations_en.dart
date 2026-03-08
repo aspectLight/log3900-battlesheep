@@ -203,4 +203,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get send => 'Send';
+
+  @override
+  String get leaveGame => 'Leave Game';
+
+  @override
+  String get action => 'Action';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get time => 'Time';
+
+  @override
+  String get noEntries => 'No entry';
+
+  @override
+  String get result => 'Result';
+
+  @override
+  String get abandoned => 'Abandonned';
 }

@@ -27,6 +27,22 @@ class AuthLandingRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [GameHistoryScreen]
+class GameHistoryRoute extends PageRouteInfo<void> {
+  const GameHistoryRoute({List<PageRouteInfo>? children})
+    : super(GameHistoryRoute.name, initialChildren: children);
+
+  static const String name = 'GameHistoryRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const GameHistoryScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [LoginScreen]
 class LoginRoute extends PageRouteInfo<void> {
   const LoginRoute({List<PageRouteInfo>? children})
@@ -38,6 +54,22 @@ class LoginRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const LoginScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [LogsHistoryScreen]
+class LogsHistoryRoute extends PageRouteInfo<void> {
+  const LogsHistoryRoute({List<PageRouteInfo>? children})
+    : super(LogsHistoryRoute.name, initialChildren: children);
+
+  static const String name = 'LogsHistoryRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const LogsHistoryScreen();
     },
   );
 }
