@@ -1,6 +1,7 @@
 import { AuthService } from '@app/modules/auth/services/auth.service';
 import { GENERAL_CHAT_ROOM } from '@app/modules/general-chat/constants/general-chat.constants';
 import { ChatMessage } from '@app/modules/general-chat/interfaces/chat';
+import { ChatModerationService } from '@app/modules/general-chat/services/chat-moderation.service';
 import { CustomChannelService } from '@app/modules/general-chat/services/custom-channel.service';
 import { GeneralChatService } from '@app/modules/general-chat/services/general-chat.service';
 import { CustomChannelEvents, GeneralChatEvents } from '@common/socket.constants';
@@ -29,6 +30,7 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         private readonly generalChatService: GeneralChatService,
         private readonly customChannelService: CustomChannelService,
         private readonly authService: AuthService,
+        private readonly chatModerationService: ChatModerationService,
     ) {}
 
     // ===== General Chat Events =====
@@ -42,10 +44,13 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
 
     @SubscribeMessage(GeneralChatEvents.SendMessageToGeneralChat)
     async handleSendMessage(@ConnectedSocket() socket: Socket, @MessageBody() data: { username: string; message: string }): Promise<void> {
+        // Censurer le message avant de le diffuser
+        const censoredMessage = this.chatModerationService.censor(data.message);
+
         const chatMessage: ChatMessage = {
             type: 'received',
             name: data.username,
-            content: data.message,
+            content: censoredMessage,
             time: new Date().toLocaleTimeString('en-GB', {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -57,7 +62,7 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
 
         socket.to(GENERAL_CHAT_ROOM).emit(GeneralChatEvents.GeneralChatMessage, chatMessage);
         socket.emit(GeneralChatEvents.GeneralChatMessage, chatMessage);
-        this.logger.log(`Message de ${data.username}: ${data.message}`);
+        this.logger.log(`Message de ${data.username}: ${censoredMessage}`);
     }
 
     @SubscribeMessage(GeneralChatEvents.SendEmojiToGeneralChat)
@@ -201,10 +206,13 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
                 }
             }
 
+            // Censurer le message avant de le diffuser
+            const censoredMessage = this.chatModerationService.censor(data.message);
+
             const chatMessage: ChatMessage = {
                 type: 'received',
                 name: data.username,
-                content: data.message,
+                content: censoredMessage,
                 time: new Date().toLocaleTimeString('en-GB', {
                     hour: '2-digit',
                     minute: '2-digit',
