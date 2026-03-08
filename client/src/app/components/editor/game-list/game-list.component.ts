@@ -39,26 +39,6 @@ export class GameListComponent implements OnInit {
         this.getAllGames();
     }
 
-    onCheckboxClick(game: Game, event: MouseEvent): void {
-        event.preventDefault();
-        event.stopPropagation();
-
-        this.pendingGame = game;
-        this.errorMessage = WARNING_MESSAGES.VisibilityWarning;
-        this.showError = true;
-        this.onConfirm = this.onConfirmVisibility;
-    }
-
-    onConfirmVisibility(): void {
-        if (!this.pendingGame) return;
-        this.gameListService.onCheckboxClick(this.pendingGame).subscribe({
-            next: () => {
-                this.getAllGames();
-            },
-        });
-        this.clearPending();
-    }
-
     onModifyClick(game: Game): void {
         this.gameListService.onModifyClick(game);
     }

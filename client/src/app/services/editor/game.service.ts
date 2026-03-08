@@ -124,7 +124,6 @@ export class GameService {
     }
 
     saveModifications(): Observable<Game> {
-        this.game.isVisible = false;
         return this.http
             .patch<Game>(this.baseUrl + API_ENDPOINTS.games + this.game._id, this.game, {
                 headers: { contentType: 'application/json' },

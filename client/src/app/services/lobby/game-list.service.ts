@@ -28,13 +28,6 @@ export class GameListService {
         return date;
     }
 
-    onCheckboxClick(game: Game): Observable<object> {
-        const updatedGame = { isVisible: !game.isVisible };
-        return this.http.patch(environment.serverUrl + API_ENDPOINTS.games + game._id, updatedGame, {
-            headers: { contentType: 'application/json' },
-        });
-    }
-
     onDeleteClick(game: Game): Observable<object> {
         return this.http.delete(environment.serverUrl + API_ENDPOINTS.games + game._id, {
             headers: { contentType: 'application/json' },
@@ -46,10 +39,9 @@ export class GameListService {
     }
 
     async fetchGameById(id: string): Promise<boolean> {
-        let game: Game;
         try {
-            game = await firstValueFrom(this.http.get<Game>(environment.serverUrl + API_ENDPOINTS.games + id));
-            return !game.isVisible;
+            await firstValueFrom(this.http.get<Game>(environment.serverUrl + API_ENDPOINTS.games + id));
+            return false;
         } catch (error) {
             return true;
         }

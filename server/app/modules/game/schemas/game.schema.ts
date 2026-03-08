@@ -23,12 +23,6 @@ export class Game extends Document {
 
     @Prop({
         required: true,
-        default: false,
-    })
-    isVisible: boolean;
-
-    @Prop({
-        required: true,
     })
     modificationDate: string;
 

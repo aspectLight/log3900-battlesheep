@@ -7,7 +7,6 @@ export class Game {
     description: string;
     mode: string;
     board: Board;
-    isVisible: boolean;
     modificationDate: string;
     constructor(data?: Game) {
         if (data) {
@@ -18,7 +17,6 @@ export class Game {
             this.description = '';
             this.mode = '';
             this.board = new Board(BOARD_CONFIGS[boardSize].board);
-            this.isVisible = false;
             this.modificationDate = Date.now().toString();
         }
     }
@@ -37,7 +35,6 @@ export class Game {
         this.description = data.description;
         this.mode = data.mode;
         this.board = new Board(data.board);
-        this.isVisible = data.isVisible;
         this.modificationDate = data.modificationDate;
     }
 }
