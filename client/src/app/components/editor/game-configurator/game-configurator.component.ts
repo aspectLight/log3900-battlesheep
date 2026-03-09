@@ -12,6 +12,7 @@ import { ROUTES } from '@app/constants/routes.constants';
 })
 export class GameConfiguratorComponent {
     mode: string = 'classique';
+    privacy: 'public' | 'private' | 'protected' = 'public';
     modeDescription: string = MODE_DESCRIPTIONS[this.mode as MODES];
     boardSize: BoardSizes = BoardSizes.Moyenne;
     board: number = BOARD_CONFIGS[this.boardSize].board;
@@ -37,10 +38,14 @@ export class GameConfiguratorComponent {
         this.items = BOARD_CONFIGS[this.boardSize].items;
     }
 
+    onPrivacyChange(privacy: string): void {
+        this.privacy = privacy as 'public' | 'private' | 'protected';
+    }
+
     createGame(): void {
         this.router.navigate([ROUTES.edit]);
         this.gameService.setNewGame();
-        this.gameService.setGameSettings(this.mode, this.board);
+        this.gameService.setGameSettings(this.mode, this.board, this.privacy);
     }
 
     cancel(): void {

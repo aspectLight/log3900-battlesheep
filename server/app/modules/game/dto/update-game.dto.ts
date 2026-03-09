@@ -13,4 +13,8 @@ export class UpdateGameDto {
     @IsOptional()
     @IsNotEmpty()
     board?: Board;
+
+    @IsOptional()
+    @IsString()
+    privacy?: string;
 }

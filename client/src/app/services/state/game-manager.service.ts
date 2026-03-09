@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Auth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { Board } from '@app/classes/board/board';
 import { Cell } from '@app/classes/board/cell';
@@ -16,8 +17,9 @@ import { MovementService } from '@app/services/gameplay/movement.service';
 import { PathService } from '@app/services/gameplay/path.service';
 import { HistoryService } from '@app/services/history/history.service';
 import { GameRoomService } from '@app/services/state/game-room.service';
+import { SessionService } from '@app/services/state/session.service';
 import { API_ENDPOINTS } from '@common/api-endpoints.constants';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, from, switchMap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -65,6 +67,8 @@ export class GameManagerService {
         private pathService: PathService,
         private router: Router,
         private historyService: HistoryService,
+        private auth: Auth,
+        private session: SessionService,
     ) {
         this.movementService = new MovementService();
         this.gameRoomService.room$.subscribe((room) => {
@@ -173,7 +177,21 @@ export class GameManagerService {
     }
 
     fetchGame(gameId: string): Observable<Game> {
-        return this.http.get<Game>(environment.serverUrl + API_ENDPOINTS.games + gameId);
+        return from(this.getAuthHeaders()).pipe(
+            switchMap((headers) => this.http.get<Game>(environment.serverUrl + API_ENDPOINTS.games + gameId, { headers })),
+        );
+    }
+
+    private async getAuthHeaders(): Promise<HttpHeaders> {
+        const user = this.auth.currentUser;
+        const sessionId = this.session.sessionId;
+
+        if (!user || !sessionId) {
+            throw new Error('Utilisateur non authentifié');
+        }
+
+        const token = await user.getIdToken();
+        return new HttpHeaders().set('Authorization', `Bearer ${token}`).set('x-session-id', sessionId);
     }
 
     getIsGameLoaded(): boolean {

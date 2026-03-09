@@ -39,6 +39,24 @@
         </div>
     </div>
 
+    <div class="privacy-selection">
+        <h2>Confidentialité</h2>
+        <div class="privacy-selection-buttons">
+            <label>
+                <input type="radio" name="privacy" value="public" (change)="onPrivacyChange('public')" checked />
+                Public
+            </label>
+            <label>
+                <input type="radio" name="privacy" value="private" (change)="onPrivacyChange('private')" />
+                Privé
+            </label>
+            <label>
+                <input type="radio" name="privacy" value="protected" (change)="onPrivacyChange('protected')" />
+                Privé-partagé
+            </label>
+        </div>
+    </div>
+
     <div class="actions">
         <br />
         <button class="cancel-btn" (click)="cancel()">Annuler</button>

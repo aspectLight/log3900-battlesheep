@@ -33,6 +33,11 @@ export class WaitingRoomManagementHandler {
         server: Server,
     ): Promise<{ success: boolean; error?: string }> {
         try {
+            const game = await this.gameService.getGameById(data.gameId);
+            if (game.privacy === 'private' && game.owner !== data.host.name) {
+                return { success: false, error: 'Seul le propriétaire peut créer une partie avec un jeu privé' };
+            }
+
             data.host.inventory = [];
             const room = this.waitingRoomService.createRoom(data.roomId, data.gameId, data.host, socket.id);
             this.logger.log(`Salle ${data.roomId} créée par ${data.host.id}`);

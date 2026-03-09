@@ -8,6 +8,9 @@ export class Game {
     mode: string;
     board: Board;
     modificationDate: string;
+    privacy: string;
+    owner: string;
+
     constructor(data?: Game) {
         if (data) {
             this.setData(data);
@@ -18,6 +21,8 @@ export class Game {
             this.mode = '';
             this.board = new Board(BOARD_CONFIGS[boardSize].board);
             this.modificationDate = Date.now().toString();
+            this.privacy = 'public';
+            this.owner = '';
         }
     }
 
@@ -36,5 +41,7 @@ export class Game {
         this.mode = data.mode;
         this.board = new Board(data.board);
         this.modificationDate = data.modificationDate;
+        this.privacy = data.privacy;
+        this.owner = data.owner;
     }
 }
