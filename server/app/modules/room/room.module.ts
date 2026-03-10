@@ -14,6 +14,7 @@ import { ItemsHandler } from './game-room/handlers/items.handler';
 import { MovementHandler } from './game-room/handlers/movement.handler';
 import { PlayerConnectionHandler } from './game-room/handlers/player-connection.handler';
 import { StatisticsHandler } from './game-room/handlers/statistics.handler';
+import { TrapHandler } from './game-room/handlers/trap.handler';
 import { TurnHandler } from './game-room/handlers/turn.handler';
 import { VirtualPlayerHandler } from './game-room/handlers/virtual-player.handler';
 import { WaitingRoomChatHandler } from './waiting-room/handlers/waiting-room-chat.handler';
@@ -34,6 +35,7 @@ import { WaitingRoomGateway } from './waiting-room/waiting-room.gateway';
         VirtualPlayerHandler,
         GameLifecycleHandler,
         TurnHandler,
+        TrapHandler,
         ChatHandler,
         StatisticsHandler,
         PlayerConnectionHandler,

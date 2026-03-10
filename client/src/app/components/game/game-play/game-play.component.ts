@@ -14,6 +14,7 @@ import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { GAME_RESULT_MESSAGES, MODES, OUTCOME } from '@app/constants/game.constants';
 import { ROUTES } from '@app/constants/routes.constants';
 import { ActionSocketService } from '@app/services/communication/socket-handlers/action-socket.service';
+import { MovementSocketService } from '@app/services/communication/socket-handlers/movement-socket.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { CombatService } from '@app/services/gameplay/combat.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
@@ -50,6 +51,7 @@ export class GamePlayComponent implements OnInit {
         public router: Router,
         private socketService: SocketService,
         private actionSocketService: ActionSocketService,
+        private movementSocketService: MovementSocketService,
     ) {}
 
     get board(): Board {
@@ -82,6 +84,20 @@ export class GamePlayComponent implements OnInit {
 
     get candidateItems() {
         return this.gameManager.pendingReplacement?.candidateItems as Item[];
+    }
+
+    get isTrapPopupVisible(): boolean {
+        return this.gameManager.isTrapPopupVisible;
+    }
+
+    get trapCanAvoid(): boolean {
+        return this.gameManager.trapCanAvoid;
+    }
+
+    get trapDescription(): string {
+        return this.trapCanAvoid
+            ? 'Vous pouvez éviter le piège ou tenter de le traverser.'
+            : "Vous n'avez pas assez de points pour éviter le piège. Vous devez le traverser.";
     }
 
     get notificationTime(): number {
@@ -131,6 +147,11 @@ export class GamePlayComponent implements OnInit {
     onItemReplacement(selectedItem: Item): void {
         const [toDrop, coords] = this.gameManager.processReplacement(selectedItem);
         this.socketService.dropItem(toDrop, coords);
+    }
+
+    onTrapChoice(choice: 'avoid' | 'traverse'): void {
+        if (choice === 'avoid' && !this.trapCanAvoid) return;
+        this.movementSocketService.sendTrapChoice(choice);
     }
 
     generateEndMessage(): string {

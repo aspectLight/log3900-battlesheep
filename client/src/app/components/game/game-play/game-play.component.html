@@ -1,14 +1,23 @@
 <app-notification [message]="notificationMessage" [mode]="turnStartingMode"></app-notification>
 
 @if (isPopUpVisible) {
-    <app-pop-up 
-         [popUpMessage]="replaceMessage"
-         [items]="candidateItems"
-         (itemSelected)="onItemReplacement($event)">
-    </app-pop-up>
-}
-@if (isGameLoaded) {
+<app-pop-up [popUpMessage]="replaceMessage" [items]="candidateItems" (itemSelected)="onItemReplacement($event)"> </app-pop-up>
+} 
 
+@if (isTrapPopupVisible) {
+<app-pop-up
+    popUpMessage="Vous êtes sur un piège!"
+    [description]="trapDescription"
+    [firstOption]="trapCanAvoid ? 'Éviter' : 'Traverser'"
+    [secondOption]="'Traverser'"
+    [showSecondButton]="trapCanAvoid"
+    (confirm)="onTrapChoice(trapCanAvoid ? 'avoid' : 'traverse')"
+    (cancel)="onTrapChoice('traverse')"
+>
+</app-pop-up>
+}
+
+@if (isGameLoaded) {
 
 <!-- @if (isGameCanceled) {
     <app-pop-up popUpMessage="Partie annulée par manque de joueurs"
@@ -19,11 +28,10 @@
     } -->
 
 @if (isGameFinished) {
-    <app-notification [message]="generateEndMessage()" [time]=5000 [mode]="finishMode"></app-notification>
+<app-notification [message]="generateEndMessage()" [time]="5000" [mode]="finishMode"></app-notification>
 }
 
 @if(isCombatMode) {
-
 <div class="main-container">
     <div class="left-side">
         <app-game-info></app-game-info>
@@ -36,11 +44,11 @@
     </div>
     <div class="middle">
         <!-- <app-timer></app-timer> -->
-         @if(isTurnToFight){
+        @if(isTurnToFight){
             <p class="combatCountdown">À vous de jouer! Il vous reste: {{combatCountdown}} secondes</p>
-         }@else {
+        }@else {
             <p class="combatCountdown">C'est votre tour dans: {{combatCountdown}} secondes</p>
-         }
+        }
         <app-combat></app-combat>
     </div>
     <div class="right-side">
@@ -69,7 +77,7 @@
     <div class="right-side">
         <app-actions-hud></app-actions-hud>
         @if (isDebugging) {
-            <div class="debug-info">Game is in debug mode</div>
+        <div class="debug-info">Game is in debug mode</div>
         }
         <app-chatbox></app-chatbox>
     </div>
@@ -81,6 +89,6 @@
             [showSecondButton]="false"
             (confirm)="goBackToMenu()">
         </app-pop-up>
-    }
+}
 <app-loading-screen></app-loading-screen>
 }

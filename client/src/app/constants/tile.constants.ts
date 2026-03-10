@@ -46,6 +46,16 @@ export const TILE_TYPES: {
         defaultState: 'default',
         defaultOrientation: '',
     },
+    trap: {
+        name: 'Trap',
+        description: 'Un piège qui freine les déplacements',
+        baseMoveModifier: 1,
+        images: {
+            default: './assets/tiles/trap.png',
+        },
+        defaultState: 'default',
+        defaultOrientation: '',
+    },
     ice: {
         name: 'Ice',
         description: 'Une tuile de glace',
@@ -238,4 +248,4 @@ export const TILE_TYPES: {
     },
 };
 
-export const ALLOWED_TILES = ['door', 'water', 'ice', 'wall', 'tree', 'stone'];
+export const ALLOWED_TILES = ['door', 'water', 'ice', 'wall', 'tree', 'stone', 'trap'];

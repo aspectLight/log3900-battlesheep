@@ -48,6 +48,9 @@ export class GameManagerService {
     pendingReplacement: { player: Player; newItem: Item; candidateItems: Item[]; cellCoords: Coords } | null = null;
     dropItem: (item: Item, coords: Coords) => void;
 
+    isTrapPopupVisible: boolean = false;
+    trapCanAvoid: boolean = false;
+
     movementService: MovementService;
     room: Room;
 
