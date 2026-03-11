@@ -56,7 +56,7 @@ export class GameService {
         return this.game.description;
     }
     getGameSettings() {
-        return { mode: this.game.mode, boardSize: this.game.board.size };
+        return { mode: this.game.mode, boardSize: this.game.board.size, actionPoints: this.game.actionPoints ?? 1 };
     }
     getBoard(): Board {
         return this.game.getBoard();
@@ -71,9 +71,10 @@ export class GameService {
     setDescription(description: string) {
         this.game.description = description;
     }
-    setGameSettings(mode: string, boardSize: number): void {
+    setGameSettings(mode: string, boardSize: number, actionPoints: number = 1): void {
         this.game.mode = mode;
         this.game.board.size = boardSize;
+        this.game.actionPoints = actionPoints;
         this.itemService.setItemCountFromBoard(this.game.board);
 
         this.saveGameToLocalStorage();

@@ -9,6 +9,7 @@ export class Game {
     board: Board;
     isVisible: boolean;
     modificationDate: string;
+    actionPoints: number;
     constructor(data?: Game) {
         if (data) {
             this.setData(data);
@@ -20,6 +21,7 @@ export class Game {
             this.board = new Board(BOARD_CONFIGS[boardSize].board);
             this.isVisible = false;
             this.modificationDate = Date.now().toString();
+            this.actionPoints = 1;
         }
     }
 
@@ -39,5 +41,6 @@ export class Game {
         this.board = new Board(data.board);
         this.isVisible = data.isVisible;
         this.modificationDate = data.modificationDate;
+        this.actionPoints = data.actionPoints ?? 1;
     }
 }
