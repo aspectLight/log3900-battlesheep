@@ -1,7 +1,7 @@
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
 import { WaitingRoomService } from '@app/modules/shared-room/services/waiting-room.service';
 import { GameRoomEvents, WaitingRoomEvents } from '@common/socket.constants';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 
 /**
@@ -38,6 +38,13 @@ export class WaitingRoomGameHandler {
             return { success: true };
         } catch (error) {
             this.logger.error(`Erreur démarrage partie: ${error.message}`);
+
+            if (error instanceof NotFoundException) {
+                this.waitingRoomService.deleteRoom(roomId);
+                server.to(roomId).emit(WaitingRoomEvents.RoomCanceled);
+                this.logger.log(`Salle ${roomId} dissoute car le jeu a été supprimé`);
+            }
+
             return { success: false, error: error.message };
         }
     }

@@ -12,6 +12,7 @@ import { GameService } from '@app/services/editor/game.service';
 })
 export class GameConfiguratorComponent {
     mode: string = 'classique';
+    privacy: 'public' | 'private' | 'protected' = 'public';
     modeDescription: string = MODE_DESCRIPTIONS[this.mode as MODES];
     actionsDescription: string = "Nombre de points d'actions alloués à chaque joueur à chaque tour";
     boardSize: BoardSizes = BoardSizes.Moyenne;
@@ -39,6 +40,10 @@ export class GameConfiguratorComponent {
         this.items = BOARD_CONFIGS[this.boardSize].items;
     }
 
+    onPrivacyChange(privacy: string): void {
+        this.privacy = privacy as 'public' | 'private' | 'protected';
+    }
+
     onActionsChange(actions: number): void {
         this.actionsPoints = actions;
     }
@@ -46,7 +51,7 @@ export class GameConfiguratorComponent {
     createGame(): void {
         this.router.navigate([ROUTES.edit]);
         this.gameService.setNewGame();
-        this.gameService.setGameSettings(this.mode, this.board, this.actionsPoints);
+        this.gameService.setGameSettings(this.mode, this.board, this.privacy, this.actionsPoints);
     }
 
     cancel(): void {

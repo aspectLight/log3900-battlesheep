@@ -4,60 +4,96 @@
         <span>Nom</span>
         <span>Taille</span>
         <span>Mode de jeu</span>
+        <span>Propriétaire</span>
         <span>Dernière modification</span>
         @if (isModifierVisible) {
-        <span>Visibilité</span>
+        <span>Confidentialité</span>
         <span>Modifier</span>
         <span>Supprimer</span>
+        <span>Dupliquer</span>
         }
     </li>
     <div class="list">
-        @if (games.length > 0) {
-            <div class="games">
-                @for (game of games; track $index + '_' + game._id) { @if (isModifierVisible || game.isVisible) {
-                <li
-                    [attr.id]="game._id"
-                    [class.selected]="!isModifierVisible && game._id === selectedGameId"
-                    (click)="!isModifierVisible ? onSelectGame(game) : null"
-                >
-                    <span class="preview-image" [title]="game.description">
-                        <app-board [board]="game.board" mode="view"></app-board>
-                    </span>
-                    <span>{{ game.name }}</span>
-                    <span>{{ game.board.size }}</span>
-                    <span>{{ game.mode }}</span>
-                    <span>{{ game.modificationDate | date: 'short' }}</span>
-                    @if (isModifierVisible) {
-                    <span>
-                        <input class="checkbox" type="checkbox" [checked]="game.isVisible" (click)="onCheckboxClick(game, $event)" />
-                    </span>
-                    <span>
-                        <button (click)="onModifyClick(game)" routerLink="/edit-game">
-                            <img src="./assets/ui/edit_icon.png" style="width: 30px; height: auto" />
-                        </button>
-                    </span>
-                    <span>
-                        <button (click)="onDeleteClick(game)">
-                            <img src="./assets/ui/delete.png" style="width: 30px; height: auto" />
-                        </button>
-                    </span>
+        @if (isLoading) {
+        <app-loading-screen></app-loading-screen>
+        } @else if (games.length > 0) {
+        <div class="games">
+            @for (game of games; track $index + '_' + game._id) {
+            <li
+                [attr.id]="game._id"
+                [class.selected]="!isModifierVisible && game._id === selectedGameId"
+                (click)="!isModifierVisible ? onSelectGame(game) : null"
+            >
+                <span class="preview-image" [title]="game.description">
+                    <app-board [board]="game.board" mode="view"></app-board>
+                </span>
+                <span>{{ game.name }}</span>
+                <span>{{ game.board.size }}</span>
+                <span>{{ game.mode }}</span>
+                <span>{{ game.owner }}</span>
+                <span>{{ game.modificationDate | date: 'short' }}</span>
+                @if (isModifierVisible) {
+                <span>
+                    @if (game.owner === currentUsername) {
+                    <select [value]="game.privacy" (change)="onPrivacyChange(game, $any($event.target).value)">
+                        <option value="public">Public</option>
+                        <option value="private">Privé</option>
+                        <option value="protected">Privé-partagé</option>
+                    </select>
+                    } @else {
+                    {{ game.privacy }}
                     }
-                </li>
-                } }
-            </div>
+                </span>
+                <span>
+                    <button (click)="onModifyClick(game)" routerLink="/edit-game">
+                        <img src="./assets/ui/edit_icon.png" style="width: 30px; height: auto" />
+                    </button>
+                </span>
+                <span>
+                    <button (click)="onDeleteClick(game)">
+                        <img src="./assets/ui/delete.png" style="width: 30px; height: auto" />
+                    </button>
+                </span>
+                <span>
+                    @if (game.privacy === 'public') {
+                    <button (click)="onDuplicateClick(game)">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="25"
+                            height="25"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="white"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                    }
+                </span>
+                }
+            </li>
+            }
+        </div>
         } @else {
-            <app-loading-screen></app-loading-screen>
+        <p class="no-games-message">Aucun jeu disponible.</p>
         }
-
-        @if (isAddBoardVisible && games.length > 0) {
-        <button routerLink="/configure-game" class="square-button">
-            Ajouter un jeu
-        </button>
+        @if (isAddBoardVisible) {
+        <button routerLink="/configure-game" class="square-button">Ajouter un jeu</button>
         }
     </div>
     @if (showError) {
-    <app-pop-up popUpMessage="{{errorMessage}}" [popUpMessage]="errorMessage" [showSecondButton]="true"
-        secondOption="Non" (confirm)="onConfirm()" (cancel)="onCancel()">
+    <app-pop-up
+        popUpMessage="{{ errorMessage }}"
+        [popUpMessage]="errorMessage"
+        [showSecondButton]="true"
+        secondOption="Non"
+        (confirm)="onConfirm()"
+        (cancel)="onCancel()"
+    >
     </app-pop-up>
     }
-    </div>
+</div>

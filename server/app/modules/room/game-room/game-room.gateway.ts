@@ -22,6 +22,7 @@ import { ItemsHandler } from './handlers/items.handler';
 import { MovementHandler } from './handlers/movement.handler';
 import { PlayerConnectionHandler } from './handlers/player-connection.handler';
 import { StatisticsHandler } from './handlers/statistics.handler';
+import { TrapHandler } from './handlers/trap.handler';
 import { TurnHandler } from './handlers/turn.handler';
 import { VirtualPlayerHandler } from './handlers/virtual-player.handler';
 /**
@@ -43,6 +44,7 @@ export class GameRoomGateway implements OnGatewayConnection, OnGatewayDisconnect
         private readonly virtualPlayerHandler: VirtualPlayerHandler,
         private readonly gameLifecycleHandler: GameLifecycleHandler,
         private readonly turnHandler: TurnHandler,
+        private readonly trapHandler: TrapHandler,
         private readonly chatHandler: ChatHandler,
         private readonly statisticsHandler: StatisticsHandler,
         private readonly playerConnectionHandler: PlayerConnectionHandler,
@@ -135,6 +137,13 @@ export class GameRoomGateway implements OnGatewayConnection, OnGatewayDisconnect
     @SubscribeMessage(GameRoomEvents.SynchronizeMovement)
     handleSynchronizeMovement(@MessageBody() data: { roomId: string; playerId: string; destination: Coords }, @ConnectedSocket() socket: Socket) {
         return this.movementHandler.handleSynchronizeMovement(data, socket, this.server);
+    }
+
+    // ===== Trap Events =====
+
+    @SubscribeMessage(GameRoomEvents.TrapChoice)
+    handleTrapChoice(@MessageBody() data: { roomId: string; playerId: string; choice: 'avoid' | 'traverse' }): { success: boolean; error?: string } {
+        return this.trapHandler.handleTrapChoice(data, this.server);
     }
 
     // ===== Combat Events =====

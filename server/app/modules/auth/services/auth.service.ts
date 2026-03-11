@@ -4,6 +4,7 @@ import { User, UserDocument } from '@app/modules/auth/schemas/user.schema';
 import { FirebaseAdminService } from '@app/modules/auth/services/firebase-admin.service';
 import { CustomChannelService } from '@app/modules/general-chat/services/custom-channel.service';
 import { GeneralChatService } from '@app/modules/general-chat/services/general-chat.service';
+import { GameService } from '@app/modules/game/services/game.service';
 import { ConflictException, ForbiddenException, Inject, Injectable, Logger, NotFoundException, UnauthorizedException, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { DecodedIdToken } from 'firebase-admin/auth';
@@ -21,6 +22,7 @@ export class AuthService {
         @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
         @Inject(forwardRef(() => GeneralChatService)) private readonly generalChatService: GeneralChatService,
         @Inject(forwardRef(() => CustomChannelService)) private readonly customChannelService: CustomChannelService,
+        @Inject(forwardRef(() => GameService)) private readonly gameService: GameService,
     ) {}
 
     async verifyToken(idToken: string): Promise<DecodedIdToken> {
@@ -177,10 +179,14 @@ export class AuthService {
             await this.generalChatService.replaceUsername(username, DELETED_USER_PLACEHOLDER);
             await this.customChannelService.replaceUsername(username, DELETED_USER_PLACEHOLDER);
 
-            // 3. Delete user from Firebase Auth
+            // 3. Delete all games owned by this user
+            const deletedCount = await this.gameService.deleteGamesByOwner(username);
+            this.logger.log(`Deleted ${deletedCount} game(s) owned by user: ${username}`);
+
+            // 4. Delete user from Firebase Auth
             await this.firebaseAdminService.getAuth().deleteUser(uid);
 
-            // 4. Delete user from MongoDB
+            // 5. Delete user from MongoDB
             await this.userModel.deleteOne({ firebaseUid: uid });
 
             this.logger.log(`User deleted: ${uid}`);

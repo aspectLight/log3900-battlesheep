@@ -5,6 +5,7 @@ import { ErrorMessages } from '@common/error-messages.constants';
 import { GameRoomEvents } from '@common/socket.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
+import { TrapHandler } from './trap.handler';
 
 /**
  * Handler for player movement-related events in the game room
@@ -16,6 +17,7 @@ export class MovementHandler {
     constructor(
         private readonly gameRoomService: GameRoomService,
         private readonly gameMovementService: GameMovementService,
+        private readonly trapHandler: TrapHandler,
     ) {}
 
     /**
@@ -68,16 +70,39 @@ export class MovementHandler {
                 return { success: false, error: validation.isValid === false ? validation.error : '' };
             }
 
+            // Scan the path for trap tiles (skip index 0 which is the starting position)
+            let trapIndex = -1;
+            for (let i = 1; i < selectedPath.length; i++) {
+                if (this.trapHandler.isTrapTile(roomId, selectedPath[i].x, selectedPath[i].y)) {
+                    trapIndex = i;
+                    break;
+                }
+            }
+
+            // If a trap is found mid-path, truncate the path to stop at the trap
+            const effectivePath = trapIndex !== -1 ? selectedPath.slice(0, trapIndex + 1) : selectedPath;
+            const destination = effectivePath[effectivePath.length - 1];
+            const isTrap = trapIndex !== -1;
+
             const playerStats = room.playersStats.find((p) => p.name === player.name);
-            for (const path of selectedPath) {
+            for (const path of effectivePath) {
                 const alreadyVisited = playerStats.tilesVisited.some((tile) => tile.x === path.x && tile.y === path.y);
                 if (!alreadyVisited) playerStats.tilesVisited.push(path);
             }
 
-            const destination = selectedPath[selectedPath.length - 1];
             const movementPoints = this.gameMovementService.movePlayer(roomId, playerId, room.players, destination);
 
-            server.to(roomId).emit(GameRoomEvents.PlayerMoved, { ...data, movementPoints });
+            server.to(roomId).emit(GameRoomEvents.PlayerMoved, {
+                roomId,
+                playerId,
+                selectedPath: effectivePath,
+                movementPoints,
+                isTrap,
+            });
+
+            if (isTrap) {
+                this.trapHandler.handleTrapLanded(roomId, playerId, server);
+            }
 
             return { success: true, movementPoints };
         } catch (error) {

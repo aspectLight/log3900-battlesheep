@@ -6,9 +6,10 @@
     <h1> Créer une partie </h1>
 </div>
 
-<app-game-list 
-    [isAddBoardVisible]="false" 
-    [isModifierVisible]="false" 
+<app-game-list
+    [isAddBoardVisible]="false"
+    [isModifierVisible]="false"
+    [includeProtected]="true"
     (selectedGame)="onSelectGame($event)"
     (gamesLength)="onGamesLengthChange($event)"
     class="game-list">

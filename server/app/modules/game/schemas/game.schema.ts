@@ -23,12 +23,6 @@ export class Game extends Document {
 
     @Prop({
         required: true,
-        default: false,
-    })
-    isVisible: boolean;
-
-    @Prop({
-        required: true,
     })
     modificationDate: string;
 
@@ -45,6 +39,16 @@ export class Game extends Document {
         type: boardSchema,
     })
     board: Board;
+
+    @Prop({
+        required: true,
+        enum: ['public', 'private', 'protected'],
+        default: 'public',
+    })
+    privacy: string;
+
+    @Prop({ required: true })
+    owner: string;
 }
 
 export const gameSchema = SchemaFactory.createForClass(Game);

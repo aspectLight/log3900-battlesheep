@@ -87,7 +87,7 @@ describe('CreateGamePageComponent', () => {
         expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.createPlayer]);
     });
 
-    it('should not navigate if game is modified (hidden or deleted)', async () => {
+    it('should not navigate if game is not found (deleted)', async () => {
         const mockGame: Game = { _id: '123', name: 'Test Game' } as Game;
         component.selectedGame = mockGame;
 

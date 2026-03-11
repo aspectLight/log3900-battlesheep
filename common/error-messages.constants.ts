@@ -60,7 +60,7 @@ export const SPECIFIC_ERROR = {
 
 export const enum WARNING_MESSAGES {
     DeleteWarning = 'Vous allez supprimer ce jeu, voulez vous continuer ?',
-    VisibilityWarning = 'Vous allez modifier la visibilité de ce jeu, voulez vous continuer ?',
+
     SaveConfirmation = 'Voulez vous sauvegarder les mofification ?',
     QuitEdit = 'Attention, les modifications ne sont pas enregistrées, voulez-vous vraiment quitter ?',
     QuitChannel = 'Voulez-vous vraiment supprimer ce canal ?',
