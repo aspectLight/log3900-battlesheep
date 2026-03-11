@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { PROFILE_AVATARS } from '@app/constants/profile.constants';
 import { ChatService } from '@app/services/communication/chat.service';
 import { CustomChannelService } from '@app/services/communication/custom-channel.service';
 import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';

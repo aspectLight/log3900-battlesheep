@@ -19,6 +19,10 @@ export class ChatHandler {
      */
     async handleSendMessage(data: { message: string; playerName: string | null; roomId: string }, socket: Socket, server: Server): Promise<void> {
         try {
+            const room = this.gameRoomService.findRoomById(data.roomId);
+            const player = room?.players.find((p) => p.name === data.playerName);
+            const avatarId = player?.avatar?.name ? player.avatar.name.toLowerCase() : undefined;
+
             // Censurer le message avant de le diffuser
             const censoredMessage = this.chatModerationService.censor(data.message);
 

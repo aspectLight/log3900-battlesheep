@@ -3,7 +3,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Player } from '@app/classes/entity/player';
 import { PlayerCardComponent } from '@app/components/player/player-card/player-card.component';
-import { ChatboxComponent } from '@app/components/shared/chatbox/chatbox.component';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { VirtualPlayerType } from '@app/constants/player.constants';
 import { ROUTES } from '@app/constants/routes.constants';

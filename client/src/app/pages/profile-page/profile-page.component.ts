@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Auth, signOut } from '@angular/fire/auth';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -35,21 +35,18 @@ export class ProfilePageComponent implements OnInit {
     avatarFileError: string | null = null;
     avatarPreviewUrl: string | null = null;
 
-    form = this.fb.nonNullable.group({
+    form = inject(FormBuilder).nonNullable.group({
         username: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9]+$/)]],
         email: ['', [Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
         avatarId: [''],
     });
 
-    constructor(
-        private fb: FormBuilder,
-        private profileService: ProfileService,
-        private statsService: StatsService,
-        private socketService: SocketService,
-        private session: SessionService,
-        private auth: Auth,
-        private router: Router,
-    ) {}
+    private profileService = inject(ProfileService);
+    private statsService = inject(StatsService);
+    private socketService = inject(SocketService);
+    private session = inject(SessionService);
+    private auth = inject(Auth);
+    private router = inject(Router);
 
     get selectedAvatarId(): string {
         return this.form.controls.avatarId.value ?? '';
@@ -111,7 +108,7 @@ export class ProfilePageComponent implements OnInit {
                 avatarId: profile.avatarId,
             });
             if (profile.avatarUrl) {
-                this.avatarPreviewUrl = `${environment.serverUrl}${profile.avatarUrl}`;
+                this.avatarPreviewUrl = `${environment.serverUrl}${profile.avatarUrl}?t=${Date.now()}`;
                 this.form.controls.avatarId.setValue('');
             }
         } catch (error) {
@@ -166,6 +163,9 @@ export class ProfilePageComponent implements OnInit {
                 const updatedProfileWithAvatar = await this.profileService.uploadAvatar(this.selectedAvatarFile);
                 this.profile = updatedProfileWithAvatar;
                 this.selectedAvatarFile = null;
+                if (updatedProfileWithAvatar.avatarUrl) {
+                    this.avatarPreviewUrl = `${environment.serverUrl}${updatedProfileWithAvatar.avatarUrl}?t=${Date.now()}`;
+                }
             }
 
             this.showSuccessMessage = true;
