@@ -17,6 +17,12 @@ class ChannelMessage {
 
     @Prop({ required: true })
     time: string;
+
+    @Prop()
+    avatarId: string;
+
+    @Prop()
+    avatarUrl: string;
 }
 
 const channelMessageSchema = SchemaFactory.createForClass(ChannelMessage);

@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { PROFILE_AVATARS } from '@app/constants/profile.constants';
+import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
 import { AuthService } from '@app/services/communication/auth.service';
 import { ProfileService } from '@app/services/communication/profile.service';
 
@@ -37,7 +37,7 @@ export class RegisterPageComponent {
     showPassword = false;
     showConfirmPassword = false;
 
-    avatars = PROFILE_AVATARS;
+    avatars = ACCOUNT_CREATION_AVATARS;
 
     selectedAvatarFile: File | null = null;
     avatarFileError: string | null = null;

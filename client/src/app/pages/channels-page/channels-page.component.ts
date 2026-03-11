@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
 import { AuthService } from '@app/services/communication/auth.service';
 import { ChannelInfo, ChannelMessage, CustomChannelService } from '@app/services/communication/custom-channel.service';
 import { Subscription } from 'rxjs';
@@ -194,6 +195,13 @@ export class ChannelsPageComponent implements OnInit, OnDestroy {
 
         this.customChannelService.sendMessage(id, content);
         this.activeMessage = '';
+    }
+
+    resolveAvatar(avatarId?: string | null, avatarUrl?: string | null): string | null {
+        if (avatarUrl) return avatarUrl;
+        if (!avatarId) return null;
+        const avatar = ACCOUNT_CREATION_AVATARS.find((a) => a.id === avatarId);
+        return avatar ? avatar.image : null;
     }
 
     // --- Feedback UI ---------------------------------

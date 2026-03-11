@@ -9,9 +9,11 @@ import { GeneralChatEvents } from '@common/socket.constants';
     providedIn: 'root',
 })
 export class ChatService {
-    messages: { type: string; name?: string | null; content: string; time: string; avatarId?: string | null }[] = [];
+    messages: { type: string; name?: string | null; content: string; time: string; avatarId?: string | null; avatarUrl?: string | null }[] = [];
     playerName: string | null = null;
     username: string | null = null;
+    avatarId: string | null = null;
+    avatarUrl: string | null = null;
     private scrollCallback: (() => void) | null = null;
 
     constructor(
@@ -26,7 +28,7 @@ export class ChatService {
     setupListeners(): void {
         this.socketService.on(
             'massMessage',
-            (message: { type: string; name?: string | null; content: string; time: string; avatarId?: string | null }) => {
+            (message: { type: string; name?: string | null; content: string; time: string; avatarId?: string | null; avatarUrl?: string | null }) => {
                 this.messages.push(message);
                 this.triggerScroll();
             },
@@ -34,7 +36,14 @@ export class ChatService {
 
         this.socketService.on(
             'getMessagesResponse',
-            (messages: { type: string; name?: string | null; content: string; time: string; avatarId?: string | null }[]) => {
+            (messages: {
+                type: string;
+                name?: string | null;
+                content: string;
+                time: string;
+                avatarId?: string | null;
+                avatarUrl?: string | null;
+            }[]) => {
                 this.messages = messages;
                 this.triggerScroll();
             },
@@ -42,7 +51,7 @@ export class ChatService {
 
         this.socketService.on(
             GeneralChatEvents.GeneralChatMessage,
-            (message: { type: string; name: string; content: string; time: string; avatarId?: string | null }) => {
+            (message: { type: string; name: string; content: string; time: string; avatarId?: string | null; avatarUrl?: string | null }) => {
                 this.messages.push(message);
                 this.triggerScroll();
             },
@@ -50,7 +59,7 @@ export class ChatService {
 
         this.socketService.on(
             GeneralChatEvents.GeneralChatEmoji,
-            (emoji: { type: string; name: string; content: string; time: string; avatarId?: string | null }) => {
+            (emoji: { type: string; name: string; content: string; time: string; avatarId?: string | null; avatarUrl?: string | null }) => {
                 this.messages.push(emoji);
                 this.triggerScroll();
             },
@@ -58,7 +67,7 @@ export class ChatService {
 
         this.socketService.on(
             GeneralChatEvents.GetGeneralChatMessagesResponse,
-            (messages: { type: string; name: string; content: string; time: string; avatarId?: string | null }[]) => {
+            (messages: { type: string; name: string; content: string; time: string; avatarId?: string | null; avatarUrl?: string | null }[]) => {
                 this.messages = messages;
                 this.triggerScroll();
             },
@@ -119,8 +128,10 @@ export class ChatService {
         this.socketService.sendMessageToGameRoom(newMessage, this.playerName);
     }
 
-    joinGeneralChat(username: string): void {
+    joinGeneralChat(username: string, avatarId?: string | null, avatarUrl?: string | null): void {
         this.username = username;
+        this.avatarId = avatarId ?? null;
+        this.avatarUrl = avatarUrl ?? null;
         this.socketService.send(GeneralChatEvents.JoinGeneralChat, username);
     }
 
@@ -130,7 +141,12 @@ export class ChatService {
     }
 
     sendMessageToGeneralChat(newMessage: string): void {
-        this.socketService.send(GeneralChatEvents.SendMessageToGeneralChat, { username: this.username, message: newMessage });
+        this.socketService.send(GeneralChatEvents.SendMessageToGeneralChat, {
+            username: this.username,
+            message: newMessage,
+            avatarId: this.avatarId,
+            avatarUrl: this.avatarUrl,
+        });
     }
 
     setScrollHandler(callback: () => void) {

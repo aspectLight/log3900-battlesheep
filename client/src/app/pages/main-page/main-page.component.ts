@@ -4,8 +4,10 @@ import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { AuthService } from '@app/services/communication/auth.service';
 import { ChatService } from '@app/services/communication/chat.service';
 import { CustomChannelService } from '@app/services/communication/custom-channel.service';
+import { ProfileService } from '@app/services/communication/profile.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-main-page',
@@ -25,6 +27,7 @@ export class MainPageComponent implements OnInit {
         private authService: AuthService,
         private chatService: ChatService,
         private customChannelService: CustomChannelService,
+        private profileService: ProfileService,
         private router: Router,
     ) {}
 
@@ -45,12 +48,26 @@ export class MainPageComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         const username = this.authService.currentUser?.displayName || 'Utilisateur';
+
+        // Fetch the user profile to get the avatar of the logged-in user
+        let avatarId: string | null = null;
+        let avatarUrl: string | null = null;
+        try {
+            const profile = await this.profileService.getProfile();
+            avatarId = profile.avatarId ?? null;
+            avatarUrl = profile.avatarUrl ? `${environment.serverUrl}${profile.avatarUrl}` : null;
+        } catch {
+            // Continue without avatar on error
+        }
+
         // Wait for the socket to be fully reconnected
         await this.socketService.reconnect();
         // Then, configure listeners and join the chat
         this.chatService.setupListeners();
         this.customChannelService.setupListeners();
-        this.chatService.joinGeneralChat(username);
+        this.chatService.joinGeneralChat(username, avatarId, avatarUrl);
+        this.customChannelService.avatarId = avatarId;
+        this.customChannelService.avatarUrl = avatarUrl;
     }
 
     understandError() {

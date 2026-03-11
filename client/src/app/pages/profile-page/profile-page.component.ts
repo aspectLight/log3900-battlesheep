@@ -1,16 +1,16 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { environment } from 'src/environments/environment';
 import { Auth, signOut } from '@angular/fire/auth';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
+import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
 import { ROUTES } from '@app/constants/routes.constants';
-import { PROFILE_AVATARS } from '@app/constants/profile.constants';
 import { UserProfile, UserStatistics } from '@app/interfaces/profile.interface';
-import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { ProfileService } from '@app/services/communication/profile.service';
+import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { StatsService } from '@app/services/communication/stats.service';
 import { SessionService } from '@app/services/state/session.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-profile-page',
@@ -19,7 +19,7 @@ import { SessionService } from '@app/services/state/session.service';
     imports: [ReactiveFormsModule, RouterLink, PopUpComponent],
 })
 export class ProfilePageComponent implements OnInit {
-    avatars = PROFILE_AVATARS;
+    avatars = ACCOUNT_CREATION_AVATARS;
 
     profile: UserProfile | null = null;
     statistics: UserStatistics | null = null;
@@ -85,6 +85,7 @@ export class ProfilePageComponent implements OnInit {
         }
 
         this.selectedAvatarFile = file;
+        this.form.controls.avatarId.setValue('');
 
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -163,6 +164,7 @@ export class ProfilePageComponent implements OnInit {
                 const updatedProfileWithAvatar = await this.profileService.uploadAvatar(this.selectedAvatarFile);
                 this.profile = updatedProfileWithAvatar;
                 this.selectedAvatarFile = null;
+                this.form.controls.avatarId.setValue('');
                 if (updatedProfileWithAvatar.avatarUrl) {
                     this.avatarPreviewUrl = `${environment.serverUrl}${updatedProfileWithAvatar.avatarUrl}?t=${Date.now()}`;
                 }

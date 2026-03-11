@@ -4,4 +4,5 @@ export interface ChatMessage {
     content: string;
     time: string;
     avatarId?: string;
+    avatarUrl?: string;
 }

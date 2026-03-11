@@ -18,6 +18,12 @@ class HistoryMessage {
 
     @Prop({ required: true })
     time: string;
+
+    @Prop()
+    avatarId: string;
+
+    @Prop()
+    avatarUrl: string;
 }
 
 const HistoryMessageSchema = SchemaFactory.createForClass(HistoryMessage);
