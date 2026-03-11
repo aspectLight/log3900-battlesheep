@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild, inject } from '@angular/core';
 import { Auth, signOut } from '@angular/fire/auth';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -6,6 +6,7 @@ import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
 import { ROUTES } from '@app/constants/routes.constants';
 import { UserProfile, UserStatistics } from '@app/interfaces/profile.interface';
+import { CameraCaptureService } from '@app/services/communication/camera-capture.service';
 import { ProfileService } from '@app/services/communication/profile.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { StatsService } from '@app/services/communication/stats.service';
@@ -19,6 +20,12 @@ import { environment } from 'src/environments/environment';
     imports: [ReactiveFormsModule, RouterLink, PopUpComponent],
 })
 export class ProfilePageComponent implements OnInit {
+    @ViewChild('cameraVideo') cameraVideoRef!: ElementRef<HTMLVideoElement>;
+    @ViewChild('cameraCanvas') cameraCanvasRef!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
+
+    showAvatarMenu = false;
+
     avatars = ACCOUNT_CREATION_AVATARS;
 
     profile: UserProfile | null = null;
@@ -41,6 +48,8 @@ export class ProfilePageComponent implements OnInit {
         avatarId: [''],
     });
 
+    camera = inject(CameraCaptureService);
+
     private profileService = inject(ProfileService);
     private statsService = inject(StatsService);
     private socketService = inject(SocketService);
@@ -58,6 +67,14 @@ export class ProfilePageComponent implements OnInit {
         }
         const found = this.avatars.find((a) => a.id === this.profile?.avatarId);
         return found?.image ?? '';
+    }
+
+    @HostListener('document:click', ['$event.target'])
+    onDocumentClick(target: EventTarget | null) {
+        const picker = document.querySelector('.avatar-source-picker');
+        if (picker && target instanceof Node && !picker.contains(target)) {
+            this.showAvatarMenu = false;
+        }
     }
 
     onAvatarFileSelected(event: Event) {
@@ -179,6 +196,51 @@ export class ProfilePageComponent implements OnInit {
         } finally {
             this.isSaving = false;
         }
+    }
+
+    triggerFileInput() {
+        this.showAvatarMenu = false;
+        this.fileInputRef?.nativeElement.click();
+    }
+
+    async openCamera() {
+        this.showAvatarMenu = false;
+        this.camera.reset();
+        this.camera.showCameraModal = true;
+
+        await this.camera.startStream();
+
+        if (!this.camera.cameraError) {
+            setTimeout(() => this.camera.attachStream(this.cameraVideoRef), 0);
+        }
+    }
+
+    capturePhoto() {
+        this.camera.capturePhoto(this.cameraVideoRef, this.cameraCanvasRef);
+    }
+
+    async retakePhoto() {
+        this.camera.stopStream(this.cameraVideoRef);
+        this.camera.capturedImageDataUrl = null;
+        await this.camera.startStream();
+        if (!this.camera.cameraError) {
+            setTimeout(() => this.camera.attachStream(this.cameraVideoRef), 0);
+        }
+    }
+
+    useCapturedPhoto() {
+        if (!this.camera.capturedImageDataUrl) return;
+
+        this.selectedAvatarFile = this.camera.dataUrlToFile(this.camera.capturedImageDataUrl);
+        this.avatarPreviewUrl = this.camera.capturedImageDataUrl;
+        this.avatarFileError = null;
+        this.form.controls.avatarId.setValue('');
+
+        this.camera.closeCamera(this.cameraVideoRef);
+    }
+
+    closeCamera() {
+        this.camera.closeCamera(this.cameraVideoRef);
     }
 
     showError(message: string) {

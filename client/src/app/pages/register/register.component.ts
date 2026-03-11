@@ -1,8 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
+import { CameraCaptureService } from '@app/services/communication/camera-capture.service';
 import { AuthService } from '@app/services/communication/auth.service';
 import { ProfileService } from '@app/services/communication/profile.service';
 
@@ -27,15 +29,20 @@ const passwordMatchValidator: ValidatorFn = (group: AbstractControl): Validation
 @Component({
     selector: 'app-signup-page',
     standalone: true,
-    imports: [ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink, PopUpComponent],
     templateUrl: './register.component.html',
     styleUrl: './register.component.scss',
 })
 export class RegisterPageComponent {
+    @ViewChild('cameraVideo') cameraVideoRef!: ElementRef<HTMLVideoElement>;
+    @ViewChild('cameraCanvas') cameraCanvasRef!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
+
     errorMessage: string | null = null;
     isSubmitting = false;
     showPassword = false;
     showConfirmPassword = false;
+    showAvatarMenu = false;
 
     avatars = ACCOUNT_CREATION_AVATARS;
 
@@ -59,10 +66,19 @@ export class RegisterPageComponent {
         private authService: AuthService,
         private profileService: ProfileService,
         private router: Router,
+        public camera: CameraCaptureService,
     ) {}
 
     get selectedAvatarId(): string {
         return this.form.controls.avatarId.value ?? '';
+    }
+
+    @HostListener('document:click', ['$event.target'])
+    onDocumentClick(target: EventTarget | null) {
+        const picker = document.querySelector('.avatar-source-picker');
+        if (picker && target instanceof Node && !picker.contains(target)) {
+            this.showAvatarMenu = false;
+        }
     }
 
     onAvatarFileSelected(event: Event) {
@@ -112,6 +128,52 @@ export class RegisterPageComponent {
         this.avatarFileError = null;
         this.form.controls.avatarId.setValue(id);
         this.form.controls.avatarId.markAsTouched();
+    }
+
+    triggerFileInput() {
+        this.showAvatarMenu = false;
+        this.fileInputRef?.nativeElement.click();
+    }
+
+    async openCamera() {
+        this.showAvatarMenu = false;
+        this.camera.reset();
+        this.camera.showCameraModal = true;
+
+        await this.camera.startStream();
+
+        if (!this.camera.cameraError) {
+            setTimeout(() => this.camera.attachStream(this.cameraVideoRef), 0);
+        }
+    }
+
+    capturePhoto() {
+        this.camera.capturePhoto(this.cameraVideoRef, this.cameraCanvasRef);
+    }
+
+    async retakePhoto() {
+        this.camera.stopStream(this.cameraVideoRef);
+        this.camera.capturedImageDataUrl = null;
+        await this.camera.startStream();
+        if (!this.camera.cameraError) {
+            setTimeout(() => this.camera.attachStream(this.cameraVideoRef), 0);
+        }
+    }
+
+    useCapturedPhoto() {
+        if (!this.camera.capturedImageDataUrl) return;
+
+        this.selectedAvatarFile = this.camera.dataUrlToFile(this.camera.capturedImageDataUrl);
+        this.avatarPreviewUrl = this.camera.capturedImageDataUrl;
+        this.avatarFileError = null;
+        this.form.controls.avatarId.setValue('custom');
+        this.form.controls.avatarId.markAsTouched();
+
+        this.camera.closeCamera(this.cameraVideoRef);
+    }
+
+    closeCamera() {
+        this.camera.closeCamera(this.cameraVideoRef);
     }
 
     togglePasswordVisibility() {
