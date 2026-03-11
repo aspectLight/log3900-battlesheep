@@ -53,7 +53,7 @@
                             <button
                                 type="button"
                                 class="avatar-btn"
-                                [class.selected]="selectedAvatarId === a.id"
+                                [class.selected]="selectedAvatarId === a.id && !selectedAvatarFile"
                                 (click)="selectAvatar(a.id)"
                                 [title]="a.label"
                             >
@@ -61,8 +61,32 @@
                             </button>
                             }
                         </div>
-                        @if (form.controls.avatarId.touched && form.controls.avatarId.errors?.['required']) {
-                        <small class="error">Sélectionnez un avatar</small>
+                    </div>
+
+                    <div class="field">
+                        <label class="label" for="avatarUpload">Téléverser un avatar personnalisé</label>
+                        <div class="avatar-upload-row">
+                            @if (avatarPreviewUrl) {
+                            <div class="avatar-upload-preview">
+                                <img [src]="avatarPreviewUrl" alt="Aperçu avatar" class="avatar-preview-img" />
+                            </div>
+                            }
+                            <div class="upload-input-wrapper">
+                                <input
+                                    id="avatarUpload"
+                                    type="file"
+                                    (change)="onAvatarFileSelected($event)"
+                                    accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                                />
+                                @if (avatarPreviewUrl) {
+                                <span class="avatar-current-label">
+                                    @if (selectedAvatarFile) { Nouvel avatar } @else { Avatar actuel }
+                                </span>
+                                }
+                            </div>
+                        </div>
+                        @if (avatarFileError) {
+                        <small class="error">{{ avatarFileError }}</small>
                         }
                     </div>
 

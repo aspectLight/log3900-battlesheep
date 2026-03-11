@@ -11,7 +11,7 @@ import { Socket } from 'socket.io';
 @Injectable()
 export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly logger = new Logger(GeneralChatGateway.name);
-    private socketIdToUser = new Map<string, { username: string; avatarId: string }>();
+    private socketIdToUsername = new Map<string, string>();
     private disconnectionTimeouts = new Map<string, NodeJS.Timeout>();
 
     constructor(

@@ -6,6 +6,7 @@ import { PROFILE_AVATARS } from '@app/constants/profile.constants';
 import { UserProfile, UserStatistics } from '@app/interfaces/profile.interface';
 import { ProfileService } from '@app/services/communication/profile.service';
 import { StatsService } from '@app/services/communication/stats.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-profile-page',
@@ -24,10 +25,14 @@ export class ProfilePageComponent implements OnInit {
     showErrorMessage = false;
     errorMessage = '';
 
+    selectedAvatarFile: File | null = null;
+    avatarFileError: string | null = null;
+    avatarPreviewUrl: string | null = null;
+
     form = this.fb.nonNullable.group({
         username: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9]+$/)]],
         email: ['', [Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
-        avatarId: ['', [Validators.required]],
+        avatarId: [''],
     });
 
     constructor(
@@ -38,6 +43,47 @@ export class ProfilePageComponent implements OnInit {
 
     get selectedAvatarId(): string {
         return this.form.controls.avatarId.value ?? '';
+    }
+
+    get currentAvatarSrc(): string {
+        if (this.profile?.avatarUrl) {
+            return `${environment.serverUrl}${this.profile.avatarUrl}`;
+        }
+        const found = this.avatars.find((a) => a.id === this.profile?.avatarId);
+        return found?.image ?? '';
+    }
+
+    onAvatarFileSelected(event: Event) {
+        const input = event.target as HTMLInputElement;
+        const file = input.files?.[0] ?? null;
+        this.avatarFileError = null;
+        this.selectedAvatarFile = null;
+        this.avatarPreviewUrl = null;
+
+        if (!file) return;
+
+        const maxSize = 2 * 1024 * 1024;
+        const validTypes = ['image/jpeg', 'image/png'];
+
+        if (!validTypes.includes(file.type)) {
+            const extension = file.name.split('.').pop()?.toLowerCase() ?? 'inconnu';
+            this.avatarFileError = `Fichier de type "${extension}" non autorisé. Formats permis : JPG, JPEG, PNG (taille maximale 2 MB).`;
+            return;
+        }
+
+        if (file.size > maxSize) {
+            const sizeMb = file.size / (1024 * 1024);
+            this.avatarFileError = `Fichier trop volumineux (${sizeMb.toFixed(2)} MB). Taille maximale autorisée : 2 MB.`;
+            return;
+        }
+
+        this.selectedAvatarFile = file;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            this.avatarPreviewUrl = e.target?.result as string;
+        };
+        reader.readAsDataURL(file);
     }
 
     async ngOnInit() {
@@ -54,6 +100,10 @@ export class ProfilePageComponent implements OnInit {
                 email: profile.email,
                 avatarId: profile.avatarId,
             });
+            if (profile.avatarUrl) {
+                this.avatarPreviewUrl = `${environment.serverUrl}${profile.avatarUrl}`;
+                this.form.controls.avatarId.setValue('');
+            }
         } catch (error) {
             this.showError(this.profileService.getDefaultErrorMessage());
         } finally {
@@ -62,6 +112,9 @@ export class ProfilePageComponent implements OnInit {
     }
 
     selectAvatar(id: string) {
+        this.selectedAvatarFile = null;
+        this.avatarPreviewUrl = null;
+        this.avatarFileError = null;
         this.form.controls.avatarId.setValue(id);
         this.form.controls.avatarId.markAsTouched();
     }
@@ -69,7 +122,8 @@ export class ProfilePageComponent implements OnInit {
     async submitForm() {
         this.form.markAllAsTouched();
 
-        if (this.form.invalid || !this.profile) {
+        const hasAvatarSelected = !!this.form.controls.avatarId.value || !!this.selectedAvatarFile || !!this.profile?.avatarUrl;
+        if (this.form.invalid || !this.profile || !hasAvatarSelected) {
             return;
         }
 
@@ -78,19 +132,41 @@ export class ProfilePageComponent implements OnInit {
         this.showSuccessMessage = false;
 
         const formValues = this.form.getRawValue();
-        const result = await this.profileService.submitProfileUpdate(this.profile, formValues);
 
-        if (result.success && result.updatedProfile) {
-            this.profile = result.updatedProfile;
+        const updatePayload = this.profileService.buildUpdatePayload(this.profile, formValues);
+        const hasProfileChanges = Object.keys(updatePayload).length > 0;
+        const hasAvatarFile = !!this.selectedAvatarFile;
+
+        if (!hasProfileChanges && !hasAvatarFile) {
+            this.showError('Aucune modification détectée');
+            this.isSaving = false;
+            return;
+        }
+
+        try {
+            if (hasProfileChanges) {
+                const updatedProfile = await this.profileService.updateProfile(updatePayload);
+                this.profile = updatedProfile;
+                if (!updatedProfile.avatarUrl) {
+                    this.avatarPreviewUrl = null;
+                }
+            }
+
+            if (hasAvatarFile && this.selectedAvatarFile) {
+                const updatedProfileWithAvatar = await this.profileService.uploadAvatar(this.selectedAvatarFile);
+                this.profile = updatedProfileWithAvatar;
+                this.selectedAvatarFile = null;
+            }
+
             this.showSuccessMessage = true;
             setTimeout(() => {
                 this.showSuccessMessage = false;
             }, 3000);
-        } else if (result.error) {
-            this.showError(result.error);
+        } catch (error: unknown) {
+            this.showError(this.profileService.extractErrorMessage(error));
+        } finally {
+            this.isSaving = false;
         }
-
-        this.isSaving = false;
     }
 
     showError(message: string) {

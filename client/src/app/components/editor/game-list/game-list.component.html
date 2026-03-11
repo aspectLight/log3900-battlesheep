@@ -13,51 +13,53 @@
     </li>
     <div class="list">
         @if (games.length > 0) {
-            <div class="games">
-                @for (game of games; track $index + '_' + game._id) { @if (isModifierVisible || game.isVisible) {
-                <li
-                    [attr.id]="game._id"
-                    [class.selected]="!isModifierVisible && game._id === selectedGameId"
-                    (click)="!isModifierVisible ? onSelectGame(game) : null"
-                >
-                    <span class="preview-image" [title]="game.description">
-                        <app-board [board]="game.board" mode="view"></app-board>
-                    </span>
-                    <span>{{ game.name }}</span>
-                    <span>{{ game.board.size }}</span>
-                    <span>{{ game.mode }}</span>
-                    <span>{{ game.modificationDate | date: 'short' }}</span>
-                    @if (isModifierVisible) {
-                    <span>
-                        <input class="checkbox" type="checkbox" [checked]="game.isVisible" (click)="onCheckboxClick(game, $event)" />
-                    </span>
-                    <span>
-                        <button (click)="onModifyClick(game)" routerLink="/edit-game">
-                            <img src="./assets/ui/edit_icon.png" style="width: 30px; height: auto" />
-                        </button>
-                    </span>
-                    <span>
-                        <button (click)="onDeleteClick(game)">
-                            <img src="./assets/ui/delete.png" style="width: 30px; height: auto" />
-                        </button>
-                    </span>
-                    }
-                </li>
-                } }
-            </div>
+        <div class="games">
+            @for (game of games; track $index + '_' + game._id) { @if (isModifierVisible || game.isVisible) {
+            <li
+                [attr.id]="game._id"
+                [class.selected]="!isModifierVisible && game._id === selectedGameId"
+                (click)="!isModifierVisible ? onSelectGame(game) : null"
+            >
+                <span class="preview-image" [title]="game.description">
+                    <app-board [board]="game.board" mode="view"></app-board>
+                </span>
+                <span>{{ game.name }}</span>
+                <span>{{ game.board.size }}</span>
+                <span>{{ game.mode }}</span>
+                <span>{{ game.modificationDate | date: 'short' }}</span>
+                @if (isModifierVisible) {
+                <span>
+                    <input class="checkbox" type="checkbox" [checked]="game.isVisible" (click)="onCheckboxClick(game, $event)" />
+                </span>
+                <span>
+                    <button (click)="onModifyClick(game)" routerLink="/edit-game">
+                        <img src="./assets/ui/edit_icon.png" style="width: 30px; height: auto" />
+                    </button>
+                </span>
+                <span>
+                    <button (click)="onDeleteClick(game)">
+                        <img src="./assets/ui/delete.png" style="width: 30px; height: auto" />
+                    </button>
+                </span>
+                }
+            </li>
+            } }
+        </div>
         } @else {
-            <app-loading-screen></app-loading-screen>
-        }
-
-        @if (isAddBoardVisible && games.length > 0) {
-        <button routerLink="/configure-game" class="square-button">
-            Ajouter un jeu
-        </button>
+        <app-loading-screen></app-loading-screen>
+        } @if (isAddBoardVisible && games.length > 0) {
+        <button routerLink="/configure-game" class="square-button">Ajouter un jeu</button>
         }
     </div>
     @if (showError) {
-    <app-pop-up popUpMessage="{{errorMessage}}" [popUpMessage]="errorMessage" [showSecondButton]="true"
-        secondOption="Non" (confirm)="onConfirm()" (cancel)="onCancel()">
+    <app-pop-up
+        popUpMessage="{{ errorMessage }}"
+        [popUpMessage]="errorMessage"
+        [showSecondButton]="true"
+        secondOption="Non"
+        (confirm)="onConfirm()"
+        (cancel)="onCancel()"
+    >
     </app-pop-up>
     }
-    </div>
+</div>

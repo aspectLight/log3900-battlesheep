@@ -3,7 +3,24 @@ import { GetEmailByUsernameDto, LoginDto, RegisterUserDto, UpdateUserDto, Verify
 import { AuthGuard } from '@app/modules/auth/guards/auth.guard';
 import { UserDocument } from '@app/modules/auth/schemas/user.schema';
 import { AuthService } from '@app/modules/auth/services/auth.service';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpCode,
+    HttpStatus,
+    Param,
+    Patch,
+    Post,
+    Res,
+    UploadedFile,
+    UseGuards,
+    UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import type { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -20,6 +37,7 @@ export class AuthController {
                 email: user.email,
                 username: user.username,
                 avatarId: user.avatarId,
+                avatarUrl: user.avatarUrl,
             },
         };
     }
@@ -39,6 +57,7 @@ export class AuthController {
                 email: user.email,
                 username: user.username,
                 avatarId: user.avatarId,
+                avatarUrl: user.avatarUrl,
             },
         };
     }
@@ -81,6 +100,7 @@ export class AuthController {
             email: user.email,
             username: user.username,
             avatarId: user.avatarId,
+            avatarUrl: user.avatarUrl,
             preferences: user.preferences,
         };
     }
@@ -96,6 +116,7 @@ export class AuthController {
                 username: user.username,
                 email: user.email,
                 avatarId: user.avatarId,
+                avatarUrl: user.avatarUrl,
                 preferences: user.preferences,
             },
         };
@@ -134,10 +155,7 @@ export class AuthController {
     @Post('history/games/start')
     @UseGuards(AuthGuard)
     @HttpCode(HttpStatus.OK)
-    async startGameHistory(
-        @CurrentUser('firebaseUid') uid: string,
-        @Body() body: { mode: 'Classique' | 'CTF' },
-    ) {
+    async startGameHistory(@CurrentUser('firebaseUid') uid: string, @Body() body: { mode: 'Classique' | 'CTF' }) {
         return await this.authService.startGameHistory(uid, body.mode);
     }
 
@@ -145,10 +163,7 @@ export class AuthController {
     @Post('history/games/end')
     @UseGuards(AuthGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
-    async endGameHistory(
-        @CurrentUser('firebaseUid') uid: string,
-        @Body() body: { startDate: string; hasWon: boolean },
-    ) {
+    async endGameHistory(@CurrentUser('firebaseUid') uid: string, @Body() body: { startDate: string; hasWon: boolean }) {
         await this.authService.endGameHistory(uid, body.startDate, body.hasWon);
     }
 
@@ -156,10 +171,56 @@ export class AuthController {
     @Post('history/games/abandon')
     @UseGuards(AuthGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
-    async abandonGameHistory(
-        @CurrentUser('firebaseUid') uid: string,
-        @Body() body: { startDate: string },
-    ) {
+    async abandonGameHistory(@CurrentUser('firebaseUid') uid: string, @Body() body: { startDate: string }) {
         await this.authService.abandonGameHistory(uid, body.startDate);
+    }
+
+    // POST /auth/avatar
+    @Post('avatar')
+    @UseGuards(AuthGuard)
+    @UseInterceptors(
+        FileInterceptor('file', {
+            limits: { fileSize: 2 * 1024 * 1024 },
+            fileFilter: (req, file, cb) => {
+                const allowedMimeTypes = ['image/jpeg', 'image/png'];
+                if (!allowedMimeTypes.includes(file.mimetype)) {
+                    return cb(new BadRequestException('Formats acceptés : JPG, JPEG, PNG. GIF refusé.'), false);
+                }
+                cb(null, true);
+            },
+        }),
+    )
+    async uploadAvatar(@CurrentUser('firebaseUid') uid: string, @UploadedFile() file: Express.Multer.File) {
+        if (!file) {
+            throw new BadRequestException('Aucun fichier reçu');
+        }
+
+        const user = await this.authService.updateAvatarFromFile(uid, file);
+
+        return {
+            message: 'Avatar mis à jour',
+            user: {
+                id: user._id,
+                email: user.email,
+                username: user.username,
+                avatarId: user.avatarId,
+                avatarUrl: user.avatarUrl,
+                preferences: user.preferences,
+            },
+        };
+    }
+
+    // GET /auth/avatar/:uid
+    @Get('avatar/:uid')
+    async getAvatar(@Param('uid') uid: string, @Res() res: Response) {
+        const user = await this.authService.getUserByUid(uid);
+
+        if (!user.avatarImageBuffer || !user.avatarImageMimeType) {
+            throw new BadRequestException('Avatar introuvable pour cet utilisateur');
+        }
+
+        res.setHeader('Content-Type', user.avatarImageMimeType);
+        res.setHeader('Cache-Control', 'public, max-age=86400');
+        return res.send(user.avatarImageBuffer);
     }
 }
