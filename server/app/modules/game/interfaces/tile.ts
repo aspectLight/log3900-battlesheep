@@ -15,6 +15,7 @@ export enum TileType {
     Corner = 'corner',
     Intersection = 'intersection',
     Trap = 'trap',
+    TeleportPad = 'teleportPad',
 }
 
 export enum MoveCosts {
@@ -29,4 +30,5 @@ export enum MoveCosts {
     Corner = Infinity,
     Intersection = Infinity,
     Trap = 1,
+    TeleportPad = 1,
 }

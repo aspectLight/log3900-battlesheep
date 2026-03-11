@@ -283,6 +283,17 @@ export class MovementSocketService implements ISocketService {
                         });
                     }
                 }
+
+                // Teleport VP after animation completes to stay in sync with server
+                if (data.teleportDestination) {
+                    this.movementService.teleportPlayer(
+                        this.gameManagerService.getBoard(),
+                        player,
+                        data.teleportDestination.x,
+                        data.teleportDestination.y,
+                    );
+                }
+
                 const gameRoomId = this.gameManagerService.getRoomId();
                 if (data.opponentPlayerId) {
                     this.startVirtualCombat(gameRoomId, data.playerId, data.opponentPlayerId);
@@ -388,6 +399,11 @@ export class MovementSocketService implements ISocketService {
         if (!player.cell) {
             return false;
         }
+
+        if (player.actionPoints > 0 && player.cell.tile.type === 'teleportPad') {
+            return true;
+        }
+
         const directions = [
             { x: 0, y: 1 },
             { x: 0, y: -1 },

@@ -3,6 +3,7 @@ import { Board } from '@app/classes/board/board';
 import { Cell } from '@app/classes/board/cell';
 import { AutoTileService } from '@app/services/editor/auto-tile.service';
 import { ItemService } from '@app/services/editor/item.service';
+import { TeleportService } from '@app/services/editor/teleport.service';
 import { TileService } from '@app/services/editor/tile.service';
 
 @Injectable({
@@ -17,14 +18,21 @@ export class PaintService {
         private tileService: TileService,
         private itemService: ItemService,
         private autoTileService: AutoTileService,
+        private teleportService: TeleportService,
     ) {}
 
     handleMouseDown(event: MouseEvent, cell: Cell, board: Board): void {
         if (event.button === 0) {
             if (this.isDisabled) return;
             event.preventDefault();
-            this.isPainting = true;
-            this.paint(cell, board);
+
+            const activeTile = this.tileService.getActiveTile();
+            if (activeTile?.type === 'teleportPad') {
+                this.teleportService.placeTeleportTile(cell, board);
+            } else {
+                this.isPainting = true;
+                this.paint(cell, board);
+            }
         } else if (event.button === 2) {
             this.isErasing = true;
             this.erase(cell, board);
@@ -66,6 +74,10 @@ export class PaintService {
     }
 
     private erase(cell: Cell, board: Board): void {
+        if (cell.tile.type === 'teleportPad') {
+            this.teleportService.erasePair(cell, board);
+            return;
+        }
         this.eraseItem(cell);
         board.setTileDefault(cell.x, cell.y);
         this.autoTileService.updateSurroundingTiles(cell.x, cell.y, board);
