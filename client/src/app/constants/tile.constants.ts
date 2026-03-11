@@ -246,26 +246,6 @@ export const TILE_TYPES: {
         defaultOrientation: 'TUp',
         rotations: ['TUp', 'TRight', 'TDown', 'TLeft', 'Cross'],
     },
-    trap: {
-        name: 'Tree',
-        description: 'Un arbre qui ne peut pas être grimpé',
-        baseMoveModifier: -1,
-        images: {
-            default: './assets/tiles/tree.png',
-        },
-        defaultState: 'default',
-        defaultOrientation: '',
-    },
-    teleportPad: {
-        name: 'Tree',
-        description: 'Un arbre qui ne peut pas être grimpé',
-        baseMoveModifier: -1,
-        images: {
-            default: './assets/tiles/tree.png',
-        },
-        defaultState: 'default',
-        defaultOrientation: '',
-    },
 };
 
 export const ALLOWED_TILES = ['door', 'water', 'ice', 'wall', 'tree', 'stone', 'trap'];
