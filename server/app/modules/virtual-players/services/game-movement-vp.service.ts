@@ -15,163 +15,163 @@ export class GameMovementVPService {
         private readonly gameRoomService: GameRoomService,
     ) {}
 
-    determineVPMovement(player: Player, players: Player[], isCTF?: boolean) {
-        if (isCTF) return this.determineCTFAction(player, players);
+    determineVPMovement(roomId: string, player: Player, players: Player[], isCTF?: boolean) {
+        if (isCTF) return this.determineCTFAction(roomId, player, players);
         return player.profile === VirtualPlayerType.Aggressive
-            ? this.determineAggressiveAction(player, players)
-            : this.determineDefensiveAction(player, players);
+            ? this.determineAggressiveAction(roomId, player, players)
+            : this.determineDefensiveAction(roomId, player, players);
     }
 
-    determineCTFAction(player: Player, players: Player[]) {
-        const reachableData = this.gameMovementService.getReachableTilesAndPaths(player.id, players, true);
+    determineCTFAction(roomId: string, player: Player, players: Player[]) {
+        const reachableData = this.gameMovementService.getReachableTilesAndPaths(roomId, player.id, players, true);
         if (!reachableData) return null;
-        const { reachableTiles, pathsMap } = reachableData;
+        const { reachableTiles, pathsMap, costMap } = reachableData;
 
         if (this.gameRoomService.isCarryingFlag(player)) {
-            return this.goToSpawnPoint(player, reachableTiles, pathsMap);
+            return this.goToSpawnPoint(roomId, player, reachableTiles, pathsMap, undefined, costMap);
         }
 
-        const flagItem = this.movementAlgorithms.findClosestItem(player.position, this.hasFlagItem);
-        if (flagItem) return this.goCloserToTarget(player, flagItem.path);
+        const flagItem = this.movementAlgorithms.findClosestItem(roomId, player.position, this.hasFlagItem);
+        if (flagItem) return this.goCloserToTarget(roomId, player, flagItem.path);
 
         const allyWithFlag = this.gameRoomService.isFlagWithOurTeam(player);
         if (allyWithFlag) {
-            const movement = this.chaseOpponent(player, reachableTiles, pathsMap);
+            const movement = this.chaseOpponent(roomId, player, reachableTiles, pathsMap, undefined, costMap);
             if (movement) return movement;
         } else if (!allyWithFlag) {
             if (player.profile === VirtualPlayerType.Aggressive) {
-                const movement = this.chaseOpponent(player, reachableTiles, pathsMap, true);
+                const movement = this.chaseOpponent(roomId, player, reachableTiles, pathsMap, true, costMap);
                 if (movement) return movement;
             } else if (player.profile === 'defensive') {
                 const opponentWithFlag = this.findOpponentWithFlag(player, players);
-                if (opponentWithFlag) return this.goToSpawnPoint(player, reachableTiles, pathsMap, opponentWithFlag);
+                if (opponentWithFlag) return this.goToSpawnPoint(roomId, player, reachableTiles, pathsMap, opponentWithFlag, costMap);
             }
         }
-        return this.goToSpawnPoint(player, reachableTiles, pathsMap);
+        return this.goToSpawnPoint(roomId, player, reachableTiles, pathsMap, undefined, costMap);
     }
 
-    determineAggressiveAction(player: Player, players: Player[]) {
+    determineAggressiveAction(roomId: string, player: Player, players: Player[]) {
         const emptyPath: Coords[] = [];
-        const reachableData = this.gameMovementService.getReachableTilesAndPaths(player.id, players, true);
+        const reachableData = this.gameMovementService.getReachableTilesAndPaths(roomId, player.id, players, true);
         if (!reachableData) return null;
-        const { reachableTiles, pathsMap } = reachableData;
+        const { reachableTiles, pathsMap, costMap } = reachableData;
 
-        const neighborOpponentTarget = this.movementAlgorithms.findNeighborPlayer(player);
+        const neighborOpponentTarget = this.movementAlgorithms.findNeighborPlayer(roomId, player);
         if (neighborOpponentTarget) return { path: emptyPath, remainingMovementPoints: player.movementPoints };
-        const opponentTarget = this.findReachablePlayer(player, reachableTiles);
+        const opponentTarget = this.findReachablePlayer(roomId, player, reachableTiles);
         if (opponentTarget) {
-            const { path, destination } = this.movementAlgorithms.findWayToTarget(player, opponentTarget.coord, reachableTiles, pathsMap);
+            const { path, destination } = this.movementAlgorithms.findWayToTarget(roomId, player, opponentTarget.coord, reachableTiles, pathsMap);
             if (!path || !destination) return null;
-            const itemPathData = this.movementAlgorithms.lookForItemInPath(path);
+            const itemPathData = this.movementAlgorithms.lookForItemInPath(roomId, path);
             if (itemPathData) {
-                const remainingMovementPointsItem = this.moveVirtualPlayer(player, {
+                const remainingMovementPointsItem = this.moveVirtualPlayer(roomId, player, {
                     coord: itemPathData.path[itemPathData.path.length - 1],
                     cost: itemPathData.cost,
-                });
+                }, costMap);
                 return {
                     path: itemPathData.path,
                     remainingMovementPoints: remainingMovementPointsItem,
                 };
             }
-            const remainingMovementPoints = this.moveVirtualPlayer(player, destination);
+            const remainingMovementPoints = this.moveVirtualPlayer(roomId, player, destination, costMap);
             return { path, remainingMovementPoints };
         }
 
-        const itemTarget = this.findReachableItem(player, reachableTiles);
-        if (itemTarget) return this.goForReachableTarget(player, itemTarget, pathsMap);
+        const itemTarget = this.findReachableItem(roomId, player, reachableTiles);
+        if (itemTarget) return this.goForReachableTarget(roomId, player, itemTarget, pathsMap, costMap);
 
-        let movement = this.goForDistantTarget(player, 'player');
+        let movement = this.goForDistantTarget(roomId, player, 'player');
         if (movement) return movement;
 
-        movement = this.goForDistantTarget(player, 'item');
+        movement = this.goForDistantTarget(roomId, player, 'item');
         if (movement) return movement;
 
         if (player.inventory.length < 2) {
-            const randomItemTarget = this.findReachableRandomItem(player, reachableTiles);
-            if (randomItemTarget) return this.goForReachableTarget(player, randomItemTarget, pathsMap);
-            movement = this.goForDistantTarget(player, 'random');
+            const randomItemTarget = this.findReachableRandomItem(roomId, player, reachableTiles);
+            if (randomItemTarget) return this.goForReachableTarget(roomId, player, randomItemTarget, pathsMap, costMap);
+            movement = this.goForDistantTarget(roomId, player, 'random');
             if (movement) return movement;
         }
 
-        return this.goToSpawnPoint(player, reachableTiles, pathsMap);
+        return this.goToSpawnPoint(roomId, player, reachableTiles, pathsMap, undefined, costMap);
     }
 
-    determineDefensiveAction(player: Player, players: Player[]) {
+    determineDefensiveAction(roomId: string, player: Player, players: Player[]) {
         const emptyPath: Coords[] = [];
-        const reachableData = this.gameMovementService.getReachableTilesAndPaths(player.id, players, true);
+        const reachableData = this.gameMovementService.getReachableTilesAndPaths(roomId, player.id, players, true);
         if (!reachableData) return null;
-        const { reachableTiles, pathsMap } = reachableData;
+        const { reachableTiles, pathsMap, costMap } = reachableData;
 
-        const itemTarget = this.findReachableItem(player, reachableTiles);
-        if (itemTarget) return this.goForReachableTarget(player, itemTarget, pathsMap);
+        const itemTarget = this.findReachableItem(roomId, player, reachableTiles);
+        if (itemTarget) return this.goForReachableTarget(roomId, player, itemTarget, pathsMap, costMap);
 
-        const neighborOpponentTarget = this.movementAlgorithms.findNeighborPlayer(player);
+        const neighborOpponentTarget = this.movementAlgorithms.findNeighborPlayer(roomId, player);
         if (neighborOpponentTarget) return { path: emptyPath, remainingMovementPoints: player.movementPoints };
 
-        const opponentTarget = this.findReachablePlayer(player, reachableTiles);
+        const opponentTarget = this.findReachablePlayer(roomId, player, reachableTiles);
         if (opponentTarget) {
-            const { path, destination } = this.movementAlgorithms.findWayToTarget(player, opponentTarget.coord, reachableTiles, pathsMap);
+            const { path, destination } = this.movementAlgorithms.findWayToTarget(roomId, player, opponentTarget.coord, reachableTiles, pathsMap);
             if (!path || !destination) return null;
-            const itemPathData = this.movementAlgorithms.lookForItemInPath(path);
+            const itemPathData = this.movementAlgorithms.lookForItemInPath(roomId, path);
             if (itemPathData) {
-                const remainingMovementPointsItem = this.moveVirtualPlayer(player, {
+                const remainingMovementPointsItem = this.moveVirtualPlayer(roomId, player, {
                     coord: itemPathData.path[itemPathData.path.length - 1],
                     cost: itemPathData.cost,
-                });
+                }, costMap);
                 return {
                     path: itemPathData.path,
                     remainingMovementPoints: remainingMovementPointsItem,
                 };
             }
-            const remainingMovementPoints = this.moveVirtualPlayer(player, destination);
+            const remainingMovementPoints = this.moveVirtualPlayer(roomId, player, destination, costMap);
             return { path, remainingMovementPoints };
         }
 
-        const itemMovement = this.goForDistantTarget(player, 'item');
+        const itemMovement = this.goForDistantTarget(roomId, player, 'item');
         if (itemMovement) return itemMovement;
 
-        const playerMovement = this.goForDistantTarget(player, 'player');
+        const playerMovement = this.goForDistantTarget(roomId, player, 'player');
         if (playerMovement) return playerMovement;
 
         if (player.inventory.length < 2) {
-            const randomItemTarget = this.findReachableRandomItem(player, reachableTiles);
-            if (randomItemTarget) return this.goForReachableTarget(player, randomItemTarget, pathsMap);
-            const movement = this.goForDistantTarget(player, 'random');
+            const randomItemTarget = this.findReachableRandomItem(roomId, player, reachableTiles);
+            if (randomItemTarget) return this.goForReachableTarget(roomId, player, randomItemTarget, pathsMap, costMap);
+            const movement = this.goForDistantTarget(roomId, player, 'random');
             if (movement) return movement;
         }
-        return this.goToSpawnPoint(player, reachableTiles, pathsMap);
+        return this.goToSpawnPoint(roomId, player, reachableTiles, pathsMap, undefined, costMap);
     }
 
-    goForReachableTarget(player: Player, target: { coord: Coords; cost: number }, pathsMap: Map<string, Coords>) {
+    goForReachableTarget(roomId: string, player: Player, target: { coord: Coords; cost: number }, pathsMap: Map<string, Coords>, costMap?: Map<string, number>) {
         const path = this.gameMovementService.getShortestPath(player.position, target.coord, pathsMap);
-        const remainingMovementPoints = this.moveVirtualPlayer(player, target);
+        const remainingMovementPoints = this.moveVirtualPlayer(roomId, player, target, costMap);
         return { path, remainingMovementPoints };
     }
 
-    goForDistantTarget(player: Player, targetType: 'item' | 'player' | 'random') {
+    goForDistantTarget(roomId: string, player: Player, targetType: 'item' | 'player' | 'random') {
         if (targetType === 'player') {
-            const closestOpponent = this.movementAlgorithms.findClosestPlayer(player);
-            if (closestOpponent) return this.goCloserToTarget(player, closestOpponent.path);
+            const closestOpponent = this.movementAlgorithms.findClosestPlayer(roomId, player);
+            if (closestOpponent) return this.goCloserToTarget(roomId, player, closestOpponent.path);
         } else if (targetType === 'item') {
             const closestItem =
                 player.profile === VirtualPlayerType.Aggressive
-                    ? this.movementAlgorithms.findClosestItem(player.position, this.hasAggressiveItem)
-                    : this.movementAlgorithms.findClosestItem(player.position, this.hasDefensiveItem);
-            if (closestItem) return this.goCloserToTarget(player, closestItem.path);
+                    ? this.movementAlgorithms.findClosestItem(roomId, player.position, this.hasAggressiveItem)
+                    : this.movementAlgorithms.findClosestItem(roomId, player.position, this.hasDefensiveItem);
+            if (closestItem) return this.goCloserToTarget(roomId, player, closestItem.path);
         } else if (targetType === 'random') {
-            const closestItem = this.movementAlgorithms.findClosestItem(player.position, this.hasItem);
-            if (closestItem) return this.goCloserToTarget(player, closestItem.path);
+            const closestItem = this.movementAlgorithms.findClosestItem(roomId, player.position, this.hasItem);
+            if (closestItem) return this.goCloserToTarget(roomId, player, closestItem.path);
         }
     }
 
-    goCloserToTarget(player: Player, wayToTarget: Coords[]) {
-        const truncatedPath = this.movementAlgorithms.truncatePath(wayToTarget, player.movementPoints, player.position);
+    goCloserToTarget(roomId: string, player: Player, wayToTarget: Coords[]) {
+        const truncatedPath = this.movementAlgorithms.truncatePath(roomId, wayToTarget, player.movementPoints, player.position);
         const destination = truncatedPath[truncatedPath.length - 1];
-        const remainingMovementPoints = this.moveVirtualPlayer(player, destination);
+        const remainingMovementPoints = this.moveVirtualPlayer(roomId, player, destination);
         return { path: truncatedPath, remainingMovementPoints };
     }
 
-    goToSpawnPoint(player: Player, reachableTiles: { coord: Coords; cost: number }[], pathsMap: Map<string, Coords>, otherPlayer?: Player) {
+    goToSpawnPoint(roomId: string, player: Player, reachableTiles: { coord: Coords; cost: number }[], pathsMap: Map<string, Coords>, otherPlayer?: Player, costMap?: Map<string, number>) {
         const emptyPath: Coords[] = [];
         const isAtSpawnPoint = (movingPlayer: Player, targetSpawnPoint: Coords) =>
             movingPlayer.position.x === targetSpawnPoint.x && movingPlayer.position.y === targetSpawnPoint.y;
@@ -183,121 +183,122 @@ export class GameMovementVPService {
         }
 
         const spawnPoint = otherPlayer
-            ? this.gameMovementService.getCell(otherPlayer.spawnPoint.x, otherPlayer.spawnPoint.y)
-            : this.gameMovementService.getCell(player.spawnPoint.x, player.spawnPoint.y);
+            ? this.gameMovementService.getCell(roomId, otherPlayer.spawnPoint.x, otherPlayer.spawnPoint.y)
+            : this.gameMovementService.getCell(roomId, player.spawnPoint.x, player.spawnPoint.y);
 
         const reachableSpawnPoint = otherPlayer
-            ? this.findReachableSpawnPoint(player, reachableTiles, otherPlayer)
-            : this.findReachableSpawnPoint(player, reachableTiles);
+            ? this.findReachableSpawnPoint(roomId, player, reachableTiles, otherPlayer)
+            : this.findReachableSpawnPoint(roomId, player, reachableTiles);
 
         if (reachableSpawnPoint) {
-            if (this.gameMovementService.isCellFree(spawnPoint, player.id)) return this.goForReachableTarget(player, reachableSpawnPoint, pathsMap);
+            if (this.gameMovementService.isCellFree(spawnPoint, player.id)) return this.goForReachableTarget(roomId, player, reachableSpawnPoint, pathsMap, costMap);
             else {
-                const neighborOpponentTarget = this.movementAlgorithms.findNeighborPlayer(player, true);
+                const neighborOpponentTarget = this.movementAlgorithms.findNeighborPlayer(roomId, player, true);
                 if (!neighborOpponentTarget) {
                     return { path: emptyPath, remainingMovementPoints: player.movementPoints };
                 } else {
                     const spawnPointCoords = { x: spawnPoint.x, y: spawnPoint.y };
-                    const { path, destination } = this.movementAlgorithms.findWayToTarget(player, spawnPointCoords, reachableTiles, pathsMap);
+                    const { path, destination } = this.movementAlgorithms.findWayToTarget(roomId, player, spawnPointCoords, reachableTiles, pathsMap);
                     if (!path || !destination) return null;
-                    const remainingMovementPoints = this.moveVirtualPlayer(player, destination);
+                    const remainingMovementPoints = this.moveVirtualPlayer(roomId, player, destination, costMap);
                     return { path, remainingMovementPoints };
                 }
             }
         }
 
         const distantSpawnPoint = otherPlayer
-            ? this.movementAlgorithms.findSpawnPoint(player, otherPlayer)
-            : this.movementAlgorithms.findSpawnPoint(player);
+            ? this.movementAlgorithms.findSpawnPoint(roomId, player, otherPlayer)
+            : this.movementAlgorithms.findSpawnPoint(roomId, player);
 
         if (!distantSpawnPoint || !distantSpawnPoint.path) return null;
-        return this.goCloserToTarget(player, distantSpawnPoint.path);
+        return this.goCloserToTarget(roomId, player, distantSpawnPoint.path);
     }
 
-    chaseOpponent(player: Player, reachableTiles: { coord: Coords; cost: number }[], pathsMap: Map<string, Coords>, withFlag?: boolean) {
+    chaseOpponent(roomId: string, player: Player, reachableTiles: { coord: Coords; cost: number }[], pathsMap: Map<string, Coords>, withFlag?: boolean, costMap?: Map<string, number>) {
         const reachableOpponent = withFlag
-            ? this.findReachableOpponentWithFlag(player, reachableTiles)
-            : this.findReachableOpponent(player, reachableTiles);
+            ? this.findReachableOpponentWithFlag(roomId, player, reachableTiles)
+            : this.findReachableOpponent(roomId, player, reachableTiles);
         if (reachableOpponent) {
-            const { path, destination } = this.movementAlgorithms.findWayToTarget(player, reachableOpponent.coord, reachableTiles, pathsMap);
+            const { path, destination } = this.movementAlgorithms.findWayToTarget(roomId, player, reachableOpponent.coord, reachableTiles, pathsMap);
             if (!path || !destination) return null;
-            const itemPathData = this.movementAlgorithms.lookForItemInPath(path);
+            const itemPathData = this.movementAlgorithms.lookForItemInPath(roomId, path);
             if (itemPathData) {
-                const remainingMovementPointsItem = this.moveVirtualPlayer(player, {
+                const remainingMovementPointsItem = this.moveVirtualPlayer(roomId, player, {
                     coord: itemPathData.path[itemPathData.path.length - 1],
                     cost: itemPathData.cost,
-                });
+                }, costMap);
                 return {
                     path: itemPathData.path,
                     remainingMovementPoints: remainingMovementPointsItem,
                 };
             }
-            const remainingMovementPoints = this.moveVirtualPlayer(player, destination);
+            const remainingMovementPoints = this.moveVirtualPlayer(roomId, player, destination, costMap);
             return { path, remainingMovementPoints };
         }
 
         const distantOpponent = withFlag
-            ? this.movementAlgorithms.findClosestPlayer(player, true)
-            : this.movementAlgorithms.findClosestPlayer(player);
-        if (distantOpponent) return this.goCloserToTarget(player, distantOpponent.path);
+            ? this.movementAlgorithms.findClosestPlayer(roomId, player, true)
+            : this.movementAlgorithms.findClosestPlayer(roomId, player);
+        if (distantOpponent) return this.goCloserToTarget(roomId, player, distantOpponent.path);
     }
 
-    moveVirtualPlayer(player: Player, destination: { coord: Coords; cost: number }) {
-        const destinationCell = this.gameMovementService.getCell(destination.coord.x, destination.coord.y);
+    moveVirtualPlayer(roomId: string, player: Player, destination: { coord: Coords; cost: number }, costMap?: Map<string, number>) {
+        const destinationCell = this.gameMovementService.getCell(roomId, destination.coord.x, destination.coord.y);
         if (!destinationCell) throw new Error('Case introuvable');
         if (!this.gameMovementService.isCellFree(destinationCell, player.id) || !this.gameMovementService.isCellReachable(destinationCell))
             return null;
 
-        const startCell = this.gameMovementService.getCell(player.position.x, player.position.y);
+        const cost = costMap ? (costMap.get(`${destination.coord.x},${destination.coord.y}`) ?? destination.cost) : destination.cost;
+        const startCell = this.gameMovementService.getCell(roomId, player.position.x, player.position.y);
         startCell.player = null;
-        player.position = destinationCell;
-        player.movementPoints = player.movementPoints - destination.cost;
+        player.position = { x: destinationCell.x, y: destinationCell.y };
+        player.movementPoints = player.movementPoints - cost;
         destinationCell.player = player;
         return player.movementPoints;
     }
 
-    findReachablePlayer(player: Player, reachableTiles: { coord: Coords; cost: number }[], isCTF?: boolean) {
+    findReachablePlayer(roomId: string, player: Player, reachableTiles: { coord: Coords; cost: number }[], isCTF?: boolean) {
         return reachableTiles.find((tile) => {
-            const cell = this.gameMovementService.getCell(tile.coord.x, tile.coord.y);
+            const cell = this.gameMovementService.getCell(roomId, tile.coord.x, tile.coord.y);
             if (isCTF) return cell && cell.player && this.gameRoomService.isOpponent(player, cell.player, isCTF);
             return cell && cell.player && cell.player.id !== player.id;
         });
     }
 
-    findReachableRandomItem(player: Player, reachableTiles: { coord: Coords; cost: number }[]) {
+    findReachableRandomItem(roomId: string, player: Player, reachableTiles: { coord: Coords; cost: number }[]) {
         return reachableTiles.find((tile) => {
-            const cell = this.gameMovementService.getCell(tile.coord.x, tile.coord.y);
+            const cell = this.gameMovementService.getCell(roomId, tile.coord.x, tile.coord.y);
             return cell && this.hasItem(cell) && !cell.player;
         });
     }
 
-    findReachableItem(player: Player, reachableTiles: { coord: Coords; cost: number }[]) {
+    findReachableItem(roomId: string, player: Player, reachableTiles: { coord: Coords; cost: number }[]) {
         return reachableTiles.find((tile) => {
-            const cell = this.gameMovementService.getCell(tile.coord.x, tile.coord.y);
+            const cell = this.gameMovementService.getCell(roomId, tile.coord.x, tile.coord.y);
             return (
                 cell && (player.profile === VirtualPlayerType.Aggressive ? this.hasAggressiveItem(cell) : this.hasDefensiveItem(cell)) && !cell.player
             );
         });
     }
 
-    findReachableSpawnPoint(player: Player, reachableTiles: { coord: Coords; cost: number }[], opponent?: Player) {
+    findReachableSpawnPoint(roomId: string, player: Player, reachableTiles: { coord: Coords; cost: number }[], opponent?: Player) {
         return reachableTiles.find((tile) => {
-            const cell = this.gameMovementService.getCell(tile.coord.x, tile.coord.y);
+            const cell = this.gameMovementService.getCell(roomId, tile.coord.x, tile.coord.y);
             if (opponent) return cell && cell.x === opponent.spawnPoint.x && cell.y === opponent.spawnPoint.y;
             return cell && cell.x === player.spawnPoint.x && cell.y === player.spawnPoint.y;
         });
     }
 
-    findReachableOpponentWithFlag(player: Player, reachableTiles: { coord: Coords; cost: number }[]) {
+    findReachableOpponentWithFlag(roomId: string, player: Player, reachableTiles: { coord: Coords; cost: number }[]) {
         return reachableTiles.find((tile) => {
-            const cell = this.gameMovementService.getCell(tile.coord.x, tile.coord.y);
+            const cell = this.gameMovementService.getCell(roomId, tile.coord.x, tile.coord.y);
             return cell && cell.player && cell.player.id !== player.id && this.gameRoomService.isOpponentCarryingFlag(player, cell.player);
         });
     }
 
-    findReachableOpponent(player: Player, reachableTiles: { coord: Coords; cost: number }[]) {
+    findReachableOpponent(roomId: string, player: Player, reachableTiles: { coord: Coords; cost: number }[]) {
         return reachableTiles.find((tile) => {
-            const cell = this.gameMovementService.getCell(tile.coord.x, tile.coord.y);
+            const cell = this.gameMovementService.getCell(roomId, tile.coord.x, tile.coord.y);
             return cell && cell.player && this.gameRoomService.isOpponent(player, cell.player, true);
         });
     }

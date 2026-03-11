@@ -2,33 +2,33 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Board } from '@app/classes/board/board';
 import { Item } from '@app/classes/entity/item';
+import { CombatComponent } from '@app/components/game/combat/combat.component';
+import { GameInfoComponent } from '@app/components/lobby/game-info/game-info.component';
+import { PlayerHudComponent } from '@app/components/player/player-hud/player-hud.component';
 import { ActionsHudComponent } from '@app/components/shared/actions-hud/actions-hud.component';
 import { BoardComponent } from '@app/components/shared/board/board.component';
 import { ChatboxComponent } from '@app/components/shared/chatbox/chatbox.component';
-import { CombatComponent } from '@app/components/game/combat/combat.component';
-import { GameInfoComponent } from '@app/components/lobby/game-info/game-info.component';
 import { LoadingScreenComponent } from '@app/components/shared/loading-screen/loading-screen.component';
 import { NotificationComponent } from '@app/components/shared/notification/notification.component';
-import { PlayerHudComponent } from '@app/components/player/player-hud/player-hud.component';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { GAME_RESULT_MESSAGES, MODES, OUTCOME } from '@app/constants/game.constants';
 import { ROUTES } from '@app/constants/routes.constants';
+import { ActionSocketService } from '@app/services/communication/socket-handlers/action-socket.service';
+import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { CombatService } from '@app/services/gameplay/combat.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
-import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
-import { ActionSocketService } from '@app/services/communication/socket-handlers/action-socket.service';
 @Component({
     selector: 'app-game-play',
     imports: [
         BoardComponent,
         PlayerHudComponent,
         ActionsHudComponent,
-        ChatboxComponent,
         GameInfoComponent,
         CombatComponent,
         NotificationComponent,
         PopUpComponent,
         LoadingScreenComponent,
+        ChatboxComponent,
     ],
     templateUrl: './game-play.component.html',
     styleUrl: './game-play.component.scss',

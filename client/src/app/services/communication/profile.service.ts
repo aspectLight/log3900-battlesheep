@@ -102,6 +102,16 @@ export class ProfileService {
         return await firstValueFrom(this.http.get<UserStatistics>(`${this.apiUrl}/statistics`, { headers }));
     }
 
+    async deleteAccount(): Promise<{ success: boolean; error?: string }> {
+        const headers = await this.getAuthHeaders();
+        try {
+            await firstValueFrom(this.http.delete(`${this.apiUrl}/account`, { headers }));
+            return { success: true };
+        } catch (error: unknown) {
+            return { success: false, error: this.extractErrorMessage(error) };
+        }
+    }
+
     private async getAuthHeaders(): Promise<HttpHeaders> {
         const user = this.auth.currentUser;
         const sessionId = this.session.sessionId;

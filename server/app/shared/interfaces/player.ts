@@ -26,6 +26,7 @@ export interface Player {
     hasBoots?: boolean;
     team?: number;
     firebaseUid?: string;
+    fightsWon?: number;
 }
 
 export const enum BonusType {

@@ -1,12 +1,17 @@
-<div class="chatbox" [class.collapsed]="isCollapsed">
+﻿<div class="chatbox" [class.collapsed]="isCollapsed">
     <div class="chatbox-header">
-        <h3>Chat</h3>
+        <select class="channel-select" [ngModel]="activeChannelId" (ngModelChange)="switchChannel($event)">
+            <option [ngValue]="null">Général</option>
+            @for (ch of joinedChannelInfos; track ch.id) {
+                <option [ngValue]="ch.id">{{ ch.isGameChannel ? 'Canal de ' + ch.name : ch.name }}</option>
+            }
+        </select>
         <div class="header-buttons">
             <div class="toggle-button" (click)="toggleChatbox()">
                 @if (isCollapsed) {
-                <span>▼</span>
+                    <span>▼</span>
                 } @else {
-                <span>▲</span>
+                    <span>▲</span>
                 }
             </div>
         </div>
@@ -14,18 +19,12 @@
 
     <div class="chatbox-content" [class.hidden]="isCollapsed">
         <div class="chatbox-messages" #chatboxMessages>
-            @for (msg of messages; track $index) {
-            <div class="message">
-                @if (getAvatarImage(msg.avatarId)) {
-                <div class="message-avatar">
-                    <img [src]="getAvatarImage(msg.avatarId)" alt="Avatar" class="avatar-icon" />
+            @for (msg of displayMessages; track $index) {
+                <div class="message">
+                    <span class="msg-time">{{ msg.time }}</span>
+                    <span class="msg-author">{{ msg.name }}</span>
+                    <span class="msg-content">{{ msg.content }}</span>
                 </div>
-                }
-                <div class="message-content">
-                    <span class="message-meta">{{ msg.time }} - {{ msg.name }}:</span>
-                    <span class="message-text"> {{ msg.content }} </span>
-                </div>
-            </div>
             }
         </div>
 
@@ -34,7 +33,7 @@
                 #messageInput
                 type="text"
                 maxlength="200"
-                placeholder="Écrire un message..."
+                [placeholder]="activeChannelId ? ('Écrire dans ' + activeChannelLabel + '...') : 'Écrire un message...'"
                 [(ngModel)]="newMessage"
                 (keydown.enter)="sendMessage()"
             />

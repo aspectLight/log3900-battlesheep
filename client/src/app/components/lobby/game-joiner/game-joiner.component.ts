@@ -1,14 +1,17 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Auth } from '@angular/fire/auth';
 import { Router, RouterLink } from '@angular/router';
+import { RoomListComponent } from '@app/components/lobby/room-list/room-list.component';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ROUTES } from '@app/constants/routes.constants';
-import { GameCreationService } from '@app/services/lobby/game-creation.service';
+import { RoomInfo } from '@app/interfaces/room-info.interface';
 import { MovementSocketService } from '@app/services/communication/socket-handlers/movement-socket.service';
 import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
+import { GameCreationService } from '@app/services/lobby/game-creation.service';
 @Component({
     selector: 'app-game-joiner',
     templateUrl: './game-joiner.component.html',
-    imports: [RouterLink, PopUpComponent],
+    imports: [RouterLink, PopUpComponent, RoomListComponent],
     styleUrl: './game-joiner.component.scss',
 })
 export class GameJoinerComponent {
@@ -21,6 +24,7 @@ export class GameJoinerComponent {
         private movementSocketService: MovementSocketService,
         private gameCreationService: GameCreationService,
         private router: Router,
+        private auth: Auth,
     ) {
         this.gameCreationService.isHost = false;
         this.movementSocketService.sync();
@@ -28,9 +32,39 @@ export class GameJoinerComponent {
 
     joinGame() {
         const gameCode = this.gameCodeInput.nativeElement.value;
+        this.joinByCode(gameCode);
+    }
+
+    onRoomSelected(room: RoomInfo) {
+        if (room.status === 'playing' && room.dropInDropOut) {
+            const currentUid = this.auth.currentUser?.uid;
+            const isReturning = !!currentUid && (room.abandonedPlayerFirebaseIds ?? []).includes(currentUid);
+
+            this.gameCreationService.gameCode = room.roomId;
+            this.gameCreationService.isDropIn = true;
+
+            if (isReturning) {
+                // Returning player: bypass character creation and rejoin directly with saved data
+                this.socketService.rejoinGame(room.roomId, currentUid, (success, error) => {
+                    if (!success) {
+                        this.errorMessage = error || 'Impossible de rejoindre la partie';
+                        this.showError = true;
+                    }
+                });
+            } else {
+                // New drop-in player: go through character creation
+                this.router.navigate([ROUTES.createPlayer]);
+            }
+        } else {
+            this.joinByCode(room.roomId);
+        }
+    }
+
+    private joinByCode(gameCode: string) {
         this.socketService.joinRoom(gameCode, (success, error) => {
             if (success) {
                 this.gameCreationService.gameCode = gameCode;
+                this.gameCreationService.isDropIn = false;
                 this.router.navigate([ROUTES.createPlayer]);
             } else {
                 this.errorMessage = error || '';

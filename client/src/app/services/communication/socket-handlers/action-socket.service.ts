@@ -8,6 +8,7 @@ import { GameRoomService } from '@app/services/state/game-room.service';
 import { GameRoomEvents } from '@common/socket.constants';
 import { Socket } from 'socket.io-client';
 import { MovementSocketService } from './movement-socket.service';
+import { NOTIFICATION_DURATION } from '@app/constants/combat.constants';
 @Injectable({
     providedIn: 'root',
 })
@@ -92,6 +93,13 @@ export class ActionSocketService implements ISocketService {
         });
 
         this.socket.on(GameRoomEvents.EndCombat, (winnerId, loserId, isByFlight) => {
+            if (isByFlight) {
+                this.combatService.flightAttemptsLeft = 2;
+                setTimeout(() => {
+                    this.combatService.resetCombat();
+                }, NOTIFICATION_DURATION);
+                return;
+            }
             this.combatService.handleEnd(winnerId, loserId);
             const loser = this.gameManagerService.room.players.find((p) => p.id === loserId);
             const hostId = this.gameManagerService.room.hostId;

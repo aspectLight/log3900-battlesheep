@@ -731,11 +731,11 @@ describe('GameRoomService', () => {
         };
         testRoom.players.push(secondPlayer);
 
-        service.changehost(testRoom.roomId);
+        service.changeHost(testRoom.roomId);
 
         expect(testRoom.hostId).toEqual('test_player');
         expect(() => {
-            service.changehost('nonExistentRoom');
+            service.changeHost('nonExistentRoom');
         }).toThrow("La salle n'existe pas");
     });
 

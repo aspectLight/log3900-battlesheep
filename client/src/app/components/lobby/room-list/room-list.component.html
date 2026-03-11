@@ -1,0 +1,34 @@
+<div class="room-list">
+    <li class="header">
+        <span>Prévisualisation</span>
+        <span>Joueurs</span>
+        <span>Taille</span>
+        <span>Statut</span>
+        <span>Mode</span>
+        <span>Accessibilité</span>
+        <span>Code</span>
+    </li>
+    <div class="list">
+        @if (isLoading) {
+        <app-loading-screen></app-loading-screen>
+        } @else if (rooms.length === 0) {
+        <p class="no-rooms">Aucune partie disponible</p>
+        } @else {
+        <div class="rooms">
+            @for (room of rooms; track room.roomId) {
+            <li [class.selected]="room.roomId === selectedRoomId" [class.full]="room.playerCount >= room.maxPlayers" (click)="onSelectRoom(room)">
+                <span class="preview-image">
+                    <app-board [board]="getBoard(room)" mode="view"></app-board>
+                </span>
+                <span>{{ room.playerCount }}/{{ room.maxPlayers }}</span>
+                <span>{{ room.boardSize }}</span>
+                <span>{{ getStatusLabel(room.status) }}</span>
+                <span [class.drop-in-badge]="room.dropInDropOut">{{ room.dropInDropOut ? 'Drop-in' : '-' }}</span>
+                <span>{{ getAccessibilityLabel(room) }}</span>
+                <span class="room-code">{{ room.roomId.replace('game_', '') }}</span>
+            </li>
+            }
+        </div>
+        }
+    </div>
+</div>

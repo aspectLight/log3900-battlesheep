@@ -14,7 +14,7 @@ export class MovementAlgorithmsService {
         private readonly gameRoomService: GameRoomService,
     ) {}
 
-    findNeighborPlayer(player: Player, isCTF?: boolean) {
+    findNeighborPlayer(roomId: string, player: Player, isCTF?: boolean) {
         const playerPosition = player.position;
         const neighbors: Coords[] = [
             { x: playerPosition.x, y: playerPosition.y - 1 },
@@ -23,7 +23,7 @@ export class MovementAlgorithmsService {
             { x: playerPosition.x + 1, y: playerPosition.y },
         ];
         for (const neighbor of neighbors) {
-            const cell = this.gameMovementService.getCell(neighbor.x, neighbor.y);
+            const cell = this.gameMovementService.getCell(roomId, neighbor.x, neighbor.y);
             if (cell && cell.player) {
                 if (isCTF && this.gameRoomService.isOpponent(player, cell.player, isCTF)) return cell.player;
                 else if (!isCTF) return cell.player;
@@ -31,7 +31,7 @@ export class MovementAlgorithmsService {
         }
     }
 
-    findSpawnPoint(player: Player, opponent?: Player) {
+    findSpawnPoint(roomId: string, player: Player, opponent?: Player) {
         const queue: { coord: Coords; cost: number }[] = [{ coord: player.position, cost: 0 }];
         const costMap = new Map<string, number>();
         const pathMap = new Map<string, Coords>();
@@ -45,7 +45,7 @@ export class MovementAlgorithmsService {
 
             if (costMap.get(key) < current.cost) continue;
 
-            const cell = this.gameMovementService.getCell(current.coord.x, current.coord.y);
+            const cell = this.gameMovementService.getCell(roomId, current.coord.x, current.coord.y);
             const spawnPoint = opponent ? opponent.spawnPoint : player.spawnPoint;
             if (cell && cell.x === spawnPoint.x && cell.y === spawnPoint.y) {
                 const path = this.gameMovementService.getShortestPath(player.position, current.coord, pathMap);
@@ -62,7 +62,7 @@ export class MovementAlgorithmsService {
             for (const neighbor of neighbors) {
                 const neighborKey = `${neighbor.x},${neighbor.y}`;
 
-                const neighborCell = this.gameMovementService.getCell(neighbor.x, neighbor.y);
+                const neighborCell = this.gameMovementService.getCell(roomId, neighbor.x, neighbor.y);
                 if (!neighborCell || !this.gameMovementService.isCellReachable(neighborCell)) continue;
 
                 const tileType = neighborCell.tile.type.replace(/^\w/, (c) => c.toUpperCase());
@@ -78,7 +78,7 @@ export class MovementAlgorithmsService {
         return null;
     }
 
-    findClosestItem(start: Coords, predicate: (cell: Cell) => boolean, playerId?: string) {
+    findClosestItem(roomId: string, start: Coords, predicate: (cell: Cell) => boolean, playerId?: string) {
         const queue: { coord: Coords; cost: number }[] = [{ coord: start, cost: 0 }];
         const costMap = new Map<string, number>();
         const pathMap = new Map<string, Coords>();
@@ -92,7 +92,7 @@ export class MovementAlgorithmsService {
 
             if (costMap.get(key) < current.cost) continue;
 
-            const cell = this.gameMovementService.getCell(current.coord.x, current.coord.y);
+            const cell = this.gameMovementService.getCell(roomId, current.coord.x, current.coord.y);
             if (cell && predicate(cell)) {
                 const path = this.gameMovementService.getShortestPath(start, current.coord, pathMap);
                 return { path, cost: current.cost };
@@ -108,7 +108,7 @@ export class MovementAlgorithmsService {
             for (const neighbor of neighbors) {
                 const neighborKey = `${neighbor.x},${neighbor.y}`;
 
-                const neighborCell = this.gameMovementService.getCell(neighbor.x, neighbor.y);
+                const neighborCell = this.gameMovementService.getCell(roomId, neighbor.x, neighbor.y);
                 if (
                     !neighborCell ||
                     !this.gameMovementService.isCellFree(neighborCell, playerId) ||
@@ -129,7 +129,7 @@ export class MovementAlgorithmsService {
         return null;
     }
 
-    findClosestPlayer(player: Player, isCTF?: boolean) {
+    findClosestPlayer(roomId: string, player: Player, isCTF?: boolean) {
         const queue: { coord: Coords; cost: number }[] = [{ coord: player.position, cost: 0 }];
         const pathMap = new Map<string, Coords>();
         const costMap = new Map<string, number>();
@@ -143,7 +143,7 @@ export class MovementAlgorithmsService {
 
             if (costMap.get(key) < current.cost) continue;
 
-            const cell = this.gameMovementService.getCell(current.coord.x, current.coord.y);
+            const cell = this.gameMovementService.getCell(roomId, current.coord.x, current.coord.y);
             if (cell && cell.player && this.gameRoomService.isOpponent(player, cell.player, isCTF)) {
                 if (isCTF && this.gameRoomService.isOpponentCarryingFlag(player, cell.player)) {
                     const path = this.gameMovementService.getShortestPath(player.position, current.coord, pathMap);
@@ -165,7 +165,7 @@ export class MovementAlgorithmsService {
             for (const neighbor of neighbors) {
                 const neighborKey = `${neighbor.x},${neighbor.y}`;
 
-                const neighborCell = this.gameMovementService.getCell(neighbor.x, neighbor.y);
+                const neighborCell = this.gameMovementService.getCell(roomId, neighbor.x, neighbor.y);
                 if (!neighborCell || !this.gameMovementService.isCellReachable(neighborCell)) continue;
 
                 const tileType = neighborCell.tile.type.replace(/^\w/, (c) => c.toUpperCase());
@@ -181,11 +181,11 @@ export class MovementAlgorithmsService {
         return null;
     }
 
-    findWayToTarget(player: Player, target: Coords, reachableTiles: { coord: Coords; cost: number }[], pathsMap: Map<string, Coords>) {
+    findWayToTarget(roomId: string, player: Player, target: Coords, reachableTiles: { coord: Coords; cost: number }[], pathsMap: Map<string, Coords>) {
         const isTargetReachable = reachableTiles.some((tile) => tile.coord.x === target.x && tile.coord.y === target.y);
         if (!isTargetReachable) return null;
 
-        const targetCell = this.gameMovementService.getCell(target.x, target.y);
+        const targetCell = this.gameMovementService.getCell(roomId, target.x, target.y);
         if (!targetCell) return null;
 
         const neighbors: Coords[] = [
@@ -201,7 +201,7 @@ export class MovementAlgorithmsService {
         });
 
         const freeReachableNeighbors = reachableNeighbors.filter((neighbor) => {
-            const cell = this.gameMovementService.getCell(neighbor.x, neighbor.y);
+            const cell = this.gameMovementService.getCell(roomId, neighbor.x, neighbor.y);
             const isFree = cell && this.gameMovementService.isCellFree(cell, player.id) && this.gameMovementService.isCellReachable(cell);
             return isFree;
         });
@@ -215,7 +215,7 @@ export class MovementAlgorithmsService {
 
                     let isPathFree = true;
                     for (const coord of neighborPath) {
-                        const pathCell = this.gameMovementService.getCell(coord.x, coord.y);
+                        const pathCell = this.gameMovementService.getCell(roomId, coord.x, coord.y);
                         if (!pathCell || !this.gameMovementService.isCellFree(pathCell, player.id)) {
                             isPathFree = false;
                             break;
@@ -237,12 +237,12 @@ export class MovementAlgorithmsService {
         return null;
     }
 
-    truncatePath(path: Coords[], movementPoints: number, startPoint: Coords) {
+    truncatePath(roomId: string, path: Coords[], movementPoints: number, startPoint: Coords) {
         let accumulatedCost = 0;
         const truncatedPath: { coord: Coords; cost: number }[] = [];
 
         for (const coord of path) {
-            const cell = this.gameMovementService.getCell(coord.x, coord.y);
+            const cell = this.gameMovementService.getCell(roomId, coord.x, coord.y);
             const tileType = cell.tile.type.replace(/^\w/, (c) => c.toUpperCase());
             const moveCost = coord.x === startPoint.x && coord.y === startPoint.y ? 0 : MoveCosts[tileType];
             if (accumulatedCost + moveCost > movementPoints) break;
@@ -252,11 +252,11 @@ export class MovementAlgorithmsService {
         return truncatedPath;
     }
 
-    lookForItemInPath(path: Coords[]) {
+    lookForItemInPath(roomId: string, path: Coords[]) {
         const truncatedPath: Coords[] = [];
         let totalCost = 0;
         for (const coord of path) {
-            const cell = this.gameMovementService.getCell(coord.x, coord.y);
+            const cell = this.gameMovementService.getCell(roomId, coord.x, coord.y);
             truncatedPath.push(coord);
             const tileType = cell.tile.type.replace(/^\w/, (c) => c.toUpperCase());
             totalCost += MoveCosts[tileType];

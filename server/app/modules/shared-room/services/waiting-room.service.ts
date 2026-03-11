@@ -16,6 +16,7 @@ export class WaitingRoomService {
             players: [host],
             futurePlayers: [],
             isLocked: false,
+            dropInDropOut: false,
             messages: [],
         };
         newRoom.reservedAvatars = [{ reservorId: host.id, chosenAvatar: host.avatar.name }];
@@ -109,6 +110,18 @@ export class WaitingRoomService {
         return room.isLocked;
     }
 
+    toggleDropInDropOut(roomId: string, hostId: string): boolean {
+        const room = this.findRoomById(roomId);
+        if (!room) {
+            throw new Error(ErrorMessages.RoomDoesNotExist);
+        }
+        if (room.hostId !== hostId) {
+            throw new Error(ErrorMessages.HostOnlyLockRoom);
+        }
+        room.dropInDropOut = !room.dropInDropOut;
+        return room.dropInDropOut;
+    }
+
     kickPlayer(roomId: string, hostId: string, playerToKick: Player) {
         const room = this.findRoomById(roomId);
         if (!room) {
@@ -136,6 +149,10 @@ export class WaitingRoomService {
             code = (Math.floor(Math.random() * MAX_CODE) + 1).toString().padStart(MAX_DIGITS, '0');
         }
         return code;
+    }
+
+    getAvailableRooms(): Room[] {
+        return this.waitingRooms.filter((room) => !room.isLocked);
     }
 
     findRoomsByPlayerId(playerId: string): Room[] {

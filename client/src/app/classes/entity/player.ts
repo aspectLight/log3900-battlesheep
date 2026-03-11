@@ -103,6 +103,9 @@ export class Player extends Entity {
         player.stats = { ...obj.stats };
         player.profile = obj.profile;
         player.isVirtual = obj.isVirtual;
+        if ((obj as any).fightsWon !== undefined) {
+            player.fightsWon = (obj as any).fightsWon;
+        }
 
         return player;
     }

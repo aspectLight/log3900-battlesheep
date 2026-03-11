@@ -297,7 +297,7 @@ describe('GameRoomGateway', () => {
         gameRoomService.isPlayerTurn.returns(true);
         const emitSpy = jest.fn();
         const endTurnSpy = jest.spyOn(gameRoomService, 'endTurn');
-        const changehostSpy = jest.spyOn(gameRoomService, 'changehost');
+        const changeHostSpy = jest.spyOn(gameRoomService, 'changeHost');
 
         server.to.returns({
             emit: emitSpy,
@@ -309,7 +309,7 @@ describe('GameRoomGateway', () => {
         expect(loggerSpy).toHaveBeenCalledWith(`socket déconnecté: ${socketId}`);
         expect(emitSpy).toHaveBeenCalledWith(GameRoomEvents.GameCanceled);
         expect(emitSpy).toHaveBeenCalledWith(GameRoomEvents.DebugModeDisabled);
-        expect(changehostSpy).toHaveBeenCalledWith(mockRoom.roomId);
+        expect(changeHostSpy).toHaveBeenCalledWith(mockRoom.roomId);
         expect(endTurnSpy).toHaveBeenCalledWith(mockRoom.roomId);
     });
 

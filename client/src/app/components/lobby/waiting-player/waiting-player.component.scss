@@ -59,31 +59,31 @@
     overflow-x: auto;
     padding: 10px 20px;
     gap: 10px;
-    
+
     /* Ensure player cards compress instead of wrap */
     ::ng-deep .player-container {
         flex-shrink: 1;
         min-width: 150px; /* Minimum size before horizontal scrolling starts */
-        width: auto;      /* Allow auto-sizing */
+        width: auto; /* Allow auto-sizing */
         transform: scale(0.95); /* Slightly reduce scale */
         transition: all 0.3s ease;
     }
-    
+
     /* Add scrollbar styling */
     &::-webkit-scrollbar {
         height: 8px;
     }
-    
+
     &::-webkit-scrollbar-track {
         background: rgba(0, 0, 0, 0.1);
         border-radius: 4px;
     }
-    
+
     &::-webkit-scrollbar-thumb {
         background: rgba(255, 255, 255, 0.2);
         border-radius: 4px;
     }
-    
+
     &::-webkit-scrollbar-thumb:hover {
         background: rgba(255, 255, 255, 0.3);
     }
@@ -196,7 +196,7 @@ button {
 .startGame-btn.isClickable {
     opacity: 1;
     border-color: #7f1f1f;
-    pointer-events: auto
+    pointer-events: auto;
 }
 
 .startGame-btn.isClickable:hover {
@@ -225,4 +225,31 @@ button {
     background-color: #7f1f1f;
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(85, 0, 0, 0.3);
+}
+
+.drop-in-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.75rem 1.5rem;
+    background-color: #550000;
+    color: #fff0f0;
+    border: 1px solid #7f1f1f;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.drop-in-toggle:hover {
+    background-color: #7f1f1f;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(85, 0, 0, 0.3);
+}
+
+.drop-in-toggle input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+    accent-color: #7f1f1f;
+    cursor: pointer;
 }

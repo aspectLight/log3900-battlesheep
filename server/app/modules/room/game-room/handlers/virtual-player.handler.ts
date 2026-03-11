@@ -30,8 +30,8 @@ export class VirtualPlayerHandler {
 
             setTimeout(
                 () => {
-                    const movement = this.gameMovementVPService.determineVPMovement(player, room.players, data.isCTF);
-                    const neighborPlayer = this.movementAlgorithms.findNeighborPlayer(player);
+                    const movement = this.gameMovementVPService.determineVPMovement(data.roomId, player, room.players, data.isCTF);
+                    const neighborPlayer = this.movementAlgorithms.findNeighborPlayer(data.roomId, player);
 
                     if (movement.path.length <= 1) {
                         if (neighborPlayer && this.gameRoomService.isOpponent(player, neighborPlayer, data.isCTF)) {

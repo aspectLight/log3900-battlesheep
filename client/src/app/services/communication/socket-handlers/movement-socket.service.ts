@@ -187,34 +187,39 @@ export class MovementSocketService implements ISocketService {
         this.socket.on(GameRoomEvents.PlayerMoved, (data) => {
             const player = this.gameManagerService.getBoard().getPlayerById(data.playerId);
             if (!player) return;
+            
             const map = new Map<Coords, Coords[]>(data.map);
+            const lastCoord = data.selectedPath[data.selectedPath.length - 1];
 
             this.gameManagerService.setPlayer(player);
             this.gameManagerService.setMovementPoints(data.movementPoints);
             this.gameManagerService.setPaths(map);
             this.gameManagerService.setSelectedPathFromCoords(data.selectedPath);
-            this.gameManagerService.movePlayerFromPath((item, cell) => {
-                if (this.gameManagerService.currentPlayerId === this.socket.id) {
-                    if (item && cell) {
-                        const roomId = this.socketService.getRoomId();
-                        this.socket.emit(GameRoomEvents.ItemCollected, {
-                            roomId,
-                            playerId: this.socket.id,
-                            item,
-                            position: { x: cell.x, y: cell.y },
-                        });
-                        this.getPlayerMovements();
-                    }
-                    const lastCell = data.selectedPath[data.selectedPath.length - 1];
-                    this.synchronizeMovement(data.playerId, lastCell.x, lastCell.y);
+            this.gameManagerService.movePlayerFromPath(
+                // Callback function to handle item collection
+                (item, cell) => {
+                    if (this.gameManagerService.currentPlayerId === this.socket.id) {
+                        if (item && cell) {
+                            const roomId = this.socketService.getRoomId();
+                            this.socket.emit(GameRoomEvents.ItemCollected, {
+                                roomId,
+                                playerId: this.socket.id,
+                                item,
+                                position: { x: cell.x, y: cell.y },
+                            });
+                            this.getPlayerMovements();
+                        }
 
-                    const mainPlayer = this.gameManagerService.getMainPlayer();
-                    if (!mainPlayer) return;
-                    if (this.checkForAvailablePoints(mainPlayer)) return;
-                    if (this.checkForFlag(mainPlayer)) return;
-                    if (!this.canMoveOrAct(mainPlayer)) this.socketService.endPlayerTurn(this.gameManagerService.getRoomId());
+                        this.synchronizeMovement(data.playerId, lastCoord.x, lastCoord.y);
+
+                        const mainPlayer = this.gameManagerService.getMainPlayer();
+                        if (!mainPlayer) return;
+                        if (this.checkForAvailablePoints(mainPlayer)) return;
+                        if (this.checkForFlag(mainPlayer)) return;
+                        if (!this.canMoveOrAct(mainPlayer, item ?? undefined)) this.socketService.endPlayerTurn(this.gameManagerService.getRoomId());
+                    }
                 }
-            });
+            );
 
             if (this.gameManagerService.currentPlayerId === this.socket.id) this.getPlayerMovements();
         });
@@ -227,11 +232,6 @@ export class MovementSocketService implements ISocketService {
 
             const cell = this.gameManagerService.getBoard().getCell(data.destination.x, data.destination.y);
             if (!cell) return;
-
-            if (cell.item && cell.item.type !== 'spawnPoint') {
-                player.addItem(cell.item);
-                cell.removeItem();
-            }
 
             this.movementService.teleportPlayer(this.gameManagerService.getBoard(), player, cell.x, cell.y);
 
@@ -257,6 +257,7 @@ export class MovementSocketService implements ISocketService {
             }
             const player = this.gameManagerService.getBoard().getPlayerById(data.playerId);
             if (!player) return;
+
             this.gameManagerService.setPlayer(player);
             this.gameManagerService.setMovementPoints(data.remainingMovementPoints);
             this.gameManagerService.setSelectedPathFromCoords(coordsArray);
@@ -286,6 +287,27 @@ export class MovementSocketService implements ISocketService {
                 if (player) this.checkForFlag(player);
             });
         });
+
+        // Server-authoritative item collection: the server broadcasts this event
+        // after validating the collection. All clients update their local board here.
+        this.socket.on(GameRoomEvents.ItemCollected, (data: { playerId: string; item: Item; position: Coords; inventoryFull: boolean }) => {
+            this.gameManagerService.collectItem(data.playerId, data.item, data.position, data.inventoryFull);
+
+            if (data.playerId === this.socket.id && this.gameManagerService.currentPlayerId === this.socket.id) {
+                // Boots just added to inventory: re-fetch paths so water tiles cost 1 movement point
+                if (data.item.type === 'waterproofBoots') {
+                    this.getPlayerMovements();
+                }
+                // Action item just added: update canEndTurn so the HUD button reflects the new capability
+                if (data.item.type === 'camouflage' || data.item.type === 'airStrike') {
+                    const mainPlayer = this.gameManagerService.getMainPlayer();
+                    if (mainPlayer) {
+                        this.gameManagerService.canEndTurn = this.canMoveOrAct(mainPlayer);
+                    }
+                }
+            }
+        });
+
         this.socket.on(GameRoomEvents.PlayerAbandoned, (playerId) => {
             this.gameManagerService.disconnectPlayer(playerId);
             if (this.gameManagerService.currentPlayerId === this.socket.id) {
@@ -309,9 +331,11 @@ export class MovementSocketService implements ISocketService {
         });
     }
 
-    private canMoveOrAct(player: Player): boolean {
+    // Accept a pending item that is not yet in the player's inventory
+    private canMoveOrAct(player: Player, pendingItem?: Item): boolean {
         if (player.movementPoints > 0) return true;
-        const hasActiveItem = player.hasItem('camouflage') || player.hasItem('airStrike');
+        const hasActiveItem =
+            player.hasItem('camouflage') || player.hasItem('airStrike') || pendingItem?.type === 'camouflage' || pendingItem?.type === 'airStrike';
         if (player.actionPoints > 0 && hasActiveItem) {
             return true;
         }
@@ -328,7 +352,8 @@ export class MovementSocketService implements ISocketService {
         for (const direction of directions) {
             const cell = this.gameManagerService.getBoard().getCell(player.cell.x + direction.x, player.cell.y + direction.y);
             if (cell?.player) {
-                return true;
+                const isSameTeamInCTF = this.gameManagerService.isCTF && cell.player.team === player.team;
+                if (!isSameTeamInCTF) return true;
             }
             if (cell?.tile.type === 'door' && player.actionPoints > 0) {
                 return true;

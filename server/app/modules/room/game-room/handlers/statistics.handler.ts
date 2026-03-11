@@ -20,11 +20,16 @@ export class StatisticsHandler {
     async handleGetStatistics(roomId: string, socket: Socket): Promise<void> {
         try {
             const room = this.gameRoomService.findRoomById(roomId);
+            if (!room.globalStats) {
+                room.globalStats = { gameDuration: '', doorsToggled: [], turns: 0 };
+            }
             const statistics = {
                 playerStats: room.playersStats,
-                globalStats: room.globalStats,
-                walkableTiles: this.gameMovementService.getWalkableTiles(),
-                toggableDoors: this.gameMovementService.getAllDoors(),
+                globalStats: {
+                    ...room.globalStats,
+                    walkableTiles: this.gameMovementService.getWalkableTiles(roomId),
+                    toggableDoors: this.gameMovementService.getAllDoors(roomId),
+                },
             };
             socket.emit(GameRoomEvents.GetStatisticsResponse, statistics);
         } catch (error) {

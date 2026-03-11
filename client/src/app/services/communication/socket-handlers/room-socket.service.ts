@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
+import { Item } from '@app/classes/entity/item';
 import { Player } from '@app/classes/entity/player';
 import { Reservation } from '@app/interfaces/reservation.interface';
+import { RoomInfo } from '@app/interfaces/room-info.interface';
 import { Room } from '@app/interfaces/room.interface';
 import { ISocketService } from '@app/interfaces/socket-service.interface';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
@@ -107,7 +109,9 @@ export class RoomSocketService implements ISocketService {
     }
 
     toggleLockRoom(roomId: string): void {
-        if (this.room.players.length < SIZE_LIMITS[this.gameCreationService.selectedGame.board.size].max) {
+        const boardSize = this.gameCreationService.selectedGame?.board?.size ?? (this.waitingPlayerService.currentRoom.getValue() as any)?.boardSize;
+
+        if (boardSize && this.room.players.length < SIZE_LIMITS[boardSize].max) {
             this.socket.emit(WaitingRoomEvents.ToggleLockWaitingRoom, roomId);
         } else {
             this.waitingPlayerService.maxPlayerLimitReached();
@@ -139,11 +143,9 @@ export class RoomSocketService implements ISocketService {
     }
 
     async startGame(roomId: string): Promise<void> {
-        if (
-            this.room.players.length <= SIZE_LIMITS[this.gameCreationService.selectedGame.board.size].max &&
-            this.room.players.length >= SIZE_LIMITS[this.gameCreationService.selectedGame.board.size].min &&
-            this.roomLocked$
-        ) {
+        const boardSize = this.gameCreationService.selectedGame?.board?.size ?? (this.waitingPlayerService.currentRoom.getValue() as any)?.boardSize;
+
+        if (boardSize && this.room.players.length <= SIZE_LIMITS[boardSize].max && this.room.players.length >= SIZE_LIMITS[boardSize].min) {
             const result = await this.socket.emitWithAck(WaitingRoomEvents.StartGame, roomId);
             if (!result.success) {
                 throw new Error(result.error || 'Failed to start game');
@@ -156,6 +158,65 @@ export class RoomSocketService implements ISocketService {
         this.socket.once(WaitingRoomEvents.GenerateCodeResponse, (response: { code: string }) => {
             callback(response.code);
         });
+    }
+
+    getAvailableRooms(callback: (rooms: RoomInfo[]) => void): void {
+        this.socket.emit(WaitingRoomEvents.GetAvailableRooms);
+        this.socket.once(WaitingRoomEvents.AvailableRoomsResponse, callback);
+    }
+
+    toggleDropInDropOut(roomId: string): void {
+        this.socket.emit(WaitingRoomEvents.ToggleDropInDropOut, roomId);
+    }
+
+    rejoinGame(roomId: string, firebaseUid: string, callback: (success: boolean, error?: string) => void): void {
+        this.socket.emit(GameRoomEvents.JoinGameRoom, { roomId, firebaseUid });
+        this.socket.once(
+            GameRoomEvents.JoinGameRoomResponse,
+            (response: { success: boolean; error?: string; gameRoom?: any; currentBoard?: any; currentPlayerId?: string }) => {
+                if (response.success && response.gameRoom) {
+                    this.gameManagerService.resetManager();
+                    this.gameRoomService.updateRoom(response.gameRoom);
+                    this.gameManagerService.loadGame(response.currentBoard).subscribe({
+                        next: () => {
+                            this.gameManagerService.isGameLoaded = true;
+                            this.gameManagerService.addPlayersToBoard(this.gameManagerService.getPlayers(), true);
+                            this.gameManagerService.setMainPlayer(this.socket.id);
+                            if (response.currentPlayerId) {
+                                this.gameManagerService.currentPlayerId = response.currentPlayerId;
+                            }
+                            this.gameManagerService.redirect();
+                        },
+                    });
+                }
+                callback(response.success, response.error);
+            },
+        );
+    }
+
+    joinGameRoom(roomId: string, player: any, callback: (success: boolean, error?: string, gameRoom?: any) => void): void {
+        this.socket.emit(GameRoomEvents.JoinGameRoom, { roomId, player });
+        this.socket.once(
+            GameRoomEvents.JoinGameRoomResponse,
+            (response: { success: boolean; error?: string; gameRoom?: any; currentBoard?: any; isReturning?: boolean; currentPlayerId?: string }) => {
+                if (response.success && response.gameRoom) {
+                    this.gameManagerService.resetManager();
+                    this.gameRoomService.updateRoom(response.gameRoom);
+                    this.gameManagerService.loadGame(response.currentBoard).subscribe({
+                        next: () => {
+                            this.gameManagerService.isGameLoaded = true;
+                            this.gameManagerService.addPlayersToBoard(this.gameManagerService.getPlayers(), true);
+                            this.gameManagerService.setMainPlayer(this.socket.id);
+                            if (response.currentPlayerId) {
+                                this.gameManagerService.currentPlayerId = response.currentPlayerId;
+                            }
+                            this.gameManagerService.redirect();
+                        },
+                    });
+                }
+                callback(response.success, response.error, response.gameRoom);
+            },
+        );
     }
 
     getMessagesFromWaitingRoom(): void {
@@ -178,7 +239,10 @@ export class RoomSocketService implements ISocketService {
 
         this.socket.on(WaitingRoomEvents.PlayerCreated, (players) => {
             this.waitingPlayerService.addPlayer(players);
-            if (this.room.players.length >= SIZE_LIMITS[this.gameCreationService.selectedGame.board.size].max) {
+            const boardSize =
+                this.gameCreationService.selectedGame?.board?.size ?? (this.waitingPlayerService.currentRoom.getValue() as any)?.boardSize;
+
+            if (boardSize && this.room.players.length >= SIZE_LIMITS[boardSize].max) {
                 this.socket.emit(WaitingRoomEvents.ToggleLockWaitingRoom, this.gameCreationService.gameCode);
             }
         });
@@ -223,6 +287,42 @@ export class RoomSocketService implements ISocketService {
         this.socket.on(WaitingRoomEvents.WaitingRoomUnlocked, () => {
             this.roomLockedSubject.next(false);
             this.waitingPlayerService.toggleLock(false);
+        });
+
+        this.socket.on(WaitingRoomEvents.DropInDropOutToggled, (data: { dropInDropOut: boolean }) => {
+            this.waitingPlayerService.toggleDropInDropOut(data.dropInDropOut);
+        });
+
+        this.socket.on(GameRoomEvents.PlayerJoinedGame, (data: { player: any; isReturning: boolean; players: any[] }) => {
+            this.gameRoomService.updatePlayers(data.players);
+
+            // Place the newly joined player on the board so their movements are visible to other clients
+            const board = this.gameManagerService.getBoard();
+            if (board) {
+                // Remove any stale board entry for this player first (ghost left by drop-out)
+                this.gameManagerService.removePlayer(data.player.id);
+
+                const position = data.player.position;
+                if (position) {
+                    const cell = board.getCell(position.x, position.y);
+                    if (cell && !cell.getEntity()) {
+                        const newPlayer = Player.fromObject(data.player);
+                        newPlayer.addCell(cell);
+                        cell.addEntity(newPlayer);
+                    }
+                }
+
+                const spawnPoint = data.player.spawnPoint;
+                if (spawnPoint) {
+                    const spawnCell = board.getCell(spawnPoint.x, spawnPoint.y);
+                    if (spawnCell && !spawnCell.item) {
+                        spawnCell.item = new Item('spawnPoint');
+                        if (data.player.color) {
+                            spawnCell.item.imagePath = `assets/items/${data.player.color}_spawn.gif`;
+                        }
+                    }
+                }
+            }
         });
     }
 }

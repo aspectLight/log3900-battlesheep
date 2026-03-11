@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { environment } from 'src/environments/environment';
+import { Auth, signOut } from '@angular/fire/auth';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
+import { ROUTES } from '@app/constants/routes.constants';
 import { PROFILE_AVATARS } from '@app/constants/profile.constants';
 import { UserProfile, UserStatistics } from '@app/interfaces/profile.interface';
+import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { ProfileService } from '@app/services/communication/profile.service';
 import { StatsService } from '@app/services/communication/stats.service';
-import { environment } from 'src/environments/environment';
+import { SessionService } from '@app/services/state/session.service';
 
 @Component({
     selector: 'app-profile-page',
@@ -21,8 +25,10 @@ export class ProfilePageComponent implements OnInit {
     statistics: UserStatistics | null = null;
     isLoading = true;
     isSaving = false;
+    isDeleting = false;
     showSuccessMessage = false;
     showErrorMessage = false;
+    showDeleteConfirm = false;
     errorMessage = '';
 
     selectedAvatarFile: File | null = null;
@@ -39,6 +45,10 @@ export class ProfilePageComponent implements OnInit {
         private fb: FormBuilder,
         private profileService: ProfileService,
         private statsService: StatsService,
+        private socketService: SocketService,
+        private session: SessionService,
+        private auth: Auth,
+        private router: Router,
     ) {}
 
     get selectedAvatarId(): string {
@@ -184,5 +194,32 @@ export class ProfilePageComponent implements OnInit {
 
     formatTime(seconds: number): string {
         return this.statsService.formatTime(seconds);
+    }
+
+    deleteAccount() {
+        this.showDeleteConfirm = true;
+    }
+
+    onDeleteCancel() {
+        this.showDeleteConfirm = false;
+    }
+
+    async onDeleteConfirm() {
+        this.showDeleteConfirm = false;
+        this.isDeleting = true;
+        this.showErrorMessage = false;
+
+        const result = await this.profileService.deleteAccount();
+
+        if (result.success) {
+            this.socketService.disconnect();
+            this.session.clear();
+            await signOut(this.auth);
+            this.router.navigate([ROUTES.signin]);
+        } else if (result.error) {
+            this.showError(result.error);
+        }
+
+        this.isDeleting = false;
     }
 }

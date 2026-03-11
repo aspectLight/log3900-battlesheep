@@ -32,6 +32,12 @@ export enum WaitingRoomEvents {
     GetMessagesResponse = 'getMessagesResponse',
 
     WaitingRoomError = 'waitingRoomError',
+
+    GetAvailableRooms = 'getAvailableRooms',
+    AvailableRoomsResponse = 'availableRoomsResponse',
+
+    ToggleDropInDropOut = 'toggleDropInDropOut',
+    DropInDropOutToggled = 'dropInDropOutToggled',
 }
 
 export enum GameRoomEvents {
@@ -95,6 +101,10 @@ export enum GameRoomEvents {
     VirtualPlayerAttack = 'virtualPlayerAttack',
     StartVirtualCombat = 'startVirtualCombat',
     OrganizatorChanged = 'organizatorChanged',
+
+    JoinGameRoom = 'joinGameRoom',
+    JoinGameRoomResponse = 'joinGameRoomResponse',
+    PlayerJoinedGame = 'playerJoinedGame',
 }
 
 export enum ChatEvents {
@@ -120,4 +130,26 @@ export enum GeneralChatEvents {
     GetGeneralChatMessages = 'getGeneralChatMessages',
     GetGeneralChatMessagesResponse = 'getGeneralChatMessagesResponse',
     GeneralChatError = 'generalChatError',
+}
+
+export enum CustomChannelEvents {
+    // Émis par le client
+    CreateCustomChannel = 'createCustomChannel',
+    JoinCustomChannel = 'joinCustomChannel',
+    LeaveCustomChannel = 'leaveCustomChannel',
+    DeleteCustomChannel = 'deleteCustomChannel',
+    SendMessageToCustomChannel = 'sendMessageToCustomChannel',
+    GetCustomChannelMessages = 'getCustomChannelMessages',
+    ListCustomChannels = 'listCustomChannels',
+
+    // Émis par le serveur
+    CustomChannelCreated = 'customChannelCreated',
+    CustomChannelMessage = 'customChannelMessage',
+    CustomChannelMessagesResponse = 'customChannelMessagesResponse',
+    CustomChannelsListResponse = 'customChannelsListResponse',
+    CustomChannelJoined = 'customChannelJoined',
+    CustomChannelLeft = 'customChannelLeft',
+    CustomChannelDeleted = 'customChannelDeleted',
+    CustomChannelError = 'customChannelError',
+    UserChannelsRestored = 'userChannelsRestored', // Envoyé à la reconnexion pour restaurer les canaux rejoints
 }

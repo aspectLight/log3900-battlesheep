@@ -3,13 +3,12 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { GlobalStats } from '@app/classes/stats/global-stats';
 import { PlayerStats } from '@app/classes/stats/player-stats';
-import { ChatboxComponent } from '@app/components/shared/chatbox/chatbox.component';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 
 const ONE_HUNDRED = 100;
 
 @Component({
-    imports: [CommonModule, ChatboxComponent],
+    imports: [CommonModule],
     selector: 'app-end-game',
     templateUrl: './end-game.component.html',
     styleUrl: './end-game.component.scss',

@@ -24,6 +24,13 @@ export class WaitingRoomService {
         return this.currentRoom.asObservable();
     }
 
+    /** ID du canal de partie (= roomId de la salle d'attente, sans le préfixe "game_"). */
+    get gameChannelId(): string {
+        const roomId = this.currentRoom.getValue().roomId;
+        if (!roomId) return '';
+        return roomId.startsWith('game_') ? roomId.slice(5) : roomId;
+    }
+
     getPlayerFromId(playerId: string): Player | undefined {
         const room = this.currentRoom.getValue();
         return room.players.find((player) => player.id === playerId);
@@ -53,6 +60,12 @@ export class WaitingRoomService {
     toggleLock(isLocked: boolean) {
         const room = this.currentRoom.getValue();
         room.isLocked = isLocked;
+        this.updateRoom(room);
+    }
+
+    toggleDropInDropOut(dropInDropOut: boolean) {
+        const room = this.currentRoom.getValue();
+        room.dropInDropOut = dropInDropOut;
         this.updateRoom(room);
     }
 

@@ -1,6 +1,5 @@
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
 import { WaitingRoomService } from '@app/modules/shared-room/services/waiting-room.service';
-import { ErrorMessages } from '@common/error-messages.constants';
 import { GameRoomEvents, WaitingRoomEvents } from '@common/socket.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
@@ -24,11 +23,7 @@ export class WaitingRoomGameHandler {
         try {
             const waitingRoom = this.waitingRoomService.findRoomById(roomId);
 
-            if (!waitingRoom.isLocked) {
-                throw new Error(ErrorMessages.RoomNotLocked);
-            }
-
-            const gameRoom = await this.gameRoomService.createRoom(waitingRoom);
+            const gameRoom = await this.gameRoomService.createRoom(waitingRoom as any);
             const sockets = await server.in(roomId).fetchSockets();
 
             for (const playerSocket of sockets) {

@@ -1,0 +1,147 @@
+<div class="channels-page">
+    <div class="header">
+        <button class="return-button" routerLink="/home">
+            <img src="./assets/ui/left.png" alt="Retour" />
+            Page d'accueil
+        </button>
+        <h1>Canaux de discussion</h1>
+    </div>
+
+    @if (successMessage()) {
+        <div class="alert success">{{ successMessage() }}</div>
+    }
+    @if (errorMessage()) {
+        <div class="alert error">{{ errorMessage() }}</div>
+    }
+
+    <div class="create-section">
+        <h2>Créer un nouveau canal</h2>
+        <div class="create-form">
+            <input
+                type="text"
+                class="channel-input"
+                placeholder="Nom du canal (ex: ABC)"
+                [(ngModel)]="newChannelName"
+                maxlength="50"
+                (keydown.enter)="createChannel()"
+            />
+            <button class="btn btn-create" (click)="createChannel()" [disabled]="isCreating || !newChannelName.trim()">
+                @if (isCreating) {
+                    Création...
+                } @else {
+                    Créer
+                }
+            </button>
+        </div>
+    </div>
+
+    <div class="channels-section">
+        <h2>Canaux disponibles</h2>
+
+        <div class="search-bar">
+            <input
+                type="text"
+                class="channel-input"
+                placeholder="Rechercher un canal par nom..."
+                [(ngModel)]="filterTerm"
+            />
+        </div>
+
+        @if (isLoading()) {
+            <div class="state">Chargement des canaux...</div>
+        } @else if (filteredChannels().length === 0) {
+            <div class="state empty">Aucun canal ne correspond à la recherche.</div>
+        } @else {
+            <div class="channel-list">
+                <div class="channel-header-row">
+                    <span>Nom</span>
+                    <span>Créateur</span>
+                    <span>Membres</span>
+                    <span>Actions</span>
+                </div>
+                @for (channel of filteredChannels(); track channel.id) {
+                    <div class="channel-row" [class.own-channel]="isCreator(channel)">
+                        <span class="channel-name">
+                            {{ channel.name }}
+                            @if (isCreator(channel)) {
+                                <span class="creator-badge">Vous</span>
+                            }
+                        </span>
+                        <span class="channel-creator">{{ channel.creator }}</span>
+                        <span class="channel-members">{{ channel.memberCount }} membre{{ channel.memberCount !== 1 ? 's' : '' }}</span>
+                        <span class="channel-actions">
+                            @if (isJoined(channel)) {
+                                <button class="btn btn-leave" (click)="leaveChannel(channel.id)">Quitter</button>
+                            } @else {
+                                <button class="btn btn-join" (click)="joinChannel(channel)">Joindre</button>
+                            }
+                            @if (isCreator(channel)) {
+                                <button class="btn btn-delete" (click)="toggleConfirmation()">Supprimer</button>
+                            }
+                        </span>
+                    </div>
+                    @if (showConfirmation) {
+                        <app-pop-up [popUpMessage]="quitMessage"
+                        [showSecondButton]="true" firstOption="Oui" secondOption="Non" (confirm)="deleteChannel(channel.id)" (cancel)="onCancelQuit()"></app-pop-up> 
+                    }
+                }
+            </div>
+        }
+    </div>
+
+    <div class="joined-section">
+        @if (joinedChannels().length > 0) {
+            <div class="joined-tabs">
+                @for (id of joinedChannels(); track id) {
+                    <button
+                        class="joined-tab"
+                        [class.active]="activeChannelId() === id"
+                        (click)="setActiveChannel(id)"
+                    >
+                        {{ getChannelName(id) }}
+                    </button>
+                }
+            </div>
+
+            @if (activeChannelId()) {
+                <div class="chat-panel">
+                    <div class="chat-header">
+                        <h3>Canal #{{ getActiveChannelName() }}</h3>
+                        <button class="btn btn-delete" (click)="leaveActiveChannel()">Quitter ce canal</button>
+                    </div>
+
+                    <div class="chat-messages">
+                        @if (channelMessages().length === 0) {
+                            <div class="state empty">Aucun message pour l'instant.</div>
+                        } @else {
+                            @for (msg of channelMessages(); track $index) {
+                                <div class="message-row">
+                                    <span class="time">{{ msg.time }}</span>
+                                    <span class="author">{{ msg.name }}</span>
+                                    <span class="content">{{ msg.content }}</span>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <div class="chat-input">
+                        <input
+                            type="text"
+                            maxlength="200"
+                            placeholder="Écrire un message dans #{{ getActiveChannelName() }}..."
+                            [(ngModel)]="activeMessage"
+                            (keydown.enter)="sendMessageToActiveChannel()"
+                        />
+                        <button class="btn btn-create" (click)="sendMessageToActiveChannel()" [disabled]="!activeMessage.trim()">
+                            Envoyer
+                        </button>
+                    </div>
+                </div>
+            } @else {
+                <div class="state empty">Sélectionnez un canal rejoint pour afficher la discussion.</div>
+            }
+        } @else {
+            <div class="state empty">Rejoignez un canal pour commencer à discuter.</div>
+        }
+    </div>
+</div>

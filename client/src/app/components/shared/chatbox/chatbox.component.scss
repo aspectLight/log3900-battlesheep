@@ -38,6 +38,30 @@
   font-size: 1.2rem;
 }
 
+.channel-select {
+  flex: 1;
+  background: #3a1212;
+  color: #f0e0e0;
+  border: 1px solid #5a2020;
+  border-radius: 5px;
+  padding: 4px 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none;
+  max-width: 180px;
+  transition: border-color 0.2s ease;
+}
+
+.channel-select:hover,
+.channel-select:focus {
+  border-color: #8b0000;
+}
+
+.channel-select option {
+  background: #2a0e0e;
+  color: #f0e0e0;
+}
+
 .header-buttons {
   display: flex;
   align-items: center;

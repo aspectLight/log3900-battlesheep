@@ -1,9 +1,5 @@
 @if (showError) {
-    <app-pop-up
-        popUpMessage="{{errorMessage}}"
-        [showSecondButton]="false"
-        (confirm)="this.showError = false">
-    </app-pop-up>
+<app-pop-up popUpMessage="{{ errorMessage }}" [showSecondButton]="false" (confirm)="this.showError = false"> </app-pop-up>
 }
 
 <div class="header">
@@ -12,18 +8,14 @@
         Menu Principal
     </button>
     <h1>Rejoindre une partie</h1>
-
 </div>
 
-<div class="join-game-container">
+<app-room-list (selectedRoom)="onRoomSelected($event)"></app-room-list>
 
+<div class="join-game-container">
     <h2>Entrez le code de la partie à 4 chiffres</h2>
-    <h3 class="room-code-description">Vous pouvez trouver ce code dans la salle d'attente de la partie</h3>
-    <input #gameCode type="text" pattern="\d{4}" maxlength="4" title="Entrez exactement 4 chiffres" required>
-    <button
-        class="square-button"
-        (click) = "joinGame()"
-        >
-        Accéder à la salle d'attente
-    </button>
+    <div class="code-input-column">
+        <input #gameCode type="text" pattern="\d{4}" maxlength="4" title="Entrez exactement 4 chiffres" required />
+        <button class="square-button" (click)="joinGame()">Accéder à la salle d'attente</button>
+    </div>
 </div>
