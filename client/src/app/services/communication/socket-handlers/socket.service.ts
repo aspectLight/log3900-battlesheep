@@ -257,7 +257,8 @@ export class SocketService implements ISocketService {
 
     private setupPlayerPoints(player: Player): void {
         this.gameManagerService.setMovementPoints(player.movementPoints);
-        this.gameManagerService.setActionPoints(1);
+        const actionPoints = this.gameManagerService.getGame()?.actionPoints ?? 1;
+        this.gameManagerService.setActionPoints(actionPoints);
     }
 
     private handlePlayerTurn(nextPlayer: Player, currentPlayer: Player, room: Room): void {

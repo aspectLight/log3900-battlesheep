@@ -39,6 +39,35 @@
         </div>
     </div>
 
+    <div class="size-selection">
+        <h2>Nombre de points d'actions</h2>
+        <div class="size-selection-buttons">
+            <label>
+                <input type="radio" name="size" value="petite" (change)="onActionsChange(1)" checked/>
+                1
+            </label>
+            <label>
+                <input type="radio" name="size" value="moyenne" (change)="onActionsChange(2)" />
+                2
+            </label>
+            <label>
+                <input type="radio" name="size" value="grande" (change)="onActionsChange(3)" />
+                3
+            </label>
+            <label>
+                <input type="radio" name="size" value="grande" (change)="onActionsChange(4)" />
+                4
+            </label>
+            <label>
+                <input type="radio" name="size" value="grande" (change)="onActionsChange(5)" />
+                5
+            </label>
+        </div>
+        <div class="size-description">
+            <span class="mode-description">{{ actionsDescription }}</span>
+        </div>
+    </div>
+
     <div class="privacy-selection">
         <h2>Confidentialité</h2>
         <div class="privacy-selection-buttons">

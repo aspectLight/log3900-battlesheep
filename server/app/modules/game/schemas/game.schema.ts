@@ -27,6 +27,14 @@ export class Game extends Document {
     modificationDate: string;
 
     @Prop({
+        required: false,
+        default: 1,
+        min: 1,
+        max: 5,
+    })
+    actionPoints: number;
+
+    @Prop({
         required: true,
         type: boardSchema,
     })

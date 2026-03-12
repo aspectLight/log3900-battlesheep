@@ -11,6 +11,7 @@ export class Game {
     privacy: string;
     owner: string;
 
+    actionPoints: number;
     constructor(data?: Game) {
         if (data) {
             this.setData(data);
@@ -23,6 +24,7 @@ export class Game {
             this.modificationDate = Date.now().toString();
             this.privacy = 'public';
             this.owner = '';
+            this.actionPoints = 1;
         }
     }
 
@@ -43,5 +45,6 @@ export class Game {
         this.modificationDate = data.modificationDate;
         this.privacy = data.privacy;
         this.owner = data.owner;
+        this.actionPoints = data.actionPoints ?? 1;
     }
 }
