@@ -76,14 +76,14 @@
                                 <button class="btn btn-join" (click)="joinChannel(channel)">Joindre</button>
                             }
                             @if (isCreator(channel)) {
-                                <button class="btn btn-delete" (click)="toggleConfirmation()">Supprimer</button>
+                                <button class="btn btn-delete" (click)="requestDeleteChannel(channel.id)">Supprimer</button>
                             }
                         </span>
                     </div>
-                    @if (showConfirmation) {
-                        <app-pop-up [popUpMessage]="quitMessage"
-                        [showSecondButton]="true" firstOption="Oui" secondOption="Non" (confirm)="deleteChannel(channel.id)" (cancel)="onCancelQuit()"></app-pop-up> 
-                    }
+                }
+                @if (showConfirmation) {
+                    <app-pop-up [popUpMessage]="quitMessage"
+                    [showSecondButton]="true" firstOption="Oui" secondOption="Non" (confirm)="confirmDeleteChannel()" (cancel)="onCancelQuit()"></app-pop-up>
                 }
             </div>
         }

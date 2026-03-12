@@ -31,6 +31,7 @@ export class ChannelsPageComponent implements OnInit, OnDestroy {
     activeMessage = '';
 
     isCreating = false;
+    channelToDelete: string | null = null;
 
     private subscriptions = new Subscription();
 
@@ -45,10 +46,7 @@ export class ChannelsPageComponent implements OnInit, OnDestroy {
 
     onCancelQuit(): void {
         this.showConfirmation = false;
-    }
-
-    toggleConfirmation(): void {
-        this.showConfirmation = !this.showConfirmation;
+        this.channelToDelete = null;
     }
 
     ngOnInit(): void {
@@ -134,9 +132,17 @@ export class ChannelsPageComponent implements OnInit, OnDestroy {
         this.customChannelService.createChannel(name);
     }
 
-    deleteChannel(channelId: string): void {
-        this.customChannelService.deleteChannel(channelId);
-        this.toggleConfirmation();
+    requestDeleteChannel(channelId: string): void {
+        this.channelToDelete = channelId;
+        this.showConfirmation = true;
+    }
+
+    confirmDeleteChannel(): void {
+        if (this.channelToDelete) {
+            this.customChannelService.deleteChannel(this.channelToDelete);
+        }
+        this.showConfirmation = false;
+        this.channelToDelete = null;
     }
 
     isCreator(channel: ChannelInfo): boolean {

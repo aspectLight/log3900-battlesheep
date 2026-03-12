@@ -102,7 +102,8 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         @MessageBody() data: { channelName: string; username: string },
     ): Promise<void> {
         try {
-            const channel = await this.customChannelService.createChannel(data.channelName, data.username);
+            const username = this.socketIdToUsername.get(socket.id) ?? data.username;
+            const channel = await this.customChannelService.createChannel(data.channelName, username);
 
             // Le créateur rejoint automatiquement la room socket de son canal
             socket.join(`custom-channel-${channel.channelId}`);
@@ -137,7 +138,8 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
     @SubscribeMessage(CustomChannelEvents.JoinCustomChannel)
     async handleJoinCustomChannel(@ConnectedSocket() socket: Socket, @MessageBody() data: { channelId: string; username: string }): Promise<void> {
         try {
-            await this.customChannelService.joinChannel(data.channelId, data.username);
+            const username = this.socketIdToUsername.get(socket.id) ?? data.username;
+            await this.customChannelService.joinChannel(data.channelId, username);
             socket.join(`custom-channel-${data.channelId}`);
 
             const channel = await this.customChannelService.getChannel(data.channelId);
@@ -159,7 +161,8 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
     @SubscribeMessage(CustomChannelEvents.LeaveCustomChannel)
     async handleLeaveCustomChannel(@ConnectedSocket() socket: Socket, @MessageBody() data: { channelId: string; username: string }): Promise<void> {
         try {
-            await this.customChannelService.leaveChannel(data.channelId, data.username);
+            const username = this.socketIdToUsername.get(socket.id) ?? data.username;
+            await this.customChannelService.leaveChannel(data.channelId, username);
             socket.leave(`custom-channel-${data.channelId}`);
             socket.emit(CustomChannelEvents.CustomChannelLeft, { channelId: data.channelId });
 
@@ -177,7 +180,8 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
     @SubscribeMessage(CustomChannelEvents.DeleteCustomChannel)
     async handleDeleteCustomChannel(@ConnectedSocket() socket: Socket, @MessageBody() data: { channelId: string; username: string }): Promise<void> {
         try {
-            await this.customChannelService.deleteChannel(data.channelId, data.username);
+            const username = this.socketIdToUsername.get(socket.id) ?? data.username;
+            await this.customChannelService.deleteChannel(data.channelId, username);
 
             socket.emit(CustomChannelEvents.CustomChannelDeleted, {
                 channelId: data.channelId,
