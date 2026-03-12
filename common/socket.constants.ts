@@ -109,6 +109,8 @@ export enum GameRoomEvents {
     JoinGameRoom = 'joinGameRoom',
     JoinGameRoomResponse = 'joinGameRoomResponse',
     PlayerJoinedGame = 'playerJoinedGame',
+
+    TorchIlluminationUpdate = 'torchIlluminationUpdate',
 }
 
 export enum ChatEvents {

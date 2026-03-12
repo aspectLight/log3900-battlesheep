@@ -1,5 +1,6 @@
 import { Coords } from '@app/modules/movement/interfaces/coords';
 import { GameMovementService } from '@app/modules/movement/services/game-movement.service';
+import { TorchService } from '@app/modules/movement/services/torch.service';
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
 import { ErrorMessages } from '@common/error-messages.constants';
 import { GameRoomEvents } from '@common/socket.constants';
@@ -18,6 +19,7 @@ export class MovementHandler {
         private readonly gameRoomService: GameRoomService,
         private readonly gameMovementService: GameMovementService,
         private readonly trapHandler: TrapHandler,
+        private readonly torchService: TorchService,
     ) {}
 
     /**
@@ -92,6 +94,10 @@ export class MovementHandler {
 
             const movementPoints = this.gameMovementService.movePlayer(roomId, playerId, room.players, destination);
 
+            // Recalculate torch illumination after movement
+            const illuminatedCells = this.torchService.recalculateIllumination(roomId, room.players);
+            server.to(roomId).emit(GameRoomEvents.TorchIlluminationUpdate, { roomId, illuminatedCells, players: room.players });
+
             server.to(roomId).emit(GameRoomEvents.PlayerMoved, {
                 roomId,
                 playerId,
@@ -160,6 +166,10 @@ export class MovementHandler {
                 }
             }
 
+            // Recalculate torch illumination after teleportation
+            const teleportIlluminatedCells = this.torchService.recalculateIllumination(data.roomId, room.players);
+            server.to(data.roomId).emit(GameRoomEvents.TorchIlluminationUpdate, { roomId: data.roomId, illuminatedCells: teleportIlluminatedCells, players: room.players });
+
             server.to(data.roomId).emit(GameRoomEvents.PlayerTeleported, data);
 
             return { success: true };
@@ -177,6 +187,10 @@ export class MovementHandler {
             const room = this.gameRoomService.findRoomById(data.roomId);
             this.gameMovementService.toggleDoor(data.roomId, data.x, data.y, room);
             server.to(data.roomId).emit(GameRoomEvents.DoorToggled, data);
+
+            // Recalculate torch illumination after door toggle (light may now pass through)
+            const illuminatedCells = this.torchService.recalculateIllumination(data.roomId, room.players);
+            server.to(data.roomId).emit(GameRoomEvents.TorchIlluminationUpdate, { roomId: data.roomId, illuminatedCells, players: room.players });
         } catch (error) {
             socket.emit(GameRoomEvents.GameRoomError, error.message);
         }

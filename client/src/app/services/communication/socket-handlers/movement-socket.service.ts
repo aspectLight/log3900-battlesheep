@@ -385,6 +385,11 @@ export class MovementSocketService implements ISocketService {
                 }
             },
         );
+
+        // Torch illumination: server broadcasts updated illumination state
+        this.socket.on(GameRoomEvents.TorchIlluminationUpdate, (data: { roomId: string; illuminatedCells: string[]; players: any[] }) => {
+            this.gameManagerService.updateIllumination(data.illuminatedCells, data.players);
+        });
     }
 
     // Accept a pending item that is not yet in the player's inventory

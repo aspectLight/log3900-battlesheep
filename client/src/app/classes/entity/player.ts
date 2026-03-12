@@ -258,6 +258,8 @@ export class Player extends Entity {
                 break;
             case 'airStrike':
                 break;
+            case 'torch':
+                break;
         }
     }
 }

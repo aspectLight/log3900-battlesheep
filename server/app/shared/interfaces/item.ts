@@ -10,6 +10,7 @@ export enum ItemType {
     Camouflage = 'camouflage',
     WaterProofBoots = 'waterproofBoots',
     AirStrike = 'airStrike',
+    Torch = 'torch',
     SpawnPoint = 'spawnPoint',
     Random = 'random',
     Flag = 'flag',
