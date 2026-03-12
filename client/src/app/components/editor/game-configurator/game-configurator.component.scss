@@ -10,7 +10,7 @@
 
 h2 {
     margin-bottom: 20px;
-    color: #ffffff;
+    color: var(--theme-text-primary);
 }
 
 .mode-selection-buttons,
@@ -23,15 +23,15 @@ h2 {
 
 label:hover:not(.ctf-label) {
     cursor: pointer;
-    color: red;
+    color: var(--theme-text-hover);
 }
 
 label:active:not(.ctf-label) {
-    color: darkred;
+    color: var(--theme-text-hover-active);
 } 
 
 .ctf-label {
-    color: white;
+    color: var(--theme-text-primary);
 }
 
 input[disabled] {
@@ -39,16 +39,16 @@ input[disabled] {
 }
 
 input[type='radio'] {
-    accent-color: red;
+    accent-color: var(--theme-accent-hover);
     cursor: pointer;
 }
 
 .mode-description {
-    color: darkgray;
+    color: var(--theme-text-muted);
 }
 
 .size-description {
-    color: darkgray;
+    color: var(--theme-text-muted);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -66,9 +66,9 @@ button {
 
 button:hover {
     cursor: pointer;
-    color: red;
+    color: var(--theme-text-hover);
 }
 
 button:active {
-    color: darkred;
+    color: var(--theme-text-hover-active);
 }
