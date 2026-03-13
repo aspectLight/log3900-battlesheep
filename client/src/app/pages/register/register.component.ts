@@ -1,9 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { PROFILE_AVATARS } from '@app/constants/profile.constants';
+import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
+import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
+import { CameraCaptureService } from '@app/services/communication/camera-capture.service';
 import { AuthService } from '@app/services/communication/auth.service';
+import { ProfileService } from '@app/services/communication/profile.service';
 
 const passwordContainsLetter: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     return /[a-zA-Z]/.test(control.value) ? null : { noLetter: true };
@@ -26,17 +29,26 @@ const passwordMatchValidator: ValidatorFn = (group: AbstractControl): Validation
 @Component({
     selector: 'app-signup-page',
     standalone: true,
-    imports: [ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink, PopUpComponent],
     templateUrl: './register.component.html',
     styleUrl: './register.component.scss',
 })
 export class RegisterPageComponent {
+    @ViewChild('cameraVideo') cameraVideoRef!: ElementRef<HTMLVideoElement>;
+    @ViewChild('cameraCanvas') cameraCanvasRef!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
+
     errorMessage: string | null = null;
     isSubmitting = false;
     showPassword = false;
     showConfirmPassword = false;
+    showAvatarMenu = false;
 
-    avatars = PROFILE_AVATARS;
+    avatars = ACCOUNT_CREATION_AVATARS;
+
+    selectedAvatarFile: File | null = null;
+    avatarFileError: string | null = null;
+    avatarPreviewUrl: string | null = null;
 
     form = this.fb.nonNullable.group(
         {
@@ -52,16 +64,116 @@ export class RegisterPageComponent {
     constructor(
         private fb: FormBuilder,
         private authService: AuthService,
+        private profileService: ProfileService,
         private router: Router,
+        public camera: CameraCaptureService,
     ) {}
 
     get selectedAvatarId(): string {
         return this.form.controls.avatarId.value ?? '';
     }
 
+    @HostListener('document:click', ['$event.target'])
+    onDocumentClick(target: EventTarget | null) {
+        const picker = document.querySelector('.avatar-source-picker');
+        if (picker && target instanceof Node && !picker.contains(target)) {
+            this.showAvatarMenu = false;
+        }
+    }
+
+    onAvatarFileSelected(event: Event) {
+        const input = event.target as HTMLInputElement;
+        const file = input.files?.[0] ?? null;
+        this.avatarFileError = null;
+        this.selectedAvatarFile = null;
+        this.avatarPreviewUrl = null;
+
+        if (!file) {
+            if (!this.form.controls.avatarId.value || this.form.controls.avatarId.value === 'custom') {
+                this.form.controls.avatarId.setValue('');
+            }
+            return;
+        }
+
+        const maxSize = 2 * 1024 * 1024;
+        const validTypes = ['image/jpeg', 'image/png'];
+
+        if (!validTypes.includes(file.type)) {
+            const extension = file.name.split('.').pop()?.toLowerCase() ?? 'inconnu';
+            this.avatarFileError = `Fichier de type "${extension}" non autorisé. Formats permis : JPG, JPEG, PNG (taille maximale 2 MB).`;
+            return;
+        }
+
+        if (file.size > maxSize) {
+            const sizeMb = file.size / (1024 * 1024);
+            this.avatarFileError = `Fichier trop volumineux (${sizeMb.toFixed(2)} MB). Taille maximale autorisée : 2 MB.`;
+            return;
+        }
+
+        this.selectedAvatarFile = file;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            this.avatarPreviewUrl = e.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+
+        this.form.controls.avatarId.setValue('custom');
+        this.form.controls.avatarId.markAsTouched();
+    }
+
     selectAvatar(id: string) {
+        this.selectedAvatarFile = null;
+        this.avatarPreviewUrl = null;
+        this.avatarFileError = null;
         this.form.controls.avatarId.setValue(id);
         this.form.controls.avatarId.markAsTouched();
+    }
+
+    triggerFileInput() {
+        this.showAvatarMenu = false;
+        this.fileInputRef?.nativeElement.click();
+    }
+
+    async openCamera() {
+        this.showAvatarMenu = false;
+        this.camera.reset();
+        this.camera.showCameraModal = true;
+
+        await this.camera.startStream();
+
+        if (!this.camera.cameraError) {
+            setTimeout(() => this.camera.attachStream(this.cameraVideoRef), 0);
+        }
+    }
+
+    capturePhoto() {
+        this.camera.capturePhoto(this.cameraVideoRef, this.cameraCanvasRef);
+    }
+
+    async retakePhoto() {
+        this.camera.stopStream(this.cameraVideoRef);
+        this.camera.capturedImageDataUrl = null;
+        await this.camera.startStream();
+        if (!this.camera.cameraError) {
+            setTimeout(() => this.camera.attachStream(this.cameraVideoRef), 0);
+        }
+    }
+
+    useCapturedPhoto() {
+        if (!this.camera.capturedImageDataUrl) return;
+
+        this.selectedAvatarFile = this.camera.dataUrlToFile(this.camera.capturedImageDataUrl);
+        this.avatarPreviewUrl = this.camera.capturedImageDataUrl;
+        this.avatarFileError = null;
+        this.form.controls.avatarId.setValue('custom');
+        this.form.controls.avatarId.markAsTouched();
+
+        this.camera.closeCamera(this.cameraVideoRef);
+    }
+
+    closeCamera() {
+        this.camera.closeCamera(this.cameraVideoRef);
     }
 
     togglePasswordVisibility() {
@@ -88,6 +200,16 @@ export class RegisterPageComponent {
                 password,
                 avatarId,
             });
+
+            if (this.selectedAvatarFile) {
+                try {
+                    await this.profileService.uploadAvatar(this.selectedAvatarFile);
+                    this.selectedAvatarFile = null;
+                } catch {
+                    this.errorMessage = "Erreur lors du téléversement de l'avatar (l'image par défaut a été conservée).";
+                }
+            }
+
             await this.router.navigate(['/home']);
             // eslint-disable-next-line no-console
             console.log('Session créée:', res.sessionId, res.user);

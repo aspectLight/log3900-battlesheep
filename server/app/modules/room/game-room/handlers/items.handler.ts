@@ -27,11 +27,17 @@ export class ItemsHandler {
             if (!player.itemsCollected.includes(data.item.type)) player.itemsCollected.push(data.item.type);
 
             const result = this.gameRoomService.addItemToInventory(data.roomId, data.playerId, data.item);
-            this.gameMovementService.removeItemFromBoard(data.position);
+            this.gameMovementService.removeItemFromBoard(data.roomId, data.position);
 
             if (result.shouldDrop) {
-                this.gameMovementService.addItemToBoard(result.shouldDrop.item, result.player.position);
+                this.gameMovementService.addItemToBoard(data.roomId, result.shouldDrop.item, result.player.position);
             }
+
+            // Broadcast confirmed item collection to ALL clients
+            server.to(data.roomId).emit(GameRoomEvents.ItemCollected, {
+                ...data,
+                inventoryFull: result.inventoryFull || false,
+            });
 
             if (data.item.type === 'flag') server.to(data.roomId).emit(GameRoomEvents.FlagCollected, data.playerId);
         } catch (error) {
@@ -44,9 +50,10 @@ export class ItemsHandler {
      */
     handleItemDropped(data: { roomId: string; playerId: string; item: Item; coords: Coords }, socket: Socket, server: Server): void {
         try {
+            const room = this.gameRoomService.findRoomById(data.roomId);
             server.to(data.roomId).emit(GameRoomEvents.ItemDropped, data);
             this.gameRoomService.removeItemFromInventory(data.roomId, data.playerId, data.item);
-            this.gameMovementService.addItemToBoard(data.item, data.coords);
+            this.gameMovementService.addItemToBoard(data.roomId, data.item, data.coords);
         } catch (error) {
             socket.emit(GameRoomEvents.GameRoomError, error.message);
         }

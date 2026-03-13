@@ -1,3 +1,4 @@
+import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
 import { WaitingRoomService } from '@app/modules/shared-room/services/waiting-room.service';
 import { Player } from '@app/shared/interfaces/player';
 import { WaitingRoomEvents } from '@common/socket.constants';
@@ -11,7 +12,10 @@ import { Server, Socket } from 'socket.io';
 export class WaitingRoomPlayerHandler {
     private readonly logger = new Logger(WaitingRoomPlayerHandler.name);
 
-    constructor(private readonly waitingRoomService: WaitingRoomService) {}
+    constructor(
+        private readonly waitingRoomService: WaitingRoomService,
+        private readonly gameRoomService: GameRoomService,
+    ) {}
 
     /**
      * Handles player creation in waiting room
@@ -76,12 +80,21 @@ export class WaitingRoomPlayerHandler {
      */
     handleGetReservedAvatars(data: { roomId: string }, socket: Socket): void {
         try {
-            const room = this.waitingRoomService.findRoomById(data.roomId);
+            const waitingRoom = this.waitingRoomService.findRoomById(data.roomId);
 
-            if (!room) {
-                socket.emit(WaitingRoomEvents.UpdateAvatarReserved, { reservedAvatars: [] });
+            if (waitingRoom) {
+                socket.emit(WaitingRoomEvents.UpdateAvatarReserved, { reservedAvatars: waitingRoom.reservedAvatars });
             } else {
-                socket.emit(WaitingRoomEvents.UpdateAvatarReserved, { reservedAvatars: room.reservedAvatars });
+                // For drop-in: look in game rooms and build reserved list from active players
+                const gameRoom = this.gameRoomService.findRoomById(data.roomId);
+                if (gameRoom) {
+                    const reservedAvatars = gameRoom.players
+                        .filter((p) => p.avatar)
+                        .map((p) => ({ reservorId: p.id, chosenAvatar: p.avatar?.name as string }));
+                    socket.emit(WaitingRoomEvents.UpdateAvatarReserved, { reservedAvatars });
+                } else {
+                    socket.emit(WaitingRoomEvents.UpdateAvatarReserved, { reservedAvatars: [] });
+                }
             }
 
             this.logger.log(`Joueur ${socket.id} a demandé la liste des avatars réservés de la room ${data.roomId}`);

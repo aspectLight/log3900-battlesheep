@@ -1,6 +1,8 @@
 /* eslint-disable max-lines */
+import { AuthService } from '@app/modules/auth/services/auth.service';
 import { Coords } from '@app/modules/movement/interfaces/coords';
 import { Item } from '@app/shared/interfaces/item';
+import { Player } from '@app/shared/interfaces/player';
 import { GameRoomEvents } from '@common/socket.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import {
@@ -22,7 +24,6 @@ import { PlayerConnectionHandler } from './handlers/player-connection.handler';
 import { StatisticsHandler } from './handlers/statistics.handler';
 import { TurnHandler } from './handlers/turn.handler';
 import { VirtualPlayerHandler } from './handlers/virtual-player.handler';
-import { AuthService } from '@app/modules/auth/services/auth.service';
 /**
  * Gateway for game room WebSocket events
  * Acts as a pure event router - all business logic delegated to handlers
@@ -74,6 +75,11 @@ export class GameRoomGateway implements OnGatewayConnection, OnGatewayDisconnect
     @SubscribeMessage(GameRoomEvents.AbandonGame)
     handleLeaveRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
         return this.playerConnectionHandler.handleLeaveRoom(roomId, socket, this.server);
+    }
+
+    @SubscribeMessage(GameRoomEvents.JoinGameRoom)
+    async handleJoinGameRoom(@MessageBody() data: { roomId: string; player: Player }, @ConnectedSocket() socket: Socket) {
+        return this.playerConnectionHandler.handleJoinGameRoom(data, socket, this.server);
     }
 
     // ===== Turn Management Events =====
@@ -134,7 +140,7 @@ export class GameRoomGateway implements OnGatewayConnection, OnGatewayDisconnect
     // ===== Combat Events =====
 
     @SubscribeMessage(GameRoomEvents.StartCombat)
-    handleStartFight(@MessageBody() data: { roomId: string; opponentId: string }, @ConnectedSocket() socket: Socket) {
+    handleStartFight(@MessageBody() data: { roomId: string; opponentId: string, isPlayerOnIce: boolean, isOpponentOnIce: boolean }, @ConnectedSocket() socket: Socket) {
         return this.combatHandler.handleStartFight(data, socket, this.server);
     }
 
@@ -179,30 +185,27 @@ export class GameRoomGateway implements OnGatewayConnection, OnGatewayDisconnect
 
     async handleConnection(@ConnectedSocket() socket: Socket) {
         try {
-          const { token, sessionId } = socket.handshake.auth as { token?: string; sessionId?: string };
-      
-          if (!token || !sessionId) {
-            this.logger.warn(`Socket ${socket.id} missing token/sessionId`);
-            socket.disconnect();
-            return;
-          }
-      
-          const decoded = await this.authService.verifyToken(token);
-          const ok = await this.authService.validateSession(decoded.uid, sessionId);
-      
-          if (!ok) {
-            this.logger.warn(`Socket ${socket.id} invalid session for uid=${decoded.uid}`);
-            socket.disconnect();
-            return;
-          }
-      
-          socket.data.uid = decoded.uid;
-          socket.data.sessionId = sessionId;
-      
-          this.logger.log(`socket connecté: ${socket.id} uid=${decoded.uid}`);
+            const { token, sessionId } = socket.handshake.auth as { token?: string; sessionId?: string };
+
+            if (!token || !sessionId) {
+                this.logger.warn(`Socket ${socket.id} missing token/sessionId`);
+                return;
+            }
+
+            const decoded = await this.authService.verifyToken(token);
+            const ok = await this.authService.validateSession(decoded.uid, sessionId);
+
+            if (!ok) {
+                this.logger.warn(`Socket ${socket.id} invalid session for uid=${decoded.uid}`);
+                return;
+            }
+
+            socket.data.uid = decoded.uid;
+            socket.data.sessionId = sessionId;
+
+            this.logger.log(`socket connecté: ${socket.id} uid=${decoded.uid}`);
         } catch (e) {
-          this.logger.warn(`Socket ${socket.id} auth failed`);
-          socket.disconnect();
+            this.logger.warn(`Socket ${socket.id} auth failed`);
         }
     }
 

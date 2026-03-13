@@ -1,6 +1,14 @@
 import { GameService } from '@app/modules/game/services/game.service';
 import { COUNTDOWN_INTERVAL, RANDOM_CALCULATOR_VALUE, TURN_BREAK, TURN_DURATION } from '@app/modules/shared-room/constants/game-room.constants';
 import { GameRoom } from '@app/modules/shared-room/interfaces/game-room';
+import {
+    ADRENALINE_HEALTH_BOOST,
+    PROPAGANDA_ATTACK_BOOST,
+    PROPAGANDA_DEFENSE_BOOST,
+    PROPAGANDA_HEALTH_THRESHOLD,
+    VODKA_ATTACK_BOOST,
+    VODKA_SPEED_REDUCTION,
+} from '@app/shared/constants/item.constants';
 import { Item, ItemType } from '@app/shared/interfaces/item';
 import { Player } from '@app/shared/interfaces/player';
 import { ErrorMessages } from '@common/error-messages.constants';
@@ -13,6 +21,7 @@ export class GameRoomService {
     private server: Server;
     private turnTimeouts: Map<string, NodeJS.Timeout> = new Map();
     private roomsEndingTurn: Set<string> = new Set();
+    private propagandaActivePlayers: Set<string> = new Set();
 
     constructor(private gameService: GameService) {}
 
@@ -31,6 +40,8 @@ export class GameRoomService {
             hostId: waitingRoom.hostId,
             players: waitingRoom.players,
             isLocked: true,
+            dropInDropOut: waitingRoom.dropInDropOut || false,
+            abandonedPlayers: [],
             isDebugging: false,
             turnTimer: undefined,
             timeRemaining: undefined,
@@ -60,8 +71,8 @@ export class GameRoomService {
         newRoom.players = this.assignTurnOrder(newRoom.players);
         newRoom.players = this.assignColor(newRoom.players);
 
-        const game = await this.gameService.getGameById(waitingRoom.gameId);
-        if (game.mode === 'ctf') {
+        const gameInfo = await this.gameService.getGameById(waitingRoom.gameId);
+        if (gameInfo.mode === 'ctf') {
             newRoom.players = this.assignTeam(newRoom.players);
         }
 
@@ -75,6 +86,20 @@ export class GameRoomService {
         if (!room) {
             throw new Error(ErrorMessages.RoomDoesNotExist);
         }
+
+        // Store abandoned player data for potential rejoin
+        const abandonedPlayer = room.players.find((p) => p.id === playerId);
+        if (abandonedPlayer && abandonedPlayer.firebaseUid && room.dropInDropOut) {
+            const playerStats = room.playersStats?.find((s) => s.name === abandonedPlayer.name);
+            // Remove any previous entry for this firebaseUid
+            room.abandonedPlayers = room.abandonedPlayers.filter((ap) => ap.firebaseUid !== abandonedPlayer.firebaseUid);
+            room.abandonedPlayers.push({
+                firebaseUid: abandonedPlayer.firebaseUid,
+                player: { ...abandonedPlayer, inventory: [] },
+                stats: playerStats ? { ...playerStats } : null,
+            });
+        }
+
         room.players = room.players.filter((p) => p.id !== playerId);
         if (room.hostId === playerId) {
             if (room.players.length > 0) {
@@ -259,6 +284,10 @@ export class GameRoomService {
         }
     }
 
+    getAvailableRooms(): GameRoom[] {
+        return this.gameRooms.filter((room) => room.dropInDropOut);
+    }
+
     findRoomsByPlayerId(playerId: string): GameRoom[] {
         return this.gameRooms.filter((room) => {
             if (!room || !room.players) {
@@ -271,21 +300,127 @@ export class GameRoomService {
         });
     }
 
-    addItemToInventory(roomId: string, playerId: string, item: Item): { shouldDrop?: { item: Item }; player: Player } {
+    addPlayerToGame(
+        roomId: string,
+        player: Player,
+        socketId: string,
+        maxPlayers: number,
+    ): { player: Player; isReturning: boolean; restoredStats?: any } {
+        const room = this.findRoomById(roomId);
+        if (!room) {
+            throw new Error(ErrorMessages.RoomDoesNotExist);
+        }
+        if (!room.dropInDropOut) {
+            throw new Error("Le drop-in n'est pas activé pour cette partie");
+        }
+        if (room.players.length >= maxPlayers) {
+            throw new Error('La limite de joueurs est atteinte');
+        }
+
+        // Check if this is a returning player
+        const abandonedEntry = player.firebaseUid ? room.abandonedPlayers.find((ap) => ap.firebaseUid === player.firebaseUid) : null;
+
+        if (abandonedEntry) {
+            // Returning player: restore their original config with full HP and empty inventory
+            const restoredPlayer = {
+                ...abandonedEntry.player,
+                id: socketId,
+                inventory: [],
+                fightsWon: abandonedEntry.stats?.victories ?? 0,
+            };
+            if (restoredPlayer.stats?.['life']) {
+                restoredPlayer.stats = {
+                    ...restoredPlayer.stats,
+                    life: { ...restoredPlayer.stats['life'], value: restoredPlayer.stats['life'].maxValue },
+                };
+            }
+            room.players.push(restoredPlayer);
+
+            // Restore stats
+            if (abandonedEntry.stats) {
+                const existingStatsIndex = room.playersStats?.findIndex((s) => s.name === restoredPlayer.name);
+                if (existingStatsIndex >= 0) {
+                    room.playersStats[existingStatsIndex] = { ...abandonedEntry.stats };
+                } else {
+                    room.playersStats?.push({ ...abandonedEntry.stats });
+                }
+            }
+
+            // Remove from abandoned list
+            room.abandonedPlayers = room.abandonedPlayers.filter((ap) => ap.firebaseUid !== player.firebaseUid);
+
+            return { player: restoredPlayer, isReturning: true, restoredStats: abandonedEntry.stats };
+        } else {
+            // New player: assign color and add fresh stats
+            const usedColors = room.players.map((p) => p.color);
+            const allColors = ['yellow', 'blue', 'green', 'pink', 'purple', 'red'];
+            const availableColor = allColors.find((c) => !usedColors.includes(c)) || allColors[0];
+
+            player.id = socketId;
+            player.color = availableColor;
+            player.inventory = [];
+            player.team = 0;
+
+            // If either team count is > 0, this is a CTF game
+            // Assign to the smallest team (teams are 1 and 2)
+            const teamCounts = room.players.reduce(
+                (acc, p) => {
+                    if (p.team === 1) acc[1]++;
+                    else if (p.team === 2) acc[2]++;
+                    return acc;
+                },
+                { 1: 0, 2: 0 },
+            );
+            if (teamCounts[1] > 0 || teamCounts[2] > 0) {
+                player.team = teamCounts[1] <= teamCounts[2] ? 1 : 2;
+            }
+
+            room.players.push(player);
+
+            room.playersStats?.push({
+                name: player.name,
+                combats: 0,
+                evasions: 0,
+                victories: 0,
+                defeats: 0,
+                healthLost: 0,
+                damage: 0,
+                itemsCollected: [],
+                tilesVisited: [],
+            });
+
+            return { player, isReturning: false };
+        }
+    }
+
+    addItemToInventory(roomId: string, playerId: string, item: Item): { shouldDrop?: { item: Item }; inventoryFull?: boolean; player: Player } {
         const room = this.findRoomById(roomId);
         const player: Player = room.players.find((p) => p.id === playerId);
 
-        if (player.isVirtual && player.inventory.length >= 2) {
-            const itemDropped = player.inventory.find((i) => i.type !== 'flag');
-            const index = player.inventory.findIndex((i) => i.type === itemDropped.type);
-            if (index >= 0) {
-                player.inventory.splice(index, 1);
+        if (player.inventory.length >= 2) {
+            if (player.isVirtual) {
+                // Virtual players auto-drop a non-flag item
+                const itemDropped = player.inventory.find((i) => i.type !== 'flag');
+                const index = player.inventory.findIndex((i) => i.type === itemDropped.type);
+                if (index >= 0) {
+                    player.inventory.splice(index, 1);
+                }
+                player.inventory.push(item);
+                this.removeItemStatEffect(player, itemDropped);
+                this.applyItemStatEffect(player, item);
+                this.server.to(roomId).emit(GameRoomEvents.ItemDropped, { roomId, playerId, item: itemDropped, coords: player.position });
+                return { shouldDrop: { item: itemDropped }, player };
+            } else {
+                // Real players: push item temporarily (inventory will have 3 items).
+                // The client will show a replacement popup — when the player drops
+                // an item, ItemDropped will bring inventory back to 2.
+                player.inventory.push(item);
+                this.applyItemStatEffect(player, item);
+                return { inventoryFull: true, player };
             }
-            player.inventory.push(item);
-            this.server.to(roomId).emit(GameRoomEvents.ItemDropped, { roomId, playerId, item: itemDropped, coords: player.position });
-            return { shouldDrop: { item: itemDropped }, player };
         } else {
             player.inventory.push(item);
+            this.applyItemStatEffect(player, item);
             return { player };
         }
     }
@@ -297,8 +432,73 @@ export class GameRoomService {
         const index = player.inventory.findIndex((i) => i.type === item.type);
         if (index >= 0) {
             player.inventory.splice(index, 1);
+            this.removeItemStatEffect(player, item);
         }
         return player;
+    }
+
+    /**
+     * Re-evaluates the propaganda buff for a player based on their current health.
+     * Should be called whenever the player's health changes (after combat hits or health restoration).
+     */
+    reevaluatePropaganda(player: Player): void {
+        const hasPropaganda = player.inventory?.some((i) => i?.type === 'propaganda');
+        if (!hasPropaganda) return;
+
+        const belowThreshold = player.stats['health'].value < PROPAGANDA_HEALTH_THRESHOLD;
+        const isActive = this.propagandaActivePlayers.has(player.id);
+
+        if (belowThreshold && !isActive) {
+            player.stats['attack'].value += PROPAGANDA_ATTACK_BOOST;
+            player.stats['defense'].value += PROPAGANDA_DEFENSE_BOOST;
+            this.propagandaActivePlayers.add(player.id);
+        } else if (!belowThreshold && isActive) {
+            player.stats['attack'].value -= PROPAGANDA_ATTACK_BOOST;
+            player.stats['defense'].value -= PROPAGANDA_DEFENSE_BOOST;
+            this.propagandaActivePlayers.delete(player.id);
+        }
+    }
+
+    private applyItemStatEffect(player: Player, item: Item): void {
+        if (!player.stats || !item) return;
+        switch (item.type) {
+            case 'adrenaline':
+                player.stats['health'].value += ADRENALINE_HEALTH_BOOST;
+                break;
+            case 'vodka':
+                player.stats['attack'].value += VODKA_ATTACK_BOOST;
+                player.stats['speed'].value -= VODKA_SPEED_REDUCTION;
+                break;
+            case 'propaganda':
+                // Propaganda is conditional: activate immediately only if health is already below threshold.
+                // reevaluatePropaganda handles activation/deactivation as health changes during combat.
+                if (player.stats['health'].value < PROPAGANDA_HEALTH_THRESHOLD && !this.propagandaActivePlayers.has(player.id)) {
+                    player.stats['attack'].value += PROPAGANDA_ATTACK_BOOST;
+                    player.stats['defense'].value += PROPAGANDA_DEFENSE_BOOST;
+                    this.propagandaActivePlayers.add(player.id);
+                }
+                break;
+        }
+    }
+
+    private removeItemStatEffect(player: Player, item: Item): void {
+        if (!player.stats || !item) return;
+        switch (item.type) {
+            case 'adrenaline':
+                player.stats['health'].value -= ADRENALINE_HEALTH_BOOST;
+                break;
+            case 'vodka':
+                player.stats['attack'].value -= VODKA_ATTACK_BOOST;
+                player.stats['speed'].value += VODKA_SPEED_REDUCTION;
+                break;
+            case 'propaganda':
+                if (this.propagandaActivePlayers.has(player.id)) {
+                    player.stats['attack'].value -= PROPAGANDA_ATTACK_BOOST;
+                    player.stats['defense'].value -= PROPAGANDA_DEFENSE_BOOST;
+                    this.propagandaActivePlayers.delete(player.id);
+                }
+                break;
+        }
     }
 
     dropItemsWhenDisconnected(roomId: string, playerId: string) {
@@ -335,7 +535,7 @@ export class GameRoomService {
         return allies.find((p) => this.isCarryingFlag(p));
     }
 
-    changehost(roomId: string): void {
+    changeHost(roomId: string): void {
         const room = this.findRoomById(roomId);
         if (!room) {
             throw new Error(ErrorMessages.RoomDoesNotExist);

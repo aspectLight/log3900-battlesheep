@@ -29,6 +29,20 @@ export class ProfileService {
         return response.user;
     }
 
+    async uploadAvatar(file: File): Promise<UserProfile> {
+        const headers = await this.getAuthHeaders();
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await firstValueFrom(
+            this.http.post<{ message: string; user: UserProfile }>(`${this.apiUrl}/avatar`, formData, {
+                headers,
+            }),
+        );
+
+        return response.user;
+    }
+
     buildUpdatePayload(currentProfile: UserProfile, formValues: { username: string; email: string; avatarId: string }): UpdateProfilePayload {
         const updatePayload: UpdateProfilePayload = {};
 
@@ -38,7 +52,7 @@ export class ProfileService {
         if (formValues.email !== currentProfile.email) {
             updatePayload.email = formValues.email;
         }
-        if (formValues.avatarId !== currentProfile.avatarId) {
+        if (formValues.avatarId && formValues.avatarId !== currentProfile.avatarId) {
             updatePayload.avatarId = formValues.avatarId;
         }
 
@@ -86,6 +100,16 @@ export class ProfileService {
     async getStatistics(): Promise<UserStatistics> {
         const headers = await this.getAuthHeaders();
         return await firstValueFrom(this.http.get<UserStatistics>(`${this.apiUrl}/statistics`, { headers }));
+    }
+
+    async deleteAccount(): Promise<{ success: boolean; error?: string }> {
+        const headers = await this.getAuthHeaders();
+        try {
+            await firstValueFrom(this.http.delete(`${this.apiUrl}/account`, { headers }));
+            return { success: true };
+        } catch (error: unknown) {
+            return { success: false, error: this.extractErrorMessage(error) };
+        }
     }
 
     private async getAuthHeaders(): Promise<HttpHeaders> {

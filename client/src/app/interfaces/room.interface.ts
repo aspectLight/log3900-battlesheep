@@ -7,4 +7,5 @@ export interface Room {
     players: Player[];
     isLocked: boolean;
     isDebugging: boolean;
+    dropInDropOut?: boolean;
 }

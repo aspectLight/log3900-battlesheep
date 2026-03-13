@@ -35,7 +35,7 @@ export class MovementHandler {
             }
 
             player.hasBoots = hasBoots;
-            const paths = this.gameMovementService.getAllPaths(socket.id, room.players);
+            const paths = this.gameMovementService.getAllPaths(roomId, socket.id, room.players);
 
             return {
                 success: true,
@@ -62,7 +62,7 @@ export class MovementHandler {
                 return { success: false, error: ErrorMessages.PlayerNotFound };
             }
 
-            const validation = this.gameMovementService.validatePath(playerId, selectedPath, room.players);
+            const validation = this.gameMovementService.validatePath(roomId, playerId, selectedPath, room.players);
 
             if (!validation.isValid) {
                 return { success: false, error: validation.isValid === false ? validation.error : '' };
@@ -75,7 +75,7 @@ export class MovementHandler {
             }
 
             const destination = selectedPath[selectedPath.length - 1];
-            const movementPoints = this.gameMovementService.movePlayer(playerId, room.players, destination);
+            const movementPoints = this.gameMovementService.movePlayer(roomId, playerId, room.players, destination);
 
             server.to(roomId).emit(GameRoomEvents.PlayerMoved, { ...data, movementPoints });
 
@@ -107,18 +107,19 @@ export class MovementHandler {
                 throw new Error('Invalid destination coordinates');
             }
 
-            const destinationCell = this.gameMovementService.getCell(data.destination.x, data.destination.y);
+            const destinationCell = this.gameMovementService.getCell(data.roomId, data.destination.x, data.destination.y);
             const item = destinationCell?.item;
             const hasCollectableItem = item && item.type !== 'spawnPoint';
 
-            this.gameMovementService.movePlayer(data.playerId, room.players, data.destination, true);
+            this.gameMovementService.movePlayer(data.roomId, data.playerId, room.players, data.destination, true);
 
             if (hasCollectableItem) {
                 const result = this.gameRoomService.addItemToInventory(data.roomId, data.playerId, item);
-                this.gameMovementService.removeItemFromBoard(data.destination);
+                this.gameMovementService.removeItemFromBoard(data.roomId, data.destination);
 
+                // VP has a full inventory and drops an item
                 if (result.shouldDrop) {
-                    this.gameMovementService.addItemToBoard(result.shouldDrop.item, result.player.position);
+                    this.gameMovementService.addItemToBoard(data.roomId, result.shouldDrop.item, result.player.position);
                 }
 
                 server.to(data.roomId).emit(GameRoomEvents.ItemCollected, {
@@ -126,6 +127,7 @@ export class MovementHandler {
                     playerId: data.playerId,
                     item,
                     position: data.destination,
+                    inventoryFull: result.inventoryFull || false,
                 });
 
                 if (item.type === 'flag') {
@@ -148,7 +150,7 @@ export class MovementHandler {
     handleDoorToggled(data: { roomId: string; x: number; y: number }, socket: Socket, server: Server): void {
         try {
             const room = this.gameRoomService.findRoomById(data.roomId);
-            this.gameMovementService.toggleDoor(data.x, data.y, room);
+            this.gameMovementService.toggleDoor(data.roomId, data.x, data.y, room);
             server.to(data.roomId).emit(GameRoomEvents.DoorToggled, data);
         } catch (error) {
             socket.emit(GameRoomEvents.GameRoomError, error.message);

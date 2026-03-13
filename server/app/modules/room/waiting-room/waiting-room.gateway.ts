@@ -36,26 +36,31 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
     // ===== Room Management Events =====
 
     @SubscribeMessage(WaitingRoomEvents.CreateWaitingRoom)
-    handleCreateRoom(
+    async handleCreateRoom(
         @MessageBody() data: { roomId: string; gameId: string; host: Player },
         @ConnectedSocket() socket: Socket,
-    ): { success: boolean; error?: string } {
+    ): Promise<{ success: boolean; error?: string }> {
         return this.managementHandler.handleCreateRoom(data, socket, this.server);
     }
 
     @SubscribeMessage(WaitingRoomEvents.JoinWaitingRoom)
-    handleJoinRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
+    async handleJoinRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
         return this.managementHandler.handleJoinRoom(roomId, socket);
     }
 
     @SubscribeMessage(WaitingRoomEvents.LeaveWaitingRoom)
-    handleLeaveRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
+    async handleLeaveRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
         return this.managementHandler.handleLeaveRoom(roomId, socket, this.server);
     }
 
     @SubscribeMessage(WaitingRoomEvents.ToggleLockWaitingRoom)
     handleLockRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
         return this.managementHandler.handleLockRoom(roomId, socket, this.server);
+    }
+
+    @SubscribeMessage(WaitingRoomEvents.ToggleDropInDropOut)
+    handleToggleDropInDropOut(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
+        return this.managementHandler.handleToggleDropInDropOut(roomId, socket, this.server);
     }
 
     // ===== Player Management Events =====
@@ -107,13 +112,20 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
         return this.chatHandler.handleGetMessagesFromWaitingRoom(roomId, socket);
     }
 
+    // ===== Room Listing Events =====
+
+    @SubscribeMessage(WaitingRoomEvents.GetAvailableRooms)
+    async handleGetAvailableRooms(@ConnectedSocket() socket: Socket) {
+        return this.managementHandler.handleGetAvailableRooms(socket);
+    }
+
     // ===== WebSocket Lifecycle Events =====
 
     handleConnection(@ConnectedSocket() socket: Socket) {
         this.logger.log(`socket connecté: ${socket.id}`);
     }
 
-    handleDisconnect(@ConnectedSocket() socket: Socket) {
-        this.managementHandler.handleDisconnect(socket, this.server);
+    async handleDisconnect(@ConnectedSocket() socket: Socket) {
+        return this.managementHandler.handleDisconnect(socket, this.server);
     }
 }

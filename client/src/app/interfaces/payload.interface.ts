@@ -12,6 +12,8 @@ export interface CombatRoom {
 export interface CombatPayload {
     roomId: string;
     opponentId: string;
+    isPlayerOnIce?: boolean;
+    isOpponentOnIce?: boolean;
 }
 
 export interface CombatValue {
