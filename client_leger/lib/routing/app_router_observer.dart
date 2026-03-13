@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
-import '../presentation/widgets/loading_overlay/loading_overlay_view_model.dart';
+import '../core/presentation/widgets/loading_overlay/loading_overlay_view_model.dart';
 
 class AppRouterObserver extends AutoRouteObserver {
   AppRouterObserver({required this.loadingOverlayViewModel});

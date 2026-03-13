@@ -1,0 +1,4 @@
+enum SessionEndReason {
+  abandoned,
+  canceled,
+}

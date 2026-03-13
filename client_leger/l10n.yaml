@@ -1,5 +1,6 @@
 enabled: true
-arb-dir: assets/l10n
-output-dir: lib/generated/l10n
-template-arb-file: app_en.arb
-output-localization-file: app_localizations.dart
+arb-dir: lib/core/localisation
+template-arb-file: core_en.arb
+output-dir: lib/core/localisation
+output-localization-file: core_localizations.dart
+output-class: CoreLocalizations

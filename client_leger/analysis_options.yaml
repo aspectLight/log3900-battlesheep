@@ -9,6 +9,33 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:total_lints/app.yaml
 
+analyzer:
+    exclude:
+        - draft/**
+    plugins:
+        - import_lint
+    errors:
+        avoid_dynamic_calls: error
+        avoid_annotating_with_dynamic: error
+
+# Feature layer: each feature may only import from core and its own feature.
+# import_lint 0.1.6: plugin is loaded but 0.1.6 reads import_analysis_options.yaml (RegExp) for CLI.
+# Newer import_lint (0.9+/1.x) would use target/from here but conflicts with freezed's analyzer.
+# For cross-feature lint in IDE, use a custom lint or upgrade when import_lint supports analyzer ^7.
+import_lint:
+    severity: error
+    rules:
+        no_authentication_import_other_features:
+            target_file_path: "package:client_leger/features/authentication/**/*.dart"
+            not_allow_imports:
+                - "package:client_leger/features/chat/**/*.dart"
+            exclude_imports: []
+        no_chat_import_other_features:
+            target_file_path: "package:client_leger/features/chat/**/*.dart"
+            not_allow_imports:
+                - "package:client_leger/features/authentication/**/*.dart"
+            exclude_imports: []
+
 linter:
     # The lint rules applied to this project can be customized in the
     # section below to disable rules from the `package:flutter_lints/flutter.yaml`
@@ -21,9 +48,15 @@ linter:
     # `// ignore_for_file: name_of_lint` syntax on the line or in the file
     # producing the lint.
     rules:
-        avoid_print: false # Uncomment to disable the `avoid_print` rule
+        avoid_dynamic_calls: true
+        avoid_print: false
         omit_obvious_property_types: false
         use_setters_to_change_properties: false
+        lines_longer_than_80_chars: false
+        eol_at_end_of_file: false
+        directives_ordering: false
+        combinators_ordering: false
+        sort_pub_dependencies: false
         # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
 
 # Additional information about this file can be found at

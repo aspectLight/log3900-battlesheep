@@ -1,0 +1,5 @@
+enum WaitingRoomLeaveReason {
+  kicked,
+  roomCanceled,
+}
+

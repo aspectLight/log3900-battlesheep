@@ -1,271 +1,229 @@
 {
   "@@locale": "en",
   "welcomeUser": "Welcome back, {username}",
-  "@welcomeUser": {
-    "description": "Welcome message on the home screen",
-    "placeholders": {
-      "username": {
-        "type": "String",
-        "example": "JohnDoe"
-      }
-    }
-  },
   "gameContentSoon": "Game content coming soon...",
-  "@gameContentSoon": {
-    "description": "Placeholder text for upcoming game features"
-  },
   "createAccount": "Create Account",
-  "@createAccount": {
-    "description": "Button text to create a new account"
-  },
   "signUpToStart": "Sign up to get started",
-  "@signUpToStart": {
-    "description": "Subtitle text encouraging signup"
-  },
-  "mainMenu": "Main Menu",
-  "@mainMenu": {
-    "description": "Title for the main menu screen"
-  },
+  "mainMenu": "Home",
   "usernameRequired": "Required field",
-  "@usernameRequired": {
-    "description": "Validation error when username is empty"
-  },
   "identifierRequired": "Username or Email is required",
-  "@identifierRequired": {
-    "description": "Validation error when identifier is empty"
-  },
   "invalidEmail": "Invalid email format",
-  "@invalidEmail": {
-    "description": "Validation error for invalid email format"
-  },
   "usernameTooShort": "Username must be at least 3 characters",
-  "@usernameTooShort": {
-    "description": "Validation error for short username"
-  },
   "usernameTooLong": "Username must be at most 15 characters",
-  "@usernameTooLong": {
-    "description": "Validation error for long username"
-  },
   "usernameSpecialChars": "Special characters not allowed",
-  "@usernameSpecialChars": {
-    "description": "Validation error for special characters in username"
-  },
   "usernameInvalidLength": "Username must be between 3 and 15 characters",
-  "@usernameInvalidLength": {
-    "description": "Validation error for username length not within range"
-  },
   "passwordRequired": "Required field",
-  "@passwordRequired": {
-    "description": "Validation error when password is empty"
-  },
   "passwordTooShort": "Minimum 8 characters",
-  "@passwordTooShort": {
-    "description": "Validation error for short password"
-  },
   "passwordLeastOneLetter": "Password must contain at least one letter",
-  "@passwordLeastOneLetter": {
-    "description": "Validation error for missing letter in password"
-  },
   "passwordLeastOneDigit": "Password must contain at least one digit",
-  "@passwordLeastOneDigit": {
-    "description": "Validation error for missing digit in password"
-  },
   "passwordNoSpaces": "Password must not contain spaces",
-  "@passwordNoSpaces": {
-    "description": "Validation error for spaces in password"
-  },
   "confirmationRequired": "Required field",
-  "@confirmationRequired": {
-    "description": "Validation error when confirmation is missing"
-  },
   "passwordsDoNotMatch": "Passwords do not match",
-  "@passwordsDoNotMatch": {
-    "description": "Validation error when passwords differ"
-  },
   "emailRequired": "Required field",
-  "@emailRequired": {
-    "description": "Validation error when email is empty"
-  },
   "welcomeBack": "Welcome Back",
-  "@welcomeBack": {
-    "description": "Title or greeting for returning users"
-  },
   "signInToContinue": "Sign in to continue",
-  "@signInToContinue": {
-    "description": "Subtitle text encouraging sign in"
-  },
   "usernameOrEmail": "Username or Email",
-  "@usernameOrEmail": {
-    "description": "Label for username or email input field"
-  },
   "username": "Username",
-  "@username": {
-    "description": "Label for username input field"
-  },
   "email": "Email",
-  "@email": {
-    "description": "Label for email input field"
-  },
   "password": "Password",
-  "@password": {
-    "description": "Label for password input field"
-  },
   "confirmPassword": "Confirm Password",
-  "@confirmPassword": {
-    "description": "Label for confirm password input field"
-  },
   "signIn": "Sign In",
-  "@signIn": {
-    "description": "Button text to sign in"
-  },
   "signingIn": "Signing In...",
-  "@signingIn": {
-    "description": "Button text while signing in"
-  },
   "signUp": "Sign Up",
-  "@signUp": {
-    "description": "Button text to sign up"
-  },
   "signingUp": "Creating Account...",
-  "@signingUp": {
-    "description": "Button text while creating an account"
-  },
   "noAccount": "Don't have an account? ",
-  "@noAccount": {
-    "description": "Text asking if user has no account"
-  },
   "alreadyHaveAccount": "Already have an account? ",
-  "@alreadyHaveAccount": {
-    "description": "Text asking if user already has an account"
-  },
   "invalidCredentials": "Incorrect username or password",
-  "@invalidCredentials": {
-    "description": "Error message for invalid login credentials"
-  },
   "emailAlreadyInUse": "This email is already in use",
-  "@emailAlreadyInUse": {
-    "description": "Error message when registering with existing email"
-  },
   "usernameAlreadyInUse": "This username is already in use",
-  "@usernameAlreadyInUse": {
-    "description": "Error message when registering with existing username"
-  },
   "accountAlreadyConnected": "This account is already connected on another device.",
-  "@accountAlreadyConnected": {
-    "description": "Error message when user is already logged in elsewhere"
-  },
   "userNotFound": "No account exists with this identifier",
-  "@userNotFound": {
-    "description": "Error message when user is not found"
-  },
   "networkError": "Network connection problem",
-  "@networkError": {
-    "description": "Error message for network issues"
-  },
   "serverError": "Server error",
-  "@serverError": {
-    "description": "Error message for server issues"
-  },
   "unknownError": "An unknown error occurred",
-  "@unknownError": {
-    "description": "Error message for unknown issues"
-  },
   "chat": "Chat",
-  "@chat": {
-    "description": "Title or label for the chat feature"
-  },
   "noMessages": "No messages yet. Start the conversation!",
-  "@noMessages": {
-    "description": "Placeholder text when chat is empty"
-  },
   "typeMessage": "Type a message...",
-  "@typeMessage": {
-    "description": "Placeholder text for message input field"
-  },
   "back": "Back",
-  "@back": {
-    "description": "Label for back button"
-  },
+  "homePage": "Home",
   "avatarTitle": "Avatar",
-  "@avatarTitle": {
-    "description": "Title for the avatar selection section"
-  },
   "usernamePlaceholder": "JohnDoe",
-  "@usernamePlaceholder": {
-    "description": "Placeholder text for the username input field"
-  },
   "emailPlaceholder": "johndoe@example.com",
-  "@emailPlaceholder": {
-    "description": "Placeholder text for the email input field"
-  },
   "passwordPlaceholder": "••••••••",
-  "@passwordPlaceholder": {
-    "description": "Placeholder text for the password input field"
-  },
   "teamName": "Team 105",
-  "@teamName": {
-    "description": "Team name displayed in the footer"
-  },
   "avatarRequired": "Select an avatar",
-  "@avatarRequired": {
-    "description": "Validation error when avatar is not selected"
-  },
   "teamMembers": "Ahmed Sami Benabbou, May Guessous, Ayoub Marfouk, Pierre Carré, Anis Gadouche, Djihed Benaiche",
-  "@teamMembers": {
-    "description": "List of team members displayed in the footer"
-  },
   "joinGame": "Join Game",
-  "@joinGame": {
-    "description": "Button text to join a game"
-  },
   "createGame": "Create Game",
-  "@createGame": {
-    "description": "Button text to create a game"
-  },
   "administerGames": "Administer Games",
-  "@administerGames": {
-    "description": "Button text to administer games"
-  },
   "settings": "Settings",
-  "@settings": {
-    "description": "Tooltip for the settings button"
-  },
   "profile": "Profile",
-  "@profile": {
-    "description": "Menu option to view profile"
-  },
   "signOut": "Sign Out",
-  "@signOut": {
-    "description": "Menu option to sign out"
-  },
   "connectionHistory": "Connection History",
-  "@connectionHistory": {
-    "description": "Menu option to view connection history"
-  },
   "gameHistory": "Games History",
-  "@gameHistory": {
-    "description": "Menu option to view games history"
-  },
   "filter": "Filter",
-  "@filter": {
-    "description": "Text for filtering"
-  },
   "none": "None",
-  "@none": {
-    "description": "Option for no filter"
-  },
   "send": "Send",
-  "@send": {
-    "description": "Text for the send message button"
-  },
-  "leaveGame": "Leave Game",
-  "@send": {
-    "description": "Text for the leave game button"
-  },
-  "action" : "Action",
-  "date" : "Date",
-  "time" : "Time",
-  "noEntries" : "No entry",
-  "result" : "Result",
-  "abandoned" : "Abandonned"
+  "yes": "Yes",
+  "no": "No",
+  "autoDisconnect": "Automatic disconnection",
+  "leaveGame": "Leave game",
+  "waitingRoom": "WAITING ROOM",
+  "waitingForPlayers": "Waiting For Players...",
+  "unlockRoom": "Unlock room",
+  "lockRoom": "Lock room",
+  "startGame": "Start game",
+  "addVirtualPlayer": "Add virtual player",
+  "selectVirtualProfile": "Select the virtual player's profile:",
+  "aggressive": "Aggressive",
+  "defensive": "Defensive",
+  "waitingForHost": "Waiting for the game host...",
+  "gameCode": "Game Code :",
+  "joinGameTitle": "Join a game",
+  "joinGameSubtitle": "Enter the 4-digit game code",
+  "joinGameDescription": "You can find this code in the waiting room of the game",
+  "joinGameButton": "Access waiting room",
+  "joinGameCodeLength": "The code must be exactly 4 digits",
+  "joinGameErrorEmptyCode": "Please enter a 4-digit code",
+  "joinGameErrorCodeLength": "The code must be exactly 4 digits",
+  "joinGameFailed": "Failed to join game",
+  "joinCodeInvalidLength": "The code must be exactly 4 digits",
+  "chooseCharacterPlaceholder": "Choose a character",
+  "confirmLeaveRoom": "Do you really want to leave the game?",
+  "confirmLockRoom": "Lock the room?",
+  "confirmUnlockRoom": "Unlock the room?",
+  "confirmKickPlayer": "Kick this player?",
+  "createPlayerTitle": "Create player",
+  "createGamePreviewHeader": "Preview",
+  "createGameNameHeader": "Name",
+  "createGameSizeHeader": "Size",
+  "createGameModeHeader": "Mode",
+  "createGameLastModifiedHeader": "Last modified",
+  "createGameModeClassic": "Classic",
+  "createGameModeCtf": "Capture the flag",
+  "waitingRoomTitle": "Waiting room",
+  "waitingRoomWaitingForPlayers": "Waiting for players...",
+  "waitingRoomGameCode": "Game code",
+  "waitingRoomUnlockRoom": "Unlock room",
+  "waitingRoomLockRoom": "Lock room",
+  "waitingRoomAddVirtualPlayer": "Add virtual player",
+  "waitingRoomWaitingForHost": "Waiting for host...",
+  "waitingRoomVirtualPlayerName": "Virtual player name",
+  "waitingRoomVirtualPlayerCharacter": "Character",
+  "waitingRoomVirtualPlayerType": "Type",
+  "waitingRoomAddButton": "Add",
+  "waitingRoomRoomNotFound": "Game not found",
+  "waitingRoomRoomLocked": "Game is locked",
+  "waitingRoomCharacterAlreadyReserved": "Character already taken",
+  "waitingRoomPlayerKicked": "You have been kicked",
+  "gameNotFound": "Game not found",
+  "gameInventoryFullDiscardTitle": "Inventory full",
+  "gamePlayersListPlaying": "Playing",
+  "gamePlayersListVirtual": "Virtual",
+  "gameTimerLabel": "Time",
+  "gameDebugMode": "Debug mode",
+  "gameActionCancel": "Cancel",
+  "gameActionAct": "Act",
+  "gameActionForwardTurn": "End turn",
+  "gameCellDetailCost": "Cost",
+  "gameCellDetailDescription": "Description",
+  "gameCellDetailYou": "You",
+  "combatYourTurn": "Your turn ({countdown}s)",
+  "combatYourTurnIn": "Your turn in {countdown}s",
+  "combatFlightAttemptsLeft": "{count} flight attempts left",
+  "combatYourDefense": "Your defense",
+  "combatYourAttack": "Your attack",
+  "combatEnemyAttack": "Enemy attack",
+  "combatEnemyDefense": "Enemy defense",
+  "combatFlee": "Flee",
+  "combatAttack": "Attack",
+  "combatNotificationVictory": "Victory",
+  "combatNotificationVictoryMessage": "You won the combat!",
+  "combatNotificationDefeat": "Defeat",
+  "combatNotificationDefeatMessage": "You lost. {winnerName} won.",
+  "combatNotificationFlightSuccessTitle": "Fled",
+  "combatNotificationFlightSuccess": "You got away.",
+  "combatNotificationEnemyFled": "{enemyName} fled.",
+  "notificationVictoryCtf": "Victory by capture the flag!",
+  "notificationVictoryClassic": "Victory!",
+  "notificationDefeatCtf": "Defeat! {winnerTeamName} won.",
+  "notificationDefeatClassic": "Defeat! {winnerName} won.",
+  "notificationGameAbandoned": "Game abandoned",
+  "notificationTurnStart": "{playerName}'s turn ({seconds}s)",
+  "playerHudMovements": "Movements: {count}",
+  "playerHudActions": "Actions: {count}",
+  "statHealth": "Health",
+  "statAttack": "Attack",
+  "statDefense": "Defense",
+  "statSpeed": "Speed",
+  "characterCreationValidationMessage": "Please fill all fields",
+  "statisticsTitle": "Statistics",
+  "statisticsReturnHome": "Back",
+  "statisticsPlayersTitle": "Players",
+  "statisticsPlayerName": "Player",
+  "statisticsCombats": "Combats",
+  "statisticsEvasions": "Evasions",
+  "statisticsVictories": "Victories",
+  "statisticsDefeats": "Defeats",
+  "statisticsHealthLost": "Health lost",
+  "statisticsDamage": "Damage",
+  "statisticsItemsCollected": "Items collected",
+  "statisticsTilesVisited": "Tiles visited",
+  "statisticsGlobalTitle": "Global",
+  "statisticsDuration": "Duration",
+  "statisticsTurns": "Turns",
+  "statisticsTilesExplored": "Tiles explored",
+  "statisticsDoorsToggled": "Doors toggled",
+  "statisticsFlags": "Flags",
+  "itemAdrenalineName": "Adrenaline",
+  "itemAdrenalineDesc": "Adrenaline description",
+  "itemVodkaName": "Vodka",
+  "itemVodkaDesc": "Vodka description",
+  "itemPropagandaName": "Propaganda",
+  "itemPropagandaDesc": "Propaganda description",
+  "itemBarbedWireName": "Barbed wire",
+  "itemBarbedWireDesc": "Barbed wire description",
+  "itemCamouflageName": "Camouflage",
+  "itemCamouflageDesc": "Camouflage description",
+  "itemWaterproofBootsName": "Waterproof boots",
+  "itemWaterproofBootsDesc": "Waterproof boots description",
+  "itemAirStrikeName": "Air strike",
+  "itemAirStrikeDesc": "Air strike description",
+  "itemRandomName": "Random",
+  "itemRandomDesc": "Random description",
+  "itemFlagName": "Flag",
+  "itemFlagDesc": "Flag description",
+  "itemSpawnName": "Spawn point",
+  "itemSpawnDesc": "Spawn point description",
+  "ok": "OK",
+  "appTitle": "Eastern Solace",
+  "joinGameCodeHint": "0000",
+  "characterNameLabel": "Character name",
+  "createPlayerButton": "Create player",
+  "playerHudStatsSection": "Stats",
+  "playerHudDiceSection": "Dice",
+  "tileSnowName": "Snow",
+  "tileTreeName": "Tree",
+  "tileStoneName": "Stone",
+  "tileIceName": "Ice",
+  "tileWaterName": "Water",
+  "tileDoorName": "Door",
+  "tileWallName": "Wall",
+  "tileCornerName": "Corner",
+  "tileIntersectionName": "Intersection",
+  "tileSnowDesc": "Snow tile",
+  "tileTreeDesc": "Tree tile",
+  "tileStoneDesc": "Stone tile",
+  "tileIceDesc": "Ice tile",
+  "tileWaterDesc": "Water tile",
+  "tileDoorDesc": "Door tile",
+  "tileWallDesc": "Wall tile",
+  "tileCornerDesc": "Corner tile",
+  "tileIntersectionDesc": "Intersection tile",
+  "gameSessionInfoPlayers": "Players",
+  "gameSessionInfoActivePlayer": "Active player",
+  "gameSessionInfoBoardSize": "Board size",
+  "gameSessionInfoContinue": "Continue",
+  "gameSessionInfoQuit": "Quit",
+  "toggleDebugMode": "Debug mode"
 }

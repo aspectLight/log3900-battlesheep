@@ -1,0 +1,4 @@
+enum PlayerLeaveReason {
+  left,
+  abandoned,
+}

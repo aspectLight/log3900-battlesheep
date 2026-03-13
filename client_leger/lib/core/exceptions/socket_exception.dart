@@ -1,21 +1,36 @@
-sealed class SocketException implements Exception {
+abstract class SocketException implements Exception {
   const SocketException();
+
+  String get devMessage;
+
+  @override
+  String toString() => devMessage;
 }
 
 class NotConnectedException extends SocketException {
   const NotConnectedException();
+
+  @override
+  String get devMessage => 'Not connected';
 }
 
 class ConnectionFailedException extends SocketException {
-  final String? message;
-  const ConnectionFailedException([this.message]);
+  @override
+  final String devMessage;
+
+  const ConnectionFailedException([this.devMessage = 'Connection failed']);
 }
 
 class SocketTimeoutException extends SocketException {
   const SocketTimeoutException();
+
+  @override
+  String get devMessage => 'Socket timeout';
 }
 
 class UnknownSocketException extends SocketException {
-  final String message;
-  const UnknownSocketException(this.message);
+  @override
+  final String devMessage;
+
+  const UnknownSocketException(this.devMessage);
 }
