@@ -5,22 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
-import '../../../../../core/constants/ui_assets.dart';
-import '../../../core/app_events/game_session_events.dart';
-import '../../../core/enums/player_leave_reason.dart';
 import '../../../../../core/app_transition/app_transition_bus.dart';
-import '../../../domain/commands/game_action_commands.dart';
+import '../../../../../core/constants/ui_assets.dart';
+import '../../../../../core/modal/modal_intent_sink.dart';
+import '../../../core/app_events/game_session_events.dart';
+import '../../../core/context/game_session_scope_holder.dart';
+import '../../../core/enums/player_leave_reason.dart';
+import '../../../core/modal/game_info_modal_intent.dart';
 import '../../../data/repositories/game_actions_repository.dart';
 import '../../../data/repositories/game_metadata_repository.dart';
+import '../../../domain/commands/game_action_commands.dart';
 import '../../../domain/state/game_session_state.dart';
 import '../../widgets/game_actions/game_actions_widget.dart';
 import '../../widgets/game_board/game_board_widget.dart';
 import '../../widgets/game_cell_detail/game_cell_detail_widget.dart';
 import '../../widgets/game_combat/game_combat_widget.dart';
 import '../../widgets/game_debug_mode_strip/game_debug_mode_strip.dart';
-import '../../../../../core/modal/modal_intent_sink.dart';
-import '../../../core/context/game_session_scope_holder.dart';
-import '../../../core/modal/game_info_modal_intent.dart';
 import '../../widgets/game_player_cards_hud/game_player_cards_hud_widget.dart';
 import '../../widgets/game_player_hud/game_player_hud_widget.dart';
 import '../../widgets/game_player_inventory/game_player_inventory_widget.dart';
@@ -54,9 +54,7 @@ class _GameScreenState extends State<GameScreen> {
     final actionsRepository = GetIt.I<GameActionsRepository>();
     final scope = GetIt.I<GameSessionScopeHolder>().scope;
     if (scope == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     final metadataRepository = scope.get<GameMetadataRepository>();
 
@@ -137,7 +135,8 @@ class _LeftSide extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (!isCombatMode) const Expanded(child: GameCellDetailWidget()),
+                    if (!isCombatMode)
+                      const Expanded(child: GameCellDetailWidget()),
                     const GameActionsWidget(),
                   ],
                 ),
@@ -148,10 +147,13 @@ class _LeftSide extends StatelessWidget {
                   flex: 3,
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final squareSize = constraints.maxWidth < constraints.maxHeight
+                      final squareSize =
+                          constraints.maxWidth < constraints.maxHeight
                           ? constraints.maxWidth
                           : constraints.maxHeight;
-                      final size = squareSize < boardSize ? squareSize : boardSize;
+                      final size = squareSize < boardSize
+                          ? squareSize
+                          : boardSize;
                       return Center(
                         child: _BoardContainer(
                           size: size,
@@ -215,11 +217,8 @@ class _GameInfoGearButton extends StatelessWidget {
           UiAssets.settingsGear,
           width: 28,
           height: 28,
-          errorBuilder: (_, _, _) => const Icon(
-            Icons.settings,
-            color: Color(0xFFCCC0C0),
-            size: 28,
-          ),
+          errorBuilder: (_, _, _) =>
+              const Icon(Icons.settings, color: Color(0xFFCCC0C0), size: 28),
         ),
       ),
     );
@@ -267,9 +266,17 @@ class _MiddleSection extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         if (!isCombatMode)
-          const SizedBox(
-            height: 240,
-            child: Center(child: GamePlayerInventoryWidget()),
+          SizedBox(
+            // Reserve full card height but push the inventory
+            // further DOWN so only a slimmer strip is visible.
+            height: 200,
+            child: Transform.translate(
+              offset: const Offset(0, 130),
+              child: const Align(
+                alignment: Alignment.topCenter,
+                child: GamePlayerInventoryWidget(),
+              ),
+            ),
           ),
       ],
     );
@@ -327,7 +334,9 @@ class _RightSide extends StatelessWidget {
       child: const Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SizedBox(height: 350, child: GamePlayerCardsHudWidget()),
+          // Let the player cards list take all available
+          // vertical space given by the right panel.
+          Expanded(child: GamePlayerCardsHudWidget()),
           GameDebugModeStrip(),
         ],
       ),

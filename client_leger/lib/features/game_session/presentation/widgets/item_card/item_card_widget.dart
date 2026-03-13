@@ -13,8 +13,8 @@ class ItemCardWidget extends StatelessWidget {
 
   const ItemCardWidget({
     required this.item,
-    this.width = 150,
-    this.height = 220,
+    this.width = 110,
+    this.height = 160,
     this.onTap,
     super.key,
   });

@@ -3,14 +3,14 @@ import 'package:fpdart/fpdart.dart' show None, Option, Some;
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
-import '../../../core/context/game_session_scope_holder.dart';
 import '../../../../../core/constants/character_assets.dart';
 import '../../../../../core/constants/ui_assets.dart';
-import '../../mappers/path_display_mapper.dart';
-import '../../../core/painters/dashed_path_painter.dart';
+import '../../../core/context/game_session_scope_holder.dart';
 import '../../../core/enums/tile_type.dart';
+import '../../../core/painters/dashed_path_painter.dart';
 import '../../../domain/models/game_board_position.dart';
 import '../../../domain/models/tile.dart';
+import '../../mappers/path_display_mapper.dart';
 import '../../ui_models/components/game_board_cell_path_directions_ui.dart';
 import '../../ui_models/components/game_board_cell_ui.dart';
 import '../../ui_models/components/game_board_ui_cell_interaction.dart';
@@ -30,7 +30,8 @@ class _GameBoardWidgetState extends State<GameBoardWidget> {
   @override
   void initState() {
     super.initState();
-    _viewModel = GetIt.I<GameSessionScopeHolder>().scope!.get<GameBoardViewModel>();
+    _viewModel = GetIt.I<GameSessionScopeHolder>().scope!
+        .get<GameBoardViewModel>();
   }
 
   @override
@@ -83,10 +84,8 @@ class _GameBoardWidgetState extends State<GameBoardWidget> {
                       child: Image.asset(
                         tileUi.imagePath,
                         fit: BoxFit.fill,
-                        errorBuilder: (_, _, _) => Image.asset(
-                          tileUi.imagePathBase,
-                          fit: BoxFit.fill,
-                        ),
+                        errorBuilder: (_, _, _) =>
+                            Image.asset(tileUi.imagePathBase, fit: BoxFit.fill),
                       ),
                     ),
                   );
@@ -144,7 +143,8 @@ class _GameBoardWidgetState extends State<GameBoardWidget> {
                       pathDirections: pathDirectionsUi,
                     ),
                     onTap: () => _viewModel.handleCellPrimaryTap(cell),
-                    onSecondaryTap: () => _viewModel.handleCellSecondaryTap(cell),
+                    onSecondaryTap: () =>
+                        _viewModel.handleCellSecondaryTap(cell),
                     onLongPress: () => _viewModel.handleCellLongPress(cell),
                     contentOnly: true,
                   );
@@ -295,10 +295,8 @@ class _GameBoardCellWidget extends StatelessWidget {
       child: Image.asset(
         tileUi.imagePath,
         fit: BoxFit.fill,
-        errorBuilder: (_, _, _) => Image.asset(
-          tileUi.imagePathBase,
-          fit: BoxFit.fill,
-        ),
+        errorBuilder: (_, _, _) =>
+            Image.asset(tileUi.imagePathBase, fit: BoxFit.fill),
       ),
     );
   }
@@ -334,10 +332,7 @@ class _GameBoardCellWidget extends StatelessWidget {
   Widget _buildSelectionOverlay() {
     if (interactionState.isActionModeActive) {
       return Positioned.fill(
-        child: Image.asset(
-          UiAssets.actionTargetOverlay,
-          fit: BoxFit.contain,
-        ),
+        child: Image.asset(UiAssets.actionTargetOverlay, fit: BoxFit.contain),
       );
     }
     if (interactionState.isSelectionModeActive) {

@@ -35,18 +35,46 @@ class _GamePlayerCardsHudWidgetState extends State<GamePlayerCardsHudWidget> {
 
     return Container(
       padding: const EdgeInsets.all(20),
-      child: Center(
-        child: SizedBox(
-          height: 350,
-          child: ListView.separated(
-            shrinkWrap: true,
-            scrollDirection: Axis.horizontal,
-            itemCount: cards.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 10),
-            itemBuilder: (_, int index) =>
-                _PlayerCardsHudCard(card: cards[index]),
-          ),
-        ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Distribute cards across the full available WIDTH,
+          // but keep a fixed vertical size for each card.
+          final maxWidth = constraints.maxWidth;
+
+          // Fixed card height (no vertical stretching).
+          const cardHeight = 270.0;
+
+          // Spread cards evenly across the width, leaving a small gap.
+          const gap = 12.0;
+          final totalGapWidth =
+              cards.length > 1 ? gap * (cards.length - 1) : 0.0;
+          final availableWidth = (maxWidth - totalGapWidth).clamp(0.0, maxWidth);
+          final cardWidth =
+              cards.isNotEmpty ? availableWidth / cards.length : 0.0;
+
+          return Align(
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+              height: cardHeight,
+              width: maxWidth,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  for (var i = 0; i < cards.length; i++)
+                    SizedBox(
+                      width: cardWidth,
+                      height: cardHeight,
+                      child: _PlayerCardsHudCard(
+                        card: cards[i],
+                        width: cardWidth,
+                        height: cardHeight,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -54,8 +82,14 @@ class _GamePlayerCardsHudWidgetState extends State<GamePlayerCardsHudWidget> {
 
 class _PlayerCardsHudCard extends StatelessWidget {
   final GamePlayerUiCard card;
+  final double width;
+  final double height;
 
-  const _PlayerCardsHudCard({required this.card});
+  const _PlayerCardsHudCard({
+    required this.card,
+    required this.width,
+    required this.height,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -84,8 +118,8 @@ class _PlayerCardsHudCard extends StatelessWidget {
         child: ClipPath(
           clipper: GamePlayerCardsHudCardClipper(),
           child: Container(
-            width: 150,
-            height: 270,
+            width: width,
+            height: height,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
@@ -201,7 +235,7 @@ class _PlayerCardsHudCard extends StatelessWidget {
                   if (card.hasFlag)
                     Positioned(
                       top: 73,
-                      left: 150 * 0.65 - 15,
+                      left: width * 0.65 - 15,
                       child: Image.asset(
                         UiAssets.flagIcon,
                         width: 30,

@@ -6,6 +6,7 @@ import '../../../core/localisation/waiting_room_localizations.dart';
 class WaitingRoomWelcomeNotificationWidget extends StatelessWidget {
   const WaitingRoomWelcomeNotificationWidget({
     super.key,
+    // ignore: avoid_unused_constructor_parameters
     required WaitingRoomWelcomeNotificationIntent intent,
     required VoidCallback onDismiss,
   }) : _onDismiss = onDismiss;
@@ -49,10 +50,7 @@ class WaitingRoomWelcomeNotificationWidget extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                _WelcomeActionButton(
-                  label: l10n.ok,
-                  onTap: _onDismiss,
-                ),
+                _WelcomeActionButton(label: l10n.ok, onTap: _onDismiss),
               ],
             ),
           ),
@@ -63,10 +61,7 @@ class WaitingRoomWelcomeNotificationWidget extends StatelessWidget {
 }
 
 class _WelcomeActionButton extends StatelessWidget {
-  const _WelcomeActionButton({
-    required this.label,
-    required this.onTap,
-  });
+  const _WelcomeActionButton({required this.label, required this.onTap});
 
   final String label;
   final VoidCallback onTap;
@@ -107,4 +102,3 @@ class _WelcomeActionButton extends StatelessWidget {
     );
   }
 }
-
