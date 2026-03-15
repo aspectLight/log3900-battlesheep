@@ -53,6 +53,8 @@ class AppNavigationHandler extends AppNavigator {
         _pushAuthenticated(const StatisticsRoute());
       case GoToJoinGameSession():
         _pushAuthenticated(const JoinGameSessionRoute());
+      case GoToDiscussionCanals():
+        _pushAuthenticated(const DiscussionCanalsRoute());
       case GoToCharacterCreation():
         _pushAuthenticated(const CharacterCreationRoute());
       case GoToSelectGameSession():

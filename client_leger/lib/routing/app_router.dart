@@ -6,13 +6,14 @@ import '../core/presentation/screens/main_menu/main_menu_screen.dart';
 import '../features/authentication/presentation/screens/auth_landing/auth_landing_screen.dart';
 import '../features/authentication/presentation/screens/login/login_screen.dart';
 import '../features/authentication/presentation/screens/sign_up/sign_up_screen.dart';
+import '../features/character_creation/presentation/screens/character_creation/character_creation_screen.dart';
+import '../features/discussion_canals/presentation/screens/discussion_canals_screen.dart';
+import '../features/game_history/presentation/screens/game_history/game_history_screen.dart';
 import '../features/game_session/presentation/screens/game_screen/game_screen.dart';
 import '../features/join_game_session/presentation/screens/join_game_session/join_game_session_screen.dart';
-import '../features/game_history/presentation/screens/game_history/game_history_screen.dart';
 import '../features/logs_history/presentation/screens/logs_history/logs_history_screen.dart';
 import '../features/profile/presentation/screens/profile/profile_screen.dart';
 import '../features/select_game_session/presentation/screens/select_game_session/select_game_session_screen.dart';
-import '../features/character_creation/presentation/screens/character_creation/character_creation_screen.dart';
 import '../features/statistics/presentation/screens/statistics_screen/statistics_screen.dart';
 import '../features/waiting_room/presentation/screens/waiting_room/waiting_room_screen.dart';
 import 'auth_guard.dart';
@@ -102,6 +103,11 @@ class AppRouter extends RootStackRouter {
         CustomRoute(
           page: ProfileRoute.page,
           path: 'profile',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+        ),
+        CustomRoute(
+          page: DiscussionCanalsRoute.page,
+          path: 'discussion-canals',
           transitionsBuilder: TransitionsBuilders.fadeIn,
         ),
       ],

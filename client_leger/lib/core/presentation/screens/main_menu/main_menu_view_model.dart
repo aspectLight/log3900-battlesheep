@@ -6,8 +6,9 @@ import 'package:signals_flutter/signals_flutter.dart';
 import '../../../../features/authentication/core/app_events/auth_events.dart';
 import '../../../../features/authentication/core/interfaces/auth_repository.dart';
 import '../../../../features/authentication/domain/models/user.dart';
-import '../../../../features/join_game_session/core/app_events/join_game_session_events.dart';
+import '../../../../features/discussion_canals/core/app_transition/discussion_canals_events.dart';
 import '../../../../features/game_history/core/app_events/game_history_events.dart';
+import '../../../../features/join_game_session/core/app_events/join_game_session_events.dart';
 import '../../../../features/logs_history/core/app_events/logs_history_events.dart';
 import '../../../../features/profile/core/app_events/profile_events.dart';
 import '../../../../features/select_game_session/core/app_events/select_game_session_events.dart';
@@ -18,8 +19,8 @@ class MainMenuViewModel {
   MainMenuViewModel({
     required AuthRepository authRepository,
     required AppTransitionEventBus appTransitionEventBus,
-  })  : _authRepository = authRepository,
-        _appTransitionEventBus = appTransitionEventBus {
+  }) : _authRepository = authRepository,
+       _appTransitionEventBus = appTransitionEventBus {
     _authSub = _authRepository.authStateChanges.listen((userOption) {
       _currentUser.value = userOption;
     });
@@ -65,5 +66,11 @@ class MainMenuViewModel {
 
   void openProfile() {
     _appTransitionEventBus.fire(const ProfileEntryAppEvent.requested());
+  }
+
+  void administerCanals() {
+    _appTransitionEventBus.fire(
+      const DiscussionCanalsEntryAppEvent.discussionCanalsRequested(),
+    );
   }
 }

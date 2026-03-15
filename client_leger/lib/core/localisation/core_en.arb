@@ -40,5 +40,6 @@
   "logout": "Logout",
   "won": "Won",
   "lost": "Lost",
-  "loading": "Loading..."
+  "loading": "Loading...",
+  "discussionCanals": "Discussion Channels"
 }

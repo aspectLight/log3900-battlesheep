@@ -4,10 +4,10 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-import '../../../constants/ui_assets.dart';
 import '../../../../../core/localisation/core_localizations.dart';
 import '../../../../../routing/app_navigator.dart';
 import '../../../../../routing/navigation_command.dart';
+import '../../../constants/ui_assets.dart';
 import '../../widgets/app_background/app_background.dart';
 import 'main_menu_view_model.dart';
 
@@ -63,10 +63,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(bottom: 50),
-                          child: Image.asset(
-                            UiAssets.logo,
-                            width: 300,
-                          ),
+                          child: Image.asset(UiAssets.logo, width: 300),
                         ),
                         _buildMenuButton(
                           label: CoreLocalizations.of(context)!.joinGame,
@@ -81,6 +78,16 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                           onPressed: () {
                             _closeSettings();
                             _viewModel.administerGames();
+                          },
+                        ),
+                        const SizedBox(height: 15),
+                        _buildMenuButton(
+                          label: CoreLocalizations.of(
+                            context,
+                          )!.discussionCanals,
+                          onPressed: () {
+                            _closeSettings();
+                            _viewModel.administerCanals();
                           },
                         ),
                       ],
@@ -153,10 +160,10 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                         children: [
                           _buildSettingsOption(
                             label: CoreLocalizations.of(context)!.profile,
-                                onTap: () {
-                                  _closeSettings();
-                                  _viewModel.openProfile();
-                                },
+                            onTap: () {
+                              _closeSettings();
+                              _viewModel.openProfile();
+                            },
                           ),
                           const Divider(height: 1),
                           _buildSettingsOption(
@@ -169,8 +176,9 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                           ),
                           const Divider(height: 1),
                           _buildSettingsOption(
-                            label:
-                                CoreLocalizations.of(context)!.connectionHistory,
+                            label: CoreLocalizations.of(
+                              context,
+                            )!.connectionHistory,
                             onTap: () {
                               _closeSettings();
                               _viewModel.openConnectionHistory();

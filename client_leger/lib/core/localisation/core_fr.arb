@@ -40,5 +40,6 @@
   "logout": "Déconnexion",
   "won": "Gagnée",
   "lost": "Perdue",
-  "loading": "Chargement..."
+  "loading": "Chargement...",
+  "discussionCanals": "Canaux de discussion"
 }

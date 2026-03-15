@@ -343,6 +343,12 @@ abstract class CoreLocalizations {
   /// In en, this message translates to:
   /// **'Loading...'**
   String get loading;
+
+  /// No description provided for @discussionCanals.
+  ///
+  /// In en, this message translates to:
+  /// **'Discussion Channels'**
+  String get discussionCanals;
 }
 
 class _CoreLocalizationsDelegate
