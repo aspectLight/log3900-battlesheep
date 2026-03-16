@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
 import { ChatService } from '@app/services/communication/chat.service';
 import { CustomChannelService } from '@app/services/communication/custom-channel.service';
 import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';
@@ -53,6 +54,13 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
 
     get name() {
         return this.chatService.playerName;
+    }
+
+    resolveAvatar(avatarId?: string | null, avatarUrl?: string | null): string | null {
+        if (avatarUrl) return avatarUrl;
+        if (!avatarId) return null;
+        const avatar = ACCOUNT_CREATION_AVATARS.find((a) => a.id === avatarId);
+        return avatar ? avatar.image : null;
     }
 
     ngOnInit() {

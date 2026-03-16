@@ -16,6 +16,8 @@ export interface ChannelMessage {
     name?: string;
     content: string;
     time: string;
+    avatarId?: string | null;
+    avatarUrl?: string | null;
 }
 
 @Injectable({
@@ -24,6 +26,8 @@ export interface ChannelMessage {
 export class CustomChannelService {
     channels: ChannelInfo[] = [];
     channelError: string | null = null;
+    avatarId: string | null = null;
+    avatarUrl: string | null = null;
 
     channelsUpdated$ = new Subject<ChannelInfo[]>();
     channelCreated$ = new Subject<{ channelId: string; channelName: string }>();
@@ -185,6 +189,8 @@ export class CustomChannelService {
             channelId,
             username: this.username,
             message,
+            avatarId: this.avatarId,
+            avatarUrl: this.avatarUrl,
         });
     }
 

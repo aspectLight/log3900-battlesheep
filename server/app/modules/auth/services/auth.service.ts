@@ -10,6 +10,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { DecodedIdToken } from 'firebase-admin/auth';
 import { Model } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type {} from 'multer';
 
 const DELETED_USER_PLACEHOLDER = '[supprimé]';
 
@@ -156,6 +158,9 @@ export class AuthService {
         // Updating avatar
         if (updateDto.avatarId && updateDto.avatarId !== user.avatarId) {
             user.avatarId = updateDto.avatarId;
+            user.avatarUrl = undefined;
+            user.avatarImageBuffer = undefined;
+            user.avatarImageMimeType = undefined;
         }
 
         // Updating preferences
@@ -194,6 +199,20 @@ export class AuthService {
             this.logger.error(`User deletion failed: ${error.message}`);
             throw error;
         }
+    }
+
+    async updateAvatarFromFile(uid: string, file: Express.Multer.File): Promise<UserDocument> {
+        const user = await this.getUserByUid(uid);
+
+        user.avatarImageBuffer = file.buffer;
+        user.avatarImageMimeType = file.mimetype;
+        user.avatarUrl = `/auth/avatar/${uid}`;
+
+        await user.save();
+
+        this.logger.log(`Avatar mis à jour pour l'utilisateur ${uid} (stocké en base)`);
+
+        return user;
     }
 
     async validateSession(uid: string, sessionId: string): Promise<boolean> {

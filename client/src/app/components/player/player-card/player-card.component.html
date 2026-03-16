@@ -18,6 +18,11 @@
         <img [src]="avatar" alt="Player Character" class="player-image" />
     </div>
     <div class="div2 player-name">
+        @if (profileAvatar) {
+            <img [src]="profileAvatar" [alt]="player.name ?? ''" class="profile-avatar" />
+        } @else {
+            <span class="profile-avatar-placeholder">{{ (player.name ?? '?')[0].toUpperCase() }}</span>
+        }
         <p>{{ player.name }}</p>
     </div>
     <div class="stats-row">

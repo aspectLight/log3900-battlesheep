@@ -14,3 +14,18 @@ export const PROFILE_AVATARS: AvatarOption[] = [
     { id: 'viktor', label: 'Viktor', image: './assets/avatars/new/viktorAvatar.png' },
     { id: 'volkov', label: 'Volkov', image: './assets/avatars/new/volkovAvatar.png' },
 ];
+
+export const ACCOUNT_CREATION_AVATARS: AvatarOption[] = [
+    { id: 'USNavySEAL', label: 'US Navy SEAL', image: './assets/avatars/account-creation/USNavySEAL.png' },
+    { id: 'agentSpetsnaz', label: 'Agent Spetsnaz', image: './assets/avatars/account-creation/agentSpetsnaz.png' },
+    { id: 'commandoSAS', label: 'Commando SAS', image: './assets/avatars/account-creation/commandoSAS.png' },
+    { id: 'gardeFrontiere', label: 'Garde-frontière', image: './assets/avatars/account-creation/garde-frontiere.png' },
+    { id: 'milicien', label: 'Milicien', image: './assets/avatars/account-creation/milicien.png' },
+    { id: 'officierAllemand', label: 'Officier Allemand', image: './assets/avatars/account-creation/officierAllemand.png' },
+    { id: 'operateurRadio', label: 'Operateur Radio', image: './assets/avatars/account-creation/operateurRadio.png' },
+    { id: 'parachutiste', label: 'Parachutiste', image: './assets/avatars/account-creation/parachutiste.png' },
+    { id: 'pilote', label: 'Pilote', image: './assets/avatars/account-creation/pilote.png' },
+    { id: 'sergent', label: 'Sergent', image: './assets/avatars/account-creation/sergent.png' },
+    { id: 'specialisteSovietique', label: 'Spécialiste Soviétique', image: './assets/avatars/account-creation/specialisteSovietique.png' },
+    { id: 'tankiste', label: 'Tankiste', image: './assets/avatars/account-creation/tankiste.png' },
+];

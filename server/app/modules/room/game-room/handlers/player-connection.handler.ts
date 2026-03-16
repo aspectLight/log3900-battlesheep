@@ -1,5 +1,6 @@
 import { GameCombatService } from '@app/modules/combat/services/game-combat.service';
 import { GameService } from '@app/modules/game/services/game.service';
+import { CustomChannelService } from '@app/modules/general-chat/services/custom-channel.service';
 import { GameMovementService } from '@app/modules/movement/services/game-movement.service';
 import { SIZE_LIMITS } from '@app/modules/shared-room/constants/waiting-room.constants';
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
@@ -20,6 +21,7 @@ export class PlayerConnectionHandler {
         private readonly gameCombatService: GameCombatService,
         private readonly gameMovementService: GameMovementService,
         private readonly gameService: GameService,
+        private readonly customChannelService: CustomChannelService,
     ) {}
 
     /**
@@ -111,6 +113,22 @@ export class PlayerConnectionHandler {
 
             // Join socket room
             socket.join(data.roomId);
+
+            // Rejoindre le canal de discussion de la partie
+            // Le roomId de la game room est "game_XXX", le channelId est "XXX"
+            const channelId = data.roomId.startsWith('game_') ? data.roomId.slice(5) : data.roomId;
+            try {
+                const messages = await this.customChannelService.getMessages(channelId);
+                socket.join(`custom-channel-${channelId}`);
+                socket.emit(CustomChannelEvents.CustomChannelJoined, {
+                    channelId,
+                    channelName: `Partie ${channelId}`,
+                    isGameChannel: true,
+                });
+                socket.emit(CustomChannelEvents.CustomChannelMessagesResponse, { channelId, messages });
+            } catch (channelError) {
+                this.logger.error(`Erreur rejoindre canal de partie (drop-in) ${channelId}: ${channelError.message}`);
+            }
 
             // Notify existing players
             server.to(data.roomId).emit(GameRoomEvents.PlayerJoinedGame, {

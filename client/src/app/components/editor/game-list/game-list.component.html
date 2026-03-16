@@ -94,6 +94,14 @@
         (confirm)="onConfirm()"
         (cancel)="onCancel()"
     >
+    <app-pop-up
+        popUpMessage="{{ errorMessage }}"
+        [popUpMessage]="errorMessage"
+        [showSecondButton]="true"
+        secondOption="Non"
+        (confirm)="onConfirm()"
+        (cancel)="onCancel()"
+    >
     </app-pop-up>
     }
 </div>

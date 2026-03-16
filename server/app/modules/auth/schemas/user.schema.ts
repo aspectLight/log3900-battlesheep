@@ -61,6 +61,15 @@ export class User {
     @Prop({ required: true })
     avatarId: string;
 
+    @Prop()
+    avatarUrl?: string;
+
+    @Prop({ type: Buffer })
+    avatarImageBuffer?: Buffer;
+
+    @Prop()
+    avatarImageMimeType?: string;
+
     @Prop({ default: null })
     currentSessionId: string | null;
 
