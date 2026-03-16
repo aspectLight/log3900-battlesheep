@@ -1,162 +1,124 @@
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:event_bus/event_bus.dart';
 import 'package:get_it/get_it.dart';
-import 'package:path_provider/path_provider.dart';
 
-import '../../data/repositories/auth_repository_impl.dart';
-import '../../data/repositories/chat_repository_impl.dart';
-import '../../data/repositories/game_history_repository_impl.dart';
-import '../../data/repositories/logs_history_repository_impl.dart';
-import '../../data/services/firebase_auth_service.dart';
-import '../../data/services/http_auth_service.dart';
-import '../../data/services/http_history_service.dart';
-import '../../data/services/socket_service.dart';
-import '../../domain/interfaces/repositories/auth_repository.dart';
-import '../../domain/interfaces/repositories/chat_repository.dart';
-import '../../domain/interfaces/repositories/game_history_repository.dart';
-import '../../domain/interfaces/repositories/logs_history_repository.dart';
-import '../../domain/interfaces/services/auth_service.dart';
-import '../../domain/interfaces/services/firebase_auth_service.dart';
-import '../../domain/interfaces/services/history_service.dart';
-import '../../domain/interfaces/services/socket_service.dart';
-import '../../presentation/screens/game_history/game_history_view_model.dart';
-import '../../presentation/screens/login/login_view_model.dart';
-import '../../presentation/screens/logs_history/logs_history_view_model.dart';
-import '../../presentation/screens/main_menu/main_menu_view_model.dart';
-import '../../presentation/screens/sign_up/sign_up_view_model.dart';
-import '../../presentation/widgets/avatar_picker/avatar_picker_view_model.dart';
-import '../../presentation/widgets/chat_line/chat_line_view_model.dart';
-import '../../presentation/widgets/chat_panel_content/chat_panel_content_view_model.dart';
-import '../../presentation/widgets/loading_overlay/loading_overlay_view_model.dart';
-import '../../presentation/widgets/sliding_chat_box/sliding_chat_box_view_model.dart';
+import '../../features/authentication/core/app_events/auth_events.dart';
+import '../../features/authentication/core/di/auth_module.dart';
+import '../../features/authentication/core/di/auth_repository_module.dart';
+import '../../features/authentication/core/di/auth_service_module.dart';
+import '../../features/authentication/core/di/auth_side_effect_module.dart';
+import '../../features/authentication/core/di/auth_use_case_module.dart';
+import '../../features/authentication/core/di/auth_view_model_module.dart';
+import '../../features/authentication/core/interfaces/auth_repository.dart';
+import '../../features/authentication/domain/commands/auth_commands.dart';
+import '../../features/character_creation/core/di/character_creation_module.dart';
+import '../../features/chat/core/di/chat_module.dart';
+import '../../features/game_session/core/di/game_session_module.dart';
+import '../../features/join_game_session/core/di/join_game_session_module.dart';
+import '../../features/join_game_session/core/di/join_game_session_side_effect_module.dart';
+import '../../features/game_history/core/di/game_history_module.dart';
+import '../../features/logs_history/core/di/logs_history_module.dart';
+import '../../features/profile/core/di/profile_module.dart';
+import '../../features/select_game_session/core/di/select_game_session_module.dart';
+import '../../features/select_game_session/core/di/select_game_session_side_effect_module.dart';
+import '../../features/statistics/core/di/statistics_module.dart';
+import '../../features/waiting_room/core/di/waiting_room_module.dart';
+import '../../routing/app_navigation_handler.dart';
+import '../../routing/app_navigator.dart';
 import '../../routing/app_router.dart';
 import '../../routing/auth_guard.dart';
+import '../../routing/navigation_command.dart';
+import '../../routing/route_to_navigation_state_mapper.dart';
+import '../app_transition/app_event_handler.dart';
+import '../app_transition/app_initialization.dart';
+import '../app_transition/app_transition_bus.dart';
+import '../config/app_flavor.dart';
 import '../config/env_config.dart';
-import '../session/session_credentials.dart';
-import '../session/user_session.dart';
+import '../connected_scope/session_scope_manager.dart';
+import '../modal/modal_module.dart';
+import '../notification/notification_module.dart';
+import '../services/log_service.dart';
+import 'app_event_handler_module.dart';
+import 'service_module.dart';
+import 'view_model_module.dart';
 
-final getIt = GetIt.instance;
+final GetIt getIt = GetIt.instance;
 
 Future<void> setupDependencies() async {
-  _registerServices();
-  _registerRepositories();
-  _registerSession();
-  _registerViewModels();
-  _registerRouting();
-  await getIt.allReady();
-}
-
-void _registerServices() {
-  getIt.registerSingletonAsync<Dio>(() async {
-    final dio = Dio(BaseOptions(baseUrl: EnvConfig.baseUrl));
-    final appDocDir = await getApplicationDocumentsDirectory();
-    final cookieJar = PersistCookieJar(
-      storage: FileStorage('${appDocDir.path}/.cookies/'),
-    );
-    dio.interceptors.add(CookieManager(cookieJar));
-    return dio;
-  });
-
-  getIt.registerLazySingleton<SessionCredentials>(SessionCredentials.new);
-
-  getIt.registerLazySingleton<AuthService>(
-    () => HttpAuthService(
-      credentials: getIt<SessionCredentials>(),
-      dio: getIt<Dio>(),
-    ),
+  registerCoreServices(getIt);
+  getIt.registerLazySingleton<Dio>(
+    () => Dio(BaseOptions(baseUrl: EnvConfig.baseUrl)),
   );
-
-  getIt.registerLazySingleton<FirebaseAuthService>(FirebaseAuthServiceImpl.new);
-
-  getIt.registerLazySingleton<SocketService>(SocketServiceImpl.new);
-
-  getIt.registerLazySingleton<HistoryService>(
-    () => HttpHistoryService(credentials: getIt<SessionCredentials>()),
+  getIt.registerLazySingleton<EventBus>(EventBus.new);
+  getIt.registerLazySingleton<AppTransitionEventBus>(
+    () => AppTransitionEventBus(getIt<EventBus>()),
   );
-}
-
-void _registerRepositories() {
-  getIt.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(
-      authService: getIt<AuthService>(),
-      firebaseAuthService: getIt<FirebaseAuthService>(),
-    ),
+  getIt.registerLazySingleton<AppInitialization>(AppInitialization.new);
+  getIt.registerLazySingleton<SessionScopeManager>(
+    () => SessionScopeManager(getIt),
   );
-
-  getIt.registerLazySingleton<LogsHistoryRepository>(
-    () => LogsHistoryRepositoryImpl(getIt<HistoryService>()),
-  );
-
-  getIt.registerLazySingleton<GameHistoryRepository>(
-    () => GameHistoryRepositoryImpl(getIt<HistoryService>()),
-  );
-
-  getIt.registerLazySingleton<ChatRepository>(
-    () => ChatRepositoryImpl(
-      socketService: getIt<SocketService>(),
-      userSession: getIt<UserSession>(),
-    ),
-  );
-}
-
-void _registerSession() {
-  getIt.registerLazySingleton<UserSession>(
-    () => UserSession(
-      socketService: getIt<SocketService>(),
-      authRepository: getIt<AuthRepository>(),
-    ),
-  );
-}
-
-void _registerViewModels() {
-  getIt.registerLazySingleton<LoadingOverlayViewModel>(
-    LoadingOverlayViewModel.new,
-  );
-
-  getIt.registerFactory<MainMenuViewModel>(
-    () => MainMenuViewModel(
-      userSession: getIt<UserSession>(),
-      authRepository: getIt<AuthRepository>(),
-    ),
-  );
-
-  getIt.registerFactory<LoginViewModel>(
-    () => LoginViewModel(authRepository: getIt<AuthRepository>()),
-  );
-
-  getIt.registerFactory<SignUpViewModel>(
-    () => SignUpViewModel(authRepository: getIt<AuthRepository>()),
-  );
-
-  getIt.registerFactory<AvatarPickerViewModel>(AvatarPickerViewModel.new);
-
-  getIt.registerLazySingleton<SlidingChatBoxViewModel>(
-    SlidingChatBoxViewModel.new,
-  );
-  getIt.registerLazySingleton<ChatPanelContentViewModel>(
-    () => ChatPanelContentViewModel(
-      repository: getIt<ChatRepository>(),
-      userSession: getIt<UserSession>(),
-    ),
-  );
-  getIt.registerLazySingleton<ChatLineViewModel>(ChatLineViewModel.new);
-
-  getIt.registerFactory<LogsHistoryViewModel>(
-    () => LogsHistoryViewModel(getIt<LogsHistoryRepository>()),
-  );
-
-  getIt.registerFactory<GameHistoryViewModel>(
-    () => GameHistoryViewModel(getIt<GameHistoryRepository>()),
-  );
-}
-
-void _registerRouting() {
+  registerAuthServices(getIt);
+  registerAuthRepository(getIt);
+  registerAuthUseCases(getIt);
   getIt.registerLazySingleton<AuthGuard>(
     () => AuthGuard(authRepository: getIt<AuthRepository>()),
   );
-
+  getIt.registerLazySingleton<RouteToNavigationStateMapper>(
+    RouteToNavigationStateMapper.new,
+  );
   getIt.registerLazySingleton<AppRouter>(
     () => AppRouter(authGuard: getIt<AuthGuard>()),
   );
+  getIt.registerLazySingleton<AppNavigator>(
+    () => AppNavigationHandler(
+      appRouter: getIt<AppRouter>(),
+      mapper: getIt<RouteToNavigationStateMapper>(),
+    ),
+  );
+  registerAuthCoordinator(getIt);
+  registerAuthViewModels(getIt);
+  registerAuthSideEffects(getIt);
+  registerChatRoot(getIt);
+  registerNotificationModule(getIt);
+  registerModalModule(getIt);
+  registerGameSessionRoot(getIt);
+  registerStatisticsRoot(getIt);
+  registerSelectGameSessionRoot(getIt);
+  registerJoinGameSessionRoot(getIt);
+  registerLogsHistoryRoot(getIt);
+  registerGameHistoryRoot(getIt);
+  registerProfileRoot(getIt);
+  registerCharacterCreationRoot(getIt);
+  registerWaitingRoomRoot(getIt);
+  registerAppEventHandler(getIt);
+  registerViewModels(getIt);
+  await getIt.allReady();
+  getIt.get<AppEventHandler>();
+  bootstrapAuthSideEffects(getIt);
+  bootstrapSelectGameSessionSideEffects(getIt);
+  bootstrapJoinGameSessionSideEffects(getIt);
+  getIt<AppInitialization>().setReady();
+  if (AppFlavor.isDev &&
+      EnvConfig.devUsername.isNotEmpty &&
+      EnvConfig.devPassword.isNotEmpty) {
+    final result = await getIt<AuthRepository>()
+        .signIn(
+          SignInCommand(
+            username: EnvConfig.devUsername,
+            password: EnvConfig.devPassword,
+          ),
+        )
+        .run();
+    result.fold(
+      (exception) {
+        LogService.e('Dev auto sign-in failed', exception);
+        getIt<AppNavigator>().request(ForceUnauthenticated());
+      },
+      (user) => getIt<AppTransitionEventBus>().fire(
+        AuthEntryAppEvent.signInSuccess(user),
+      ),
+    );
+  } else {
+    getIt<AppNavigator>().request(ForceUnauthenticated());
+  }
 }

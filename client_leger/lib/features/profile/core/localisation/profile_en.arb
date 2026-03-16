@@ -1,0 +1,18 @@
+{
+  "@@locale": "en",
+  "profileTitle": "Profile configuration",
+  "profileBack": "Back",
+  "profileUsernameLabel": "Username",
+  "profileEmailLabel": "Email",
+  "profileAvatarLabel": "Avatar",
+  "profileSave": "Save changes",
+  "profileSaveInProgress": "Saving...",
+  "profileFillAllFieldsError": "Please fill all fields and select an avatar.",
+  "profileStatisticsTitle": "Statistics",
+  "profileClassicGames": "Classic games",
+  "profileCtfGames": "CTF games",
+  "profileGamesWon": "Games won",
+  "profileAverageTime": "Average time per game",
+  "profileDeleteAccount": "Delete account"
+}
+

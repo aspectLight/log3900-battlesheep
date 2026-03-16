@@ -1,0 +1,51 @@
+# import_lint 0.1.6: file paths use OS separator (\ on Windows). Use [\\\\/] for path segments.
+# not_allow matches the full source line (e.g. import '...';). Run: dart run import_lint
+rules:
+  no_authentication_import_chat:
+    search_file_path_reg_exp: ".*features[\\\\/]authentication[\\\\/].*\\.dart"
+    not_allow_import_reg_exps: [".*[\\\\/]chat[\\\\/].*"]
+    ignore_import_reg_exps: []
+  no_authentication_import_game_session:
+    search_file_path_reg_exp: ".*features[\\\\/]authentication[\\\\/].*\\.dart"
+    not_allow_import_reg_exps: [".*game_session.*"]
+    ignore_import_reg_exps: []
+  no_authentication_import_statistics:
+    search_file_path_reg_exp: ".*features[\\\\/]authentication[\\\\/].*\\.dart"
+    not_allow_import_reg_exps: [".*[\\\\/]statistics[\\\\/].*"]
+    ignore_import_reg_exps: []
+  no_chat_import_authentication:
+    search_file_path_reg_exp: ".*features[\\\\/]chat[\\\\/].*\\.dart"
+    not_allow_import_reg_exps: [".*authentication.*"]
+    ignore_import_reg_exps: []
+  no_chat_import_game_session:
+    search_file_path_reg_exp: ".*features[\\\\/]chat[\\\\/].*\\.dart"
+    not_allow_import_reg_exps: [".*game_session.*"]
+    ignore_import_reg_exps: []
+  no_chat_import_statistics:
+    search_file_path_reg_exp: ".*features[\\\\/]chat[\\\\/].*\\.dart"
+    not_allow_import_reg_exps: [".*[\\\\/]statistics[\\\\/].*"]
+    ignore_import_reg_exps: []
+  no_game_session_import_authentication:
+    search_file_path_reg_exp: ".*features[\\\\/]game_session[\\\\/].*\\.dart"
+    not_allow_import_reg_exps: [".*authentication.*"]
+    ignore_import_reg_exps: []
+  no_game_session_import_chat:
+    search_file_path_reg_exp: ".*features[\\\\/]game_session[\\\\/].*\\.dart"
+    not_allow_import_reg_exps: [".*[\\\\/]chat[\\\\/].*"]
+    ignore_import_reg_exps: []
+  no_game_session_import_statistics:
+    search_file_path_reg_exp: ".*features[\\\\/]game_session[\\\\/].*\\.dart"
+    not_allow_import_reg_exps: [".*[\\\\/]statistics[\\\\/].*"]
+    ignore_import_reg_exps: []
+  no_statistics_import_authentication:
+    search_file_path_reg_exp: ".*features[\\\\/]statistics[\\\\/].*\\.dart"
+    not_allow_import_reg_exps: [".*authentication.*"]
+    ignore_import_reg_exps: []
+  no_statistics_import_chat:
+    search_file_path_reg_exp: ".*features[\\\\/]statistics[\\\\/].*\\.dart"
+    not_allow_import_reg_exps: [".*[\\\\/]chat[\\\\/].*"]
+    ignore_import_reg_exps: []
+  no_statistics_import_game_session:
+    search_file_path_reg_exp: ".*features[\\\\/]statistics[\\\\/].*\\.dart"
+    not_allow_import_reg_exps: [".*game_session.*"]
+    ignore_import_reg_exps: []
