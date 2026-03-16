@@ -93,6 +93,13 @@ class _SlidingChatBoxState extends State<SlidingChatBox> {
                       return _ChannelChatPanel(
                         viewModel: widget.viewModel,
                         channelId: activeId,
+                        emojis: widget.chatPanelContentViewModel.defaultEmojis,
+                        selectedEmojiIndex: widget
+                            .chatPanelContentViewModel
+                            .selectedEmojiIndex
+                            .value,
+                        onSelectEmoji:
+                            widget.chatPanelContentViewModel.selectEmoji,
                       );
                     }),
                   ],
@@ -209,10 +216,19 @@ class _ChannelTab extends StatelessWidget {
 }
 
 class _ChannelChatPanel extends StatefulWidget {
-  const _ChannelChatPanel({required this.viewModel, required this.channelId});
+  const _ChannelChatPanel({
+    required this.viewModel,
+    required this.channelId,
+    required this.emojis,
+    required this.selectedEmojiIndex,
+    required this.onSelectEmoji,
+  });
 
   final SlidingChatBoxViewModel viewModel;
   final String channelId;
+  final List<String> emojis;
+  final int selectedEmojiIndex;
+  final void Function(int) onSelectEmoji;
 
   @override
   State<_ChannelChatPanel> createState() => _ChannelChatPanelState();
@@ -348,6 +364,35 @@ class _ChannelChatPanelState extends State<_ChannelChatPanel> {
                   ),
                 ),
                 const SizedBox(width: 8),
+                ...widget.emojis.asMap().entries.map((entry) {
+                  final isSelected = entry.key == widget.selectedEmojiIndex;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: GestureDetector(
+                      onTap: () => widget.onSelectEmoji(entry.key),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? const Color(0xFF550000)
+                              : const Color(0xFF2B2B2B),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(
+                            color: isSelected
+                                ? const Color(0xFF7F1F1F)
+                                : const Color(0xFF444444),
+                            width: isSelected ? 2 : 1,
+                          ),
+                        ),
+                        child: Text(
+                          entry.value,
+                          style: const TextStyle(fontSize: 18),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+                const SizedBox(width: 10),
                 GestureDetector(
                   onTap: _send,
                   child: Container(
