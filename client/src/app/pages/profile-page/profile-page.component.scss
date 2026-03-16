@@ -335,6 +335,90 @@
     font-size: 1rem;
 }
 
+// ── Thème visuel ─────────────────────────────────────────────────
+
+.theme-section {
+    margin-top: 16px;
+    background: var(--theme-bg-card-light);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid var(--theme-scrollbar-thumb-soft);
+    box-sizing: border-box;
+}
+
+.theme-picker {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.theme-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 2px solid var(--theme-border-tertiary);
+    background: var(--theme-bg-card);
+    cursor: pointer;
+    transition:
+        border-color 0.25s,
+        box-shadow 0.25s,
+        transform 0.2s;
+    min-width: 80px;
+    position: relative;
+
+    &:hover {
+        border-color: var(--theme-border-focus);
+        transform: translateY(-2px);
+    }
+
+    &.active {
+        border-color: var(--theme-border-focus);
+        box-shadow: 0 0 10px 2px var(--theme-border-focus-shadow);
+    }
+}
+
+// Couleurs des swatches spécifiques à chaque thème (hardcodés intentionnellement
+// car ils doivent représenter les thèmes indépendamment du thème actif)
+.theme-btn[data-theme='default'] .theme-swatch {
+    background: linear-gradient(135deg, #550000 40%, #2b2b2b 100%);
+}
+
+.theme-btn[data-theme='neon'] .theme-swatch {
+    background: linear-gradient(135deg, #6a00f4 40%, #00d9ff 100%);
+}
+
+.theme-btn[data-theme='light'] .theme-swatch {
+    background: linear-gradient(135deg, #007bff 40%, #f5f5f5 100%);
+}
+
+.theme-swatch {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    border: 2px solid var(--theme-border-tertiary);
+    flex-shrink: 0;
+}
+
+.theme-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--theme-text-secondary);
+}
+
+.theme-check {
+    position: absolute;
+    top: 4px;
+    right: 7px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--theme-text-hover);
+}
+
 @keyframes scaleBackground {
     from {
         transform: scale(1);

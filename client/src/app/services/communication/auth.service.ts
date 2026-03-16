@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Auth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
+import { ProfileService } from '@app/services/communication/profile.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { SessionService } from '@app/services/state/session.service';
 import { firstValueFrom } from 'rxjs';
@@ -32,6 +33,7 @@ export class AuthService {
         private auth: Auth,
         private session: SessionService,
         private socketService: SocketService,
+        private profileService: ProfileService,
     ) {}
 
     get currentUser() {
@@ -75,6 +77,8 @@ export class AuthService {
             }
             this.socketService.disconnect();
         } finally {
+            // Invalide le cache profil pour que le prochain login recharge le bon thème
+            this.profileService.invalidateCache();
             this.session.clear();
             await signOut(this.auth);
         }

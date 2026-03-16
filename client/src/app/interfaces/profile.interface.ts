@@ -3,6 +3,7 @@ export interface UserProfile {
     email: string;
     username: string;
     avatarId: string;
+    theme?: string;
     preferences?: Record<string, unknown>;
 }
 
@@ -17,6 +18,7 @@ export interface UpdateProfilePayload {
     username?: string;
     email?: string;
     avatarId?: string;
+    theme?: string;
 }
 
 export interface AvatarOption {

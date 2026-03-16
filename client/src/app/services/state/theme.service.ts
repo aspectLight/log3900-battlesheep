@@ -4,18 +4,19 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 export type ThemeType = 'default' | 'neon' | 'light';
 
+const VALID_THEMES: ThemeType[] = ['default', 'neon', 'light'];
+
 @Injectable({
     providedIn: 'root',
 })
 export class ThemeService {
-    private readonly themeSubject = new BehaviorSubject<ThemeType>('neon');
+    private readonly themeSubject = new BehaviorSubject<ThemeType>('default');
     readonly theme$: Observable<ThemeType> = this.themeSubject.asObservable();
 
-    constructor() {
-        this.initTheme();
-    }
-
     setTheme(theme: ThemeType): void {
+        const body = document.body;
+        VALID_THEMES.forEach((t) => body.classList.remove(`theme-${t}`));
+        body.classList.add(`theme-${theme}`);
         this.themeSubject.next(theme);
     }
 
@@ -23,7 +24,9 @@ export class ThemeService {
         return this.themeSubject.value;
     }
 
-    private initTheme(): void {
-        this.themeSubject.next('default');
+    /** Applique le thème venant du profil (avec fallback sur 'default') */
+    applyFromProfile(theme: string | undefined): void {
+        const safe = VALID_THEMES.includes(theme as ThemeType) ? (theme as ThemeType) : 'default';
+        this.setTheme(safe);
     }
 }

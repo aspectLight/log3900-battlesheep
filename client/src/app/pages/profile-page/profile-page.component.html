@@ -112,6 +112,28 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="theme-section">
+                        <h2 class="section-title">Thème visuel</h2>
+                        <div class="theme-picker">
+                            @for (t of themes; track t.value) {
+                            <button
+                                type="button"
+                                class="theme-btn"
+                                [class.active]="themeService.getCurrentTheme() === t.value"
+                                [attr.data-theme]="t.value"
+                                (click)="selectTheme(t.value)"
+                                [title]="t.description"
+                            >
+                                <span class="theme-swatch"></span>
+                                <span class="theme-label">{{ t.label }}</span>
+                                @if (themeService.getCurrentTheme() === t.value) {
+                                <span class="theme-check">✓</span>
+                                }
+                            </button>
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>

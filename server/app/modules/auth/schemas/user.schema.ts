@@ -61,6 +61,9 @@ export class User {
     @Prop({ required: true })
     avatarId: string;
 
+    @Prop({ default: 'default', enum: ['default', 'neon', 'light'] })
+    theme: string;
+
     @Prop({ default: null })
     currentSessionId: string | null;
 

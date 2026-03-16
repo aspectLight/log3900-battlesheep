@@ -158,6 +158,12 @@ export class AuthService {
             user.avatarId = updateDto.avatarId;
         }
 
+        // Updating theme
+        const validThemes = ['default', 'neon', 'light'];
+        if (updateDto.theme && validThemes.includes(updateDto.theme) && updateDto.theme !== user.theme) {
+            user.theme = updateDto.theme;
+        }
+
         // Updating preferences
         if (updateDto.preferences && updateDto.preferences !== user.preferences) {
             user.preferences = { ...user.preferences, ...updateDto.preferences };

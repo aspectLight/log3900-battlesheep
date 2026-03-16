@@ -1,15 +1,17 @@
+/* eslint-disable max-params */
 import { Component, OnInit } from '@angular/core';
 import { Auth, signOut } from '@angular/fire/auth';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
-import { ROUTES } from '@app/constants/routes.constants';
 import { PROFILE_AVATARS } from '@app/constants/profile.constants';
+import { ROUTES } from '@app/constants/routes.constants';
 import { UserProfile, UserStatistics } from '@app/interfaces/profile.interface';
-import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { ProfileService } from '@app/services/communication/profile.service';
+import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { StatsService } from '@app/services/communication/stats.service';
 import { SessionService } from '@app/services/state/session.service';
+import { ThemeService, ThemeType } from '@app/services/state/theme.service';
 
 @Component({
     selector: 'app-profile-page',
@@ -30,6 +32,12 @@ export class ProfilePageComponent implements OnInit {
     showDeleteConfirm = false;
     errorMessage = '';
 
+    readonly themes: { value: ThemeType; label: string; description: string }[] = [
+        { value: 'default', label: 'Classique', description: 'Rouge sombre' },
+        { value: 'neon', label: 'Neon', description: 'Bleu cyberpunk' },
+        { value: 'light', label: 'Clair', description: 'Mode jour' },
+    ];
+
     form = this.fb.nonNullable.group({
         username: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9]+$/)]],
         email: ['', [Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
@@ -44,6 +52,7 @@ export class ProfilePageComponent implements OnInit {
         private session: SessionService,
         private auth: Auth,
         private router: Router,
+        readonly themeService: ThemeService,
     ) {}
 
     get selectedAvatarId(): string {
@@ -74,6 +83,19 @@ export class ProfilePageComponent implements OnInit {
     selectAvatar(id: string) {
         this.form.controls.avatarId.setValue(id);
         this.form.controls.avatarId.markAsTouched();
+    }
+
+    async selectTheme(theme: ThemeType) {
+        if (!this.profile) return;
+        // Applique immédiatement (retour visuel instantané)
+        this.themeService.setTheme(theme);
+        // Sauvegarde sur le backend (lié au compte)
+        try {
+            const updated = await this.profileService.updateProfile({ theme });
+            this.profile = updated;
+        } catch {
+            // En cas d'erreur réseau, le changement visuel reste appliqué localement
+        }
     }
 
     async submitForm() {
