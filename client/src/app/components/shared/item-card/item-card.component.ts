@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Item } from '@app/classes/entity/item';
 
@@ -11,4 +11,14 @@ import { Item } from '@app/classes/entity/item';
 export class ItemCardComponent {
     @Input() item: Item;
     @Input() index: number = 0;
+    @Input() showDropButton: boolean = false;
+    @Input() dropEnabled: boolean = false;
+    @Output() dropClicked = new EventEmitter<Item>();
+
+    onDropClick(event: Event): void {
+        event.stopPropagation();
+        if (this.dropEnabled) {
+            this.dropClicked.emit(this.item);
+        }
+    }
 }

@@ -195,4 +195,28 @@
 .card-name {
   color: #000000;
   font-size: 0.9rem;
-} 
+}
+
+.drop-button {
+  position: relative;
+  z-index: 4;
+  padding: 4px 12px;
+  margin-top: 6px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #660000;
+  border: 1px solid #990000;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: #990000;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
