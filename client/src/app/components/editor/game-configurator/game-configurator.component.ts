@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { GameService } from '@app/services/editor/game.service';
 import { BOARD_CONFIGS, BoardSizes } from '@app/constants/board.constants';
 import { MODES, MODE_DESCRIPTIONS } from '@app/constants/game.constants';
 import { ROUTES } from '@app/constants/routes.constants';
+import { GameService } from '@app/services/editor/game.service';
 
 @Component({
     selector: 'app-game-configurator',
@@ -12,11 +12,14 @@ import { ROUTES } from '@app/constants/routes.constants';
 })
 export class GameConfiguratorComponent {
     mode: string = 'classique';
+    privacy: 'public' | 'private' | 'protected' = 'public';
     modeDescription: string = MODE_DESCRIPTIONS[this.mode as MODES];
+    actionsDescription: string = "Nombre de points d'actions alloués à chaque joueur à chaque tour";
     boardSize: BoardSizes = BoardSizes.Moyenne;
     board: number = BOARD_CONFIGS[this.boardSize].board;
     players: string = BOARD_CONFIGS[this.boardSize].players;
     items: number = BOARD_CONFIGS[this.boardSize].items;
+    actionsPoints: number = 1;
 
     readonly boardSizes = BoardSizes;
 
@@ -37,10 +40,18 @@ export class GameConfiguratorComponent {
         this.items = BOARD_CONFIGS[this.boardSize].items;
     }
 
+    onPrivacyChange(privacy: string): void {
+        this.privacy = privacy as 'public' | 'private' | 'protected';
+    }
+
+    onActionsChange(actions: number): void {
+        this.actionsPoints = actions;
+    }
+
     createGame(): void {
         this.router.navigate([ROUTES.edit]);
         this.gameService.setNewGame();
-        this.gameService.setGameSettings(this.mode, this.board);
+        this.gameService.setGameSettings(this.mode, this.board, this.privacy, this.actionsPoints);
     }
 
     cancel(): void {

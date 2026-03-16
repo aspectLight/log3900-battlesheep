@@ -16,4 +16,8 @@ export class CreateGameDto {
 
     @IsNotEmpty()
     board: Board;
+
+    @IsString()
+    @IsNotEmpty()
+    privacy: string;
 }

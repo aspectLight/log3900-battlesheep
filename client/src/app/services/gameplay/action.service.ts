@@ -117,6 +117,11 @@ export class ActionService {
         const cell = this.selectedCell.value;
         if (!cell) return;
 
+        if (this.isTeleportPadPartner(cell)) {
+            await this.handleTeleportPadAction(cell);
+            return;
+        }
+
         const hasCamouflage = this.player.hasItem('camouflage');
         const hasAirStrike = this.player.hasItem('airStrike');
 
@@ -193,11 +198,42 @@ export class ActionService {
             return false;
         }
 
+        if (this.isTeleportPadPartner(cell)) {
+            return true;
+        }
+
         if (!this.isCellCloseToPlayer()) {
             return false;
         }
 
         return (cell.tile.type === 'door' && (cell.tile.state === 'closed' || cell.tile.state === 'opened') && !cell.player) || cell.player !== null;
+    }
+
+    private isTeleportPadPartner(cell: Cell): boolean {
+        if (!this.player) return false;
+        const boardPlayer = this.gameManager.getBoard().getPlayerById(this.player.id);
+        if (!boardPlayer?.cell) return false;
+        const playerCell = boardPlayer.cell;
+        return (
+            playerCell.tile.type === 'teleportPad' &&
+            cell.tile.type === 'teleportPad' &&
+            playerCell.tile.state === cell.tile.state &&
+            (playerCell.x !== cell.x || playerCell.y !== cell.y) &&
+            !cell.player
+        );
+    }
+
+    private async handleTeleportPadAction(cell: Cell): Promise<void> {
+        try {
+            await this.movementSocketService.teleportPlayer(cell.x, cell.y, { playerId: this.player?.id });
+            this.removeActionPoints();
+            if (this.player && this.player.movementPoints <= 0 && this.player.actionPoints <= 0) {
+                this.actionSocketService.endPlayerTurn();
+            }
+        } catch (error) {
+            // eslint-disable-next-line no-console
+            console.log('Teleport pad action failed:', error);
+        }
     }
 
     private async handleRemoteAction(cell: Cell, hasAirStrike: boolean, hasCamouflage: boolean): Promise<void> {

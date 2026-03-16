@@ -102,9 +102,15 @@ export enum GameRoomEvents {
     StartVirtualCombat = 'startVirtualCombat',
     OrganizatorChanged = 'organizatorChanged',
 
+    TrapPending = 'trapPending',
+    TrapChoice = 'trapChoice',
+    TrapResult = 'trapResult',
+
     JoinGameRoom = 'joinGameRoom',
     JoinGameRoomResponse = 'joinGameRoomResponse',
     PlayerJoinedGame = 'playerJoinedGame',
+
+    TorchIlluminationUpdate = 'torchIlluminationUpdate',
 }
 
 export enum ChatEvents {

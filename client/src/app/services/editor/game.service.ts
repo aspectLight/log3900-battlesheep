@@ -1,9 +1,11 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Auth } from '@angular/fire/auth';
 import { Board } from '@app/classes/board/board';
 import { Game } from '@app/classes/game/game';
+import { SessionService } from '@app/services/state/session.service';
 import { API_ENDPOINTS } from '@common/api-endpoints.constants';
-import { Observable } from 'rxjs';
+import { Observable, from, switchMap } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { ItemService } from '@app/services/editor/item.service';
@@ -27,6 +29,8 @@ export class GameService {
     constructor(
         private http: HttpClient,
         private itemService: ItemService,
+        private auth: Auth,
+        private session: SessionService,
     ) {
         const savedData = this.getSavedGameData();
 
@@ -56,7 +60,7 @@ export class GameService {
         return this.game.description;
     }
     getGameSettings() {
-        return { mode: this.game.mode, boardSize: this.game.board.size };
+        return { mode: this.game.mode, boardSize: this.game.board.size, actionPoints: this.game.actionPoints ?? 1 };
     }
     getBoard(): Board {
         return this.game.getBoard();
@@ -68,16 +72,22 @@ export class GameService {
     setName(name: string) {
         this.game.name = name;
     }
+
     setDescription(description: string) {
         this.game.description = description;
     }
-    setGameSettings(mode: string, boardSize: number): void {
+
+    setGameSettings(mode: string, boardSize: number, privacy: string, actionPoints: number = 1): void {
         this.game.mode = mode;
         this.game.board.size = boardSize;
+        this.game.privacy = privacy;
+
+        this.game.actionPoints = actionPoints;
         this.itemService.setItemCountFromBoard(this.game.board);
 
         this.saveGameToLocalStorage();
     }
+
     setBoard(board: Board): void {
         this.game.board = board;
     }
@@ -89,7 +99,7 @@ export class GameService {
 
     setGame(gameData: Game) {
         this.game = new Game(gameData);
-        this.setGameSettings(this.game.mode, this.game.board.size);
+        this.setGameSettings(this.game.mode, this.game.board.size, this.game.privacy);
         this.isGameBeingModified = true;
 
         this.tempGame = new Game(gameData);
@@ -108,38 +118,47 @@ export class GameService {
         this.saveGameToLocalStorage();
     }
 
+    // Sauvegarde un nouveau jeu sur le serveur.
+    // from() convertit la Promise de getAuthHeaders() en Observable pour l'intégrer dans le flux RxJS.
+    // switchMap() attend les headers d'auth, puis lance la requête HTTP POST avec ceux-ci.
+    // tap() exécute un effet secondaire (nettoyage du localStorage) sans modifier la valeur émise.
+    // L'Observable retourné n'est exécuté que lorsqu'un composant s'y abonne via .subscribe().
     saveNewGame(): Observable<void> {
-        return this.http
-            .post<void>(this.baseUrl + API_ENDPOINTS.games, this.game, {
-                headers: { contentType: 'application/json' },
-            })
-            .pipe(
-                // We're using tap to execute a side effect after the http request success
-                // Since we're returning an observable, the http request isn't executed here
-                tap(() => {
-                    localStorage.removeItem('savedGame');
-                    this.isGameBeingModified = false;
-                }),
-            );
+        return from(this.getAuthHeaders()).pipe(
+            switchMap((headers) =>
+                this.http.post<void>(this.baseUrl + API_ENDPOINTS.games, this.game, { headers }),
+            ),
+            tap(() => {
+                localStorage.removeItem('savedGame');
+                this.isGameBeingModified = false;
+            }),
+        );
     }
 
+    // Sauvegarde les modifications d'un jeu existant (PATCH).
+    // Même pattern que saveNewGame : from → switchMap (requête HTTP) → tap (nettoyage).
     saveModifications(): Observable<Game> {
-        this.game.isVisible = false;
-        return this.http
-            .patch<Game>(this.baseUrl + API_ENDPOINTS.games + this.game._id, this.game, {
-                headers: { contentType: 'application/json' },
-            })
-            .pipe(
-                // We're using tap to execute a side effect after the http request success
-                // Since we're returning an observable, the http request isn't executed here
-                tap(() => {
-                    localStorage.removeItem('savedGame');
-                    this.isGameBeingModified = false;
-                }),
-            );
+        return from(this.getAuthHeaders()).pipe(
+            switchMap((headers) =>
+                this.http.patch<Game>(this.baseUrl + API_ENDPOINTS.games + this.game._id, this.game, { headers }),
+            ),
+            tap(() => {
+                localStorage.removeItem('savedGame');
+                this.isGameBeingModified = false;
+            }),
+        );
     }
-    fetchGames(): Observable<Game[]> {
-        return this.http.get<Game[]>(environment.serverUrl + API_ENDPOINTS.games);
+
+    // Récupère la liste de tous les jeux depuis le serveur.
+    // from → switchMap : obtient les headers d'auth puis lance le GET.
+    fetchGames(purpose?: string): Observable<Game[]> {
+        return from(this.getAuthHeaders()).pipe(
+            switchMap((headers) => {
+                const params: Record<string, string> = {};
+                if (purpose) params['purpose'] = purpose;
+                return this.http.get<Game[]>(environment.serverUrl + API_ENDPOINTS.games, { headers, params });
+            }),
+        );
     }
 
     isGameExpired(): boolean {
@@ -154,6 +173,18 @@ export class GameService {
     clearSavedGame(): void {
         localStorage.removeItem('savedGame');
         this.setNewGame();
+    }
+
+    private async getAuthHeaders(): Promise<HttpHeaders> {
+        const user = this.auth.currentUser;
+        const sessionId = this.session.sessionId;
+
+        if (!user || !sessionId) {
+            throw new Error('Utilisateur non authentifié');
+        }
+
+        const token = await user.getIdToken();
+        return new HttpHeaders().set('Authorization', `Bearer ${token}`).set('x-session-id', sessionId);
     }
 
     private getSavedGameData(): SavedGameData | null {

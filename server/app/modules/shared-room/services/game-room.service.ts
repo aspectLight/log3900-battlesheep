@@ -478,6 +478,9 @@ export class GameRoomService {
                     this.propagandaActivePlayers.add(player.id);
                 }
                 break;
+            case 'torch':
+                // Torch bonus is positional (handled by TorchService), not a permanent pickup effect
+                break;
         }
     }
 
@@ -497,6 +500,9 @@ export class GameRoomService {
                     player.stats['defense'].value -= PROPAGANDA_DEFENSE_BOOST;
                     this.propagandaActivePlayers.delete(player.id);
                 }
+                break;
+            case 'torch':
+                // Torch bonus is positional (handled by TorchService), not a permanent pickup effect
                 break;
         }
     }

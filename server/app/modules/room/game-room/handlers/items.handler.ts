@@ -1,5 +1,6 @@
 import { Coords } from '@app/modules/movement/interfaces/coords';
 import { GameMovementService } from '@app/modules/movement/services/game-movement.service';
+import { TorchService } from '@app/modules/movement/services/torch.service';
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
 import { Item } from '@app/shared/interfaces/item';
 import { GameRoomEvents } from '@common/socket.constants';
@@ -14,6 +15,7 @@ export class ItemsHandler {
     constructor(
         private readonly gameRoomService: GameRoomService,
         private readonly gameMovementService: GameMovementService,
+        private readonly torchService: TorchService,
     ) {}
 
     /**
@@ -40,6 +42,10 @@ export class ItemsHandler {
             });
 
             if (data.item.type === 'flag') server.to(data.roomId).emit(GameRoomEvents.FlagCollected, data.playerId);
+
+            // Recalculate torch illumination after item pickup
+            const illuminatedCells = this.torchService.recalculateIllumination(data.roomId, room.players);
+            server.to(data.roomId).emit(GameRoomEvents.TorchIlluminationUpdate, { roomId: data.roomId, illuminatedCells, players: room.players });
         } catch (error) {
             socket.emit(GameRoomEvents.GameRoomError, error.message);
         }
@@ -54,6 +60,10 @@ export class ItemsHandler {
             server.to(data.roomId).emit(GameRoomEvents.ItemDropped, data);
             this.gameRoomService.removeItemFromInventory(data.roomId, data.playerId, data.item);
             this.gameMovementService.addItemToBoard(data.roomId, data.item, data.coords);
+
+            // Recalculate torch illumination after item drop
+            const illuminatedCells = this.torchService.recalculateIllumination(data.roomId, room.players);
+            server.to(data.roomId).emit(GameRoomEvents.TorchIlluminationUpdate, { roomId: data.roomId, illuminatedCells, players: room.players });
         } catch (error) {
             socket.emit(GameRoomEvents.GameRoomError, error.message);
         }

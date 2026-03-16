@@ -11,6 +11,10 @@ export const PROPAGANDA_ATTACK_BOOST = 5;
 export const PROPAGANDA_DEFENSE_BOOST = 5;
 export const PROPAGANDA_HEALTH_THRESHOLD = 3;
 
+export const TORCH_ATTACK_BOOST = 1;
+export const TORCH_DEFENSE_BOOST = 1;
+export const TORCH_ILLUMINATION_RADIUS = 2;
+
 export const ITEM_TYPES: { [key: string]: ItemType } = {
     adrenaline: {
         name: 'Adrenaline',
@@ -46,6 +50,11 @@ export const ITEM_TYPES: { [key: string]: ItemType } = {
         name: 'Air Strike',
         description: "Permet d'attaquer à distance",
         imagePath: './assets/items/air_strike.png',
+    },
+    torch: {
+        name: 'Torch',
+        description: 'Une torche enflammée',
+        imagePath: './assets/items/torch.png',
     },
     random: {
         name: 'Random',

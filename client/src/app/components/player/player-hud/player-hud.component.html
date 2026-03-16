@@ -1,7 +1,7 @@
 <!-- Cards container moved outside the main container -->
 <div class="cards-container">
   @for (card of cards; track card.item; let i = $index) {
-    <app-item-card [item]="card.item" [index]="i"></app-item-card>
+    <app-item-card [item]="card.item" [index]="i" [showDropButton]="isTorch(card.item)" [dropEnabled]="canDropOnCurrentTile" (dropClicked)="onDropTorch($event)"></app-item-card>
   }
 </div>
 
