@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'chat_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -13,4 +14,7 @@ class ChatLocalizationsFr extends ChatLocalizations {
 
   @override
   String get send => 'Envoyer';
+
+  @override
+  String get chatGeneralTab => 'Général';
 }

@@ -109,6 +109,8 @@ abstract class ChatLocalizations {
   /// In en, this message translates to:
   /// **'Send'**
   String get send;
+
+  String get chatGeneralTab;
 }
 
 class _ChatLocalizationsDelegate

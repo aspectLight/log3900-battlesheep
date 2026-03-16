@@ -1,6 +1,7 @@
 {
   "@@locale": "en",
   "chat": "Chat",
-  "send": "Send"
+  "send": "Send",
+  "chatGeneralTab": "General"
 }
 
