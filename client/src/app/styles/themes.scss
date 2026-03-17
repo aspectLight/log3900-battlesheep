@@ -127,250 +127,70 @@
     --theme-game-text-red: #ff6a6a;
 }
 
-// Thème neon
-.theme-neon {
-    // Backgrounds principaux
-    --theme-bg-overlay: rgba(5, 10, 28, 0.45);
-    --theme-bg-overlay-dark: rgba(2, 4, 12, 0.82);
-    --theme-bg-overlay-medium: rgba(8, 14, 36, 0.55);
-    --theme-bg-overlay-light: rgba(0, 255, 255, 0.08);
-    
-    // Backgrounds de cartes et conteneurs
-    --theme-bg-card: #0f1324;
-    --theme-bg-card-hover: #171c33;
-    --theme-bg-card-dark: #090d19;
-    --theme-bg-card-light: rgba(0, 255, 255, 0.1);
-    --theme-bg-surface: #0f1324;
-    
-    // Backgrounds de dropdowns et menus
-    --theme-bg-dropdown: rgba(9, 13, 25, 0.96);
-    --theme-bg-dropdown-light: rgba(15, 22, 43, 0.92);
-    --theme-bg-chat-select: #141b33;
-    
-    // Backgrounds de boutons
-    --theme-bg-button: #6a00f4;
-    --theme-bg-button-hover: #00d9ff;
-    --theme-bg-button-danger: #c2185b;
-    --theme-bg-button-danger-hover: #ff2d95;
-    
-    // Backgrounds de champs de saisie
-    --theme-bg-input: #10162b;
-    --theme-bg-input-focus: #18203d;
-    
-    // Backgrounds spéciaux
-    --theme-bg-chat: rgba(10, 16, 34, 0.82);
-    --theme-bg-chat-header: #141b33;
-    --theme-bg-chat-message: #0c1122;
-    --theme-bg-chat-message-alt: #11182d;
-    --theme-bg-chat-input: rgba(12, 18, 36, 0.94);
-    --theme-bg-chat-scrollbar: #090d19;
-    
-    // Textes
-    --theme-text-primary: #f6f7ff;
-    --theme-text-secondary: #d8dcff;
-    --theme-text-tertiary: #c6cbff;
-    --theme-text-muted: rgba(214, 220, 255, 0.72);
-    --theme-text-muted-light: rgba(214, 220, 255, 0.55);
-    --theme-text-muted-dark: rgba(214, 220, 255, 0.85);
-    --theme-text-special: #7df9ff;
-    --theme-text-special-alt: #ff8df3;
-    --theme-text-author: #7df9ff;
-    --theme-text-time: #93a0d3;
-    --theme-text-footer: #a8b3e0;
-    --theme-text-link: #46c2ff;
-    --theme-text-hover: #ff5ccf;
-    --theme-text-hover-active: #c2185b;
-    --theme-text-on-surface: #d8dcff;
-    --theme-text-chat-header: #d8dcff;
-    --theme-text-chat-select: #d8dcff;
-    --theme-text-badge-success: #a9ffd0;
-    --theme-text-badge-error: #ff9db0;
-    
-    // Bordures
-    --theme-border-primary: #00d9ff;
-    --theme-border-secondary: #33406b;
-    --theme-border-tertiary: #253055;
-    --theme-border-light: #1a2342;
-    --theme-border-button: #00d9ff;
-    --theme-border-button-danger: #ff2d95;
-    --theme-border-focus: #7df9ff;
-    --theme-border-focus-shadow: rgba(0, 217, 255, 0.65);
-    --theme-outline-strong: #090d19;
-    --theme-outline-soft: #171c33;
-    --theme-border-chat-select: #33406b;
-    --theme-border-chat-select-focus: #00d9ff;
-    
-    // Couleurs d'état
-    --theme-error: #ff4d6d;
-    --theme-error-bg: rgba(255, 77, 109, 0.18);
-    --theme-error-border: #ff4d6d;
-    --theme-success: #39ff88;
-    --theme-success-text: #a9ffd0;
-    --theme-warning: #ffd166;
-    --theme-warning-border: #ffb703;
-    --theme-bg-success-soft: rgba(57, 255, 136, 0.12);
-    --theme-border-success: #39ff88;
-    --theme-bg-error-soft: rgba(255, 77, 109, 0.14);
-    --theme-text-error-soft: #ff9db0;
-    --theme-bg-danger: #ff2d95;
-    --theme-bg-danger-hover: #ff5ccf;
-    --theme-border-danger: #ff2d95;
-    --theme-bg-danger-badge: rgba(255, 45, 149, 0.22);
-    --theme-bg-warning-soft: rgba(255, 183, 3, 0.18);
-    --theme-bg-success: #39ff88;
-    --theme-bg-success-hover: #00d9ff;
-    --theme-text-placeholder: rgba(214, 220, 255, 0.55);
-    
-    // Ombres et effets
-    --theme-shadow-sm: rgba(0, 0, 0, 0.3);
-    --theme-shadow-md: rgba(0, 0, 0, 0.4);
-    --theme-shadow-lg: rgba(0, 0, 0, 0.55);
-    --theme-shadow-xl: rgba(0, 0, 0, 0.7);
-    --theme-shadow-strong: rgba(0, 0, 0, 0.6);
-    --theme-bg-overlay-strong: rgba(8, 14, 36, 0.6);
-    --theme-bg-overlay-modal: rgba(2, 4, 12, 0.75);
-    --theme-bg-overlay-modal-strong: rgba(2, 4, 12, 0.85);
-    --theme-shadow-button: rgba(106, 0, 244, 0.35);
-    --theme-shadow-button-hover: rgba(0, 217, 255, 0.35);
-    --theme-shadow-focus: rgba(0, 217, 255, 0.45);
-    
-    // Scrollbar
-    --theme-scrollbar-thumb: #00d9ff;
-    --theme-scrollbar-track: #0a1020;
-    --theme-scrollbar-thumb-soft: rgba(0, 217, 255, 0.25);
-    --theme-scrollbar-thumb-soft-hover: rgba(0, 217, 255, 0.35);
-    
-    // Accent
-    --theme-accent: #7df9ff;
-    --theme-accent-hover: #ff8df3;
-    
-    // Couleurs spéciales pour le jeu
-    --theme-game-border: #00d9ff;
-    --theme-game-bg: #0b1020;
-    --theme-game-gold: #7df9ff;
-    --theme-game-text-red: #ff5ccf;
+// Thème Froid Sibérien — même structure que default, accent bleu acier à la place du rouge
+.theme-frost {
+    // Remplace uniquement les variables "rouges" du thème default par du bleu acier
+    --theme-bg-dropdown: rgba(7, 14, 22, 0.95);
+    --theme-bg-dropdown-light: rgba(10, 18, 30, 0.85);
+    --theme-bg-chat-select: #0e1e2e;
+    --theme-bg-button: #1c3d55;
+    --theme-bg-button-hover: #28526e;
+    --theme-bg-chat: rgba(7, 14, 22, 0.6);
+    --theme-bg-chat-header: #0a1a28;
+    --theme-bg-chat-message: #060f18;
+    --theme-bg-chat-message-alt: #0a1420;
+    --theme-bg-chat-input: rgba(10, 18, 28, 0.8);
+    --theme-bg-chat-scrollbar: #050c14;
+    --theme-text-hover: #4a9cc4;
+    --theme-text-hover-active: #2a6888;
+    --theme-border-primary: #1c3d55;
+    --theme-border-light: #0a1a28;
+    --theme-border-button: #28526e;
+    --theme-border-focus: #28526e;
+    --theme-border-focus-shadow: rgba(70, 140, 190, 0.6);
+    --theme-border-chat-select: #162c40;
+    --theme-border-chat-select-focus: #1c3d55;
+    --theme-shadow-button: rgba(28, 61, 85, 0.2);
+    --theme-shadow-button-hover: rgba(28, 61, 85, 0.3);
+    --theme-shadow-focus: rgba(70, 140, 190, 0.5);
+    --theme-scrollbar-thumb: #1c3d55;
+    --theme-scrollbar-track: #050c14;
+    --theme-accent: #1c3d55;
+    --theme-accent-hover: #28526e;
+    --theme-game-bg: #060f1a;
+    --theme-game-border: #2a5068;
 }
 
-// Thème clair
-.theme-light {
-    // Backgrounds principaux
-    --theme-bg-overlay: rgba(240, 240, 240, 0.3);
-    --theme-bg-overlay-dark: rgba(200, 200, 200, 0.7);
-    --theme-bg-overlay-medium: rgba(220, 220, 220, 0.5);
-    --theme-bg-overlay-light: rgba(250, 250, 250, 0.4);
-    
-    // Backgrounds de cartes et conteneurs
-    --theme-bg-card: #f5f5f5;
-    --theme-bg-card-hover: #e8e8e8;
-    --theme-bg-card-dark: #e0e0e0;
-    --theme-bg-card-light: rgba(0, 0, 0, 0.05);
-    --theme-bg-surface: #ffffff;
-    
-    // Backgrounds de dropdowns et menus
-    --theme-bg-dropdown: rgba(255, 255, 255, 0.98);
-    --theme-bg-dropdown-light: rgba(250, 250, 250, 0.95);
-    --theme-bg-chat-select: #e8e8e8;
-    
-    // Backgrounds de boutons
-    --theme-bg-button: #007bff;
-    --theme-bg-button-hover: #0056b3;
-    --theme-bg-button-danger: #dc3545;
-    --theme-bg-button-danger-hover: #c82333;
-    
-    // Backgrounds de champs de saisie
-    --theme-bg-input: #ffffff;
-    --theme-bg-input-focus: #f0f0f0;
-    
-    // Backgrounds spéciaux
-    --theme-bg-chat: rgba(245, 245, 245, 0.9);
-    --theme-bg-chat-header: #e8e8e8;
-    --theme-bg-chat-message: #fafafa;
-    --theme-bg-chat-message-alt: #f0f0f0;
-    --theme-bg-chat-input: rgba(255, 255, 255, 0.95);
-    --theme-bg-chat-scrollbar: #e0e0e0;
-    
-    // Textes
-    --theme-text-primary: #1a1a1a;
-    --theme-text-secondary: #333333;
-    --theme-text-tertiary: #2a2a2a;
-    --theme-text-muted: rgba(26, 26, 26, 0.6);
-    --theme-text-muted-light: rgba(26, 26, 26, 0.5);
-    --theme-text-muted-dark: rgba(26, 26, 26, 0.7);
-    --theme-text-special: #4a4a4a;
-    --theme-text-special-alt: #2a2a2a;
-    --theme-text-author: #0066cc;
-    --theme-text-time: #666;
-    --theme-text-footer: #707070;
-    --theme-text-link: #0056b3;
-    --theme-text-hover: #cc0000;
-    --theme-text-hover-active: #8b0000;
-    --theme-text-on-surface: #333333;
-    --theme-text-chat-header: #333333;
-    --theme-text-chat-select: #333333;
-    --theme-text-badge-success: #155724;
-    --theme-text-badge-error: #dc3545;
-    
-    // Bordures
-    --theme-border-primary: #cccccc;
-    --theme-border-secondary: #e0e0e0;
-    --theme-border-tertiary: #d0d0d0;
-    --theme-border-light: #f0f0f0;
-    --theme-border-button: #0056b3;
-    --theme-border-button-danger: #c82333;
-    --theme-border-focus: #007bff;
-    --theme-border-focus-shadow: rgba(0, 123, 255, 0.5);
-    --theme-outline-strong: #ffffff;
-    --theme-outline-soft: #e0e0e0;
-    --theme-border-chat-select: #cccccc;
-    --theme-border-chat-select-focus: #007bff;
-    
-    // Couleurs d'état
-    --theme-error: #dc3545;
-    --theme-error-bg: rgba(220, 53, 69, 0.1);
-    --theme-error-border: #dc3545;
-    --theme-success: #28a745;
-    --theme-success-text: #155724;
-    --theme-warning: #ffc107;
-    --theme-warning-border: #856404;
-    --theme-bg-success-soft: rgba(40, 167, 69, 0.12);
-    --theme-border-success: #28a745;
-    --theme-bg-error-soft: rgba(220, 53, 69, 0.12);
-    --theme-text-error-soft: #dc3545;
-    --theme-bg-danger: #dc3545;
-    --theme-bg-danger-hover: #c82333;
-    --theme-border-danger: #dc3545;
-    --theme-bg-danger-badge: rgba(220, 53, 69, 0.14);
-    --theme-bg-warning-soft: rgba(255, 193, 7, 0.18);
-    --theme-bg-success: #28a745;
-    --theme-bg-success-hover: #1e7e34;
-    --theme-text-placeholder: #666;
-    
-    // Ombres et effets
-    --theme-shadow-sm: rgba(0, 0, 0, 0.1);
-    --theme-shadow-md: rgba(0, 0, 0, 0.15);
-    --theme-shadow-lg: rgba(0, 0, 0, 0.2);
-    --theme-shadow-xl: rgba(0, 0, 0, 0.25);
-    --theme-shadow-strong: rgba(0, 0, 0, 0.25);
-    --theme-bg-overlay-strong: rgba(0, 0, 0, 0.35);
-    --theme-bg-overlay-modal: rgba(0, 0, 0, 0.7);
-    --theme-bg-overlay-modal-strong: rgba(0, 0, 0, 0.8);
-    --theme-shadow-button: rgba(0, 123, 255, 0.2);
-    --theme-shadow-button-hover: rgba(0, 123, 255, 0.3);
-    --theme-shadow-focus: rgba(0, 123, 255, 0.4);
-    
-    // Scrollbar
-    --theme-scrollbar-thumb: #007bff;
-    --theme-scrollbar-track: #e0e0e0;
-    --theme-scrollbar-thumb-soft: rgba(0, 0, 0, 0.2);
-    --theme-scrollbar-thumb-soft-hover: rgba(0, 0, 0, 0.3);
-    
-    // Accent
-    --theme-accent: #007bff;
-    --theme-accent-hover: #0056b3;
-    
-    // Couleurs spéciales pour le jeu
-    --theme-game-border: #8b6914;
-    --theme-game-bg: #f5f5f5;
-    --theme-game-gold: #d4a017;
-    --theme-game-text-red: #cc0000;
+// Thème Village Abandonné — même structure que default, accent brun terreux à la place du rouge
+.theme-village {
+    // Remplace uniquement les variables "rouges" du thème default par du brun terreux
+    --theme-bg-dropdown: rgba(18, 12, 6, 0.95);
+    --theme-bg-dropdown-light: rgba(26, 18, 10, 0.85);
+    --theme-bg-chat-select: #241808;
+    --theme-bg-button: #4a3018;
+    --theme-bg-button-hover: #624028;
+    --theme-bg-chat: rgba(18, 12, 6, 0.6);
+    --theme-bg-chat-header: #1c1208;
+    --theme-bg-chat-message: #100a04;
+    --theme-bg-chat-message-alt: #160e06;
+    --theme-bg-chat-input: rgba(20, 13, 6, 0.8);
+    --theme-bg-chat-scrollbar: #0e0904;
+    --theme-text-hover: #c8924a;
+    --theme-text-hover-active: #9a6a2a;
+    --theme-border-primary: #4a3018;
+    --theme-border-light: #1c1208;
+    --theme-border-button: #624028;
+    --theme-border-focus: #624028;
+    --theme-border-focus-shadow: rgba(150, 100, 40, 0.6);
+    --theme-border-chat-select: #352010;
+    --theme-border-chat-select-focus: #4a3018;
+    --theme-shadow-button: rgba(74, 48, 24, 0.2);
+    --theme-shadow-button-hover: rgba(74, 48, 24, 0.3);
+    --theme-shadow-focus: rgba(150, 100, 40, 0.5);
+    --theme-scrollbar-thumb: #4a3018;
+    --theme-scrollbar-track: #0e0904;
+    --theme-accent: #4a3018;
+    --theme-accent-hover: #624028;
+    --theme-game-bg: #100a04;
+    --theme-game-border: #624028;
 }

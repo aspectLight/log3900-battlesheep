@@ -2,9 +2,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-export type ThemeType = 'default' | 'neon' | 'light';
+export type ThemeType = 'default' | 'frost' | 'village';
 
-const VALID_THEMES: ThemeType[] = ['default', 'neon', 'light'];
+const VALID_THEMES: ThemeType[] = ['default', 'frost', 'village'];
 
 @Injectable({
     providedIn: 'root',

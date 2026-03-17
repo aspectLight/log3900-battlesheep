@@ -26,14 +26,14 @@
     cursor: pointer;
     overflow: hidden;
 
-    background: linear-gradient(135deg, #660000, #990000);
+    background: linear-gradient(135deg, var(--theme-accent), var(--theme-accent-hover));
 
     clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 93%, 0 75%);
 
     transition:
         transform 0.3s ease,
         box-shadow 0.3s ease;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 8px var(--theme-shadow-strong);
     will-change: transform, clip-path;
     transform: translateZ(0);
 }
@@ -46,7 +46,7 @@
     pointer-events: none;
     border: 3px solid transparent;
 
-    border-image: linear-gradient(135deg, #d4af37, #8b0000) 1;
+    border-image: linear-gradient(135deg, var(--theme-game-gold), var(--theme-accent)) 1;
 }
 
 .card::after {
@@ -55,13 +55,13 @@
     inset: 0;
     clip-path: inherit;
     pointer-events: none;
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--theme-bg-overlay);
 }
 
 .card:hover,
 .card.active {
     transform: translateY(40px) scale(1.05);
-    box-shadow: 0 0 30px rgba(0, 0, 0, 1);
+    box-shadow: 0 0 30px var(--theme-shadow-strong);
     transition:
         transform 0.3s ease,
         box-shadow 0.3s ease;
@@ -69,8 +69,8 @@
 
 .card:hover::before,
 .card.active::before {
-    border: 3px solid #c89b05;
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+    border: 3px solid var(--theme-game-gold);
+    box-shadow: 0 0 15px var(--theme-border-focus-shadow);
     transition:
         border 0.3s ease,
         box-shadow 0.3s ease;
@@ -85,15 +85,15 @@
     align-items: center;
     justify-content: center;
     gap: 5px;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--theme-bg-overlay-dark);
 }
 
 .card-name {
     font-size: 1rem;
     text-align: center;
     margin: 5px 0;
-    color: #fff;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    color: var(--theme-text-primary);
+    text-shadow: 2px 2px 4px var(--theme-shadow-strong);
     position: relative;
     z-index: 2;
 }
@@ -106,7 +106,7 @@
     transform: translateX(-50%);
     width: 40px;
     height: 1px;
-    background: linear-gradient(90deg, transparent, #d4af37, transparent);
+    background: linear-gradient(90deg, transparent, var(--theme-game-gold), transparent);
 }
 
 .card-image {
@@ -126,16 +126,16 @@
     object-fit: cover;
     border-radius: 3px;
     filter: contrast(100%) brightness(2.5);
-    background: #333;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-    border: 1px solid #333;
+    background: var(--theme-bg-card);
+    box-shadow: 0 0 5px var(--theme-shadow-strong);
+    border: 1px solid var(--theme-bg-card);
 }
 
 .card-image::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(139, 0, 0, 0.15), transparent);
+    background: linear-gradient(135deg, var(--theme-bg-overlay), transparent);
     z-index: 2;
     pointer-events: none;
     border-radius: 3px;
@@ -145,12 +145,12 @@
     font-size: 0.8rem;
     text-align: center;
     margin: 0;
-    color: #ccc;
+    color: var(--theme-text-muted);
 }
 
 p {
     font-size: 0.8rem;
-    color: #ddd;
+    color: var(--theme-text-secondary);
     position: relative;
     padding: 0 3px;
     margin: 0;
@@ -205,13 +205,13 @@ p {
 .card.isDisconnected {
     background: linear-gradient(135deg, #444, #555);
     filter: grayscale(100%) brightness(0.7);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 10px var(--theme-shadow-md);
     pointer-events: none;
 }
 
 .card.isDisconnected::before {
     border-image: linear-gradient(135deg, #777, #555) 1;
-    box-shadow: 0 0 10px rgba(50, 50, 50, 0.5);
+    box-shadow: 0 0 10px var(--theme-shadow-md);
 }
 
 .card.isDisconnected::after {
@@ -222,7 +222,7 @@ p {
 .card.isDisconnected .card-name,
 .card.isDisconnected p {
     filter: grayscale(100%) brightness(0.5);
-    color: #888;
+    color: var(--theme-text-muted);
 }
 
 .card.virtual-player {
@@ -270,7 +270,7 @@ p {
 }
 
 .card[data-team="2"]::after {
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--theme-bg-overlay);
 }
 
 .flag-icon {
@@ -280,8 +280,3 @@ p {
     vertical-align: middle;
     filter: invert(1) brightness(1.2) contrast(1.5);
 }
-
-
-
-
-

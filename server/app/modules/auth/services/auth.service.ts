@@ -159,7 +159,7 @@ export class AuthService {
         }
 
         // Updating theme
-        const validThemes = ['default', 'neon', 'light'];
+        const validThemes = ['default', 'frost', 'village'];
         if (updateDto.theme && validThemes.includes(updateDto.theme) && updateDto.theme !== user.theme) {
             user.theme = updateDto.theme;
         }

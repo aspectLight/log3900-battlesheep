@@ -349,74 +349,151 @@
 
 .theme-picker {
     display: flex;
-    gap: 12px;
+    gap: 16px;
     flex-wrap: wrap;
     justify-content: center;
+    padding-top: 10px;
 }
 
 .theme-btn {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 14px;
-    border-radius: 10px;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+    border-radius: 12px;
     border: 2px solid var(--theme-border-tertiary);
     background: var(--theme-bg-card);
     cursor: pointer;
     transition:
         border-color 0.25s,
         box-shadow 0.25s,
-        transform 0.2s;
-    min-width: 80px;
+        transform 0.22s;
+    width: 130px;
     position: relative;
 
     &:hover {
         border-color: var(--theme-border-focus);
-        transform: translateY(-2px);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+        z-index: 10;
     }
 
     &.active {
-        border-color: var(--theme-border-focus);
-        box-shadow: 0 0 10px 2px var(--theme-border-focus-shadow);
+        border-color: var(--theme-accent);
+        box-shadow: 0 0 16px 3px var(--theme-border-focus-shadow);
     }
 }
 
-// Couleurs des swatches spécifiques à chaque thème (hardcodés intentionnellement
-// car ils doivent représenter les thèmes indépendamment du thème actif)
-.theme-btn[data-theme='default'] .theme-swatch {
-    background: linear-gradient(135deg, #550000 40%, #2b2b2b 100%);
+// Vignette miniature — toujours visible dans la carte
+.theme-thumbnail-wrapper {
+    position: relative;
+    width: 100%;
+    height: 82px;
+    overflow: hidden;
+    border-radius: 10px 10px 0 0;
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 30px;
+        background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.6));
+        pointer-events: none;
+    }
 }
 
-.theme-btn[data-theme='neon'] .theme-swatch {
-    background: linear-gradient(135deg, #6a00f4 40%, #00d9ff 100%);
+.theme-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
 }
 
-.theme-btn[data-theme='light'] .theme-swatch {
-    background: linear-gradient(135deg, #007bff 40%, #f5f5f5 100%);
+.theme-btn:hover .theme-thumbnail {
+    transform: scale(1.07);
 }
 
-.theme-swatch {
-    width: 44px;
-    height: 44px;
-    border-radius: 8px;
-    border: 2px solid var(--theme-border-tertiary);
-    flex-shrink: 0;
+// Bande inférieure avec label
+.theme-label-area {
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    border-radius: 0 0 10px 10px;
+    background: var(--theme-bg-card);
+
+    // Petit indicateur coloré
+    &::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        background: var(--theme-border-secondary);
+        transition: background 0.25s, box-shadow 0.25s;
+    }
+}
+
+.theme-btn.active .theme-label-area::before {
+    background: var(--theme-accent);
+    box-shadow: 0 0 6px var(--theme-accent);
 }
 
 .theme-label {
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     font-weight: 600;
     color: var(--theme-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
+// Badge ✓ — cercle en haut à droite de la vignette
 .theme-check {
     position: absolute;
-    top: 4px;
-    right: 7px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--theme-text-hover);
+    top: 6px;
+    right: 6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--theme-accent);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+}
+
+// Grande preview flottante au survol
+.theme-preview-img {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.92);
+    width: 210px;
+    height: 126px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid var(--theme-border-focus);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.70);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        opacity 0.22s ease,
+        transform 0.22s ease;
+    z-index: 20;
+}
+
+.theme-btn:hover .theme-preview-img {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
 }
 
 @keyframes scaleBackground {

@@ -61,7 +61,7 @@ export class User {
     @Prop({ required: true })
     avatarId: string;
 
-    @Prop({ default: 'default', enum: ['default', 'neon', 'light'] })
+    @Prop({ default: 'default', enum: ['default', 'frost', 'village'] })
     theme: string;
 
     @Prop({ default: null })

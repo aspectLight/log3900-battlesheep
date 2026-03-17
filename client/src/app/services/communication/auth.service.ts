@@ -4,6 +4,7 @@ import { Auth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from '@
 import { ProfileService } from '@app/services/communication/profile.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { SessionService } from '@app/services/state/session.service';
+import { ThemeService } from '@app/services/state/theme.service';
 import { firstValueFrom } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
@@ -34,6 +35,7 @@ export class AuthService {
         private session: SessionService,
         private socketService: SocketService,
         private profileService: ProfileService,
+        private themeService: ThemeService,
     ) {}
 
     get currentUser() {
@@ -77,8 +79,8 @@ export class AuthService {
             }
             this.socketService.disconnect();
         } finally {
-            // Invalide le cache profil pour que le prochain login recharge le bon thème
             this.profileService.invalidateCache();
+            this.themeService.setTheme('default');
             this.session.clear();
             await signOut(this.auth);
         }

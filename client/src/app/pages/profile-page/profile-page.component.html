@@ -123,10 +123,14 @@
                                 [class.active]="themeService.getCurrentTheme() === t.value"
                                 [attr.data-theme]="t.value"
                                 (click)="selectTheme(t.value)"
-                                [title]="t.description"
                             >
-                                <span class="theme-swatch"></span>
-                                <span class="theme-label">{{ t.label }}</span>
+                                <img class="theme-preview-img" [src]="t.preview" [alt]="t.label" />
+                                <div class="theme-thumbnail-wrapper">
+                                    <img class="theme-thumbnail" [src]="t.preview" [alt]="t.label" />
+                                </div>
+                                <div class="theme-label-area">
+                                    <span class="theme-label">{{ t.label }}</span>
+                                </div>
                                 @if (themeService.getCurrentTheme() === t.value) {
                                 <span class="theme-check">✓</span>
                                 }

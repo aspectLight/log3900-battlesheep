@@ -32,8 +32,8 @@
     overflow: visible;
 }
 .right-side {
-    background-color: #2a0e0e;
-    border: 4px solid #8b5e34;
+    background-color: var(--theme-game-bg);
+    border: 4px solid var(--theme-game-border);
     position: relative;
     display: flex;
     flex-direction: column;
@@ -70,19 +70,19 @@
     /* Coins décoratifs aux quatre angles */
     background-image: 
         /* Coin supérieur gauche */
-        radial-gradient(circle at 15px 15px, transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
-        radial-gradient(circle at 25px 15px, transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
-        radial-gradient(circle at 15px 25px, transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
-        /* Coin supérieur droit */ radial-gradient(circle at calc(100% - 15px) 15px, transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
-        radial-gradient(circle at calc(100% - 25px) 15px, transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
-        radial-gradient(circle at calc(100% - 15px) 25px, transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
-        /* Coin inférieur gauche */ radial-gradient(circle at 15px calc(100% - 15px), transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
-        radial-gradient(circle at 25px calc(100% - 15px), transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
-        radial-gradient(circle at 15px calc(100% - 25px), transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
+        radial-gradient(circle at 15px 15px, transparent 8px, var(--theme-game-gold) 8px, var(--theme-game-gold) 10px, transparent 10px),
+        radial-gradient(circle at 25px 15px, transparent 8px, var(--theme-game-gold) 8px, var(--theme-game-gold) 10px, transparent 10px),
+        radial-gradient(circle at 15px 25px, transparent 8px, var(--theme-game-gold) 8px, var(--theme-game-gold) 10px, transparent 10px),
+        /* Coin supérieur droit */ radial-gradient(circle at calc(100% - 15px) 15px, transparent 8px, var(--theme-game-gold) 8px, var(--theme-game-gold) 10px, transparent 10px),
+        radial-gradient(circle at calc(100% - 25px) 15px, transparent 8px, var(--theme-game-gold) 8px, var(--theme-game-gold) 10px, transparent 10px),
+        radial-gradient(circle at calc(100% - 15px) 25px, transparent 8px, var(--theme-game-gold) 8px, var(--theme-game-gold) 10px, transparent 10px),
+        /* Coin inférieur gauche */ radial-gradient(circle at 15px calc(100% - 15px), transparent 8px, var(--theme-game-gold) 8px, var(--theme-game-gold) 10px, transparent 10px),
+        radial-gradient(circle at 25px calc(100% - 15px), transparent 8px, var(--theme-game-gold) 8px, var(--theme-game-gold) 10px, transparent 10px),
+        radial-gradient(circle at 15px calc(100% - 25px), transparent 8px, var(--theme-game-gold) 8px, var(--theme-game-gold) 10px, transparent 10px),
         /* Coin inférieur droit */
-            radial-gradient(circle at calc(100% - 15px) calc(100% - 15px), transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
-        radial-gradient(circle at calc(100% - 25px) calc(100% - 15px), transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px),
-        radial-gradient(circle at calc(100% - 15px) calc(100% - 25px), transparent 8px, #f3d06a 8px, #f3d06a 10px, transparent 10px);
+            radial-gradient(circle at calc(100% - 15px) calc(100% - 15px), transparent 8px, var(--theme-game-gold) 8px, var(--theme-game-gold) 10px, transparent 10px),
+        radial-gradient(circle at calc(100% - 25px) calc(100% - 15px), transparent 8px, var(--theme-game-gold) 8px, var(--theme-game-gold) 10px, transparent 10px),
+        radial-gradient(circle at calc(100% - 15px) calc(100% - 25px), transparent 8px, var(--theme-game-gold) 8px, var(--theme-game-gold) 10px, transparent 10px);
 
     /* Taille de tous les gradients */
     background-size: 100% 100%;
@@ -103,14 +103,14 @@
     /* Structure florale aux coins */
     background-image:
         /* Coin supérieur gauche - lignes horizontales et verticales */
-        linear-gradient(to right, #f3d06a, #f3d06a),
-        linear-gradient(to bottom, #f3d06a, #f3d06a),
-        /* Coin supérieur droit - lignes horizontales et verticales */ linear-gradient(to left, #f3d06a, #f3d06a),
-        linear-gradient(to bottom, #f3d06a, #f3d06a),
-        /* Coin inférieur gauche - lignes horizontales et verticales */ linear-gradient(to right, #f3d06a, #f3d06a),
-        linear-gradient(to top, #f3d06a, #f3d06a),
-        /* Coin inférieur droit - lignes horizontales et verticales */ linear-gradient(to left, #f3d06a, #f3d06a),
-        linear-gradient(to top, #f3d06a, #f3d06a);
+        linear-gradient(to right, var(--theme-game-gold), var(--theme-game-gold)),
+        linear-gradient(to bottom, var(--theme-game-gold), var(--theme-game-gold)),
+        /* Coin supérieur droit - lignes horizontales et verticales */ linear-gradient(to left, var(--theme-game-gold), var(--theme-game-gold)),
+        linear-gradient(to bottom, var(--theme-game-gold), var(--theme-game-gold)),
+        /* Coin inférieur gauche - lignes horizontales et verticales */ linear-gradient(to right, var(--theme-game-gold), var(--theme-game-gold)),
+        linear-gradient(to top, var(--theme-game-gold), var(--theme-game-gold)),
+        /* Coin inférieur droit - lignes horizontales et verticales */ linear-gradient(to left, var(--theme-game-gold), var(--theme-game-gold)),
+        linear-gradient(to top, var(--theme-game-gold), var(--theme-game-gold));
 
     background-size:
         25px 2px,
@@ -231,7 +231,7 @@
 }
 
 .board {
-    background-color: #2b2b2b;
+    background-color: var(--theme-bg-card);
     border-radius: 12px;
     position: relative;
     overflow: hidden;
@@ -283,10 +283,10 @@ app-chatbox {
 }
 
 .flightinfos {
-    background-color: rgba(22, 7, 7, 0.6);
+    background-color: var(--theme-bg-chat);
     padding: 10px 15px;
     border-radius: 8px;
-    border: 1px solid #3a1212;
+    border: 1px solid var(--theme-border-primary);
     margin: 0;
     width: 100%;
     text-align: center;
@@ -294,15 +294,15 @@ app-chatbox {
 }
 
 .debug-info {
-    background-color: rgba(22, 7, 7, 0.6);
+    background-color: var(--theme-bg-chat);
     padding: 10px 15px;
     border-radius: 8px;
-    border: 1px solid #3a1212;
+    border: 1px solid var(--theme-border-primary);
     margin: 0;
     width: 100%;
     text-align: center;
     font-size: 0.9rem;
-    color: #ff6a6a;
+    color: var(--theme-game-text-red);
 }
 
 .right-side app-actions-hud {
