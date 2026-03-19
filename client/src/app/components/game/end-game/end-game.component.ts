@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { GlobalStats } from '@app/classes/stats/global-stats';
 import { PlayerStats } from '@app/classes/stats/player-stats';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 const ONE_HUNDRED = 100;
 
 @Component({
-    imports: [CommonModule],
+    imports: [CommonModule, TranslateModule],
     selector: 'app-end-game',
     templateUrl: './end-game.component.html',
     styleUrl: './end-game.component.scss',

@@ -1,9 +1,9 @@
 <div class="bonus-attributes-container">
-    <h1 class="title">Stats</h1>
+    <h1 class="title">{{ 'bonus.title' | translate }}</h1>
     <div class="stats-choice-container">
         <div id="health" title="{{ this.player.stats.health.description }}" class="stat-container">
             <div class="stat-name">
-                <h3>Vie</h3>
+                <h3>{{ 'bonus.health' | translate }}</h3>
                 <p class="stat-description">{{ this.player.stats.health.description }}</p>
             </div>
             <h3>{{ health }}</h3>
@@ -14,7 +14,7 @@
         </div>
         <div id="speed" title="{{ this.player.stats.speed.description }}" class="stat-container">
             <div class="stat-name">
-                <h3>Rapidité</h3>
+                <h3>{{ 'bonus.speed' | translate }}</h3>
                 <p class="stat-description">{{ this.player.stats.speed.description }}</p>
             </div>
             <h3>{{ speed }}</h3>
@@ -25,20 +25,20 @@
         </div>
         <div id="attack" title="{{ this.player.stats.attack.description }}" class="stat-container">
             <div class="stat-name">
-                <h3>Attaque</h3>
+                <h3>{{ 'bonus.attack' | translate }}</h3>
                 <p class="stat-description">{{ this.player.stats.attack.description }}</p>
             </div>
             <h3>{{ this.player.stats.attack.value }}</h3>
-            <button id="four-sides" class="button" (click)="selectAttackDice(d4Value)" [class.selected]="attackDice === d4Value" title="Dé à 4 cotés">
+            <button id="four-sides" class="button" (click)="selectAttackDice(d4Value)" [class.selected]="attackDice === d4Value">
                 <img src="./assets/items/D4.png" class="dice" />
             </button>
-            <button id="six-sides" class="button" (click)="selectAttackDice(d6Value)" [class.selected]="attackDice === d6Value" title="Dé à 6 cotés">
+            <button id="six-sides" class="button" (click)="selectAttackDice(d6Value)" [class.selected]="attackDice === d6Value">
                 <img src="./assets/items/D6.png" class="dice" />
             </button>
         </div>
         <div id="defense" title="{{ this.player.stats.defense.description }}" class="stat-container">
             <div class="stat-name">
-                <h3>Défense</h3>
+                <h3>{{ 'bonus.defense' | translate }}</h3>
                 <p class="stat-description">{{ this.player.stats.defense.description }}</p>
             </div>
             <h3>{{ this.player.stats.defense.value }}</h3>
@@ -47,7 +47,6 @@
                 class="button"
                 (click)="selectDefenseDice(d4Value)"
                 [class.selected]="defenseDice === d4Value"
-                title="Dé à 4 cotés"
             >
                 <img src="./assets/items/D4.png" class="dice" />
             </button>
@@ -56,7 +55,6 @@
                 class="button"
                 (click)="selectDefenseDice(d6Value)"
                 [class.selected]="defenseDice === d6Value"
-                title="Dé à 6 cotés"
             >
                 <img src="./assets/items/D6.png" class="dice" />
             </button>

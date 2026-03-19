@@ -14,19 +14,19 @@
             <div class="stats-container">
                 <div class="enemy-name">{{ enemy.name }}</div>
                 <div class="stat-row">
-                    <div class="stat-label">Attack</div>
+                    <div class="stat-label">{{ 'bonus.attack' | translate }}</div>
                     <div class="stat-value">{{ getEnemyStat('attack') }}</div>
                 </div>
                 <div class="stat-row">
-                    <div class="stat-label">Defense</div>
+                    <div class="stat-label">{{ 'bonus.defense' | translate }}</div>
                     <div class="stat-value">{{ getEnemyStat('defense') }}</div>
                 </div>
                 <div class="stat-row">
-                    <div class="stat-label">Speed</div>
+                    <div class="stat-label">{{ 'bonus.speed' | translate }}</div>
                     <div class="stat-value">{{ getEnemyStat('speed') }}</div>
                 </div>
                 <div class="stat-row">
-                    <div class="stat-label">Health</div>
+                    <div class="stat-label">{{ 'bonus.health' | translate }}</div>
                     <div class="stat-value">{{ getEnemyStat('health') }}</div>
                 </div>
                 <div class="dice-row">
@@ -50,7 +50,7 @@
             @else if (selectedCell.player) {
                 <div class="enemy-container">
                     <div class="enemy-name" [class.player-name]="selectedCell.player.id === player?.id">
-                        {{ selectedCell.player.id === player?.id ? 'Vous' : selectedCell.player.name }}
+                        {{ selectedCell.player.id === player?.id ? ('combat.you' | translate) : selectedCell.player.name }}
                     </div>
                     <img class="enemy" [src]="selectedCell.player.avatar?.avatarFull" />
                 </div>
@@ -59,7 +59,6 @@
             @else if (!selectedCell.player && selectedCell.tile.type !== 'door' && !selectedCell.item && !isActionActive) {
                 <div class="tile-container">
                     <div class="tile-card">
-                        <!-- Left Column - Magnifying Glass -->
                         <div class="magnifying-glass-column">
                             <div class="tile-image-container">
                                 <img class="tile-image" [src]="selectedCell.tile.imagePath" alt="Tile Image" />
@@ -68,27 +67,23 @@
                             <div class="tile-handle"></div>
                         </div>
                         
-                        <!-- Right Column - Info -->
                         <div class="info-column">
-                            <!-- Title -->
                             <div class="tile-header">
                                 <span class="tile-type">{{ selectedCell.tile.type | titlecase }}</span>
                             </div>
                             
-                            <!-- Movement Cost -->
                             @if (selectedCell.tile.moveModifier > 0) {
                                 <div class="modifier-section">
                                     <div class="modifier-label">
-                                        <span class="modifier-label-text">COST</span>
+                                        <span class="modifier-label-text">{{ 'combat.cost' | translate }}</span>
                                     </div>
                                     <div class="move-modifier-badge">+{{ selectedCell.tile.moveModifier }}</div>
                                 </div>
                             }
                             
-                            <!-- Description with lined header -->
                             <div class="description-section">
                                 <div class="description-label">
-                                    <span class="description-label-text">DESCRIPTION</span>
+                                    <span class="description-label-text">{{ 'combat.description_label' | translate }}</span>
                                 </div>
                                 <div class="tile-description">
                                     <p>{{ selectedCell.tile.description }}</p>
@@ -111,42 +106,39 @@
 
             @if(isActionActive) {
                 <button [class.active]="isActionActive" (click)="toggleSelection()">
-                    Annuler
+                    {{ 'combat.cancel' | translate }}
                 </button>
             } @else {
                 <button [class.active]="isActionActive" [class.disabled]="player?.actionPoints === 0" (click)="toggleAction()">
-                    Agir
+                    {{ 'combat.act' | translate }}
                 </button>
             }
 
-
-            <button (click)="endTurn()">Fin de tour</button>
+            <button (click)="endTurn()">{{ 'combat.end_turn' | translate }}</button>
         }
 
         @if (isCombatMode) {
             @if (isCombatPlayerTurn) {
                 @if (hasFlightAttempts) {
-                    <button [class.active]="showResults && combatState === 'flightAttempt'" (click)="flight()" [class.barbed-wire]="hasEnemyBarbedWire && !isCombatInitiator">Fuir !</button>
+                    <button [class.active]="showResults && combatState === 'flightAttempt'" (click)="flight()" [class.barbed-wire]="hasEnemyBarbedWire && !isCombatInitiator">{{ 'combat.flee' | translate }}</button>
                 }
-                <button [class.active]="showResults && (combatState === 'hit' || combatState === 'miss')" (click)="attack()">Attaquer</button>
+                <button [class.active]="showResults && (combatState === 'hit' || combatState === 'miss')" (click)="attack()">{{ 'combat.attack_btn' | translate }}</button>
             }
         }
     </div>
 
     <div class="dice-combat-container" [class.show]="showResults">
-        <!-- Player's value always on the left -->
         <div class="dice-value player-value" 
              [class.winning]="(isCombatPlayerTurn && defenseValue >= attackValue) || (!isCombatPlayerTurn && attackValue >= defenseValue)"
              [class.losing]="(isCombatPlayerTurn && defenseValue < attackValue) || (!isCombatPlayerTurn && attackValue < defenseValue)">
-            <span class="label">{{ isCombatPlayerTurn ? 'VOTRE DÉFENSE' : 'VOTRE ATTAQUE' }}</span>
+            <span class="label">{{ isCombatPlayerTurn ? ('combat.your_defense' | translate) : ('combat.your_attack' | translate) }}</span>
             <span class="value">{{ isCombatPlayerTurn ? defenseValue : attackValue }}</span>
         </div>
         
-        <!-- Enemy's value always on the right -->
         <div class="dice-value enemy-value" 
              [class.winning]="(isCombatPlayerTurn && attackValue > defenseValue) || (!isCombatPlayerTurn && defenseValue > attackValue)"
              [class.losing]="(isCombatPlayerTurn && attackValue <= defenseValue) || (!isCombatPlayerTurn && defenseValue <= attackValue)">
-            <span class="label">{{ isCombatPlayerTurn ? 'ATTAQUE ADVERSE' : 'DÉFENSE ADVERSE' }}</span>
+            <span class="label">{{ isCombatPlayerTurn ? ('combat.enemy_attack' | translate) : ('combat.enemy_defense' | translate) }}</span>
             <span class="value">{{ isCombatPlayerTurn ? attackValue : defenseValue }}</span>
         </div>
     </div>

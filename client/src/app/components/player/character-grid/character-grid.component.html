@@ -1,5 +1,5 @@
 <div class="player-creation-container">
-    <h1>Personnages</h1>
+    <h1>{{ 'characters.title' | translate }}</h1>
     <div class="characters-container">
         @for(char of getAvatarKeys() ; track characters[char].id){
             <div

@@ -4,10 +4,11 @@ import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ROUTES } from '@app/constants/routes.constants';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
+import { TranslateModule } from '@ngx-translate/core';
 @Component({
     selector: 'app-game-info',
     standalone: true,
-    imports: [PopUpComponent],
+    imports: [PopUpComponent, TranslateModule],
     templateUrl: './game-info.component.html',
     styleUrl: './game-info.component.scss',
 })

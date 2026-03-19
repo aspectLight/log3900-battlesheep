@@ -1,9 +1,9 @@
 ﻿<div class="chatbox" [class.collapsed]="isCollapsed">
     <div class="chatbox-header">
         <select class="channel-select" [ngModel]="activeChannelId" (ngModelChange)="switchChannel($event)">
-            <option [ngValue]="null">Général</option>
+            <option [ngValue]="null">{{ 'chatbox.general' | translate }}</option>
             @for (ch of joinedChannelInfos; track ch.id) {
-                <option [ngValue]="ch.id">{{ ch.isGameChannel ? 'Canal de ' + ch.name : ch.name }}</option>
+                <option [ngValue]="ch.id">{{ ch.isGameChannel ? (('chatbox.game_channel' | translate) + ch.name) : ch.name }}</option>
             }
         </select>
         <div class="header-buttons">
@@ -33,11 +33,11 @@
                 #messageInput
                 type="text"
                 maxlength="200"
-                [placeholder]="activeChannelId ? ('Écrire dans ' + activeChannelLabel + '...') : 'Écrire un message...'"
+                [placeholder]="activeChannelId ? (('chatbox.placeholder_channel' | translate: { name: activeChannelLabel })) : ('chatbox.placeholder_general' | translate)"
                 [(ngModel)]="newMessage"
                 (keydown.enter)="sendMessage()"
             />
-            <button (click)="sendMessage()" class="square-button">Envoyer</button>
+            <button (click)="sendMessage()" class="square-button">{{ 'chatbox.send' | translate }}</button>
         </div>
     </div>
 </div>

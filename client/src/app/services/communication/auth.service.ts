@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Auth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
 import { ProfileService } from '@app/services/communication/profile.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
+import { LanguageService } from '@app/services/state/language.service';
 import { SessionService } from '@app/services/state/session.service';
 import { ThemeService } from '@app/services/state/theme.service';
 import { firstValueFrom } from 'rxjs';
@@ -36,6 +37,7 @@ export class AuthService {
         private socketService: SocketService,
         private profileService: ProfileService,
         private themeService: ThemeService,
+        private languageService: LanguageService,
     ) {}
 
     get currentUser() {
@@ -81,6 +83,7 @@ export class AuthService {
         } finally {
             this.profileService.invalidateCache();
             this.themeService.setTheme('default');
+            this.languageService.resetToDefault();
             this.session.clear();
             await signOut(this.auth);
         }

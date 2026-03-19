@@ -2,27 +2,27 @@
   <div class="header">
     <button class="return-button" routerLink="/home">
       <img src="./assets/ui/left.png" />
-      Page d'accueil
+      {{ 'common.home' | translate }}
     </button>
 
-    <h1>Historique des parties</h1>
+    <h1>{{ 'history.games.title' | translate }}</h1>
   </div>
 
   <div class="history-list">
     <li class="header-row">
-      <span>Date</span>
-      <span>Heure</span>
-      <span>Résultat</span>
-      <span>Abandonnée</span>
+      <span>{{ 'history.date' | translate }}</span>
+      <span>{{ 'history.time' | translate }}</span>
+      <span>{{ 'history.games.result' | translate }}</span>
+      <span>{{ 'history.games.abandoned' | translate }}</span>
     </li>
 
     <div class="list">
       @if (loading()) {
-        <div class="state">Chargement...</div>
+        <div class="state">{{ 'history.loading' | translate }}</div>
       } @else if (error()) {
         <div class="state">{{ error() }}</div>
       } @else if (games().length === 0) {
-        <div class="state empty">Aucune entrée.</div>
+        <div class="state empty">{{ 'history.empty' | translate }}</div>
       } @else {
         <div class="rows">
           @for (it of games(); track it.startDate) {
@@ -36,7 +36,7 @@
                   [class.yes]="it.hasWon && !it.hasAbandoned"
                   [class.no]="!it.hasWon || it.hasAbandoned"
                 >
-                  {{ (it.hasWon && !it.hasAbandoned) ? 'Gagnée' : 'Perdue' }}
+                  {{ (it.hasWon && !it.hasAbandoned) ? ('history.games.won' | translate) : ('history.games.lost' | translate) }}
                 </span>
               </span>
 
@@ -46,7 +46,7 @@
                   [class.abandonedYes]="it.hasAbandoned"
                   [class.abandonedNo]="!it.hasAbandoned"
                 >
-                  {{ it.hasAbandoned ? 'Oui' : 'Non' }}
+                  {{ it.hasAbandoned ? ('history.yes' | translate) : ('history.no' | translate) }}
                 </span>
               </span>
             </li>

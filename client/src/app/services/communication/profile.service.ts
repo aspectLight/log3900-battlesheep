@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
 import { UpdateProfilePayload, UserProfile, UserStatistics } from '@app/interfaces/profile.interface';
+import { LanguageService } from '@app/services/state/language.service';
 import { SessionService } from '@app/services/state/session.service';
 import { ThemeService } from '@app/services/state/theme.service';
 import { firstValueFrom } from 'rxjs';
@@ -19,6 +20,7 @@ export class ProfileService {
         private auth: Auth,
         private session: SessionService,
         private themeService: ThemeService,
+        private languageService: LanguageService,
     ) {}
 
     /**
@@ -30,6 +32,7 @@ export class ProfileService {
             const headers = await this.getAuthHeaders();
             this.cachedProfile = await firstValueFrom(this.http.get<UserProfile>(`${this.apiUrl}/profile`, { headers }));
             this.themeService.applyFromProfile(this.cachedProfile.theme);
+            this.languageService.applyFromProfile(this.cachedProfile.language);
         }
         return this.cachedProfile;
     }
@@ -56,7 +59,7 @@ export class ProfileService {
 
     buildUpdatePayload(
         currentProfile: UserProfile,
-        formValues: { username: string; email: string; avatarId: string; theme?: string },
+        formValues: { username: string; email: string; avatarId: string; theme?: string; language?: string },
     ): UpdateProfilePayload {
         const updatePayload: UpdateProfilePayload = {};
 
@@ -71,6 +74,10 @@ export class ProfileService {
         }
         if (formValues.theme !== undefined && formValues.theme !== currentProfile.theme) {
             updatePayload.theme = formValues.theme;
+        }
+
+        if (formValues.language !== undefined && formValues.language !== currentProfile.language) { // ← ajouter
+            updatePayload.language = formValues.language;
         }
 
         return updatePayload;
@@ -94,7 +101,7 @@ export class ProfileService {
 
     async submitProfileUpdate(
         currentProfile: UserProfile,
-        formValues: { username: string; email: string; avatarId: string; theme?: string },
+        formValues: { username: string; email: string; avatarId: string; theme?: string; language?: string },
     ): Promise<{ success: boolean; updatedProfile?: UserProfile; error?: string }> {
         const updatePayload = this.buildUpdatePayload(currentProfile, formValues);
 

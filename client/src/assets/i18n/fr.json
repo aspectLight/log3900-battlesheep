@@ -1,0 +1,338 @@
+{
+  "common": {
+    "back": "Retour",
+    "home": "Page d'accueil",
+    "ok": "Ok",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "yes": "Oui",
+    "no": "Non",
+    "understood": "Compris",
+    "loading": "Chargement...",
+    "none": "Aucune entrée.",
+    "save": "Enregistrer"
+  },
+  "validation": {
+    "required": "Champ obligatoire",
+    "username_length": "Le nom d'utilisateur doit contenir entre 3 et 15 caractères",
+    "username_special": "Caractères spéciaux non autorisés",
+    "email_invalid": "Format email invalide",
+    "password_min": "Minimum 8 caractères",
+    "password_letter": "Le mot de passe doit contenir au moins une lettre",
+    "password_digit": "Le mot de passe doit contenir au moins un chiffre",
+    "password_spaces": "Le mot de passe ne doit pas contenir d'espace",
+    "password_mismatch": "Les mots de passe ne correspondent pas",
+    "avatar_required": "Sélectionnez un avatar"
+  },
+  "auth": {
+    "login": "Se connecter",
+    "register": "Créer un compte",
+    "team": "Équipe 105"
+  },
+  "login": {
+    "username": "Pseudonyme",
+    "password": "Mot de passe",
+    "submit": "Se connecter",
+    "submitting": "Connexion...",
+    "no_account": "Pas encore de compte ?",
+    "register_link": "S'inscrire"
+  },
+  "register": {
+    "username": "Nom d'utilisateur",
+    "email": "Adresse courriel",
+    "password": "Mot de passe",
+    "confirm_password": "Confirmer le mot de passe",
+    "avatar": "Avatar",
+    "submit": "Créer un compte",
+    "submitting": "Création...",
+    "already_account": "Déjà un compte ?",
+    "login_link": "Se connecter"
+  },
+  "main": {
+    "join_game": "Joindre une partie",
+    "create_game": "Créer une partie",
+    "admin_games": "Administrer les jeux",
+    "channels": "Canaux de discussion",
+    "profile": "Profil",
+    "games_history": "Historique des parties",
+    "login_history": "Historique de connexion",
+    "logout": "Se déconnecter",
+    "game_canceled": "Partie annulée par manque de joueurs",
+    "game_finished": "Partie terminée, limite de 3 victoires atteintes par un personnage"
+  },
+  "profile": {
+    "title": "Configuration du Profil",
+    "username": "Pseudonyme",
+    "email": "Email",
+    "avatar": "Avatar",
+    "save": "Enregistrer les modifications",
+    "saving": "Enregistrement...",
+    "delete": "Supprimer le compte",
+    "deleting": "Suppression...",
+    "statistics": "Statistiques",
+    "stats": {
+      "classic": "Parties Classiques",
+      "ctf": "Parties CTF",
+      "won": "Parties gagnées",
+      "avg_time": "Temps moyen par partie"
+    },
+    "theme": "Thème visuel",
+    "language": "Langue",
+    "success": "Succès",
+    "success_msg": "Profil mis à jour avec succès !",
+    "error": "Erreur",
+    "delete_title": "Supprimer le compte",
+    "delete_confirm": "Cette action est irréversible. Voulez-vous vraiment supprimer votre compte ?"
+  },
+  "admin": {
+    "title": "Administration"
+  },
+  "create_player": {
+    "title": "Créer un joueur",
+    "back": "Créer une partie",
+    "choose": "Choisissez votre personnage",
+    "health": "Vie",
+    "speed": "Rapidité",
+    "attack": "Attaque",
+    "defense": "Défense",
+    "create_game": "Créer la partie",
+    "join_waiting": "Accéder à la salle d'attente",
+    "hidden_deleted": "Le jeu sélectionné est caché ou supprimé.",
+    "choose_all": "Veillez à choisir un personnage, un nom et les 2 bonus."
+  },
+  "join": {
+    "back": "Menu Principal",
+    "title": "Rejoindre une partie",
+    "code_prompt": "Entrez le code de la partie à 4 chiffres",
+    "code_placeholder": "Entrez exactement 4 chiffres",
+    "join_btn": "Accéder à la salle d'attente"
+  },
+  "waiting": {
+    "back": "Quitter la partie",
+    "title": "Salle d'attente",
+    "code": "Code de la partie :",
+    "drop_in": "Drop-in/Drop-out",
+    "lock": "Verrouiller la salle",
+    "unlock": "Déverrouiller la salle",
+    "start": "Commencer la partie",
+    "add_vp": "Ajouter un joueur virtuel",
+    "vp_profile": "Sélectionnez le profil du joueur virtuel :",
+    "aggressive": "Agressif",
+    "defensive": "Défensif",
+    "waiting_host": "En attente de l'organisateur de la partie...",
+    "auto_disconnect": "Déconnexion automatique ...",
+    "confirm_kick": "Voulez-vous vraiment expulser ce joueur ?",
+    "confirm_lock": "Voulez-vous vraiment verrouiller la salle ?",
+    "confirm_unlock": "Voulez-vous vraiment déverrouiller la salle ?",
+    "confirm_leave": "Voulez-vous vraiment quitter la salle ?"
+  },
+  "channels": {
+    "title": "Canaux de discussion",
+    "create": "Créer un nouveau canal",
+    "create_input": "Nom du canal (ex: ABC)",
+    "create_btn": "Créer",
+    "creating": "Création...",
+    "available": "Canaux disponibles",
+    "search": "Rechercher un canal par nom...",
+    "loading": "Chargement des canaux...",
+    "no_results": "Aucun canal ne correspond à la recherche.",
+    "name": "Nom",
+    "creator": "Créateur",
+    "members": "Membres",
+    "actions": "Actions",
+    "you": "Vous",
+    "leave": "Quitter",
+    "join": "Joindre",
+    "delete": "Supprimer",
+    "no_messages": "Aucun message pour l'instant.",
+    "send": "Envoyer",
+    "no_channel": "Sélectionnez un canal rejoint pour afficher la discussion.",
+    "join_first": "Rejoignez un canal pour commencer à discuter.",
+    "leave_active": "Quitter ce canal",
+    "write_msg": "Écrire un message dans #{{ name }}...",
+    "member_singular": "membre",
+    "member_plural": "membres"
+  },
+  "history": {
+    "games": {
+      "title": "Historique des parties",
+      "result": "Résultat",
+      "abandoned": "Abandonnée",
+      "won": "Gagnée",
+      "lost": "Perdue"
+    },
+    "logins": {
+      "title": "Historique de connexion",
+      "action": "Action",
+      "login": "Connexion",
+      "logout": "Déconnexion"
+    },
+    "date": "Date",
+    "time": "Heure",
+    "loading": "Chargement...",
+    "empty": "Aucune entrée.",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "room": {
+    "preview": "Prévisualisation",
+    "players": "Joueurs",
+    "size": "Taille",
+    "status": "Statut",
+    "mode": "Mode",
+    "accessibility": "Accessibilité",
+    "code": "Code",
+    "no_rooms": "Aucune partie disponible",
+    "status_waiting": "En attente",
+    "status_playing": "En cours",
+    "status_full": "Complète",
+    "status_open": "Ouverte"
+  },
+  "game_list": {
+    "preview": "Prévisualisation",
+    "name": "Nom",
+    "size": "Taille",
+    "mode": "Mode de jeu",
+    "owner": "Propriétaire",
+    "last_modified": "Dernière modification",
+    "privacy": "Confidentialité",
+    "modify": "Modifier",
+    "delete": "Supprimer",
+    "duplicate": "Dupliquer",
+    "no_games": "Aucun jeu disponible.",
+    "add_game": "Ajouter un jeu",
+    "public": "Public",
+    "private": "Privé",
+    "private_shared": "Privé-partagé",
+    "hidden_deleted": "Le jeu sélectionné est caché ou supprimé."
+  },
+  "game_creator": {
+    "title": "Créer une partie",
+    "create_new": "Créer un nouveau jeu",
+    "game_mode": "Mode de jeu",
+    "classic": "Classique",
+    "ctf": "CTF",
+    "board_size": "Taille de la carte",
+    "small": "Petite",
+    "medium": "Moyenne",
+    "large": "Grande",
+    "grid": "Grille: ",
+    "players": "Joueurs: ",
+    "items": "Items: ",
+    "actions_points": "Nombre de points d'actions",
+    "privacy": "Confidentialité",
+    "cancel": "Annuler",
+    "create": "Créer"
+  },
+  "toolbox": {
+    "tiles": "TUILES",
+    "items": "OBJETS",
+    "infos": "INFOS",
+    "right_click": "Clic droit",
+    "right_click_desc": "pour placer",
+    "left_click": "Clic gauche",
+    "left_click_desc": "pour effacer",
+    "items_to_place": "Items à placer",
+    "spawns_to_place": "Point de départs à placer",
+    "hold_right": "Maintenir clic droit",
+    "hold_right_desc": "pour sélectionner",
+    "release": "Relâcher",
+    "release_desc": "pour placer",
+    "name": "Nom:",
+    "description": "Description:"
+  },
+  "save": {
+    "errors_title": "Le jeu ne peut pas être sauvegardé en raison des erreurs suivantes :",
+    "close": "Fermer"
+  },
+  "restart": {
+    "confirm": "Êtes-vous sûr de vouloir recommencer l'édition ?",
+    "warning": "Toute modification non sauvegardée sera perdue.",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "chatbox": {
+    "general": "Général",
+    "game_channel": "Canal de ",
+    "send": "Envoyer",
+    "placeholder_general": "Écrire un message...",
+    "placeholder_channel": "Écrire dans {{ name }}..."
+  },
+  "bonus": {
+    "title": "Stats",
+    "health": "Vie",
+    "speed": "Rapidité",
+    "attack": "Attaque",
+    "defense": "Défense"
+  },
+  "characters": {
+    "title": "Personnages"
+  },
+  "combat": {
+    "attack_btn": "Attaquer",
+    "flee": "Fuir !",
+    "cancel": "Annuler",
+    "act": "Agir",
+    "end_turn": "Fin de tour",
+    "your_turn": "À vous de jouer! Il vous reste: {{ time }} secondes",
+    "their_turn": "C'est votre tour dans: {{ time }} secondes",
+    "flight_left": "{{ count }} tentatives d'évasion restantes",
+    "your_defense": "VOTRE DÉFENSE",
+    "your_attack": "VOTRE ATTAQUE",
+    "enemy_attack": "ATTAQUE ADVERSE",
+    "enemy_defense": "DÉFENSE ADVERSE",
+    "trap": "Vous êtes sur un piège!",
+    "avoid": "Éviter",
+    "traverse": "Traverser",
+    "you": "Vous",
+    "auto_disconnect": "Déconnexion automatique",
+    "current_turn": "Tour en cours: {{ time }}",
+    "playing": "Joue...",
+    "cost": "COST",
+    "description_label": "DESCRIPTION"
+  },
+  "end_game": {
+    "title": "Statistiques",
+    "players": "Joueurs",
+    "combats": "Nombre de combats",
+    "evasions": "Nombre d'évasions",
+    "victories": "Nombre de victoires",
+    "defeats": "Nombre de défaites",
+    "health_lost": "Points de vie perdus",
+    "damage": "Points de vie enlevés",
+    "items": "Nombre d'objets différents ramassés",
+    "tiles": "Pourcentage de tuiles de terrain visitées",
+    "duration": "Durée de la partie",
+    "turns": "Nombre de tours de jeu",
+    "tiles_global": "Pourcentage des tuiles de terrain visitées par au moins un joueur",
+    "doors": "Pourcentage des portes ayant été manipulées au moins une fois",
+    "flag_players": "Nombre de joueurs différents ayant détenu le drapeau"
+  },
+  "player_card": {
+    "playing": "Joue...",
+    "virtual": "Virtuel",
+    "flag": "Drapeau"
+  },
+  "game_info": {
+    "continue": "continuer",
+    "quit": "quitter"
+  },
+  "language": {
+    "title": "Langue",
+    "fr": "Français",
+    "en": "English"
+  },
+  "game_configurator": {
+    "mode_desc_classic": "Gagnez 3 combats pour être déclaré vainqueur et mettre fin à la partie.",
+    "mode_desc_ctf": "Capturez le drapeau adverse et ramenez-le à votre point de départ pour gagner la partie.",
+    "actions_desc": "Nombre de points d'actions alloués à chaque joueur à chaque tour"
+  },
+  "game_result": {
+    "win_classic": "Victoire ! Tu as gagné trois combats",
+    "win_ctf": "Victoire ! Ton équipe a capturé le drapeau !",
+    "lose_classic_known": "Défaite ! {{ winner }} a gagné trois combats",
+    "lose_classic_unknown": "Défaite ! Un joueur a gagné trois combats",
+    "lose_ctf_known": "Défaite ! L'équipe {{ winner }} a capturé le drapeau !",
+    "lose_ctf_unknown": "Défaite ! L'équipe adverse a capturé le drapeau !"
+  }
+}

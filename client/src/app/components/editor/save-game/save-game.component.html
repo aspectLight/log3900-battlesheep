@@ -6,13 +6,13 @@
     @if (errors.length > 0) {
     <div class="dialogue">
         <div class="errors">
-            <h2>Le jeu ne peut pas être sauvegardé en raison des erreurs suivantes :</h2>
+            <h2>{{ 'save.errors_title' | translate }}</h2>
             <ul>
                 @for (error of errors; track error) {
                 <li>{{ error.message }}</li>
                 }
             </ul>
-            <button (click)="closeDialogue()">Fermer</button>
+            <button (click)="closeDialogue()">{{ 'save.close' | translate }}</button>
         </div>
     </div>
     }
@@ -22,7 +22,7 @@
             (confirm)="onConfirm()"
             (cancel)="closeDialogue()"
             [showSecondButton]="showSecondButton"
-            secondOption="Non">
+            [secondOption]="'common.no' | translate">
         </app-pop-up>
     }
 </div>

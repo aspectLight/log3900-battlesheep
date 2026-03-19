@@ -4,6 +4,7 @@ import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Va
 import { Router, RouterLink } from '@angular/router';
 import { PROFILE_AVATARS } from '@app/constants/profile.constants';
 import { AuthService } from '@app/services/communication/auth.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 const passwordContainsLetter: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     return /[a-zA-Z]/.test(control.value) ? null : { noLetter: true };
@@ -26,7 +27,7 @@ const passwordMatchValidator: ValidatorFn = (group: AbstractControl): Validation
 @Component({
     selector: 'app-signup-page',
     standalone: true,
-    imports: [ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink, TranslateModule],
     templateUrl: './register.component.html',
     styleUrl: './register.component.scss',
 })

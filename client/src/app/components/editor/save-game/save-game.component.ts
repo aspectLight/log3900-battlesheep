@@ -8,10 +8,11 @@ import { HTTP_STATUS_CODES } from '@app/constants/http-status-code.constants';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ROUTES } from '@app/constants/routes.constants';
 import { ErrorMessages, WARNING_MESSAGES } from '@common/error-messages.constants';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-save-game',
-    imports: [PopUpComponent],
+    imports: [PopUpComponent, TranslateModule],
     templateUrl: './save-game.component.html',
     styleUrl: './save-game.component.scss',
 })

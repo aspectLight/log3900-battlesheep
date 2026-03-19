@@ -10,10 +10,11 @@ import { CombatService } from '@app/services/gameplay/combat.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { ActionSocketService } from '@app/services/communication/socket-handlers/action-socket.service';
+import { TranslateModule } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 @Component({
     selector: 'app-combat',
-    imports: [TitleCasePipe, ItemCardComponent],
+    imports: [TitleCasePipe, ItemCardComponent, TranslateModule],
     templateUrl: './combat.component.html',
     styleUrl: './combat.component.scss',
 })

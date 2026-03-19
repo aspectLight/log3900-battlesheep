@@ -8,8 +8,8 @@ export enum MODES {
 }
 
 export const MODE_DESCRIPTIONS: { [key in MODES]: string } = {
-    [MODES.CLASSIQUE]: 'Gagnez 3 combats pour être déclaré vainqueur et mettre fin à la partie.',
-    [MODES.CTF]: 'Capturez le drapeau adverse et ramenez-le à votre point de départ pour gagner la partie.',
+    [MODES.CLASSIQUE]: 'game_configurator.mode_desc_classic',
+    [MODES.CTF]: 'game_configurator.mode_desc_ctf',
 };
 
 export enum OUTCOME {
@@ -17,17 +17,23 @@ export enum OUTCOME {
     LOSE = 'lose',
 }
 
-export const GAME_RESULT_MESSAGES: {
+export const GAME_RESULT_KEYS: {
     [outcome in OUTCOME]: {
-        [mode in MODES]: (args?: { winner?: string | number }) => string;
+        [mode in MODES]: (args?: { winner?: string | number }) => { key: string; params?: object };
     };
 } = {
     [OUTCOME.WIN]: {
-        [MODES.CLASSIQUE]: () => 'Victoire! Tu as gagné trois combats',
-        [MODES.CTF]: () => 'Victoire! Ton équipe a capturé le drapeau !',
+        [MODES.CLASSIQUE]: () => ({ key: 'game_result.win_classic' }),
+        [MODES.CTF]: () => ({ key: 'game_result.win_ctf' }),
     },
     [OUTCOME.LOSE]: {
-        [MODES.CLASSIQUE]: ({ winner } = {}) => `Défaite! ${winner ?? 'Un joueur'} a gagné trois combats`,
-        [MODES.CTF]: ({ winner } = {}) => `Défaite! ${winner ? "L'équipe " + winner : "L'équipe adverse"} a capturé le drapeau !`,
+        [MODES.CLASSIQUE]: ({ winner } = {}) => ({
+            key: winner ? 'game_result.lose_classic_known' : 'game_result.lose_classic_unknown',
+            params: { winner },
+        }),
+        [MODES.CTF]: ({ winner } = {}) => ({
+            key: winner ? 'game_result.lose_ctf_known' : 'game_result.lose_ctf_unknown',
+            params: { winner },
+        }),
     },
 };

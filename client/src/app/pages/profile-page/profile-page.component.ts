@@ -10,14 +10,16 @@ import { UserProfile, UserStatistics } from '@app/interfaces/profile.interface';
 import { ProfileService } from '@app/services/communication/profile.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { StatsService } from '@app/services/communication/stats.service';
+import { LanguageService, LanguageType } from '@app/services/state/language.service';
 import { SessionService } from '@app/services/state/session.service';
 import { ThemeService, ThemeType } from '@app/services/state/theme.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-profile-page',
     templateUrl: './profile-page.component.html',
     styleUrls: ['./profile-page.component.scss'],
-    imports: [ReactiveFormsModule, RouterLink, PopUpComponent],
+    imports: [ReactiveFormsModule, RouterLink, PopUpComponent, TranslateModule],
 })
 export class ProfilePageComponent implements OnInit {
     avatars = PROFILE_AVATARS;
@@ -38,6 +40,11 @@ export class ProfilePageComponent implements OnInit {
         { value: 'village', label: 'Village Abandonné', description: 'Brun terreux', preview: '/assets/ui/village_preview.png' },
     ];
 
+    readonly languages: { value: LanguageType; labelKey: string }[] = [
+        { value: 'fr', labelKey: 'language.fr' },
+        { value: 'en', labelKey: 'language.en' },
+    ];
+
     form = this.fb.nonNullable.group({
         username: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9]+$/)]],
         email: ['', [Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
@@ -53,6 +60,7 @@ export class ProfilePageComponent implements OnInit {
         private auth: Auth,
         private router: Router,
         readonly themeService: ThemeService,
+        readonly languageService: LanguageService,
     ) {}
 
     get selectedAvatarId(): string {
@@ -95,6 +103,19 @@ export class ProfilePageComponent implements OnInit {
             this.profile = updated;
         } catch {
             // En cas d'erreur réseau, le changement visuel reste appliqué localement
+        }
+    }
+
+    async selectLanguage(language: LanguageType) {
+        // Applique immédiatement
+        this.languageService.setLanguage(language);
+        // Sauvegarde sur le backend si connecté
+        if (!this.profile) return;
+        try {
+            const updated = await this.profileService.updateProfile({ language });
+            this.profile = updated;
+        } catch {
+            // En cas d'erreur réseau, le changement reste appliqué localement
         }
     }
 

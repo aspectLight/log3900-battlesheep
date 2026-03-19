@@ -1,7 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Player } from '@app/classes/entity/player';
+import { TranslateModule } from '@ngx-translate/core';
 @Component({
     selector: 'app-player-card',
+    imports: [TranslateModule],
     templateUrl: './player-card.component.html',
     styleUrls: ['./player-card.component.scss'],
 })

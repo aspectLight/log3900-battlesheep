@@ -6,12 +6,13 @@ import { AuthService } from '@app/services/communication/auth.service';
 import { ChannelInfo, ChannelMessage, CustomChannelService } from '@app/services/communication/custom-channel.service';
 import { Subscription } from 'rxjs';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
+import { TranslateModule } from '@ngx-translate/core';
 import { WARNING_MESSAGES } from '@common/error-messages.constants';
 @Component({
     selector: 'app-channels-page',
     templateUrl: './channels-page.component.html',
     styleUrls: ['./channels-page.component.scss'],
-    imports: [CommonModule, FormsModule, RouterLink, PopUpComponent],
+    imports: [CommonModule, FormsModule, RouterLink, PopUpComponent, TranslateModule],
 })
 export class ChannelsPageComponent implements OnInit, OnDestroy {
     channels = signal<ChannelInfo[]>([]);

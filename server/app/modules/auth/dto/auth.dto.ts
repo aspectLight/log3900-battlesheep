@@ -46,6 +46,10 @@ export class UpdateUserDto {
     theme?: string;
 
     @IsOptional()
+    @IsString()
+    language?: string;
+
+    @IsOptional()
     @IsObject()
     preferences?: Record<string, unknown>;
 }

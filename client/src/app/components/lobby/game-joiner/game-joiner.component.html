@@ -5,17 +5,17 @@
 <div class="header">
     <button class="return-button" routerLink="/home">
         <img src="./assets/ui/left.png" />
-        Menu Principal
+        {{ 'join.back' | translate }}
     </button>
-    <h1>Rejoindre une partie</h1>
+    <h1>{{ 'join.title' | translate }}</h1>
 </div>
 
 <app-room-list (selectedRoom)="onRoomSelected($event)"></app-room-list>
 
 <div class="join-game-container">
-    <h2>Entrez le code de la partie à 4 chiffres</h2>
+    <h2>{{ 'join.code_prompt' | translate }}</h2>
     <div class="code-input-column">
-        <input #gameCode type="text" pattern="\d{4}" maxlength="4" title="Entrez exactement 4 chiffres" required />
-        <button class="square-button" (click)="joinGame()">Accéder à la salle d'attente</button>
+        <input #gameCode type="text" pattern="\d{4}" maxlength="4" [title]="'join.code_placeholder' | translate" required />
+        <button class="square-button" (click)="joinGame()">{{ 'join.join_btn' | translate }}</button>
     </div>
 </div>

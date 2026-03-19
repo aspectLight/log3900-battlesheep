@@ -2,30 +2,30 @@
     <div class="top-bar">
         <button class="return-button" routerLink="/home">
             <img src="./assets/ui/left.png">
-            Page d'accueil
+            {{ 'common.home' | translate }}
         </button>
   
-      <h1 class="title">Historique de connexion</h1>
+      <h1 class="title">{{ 'history.logins.title' | translate }}</h1>
       <div class="spacer"></div>
     </div>
   
     <div class="history-list">
       <li class="header">
-        <span>Action</span>
-        <span>Date</span>
-        <span>Heure</span>
+        <span>{{ 'history.logins.action' | translate }}</span>
+        <span>{{ 'history.date' | translate }}</span>
+        <span>{{ 'history.time' | translate }}</span>
       </li>
   
       <div class="list">
           @if (items.length === 0) {
-            <div class="state empty">Aucune entrée.</div>
+            <div class="state empty">{{ 'history.empty' | translate }}</div>
           } @else {
             <div class="rows">
               @for (it of items; track it.date + '_' + it.type) {
                 <li class="row">
                   <span class="action">
                     <span class="badge" [class.login]="it.type === 'login'" [class.logout]="it.type === 'logout'">
-                      {{ it.type === 'login' ? 'Connexion' : 'Déconnexion' }}
+                      {{ it.type === 'login' ? ('history.logins.login' | translate) : ('history.logins.logout' | translate) }}
                     </span>
                   </span>
   

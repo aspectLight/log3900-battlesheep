@@ -16,20 +16,20 @@
           <div class="name-row">
             <h1 class="player-name">{{ player.name || 'viktor' }}</h1>
             <div class="points-info">
-              <span class="point-value">{{ movementPoints }} Movements</span>
-              <span class="point-value">{{ actionPoints }} Actions</span>
+              <span class="point-value">{{ movementPoints }} {{ 'bonus.speed' | translate }}</span>
+              <span class="point-value">{{ actionPoints }} {{ 'bonus.attack' | translate }}</span>
             </div>
           </div>
         </div>
       </div>
 
       <div class="section-header">
-        <span class="section-title">STATS</span>
+        <span class="section-title">{{ 'bonus.title' | translate }}</span>
       </div>
       
       <div class="stats-grid">
         <div class="stat-row">
-          <span class="stat-label">Health</span>
+          <span class="stat-label">{{ 'bonus.health' | translate }}</span>
           <div class="stat-points">
             @for(i of healthPoints; track i) {
               <img src="./assets/stats/health.png" class="point">
@@ -38,7 +38,7 @@
         </div>
 
         <div class="stat-row">
-          <span class="stat-label">Attack</span>
+          <span class="stat-label">{{ 'bonus.attack' | translate }}</span>
           <div class="stat-points">
             @for(i of attackPoints; track i) {
               <img src="./assets/stats/attack.png" class="point">
@@ -47,7 +47,7 @@
         </div>
 
         <div class="stat-row">
-          <span class="stat-label">Defense</span>
+          <span class="stat-label">{{ 'bonus.defense' | translate }}</span>
           <div class="stat-points">
             @for(i of defensePoints; track i) {
               <img src="./assets/stats/defense.png" class="point">
@@ -56,7 +56,7 @@
         </div>
 
         <div class="stat-row">
-          <span class="stat-label">Speed</span>
+          <span class="stat-label">{{ 'bonus.speed' | translate }}</span>
           <div class="stat-points">
             @for(i of speedPoints; track i) {
               <img src="./assets/stats/speed.png" class="point">
@@ -71,11 +71,11 @@
 
       <div class="dice-grid">
         <div class="dice-row">
-          <span class="dice-label">Attack</span>
+          <span class="dice-label">{{ 'bonus.attack' | translate }}</span>
           <img [src]="getDice('attack')" class="dice">
         </div>
         <div class="dice-row">
-          <span class="dice-label">Defense</span>
+          <span class="dice-label">{{ 'bonus.defense' | translate }}</span>
           <img [src]="getDice('defense')" class="dice">
         </div>
       </div>

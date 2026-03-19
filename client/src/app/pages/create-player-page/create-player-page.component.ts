@@ -13,12 +13,13 @@ import { GameCreationService } from '@app/services/lobby/game-creation.service';
 import { PlayerCreationService } from '@app/services/lobby/player-creation.service';
 import { ErrorMessages } from '@common/error-messages.constants';
 import { ProfileService } from '@app/services/communication/profile.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-create-player-page',
     templateUrl: './create-player-page.component.html',
     styleUrls: ['./create-player-page.component.scss'],
-    imports: [CharacterGridComponent, BonusChoicesComponent, PopUpComponent, RouterLink],
+    imports: [CharacterGridComponent, BonusChoicesComponent, PopUpComponent, RouterLink, TranslateModule],
 })
 export class CreatePlayerPageComponent implements OnInit {
     showError: boolean;

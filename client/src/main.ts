@@ -1,5 +1,5 @@
-import { provideHttpClient } from '@angular/common/http';
-import { enableProdMode } from '@angular/core';
+import { HttpClient, provideHttpClient } from '@angular/common/http';
+import { enableProdMode, importProvidersFrom } from '@angular/core';
 import { getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { browserSessionPersistence, initializeAuth, provideAuth } from '@angular/fire/auth';
 import { bootstrapApplication } from '@angular/platform-browser';
@@ -9,6 +9,7 @@ import { authGuard } from '@app/guards/auth.gard';
 import { AdminGamePageComponent } from '@app/pages/admin-game-page/admin-game-page.component';
 import { AppComponent } from '@app/pages/app/app.component';
 import { AuthLandingPageComponent } from '@app/pages/auth-landing/auth-landing.component';
+import { ChannelsPageComponent } from '@app/pages/channels-page/channels-page.component';
 import { ConfigureGamePageComponent } from '@app/pages/configure-game-page/configure-game-page.component';
 import { CreateGamePageComponent } from '@app/pages/create-game-page/create-game-page.component';
 import { CreatePlayerPageComponent } from '@app/pages/create-player-page/create-player-page.component';
@@ -23,8 +24,13 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { ProfilePageComponent } from '@app/pages/profile-page/profile-page.component';
 import { RegisterPageComponent } from '@app/pages/register/register.component';
 import { WaitingPlayerPageComponent } from '@app/pages/waiting-player-page/waiting-player-page.component';
-import { ChannelsPageComponent } from '@app/pages/channels-page/channels-page.component';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { environment } from './environments/environment';
+
+export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
+    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
 
 if (environment.production) {
     enableProdMode();
@@ -59,5 +65,15 @@ bootstrapApplication(AppComponent, {
         provideAnimations(),
         provideFirebaseApp(() => initializeApp(environment.firebase)),
         provideAuth(() => initializeAuth(getApp(), { persistence: browserSessionPersistence })),
+        importProvidersFrom(
+            TranslateModule.forRoot({
+                defaultLanguage: 'fr',
+                loader: {
+                    provide: TranslateLoader,
+                    useFactory: HttpLoaderFactory,
+                    deps: [HttpClient],
+                },
+            }),
+        ),
     ],
 });

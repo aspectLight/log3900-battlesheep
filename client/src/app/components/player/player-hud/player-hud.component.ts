@@ -4,10 +4,11 @@ import { ItemCardComponent } from '@app/components/shared/item-card/item-card.co
 import { Item } from '@app/classes/entity/item';
 import { Player } from '@app/classes/entity/player';
 import { GameManagerService } from '@app/services/state/game-manager.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-player-hud',
-    imports: [CommonModule, ItemCardComponent],
+    imports: [CommonModule, ItemCardComponent, TranslateModule],
     templateUrl: './player-hud.component.html',
     styleUrl: './player-hud.component.scss',
 })

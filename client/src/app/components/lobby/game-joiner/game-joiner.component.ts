@@ -8,10 +8,11 @@ import { RoomInfo } from '@app/interfaces/room-info.interface';
 import { MovementSocketService } from '@app/services/communication/socket-handlers/movement-socket.service';
 import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
 import { GameCreationService } from '@app/services/lobby/game-creation.service';
+import { TranslateModule } from '@ngx-translate/core';
 @Component({
     selector: 'app-game-joiner',
     templateUrl: './game-joiner.component.html',
-    imports: [RouterLink, PopUpComponent, RoomListComponent],
+    imports: [RouterLink, PopUpComponent, RoomListComponent, TranslateModule],
     styleUrl: './game-joiner.component.scss',
 })
 export class GameJoinerComponent {

@@ -6,10 +6,10 @@
 
 @if (isTrapPopupVisible) {
 <app-pop-up
-    popUpMessage="Vous êtes sur un piège!"
+    [popUpMessage]="'combat.trap' | translate"
     [description]="trapDescription"
-    [firstOption]="trapCanAvoid ? 'Éviter' : 'Traverser'"
-    [secondOption]="'Traverser'"
+    [firstOption]="trapCanAvoid ? ('combat.avoid' | translate) : ('combat.traverse' | translate)"
+    [secondOption]="'combat.traverse' | translate"
     [showSecondButton]="trapCanAvoid"
     (confirm)="onTrapChoice(trapCanAvoid ? 'avoid' : 'traverse')"
     (cancel)="onTrapChoice('traverse')"
@@ -18,14 +18,6 @@
 }
 
 @if (isGameLoaded) {
-
-<!-- @if (isGameCanceled) {
-    <app-pop-up popUpMessage="Partie annulée par manque de joueurs"
-    description=""
-    [showSecondButton]="false"
-    (confirm)="goBackToMenu()"
-    firstOption="continuer"></app-pop-up>
-    } -->
 
 @if (isGameFinished) {
 <app-notification [message]="generateEndMessage()" [time]="5000" [mode]="finishMode"></app-notification>
@@ -43,17 +35,16 @@
         <app-player-hud></app-player-hud>
     </div>
     <div class="middle">
-        <!-- <app-timer></app-timer> -->
         @if(isTurnToFight){
-            <p class="combatCountdown">À vous de jouer! Il vous reste: {{combatCountdown}} secondes</p>
+            <p class="combatCountdown">{{ 'combat.your_turn' | translate: { time: combatCountdown } }}</p>
         }@else {
-            <p class="combatCountdown">C'est votre tour dans: {{combatCountdown}} secondes</p>
+            <p class="combatCountdown">{{ 'combat.their_turn' | translate: { time: combatCountdown } }}</p>
         }
         <app-combat></app-combat>
     </div>
     <div class="right-side">
         <app-actions-hud></app-actions-hud>
-        <p class="flightinfos">{{flightAttemptsLeft}} tentatives d'évasion restantes</p>
+        <p class="flightinfos">{{ 'combat.flight_left' | translate: { count: flightAttemptsLeft } }}</p>
         <app-chatbox></app-chatbox>
     </div>
 </div>
@@ -66,8 +57,7 @@
         <app-player-hud></app-player-hud>
     </div>
     <div class="middle">
-        <!-- <app-timer></app-timer> -->
-        <p class="gameCountdown">Tour en cours: {{gameCountdown}}</p>
+        <p class="gameCountdown">{{ 'combat.current_turn' | translate: { time: gameCountdown } }}</p>
         <div class="board-container">
             <div class="board">
                 <app-board [board]="board" mode="play"></app-board>
@@ -77,7 +67,7 @@
     <div class="right-side">
         <app-actions-hud></app-actions-hud>
         @if (isDebugging) {
-        <div class="debug-info">Game is in debug mode</div>
+        <div class="debug-info">{{ 'combat.playing' | translate }}</div>
         }
         <app-chatbox></app-chatbox>
     </div>
@@ -85,7 +75,7 @@
 } } @else {
     @if (isGameCanceled || this.showError) {
         <app-pop-up
-            popUpMessage='Déconnexion automatique'
+            [popUpMessage]="'combat.auto_disconnect' | translate"
             [showSecondButton]="false"
             (confirm)="goBackToMenu()">
         </app-pop-up>

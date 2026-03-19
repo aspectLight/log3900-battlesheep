@@ -1,12 +1,13 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { Player } from '@app/classes/entity/player';
 import { BONUS_VALUE, DEFAULT_STATS_VALUE, D4_VALUE, D6_VALUE } from '@app/constants/player.constants';
 import { Bonus } from '@app/interfaces/character.interface';
 
 @Component({
     selector: 'app-bonus-choices',
-    imports: [CommonModule],
+    imports: [CommonModule, TranslateModule],
     templateUrl: './bonus-choices.component.html',
     styleUrl: './bonus-choices.component.scss',
 })

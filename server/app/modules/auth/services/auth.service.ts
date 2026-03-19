@@ -164,6 +164,12 @@ export class AuthService {
             user.theme = updateDto.theme;
         }
 
+        // Updating language
+        const validLanguages = ['fr', 'en'];
+        if (updateDto.language && validLanguages.includes(updateDto.language) && updateDto.language !== user.language) {
+            user.language = updateDto.language;
+        }
+
         // Updating preferences
         if (updateDto.preferences && updateDto.preferences !== user.preferences) {
             user.preferences = { ...user.preferences, ...updateDto.preferences };

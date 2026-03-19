@@ -11,11 +11,12 @@ import { ProfileService } from '@app/services/communication/profile.service';
 import { GameService } from '@app/services/editor/game.service';
 import { GameListService } from '@app/services/lobby/game-list.service';
 import { ErrorMessages, WARNING_MESSAGES } from '@common/error-messages.constants';
+import { TranslateModule } from '@ngx-translate/core';
 @Component({
     selector: 'app-game-list',
     templateUrl: './game-list.component.html',
     styleUrls: ['./game-list.component.scss'],
-    imports: [CommonModule, RouterLink, BoardComponent, PopUpComponent, LoadingScreenComponent],
+    imports: [CommonModule, RouterLink, BoardComponent, PopUpComponent, LoadingScreenComponent, TranslateModule],
 })
 export class GameListComponent implements OnInit {
     @Input() isAddBoardVisible = false;

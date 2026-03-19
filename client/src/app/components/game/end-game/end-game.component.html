@@ -1,16 +1,16 @@
 <div class="header">
     <button class="return-button" (click)="quitGame()">
         <img src="./assets/ui/left.png">
-        Page d'accueil
+        {{ 'common.home' | translate }}
     </button>
-    <h1> Statistiques </h1>
+    <h1>{{ 'end_game.title' | translate }}</h1>
 </div>
 
 <div class="end-game">
     <div class="personal-stats">
         <li class="stats-header" headerType= "personalHeader">
             <span class = "clickable" (click) = "sortBy('name')">
-                Joueurs
+                {{ 'end_game.players' | translate }}
                 @if (sortedProperty === 'name'){
                     @if (isAscending){
                         <img src = './assets/ui/down.png'>
@@ -20,7 +20,7 @@
                     }
                 }
             </span>
-            <span class = "clickable" (click) = "sortBy('combats')">Nombre de combats
+            <span class = "clickable" (click) = "sortBy('combats')">{{ 'end_game.combats' | translate }}
                 @if (sortedProperty === 'combats'){
                     @if (isAscending){
                         <img src = './assets/ui/down.png'>
@@ -29,7 +29,7 @@
                         <img src = './assets/ui/up.png'>
                     }
                 }</span>
-            <span class = "clickable" (click) = "sortBy('evasions')">Nombre d'évasions
+            <span class = "clickable" (click) = "sortBy('evasions')">{{ 'end_game.evasions' | translate }}
                 @if (sortedProperty === 'evasions'){
                     @if (isAscending){
                         <img src = './assets/ui/down.png'>
@@ -38,7 +38,7 @@
                         <img src = './assets/ui/up.png'>
                     }
                 }</span>
-            <span class = "clickable" (click) = "sortBy('victories')">Nombre de victoires
+            <span class = "clickable" (click) = "sortBy('victories')">{{ 'end_game.victories' | translate }}
                 @if (sortedProperty === 'victories'){
                     @if (isAscending){
                         <img src = './assets/ui/down.png'>
@@ -47,7 +47,7 @@
                         <img src = './assets/ui/up.png'>
                     }
                 }</span>
-            <span class = "clickable" (click) = "sortBy('defeats')">Nombre de défaites
+            <span class = "clickable" (click) = "sortBy('defeats')">{{ 'end_game.defeats' | translate }}
                 @if (sortedProperty === 'defeats'){
                     @if (isAscending){
                         <img src = './assets/ui/down.png'>
@@ -56,7 +56,7 @@
                         <img src = './assets/ui/up.png'>
                     }
                 }</span>
-            <span class = "clickable" (click) = "sortBy('healthLost')">Points de vie perdus
+            <span class = "clickable" (click) = "sortBy('healthLost')">{{ 'end_game.health_lost' | translate }}
                 @if (sortedProperty === 'healthLost'){
                     @if (isAscending){
                         <img src = './assets/ui/down.png'>
@@ -65,7 +65,7 @@
                         <img src = './assets/ui/up.png'>
                     }
                 }</span>
-            <span class = "clickable" (click) = "sortBy('damage')">Points de vie enlevés
+            <span class = "clickable" (click) = "sortBy('damage')">{{ 'end_game.damage' | translate }}
                 @if (sortedProperty === 'damage'){
                     @if (isAscending){
                         <img src = './assets/ui/down.png'>
@@ -74,7 +74,7 @@
                         <img src = './assets/ui/up.png'>
                     }
                 }</span>
-            <span class = "clickable" (click) = "sortBy('itemsCollected')">Nombre d'objets différents ramassés
+            <span class = "clickable" (click) = "sortBy('itemsCollected')">{{ 'end_game.items' | translate }}
                 @if (sortedProperty === 'itemsCollected'){
                     @if (isAscending){
                         <img src = './assets/ui/down.png'>
@@ -83,7 +83,7 @@
                         <img src = './assets/ui/up.png'>
                     }
                 }</span>
-            <span class = "clickable" (click) = "sortBy('tilesVisited')">Pourcentage de tuiles de terrain visitées
+            <span class = "clickable" (click) = "sortBy('tilesVisited')">{{ 'end_game.tiles' | translate }}
                 @if (sortedProperty === 'tilesVisited'){
                     @if (isAscending){
                         <img src = './assets/ui/down.png'>
@@ -111,12 +111,12 @@
     </div>
     <div class="global-stats">
         <li class="stats-header" [ngClass]="playersHadFlag > 0 ? 'columns-5' : 'columns-4'">
-            <span>Durée de la partie</span>
-            <span>Nombre de tours de jeu</span>
-            <span>Pourcentage des tuiles de terrain visitées par au moins un joueur</span>
-            <span>Pourcentage des portes ayant été manipulées au moins une fois</span>
+            <span>{{ 'end_game.duration' | translate }}</span>
+            <span>{{ 'end_game.turns' | translate }}</span>
+            <span>{{ 'end_game.tiles_global' | translate }}</span>
+            <span>{{ 'end_game.doors' | translate }}</span>
             @if(playersHadFlag > 0) {
-                <span>Nombre de joueurs différents ayant détenu le drapeau</span>
+                <span>{{ 'end_game.flag_players' | translate }}</span>
             }
         </li>
         <li class="global" [ngClass]="playersHadFlag > 0 ? 'columns-5' : 'columns-4'">

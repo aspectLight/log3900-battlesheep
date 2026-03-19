@@ -7,6 +7,6 @@
     [showSecondButton]="true" 
     (confirm)="toggleSettings()"
     (cancel)="quitGame()"
-    firstOption="continuer"
-    secondOption="quitter"></app-pop-up>
+    [firstOption]="'game_info.continue' | translate"
+    [secondOption]="'game_info.quit' | translate"></app-pop-up>
 }

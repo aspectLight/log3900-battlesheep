@@ -86,6 +86,7 @@ export class AuthController {
             username: user.username,
             avatarId: user.avatarId,
             theme: user.theme ?? 'default',
+            language: user.language ?? 'fr',
             preferences: user.preferences,
         };
     }
@@ -103,6 +104,7 @@ export class AuthController {
                 email: user.email,
                 avatarId: user.avatarId,
                 theme: user.theme ?? 'default',
+                language: user.language ?? 'fr',
                 preferences: user.preferences,
             },
         };

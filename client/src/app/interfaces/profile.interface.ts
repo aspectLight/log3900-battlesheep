@@ -4,6 +4,7 @@ export interface UserProfile {
     username: string;
     avatarId: string;
     theme?: string;
+    language?: string;
     preferences?: Record<string, unknown>;
 }
 
@@ -19,6 +20,7 @@ export interface UpdateProfilePayload {
     email?: string;
     avatarId?: string;
     theme?: string;
+    language?: string;
 }
 
 export interface AvatarOption {

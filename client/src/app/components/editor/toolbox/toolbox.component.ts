@@ -14,10 +14,11 @@ import { TileService } from '@app/services/editor/tile.service';
 import { Board } from '@app/classes/board/board';
 import { SaveGameComponent } from '@app/components/editor/save-game/save-game.component';
 import { RestartGameComponent } from '@app/components/game/restart-game/restart-game.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-toolbox',
-    imports: [KeyValuePipe, FormsModule, SaveGameComponent, RestartGameComponent],
+    imports: [KeyValuePipe, FormsModule, SaveGameComponent, RestartGameComponent, TranslateModule],
     templateUrl: './toolbox.component.html',
     styleUrls: ['./toolbox.component.scss'],
     animations: [
