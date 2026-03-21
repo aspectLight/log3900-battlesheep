@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
 import { Router, RouterLink } from '@angular/router';
 import { RoomListComponent } from '@app/components/lobby/room-list/room-list.component';
@@ -7,17 +7,21 @@ import { ROUTES } from '@app/constants/routes.constants';
 import { RoomInfo } from '@app/interfaces/room-info.interface';
 import { MovementSocketService } from '@app/services/communication/socket-handlers/movement-socket.service';
 import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
+import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { GameCreationService } from '@app/services/lobby/game-creation.service';
+import { SocialEvents } from '@common/socket.constants';
 @Component({
     selector: 'app-game-joiner',
     templateUrl: './game-joiner.component.html',
     imports: [RouterLink, PopUpComponent, RoomListComponent],
     styleUrl: './game-joiner.component.scss',
 })
-export class GameJoinerComponent {
+export class GameJoinerComponent implements OnInit, OnDestroy {
     @ViewChild('gameCode') gameCodeInput!: ElementRef<HTMLInputElement>;
     showError: boolean;
     errorMessage: string;
+    showBlockedWarning = false;
+    blockedWarningMessage = '';
 
     constructor(
         private socketService: RoomSocketService,
@@ -25,9 +29,37 @@ export class GameJoinerComponent {
         private gameCreationService: GameCreationService,
         private router: Router,
         private auth: Auth,
+        private globalSocketService: SocketService,
     ) {
         this.gameCreationService.isHost = false;
         this.movementSocketService.sync();
+    }
+
+    ngOnInit(): void {
+        const socket = this.globalSocketService.socket;
+        if (socket) {
+            socket.on(SocialEvents.BlockedUserInRoom, (data: { blockedUsernames: string[] }) => {
+                this.blockedWarningMessage = `Les utilisateurs suivants que vous avez bloqués sont dans cette salle : ${data.blockedUsernames.join(', ')}. Voulez-vous quand même entrer ?`;
+                this.showBlockedWarning = true;
+            });
+        }
+    }
+
+    ngOnDestroy(): void {
+        const socket = this.globalSocketService.socket;
+        if (socket) {
+            socket.off(SocialEvents.BlockedUserInRoom);
+        }
+    }
+
+    onBlockedWarningConfirm(): void {
+        this.showBlockedWarning = false;
+        this.globalSocketService.send(SocialEvents.BlockedUserRoomChoice, { choice: 'enter' });
+    }
+
+    onBlockedWarningCancel(): void {
+        this.showBlockedWarning = false;
+        this.globalSocketService.send(SocialEvents.BlockedUserRoomChoice, { choice: 'cancel' });
     }
 
     joinGame() {

@@ -75,7 +75,8 @@ export class RoomSocketService implements ISocketService {
     }
 
     async createRoom(roomId: string, gameId: string, host: Player): Promise<void> {
-        const result = await this.socket.emitWithAck(WaitingRoomEvents.CreateWaitingRoom, { roomId, gameId, host });
+        const friendsOnly = this.gameCreationService.friendsOnly;
+        const result = await this.socket.emitWithAck(WaitingRoomEvents.CreateWaitingRoom, { roomId, gameId, host, friendsOnly });
         if (!result.success) {
             throw new Error(result.error || 'Failed to create waiting room');
         }

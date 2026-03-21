@@ -24,6 +24,7 @@ import { ProfilePageComponent } from '@app/pages/profile-page/profile-page.compo
 import { RegisterPageComponent } from '@app/pages/register/register.component';
 import { WaitingPlayerPageComponent } from '@app/pages/waiting-player-page/waiting-player-page.component';
 import { ChannelsPageComponent } from '@app/pages/channels-page/channels-page.component';
+import { FriendsPageComponent } from '@app/pages/friends-page/friends-page.component';
 import { environment } from './environments/environment';
 
 if (environment.production) {
@@ -49,6 +50,7 @@ const routes: Routes = [
     { path: 'games-history', component: GamesHistoryComponent, canActivate: [authGuard] },
     { path: 'profile', component: ProfilePageComponent, canActivate: [authGuard] },
     { path: 'channels', component: ChannelsPageComponent, canActivate: [authGuard] },
+    { path: 'friends', component: FriendsPageComponent, canActivate: [authGuard] },
     { path: '**', redirectTo: '/home' },
 ];
 

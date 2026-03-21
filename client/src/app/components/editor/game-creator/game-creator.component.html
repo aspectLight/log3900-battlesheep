@@ -16,12 +16,18 @@
 </app-game-list>
 
 @if (hasGames) {
-    <button 
-        class="square-button" 
-        [disabled]="!selectedGame" 
-        (click)="createGame()">
-        Créer une partie
-    </button>
+    <div class="create-game-actions">
+        <label class="friends-only-toggle">
+            <input type="checkbox" [(ngModel)]="friendsOnly" />
+            Amis seulement
+        </label>
+        <button
+            class="square-button"
+            [disabled]="!selectedGame"
+            (click)="createGame()">
+            Créer une partie
+        </button>
+    </div>
 }
 
 @if (gameModified===true) {

@@ -4,6 +4,7 @@ import { GameModule } from '@app/modules/game/game.module';
 import { GeneralChatModule } from '@app/modules/general-chat/general-chat.module';
 import { MovementModule } from '@app/modules/movement/movement.module';
 import { SharedRoomModule } from '@app/modules/shared-room/shared-room.module';
+import { SocialModule } from '@app/modules/social/social.module';
 import { VirtualPlayersModule } from '@app/modules/virtual-players/virtual-players.module';
 import { Module } from '@nestjs/common';
 import { GameRoomGateway } from './game-room/game-room.gateway';
@@ -24,7 +25,7 @@ import { WaitingRoomPlayerHandler } from './waiting-room/handlers/waiting-room-p
 import { WaitingRoomGateway } from './waiting-room/waiting-room.gateway';
 
 @Module({
-    imports: [SharedRoomModule, GameModule, CombatModule, MovementModule, VirtualPlayersModule, AuthModule, GeneralChatModule],
+    imports: [SharedRoomModule, GameModule, CombatModule, MovementModule, VirtualPlayersModule, AuthModule, GeneralChatModule, SocialModule],
     providers: [
         GameRoomGateway,
         WaitingRoomGateway,

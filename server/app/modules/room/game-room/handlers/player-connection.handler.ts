@@ -1,9 +1,11 @@
+import { AuthService } from '@app/modules/auth/services/auth.service';
 import { GameCombatService } from '@app/modules/combat/services/game-combat.service';
 import { GameService } from '@app/modules/game/services/game.service';
 import { CustomChannelService } from '@app/modules/general-chat/services/custom-channel.service';
 import { GameMovementService } from '@app/modules/movement/services/game-movement.service';
 import { SIZE_LIMITS } from '@app/modules/shared-room/constants/waiting-room.constants';
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
+import { BlockService } from '@app/modules/social/services/block.service';
 import { Player } from '@app/shared/interfaces/player';
 import { CustomChannelEvents, GameRoomEvents } from '@common/socket.constants';
 import { Injectable, Logger } from '@nestjs/common';
@@ -22,6 +24,8 @@ export class PlayerConnectionHandler {
         private readonly gameMovementService: GameMovementService,
         private readonly gameService: GameService,
         private readonly customChannelService: CustomChannelService,
+        private readonly blockService: BlockService,
+        private readonly authService: AuthService,
     ) {}
 
     /**
@@ -101,6 +105,17 @@ export class PlayerConnectionHandler {
                 return { success: false, error: 'Missing player data' };
             }
 
+            // Block check: resolve joining user's username and check against room players
+            const joinerUsername = await this.resolveUsername(socket);
+            if (joinerUsername) {
+                const roomPlayerUsernames = await this.resolveRoomPlayerUsernames(room.players);
+                for (const playerUsername of roomPlayerUsernames) {
+                    if (await this.blockService.isBlockedBidirectional(joinerUsername, playerUsername)) {
+                        return { success: false, error: 'Vous ne pouvez pas rejoindre cette partie en raison d\'un blocage' };
+                    }
+                }
+            }
+
             const game = await this.gameService.getGameById(room.gameId);
             const maxPlayers = SIZE_LIMITS[game.board.size] || 2;
 
@@ -155,6 +170,33 @@ export class PlayerConnectionHandler {
             this.logger.error(`Erreur drop-in: ${error.message}`);
             return { success: false, error: error.message };
         }
+    }
+
+    private async resolveUsername(socket: Socket): Promise<string | null> {
+        try {
+            const { token } = socket.handshake.auth as { token?: string };
+            if (!token) return null;
+            const decoded = await this.authService.verifyToken(token);
+            const user = await this.authService.getUserByUid(decoded.uid);
+            return user?.username ?? null;
+        } catch {
+            return null;
+        }
+    }
+
+    private async resolveRoomPlayerUsernames(players: Player[]): Promise<string[]> {
+        const usernames: string[] = [];
+        for (const player of players) {
+            if (player.firebaseUid) {
+                try {
+                    const user = await this.authService.getUserByUid(player.firebaseUid);
+                    if (user?.username) usernames.push(user.username);
+                } catch {
+                    // Virtual players won't have a firebaseUid
+                }
+            }
+        }
+        return usernames;
     }
 
     /**
