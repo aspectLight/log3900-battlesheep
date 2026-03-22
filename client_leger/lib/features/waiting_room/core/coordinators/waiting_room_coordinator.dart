@@ -36,6 +36,9 @@ class WaitingRoomCoordinator
   final String scopeName = 'waiting_room';
 
   @override
+  bool get tearDownStaleFeatureScopeOnEntry => true;
+
+  @override
   void onScopeCreated(GetIt scope) {
     scopeHolder.setScope(scope);
     registerWaitingRoomScope(scope, getIt, entryData: entryData);

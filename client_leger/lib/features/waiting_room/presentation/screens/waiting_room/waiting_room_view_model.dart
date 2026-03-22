@@ -43,7 +43,7 @@ class WaitingRoomViewModel {
   late final room = computed<WaitingRoomModel>(
     () => _roomRepository.state.value.room,
   );
-  late final isHost = computed<bool>(() => _roomRepository.state.value.isHost);
+  late final isHost = computed<bool>(() => _roomRepository.isHost);
   late final isStartValid = computed<bool>(
     () => isWaitingRoomStartValid(room.value, _startParams),
   );

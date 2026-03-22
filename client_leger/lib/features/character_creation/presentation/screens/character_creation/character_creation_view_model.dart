@@ -14,6 +14,7 @@ import '../../../core/event_bus/character_creation_event_bus.dart';
 import '../../../core/helpers/character_creation_form_validator.dart';
 import '../../../data/repositories/character_creation_repository.dart';
 import '../../../domain/models/character_creation_entry_mode.dart';
+import '../../../domain/state/character_creation_state.dart';
 import '../../../domain/use_cases/create_character_use_case.dart';
 import '../../../domain/use_cases/reserve_character_use_case.dart';
 import '../../mappers/character_creation_form_to_command_mapper.dart';
@@ -50,11 +51,11 @@ class CharacterCreationViewModel {
   final CharacterCreationEntryMode _entryMode;
   final String _username;
 
-  final hasSelectedDice = signal(false);
-
   final createSubmitState = signal<CreateCharacterSubmitState>(
     const CreateCharacterSubmitState.initial(),
   );
+
+  Signal<CharacterCreationState> get creationState => _repository.state;
 
   late final form = computed(() => _repository.state.value.form);
 
@@ -75,6 +76,12 @@ class CharacterCreationViewModel {
     () => _repository.state.value.form.defenseDice,
   );
 
+  late final hasSelectedDice = computed(() {
+    return CharacterCreationFormValidator.hasValidDicePairing(
+      _repository.state.value.form,
+    );
+  });
+
   bool get isSubmitting =>
       createSubmitState.value is CreateCharacterSubmitStateSubmitting;
   bool get isHost => _entryMode is CharacterCreationHostEntryMode;
@@ -90,6 +97,10 @@ class CharacterCreationViewModel {
 
   void init() {
     _repository.setName(_username);
+    final form = _repository.state.value.form;
+    if (!CharacterCreationFormValidator.hasValidDicePairing(form)) {
+      selectAttackDice(CharacterCreationConstants.d4Value);
+    }
   }
 
   void selectCharacter(Character character) {
@@ -100,7 +111,7 @@ class CharacterCreationViewModel {
   }
 
   bool isCharacterDisabled(Character character) {
-    return reservedCharacters.value.any(
+    return _repository.state.value.reservedCharacters.any(
       (reservedCharacter) =>
           reservedCharacter.chosenAvatar.toLowerCase() == character.id &&
           reservedCharacter.reservorId != _socketId,
@@ -108,13 +119,17 @@ class CharacterCreationViewModel {
   }
 
   void selectHealthBonus() {
-    _repository.setHealth(CharacterCreationConstants.statWithBonusValue);
-    _repository.setSpeed(CharacterCreationConstants.defaultStatValue);
+    _repository.setHealthAndSpeed(
+      health: CharacterCreationConstants.statWithBonusValue,
+      speed: CharacterCreationConstants.defaultStatValue,
+    );
   }
 
   void selectSpeedBonus() {
-    _repository.setSpeed(CharacterCreationConstants.statWithBonusValue);
-    _repository.setHealth(CharacterCreationConstants.defaultStatValue);
+    _repository.setHealthAndSpeed(
+      health: CharacterCreationConstants.defaultStatValue,
+      speed: CharacterCreationConstants.statWithBonusValue,
+    );
   }
 
   void selectAttackDice(int sides) {
@@ -143,7 +158,6 @@ class CharacterCreationViewModel {
 
   void _applyDiceSelection({required bool isAttack, required int sides}) {
     if (!CharacterCreationFormValidator.isValidDiceValue(sides)) return;
-    hasSelectedDice.value = true;
     final opposite = sides == CharacterCreationConstants.d4Value
         ? CharacterCreationConstants.d6Value
         : CharacterCreationConstants.d4Value;

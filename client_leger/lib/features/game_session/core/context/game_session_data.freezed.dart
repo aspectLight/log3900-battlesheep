@@ -21,6 +21,7 @@ mixin _$GameSessionData {
   String get gameId => throw _privateConstructorUsedError;
   String get socketId => throw _privateConstructorUsedError;
   bool get isHost => throw _privateConstructorUsedError;
+  String get gameRoomHostId => throw _privateConstructorUsedError;
   String get gameName => throw _privateConstructorUsedError;
   String get gameDescription => throw _privateConstructorUsedError;
 
@@ -43,6 +44,7 @@ abstract class $GameSessionDataCopyWith<$Res> {
     String gameId,
     String socketId,
     bool isHost,
+    String gameRoomHostId,
     String gameName,
     String gameDescription,
   });
@@ -67,6 +69,7 @@ class _$GameSessionDataCopyWithImpl<$Res, $Val extends GameSessionData>
     Object? gameId = null,
     Object? socketId = null,
     Object? isHost = null,
+    Object? gameRoomHostId = null,
     Object? gameName = null,
     Object? gameDescription = null,
   }) {
@@ -88,6 +91,10 @@ class _$GameSessionDataCopyWithImpl<$Res, $Val extends GameSessionData>
                 ? _value.isHost
                 : isHost // ignore: cast_nullable_to_non_nullable
                       as bool,
+            gameRoomHostId: null == gameRoomHostId
+                ? _value.gameRoomHostId
+                : gameRoomHostId // ignore: cast_nullable_to_non_nullable
+                      as String,
             gameName: null == gameName
                 ? _value.gameName
                 : gameName // ignore: cast_nullable_to_non_nullable
@@ -116,6 +123,7 @@ abstract class _$$GameSessionDataImplCopyWith<$Res>
     String gameId,
     String socketId,
     bool isHost,
+    String gameRoomHostId,
     String gameName,
     String gameDescription,
   });
@@ -139,6 +147,7 @@ class __$$GameSessionDataImplCopyWithImpl<$Res>
     Object? gameId = null,
     Object? socketId = null,
     Object? isHost = null,
+    Object? gameRoomHostId = null,
     Object? gameName = null,
     Object? gameDescription = null,
   }) {
@@ -160,6 +169,10 @@ class __$$GameSessionDataImplCopyWithImpl<$Res>
             ? _value.isHost
             : isHost // ignore: cast_nullable_to_non_nullable
                   as bool,
+        gameRoomHostId: null == gameRoomHostId
+            ? _value.gameRoomHostId
+            : gameRoomHostId // ignore: cast_nullable_to_non_nullable
+                  as String,
         gameName: null == gameName
             ? _value.gameName
             : gameName // ignore: cast_nullable_to_non_nullable
@@ -181,6 +194,7 @@ class _$GameSessionDataImpl implements _GameSessionData {
     required this.gameId,
     required this.socketId,
     this.isHost = false,
+    this.gameRoomHostId = '',
     required this.gameName,
     required this.gameDescription,
   });
@@ -195,13 +209,16 @@ class _$GameSessionDataImpl implements _GameSessionData {
   @JsonKey()
   final bool isHost;
   @override
+  @JsonKey()
+  final String gameRoomHostId;
+  @override
   final String gameName;
   @override
   final String gameDescription;
 
   @override
   String toString() {
-    return 'GameSessionData(roomId: $roomId, gameId: $gameId, socketId: $socketId, isHost: $isHost, gameName: $gameName, gameDescription: $gameDescription)';
+    return 'GameSessionData(roomId: $roomId, gameId: $gameId, socketId: $socketId, isHost: $isHost, gameRoomHostId: $gameRoomHostId, gameName: $gameName, gameDescription: $gameDescription)';
   }
 
   @override
@@ -214,6 +231,8 @@ class _$GameSessionDataImpl implements _GameSessionData {
             (identical(other.socketId, socketId) ||
                 other.socketId == socketId) &&
             (identical(other.isHost, isHost) || other.isHost == isHost) &&
+            (identical(other.gameRoomHostId, gameRoomHostId) ||
+                other.gameRoomHostId == gameRoomHostId) &&
             (identical(other.gameName, gameName) ||
                 other.gameName == gameName) &&
             (identical(other.gameDescription, gameDescription) ||
@@ -227,6 +246,7 @@ class _$GameSessionDataImpl implements _GameSessionData {
     gameId,
     socketId,
     isHost,
+    gameRoomHostId,
     gameName,
     gameDescription,
   );
@@ -249,6 +269,7 @@ abstract class _GameSessionData implements GameSessionData {
     required final String gameId,
     required final String socketId,
     final bool isHost,
+    final String gameRoomHostId,
     required final String gameName,
     required final String gameDescription,
   }) = _$GameSessionDataImpl;
@@ -261,6 +282,8 @@ abstract class _GameSessionData implements GameSessionData {
   String get socketId;
   @override
   bool get isHost;
+  @override
+  String get gameRoomHostId;
   @override
   String get gameName;
   @override

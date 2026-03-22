@@ -18,7 +18,7 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$ItemDroppedEvent {
   String get roomId => throw _privateConstructorUsedError;
-  String get playerId => throw _privateConstructorUsedError;
+  String? get playerId => throw _privateConstructorUsedError;
   GameItem get item => throw _privateConstructorUsedError;
   GameBoardPosition get coords => throw _privateConstructorUsedError;
 
@@ -38,7 +38,7 @@ abstract class $ItemDroppedEventCopyWith<$Res> {
   @useResult
   $Res call({
     String roomId,
-    String playerId,
+    String? playerId,
     GameItem item,
     GameBoardPosition coords,
   });
@@ -63,7 +63,7 @@ class _$ItemDroppedEventCopyWithImpl<$Res, $Val extends ItemDroppedEvent>
   @override
   $Res call({
     Object? roomId = null,
-    Object? playerId = null,
+    Object? playerId = freezed,
     Object? item = null,
     Object? coords = null,
   }) {
@@ -73,10 +73,10 @@ class _$ItemDroppedEventCopyWithImpl<$Res, $Val extends ItemDroppedEvent>
                 ? _value.roomId
                 : roomId // ignore: cast_nullable_to_non_nullable
                       as String,
-            playerId: null == playerId
+            playerId: freezed == playerId
                 ? _value.playerId
                 : playerId // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             item: null == item
                 ? _value.item
                 : item // ignore: cast_nullable_to_non_nullable
@@ -122,7 +122,7 @@ abstract class _$$ItemDroppedEventImplCopyWith<$Res>
   @useResult
   $Res call({
     String roomId,
-    String playerId,
+    String? playerId,
     GameItem item,
     GameBoardPosition coords,
   });
@@ -148,7 +148,7 @@ class __$$ItemDroppedEventImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? roomId = null,
-    Object? playerId = null,
+    Object? playerId = freezed,
     Object? item = null,
     Object? coords = null,
   }) {
@@ -158,10 +158,10 @@ class __$$ItemDroppedEventImplCopyWithImpl<$Res>
             ? _value.roomId
             : roomId // ignore: cast_nullable_to_non_nullable
                   as String,
-        playerId: null == playerId
+        playerId: freezed == playerId
             ? _value.playerId
             : playerId // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         item: null == item
             ? _value.item
             : item // ignore: cast_nullable_to_non_nullable
@@ -188,7 +188,7 @@ class _$ItemDroppedEventImpl implements _ItemDroppedEvent {
   @override
   final String roomId;
   @override
-  final String playerId;
+  final String? playerId;
   @override
   final GameItem item;
   @override
@@ -229,7 +229,7 @@ class _$ItemDroppedEventImpl implements _ItemDroppedEvent {
 abstract class _ItemDroppedEvent implements ItemDroppedEvent {
   const factory _ItemDroppedEvent({
     required final String roomId,
-    required final String playerId,
+    required final String? playerId,
     required final GameItem item,
     required final GameBoardPosition coords,
   }) = _$ItemDroppedEventImpl;
@@ -237,7 +237,7 @@ abstract class _ItemDroppedEvent implements ItemDroppedEvent {
   @override
   String get roomId;
   @override
-  String get playerId;
+  String? get playerId;
   @override
   GameItem get item;
   @override

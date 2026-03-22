@@ -17,9 +17,6 @@ import 'character_creation_use_case_module.dart';
 import 'character_creation_view_model_module.dart';
 
 void registerCharacterCreationRoot(GetIt getIt) {
-  getIt.registerLazySingleton<CharacterCreationSocket>(
-    () => CharacterCreationSocket(socketService: getIt<SocketService>()),
-  );
   getIt.registerLazySingleton<CharacterCreationEventBus>(
     () => CharacterCreationEventBus(getIt<EventBus>()),
   );
@@ -44,6 +41,10 @@ void registerCharacterCreationScope(
   required String socketId,
   required CharacterCreationEntryMode entryMode,
 }) {
+  scope.registerSingleton<CharacterCreationSocket>(
+    CharacterCreationSocket(socketService: rootGetIt<SocketService>()),
+    dispose: (socket) => socket.dispose(),
+  );
   registerCharacterCreationRepositories(scope, rootGetIt, roomCode: roomCode);
   registerCharacterCreationProjections(scope, rootGetIt);
   registerCharacterCreationSideEffects(scope, rootGetIt);

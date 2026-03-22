@@ -28,9 +28,6 @@ import 'waiting_room_use_case_module.dart';
 import 'waiting_room_view_model_module.dart';
 
 void registerWaitingRoomRoot(GetIt getIt) {
-  getIt.registerLazySingleton<WaitingRoomSocket>(
-    () => WaitingRoomSocket(socketService: getIt<SocketService>()),
-  );
   getIt.registerLazySingleton<WaitingRoomEventBus>(
     () => WaitingRoomEventBus(getIt<EventBus>()),
   );
@@ -53,6 +50,10 @@ void registerWaitingRoomScope(
   GetIt rootGetIt, {
   required WaitingRoomEntryData entryData,
 }) {
+  scope.registerSingleton<WaitingRoomSocket>(
+    WaitingRoomSocket(socketService: rootGetIt<SocketService>()),
+    dispose: (socket) => socket.dispose(),
+  );
   scope.registerLazySingleton<WaitingRoomEntryData>(() => entryData);
   final (roomId, hostId, socketId) = (
     entryData.roomId,
@@ -80,6 +81,7 @@ void registerWaitingRoomScope(
     roomId: roomId,
     hostId: hostId,
     socketId: socketId,
+    entryData: entryData,
     initialRoom: initialRoom,
   );
   registerWaitingRoomUseCases(scope, rootGetIt);

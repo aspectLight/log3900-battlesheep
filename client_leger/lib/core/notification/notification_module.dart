@@ -6,6 +6,7 @@ import '../../features/character_creation/presentation/widgets/character_creatio
 import '../../features/game_session/presentation/widgets/combat_started_notification/combat_started_notification_widget.dart';
 import '../../features/game_session/presentation/widgets/end_combat_notification/end_combat_notification_widget.dart';
 import '../../features/game_session/presentation/widgets/game_abandoned_notification/game_abandoned_notification_widget.dart';
+import '../../features/game_session/presentation/widgets/game_canceled_notification/game_canceled_notification_widget.dart';
 import '../../features/game_session/presentation/widgets/game_finish_notification/game_finish_notification_widget.dart';
 import '../../features/game_session/presentation/widgets/game_inventory_full_discard_notification/game_inventory_full_discard_notification_widget.dart';
 import '../../features/game_session/presentation/widgets/game_turn_notification/game_turn_notification_widget.dart';
@@ -41,6 +42,10 @@ void registerNotificationModule(GetIt getIt) {
   registry.register<GameAbandonedNotificationIntent>(
     (c, intent, onDismiss) =>
         GameAbandonedNotificationWidget(intent: intent, onDismiss: onDismiss),
+  );
+  registry.register<GameCanceledNotificationIntent>(
+    (c, intent, onDismiss) =>
+        GameCanceledNotificationWidget(intent: intent, onDismiss: onDismiss),
   );
   registry.register<CombatStartedNotificationIntent>(
     (c, intent, onDismiss) => CombatStartedNotificationWidget(

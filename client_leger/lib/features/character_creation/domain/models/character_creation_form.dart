@@ -11,7 +11,7 @@ class CharacterCreationForm with _$CharacterCreationForm {
     @Default(4) int health,
     @Default(4) int speed,
     @Default(4) int attackDice,
-    @Default(4) int defenseDice,
+    @Default(6) int defenseDice,
   }) = _CharacterCreationForm;
 
   factory CharacterCreationForm.initial() => const CharacterCreationForm();

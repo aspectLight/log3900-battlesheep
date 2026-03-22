@@ -140,19 +140,39 @@ class EndCombatResultDto {
       _$EndCombatResultDtoFromJson(json);
 
   factory EndCombatResultDto.fromObject(dynamic data) {
-    if (data is List && data.length >= 3) {
-      return EndCombatResultDto(
-        winnerId: data[0] as String,
-        loserId: data[1] as String,
-        isByFlight: data[2] as bool,
-      );
+    String parseId(Object? v) => v?.toString() ?? '';
+
+    bool parseBool(Object? v) {
+      if (v is bool) return v;
+      if (v is num) return v != 0;
+      if (v is String) {
+        final s = v.toLowerCase();
+        return s == 'true' || s == '1';
+      }
+      return false;
+    }
+
+    if (data is List) {
+      if (data.length >= 3) {
+        return EndCombatResultDto(
+          winnerId: parseId(data[0]),
+          loserId: parseId(data[1]),
+          isByFlight: parseBool(data[2]),
+        );
+      }
+      if (data.length == 2) {
+        return EndCombatResultDto(
+          winnerId: parseId(data[0]),
+          loserId: parseId(data[1]),
+          isByFlight: false,
+        );
+      }
     }
     if (data is Map<String, dynamic>) {
       return EndCombatResultDto.fromJson(data);
     }
-    final winnerId = data?.toString() ?? '';
     return EndCombatResultDto(
-      winnerId: winnerId,
+      winnerId: parseId(data),
       loserId: '',
       isByFlight: false,
     );

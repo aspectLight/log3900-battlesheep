@@ -4,6 +4,7 @@ import 'package:fpdart/fpdart.dart';
 
 import '../../../../core/services/socket_service.dart';
 import '../../core/exceptions/reserve_character_failure.dart';
+import '../../../../core/helpers/replay_latest_broadcast_controller.dart';
 import '../../domain/commands/get_reserved_characters_command.dart';
 import '../../core/helpers/reserve_character_failure_mapper.dart';
 import '../../domain/commands/create_character_commands.dart';
@@ -31,7 +32,8 @@ class CharacterCreationSocket {
   StreamSubscription<Object?>? _updateCharacterReservedSub;
 
   final _reservedCharactersController =
-      StreamController<UpdateCharacterReservedPayloadDto>.broadcast();
+      ReplayLatestBroadcastController<UpdateCharacterReservedPayloadDto>();
+  int _reservedUpdateSeq = 0;
 
   Stream<UpdateCharacterReservedPayloadDto> get reservedCharactersPayloadStream =>
       _reservedCharactersController.stream;
@@ -46,6 +48,7 @@ class CharacterCreationSocket {
         .listen((data) {
           final payload = UpdateCharacterReservedPayloadDto.fromObject(data);
           if (!_reservedCharactersController.isClosed) {
+            _reservedUpdateSeq++;
             _reservedCharactersController.add(payload);
           }
         });
@@ -71,14 +74,13 @@ class CharacterCreationSocket {
   Future<List<ReservedCharacterEvent>> fetchReservedCharacters(
     GetReservedCharactersCommand command,
   ) {
-    final future = _socketService
-        .on<Object?>(CharacterCreationSocketEvents.updateAvatarReserved)
-        .map((data) =>
-            UpdateCharacterReservedPayloadDto.fromObject(data)
-                .toReservedCharacterEventList())
-        .first;
+    final beforeSeq = _reservedUpdateSeq;
     requestReservedCharacters(command);
-    return future;
+
+    return reservedCharactersPayloadStream
+        .skipWhile((_) => _reservedUpdateSeq == beforeSeq)
+        .map((payload) => payload.toReservedCharacterEventList())
+        .first;
   }
 
   Future<String> generateRoomCode() async {

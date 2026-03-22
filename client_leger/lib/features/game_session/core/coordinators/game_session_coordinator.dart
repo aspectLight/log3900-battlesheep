@@ -60,6 +60,12 @@ class GameSessionCoordinator
   @override
   void onScopeCreated(GetIt scope) {
     gameSessionScopeHolder.setScope(scope);
+    appTransitionEventBus.fire(const GameSessionCompletedAppEvent());
+  }
+
+  @override
+  void onScopeDropped() {
+    gameSessionScopeHolder.clearScope();
   }
 
   @override
@@ -73,7 +79,6 @@ class GameSessionCoordinator
         :final gameDescription,
       ):
         appNavigator.request(GoToGameLoading());
-        appTransitionEventBus.fire(const GameSessionCompletedAppEvent());
         return GameSessionData(
           roomId: roomId,
           gameId: gameId,
@@ -86,16 +91,17 @@ class GameSessionCoordinator
         :final gameId,
         :final socketId,
         :final isHost,
+        :final gameRoomHostId,
         :final gameName,
         :final gameDescription,
       ):
         appNavigator.request(GoToGameLoading());
-        appTransitionEventBus.fire(const GameSessionCompletedAppEvent());
         return GameSessionData(
           roomId: roomId,
           gameId: gameId,
           socketId: socketId,
           isHost: isHost,
+          gameRoomHostId: gameRoomHostId,
           gameName: gameName,
           gameDescription: gameDescription,
         );
@@ -112,6 +118,7 @@ class GameSessionCoordinator
   ) async {
     final scope = featureScope;
     if (scope == null) return;
+    if (scope.isRegistered<GameSessionData>()) return;
     scope.registerLazySingleton<GameSessionData>(() => data);
     final game = await gameService.getGame(data.gameId);
     scope.registerLazySingleton<Game>(() => game);
@@ -121,15 +128,20 @@ class GameSessionCoordinator
         reducer: _gameMetadataStateReducer,
         roomId: data.roomId,
         isCTF: game.isCTF,
-        initialHostId: data.isHost ? data.socketId : '',
+        initialHostId: data.gameRoomHostId.isNotEmpty
+            ? data.gameRoomHostId
+            : (data.isHost ? data.socketId : ''),
       ),
     );
+    final shouldEmitPlayGame = data.gameRoomHostId.isNotEmpty
+        ? data.socketId == data.gameRoomHostId
+        : data.isHost;
     registerGameSessionScope(
       scope,
       getIt,
       roomId: data.roomId,
       socketId: data.socketId,
-      isHost: data.isHost,
+      isHost: shouldEmitPlayGame,
     );
     final modeStr = game.isCTF ? 'CTF' : 'Classique';
     final startDate = await _gameHistoryRepository.startGameHistory(modeStr);
@@ -139,7 +151,7 @@ class GameSessionCoordinator
     bootstrapGameSessionScope(
       scope,
       roomId: data.roomId,
-      isHost: data.isHost,
+      isHost: shouldEmitPlayGame,
     );
     appTransitionEventBus.fire(const GameSessionEntryAppEvent.loaded());
   }
@@ -169,7 +181,6 @@ class GameSessionCoordinator
       }
     }
     notificationCoordinator.clearScopeEntries();
-    gameSessionScopeHolder.clearScope();
     switch (event) {
       case GameFinishedEvent(:final roomId, :final isCTF):
         appTransitionEventBus.fire(

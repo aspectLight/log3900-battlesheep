@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import '../../../../core/app_transition/app_transition_bus.dart';
 import '../../../../core/app_transition/auto_scope_coordinator.dart';
 import '../../../../core/connected_scope/session_scope_manager.dart';
+import '../../../../core/services/socket_service.dart';
 import '../../../../routing/app_navigator.dart';
 import '../../../../routing/navigation_command.dart';
 import '../../data/models/extensions/statistics_dto_extensions.dart';
@@ -25,8 +26,7 @@ class StatisticsCoordinator
     required this.statisticsScopeHolder,
     required this.appNavigator,
     required this.appTransitionEventBus,
-    required StatisticsSocket statisticsSocket,
-  }) : _statisticsSocket = statisticsSocket;
+  });
 
   final GetIt getIt;
   @override
@@ -34,7 +34,6 @@ class StatisticsCoordinator
   final StatisticsScopeHolder statisticsScopeHolder;
   final AppNavigator appNavigator;
   final AppTransitionEventBus appTransitionEventBus;
-  final StatisticsSocket _statisticsSocket;
 
   @override
   final String scopeName = 'statistics';
@@ -54,15 +53,22 @@ class StatisticsCoordinator
   @override
   Future<StatisticsData?> onEntryImpl(StatisticsEntryAppEvent event) async {
     if (event is! StatisticsRequested) return null;
-    _statisticsSocket.getStatistics(event.roomId);
-    final dto = await _statisticsSocket.statisticsResponseStream.first;
-    appNavigator.request(GoToStatistics());
-    appTransitionEventBus.fire(const StatisticsCompletedAppEvent());
-    return StatisticsData(
-      roomId: event.roomId,
-      initialData: dto.toEntity(),
-      isCTF: event.isCTF,
+    final statisticsSocket = StatisticsSocket(
+      socketService: getIt<SocketService>(),
     );
+    statisticsSocket.getStatistics(event.roomId);
+    try {
+      final dto = await statisticsSocket.statisticsResponseStream.first;
+      appNavigator.request(GoToStatistics());
+      appTransitionEventBus.fire(const StatisticsCompletedAppEvent());
+      return StatisticsData(
+        roomId: event.roomId,
+        initialData: dto.toEntity(),
+        isCTF: event.isCTF,
+      );
+    } finally {
+      await statisticsSocket.dispose();
+    }
   }
 
   @override

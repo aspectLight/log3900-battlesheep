@@ -25,6 +25,9 @@ class ChatSocket {
     _connectionSub = _socketService.connectionStream.listen((connected) {
       if (connected) _setupChatListeners();
     });
+    if (_socketService.isConnected) {
+      _setupChatListeners();
+    }
   }
 
   Stream<bool> get connectionStream => _socketService.connectionStream;

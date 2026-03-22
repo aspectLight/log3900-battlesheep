@@ -9,6 +9,7 @@ import '../../../../../core/constants/ui_assets.dart';
 import '../../../../../core/enums/character.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
 import '../../../core/constants/character_creation_constants.dart';
+import '../../../core/helpers/character_creation_form_validator.dart';
 import '../../../core/context/character_creation_scope_holder.dart';
 import '../../../core/localisation/character_creation_localizations.dart';
 import 'character_creation_view_model.dart';
@@ -242,9 +243,11 @@ class _CharacterGrid extends StatelessWidget {
               ),
               child: Watch((context) {
                 final characters = viewModel.charactersForGrid;
-                final selectedId = viewModel.form.value.selectedCharacterId
-                    .fold(() => '', (id) => id);
-                final _ = viewModel.reservedCharacters.value;
+                final state = viewModel.creationState.value;
+                final selectedId = state.form.selectedCharacterId.fold(
+                  () => '',
+                  (id) => id,
+                );
                 return Scrollbar(
                   controller: scrollController,
                   thumbVisibility: true,
@@ -362,7 +365,8 @@ class _CenterColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = CharacterCreationLocalizations.of(context)!;
     return Watch((context) {
-      final selectedCharacterId = viewModel.form.value.selectedCharacterId;
+      final form = viewModel.creationState.value.form;
+      final selectedCharacterId = form.selectedCharacterId;
       final character = selectedCharacterId.fold(() => null, Character.fromId);
       final characterName = character == null
           ? l10n.chooseCharacterPlaceholder
@@ -370,16 +374,10 @@ class _CenterColumn extends StatelessWidget {
       final avatarPath = character == null
           ? UiAssets.characterCreationEmptyPortrait
           : CharacterAssets.characterAvatarFullPath(character);
-      final healthPreview = character == null
-          ? 0
-          : viewModel.previewHealth.value;
-      final speedPreview = character == null ? 0 : viewModel.previewSpeed.value;
-      final attackPreview = character == null
-          ? 0
-          : viewModel.previewAttack.value;
-      final defensePreview = character == null
-          ? 0
-          : viewModel.previewDefense.value;
+      final healthPreview = form.health;
+      final speedPreview = form.speed;
+      final attackPreview = form.attackDice;
+      final defensePreview = form.defenseDice;
       return SizedBox(
         width: 300,
         child: Column(
@@ -617,73 +615,68 @@ class _BonusSection extends StatelessWidget {
                 ),
               ],
             ),
-            child: Column(
-              children: [
-                Watch((context) {
-                  final value = viewModel.previewHealth.value;
-                  return _StatRow(
+            child: Watch((context) {
+              final form = viewModel.creationState.value.form;
+              final hasDicePair =
+                  CharacterCreationFormValidator.hasValidDicePairing(form);
+              return Column(
+                children: [
+                  _StatRow(
                     label: l10n.statHealth,
                     description: l10n.statHealthDescription,
-                    value: value,
+                    value: form.health,
                     isSelected:
-                        value == CharacterCreationConstants.statWithBonusValue,
+                        CharacterCreationFormValidator.isHealthBonusChoiceActive(
+                          form,
+                        ),
                     onTap: viewModel.selectHealthBonus,
-                  );
-                }),
-                const SizedBox(height: 20),
-                Watch((context) {
-                  final value = viewModel.previewSpeed.value;
-                  return _StatRow(
+                  ),
+                  const SizedBox(height: 20),
+                  _StatRow(
                     label: l10n.statSpeed,
                     description: l10n.statSpeedDescription,
-                    value: value,
+                    value: form.speed,
                     isSelected:
-                        value == CharacterCreationConstants.statWithBonusValue,
+                        CharacterCreationFormValidator.isSpeedBonusChoiceActive(
+                          form,
+                        ),
                     onTap: viewModel.selectSpeedBonus,
-                  );
-                }),
-                const SizedBox(height: 20),
-                Watch((context) {
-                  final value = viewModel.previewAttack.value;
-                  final hasSelection = viewModel.hasSelectedDice.value;
-                  return _DiceRow(
+                  ),
+                  const SizedBox(height: 20),
+                  _DiceRow(
                     label: l10n.statAttack,
                     description: l10n.statAttackDescription,
-                    value: value,
-                    isD4Selected: hasSelection &&
-                        value == CharacterCreationConstants.d4Value,
-                    isD6Selected: hasSelection &&
-                        value == CharacterCreationConstants.d6Value,
+                    value: form.attackDice,
+                    isD4Selected: hasDicePair &&
+                        form.attackDice == CharacterCreationConstants.d4Value,
+                    isD6Selected: hasDicePair &&
+                        form.attackDice == CharacterCreationConstants.d6Value,
                     onSelectD4: () => viewModel.selectAttackDice(
                       CharacterCreationConstants.d4Value,
                     ),
                     onSelectD6: () => viewModel.selectAttackDice(
                       CharacterCreationConstants.d6Value,
                     ),
-                  );
-                }),
-                const SizedBox(height: 20),
-                Watch((context) {
-                  final value = viewModel.previewDefense.value;
-                  final hasSelection = viewModel.hasSelectedDice.value;
-                  return _DiceRow(
+                  ),
+                  const SizedBox(height: 20),
+                  _DiceRow(
                     label: l10n.statDefense,
                     description: l10n.statDefenseDescription,
-                    value: value,
-                    isD4Selected: hasSelection &&
-                        value == CharacterCreationConstants.d4Value,
-                    isD6Selected: hasSelection &&
-                        value == CharacterCreationConstants.d6Value,
+                    value: form.defenseDice,
+                    isD4Selected: hasDicePair &&
+                        form.defenseDice == CharacterCreationConstants.d4Value,
+                    isD6Selected: hasDicePair &&
+                        form.defenseDice == CharacterCreationConstants.d6Value,
                     onSelectD4: () => viewModel.selectDefenseDice(
                       CharacterCreationConstants.d4Value,
                     ),
                     onSelectD6: () => viewModel.selectDefenseDice(
                       CharacterCreationConstants.d6Value,
                     ),
-                  );
-                }),
-              ],
-            ),
+                  ),
+                ],
+              );
+            }),
           ),
         ],
       ),

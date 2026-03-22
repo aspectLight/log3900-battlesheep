@@ -6,8 +6,8 @@ import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
-import '../../../../../core/enums/avatar.dart';
-import '../../../../../core/constants/avatar_assets.dart';
+import '../../../../../core/constants/auth_avatar_assets.dart';
+import '../../../../../core/enums/auth_avatar.dart';
 import '../../../core/localisation/profile_localizations.dart';
 import '../../../core/extensions/profile_failure_ext.dart';
 import '../../../domain/commands/profile_commands.dart';
@@ -287,7 +287,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildAvatarGrid(String selectedAvatarId) {
-    const avatars = Avatar.values;
+    const avatars = AuthAvatar.values;
     const crossAxisCount = 4;
     final rows = <Widget>[];
     for (var i = 0; i < avatars.length; i += crossAxisCount) {
@@ -295,7 +295,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           avatars.skip(i).take(crossAxisCount).toList();
       rows.add(
         Row(
-          children: rowAvatars.map((Avatar avatar) {
+          children: rowAvatars.map((AuthAvatar avatar) {
             final id = avatar.id;
             final isSelected = selectedAvatarId == id;
             return Expanded(
@@ -329,7 +329,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(6),
                         child: Image.asset(
-                          AvatarAssets.avatarPath(avatar),
+                          AuthAvatarAssets.assetPath(avatar),
                           fit: BoxFit.contain,
                         ),
                       ),

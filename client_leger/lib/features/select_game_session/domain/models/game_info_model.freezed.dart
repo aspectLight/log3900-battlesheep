@@ -22,6 +22,8 @@ mixin _$GameModelInfo {
   String get description => throw _privateConstructorUsedError;
   GameMode get mode => throw _privateConstructorUsedError;
   int get boardSize => throw _privateConstructorUsedError;
+  List<List<GameBoardPreviewCell>> get boardMatrix =>
+      throw _privateConstructorUsedError;
   bool get isVisible => throw _privateConstructorUsedError;
   String get lastModified => throw _privateConstructorUsedError;
 
@@ -45,6 +47,7 @@ abstract class $GameModelInfoCopyWith<$Res> {
     String description,
     GameMode mode,
     int boardSize,
+    List<List<GameBoardPreviewCell>> boardMatrix,
     bool isVisible,
     String lastModified,
   });
@@ -70,6 +73,7 @@ class _$GameModelInfoCopyWithImpl<$Res, $Val extends GameModelInfo>
     Object? description = null,
     Object? mode = null,
     Object? boardSize = null,
+    Object? boardMatrix = null,
     Object? isVisible = null,
     Object? lastModified = null,
   }) {
@@ -95,6 +99,10 @@ class _$GameModelInfoCopyWithImpl<$Res, $Val extends GameModelInfo>
                 ? _value.boardSize
                 : boardSize // ignore: cast_nullable_to_non_nullable
                       as int,
+            boardMatrix: null == boardMatrix
+                ? _value.boardMatrix
+                : boardMatrix // ignore: cast_nullable_to_non_nullable
+                      as List<List<GameBoardPreviewCell>>,
             isVisible: null == isVisible
                 ? _value.isVisible
                 : isVisible // ignore: cast_nullable_to_non_nullable
@@ -124,6 +132,7 @@ abstract class _$$GameModelInfoImplCopyWith<$Res>
     String description,
     GameMode mode,
     int boardSize,
+    List<List<GameBoardPreviewCell>> boardMatrix,
     bool isVisible,
     String lastModified,
   });
@@ -148,6 +157,7 @@ class __$$GameModelInfoImplCopyWithImpl<$Res>
     Object? description = null,
     Object? mode = null,
     Object? boardSize = null,
+    Object? boardMatrix = null,
     Object? isVisible = null,
     Object? lastModified = null,
   }) {
@@ -173,6 +183,10 @@ class __$$GameModelInfoImplCopyWithImpl<$Res>
             ? _value.boardSize
             : boardSize // ignore: cast_nullable_to_non_nullable
                   as int,
+        boardMatrix: null == boardMatrix
+            ? _value._boardMatrix
+            : boardMatrix // ignore: cast_nullable_to_non_nullable
+                  as List<List<GameBoardPreviewCell>>,
         isVisible: null == isVisible
             ? _value.isVisible
             : isVisible // ignore: cast_nullable_to_non_nullable
@@ -195,9 +209,10 @@ class _$GameModelInfoImpl implements _GameModelInfo {
     required this.description,
     required this.mode,
     required this.boardSize,
+    required final List<List<GameBoardPreviewCell>> boardMatrix,
     required this.isVisible,
     required this.lastModified,
-  });
+  }) : _boardMatrix = boardMatrix;
 
   @override
   final String id;
@@ -209,6 +224,14 @@ class _$GameModelInfoImpl implements _GameModelInfo {
   final GameMode mode;
   @override
   final int boardSize;
+  final List<List<GameBoardPreviewCell>> _boardMatrix;
+  @override
+  List<List<GameBoardPreviewCell>> get boardMatrix {
+    if (_boardMatrix is EqualUnmodifiableListView) return _boardMatrix;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_boardMatrix);
+  }
+
   @override
   final bool isVisible;
   @override
@@ -216,7 +239,7 @@ class _$GameModelInfoImpl implements _GameModelInfo {
 
   @override
   String toString() {
-    return 'GameModelInfo(id: $id, name: $name, description: $description, mode: $mode, boardSize: $boardSize, isVisible: $isVisible, lastModified: $lastModified)';
+    return 'GameModelInfo(id: $id, name: $name, description: $description, mode: $mode, boardSize: $boardSize, boardMatrix: $boardMatrix, isVisible: $isVisible, lastModified: $lastModified)';
   }
 
   @override
@@ -231,6 +254,10 @@ class _$GameModelInfoImpl implements _GameModelInfo {
             (identical(other.mode, mode) || other.mode == mode) &&
             (identical(other.boardSize, boardSize) ||
                 other.boardSize == boardSize) &&
+            const DeepCollectionEquality().equals(
+              other._boardMatrix,
+              _boardMatrix,
+            ) &&
             (identical(other.isVisible, isVisible) ||
                 other.isVisible == isVisible) &&
             (identical(other.lastModified, lastModified) ||
@@ -245,6 +272,7 @@ class _$GameModelInfoImpl implements _GameModelInfo {
     description,
     mode,
     boardSize,
+    const DeepCollectionEquality().hash(_boardMatrix),
     isVisible,
     lastModified,
   );
@@ -265,6 +293,7 @@ abstract class _GameModelInfo implements GameModelInfo {
     required final String description,
     required final GameMode mode,
     required final int boardSize,
+    required final List<List<GameBoardPreviewCell>> boardMatrix,
     required final bool isVisible,
     required final String lastModified,
   }) = _$GameModelInfoImpl;
@@ -279,6 +308,8 @@ abstract class _GameModelInfo implements GameModelInfo {
   GameMode get mode;
   @override
   int get boardSize;
+  @override
+  List<List<GameBoardPreviewCell>> get boardMatrix;
   @override
   bool get isVisible;
   @override

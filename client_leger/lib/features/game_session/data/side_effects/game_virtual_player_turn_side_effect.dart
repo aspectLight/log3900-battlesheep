@@ -1,9 +1,7 @@
-import 'package:fpdart/fpdart.dart';
-
 import '../../domain/events/game_events.dart';
 import '../../domain/state/game_session_state.dart';
-import '../../../../core/interfaces/disposable_side_effect.dart';
 import '../../domain/commands/game_action_commands.dart';
+import '../../../../core/interfaces/disposable_side_effect.dart';
 import '../../data/repositories/game_actions_repository.dart';
 import '../../data/repositories/game_metadata_repository.dart';
 import '../../data/repositories/game_player_repository.dart';
@@ -40,17 +38,20 @@ class GameVirtualPlayerTurnSideEffect with DisposableSideEffect {
     final metadata = _metadataRepository.state.value;
     if (metadata is! GameSessionActive) return;
     if (_socketId != metadata.hostId) return;
+    final playerState = _playerRepository.state.value;
+    if (playerState.players.isEmpty) return;
+    final knownPlayer = playerState.findById(event.nextPlayerId).isSome();
+    if (!knownPlayer) {
+      _actionsRepository.forwardTurn(ForwardTurnCommand(roomId: _roomId));
+      return;
+    }
     if (!event.isNextPlayerVirtual) {
       return;
     }
-    final playerId = _playerRepository.state.value
-        .findById(event.nextPlayerId)
-        .map((p) => p.id)
-        .getOrElse(() => event.nextPlayerId);
     _actionsRepository.runVirtualPlayerTurn(
       VirtualPlayerTurnCommand(
         roomId: _roomId,
-        playerId: playerId,
+        playerId: event.nextPlayerId,
         isCTF: metadata.isCTF,
         skipTimeout: false,
       ),

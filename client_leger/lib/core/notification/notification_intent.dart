@@ -30,12 +30,16 @@ class FinishGameNotificationIntent extends NotificationIntent {
   bool get persistOnExit => true;
 
   final String winnerId;
+  final String winnerName;
+  final String winnerTeamName;
   final bool isCTF;
   final String currentUserSocketId;
   final void Function()? onComplete;
 
   const FinishGameNotificationIntent({
     required this.winnerId,
+    required this.winnerName,
+    required this.winnerTeamName,
     required this.isCTF,
     required this.currentUserSocketId,
     this.onComplete,
@@ -49,6 +53,15 @@ class GameAbandonedNotificationIntent extends NotificationIntent {
   final void Function()? onComplete;
 
   const GameAbandonedNotificationIntent({this.onComplete});
+}
+
+class GameCanceledNotificationIntent extends NotificationIntent {
+  @override
+  bool get persistOnExit => true;
+
+  final void Function()? onComplete;
+
+  const GameCanceledNotificationIntent({this.onComplete});
 }
 
 class CombatStartedNotificationIntent extends NotificationIntent {

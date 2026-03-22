@@ -46,6 +46,7 @@
   "notificationDefeatCtf": "Defeat! {winnerTeamName} captured the flag!",
   "notificationDefeatClassic": "Defeat! {winnerName} won three combats",
   "notificationGameAbandoned": "Game abandoned",
+  "notificationGameCanceled": "Game canceled",
   "notificationDisconnectAutomatic": "Automatic disconnect",
   "notificationTurnStart": "{playerName}'s turn ({seconds}s)",
   "playerHudMovements": "{count} Movements",

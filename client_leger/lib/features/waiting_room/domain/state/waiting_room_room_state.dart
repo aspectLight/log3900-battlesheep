@@ -10,8 +10,4 @@ class WaitingRoomRoomState with _$WaitingRoomRoomState {
     required WaitingRoomModel room,
     required String socketId,
   }) = _WaitingRoomRoomState;
-
-  const WaitingRoomRoomState._();
-
-  bool get isHost => socketId == room.hostId;
 }

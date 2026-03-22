@@ -1,17 +1,17 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
-import '../../../../../core/enums/avatar.dart';
+import '../../../../../core/enums/auth_avatar.dart';
 
 class AvatarPickerViewModel {
-  final selectedAvatar = signal<Option<Avatar>>(const Option.none());
+  final selectedAvatar = signal<Option<AuthAvatar>>(const Option.none());
 
-  List<Avatar> get avatars => Avatar.values;
+  List<AuthAvatar> get avatars => AuthAvatar.values;
 
-  bool isSelected(Avatar avatar) =>
+  bool isSelected(AuthAvatar avatar) =>
       selectedAvatar.value.fold(() => false, (s) => s == avatar);
 
-  void selectAvatar(Avatar avatar) {
+  void selectAvatar(AuthAvatar avatar) {
     selectedAvatar.value = Option.of(avatar);
   }
 

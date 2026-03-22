@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 
 import '../../../../core/app_transition/app_transition_bus.dart';
 import '../../../../core/notification/notification_coordinator.dart';
+import '../../../../core/notification/notification_intent_sink.dart';
 import '../../data/repositories/game_actions_repository.dart';
 import '../../data/repositories/game_board_interaction_repository.dart';
 import '../../data/repositories/game_board_repository.dart';
@@ -35,6 +36,7 @@ import '../../data/side_effects/game_turn_start_notification_side_effect.dart';
 import '../../data/side_effects/game_virtual_player_move_side_effect.dart';
 import '../../data/side_effects/game_virtual_player_turn_side_effect.dart';
 import '../../data/side_effects/game_win_condition_side_effect.dart';
+import '../context/game_session_scope_holder.dart';
 import '../event_bus/game_session_event_bus.dart';
 
 void registerGameSessionEventSideEffect(GetIt getIt) {
@@ -42,8 +44,11 @@ void registerGameSessionEventSideEffect(GetIt getIt) {
     () => GameSessionEventSideEffect(
       appTransitionEventBus: getIt<AppTransitionEventBus>(),
       gameSessionEventBus: getIt<GameSessionEventBus>(),
+      notificationIntentSink: getIt<NotificationIntentSink>(),
+      gameSessionScopeHolder: getIt<GameSessionScopeHolder>(),
     ),
   );
+  getIt.get<GameSessionEventSideEffect>();
 }
 
 void registerGameSideEffects(
@@ -189,6 +194,8 @@ void registerGameSideEffects(
       gameSessionEventBus: scope.get<GameSessionEventBus>(),
       notificationIntentSink: scope.get<NotificationCoordinator>(),
       appTransitionEventBus: rootGetIt.get<AppTransitionEventBus>(),
+      gameSessionScopeHolder: rootGetIt.get<GameSessionScopeHolder>(),
+      gamePlayerRepository: scope.get<GamePlayerRepository>(),
     ),
     dispose: (se) => se.dispose(),
   );
@@ -201,7 +208,6 @@ void registerGameSideEffects(
       actionsRepository: scope.get<GameActionsRepository>(),
       combatRepository: scope.get<GameCombatRepository>(),
       itemRepository: scope.get<GameItemRepository>(),
-      inventoryRepository: scope.get<GameInventoryRepository>(),
     ),
     dispose: (se) => se.dispose(),
   );

@@ -17,7 +17,7 @@ void registerChatRepositories(GetIt scope, GetIt rootGetIt) {
   );
   scope.registerLazySingleton<ChatRepository>(
     () => ChatRepository(
-      chatSocket: rootGetIt.get<ChatSocket>(),
+      chatSocket: scope.get<ChatSocket>(),
       reducer: rootGetIt.get<ChatStateReducer>(),
     ),
   );

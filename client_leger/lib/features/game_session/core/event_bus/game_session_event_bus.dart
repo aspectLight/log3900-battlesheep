@@ -29,7 +29,9 @@ class GameSessionScopeReady {
 }
 
 class GameSessionCanceled {
-  const GameSessionCanceled();
+  final String playerId;
+
+  const GameSessionCanceled({required this.playerId});
 }
 
 class GameSessionAbandoned {

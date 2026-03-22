@@ -8,7 +8,7 @@ void registerChatProjection(GetIt scope, GetIt rootGetIt) {
   scope.registerLazySingleton<ChatEventsProjection>(
     () => ChatEventsProjection(
       chatRepository: scope.get<ChatRepository>(),
-      chatSocket: rootGetIt.get<ChatSocket>(),
+      chatSocket: scope.get<ChatSocket>(),
     ),
   );
 }

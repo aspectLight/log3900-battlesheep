@@ -91,7 +91,7 @@ class ItemCollectedDto {
 @JsonSerializable()
 class ItemDroppedDto {
   final String roomId;
-  final String playerId;
+  final String? playerId;
   final GameItemDto item;
   final GameBoardPositionDto coords;
 

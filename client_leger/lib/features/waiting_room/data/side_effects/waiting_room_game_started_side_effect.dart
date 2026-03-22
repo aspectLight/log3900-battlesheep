@@ -29,6 +29,7 @@ class WaitingRoomGameStartedSideEffect with DisposableSideEffect {
   void _onGameRoomCreated(GameRoomCreatedPayloadDto payload) {
     final socketId = _sessionScopeManager.currentSession?.socketId;
     if (socketId == null) return;
+
     final isHost = payload.hostId == socketId;
     final (gameName, gameDescription) = switch (_entryData) {
       WaitingRoomHostEntryData(:final gameName, :final gameDescription) => (
@@ -46,6 +47,7 @@ class WaitingRoomGameStartedSideEffect with DisposableSideEffect {
         gameId: payload.gameId,
         socketId: socketId,
         isHost: isHost,
+        gameRoomHostId: payload.hostId,
         gameName: gameName,
         gameDescription: gameDescription,
       ),

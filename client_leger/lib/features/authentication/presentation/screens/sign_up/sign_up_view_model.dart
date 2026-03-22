@@ -3,7 +3,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../core/app_events/auth_events.dart';
 import '../../../core/enums/auth_validation_error.dart';
-import '../../../../../core/enums/avatar.dart';
+import '../../../../../core/enums/auth_avatar.dart';
 import '../../../../../core/app_transition/app_transition_bus.dart';
 import '../../../core/helpers/email_validator.dart';
 import '../../../core/helpers/password_validator.dart';
@@ -112,7 +112,7 @@ class SignUpViewModel {
     formState.value = formState.value.copyWith(confirmPassword: value);
   }
 
-  void selectAvatar(Avatar? value) {
+  void selectAvatar(AuthAvatar? value) {
     formState.value =
         formState.value.copyWith(avatar: Option.fromNullable(value));
   }

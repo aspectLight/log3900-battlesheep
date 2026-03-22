@@ -67,6 +67,26 @@ class _GameAbandonedNotificationWidgetState
               fontFamily: 'CustomFont',
             ),
           ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: 180,
+            child: ElevatedButton(
+              onPressed: () {
+                widget.intent.onComplete?.call();
+                widget.onDismiss();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 85, 0, 0),
+                foregroundColor: Colors.white,
+                shadowColor: Colors.transparent,
+                elevation: 0,
+                side: const BorderSide(color: Color.fromARGB(255, 127, 31, 31)),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                textStyle: const TextStyle(fontSize: 15, fontFamily: 'CustomFont'),
+              ),
+              child: Text(l10n.gameSessionInfoContinue),
+            ),
+          ),
         ],
       ),
     );

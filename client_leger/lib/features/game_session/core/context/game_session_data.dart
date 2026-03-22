@@ -9,6 +9,7 @@ class GameSessionData with _$GameSessionData {
     required String gameId,
     required String socketId,
     @Default(false) bool isHost,
+    @Default('') String gameRoomHostId,
     required String gameName,
     required String gameDescription,
   }) = _GameSessionData;
