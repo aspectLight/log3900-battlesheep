@@ -53,20 +53,20 @@ Option<TileOrientation> autotileOrientationForCell(
 int _cardinalBitmask(int x, int y, Board board, TileType type) {
   var mask = 0;
   final size = board.size;
-  if (y > 0 &&
-      _isSameCategoryForBitmask(type, board.matrix[x][y - 1].tile.type)) {
+  if (x > 0 &&
+      _isSameCategoryForBitmask(type, board.matrix[x - 1][y].tile.type)) {
     mask |= 1;
-  }
-  if (x < size - 1 &&
-      _isSameCategoryForBitmask(type, board.matrix[x + 1][y].tile.type)) {
-    mask |= 2;
   }
   if (y < size - 1 &&
       _isSameCategoryForBitmask(type, board.matrix[x][y + 1].tile.type)) {
+    mask |= 2;
+  }
+  if (x < size - 1 &&
+      _isSameCategoryForBitmask(type, board.matrix[x + 1][y].tile.type)) {
     mask |= 4;
   }
-  if (x > 0 &&
-      _isSameCategoryForBitmask(type, board.matrix[x - 1][y].tile.type)) {
+  if (y > 0 &&
+      _isSameCategoryForBitmask(type, board.matrix[x][y - 1].tile.type)) {
     mask |= 8;
   }
   return mask;
@@ -113,8 +113,7 @@ bool _isSameCategoryForBitmask(TileType cellType, TileType neighbourType) {
     return cellType == neighbourType;
   }
   if (_isWallCategory(cellType)) {
-    return _isWallCategory(neighbourType);
+    return _isWallCategory(neighbourType) || neighbourType == TileType.door;
   }
-  // Snow, tree, stone tiles don't participate in autotiling
   return false;
 }

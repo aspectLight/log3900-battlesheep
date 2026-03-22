@@ -2,9 +2,10 @@ import 'package:json_annotation/json_annotation.dart';
 
 import '../../../../../core/converters/board_character_converters.dart';
 import '../../../../../core/converters/stat_type_converters.dart';
+import '../../../../../core/helpers/socket_numeric_payload.dart';
+import '../../../core/constants/game_rules_constants.dart';
 import '../../../core/enums/board_character.dart';
 import '../../../core/enums/stat_type.dart';
-import '../../../core/constants/game_rules_constants.dart';
 import 'game_board_position_dto.dart';
 import 'game_item_dto.dart';
 
@@ -107,8 +108,12 @@ class SpawnedPlayerDto {
     final bonusStr = map['bonusChoice'] as String?;
     final diceChoice = d6Str != null
         ? statTypeConverter.fromJson(d6Str)
-        : (bonusStr != null ? statTypeConverter.fromJson(bonusStr) : StatType.health);
-    final d4Choice = d4Str != null ? statTypeConverter.fromJson(d4Str) : StatType.health;
+        : (bonusStr != null
+              ? statTypeConverter.fromJson(bonusStr)
+              : StatType.health);
+    final d4Choice = d4Str != null
+        ? statTypeConverter.fromJson(d4Str)
+        : StatType.health;
     final movementPointsRaw = map['movementPoints'];
     final int movementPoints = movementPointsRaw is int
         ? movementPointsRaw
@@ -137,7 +142,9 @@ class SpawnedPlayerDto {
   }
 
   static GameBoardPositionDto _readCoords(Object? value) {
-    if (value is! Map<String, dynamic>) return const GameBoardPositionDto(x: 0, y: 0);
+    if (value is! Map<String, dynamic>) {
+      return const GameBoardPositionDto(x: 0, y: 0);
+    }
     final x = (value['x'] as num?)?.toInt() ?? 0;
     final y = (value['y'] as num?)?.toInt() ?? 0;
     return GameBoardPositionDto(x: x, y: y);
@@ -180,14 +187,22 @@ class TurnStartingDto {
   factory TurnStartingDto.fromObject(dynamic data) {
     final payload = data as Map<String, dynamic>;
     final nextPlayer = payload['nextPlayer'] as Map<String, dynamic>;
-    final actionPointsRaw = nextPlayer['actionPoints'];
-    final actionPoints = actionPointsRaw is int
-        ? actionPointsRaw
-        : (actionPointsRaw is num ? actionPointsRaw.toInt() : null);
+    final breakSeconds =
+        tryParseSocketWholeNumber(
+          payload['countdown'] ?? payload['startTime'],
+        ) ??
+        0;
+    final movementPoints = tryParseSocketWholeNumber(
+      nextPlayer['movementPoints'],
+    );
+    if (movementPoints == null) {
+      throw const FormatException('TurnStarting nextPlayer.movementPoints');
+    }
+    final actionPoints = tryParseSocketWholeNumber(nextPlayer['actionPoints']);
     return TurnStartingDto(
       nextPlayerId: nextPlayer['id'] as String,
-      startTime: payload['countdown'] as int,
-      nextPlayerMovementPoints: nextPlayer['movementPoints'] as int,
+      startTime: breakSeconds,
+      nextPlayerMovementPoints: movementPoints,
       nextPlayerActionPoints: actionPoints,
       isNextPlayerVirtual: nextPlayer['isVirtual'] as bool? ?? false,
     );
@@ -205,8 +220,13 @@ class UpdateCountdownDto {
   factory UpdateCountdownDto.fromJson(Map<String, dynamic> json) =>
       _$UpdateCountdownDtoFromJson(json);
 
-  factory UpdateCountdownDto.fromObject(dynamic data) =>
-      UpdateCountdownDto(countdown: data as int);
+  factory UpdateCountdownDto.fromObject(dynamic data) {
+    return switch (data) {
+      final int v => UpdateCountdownDto(countdown: v),
+      final num v => UpdateCountdownDto(countdown: v.toInt()),
+      _ => throw FormatException('UpdateCountdown payload', data),
+    };
+  }
 
   Map<String, dynamic> toJson() => _$UpdateCountdownDtoToJson(this);
 }
@@ -220,8 +240,11 @@ class UpdateStartingCountdownDto {
   factory UpdateStartingCountdownDto.fromJson(Map<String, dynamic> json) =>
       _$UpdateStartingCountdownDtoFromJson(json);
 
-  factory UpdateStartingCountdownDto.fromObject(dynamic data) =>
-      UpdateStartingCountdownDto(countdown: data as int);
+  factory UpdateStartingCountdownDto.fromObject(dynamic data) {
+    if (data is int) return UpdateStartingCountdownDto(countdown: data);
+    if (data is num) return UpdateStartingCountdownDto(countdown: data.toInt());
+    throw FormatException('UpdateStartingCountdown payload', data);
+  }
 
   Map<String, dynamic> toJson() => _$UpdateStartingCountdownDtoToJson(this);
 }
@@ -274,9 +297,7 @@ class GameCanceledDto {
 class GameAbandonedDto {
   const GameAbandonedDto();
 
-  factory GameAbandonedDto.fromObject(dynamic _) =>
-      const GameAbandonedDto();
-
+  factory GameAbandonedDto.fromObject(dynamic _) => const GameAbandonedDto();
 }
 
 @JsonSerializable()

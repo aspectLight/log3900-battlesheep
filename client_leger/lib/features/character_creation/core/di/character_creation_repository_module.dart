@@ -10,7 +10,7 @@ void registerCharacterCreationRepositories(
 }) {
   scope.registerLazySingleton<CharacterCreationRepository>(
     () => CharacterCreationRepository(
-      socket: rootGetIt.get<CharacterCreationSocket>(),
+      socket: scope.get<CharacterCreationSocket>(),
       roomCode: roomCode,
     ),
   );

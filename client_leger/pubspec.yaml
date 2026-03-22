@@ -84,6 +84,7 @@ flutter:
         - .env.prod
         - assets/images/
         - assets/images/avatars/
+        - assets/images/auth_avatars/
         - assets/images/tiles/
         - assets/images/game_board_tiles/
         - assets/images/game_board_items/

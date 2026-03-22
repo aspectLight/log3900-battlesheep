@@ -9,7 +9,7 @@ part 'game_item_events.freezed.dart';
 class ItemDroppedEvent with _$ItemDroppedEvent {
   const factory ItemDroppedEvent({
     required String roomId,
-    required String playerId,
+    required String? playerId,
     required GameItem item,
     required GameBoardPosition coords,
   }) = _ItemDroppedEvent;

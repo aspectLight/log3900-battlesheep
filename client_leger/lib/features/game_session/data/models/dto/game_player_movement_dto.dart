@@ -136,18 +136,26 @@ class VirtualPlayerMovedDto {
 
   factory VirtualPlayerMovedDto.fromObject(dynamic data) {
     final payloadMap = data as Map<String, dynamic>;
-    final pathRaw = payloadMap['path'] as List;
-    final coordsList = pathRaw.map((item) {
+    final pathRaw = payloadMap['path'];
+    final rawPathList = pathRaw is List ? pathRaw : const [];
+    final coordsList = rawPathList.map((item) {
       if (item is Map && item.containsKey('coord')) {
         return item['coord'];
       }
       return item;
     }).toList();
     final opponentId = payloadMap['opponentPlayerId'];
+    final rawRemainingMovementPoints = payloadMap['remainingMovementPoints'];
+    final remainingMovementPoints = switch (rawRemainingMovementPoints) {
+      final int value => value,
+      final num value => value.toInt(),
+      final String value => int.tryParse(value) ?? 0,
+      _ => 0,
+    };
     return VirtualPlayerMovedDto(
-      playerId: payloadMap['playerId'] as String,
+      playerId: payloadMap['playerId'] as String? ?? '',
       path: coordsList.map(GameBoardPositionDto.fromDynamic).toList(),
-      remainingMovementPoints: payloadMap['remainingMovementPoints'] as int,
+      remainingMovementPoints: remainingMovementPoints,
       opponentPlayerId: opponentId is String ? opponentId : null,
     );
   }

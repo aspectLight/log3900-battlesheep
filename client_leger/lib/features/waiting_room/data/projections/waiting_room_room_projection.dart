@@ -48,7 +48,10 @@ class WaitingRoomRoomProjection implements EventProjection {
       _socket.playerLeftStream.listen(_onPlayerLeft),
       _socket.playerCreatedStream.listen(_onPlayerCreated),
       _socket.playerKickedStream.listen(
-        (_) => _eventBus.fire(const WaitingRoomPlayerKickedEvent()),
+        (_) {
+          _reservationsRepository.requestReservedCharacters();
+          _eventBus.fire(const WaitingRoomPlayerKickedEvent());
+        },
       ),
       _socket.waitingRoomErrorStream.listen(
         (failure) => _eventBus.fire(

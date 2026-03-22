@@ -75,10 +75,12 @@ import 'feature_coordinator.dart';
 /// This base class makes impossible states impossible. You can't have a phase
 /// without the data it needs, and you can't forget scope management.
 abstract class AutoScopeCoordinator<
-    Data,
-    Entry extends AppTransitionEvent,
-    Completed extends AppTransitionEvent,
-    Exit extends AppTransitionEvent> implements FeatureCoordinator<Entry, Completed, Exit> {
+  Data,
+  Entry extends AppTransitionEvent,
+  Completed extends AppTransitionEvent,
+  Exit extends AppTransitionEvent
+>
+    implements FeatureCoordinator<Entry, Completed, Exit> {
   /// The name of the scope this feature creates (e.g., 'game', 'chat', 'statistics')
   ///
   /// Used by the session scope manager to identify and drop scopes.
@@ -112,6 +114,7 @@ abstract class AutoScopeCoordinator<
 
   GetIt? _featureScope;
   late Data _entryData;
+  bool _isExiting = false;
 
   /// The data collected during Entry phase
   ///
@@ -156,6 +159,8 @@ abstract class AutoScopeCoordinator<
   /// DO NOT drop scope here. The framework does that after this returns.
   Future<void> onExitImpl(Exit event, Data data);
 
+  bool get tearDownStaleFeatureScopeOnEntry => false;
+
   @override
   Future<void> onEntry(Entry event) async {
     final data = await onEntryImpl(event);
@@ -163,7 +168,12 @@ abstract class AutoScopeCoordinator<
     _entryData = data;
     final sessionScope = sessionScopeManager.currentScope;
     if (sessionScope == null) return;
-    if (_featureScope != null) return;
+    if (_featureScope != null) {
+      if (!tearDownStaleFeatureScopeOnEntry) return;
+      await sessionScope.dropScope(scopeName);
+      _featureScope = null;
+      onScopeDropped();
+    }
     sessionScope.pushNewScope(
       scopeName: scopeName,
       init: (GetIt scope) {
@@ -182,15 +192,20 @@ abstract class AutoScopeCoordinator<
 
   @override
   Future<void> onExit(Exit event) async {
+    if (_isExiting) return;
     final scope = _featureScope;
-    if (scope != null) {
+    if (scope == null) return;
+    _isExiting = true;
+    try {
       await onExitImpl(event, _entryData);
+      final sessionScope = sessionScopeManager.currentScope;
+      if (sessionScope != null) {
+        await sessionScope.dropScope(scopeName);
+      }
+      _featureScope = null;
+      onScopeDropped();
+    } finally {
+      _isExiting = false;
     }
-    final sessionScope = sessionScopeManager.currentScope;
-    if (sessionScope != null) {
-      unawaited(sessionScope.dropScope(scopeName));
-    }
-    _featureScope = null;
-    onScopeDropped();
   }
 }

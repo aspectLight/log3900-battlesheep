@@ -129,9 +129,11 @@ class __$$WaitingRoomRoomStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$WaitingRoomRoomStateImpl extends _WaitingRoomRoomState {
-  const _$WaitingRoomRoomStateImpl({required this.room, required this.socketId})
-    : super._();
+class _$WaitingRoomRoomStateImpl implements _WaitingRoomRoomState {
+  const _$WaitingRoomRoomStateImpl({
+    required this.room,
+    required this.socketId,
+  });
 
   @override
   final WaitingRoomModel room;
@@ -169,12 +171,11 @@ class _$WaitingRoomRoomStateImpl extends _WaitingRoomRoomState {
       );
 }
 
-abstract class _WaitingRoomRoomState extends WaitingRoomRoomState {
+abstract class _WaitingRoomRoomState implements WaitingRoomRoomState {
   const factory _WaitingRoomRoomState({
     required final WaitingRoomModel room,
     required final String socketId,
   }) = _$WaitingRoomRoomStateImpl;
-  const _WaitingRoomRoomState._() : super._();
 
   @override
   WaitingRoomModel get room;

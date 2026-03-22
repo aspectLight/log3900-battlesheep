@@ -21,6 +21,9 @@ class GameBoardSocket {
       if (!connected) return;
       _setupListeners();
     });
+    if (_socketService.isConnected) {
+      _setupListeners();
+    }
   }
 
   void toggleDoor(ToggleDoorCommand command) {

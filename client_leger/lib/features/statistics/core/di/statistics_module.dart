@@ -16,9 +16,6 @@ import 'statistics_view_model_module.dart';
 
 void registerStatisticsRoot(GetIt getIt) {
   getIt.registerLazySingleton<StatisticsScopeHolder>(StatisticsScopeHolder.new);
-  getIt.registerLazySingleton<StatisticsSocket>(
-    () => StatisticsSocket(socketService: getIt.get<SocketService>()),
-  );
   getIt.registerLazySingleton<StatisticsCoordinator>(
     () => StatisticsCoordinator(
       getIt: getIt,
@@ -26,7 +23,6 @@ void registerStatisticsRoot(GetIt getIt) {
       statisticsScopeHolder: getIt<StatisticsScopeHolder>(),
       appNavigator: getIt<AppNavigator>(),
       appTransitionEventBus: getIt<AppTransitionEventBus>(),
-      statisticsSocket: getIt<StatisticsSocket>(),
     ),
   );
 }
@@ -37,6 +33,10 @@ void registerStatisticsScope(
   required GameStatistics initialData,
   required bool isCTF,
 }) {
+  scope.registerSingleton<StatisticsSocket>(
+    StatisticsSocket(socketService: rootGetIt.get<SocketService>()),
+    dispose: (socket) => socket.dispose(),
+  );
   registerStatisticsRepositories(scope, initialData: initialData);
   registerStatisticsProjections(scope, rootGetIt);
   registerStatisticsViewModels(scope, rootGetIt, isCTF: isCTF);

@@ -7,7 +7,7 @@ import '../../data/services/statistics_socket.dart';
 void registerStatisticsProjections(GetIt scope, GetIt rootGetIt) {
   scope.registerLazySingleton<StatisticsEventsProjection>(
     () => StatisticsEventsProjection(
-      statisticsSocket: rootGetIt.get<StatisticsSocket>(),
+      statisticsSocket: scope.get<StatisticsSocket>(),
       statisticsRepository: scope.get<StatisticsRepository>(),
     ),
   );

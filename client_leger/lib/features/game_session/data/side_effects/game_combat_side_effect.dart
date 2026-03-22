@@ -27,7 +27,6 @@ class GameCombatSideEffect with DisposableSideEffect {
   final NotificationIntentSink _notificationIntentSink;
   Timer? _combatResultsClearTimer;
   Timer? _flightAttemptFeedbackClearTimer;
-  String? _lastAttackSignature;
   Option<bool> _lastFlightAttemptSuccess = const Option.none();
   Option<int> _initialSelfHealth = const Option.none();
   Option<String> _enemyId = const Option.none();
@@ -147,20 +146,14 @@ class GameCombatSideEffect with DisposableSideEffect {
     final combat = _combatRepository.state.value;
     _cachePreCombatHealthIfNeeded();
     if (combat is CombatWithResult) {
-      final signature =
-          '${combat.lastAttackSuccess.getOrElse(() => false)}:${combat.lastAttackValue.getOrElse(() => 0)}:${combat.lastDefenseValue.getOrElse(() => 0)}:${combat.lastOpponentHealthPoints}';
-      if (signature != _lastAttackSignature) {
-        _lastAttackSignature = signature;
-        _combatResultsClearTimer?.cancel();
-        _combatResultsClearTimer = Timer(
-          const Duration(
-            milliseconds: CombatUiConstants.notificationDurationMs,
-          ),
-          _combatRepository.clearCombatResults,
-        );
-      }
+      _combatResultsClearTimer?.cancel();
+      _combatResultsClearTimer = Timer(
+        const Duration(
+          milliseconds: CombatUiConstants.notificationDurationMs,
+        ),
+        _combatRepository.clearCombatResults,
+      );
     } else {
-      _lastAttackSignature = null;
       _combatResultsClearTimer?.cancel();
       _combatResultsClearTimer = null;
     }

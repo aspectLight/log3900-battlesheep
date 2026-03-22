@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:fpdart/fpdart.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../core/enums/character.dart';
 import '../../../../core/enums/dice_stat_choice.dart';
@@ -26,7 +25,6 @@ class AddVirtualPlayerUseCase {
 
   final WaitingRoomReservationsRepository _reservationsRepository;
   final WaitingRoomRoomRepository _roomRepository;
-  static const _uuid = Uuid();
   static final _random = Random();
   static const List<String> _virtualPlayerNames = [
     'VP1',
@@ -54,9 +52,9 @@ class AddVirtualPlayerUseCase {
     if (nameOption.isNone()) {
       return left(const VirtualPlayerNameUnavailableWaitingRoomFailure());
     }
-    final id = 'vp_${_uuid.v4()}';
     final character = characterOption.assumePresent();
     final name = nameOption.assumePresent();
+    final id = name;
     final stats = _randomVirtualPlayerStats();
     final (d6Choice, d4Choice) = _randomDiceChoices();
     final player = WaitingRoomPlayerModel.virtual(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../core/context/game_session_scope_holder.dart';
 import '../../../core/localisation/game_session_localizations.dart';
 import 'game_debug_mode_strip_view_model.dart';
 
@@ -10,7 +11,9 @@ class GameDebugModeStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = GetIt.I<GameDebugModeStripViewModel>();
+    final scope = GetIt.I<GameSessionScopeHolder>().scope;
+    if (scope == null) return const SizedBox.shrink();
+    final viewModel = scope.get<GameDebugModeStripViewModel>();
     final isDebugMode = viewModel.isDebugMode.watch(context);
     if (!isDebugMode) return const SizedBox.shrink();
     final l10n = GameSessionLocalizations.of(context)!;

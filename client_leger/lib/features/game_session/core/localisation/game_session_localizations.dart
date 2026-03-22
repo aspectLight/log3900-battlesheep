@@ -380,6 +380,8 @@ abstract class GameSessionLocalizations {
   /// **'Game abandoned'**
   String get notificationGameAbandoned;
 
+  String get notificationGameCanceled;
+
   /// No description provided for @notificationDisconnectAutomatic.
   ///
   /// In en, this message translates to:

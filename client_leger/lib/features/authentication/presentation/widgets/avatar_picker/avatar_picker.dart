@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
-import '../../../../../core/constants/avatar_assets.dart';
-import '../../../../../core/enums/avatar.dart';
+import '../../../../../core/constants/auth_avatar_assets.dart';
+import '../../../../../core/enums/auth_avatar.dart';
 import '../../../core/localisation/auth_localizations.dart';
 import 'avatar_picker_view_model.dart';
 
@@ -16,7 +16,7 @@ class AvatarPicker extends StatelessWidget {
 
   final AvatarPickerViewModel viewModel;
   final String? error;
-  final void Function(Avatar)? onSelectionChange;
+  final void Function(AuthAvatar)? onSelectionChange;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,7 @@ class AvatarPicker extends StatelessWidget {
           itemCount: viewModel.avatars.length,
           itemBuilder: (context, index) {
             final avatar = viewModel.avatars[index];
-            final avatarPath = AvatarAssets.avatarPath(avatar);
+            final avatarPath = AuthAvatarAssets.assetPath(avatar);
 
             return Watch((context) {
               final isSelected = viewModel.isSelected(avatar);

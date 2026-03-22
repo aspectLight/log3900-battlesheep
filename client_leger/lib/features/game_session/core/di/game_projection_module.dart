@@ -27,7 +27,7 @@ import '../event_bus/game_session_event_bus.dart';
 void registerGameProjections(GetIt scope, GetIt rootGetIt, {required String socketId}) {
   scope.registerLazySingleton<GameTurnEventsProjection>(
     () => GameTurnEventsProjection(
-      eventsSocket: rootGetIt.get<GameEventsSocket>(),
+      eventsSocket: scope.get<GameEventsSocket>(),
       turnRepository: scope.get<GameTurnRepository>(),
       playerRepository: scope.get<GamePlayerRepository>(),
       gameSessionEventBus: rootGetIt.get<GameSessionEventBus>(),
@@ -35,7 +35,7 @@ void registerGameProjections(GetIt scope, GetIt rootGetIt, {required String sock
   );
   scope.registerLazySingleton<GameSpawnEventsProjection>(
     () => GameSpawnEventsProjection(
-      eventsSocket: rootGetIt.get<GameEventsSocket>(),
+      eventsSocket: scope.get<GameEventsSocket>(),
       playerRepository: scope.get<GamePlayerRepository>(),
       boardRepository: scope.get<GameBoardRepository>(),
       inventoryRepository: scope.get<GameInventoryRepository>(),
@@ -43,28 +43,28 @@ void registerGameProjections(GetIt scope, GetIt rootGetIt, {required String sock
   );
   scope.registerLazySingleton<GameSessionEventsProjection>(
     () => GameSessionEventsProjection(
-      eventsSocket: rootGetIt.get<GameEventsSocket>(),
+      eventsSocket: scope.get<GameEventsSocket>(),
       sessionRepository: scope.get<GameMetadataRepository>(),
       gameSessionEventBus: rootGetIt.get<GameSessionEventBus>(),
     ),
   );
   scope.registerLazySingleton<GamePlayerEventsProjection>(
     () => GamePlayerEventsProjection(
-      eventsSocket: rootGetIt.get<GameEventsSocket>(),
+      eventsSocket: scope.get<GameEventsSocket>(),
       playerRepository: scope.get<GamePlayerRepository>(),
       gameSessionEventBus: rootGetIt.get<GameSessionEventBus>(),
     ),
   );
   scope.registerLazySingleton<GameBoardEventsProjection>(
     () => GameBoardEventsProjection(
-      boardSocket: rootGetIt.get<GameBoardSocket>(),
+      boardSocket: scope.get<GameBoardSocket>(),
       boardRepository: scope.get<GameBoardRepository>(),
       gameSessionEventBus: rootGetIt.get<GameSessionEventBus>(),
     ),
   );
   scope.registerLazySingleton<GameMovementEventsProjection>(
     () => GameMovementEventsProjection(
-      movementSocket: rootGetIt.get<GamePlayerMovementSocket>(),
+      movementSocket: scope.get<GamePlayerMovementSocket>(),
       boardRepository: scope.get<GameBoardRepository>(),
       playerRepository: scope.get<GamePlayerRepository>(),
       turnRepository: scope.get<GameTurnRepository>(),
@@ -74,15 +74,15 @@ void registerGameProjections(GetIt scope, GetIt rootGetIt, {required String sock
   );
   scope.registerLazySingleton<GameCombatEventsProjection>(
     () => GameCombatEventsProjection(
-      combatSocket: rootGetIt.get<GameCombatSocket>(),
-      combatRepository: rootGetIt.get<GameCombatRepository>(),
+      combatSocket: scope.get<GameCombatSocket>(),
+      combatRepository: scope.get<GameCombatRepository>(),
       gameSessionEventBus: rootGetIt.get<GameSessionEventBus>(),
       socketId: socketId,
     ),
   );
   scope.registerLazySingleton<GameItemEventsProjection>(
     () => GameItemEventsProjection(
-      itemSocket: rootGetIt.get<GameItemSocket>(),
+      itemSocket: scope.get<GameItemSocket>(),
       boardRepository: scope.get<GameBoardRepository>(),
       inventoryRepository: scope.get<GameInventoryRepository>(),
       playerRepository: scope.get<GamePlayerRepository>(),
@@ -91,7 +91,7 @@ void registerGameProjections(GetIt scope, GetIt rootGetIt, {required String sock
   );
   scope.registerLazySingleton<GameDebugEventsProjection>(
     () => GameDebugEventsProjection(
-      debugSocket: rootGetIt.get<GameDebugSocket>(),
+      debugSocket: scope.get<GameDebugSocket>(),
       debugRepository: scope.get<GameDebugRepository>(),
       gameSessionEventBus: rootGetIt.get<GameSessionEventBus>(),
     ),

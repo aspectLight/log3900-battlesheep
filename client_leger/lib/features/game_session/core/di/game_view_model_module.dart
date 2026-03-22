@@ -31,14 +31,6 @@ import '../../presentation/widgets/game_player_inventory/game_player_inventory_v
 import '../../presentation/widgets/game_timer/game_timer_view_model.dart';
 
 void registerGameSessionRootViewModels(GetIt getIt) {
-  getIt.registerFactory<GameScreenViewModel>(
-    () => GameScreenViewModel(combatRepository: getIt<GameCombatRepository>()),
-  );
-  getIt.registerFactory<GameDebugModeStripViewModel>(
-    () => GameDebugModeStripViewModel(
-      debugRepository: getIt<GameDebugRepository>(),
-    ),
-  );
   getIt.registerFactory<GameInventoryFullDiscardNotificationViewModel>(
     () => GameInventoryFullDiscardNotificationViewModel(
       getIt<NotificationCoordinator>(),
@@ -51,6 +43,11 @@ void registerGameSessionScopeViewModels(
   GetIt rootGetIt, {
   required String socketId,
 }) {
+  scope.registerFactory<GameScreenViewModel>(
+    () => GameScreenViewModel(
+      combatRepository: scope.get<GameCombatRepository>(),
+    ),
+  );
   scope.registerFactory<GamePlayerInventoryViewModel>(
     () => GamePlayerInventoryViewModel(
       inventoryRepository: scope.get<GameInventoryRepository>(),
@@ -119,10 +116,15 @@ void registerGameSessionScopeViewModels(
   );
   scope.registerFactory<GameCombatViewModel>(
     () => GameCombatViewModel(
-      combatRepository: rootGetIt.get<GameCombatRepository>(),
+      combatRepository: scope.get<GameCombatRepository>(),
       playerRepository: scope.get<GamePlayerRepository>(),
       turnRepository: scope.get<GameTurnRepository>(),
       socketId: socketId,
+    ),
+  );
+  scope.registerFactory<GameDebugModeStripViewModel>(
+    () => GameDebugModeStripViewModel(
+      debugRepository: scope.get<GameDebugRepository>(),
     ),
   );
 }

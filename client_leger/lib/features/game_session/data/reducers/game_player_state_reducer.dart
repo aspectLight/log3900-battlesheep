@@ -169,7 +169,9 @@ class GamePlayerStateReducer {
     GamePlayerState previous,
     ItemDroppedEvent event,
   ) {
-    final idx = previous.indexOf(event.playerId);
+    final playerId = event.playerId;
+    if (playerId == null) return previous;
+    final idx = previous.indexOf(playerId);
     if (idx < 0) return previous;
     final player = previous.players[idx];
     final updated = player.withItemDropped(event.item);

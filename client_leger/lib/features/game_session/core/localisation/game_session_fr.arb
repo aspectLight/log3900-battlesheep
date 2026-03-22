@@ -46,6 +46,7 @@
   "notificationDefeatCtf": "Défaite! {winnerTeamName} a capturé le drapeau !",
   "notificationDefeatClassic": "Défaite! {winnerName} a gagné trois combats",
   "notificationGameAbandoned": "Partie abandonnée",
+  "notificationGameCanceled": "Partie annulée",
   "notificationDisconnectAutomatic": "Déconnexion automatique",
   "notificationTurnStart": "Tour de {playerName} ({seconds}s)",
   "playerHudMovements": "{count} Déplacements",

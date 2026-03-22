@@ -23,7 +23,7 @@ class WaitingRoomAutoLockOnMaxPlayersSideEffect with DisposableSideEffect {
 
   void _autoLockIfNeeded() {
     final room = _roomRepository.state.value.room;
-    if (!_roomRepository.state.value.isHost) return;
+    if (!_roomRepository.isHost) return;
     if (room.isLocked) return;
     if (!isWaitingRoomAtMaxPlayers(room, _startParams)) return;
     _roomRepository.applyRoomLocked(const RoomLockedEvent());

@@ -36,26 +36,35 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  late final GameScreenViewModel _viewModel;
+  GameScreenViewModel? _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _viewModel = GetIt.I<GameScreenViewModel>();
+    _resolveViewModel();
+  }
+
+  void _resolveViewModel() {
+    if (_viewModel != null) return;
+    final scope = GetIt.I<GameSessionScopeHolder>().scope;
+    if (scope == null || !scope.isRegistered<GameScreenViewModel>()) return;
+    _viewModel = scope.get<GameScreenViewModel>();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isCombatMode = _viewModel.isCombatMode.watch(context);
+    _resolveViewModel();
+    final scope = GetIt.I<GameSessionScopeHolder>().scope;
+    final viewModel = _viewModel;
+    if (scope == null || viewModel == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    final isCombatMode = viewModel.isCombatMode.watch(context);
     final screenHeight = MediaQuery.sizeOf(context).height;
     final boardSize = (screenHeight * 0.8).clamp(0.0, double.infinity);
     final padding = _clamp(16, MediaQuery.sizeOf(context).width * 0.02, 32);
     final appTransitionEventBus = GetIt.I<AppTransitionEventBus>();
     final actionsRepository = GetIt.I<GameActionsRepository>();
-    final scope = GetIt.I<GameSessionScopeHolder>().scope;
-    if (scope == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
     final metadataRepository = scope.get<GameMetadataRepository>();
 
     return PopScope(

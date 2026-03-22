@@ -5,6 +5,7 @@ import '../models/extensions/game_combat_dto_extensions.dart';
 import '../models/events/game_combat_socket_events.dart';
 import '../../domain/commands/game_combat_commands.dart';
 import '../../domain/events/game_combat_events.dart';
+import '../../../../core/helpers/socket_numeric_payload.dart';
 import '../../../../core/services/socket_service.dart';
 
 class GameCombatSocket {
@@ -31,6 +32,9 @@ class GameCombatSocket {
       if (!connected) return;
       _setupListeners();
     });
+    if (_socketService.isConnected) {
+      _setupListeners();
+    }
   }
 
   static const List<String> _ownedEvents = [
@@ -117,13 +121,14 @@ class GameCombatSocket {
       _socketService.on<Object?>(GameCombatSocketEvents.endCombat).listen((
         data,
       ) {
-        _endCombatController.add(
-          EndCombatResultDto.fromObject(data).toEntity(),
-        );
+        _endCombatController.add(EndCombatResultDto.fromObject(data).toEntity());
       }),
       _socketService
-          .on<int>(GameCombatSocketEvents.updateCombatCountDown)
-          .listen(_combatCountdownController.add),
+          .on<Object?>(GameCombatSocketEvents.updateCombatCountDown)
+          .listen((data) {
+            final v = tryParseSocketWholeNumber(data);
+            if (v != null) _combatCountdownController.add(v);
+          }),
     ]);
   }
 

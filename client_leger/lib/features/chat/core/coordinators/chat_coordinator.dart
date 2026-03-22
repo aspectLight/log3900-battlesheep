@@ -16,14 +16,12 @@ class ChatCoordinator
     required this.getIt,
     required this.sessionScopeManager,
     required this.chatScopeHolder,
-    required ChatSocket chatSocket,
-  }) : _chatSocket = chatSocket;
+  });
 
   final GetIt getIt;
   @override
   final SessionScopeManager sessionScopeManager;
   final ChatScopeHolder chatScopeHolder;
-  final ChatSocket _chatSocket;
 
   @override
   final String scopeName = 'chat';
@@ -49,7 +47,7 @@ class ChatCoordinator
     final scope = featureScope;
     if (scope == null) return;
     bootstrapChatScope(scope);
-    _chatSocket.join(data.username);
+    scope.get<ChatSocket>().join(data.username);
     chatScopeHolder.setScope(scope);
   }
 

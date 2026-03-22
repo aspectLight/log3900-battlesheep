@@ -11,27 +11,38 @@ import '../../data/services/game_service.dart';
 import '../../../../core/services/socket_service.dart';
 import 'package:dio/dio.dart';
 
-void registerGameServices(GetIt getIt) {
+void registerGameRootServices(GetIt getIt) {
   getIt.registerLazySingleton<GameService>(() => GameService(getIt<Dio>()));
-  getIt.registerLazySingleton<GameActionsSocket>(
-    () => GameActionsSocket(socketService: getIt<SocketService>()),
+}
+
+void registerGameScopeServices(GetIt scope, GetIt rootGetIt) {
+  final socketService = rootGetIt<SocketService>();
+  scope.registerSingleton<GameActionsSocket>(
+    GameActionsSocket(socketService: socketService),
+    dispose: (socket) => socket.dispose(),
   );
-  getIt.registerLazySingleton<GameBoardSocket>(
-    () => GameBoardSocket(socketService: getIt<SocketService>()),
+  scope.registerSingleton<GameBoardSocket>(
+    GameBoardSocket(socketService: socketService),
+    dispose: (socket) => socket.dispose(),
   );
-  getIt.registerLazySingleton<GameEventsSocket>(
-    () => GameEventsSocket(socketService: getIt<SocketService>()),
+  scope.registerSingleton<GameEventsSocket>(
+    GameEventsSocket(socketService: socketService),
+    dispose: (socket) => socket.dispose(),
   );
-  getIt.registerLazySingleton<GameCombatSocket>(
-    () => GameCombatSocket(socketService: getIt<SocketService>()),
+  scope.registerSingleton<GameCombatSocket>(
+    GameCombatSocket(socketService: socketService),
+    dispose: (socket) => socket.dispose(),
   );
-  getIt.registerLazySingleton<GameItemSocket>(
-    () => GameItemSocket(socketService: getIt<SocketService>()),
+  scope.registerSingleton<GameItemSocket>(
+    GameItemSocket(socketService: socketService),
+    dispose: (socket) => socket.dispose(),
   );
-  getIt.registerLazySingleton<GamePlayerMovementSocket>(
-    () => GamePlayerMovementSocket(socketService: getIt<SocketService>()),
+  scope.registerSingleton<GamePlayerMovementSocket>(
+    GamePlayerMovementSocket(socketService: socketService),
+    dispose: (socket) => socket.dispose(),
   );
-  getIt.registerLazySingleton<GameDebugSocket>(
-    () => GameDebugSocket(socketService: getIt<SocketService>()),
+  scope.registerSingleton<GameDebugSocket>(
+    GameDebugSocket(socketService: socketService),
+    dispose: (socket) => socket.dispose(),
   );
 }

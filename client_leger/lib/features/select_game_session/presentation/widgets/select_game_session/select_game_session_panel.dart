@@ -13,6 +13,7 @@ import '../../../core/modal/select_game_session_modal_intents.dart';
 import '../../../domain/models/game_info_model.dart';
 import '../../../domain/state/select_game_session_state.dart';
 import 'select_game_session_panel_view_model.dart';
+import 'select_game_session_board_preview_widget.dart';
 
 class SelectGameSessionPanel extends StatefulWidget {
   const SelectGameSessionPanel({super.key});
@@ -194,7 +195,7 @@ class _GameListItem extends StatelessWidget {
     return InkWell(
       onTap: () => viewModel.selectGame(game.id),
       child: Container(
-        height: 100,
+        height: 116,
         decoration: BoxDecoration(
           color: backgroundColor,
           border: Border(
@@ -203,24 +204,29 @@ class _GameListItem extends StatelessWidget {
             bottom: BorderSide(color: borderColor),
           ),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Row(
           children: [
             Expanded(
               child: Center(
                 child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
                   onTap: () => GetIt.I<ModalIntentSink>().addIntent(
                     SelectGameSessionGamePreviewModalIntent(
                       description: game.description,
                       imagePath: '',
+                      boardSize: game.boardSize,
+                      boardMatrix: game.boardMatrix,
                     ),
                   ),
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(8),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: SizedBox.square(
+                      dimension: 100,
+                      child: SelectGameSessionBoardPreviewWidget(
+                        boardSize: game.boardSize,
+                        boardMatrix: game.boardMatrix,
+                      ),
                     ),
                   ),
                 ),

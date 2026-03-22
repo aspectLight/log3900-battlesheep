@@ -37,12 +37,14 @@ class GameInventoryStateReducer {
     GameInventoryState previous,
     ItemDroppedEvent event,
   ) {
-    final current = previous.itemsByPlayerId[event.playerId] ?? [];
+    final playerId = event.playerId;
+    if (playerId == null) return previous;
+    final current = previous.itemsByPlayerId[playerId] ?? [];
     final index = current.indexWhere((i) => i.type == event.item.type);
     if (index < 0) return previous;
     final nextList = List<GameItem>.from(current)..removeAt(index);
     final next = Map<String, List<GameItem>>.from(previous.itemsByPlayerId);
-    next[event.playerId] = nextList;
+    next[playerId] = nextList;
     final clearFlag = event.item.type == ItemType.flag;
     return previous.copyWith(
       itemsByPlayerId: next,

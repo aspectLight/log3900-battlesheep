@@ -32,6 +32,7 @@ mixin _$GameSessionEntryAppEvent {
       String gameId,
       String socketId,
       bool isHost,
+      String gameRoomHostId,
       String gameName,
       String gameDescription,
     )
@@ -53,6 +54,7 @@ mixin _$GameSessionEntryAppEvent {
       String gameId,
       String socketId,
       bool isHost,
+      String gameRoomHostId,
       String gameName,
       String gameDescription,
     )?
@@ -74,6 +76,7 @@ mixin _$GameSessionEntryAppEvent {
       String gameId,
       String socketId,
       bool isHost,
+      String gameRoomHostId,
       String gameName,
       String gameDescription,
     )?
@@ -278,6 +281,7 @@ class _$StartGameSessionRequestedCommandImpl
       String gameId,
       String socketId,
       bool isHost,
+      String gameRoomHostId,
       String gameName,
       String gameDescription,
     )
@@ -303,6 +307,7 @@ class _$StartGameSessionRequestedCommandImpl
       String gameId,
       String socketId,
       bool isHost,
+      String gameRoomHostId,
       String gameName,
       String gameDescription,
     )?
@@ -334,6 +339,7 @@ class _$StartGameSessionRequestedCommandImpl
       String gameId,
       String socketId,
       bool isHost,
+      String gameRoomHostId,
       String gameName,
       String gameDescription,
     )?
@@ -427,6 +433,7 @@ abstract class _$$GameSessionStartConfirmedEventImplCopyWith<$Res> {
     String gameId,
     String socketId,
     bool isHost,
+    String gameRoomHostId,
     String gameName,
     String gameDescription,
   });
@@ -454,6 +461,7 @@ class __$$GameSessionStartConfirmedEventImplCopyWithImpl<$Res>
     Object? gameId = null,
     Object? socketId = null,
     Object? isHost = null,
+    Object? gameRoomHostId = null,
     Object? gameName = null,
     Object? gameDescription = null,
   }) {
@@ -475,6 +483,10 @@ class __$$GameSessionStartConfirmedEventImplCopyWithImpl<$Res>
             ? _value.isHost
             : isHost // ignore: cast_nullable_to_non_nullable
                   as bool,
+        gameRoomHostId: null == gameRoomHostId
+            ? _value.gameRoomHostId
+            : gameRoomHostId // ignore: cast_nullable_to_non_nullable
+                  as String,
         gameName: null == gameName
             ? _value.gameName
             : gameName // ignore: cast_nullable_to_non_nullable
@@ -497,6 +509,7 @@ class _$GameSessionStartConfirmedEventImpl
     required this.gameId,
     required this.socketId,
     required this.isHost,
+    required this.gameRoomHostId,
     required this.gameName,
     required this.gameDescription,
   });
@@ -510,13 +523,15 @@ class _$GameSessionStartConfirmedEventImpl
   @override
   final bool isHost;
   @override
+  final String gameRoomHostId;
+  @override
   final String gameName;
   @override
   final String gameDescription;
 
   @override
   String toString() {
-    return 'GameSessionEntryAppEvent.startConfirmed(roomId: $roomId, gameId: $gameId, socketId: $socketId, isHost: $isHost, gameName: $gameName, gameDescription: $gameDescription)';
+    return 'GameSessionEntryAppEvent.startConfirmed(roomId: $roomId, gameId: $gameId, socketId: $socketId, isHost: $isHost, gameRoomHostId: $gameRoomHostId, gameName: $gameName, gameDescription: $gameDescription)';
   }
 
   @override
@@ -529,6 +544,8 @@ class _$GameSessionStartConfirmedEventImpl
             (identical(other.socketId, socketId) ||
                 other.socketId == socketId) &&
             (identical(other.isHost, isHost) || other.isHost == isHost) &&
+            (identical(other.gameRoomHostId, gameRoomHostId) ||
+                other.gameRoomHostId == gameRoomHostId) &&
             (identical(other.gameName, gameName) ||
                 other.gameName == gameName) &&
             (identical(other.gameDescription, gameDescription) ||
@@ -542,6 +559,7 @@ class _$GameSessionStartConfirmedEventImpl
     gameId,
     socketId,
     isHost,
+    gameRoomHostId,
     gameName,
     gameDescription,
   );
@@ -575,6 +593,7 @@ class _$GameSessionStartConfirmedEventImpl
       String gameId,
       String socketId,
       bool isHost,
+      String gameRoomHostId,
       String gameName,
       String gameDescription,
     )
@@ -586,6 +605,7 @@ class _$GameSessionStartConfirmedEventImpl
       gameId,
       socketId,
       isHost,
+      gameRoomHostId,
       gameName,
       gameDescription,
     );
@@ -607,6 +627,7 @@ class _$GameSessionStartConfirmedEventImpl
       String gameId,
       String socketId,
       bool isHost,
+      String gameRoomHostId,
       String gameName,
       String gameDescription,
     )?
@@ -618,6 +639,7 @@ class _$GameSessionStartConfirmedEventImpl
       gameId,
       socketId,
       isHost,
+      gameRoomHostId,
       gameName,
       gameDescription,
     );
@@ -639,6 +661,7 @@ class _$GameSessionStartConfirmedEventImpl
       String gameId,
       String socketId,
       bool isHost,
+      String gameRoomHostId,
       String gameName,
       String gameDescription,
     )?
@@ -652,6 +675,7 @@ class _$GameSessionStartConfirmedEventImpl
         gameId,
         socketId,
         isHost,
+        gameRoomHostId,
         gameName,
         gameDescription,
       );
@@ -703,6 +727,7 @@ abstract class GameSessionStartConfirmedEvent
     required final String gameId,
     required final String socketId,
     required final bool isHost,
+    required final String gameRoomHostId,
     required final String gameName,
     required final String gameDescription,
   }) = _$GameSessionStartConfirmedEventImpl;
@@ -711,6 +736,7 @@ abstract class GameSessionStartConfirmedEvent
   String get gameId;
   String get socketId;
   bool get isHost;
+  String get gameRoomHostId;
   String get gameName;
   String get gameDescription;
 
@@ -784,6 +810,7 @@ class _$GameSessionLoadedEventImpl implements GameSessionLoadedEvent {
       String gameId,
       String socketId,
       bool isHost,
+      String gameRoomHostId,
       String gameName,
       String gameDescription,
     )
@@ -809,6 +836,7 @@ class _$GameSessionLoadedEventImpl implements GameSessionLoadedEvent {
       String gameId,
       String socketId,
       bool isHost,
+      String gameRoomHostId,
       String gameName,
       String gameDescription,
     )?
@@ -834,6 +862,7 @@ class _$GameSessionLoadedEventImpl implements GameSessionLoadedEvent {
       String gameId,
       String socketId,
       bool isHost,
+      String gameRoomHostId,
       String gameName,
       String gameDescription,
     )?

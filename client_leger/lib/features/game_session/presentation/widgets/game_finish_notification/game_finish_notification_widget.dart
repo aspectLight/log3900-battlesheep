@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
-import '../../../core/context/game_session_scope_holder.dart';
 import '../../../../../core/notification/notification_intent.dart';
-import '../../../data/repositories/game_player_repository.dart';
 import '../../../core/localisation/game_session_localizations.dart';
 import '../../../../../core/notification/notification_shell.dart';
 import 'game_finish_notification_view_model.dart';
@@ -31,11 +28,9 @@ class _GameFinishNotificationWidgetState
   @override
   void initState() {
     super.initState();
-    final scope = GetIt.I<GameSessionScopeHolder>().scope!;
     _viewModel = GameFinishNotificationViewModel(
       intent: widget.intent,
       onDismiss: widget.onDismiss,
-      playerRepository: scope.get<GamePlayerRepository>(),
     );
   }
 
@@ -53,8 +48,8 @@ class _GameFinishNotificationWidgetState
               ? l10n.notificationVictoryCtf
               : l10n.notificationVictoryClassic)
         : (widget.intent.isCTF
-              ? l10n.notificationDefeatCtf(_viewModel.winnerTeamName)
-              : l10n.notificationDefeatClassic(_viewModel.winnerName));
+              ? l10n.notificationDefeatCtf(widget.intent.winnerTeamName)
+              : l10n.notificationDefeatClassic(widget.intent.winnerName));
     return NotificationShell(
       child: Column(
         mainAxisSize: MainAxisSize.min,
