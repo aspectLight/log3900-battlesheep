@@ -368,14 +368,14 @@
     transition:
         border-color 0.25s,
         box-shadow 0.25s,
-        transform 0.22s;
+        transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
     width: 130px;
     position: relative;
 
     &:hover {
         border-color: var(--theme-border-focus);
-        transform: translateY(-5px);
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+        transform: translateY(-8px) scale(1.08);
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55);
         z-index: 10;
     }
 
@@ -414,7 +414,7 @@
 }
 
 .theme-btn:hover .theme-thumbnail {
-    transform: scale(1.07);
+    transform: scale(1.14);
 }
 
 // Bande inférieure avec label
@@ -474,20 +474,20 @@
 // Grande preview flottante au survol
 .theme-preview-img {
     position: absolute;
-    bottom: calc(100% + 12px);
+    bottom: calc(100% + 16px);
     left: 50%;
-    transform: translateX(-50%) scale(0.92);
-    width: 210px;
-    height: 126px;
+    transform: translateX(-50%) scale(0.88);
+    width: 420px;
+    height: 252px;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: 12px;
     border: 2px solid var(--theme-border-focus);
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.70);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.80);
     opacity: 0;
     pointer-events: none;
     transition:
-        opacity 0.22s ease,
-        transform 0.22s ease;
+        opacity 0.25s ease,
+        transform 0.28s cubic-bezier(0.34, 1.4, 0.64, 1);
     z-index: 20;
 }
 

@@ -125,12 +125,12 @@
                                 [attr.data-theme]="t.value"
                                 (click)="selectTheme(t.value)"
                             >
-                                <img class="theme-preview-img" [src]="t.preview" [alt]="t.label" />
+                                <img class="theme-preview-img" [src]="t.preview" [alt]="t.labelKey | translate" />
                                 <div class="theme-thumbnail-wrapper">
-                                    <img class="theme-thumbnail" [src]="t.preview" [alt]="t.label" />
+                                    <img class="theme-thumbnail" [src]="t.preview" [alt]="t.labelKey | translate" />
                                 </div>
                                 <div class="theme-label-area">
-                                    <span class="theme-label">{{ t.label }}</span>
+                                    <span class="theme-label">{{ t.labelKey | translate }}</span>
                                 </div>
                                 @if (themeService.getCurrentTheme() === t.value) {
                                 <span class="theme-check">✓</span>

@@ -77,6 +77,9 @@
       "avg_time": "Temps moyen par partie"
     },
     "theme": "Thème visuel",
+    "theme_default": "Classique",
+    "theme_frost": "Froid Sibérien",
+    "theme_village": "Village Abandonné",
     "language": "Langue",
     "success": "Succès",
     "success_msg": "Profil mis à jour avec succès !",

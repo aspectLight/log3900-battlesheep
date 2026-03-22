@@ -34,10 +34,10 @@ export class ProfilePageComponent implements OnInit {
     showDeleteConfirm = false;
     errorMessage = '';
 
-    readonly themes: { value: ThemeType; label: string; description: string; preview: string }[] = [
-        { value: 'default', label: 'Classique', description: 'Rouge sombre', preview: '/assets/ui/default_preview.png' },
-        { value: 'frost', label: 'Froid Sibérien', description: 'Bleu glacial', preview: '/assets/ui/froid_preview.png' },
-        { value: 'village', label: 'Village Abandonné', description: 'Brun terreux', preview: '/assets/ui/village_preview.png' },
+    readonly themes: { value: ThemeType; labelKey: string; description: string; preview: string }[] = [
+        { value: 'default', labelKey: 'profile.theme_default', description: 'Rouge sombre', preview: '/assets/ui/default_preview.png' },
+        { value: 'frost', labelKey: 'profile.theme_frost', description: 'Bleu glacial', preview: '/assets/ui/froid_preview.png' },
+        { value: 'village', labelKey: 'profile.theme_village', description: 'Brun terreux', preview: '/assets/ui/village_preview.png' },
     ];
 
     readonly languages: { value: LanguageType; labelKey: string }[] = [
