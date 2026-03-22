@@ -1,4 +1,3 @@
-/// <reference types="multer" />
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RegisterUserDto, UpdateUserDto } from '@app/modules/auth/dto/auth.dto';
 import { User, UserDocument } from '@app/modules/auth/schemas/user.schema';
@@ -11,6 +10,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { DecodedIdToken } from 'firebase-admin/auth';
 import { Model } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type {} from 'multer';
 
 const DELETED_USER_PLACEHOLDER = '[supprimé]';
 

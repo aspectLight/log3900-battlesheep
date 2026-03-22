@@ -1,5 +1,3 @@
-/// <reference types="multer" />
-
 import { CurrentUser } from '@app/modules/auth/decorators/current-user.decorator';
 import { GetEmailByUsernameDto, LoginDto, RegisterUserDto, UpdateUserDto, VerifyTokenDto } from '@app/modules/auth/dto/auth.dto';
 import { AuthGuard } from '@app/modules/auth/guards/auth.guard';
