@@ -1,14 +1,14 @@
 @if (showError) {
-<app-pop-up popUpMessage="{{ errorMessage }}" [showSecondButton]="false" (confirm)="router.navigate([routes.home])"> </app-pop-up>
+<app-pop-up [isError]="true" popUpMessage="{{ errorMessage }}" [showSecondButton]="false" (confirm)="router.navigate([routes.home])"> </app-pop-up>
 } @if (showMessage) {
 <app-pop-up popUpMessage="{{ errorMessage }}" [showSecondButton]="false" (confirm)="onCancel()"> </app-pop-up>
 } @if (showErrorFromService) {
-<app-pop-up popUpMessage="{{ errorMessageFromService }}" [showSecondButton]="false" (confirm)="disableUnlockError()"> </app-pop-up>
+<app-pop-up [isError]="true" popUpMessage="{{ errorMessageFromService }}" [showSecondButton]="false" (confirm)="disableUnlockError()"> </app-pop-up>
 } @if (showConfirmation) {
-<app-pop-up popUpMessage="{{ errorMessage }}" [showSecondButton]="true" [firstOption]="'common.yes' | translate" [secondOption]="'common.no' | translate" (confirm)="toDo()" (cancel)="onCancel()">
+<app-pop-up [isError]="true" popUpMessage="{{ errorMessage }}" [showSecondButton]="true" [firstOption]="'common.yes' | translate" [secondOption]="'common.no' | translate" (confirm)="toDo()" (cancel)="onCancel()">
 </app-pop-up>
 } @if (!code) {
-<app-pop-up [popUpMessage]="'waiting.auto_disconnect' | translate" [showSecondButton]="false" (confirm)="router.navigate([routes.home])"> </app-pop-up>
+<app-pop-up [isError]="true" [popUpMessage]="'waiting.auto_disconnect' | translate" [showSecondButton]="false" (confirm)="router.navigate([routes.home])"> </app-pop-up>
 }
 
 <div class="header">

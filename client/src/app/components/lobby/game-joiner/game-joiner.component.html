@@ -1,5 +1,5 @@
 @if (showError) {
-<app-pop-up popUpMessage="{{ errorMessage }}" [showSecondButton]="false" (confirm)="this.showError = false"> </app-pop-up>
+<app-pop-up [isError]="true" popUpMessage="{{ errorMessage }}" [showSecondButton]="false" (confirm)="this.showError = false"> </app-pop-up>
 }
 
 <div class="header">

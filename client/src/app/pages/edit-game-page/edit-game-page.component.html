@@ -12,7 +12,9 @@
 </div>
 
 @if (showConfirmation) {
-<app-pop-up [popUpMessage]="quitMessage | translate"
+<app-pop-up
+    [isError]="true"
+    [popUpMessage]="quitMessage | translate"
     [showSecondButton]="true"
     [firstOption]="'common.yes' | translate"
     [secondOption]="'common.no' | translate"

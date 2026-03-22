@@ -75,6 +75,7 @@
 } } @else {
     @if (isGameCanceled || this.showError) {
         <app-pop-up
+            [isError]="true"
             [popUpMessage]="'combat.auto_disconnect' | translate"
             [showSecondButton]="false"
             (confirm)="goBackToMenu()">

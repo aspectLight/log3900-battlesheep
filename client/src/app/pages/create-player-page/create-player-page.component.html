@@ -90,6 +90,7 @@
 
 @if (gameModified===true) {
     <app-pop-up
+        [isError]="true"
         [popUpMessage]="'create_player.hidden_deleted' | translate"
         [showSecondButton]="false"
         (confirm)="handlePopUp()">
@@ -98,6 +99,7 @@
 
 @if (showError===true) {
     <app-pop-up
+        [isError]="true"
         popUpMessage="{{errorMessage}}"
         [showSecondButton]="false"
         (confirm)="handlePopUp()">
@@ -106,6 +108,7 @@
 
 @if (!validCharacter) {
     <app-pop-up
+        [isError]="true"
         [popUpMessage]="'create_player.choose_all' | translate"
         [showSecondButton]="false"
         (confirm)="validCharacter=true">

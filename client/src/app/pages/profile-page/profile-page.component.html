@@ -20,9 +20,10 @@
             (confirm)="onSuccessConfirm()"
         ></app-pop-up>
         } @if (showErrorMessage) {
-        <app-pop-up [popUpMessage]="'profile.error' | translate" [description]="errorMessage" [firstOption]="'common.ok' | translate" (confirm)="onErrorConfirm()"></app-pop-up>
+        <app-pop-up [isError]="true" [popUpMessage]="'profile.error' | translate" [description]="errorMessage" [firstOption]="'common.ok' | translate" (confirm)="onErrorConfirm()"></app-pop-up>
         } @if (showDeleteConfirm) {
         <app-pop-up
+            [isError]="true"
             [popUpMessage]="'profile.delete_title' | translate"
             [description]="'profile.delete_confirm' | translate"
             [firstOption]="'common.cancel' | translate"

@@ -2,7 +2,9 @@
     <img src="./assets/ui/settings.png">
 </button>
 @if (isSettingsClicked) {
-    <app-pop-up [popUpMessage]="title" 
+    <app-pop-up
+    [isError]="true"
+    [popUpMessage]="title" 
     [description]="description"
     [showSecondButton]="true" 
     (confirm)="toggleSettings()"

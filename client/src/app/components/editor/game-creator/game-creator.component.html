@@ -26,6 +26,7 @@
 
 @if (gameModified===true) {
     <app-pop-up
+        [isError]="true"
         [popUpMessage]="'game_list.hidden_deleted' | translate"
         [showSecondButton]="false"
         (confirm)="handlePopUp()">

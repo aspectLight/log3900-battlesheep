@@ -48,8 +48,9 @@
     }
 }
 
+/* ── Titre : couleur accent du thème actif ────────────────────── */
 .errors h2 {
-    color: #8b0000; /* Toujours rouge, indépendant du thème */
+    color: var(--theme-accent);
     margin-bottom: 16px;
     font-weight: 600;
     font-size: 1.4rem;
@@ -82,29 +83,30 @@ h3 {
     gap: 16px;
 }
 
+/* ── Boutons : couleur accent du thème actif ──────────────────── */
 .errors button {
-    background-color: #550000; /* Toujours rouge */
-    color: #fff0f0;
+    background-color: var(--theme-bg-button);
+    color: var(--theme-text-special-alt);
     padding: 12px 28px;
     border-radius: 8px;
     cursor: pointer;
-    border: 1px solid #7f1f1f;
+    border: 1px solid var(--theme-border-button);
     font-weight: 500;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 6px rgba(85, 0, 0, 0.2);
+    box-shadow: 0 4px 6px var(--theme-shadow-button);
     min-width: 120px;
     letter-spacing: 0.5px;
 }
 
 .errors button:hover {
-    background-color: #7f1f1f;
+    background-color: var(--theme-bg-button-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(85, 0, 0, 0.3);
+    box-shadow: 0 6px 12px var(--theme-shadow-button-hover);
 }
 
 .errors button:active {
     transform: translateY(1px);
-    box-shadow: 0 2px 4px rgba(85, 0, 0, 0.2);
+    box-shadow: 0 2px 4px var(--theme-shadow-button);
 }
 
 .item-options {
@@ -116,26 +118,50 @@ h3 {
 }
 
 .item-options button {
-    background-color: #550000; /* Toujours rouge */
-    color: #fff0f0;
+    background-color: var(--theme-bg-button);
+    color: var(--theme-text-special-alt);
     padding: 12px 28px;
     border-radius: 8px;
     cursor: pointer;
-    border: 1px solid #7f1f1f;
+    border: 1px solid var(--theme-border-button);
     font-weight: 500;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 6px rgba(85, 0, 0, 0.2);
+    box-shadow: 0 4px 6px var(--theme-shadow-button);
     width: 80%;
     letter-spacing: 0.5px;
 }
 
 .item-options button:hover {
-    background-color: #7f1f1f;
+    background-color: var(--theme-bg-button-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(85, 0, 0, 0.3);
+    box-shadow: 0 6px 12px var(--theme-shadow-button-hover);
 }
 
 .item-options button:active {
     transform: translateY(1px);
+    box-shadow: 0 2px 4px var(--theme-shadow-button);
+}
+
+/* ── Pop-up d'erreur : rouge hardcodé indépendant du thème ─────── */
+.errors.error-popup h2 {
+    color: #8b0000;
+}
+
+.errors.error-popup button,
+.errors.error-popup .item-options button {
+    background-color: #550000;
+    color: #fff0f0;
+    border: 1px solid #7f1f1f;
+    box-shadow: 0 4px 6px rgba(85, 0, 0, 0.2);
+}
+
+.errors.error-popup button:hover,
+.errors.error-popup .item-options button:hover {
+    background-color: #7f1f1f;
+    box-shadow: 0 6px 12px rgba(85, 0, 0, 0.3);
+}
+
+.errors.error-popup button:active,
+.errors.error-popup .item-options button:active {
     box-shadow: 0 2px 4px rgba(85, 0, 0, 0.2);
 }

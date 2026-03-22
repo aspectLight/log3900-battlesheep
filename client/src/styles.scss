@@ -62,6 +62,18 @@ body::after {
     z-index: -1;
 }
 
+/* Thème Froid Sibérien — voile bleu glacé */
+body.theme-frost::after {
+    background: rgba(10, 28, 55, 0.28);
+    backdrop-filter: blur(3px);
+}
+
+/* Thème Village Abandonné — voile sépia chaud et tamisé */
+body.theme-village::after {
+    background: rgba(28, 20, 8, 0.30);
+    backdrop-filter: blur(3px);
+}
+
 body {
     font-family: 'CustomFont';
     font-size: 1.5em;

@@ -87,6 +87,7 @@
     </div>
     @if (showError) {
     <app-pop-up
+        [isError]="true"
         [popUpMessage]="errorMessage"
         [showSecondButton]="true"
         [secondOption]="'common.no' | translate"
