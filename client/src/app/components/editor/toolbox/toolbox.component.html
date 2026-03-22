@@ -7,7 +7,7 @@
                 <div class="tile-item">
                     <button
                         (click)="setActiveTile(tile.key)"
-                        [title]="tile.value.description"
+                        [title]="'toolbox.tile_' + tile.key | translate"
                         [class.active-overlay]="this.getActiveTile().type === tile.key"
                     >
                         <img class="item-img" [src]="tile.value.images.default" [alt]="tile.value.name" draggable="false" />
@@ -33,7 +33,7 @@
             <div class="item-list">
                 @for(item of items | keyvalue: noSort; track item) {
                 <div class="item-item" (dragstart)="startDrag(item.key)" (dragend)="handleDragEnd()" [draggable]="getItemCount(item.key) !== 0">
-                    <button [title]="item.value.description" [class.grayed-out]="getItemCount(item.key) === 0">
+                    <button [title]="'toolbox.item_' + item.key | translate" [class.grayed-out]="getItemCount(item.key) === 0">
                         <img
                             class="item-img"
                             [src]="item.value.imagePath"

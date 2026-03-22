@@ -8,7 +8,7 @@ import { RoomInfo } from '@app/interfaces/room-info.interface';
 import { MovementSocketService } from '@app/services/communication/socket-handlers/movement-socket.service';
 import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
 import { GameCreationService } from '@app/services/lobby/game-creation.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 @Component({
     selector: 'app-game-joiner',
     templateUrl: './game-joiner.component.html',
@@ -20,12 +20,18 @@ export class GameJoinerComponent {
     showError: boolean;
     errorMessage: string;
 
+    private readonly SERVER_ERROR_MAP: Record<string, string> = {
+        "La salle n'existe pas": 'errors.room_not_found',
+        'La salle est verrouillée': 'errors.room_locked',
+    };
+
     constructor(
         private socketService: RoomSocketService,
         private movementSocketService: MovementSocketService,
         private gameCreationService: GameCreationService,
         private router: Router,
         private auth: Auth,
+        private translate: TranslateService,
     ) {
         this.gameCreationService.isHost = false;
         this.movementSocketService.sync();
@@ -48,7 +54,7 @@ export class GameJoinerComponent {
                 // Returning player: bypass character creation and rejoin directly with saved data
                 this.socketService.rejoinGame(room.roomId, currentUid, (success, error) => {
                     if (!success) {
-                        this.errorMessage = error || 'Impossible de rejoindre la partie';
+                        this.errorMessage = this.translateServerError(error);
                         this.showError = true;
                     }
                 });
@@ -68,9 +74,15 @@ export class GameJoinerComponent {
                 this.gameCreationService.isDropIn = false;
                 this.router.navigate([ROUTES.createPlayer]);
             } else {
-                this.errorMessage = error || '';
+                this.errorMessage = this.translateServerError(error);
                 this.showError = true;
             }
         });
+    }
+
+    private translateServerError(error?: string): string {
+        if (!error) return this.translate.instant('errors.generic');
+        const key = this.SERVER_ERROR_MAP[error];
+        return key ? this.translate.instant(key) : error;
     }
 }

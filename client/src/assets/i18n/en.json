@@ -124,7 +124,12 @@
     "confirm_kick": "Do you really want to kick this player?",
     "confirm_lock": "Do you really want to lock the room?",
     "confirm_unlock": "Do you really want to unlock the room?",
-    "confirm_leave": "Do you really want to leave the room?"
+    "confirm_leave": "Do you really want to leave the room?",
+    "welcome": "Welcome to the waiting room, share the game code with your friends!",
+    "game_deleted": "The game has been deleted.",
+    "player_kicked": "You have been kicked from the game.",
+    "quit_error": "Error while leaving the room.",
+    "room_locked_add_player": "The room is locked, it is impossible to add a virtual player."
   },
   "channels": {
     "title": "Discussion channels",
@@ -151,7 +156,8 @@
     "leave_active": "Leave this channel",
     "write_msg": "Write a message in #{{ name }}...",
     "member_singular": "member",
-    "member_plural": "members"
+    "member_plural": "members",
+    "quit_confirm": "Do you really want to delete this channel?"
   },
   "history": {
     "games": {
@@ -204,7 +210,10 @@
     "public": "Public",
     "private": "Private",
     "private_shared": "Shared-private",
-    "hidden_deleted": "The selected game is hidden or deleted."
+    "hidden_deleted": "The selected game is hidden or deleted.",
+    "mode_classique": "Classic",
+    "mode_ctf": "CTF",
+    "delete_warning": "You are about to delete this game, do you want to continue?"
   },
   "game_creator": {
     "title": "Create a game",
@@ -239,11 +248,65 @@
     "release": "Release",
     "release_desc": "to place",
     "name": "Name:",
-    "description": "Description:"
+    "description": "Description:",
+    "name_placeholder": "Enter a name",
+    "description_placeholder": "Enter a description",
+    "tile_tree": "A tree that cannot be climbed",
+    "tile_stone": "A large stone blocking the path",
+    "tile_trap": "A trap that slows movement",
+    "tile_snow": "A snow tile",
+    "tile_corner": "An impassable corner",
+    "tile_intersection": "An impassable intersection",
+    "tile_ice": "An ice tile",
+    "tile_water": "A water tile",
+    "tile_door": "A door that can be opened or closed",
+    "tile_wall": "An impassable wall",
+    "item_adrenaline": "Adds 2 health points",
+    "item_torch": "Adds 2 health points",
+    "item_vodka": "Adds 2 attack points, removes 1 speed point",
+    "item_propaganda": "Adds 5 attack and 5 defense points if the player has less than 3 health points",
+    "item_barbedWire": "Fleeing is impossible for the opponent, only if you initiated the combat",
+    "item_camouflage": "Allows movement to any tile for 1 action point",
+    "item_waterproofBoots": "Moving to another tile costs 1 movement point",
+    "item_airStrike": "Allows ranged attacks",
+    "item_random": "A random item revealed during the game",
+    "item_flag": "A flag to bring back to base",
+    "item_spawnPoint": "A campfire serving as a base"
+  },
+  "tiles_names": {
+    "tree": "Tree",
+    "stone": "Stone",
+    "snow": "Snow",
+    "trap": "Trap",
+    "ice": "Ice",
+    "water": "Water",
+    "door": "Door",
+    "wall": "Wall",
+    "corner": "Corner",
+    "intersection": "Intersection"
+  },
+  "edit_game": {
+    "title": "Edit Mode",
+    "back": "Manage Games",
+    "quit_confirm": "Are you sure you want to leave the editor? All unsaved changes will be lost."
   },
   "save": {
     "errors_title": "The game cannot be saved due to the following errors:",
-    "close": "Close"
+    "close": "Close",
+    "conflict_error": "The chosen game name is already in use. Please change it.",
+    "generic_error": "An error occurred. Please try again.",
+    "confirm": "Do you want to save the changes?",
+    "error_name": "The game must have a name.",
+    "error_description": "The game must have a description.",
+    "error_coverage": "More than 50% of the total game area must be covered by terrain tiles.",
+    "error_accessibility": "All terrain tiles must be accessible.",
+    "error_no_terrain": "No terrain tiles were found.",
+    "error_flag": "The game must contain a flag.",
+    "error_spawn_points": "There must be between {{min}} and {{max}} spawn points.",
+    "error_items": "There must be {{count}} items.",
+    "error_door_edge": "The door at ({{x}}, {{y}}) is on the edge of the board.",
+    "error_door_walls": "The door at ({{x}}, {{y}}) is not surrounded by walls on the same axis.",
+    "error_door_terrain": "The door at ({{x}}, {{y}}) is not surrounded by terrain tiles on the opposite axis."
   },
   "restart": {
     "confirm": "Are you sure you want to restart editing?",
@@ -289,7 +352,19 @@
     "current_turn": "Current turn: {{ time }}",
     "playing": "Playing...",
     "cost": "COST",
-    "description_label": "DESCRIPTION"
+    "description_label": "DESCRIPTION",
+    "notif_miss_title": "Missed!",
+    "notif_dodge_title": "Dodged!",
+    "notif_flight_title": "Escape attempt!",
+    "notif_flight_success": "You managed to flee!",
+    "notif_flight_failure": "You failed to flee!",
+    "notif_won_title": "Victory!",
+    "notif_won_message": "You won the fight!",
+    "notif_won_flight_title": "Escape successful!",
+    "notif_lost_title": "Defeat",
+    "notif_lost_message": "{{ name }} won the fight!",
+    "notif_lost_flight_title": "Escape successful!",
+    "notif_lost_flight_message": "{{ name }} managed to flee!"
   },
   "end_game": {
     "title": "Statistics",
@@ -313,9 +388,17 @@
     "virtual": "Virtual",
     "flag": "Flag"
   },
+  "player_hud": {
+    "dice": "DICE"
+  },
   "game_info": {
     "continue": "continue",
-    "quit": "quit"
+    "quit": "quit",
+    "turn_starting": "{{ name }}'s turn starts in 3 seconds!",
+    "players_count": "Players: {{ count }}",
+    "active_player": "Active player: {{ name }}",
+    "board_size": "Board size: {{ size }}x{{ size }}",
+    "debug_mode": "Debug mode activated"
   },
   "language": {
     "title": "Language",
@@ -334,5 +417,14 @@
     "lose_classic_unknown": "Defeat! A player won three combats",
     "lose_ctf_known": "Defeat! Team {{ winner }} captured the flag!",
     "lose_ctf_unknown": "Defeat! The opposing team captured the flag!"
+  },
+  "errors": {
+    "generic": "An error occurred. Please try again.",
+    "game_deleted": "The game has been deleted.",
+    "game_deleted_or_locked": "The game has been locked or deleted.",
+    "join_impossible": "Unable to join the game.",
+    "max_player_limit": "Maximum number of players reached, unable to unlock the room.",
+    "room_not_found": "The room does not exist.",
+    "room_locked": "The room is locked."
   }
 }

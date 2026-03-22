@@ -26,7 +26,7 @@
         <div class="card-wrapper">
             <img class="suit" [src]="item.imagePath" alt="Image de la carte" />
             <div class="card-name">{{ item.name }}</div>
-            <div class="card-description">{{ item.description }}</div>
+            <div class="card-description">{{ 'toolbox.item_' + item.type | translate }}</div>
         </div>
         <div class="corner letter-reversed">{{ item.name[0] }}</div>
     </div>

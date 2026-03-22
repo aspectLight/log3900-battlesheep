@@ -124,7 +124,12 @@
     "confirm_kick": "Voulez-vous vraiment expulser ce joueur ?",
     "confirm_lock": "Voulez-vous vraiment verrouiller la salle ?",
     "confirm_unlock": "Voulez-vous vraiment déverrouiller la salle ?",
-    "confirm_leave": "Voulez-vous vraiment quitter la salle ?"
+    "confirm_leave": "Voulez-vous vraiment quitter la salle ?",
+    "welcome": "Bienvenue dans la salle d'attente, partagez le code de la partie avec vos amis !",
+    "game_deleted": "Le jeu a été supprimé.",
+    "player_kicked": "Vous avez été expulsé de la partie.",
+    "quit_error": "Erreur lors de la sortie de la salle.",
+    "room_locked_add_player": "La salle est verrouillée, impossible d'ajouter un joueur virtuel."
   },
   "channels": {
     "title": "Canaux de discussion",
@@ -151,7 +156,8 @@
     "leave_active": "Quitter ce canal",
     "write_msg": "Écrire un message dans #{{ name }}...",
     "member_singular": "membre",
-    "member_plural": "membres"
+    "member_plural": "membres",
+    "quit_confirm": "Voulez-vous vraiment supprimer ce canal ?"
   },
   "history": {
     "games": {
@@ -204,7 +210,10 @@
     "public": "Public",
     "private": "Privé",
     "private_shared": "Privé-partagé",
-    "hidden_deleted": "Le jeu sélectionné est caché ou supprimé."
+    "hidden_deleted": "Le jeu sélectionné est caché ou supprimé.",
+    "mode_classique": "Classique",
+    "mode_ctf": "CTF",
+    "delete_warning": "Vous allez supprimer ce jeu, voulez-vous continuer ?"
   },
   "game_creator": {
     "title": "Créer une partie",
@@ -239,11 +248,64 @@
     "release": "Relâcher",
     "release_desc": "pour placer",
     "name": "Nom:",
-    "description": "Description:"
+    "description": "Description:",
+    "name_placeholder": "Entrez un nom",
+    "description_placeholder": "Entrez une description",
+    "tile_tree": "Un arbre qui ne peut pas être grimpé",
+    "tile_stone": "Une grande pierre qui bloque la route",
+    "tile_trap": "Un piège qui freine les déplacements",
+    "tile_snow": "Une tuile de neige",
+    "tile_ice": "Une tuile de glace",
+    "tile_corner": "Un coin infranchissable",
+    "tile_intersection": "Une intersection infranchissable",
+    "tile_water": "Une tuile d'eau",
+    "tile_door": "Une porte qui peut être ouverte ou fermée",
+    "tile_wall": "Un mur infranchissable",
+    "item_adrenaline": "Ajoute 2 points de vie",
+    "item_vodka": "Ajoute 2 points d'attaque, enlève 1 point de rapidité",
+    "item_propaganda": "Ajoute 5 points d'attaque et 5 points de défense si le joueur est à moins de 3 points de vie",
+    "item_barbedWire": "La fuite est impossible pour l'adversaire, seulement si vous êtes l'instigateur du combat",
+    "item_camouflage": "Permet de se déplacer vers n'importe quelle case pour 1 point d'action",
+    "item_waterproofBoots": "Les déplacements vers une autre case coûtent 1 point de mouvement",
+    "item_airStrike": "Permet d'attaquer à distance",
+    "item_random": "Un item aléatoire qui sera révélé en pleine partie",
+    "item_flag": "Un drapeau à ramener à la base",
+    "item_spawnPoint": "Un feu de camp servant de base"
+  },
+  "tiles_names": {
+    "tree": "Arbre",
+    "stone": "Pierre",
+    "trap": "Piège",
+    "ice": "Glace",
+    "water": "Eau",
+    "snow": "Neige",
+    "door": "Porte",
+    "wall": "Mur",
+    "corner": "Coin",
+    "intersection": "Intersection"
+  },
+  "edit_game": {
+    "title": "Mode édition",
+    "back": "Administrer les jeux",
+    "quit_confirm": "Êtes-vous sûr de vouloir quitter l'éditeur ? Toute modification non sauvegardée sera perdue."
   },
   "save": {
     "errors_title": "Le jeu ne peut pas être sauvegardé en raison des erreurs suivantes :",
-    "close": "Fermer"
+    "close": "Fermer",
+    "conflict_error": "Le nom choisi pour le jeu est déjà utilisé. Veuillez le changer.",
+    "generic_error": "Une erreur est survenue. Veuillez réessayer.",
+    "confirm": "Voulez-vous sauvegarder les modifications ?",
+    "error_name": "Le jeu doit avoir un nom.",
+    "error_description": "Le jeu doit avoir une description.",
+    "error_coverage": "Plus de 50% de la surface totale de la zone de jeu doit être occupée par des tuiles de terrain.",
+    "error_accessibility": "Toutes les tuiles de terrain doivent être accessibles.",
+    "error_no_terrain": "Aucune tuile de terrain n'a été trouvée.",
+    "error_flag": "Le jeu doit contenir un drapeau.",
+    "error_spawn_points": "Il doit y avoir entre {{min}} et {{max}} points de départ.",
+    "error_items": "Il doit y avoir {{count}} items.",
+    "error_door_edge": "La porte à ({{x}}, {{y}}) est sur le bord du plateau.",
+    "error_door_walls": "La porte à ({{x}}, {{y}}) n'est pas entourée par des murs sur le même axe.",
+    "error_door_terrain": "La porte à ({{x}}, {{y}}) n'est pas entourée par des tuiles de terrain sur l'axe opposé."
   },
   "restart": {
     "confirm": "Êtes-vous sûr de vouloir recommencer l'édition ?",
@@ -289,7 +351,19 @@
     "current_turn": "Tour en cours: {{ time }}",
     "playing": "Joue...",
     "cost": "COST",
-    "description_label": "DESCRIPTION"
+    "description_label": "DESCRIPTION",
+    "notif_miss_title": "Raté!",
+    "notif_dodge_title": "Esquivé!",
+    "notif_flight_title": "Tentative de fuite !",
+    "notif_flight_success": "Vous avez réussi à fuir!",
+    "notif_flight_failure": "Vous n'avez pas réussi à fuir!",
+    "notif_won_title": "Victoire!",
+    "notif_won_message": "Vous avez gagné le combat!",
+    "notif_won_flight_title": "Tentative de fuite réussie!",
+    "notif_lost_title": "Défaite",
+    "notif_lost_message": "{{ name }} a gagné le combat!",
+    "notif_lost_flight_title": "Tentative de fuite réussie!",
+    "notif_lost_flight_message": "{{ name }} a réussi à fuir!"
   },
   "end_game": {
     "title": "Statistiques",
@@ -313,14 +387,22 @@
     "virtual": "Virtuel",
     "flag": "Drapeau"
   },
+  "player_hud": {
+    "dice": "DÉS"
+  },
   "game_info": {
     "continue": "continuer",
-    "quit": "quitter"
+    "quit": "quitter",
+    "turn_starting": "Le tour de {{ name }} commence dans 3 secondes !",
+    "players_count": "Joueurs: {{ count }}",
+    "active_player": "Joueur actif: {{ name }}",
+    "board_size": "Taille du plateau: {{ size }}x{{ size }}",
+    "debug_mode": "Mode débogage activé"
   },
   "language": {
     "title": "Langue",
     "fr": "Français",
-    "en": "English"
+    "en": "Anglais"
   },
   "game_configurator": {
     "mode_desc_classic": "Gagnez 3 combats pour être déclaré vainqueur et mettre fin à la partie.",
@@ -334,5 +416,14 @@
     "lose_classic_unknown": "Défaite ! Un joueur a gagné trois combats",
     "lose_ctf_known": "Défaite ! L'équipe {{ winner }} a capturé le drapeau !",
     "lose_ctf_unknown": "Défaite ! L'équipe adverse a capturé le drapeau !"
+  },
+  "errors": {
+    "generic": "Une erreur est survenue. Veuillez réessayer.",
+    "game_deleted": "Le jeu a été supprimé.",
+    "game_deleted_or_locked": "La partie a été verrouillée ou supprimée.",
+    "join_impossible": "Impossible de rejoindre la partie.",
+    "max_player_limit": "Le nombre maximum de joueurs a été atteint, impossible de déverrouiller la salle.",
+    "room_not_found": "La salle n'existe pas.",
+    "room_locked": "La salle est verrouillée."
   }
 }

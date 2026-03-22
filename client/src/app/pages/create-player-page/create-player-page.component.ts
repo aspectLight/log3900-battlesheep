@@ -8,12 +8,11 @@ import { BonusType, STAT_WITH_BONUS } from '@app/constants/bonus.constants';
 import { ROUTES } from '@app/constants/routes.constants';
 import { Bonus } from '@app/interfaces/character.interface';
 import { Reservation } from '@app/interfaces/reservation.interface';
+import { ProfileService } from '@app/services/communication/profile.service';
 import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
 import { GameCreationService } from '@app/services/lobby/game-creation.service';
 import { PlayerCreationService } from '@app/services/lobby/player-creation.service';
-import { ErrorMessages } from '@common/error-messages.constants';
-import { ProfileService } from '@app/services/communication/profile.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-create-player-page',
@@ -38,6 +37,7 @@ export class CreatePlayerPageComponent implements OnInit {
         public router: Router,
         public roomSocketService: RoomSocketService,
         public profileService: ProfileService,
+        private translate: TranslateService,
     ) {
         this.isHost = this.gameCreationService.isHost;
         this.socketService.getReservedAvatars(this.gameCreationService.gameCode);
@@ -64,7 +64,7 @@ export class CreatePlayerPageComponent implements OnInit {
     ngOnInit() {
         this.socketService.roomLocked$.subscribe((locked) => {
             if (locked) {
-                this.errorMessage = ErrorMessages.GameDeletedOrLocked;
+                this.errorMessage = this.translate.instant('errors.game_deleted_or_locked');
                 this.showError = true;
             }
         });
@@ -96,7 +96,7 @@ export class CreatePlayerPageComponent implements OnInit {
                 // Drop-in flow: join a game in progress
                 this.socketService.joinGameRoom(this.gameCreationService.gameCode, newPlayer, (success, error) => {
                     if (!success) {
-                        this.errorMessage = error || 'Impossible de rejoindre la partie';
+                        this.errorMessage = error || this.translate.instant('errors.join_impossible');
                         this.showError = true;
                     }
                     // On success, joinGameRoom callback handles the redirect via gameManagerService

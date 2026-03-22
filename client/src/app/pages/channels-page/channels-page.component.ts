@@ -2,12 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { AuthService } from '@app/services/communication/auth.service';
 import { ChannelInfo, ChannelMessage, CustomChannelService } from '@app/services/communication/custom-channel.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
-import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
-import { TranslateModule } from '@ngx-translate/core';
-import { WARNING_MESSAGES } from '@common/error-messages.constants';
 @Component({
     selector: 'app-channels-page',
     templateUrl: './channels-page.component.html',
@@ -20,7 +19,7 @@ export class ChannelsPageComponent implements OnInit, OnDestroy {
     errorMessage = signal<string | null>(null);
     successMessage = signal<string | null>(null);
     showConfirmation: boolean = false;
-    quitMessage = WARNING_MESSAGES.QuitChannel;
+    quitMessage = '';
     newChannelName = '';
     filterTerm = '';
 
@@ -37,7 +36,10 @@ export class ChannelsPageComponent implements OnInit, OnDestroy {
     constructor(
         private customChannelService: CustomChannelService,
         private authService: AuthService,
-    ) {}
+        private translate: TranslateService,
+    ) {
+        this.quitMessage = this.translate.instant('channels.quit_confirm');
+    }
 
     get username(): string {
         return this.authService.currentUser?.displayName ?? 'Utilisateur';

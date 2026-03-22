@@ -29,7 +29,7 @@
                 </span>
                 <span>{{ game.name }}</span>
                 <span>{{ game.board.size }}</span>
-                <span>{{ game.mode }}</span>
+                <span>{{ 'game_list.mode_' + game.mode | translate }}</span>
                 <span>{{ game.owner }}</span>
                 <span>{{ game.modificationDate | date: 'short' }}</span>
                 @if (isModifierVisible) {

@@ -10,6 +10,12 @@ export const ITEM_TYPES: { [key: string]: ItemType } = {
         imagePath: './assets/items/drug.png',
     },
 
+    torch: {
+        name: 'Adrenaline',
+        description: 'Ajoute 2 points de vie',
+        imagePath: './assets/items/drug.png',
+    },
+
     vodka: {
         name: 'Vodka',
         description: "Ajoute 2 points d'attaque, enlève 1 point de rapidité",

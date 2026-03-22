@@ -12,7 +12,6 @@ import { VirtualPlayerService } from '@app/services/gameplay/virtual-player.serv
 import { GameCreationService } from '@app/services/lobby/game-creation.service';
 import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ErrorMessages, WaitRoomWelcomeMessage } from '@common/error-messages.constants';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -23,7 +22,7 @@ import { Subscription } from 'rxjs';
 })
 export class WaitingPlayerComponent implements OnInit, OnDestroy {
     showError: boolean = false;
-    errorMessage: string = WaitRoomWelcomeMessage;
+    errorMessage: string = '';
     showMessage: boolean = true;
     showConfirmation: boolean = false;
     room: Room | null = null;
@@ -65,22 +64,23 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
     }
 
     get errorMessageFromService(): string {
-        return this.waitingRoomService.errorMessage;
+        return this.translate.instant(this.waitingRoomService.errorMessage);
     }
 
     ngOnInit(): void {
+        this.errorMessage = this.translate.instant('waiting.welcome');
         this.roomSubscription = this.waitingRoomService.room$.subscribe((room) => {
             this.room = room;
         });
         this.socketService.roomExists$.subscribe((roomExists) => {
             if (!roomExists) {
-                this.errorMessage = ErrorMessages.GameDeleted;
+                this.errorMessage = this.translate.instant('waiting.game_deleted');
                 this.showError = true;
             }
         });
         this.socketService.isKicked$.subscribe((isKicked) => {
             if (isKicked) {
-                this.errorMessage = ErrorMessages.PlayerKicked;
+                this.errorMessage = this.translate.instant('waiting.player_kicked');
                 this.showError = true;
             }
         });
@@ -152,7 +152,7 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
             if (success) {
                 this.router.navigate([ROUTES.home]);
             } else {
-                this.errorMessage = error || ErrorMessages.QuitError;
+                this.errorMessage = error || this.translate.instant('waiting.quit_error');
                 this.showError = true;
             }
         });
@@ -163,7 +163,7 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
         if (!this.room?.isLocked) {
             this.isProfileSectionVisible = true;
         } else {
-            this.errorMessage = ErrorMessages.RoomLockedAddPlayer;
+            this.errorMessage = this.translate.instant('waiting.room_locked_add_player');
             this.showMessage = true;
         }
     }

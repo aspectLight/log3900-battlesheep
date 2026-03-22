@@ -4,7 +4,8 @@ import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ROUTES } from '@app/constants/routes.constants';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+
 @Component({
     selector: 'app-game-info',
     standalone: true,
@@ -19,6 +20,7 @@ export class GameInfoComponent {
         private socketService: SocketService,
         private gameManagerService: GameManagerService,
         private router: Router,
+        private translate: TranslateService,
     ) {}
 
     get title() {
@@ -31,9 +33,9 @@ export class GameInfoComponent {
         const details = [
             this.gameManagerService.getGame().description,
             '',
-            `Joueurs: ${room.players.length}`,
-            `Joueur actif: ${activePlayerName}`,
-            `Taille du plateau: ${this.gameManagerService.getBoard().size}x${this.gameManagerService.getBoard().size}`,
+            this.translate.instant('game_info.players_count', { count: room.players.length }),
+            this.translate.instant('game_info.active_player', { name: activePlayerName }),
+            this.translate.instant('game_info.board_size', { size: this.gameManagerService.getBoard().size }),
         ];
         return details.join('\n');
     }

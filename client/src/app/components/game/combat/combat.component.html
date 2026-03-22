@@ -69,7 +69,7 @@
                         
                         <div class="info-column">
                             <div class="tile-header">
-                                <span class="tile-type">{{ selectedCell.tile.type | titlecase }}</span>
+                                <span class="tile-type">{{ "tiles_names." + selectedCell.tile.type | translate | titlecase }}</span>
                             </div>
                             
                             @if (selectedCell.tile.moveModifier > 0) {
@@ -86,7 +86,7 @@
                                     <span class="description-label-text">{{ 'combat.description_label' | translate }}</span>
                                 </div>
                                 <div class="tile-description">
-                                    <p>{{ selectedCell.tile.description }}</p>
+                                    <p>{{ 'toolbox.tile_' + selectedCell.tile.type | translate}}</p>
                                 </div>
                             </div>
                         </div>

@@ -9,7 +9,7 @@
             <h2>{{ 'save.errors_title' | translate }}</h2>
             <ul>
                 @for (error of errors; track error) {
-                <li>{{ error.message }}</li>
+                <li>{{ error.message! | translate: getErrorParams(error) }}</li>
                 }
             </ul>
             <button (click)="closeDialogue()">{{ 'save.close' | translate }}</button>
