@@ -24,7 +24,7 @@
                 <span>{{ room.boardSize }}</span>
                 <span>{{ getStatusLabel(room.status) }}</span>
                 <span [class.drop-in-badge]="room.dropInDropOut">{{ room.dropInDropOut ? 'Drop-in' : '-' }}</span>
-                <span>{{ getAccessibilityLabel(room) }}</span>
+                <span [class.friends-only-badge]="room.friendsOnly">{{ getAccessibilityLabel(room) }}</span>
                 <span class="room-code">{{ room.roomId.replace('game_', '') }}</span>
             </li>
             }

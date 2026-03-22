@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
+import { SocialService } from '@app/services/communication/social.service';
 import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';
 import { GameRoomService } from '@app/services/state/game-room.service';
 import { GeneralChatEvents } from '@common/socket.constants';
@@ -21,6 +22,7 @@ export class ChatService {
         private roomSocketService: RoomSocketService,
         private waitingRoomService: WaitingRoomService,
         private gameRoomService: GameRoomService,
+        private socialService: SocialService,
     ) {
         this.setupListeners();
     }
@@ -29,6 +31,7 @@ export class ChatService {
         this.socketService.on(
             'massMessage',
             (message: { type: string; name?: string | null; content: string; time: string; avatarId?: string | null; avatarUrl?: string | null }) => {
+                if (message.name && this.socialService.isInBlockRelationship(message.name)) return;
                 this.messages.push(message);
                 this.triggerScroll();
             },
@@ -44,7 +47,7 @@ export class ChatService {
                 avatarId?: string | null;
                 avatarUrl?: string | null;
             }[]) => {
-                this.messages = messages;
+                this.messages = messages.filter((m) => !m.name || !this.socialService.isInBlockRelationship(m.name));
                 this.triggerScroll();
             },
         );
@@ -52,6 +55,7 @@ export class ChatService {
         this.socketService.on(
             GeneralChatEvents.GeneralChatMessage,
             (message: { type: string; name: string; content: string; time: string; avatarId?: string | null; avatarUrl?: string | null }) => {
+                if (this.socialService.isInBlockRelationship(message.name)) return;
                 this.messages.push(message);
                 this.triggerScroll();
             },
@@ -60,6 +64,7 @@ export class ChatService {
         this.socketService.on(
             GeneralChatEvents.GeneralChatEmoji,
             (emoji: { type: string; name: string; content: string; time: string; avatarId?: string | null; avatarUrl?: string | null }) => {
+                if (this.socialService.isInBlockRelationship(emoji.name)) return;
                 this.messages.push(emoji);
                 this.triggerScroll();
             },
@@ -68,7 +73,7 @@ export class ChatService {
         this.socketService.on(
             GeneralChatEvents.GetGeneralChatMessagesResponse,
             (messages: { type: string; name: string; content: string; time: string; avatarId?: string | null; avatarUrl?: string | null }[]) => {
-                this.messages = messages;
+                this.messages = messages.filter((m) => !this.socialService.isInBlockRelationship(m.name));
                 this.triggerScroll();
             },
         );

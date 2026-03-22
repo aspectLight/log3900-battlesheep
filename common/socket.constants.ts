@@ -159,3 +159,43 @@ export enum CustomChannelEvents {
     CustomChannelError = 'customChannelError',
     UserChannelsRestored = 'userChannelsRestored', // Envoyé à la reconnexion pour restaurer les canaux rejoints
 }
+
+export enum SocialEvents {
+    // Friend requests
+    SendFriendRequest = 'sendFriendRequest',
+    FriendRequestReceived = 'friendRequestReceived',
+    AcceptFriendRequest = 'acceptFriendRequest',
+    FriendRequestAccepted = 'friendRequestAccepted',
+    RefuseFriendRequest = 'refuseFriendRequest',
+    FriendRequestRefused = 'friendRequestRefused',
+    CancelFriendRequest = 'cancelFriendRequest',
+    FriendRequestCanceled = 'friendRequestCanceled',
+    RemoveFriend = 'removeFriend',
+    FriendRemoved = 'friendRemoved',
+
+    // Block
+    BlockUser = 'blockUser',
+    UserBlocked = 'userBlocked',
+    UnblockUser = 'unblockUser',
+    UserUnblocked = 'userUnblocked',
+
+    // State synchronization
+    GetFriendsList = 'getFriendsList',
+    FriendsListResponse = 'friendsListResponse',
+    GetPendingRequests = 'getPendingRequests',
+    PendingRequestsResponse = 'pendingRequestsResponse',
+    GetBlockedUsers = 'getBlockedUsers',
+    BlockedUsersResponse = 'blockedUsersResponse',
+    GetUsersWhoBlockedMe = 'getUsersWhoBlockedMe',
+    UsersWhoBlockedMeResponse = 'usersWhoBlockedMeResponse',
+
+    // Friend presence
+    FriendOnline = 'friendOnline',
+    FriendOffline = 'friendOffline',
+
+    // Waiting room warning
+    BlockedUserInRoom = 'blockedUserInRoom',
+    BlockedUserRoomChoice = 'blockedUserRoomChoice',
+
+    SocialError = 'socialError',
+}

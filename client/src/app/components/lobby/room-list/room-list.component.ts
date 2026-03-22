@@ -53,6 +53,7 @@ export class RoomListComponent implements OnInit {
 
     getAccessibilityLabel(room: RoomInfo): string {
         if (room.playerCount >= room.maxPlayers) return 'Complète';
+        if (room.friendsOnly) return 'Amis seulement';
         if (room.status === 'playing' && room.dropInDropOut) return 'Drop-in';
         return 'Ouverte';
     }
