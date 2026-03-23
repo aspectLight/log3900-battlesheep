@@ -10,6 +10,7 @@ import { DragDropService } from '@app/services/editor/drag-drop.service';
 import { GameService } from '@app/services/editor/game.service';
 import { ItemService } from '@app/services/editor/item.service';
 import { PaintService } from '@app/services/editor/paint.service';
+import { TeleportService } from '@app/services/editor/teleport.service';
 import { TileService } from '@app/services/editor/tile.service';
 import { Board } from '@app/classes/board/board';
 import { SaveGameComponent } from '@app/components/editor/save-game/save-game.component';
@@ -56,6 +57,7 @@ export class ToolboxComponent implements OnInit, OnChanges {
         private dragDrop: DragDropService,
         private itemService: ItemService,
         private gameService: GameService,
+        private teleportService: TeleportService,
     ) {}
 
     get gameMode() {
@@ -89,6 +91,7 @@ export class ToolboxComponent implements OnInit, OnChanges {
     }
 
     setActiveTile(tileKey: string): void {
+        this.teleportService.cancelPending(this.board);
         const tileData = TILE_TYPES[tileKey];
         if (!tileData) return;
         const defaultOrientation = tileData.defaultOrientation;
@@ -112,6 +115,7 @@ export class ToolboxComponent implements OnInit, OnChanges {
     }
 
     toggleTab(tab: string): void {
+        this.teleportService.cancelPending(this.board);
         this.activeTab = tab;
         if (tab !== 'tiles') {
             this.tileService.clearActiveTile();

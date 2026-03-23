@@ -36,7 +36,7 @@ export class DragDropService {
             return;
         }
 
-        if (cell.tile.type === "trap") {
+        if (cell.tile.type === "trap" || cell.tile.type === "teleportPad") {
             this.resetInteractionState();
             return;
         }

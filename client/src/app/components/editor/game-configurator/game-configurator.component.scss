@@ -14,7 +14,8 @@ h2 {
 }
 
 .mode-selection-buttons,
-.size-selection-buttons {
+.size-selection-buttons,
+.actions-selection-buttons {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
@@ -43,7 +44,8 @@ input[type='radio'] {
     cursor: pointer;
 }
 
-.mode-description {
+.mode-description,
+.actions-description {
     color: var(--theme-text-muted);
 }
 

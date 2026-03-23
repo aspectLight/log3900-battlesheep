@@ -24,6 +24,7 @@ type LoginResponse = {
         email: string;
         username: string;
         avatarId: string;
+        avatarUrl?: string | null;
     };
 };
 

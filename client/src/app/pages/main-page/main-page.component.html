@@ -38,6 +38,12 @@
             <button class="button" id="create-game-button" routerLink="/create-game">{{ 'main.create_game' | translate }}</button>
             <button class="button" id="admin-game-button" routerLink="/admin-game">{{ 'main.admin_games' | translate }}</button>
             <button class="button" id="channels-button" routerLink="/channels">{{ 'main.channels' | translate }}</button>
+            <button class="button friends-button" id="friends-button" routerLink="/friends">
+                Amis
+                @if (pendingRequestCount > 0) {
+                    <span class="badge">{{ pendingRequestCount }}</span>
+                }
+            </button>
         </section>
     </div>
 

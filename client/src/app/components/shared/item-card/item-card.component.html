@@ -27,6 +27,11 @@
             <img class="suit" [src]="item.imagePath" alt="Image de la carte" />
             <div class="card-name">{{ item.name }}</div>
             <div class="card-description">{{ 'toolbox.item_' + item.type | translate }}</div>
+            @if (showDropButton) {
+                <button class="drop-button" [disabled]="!dropEnabled" (click)="onDropClick($event)">
+                    Déposer
+                </button>
+            }
         </div>
         <div class="corner letter-reversed">{{ item.name[0] }}</div>
     </div>

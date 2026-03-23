@@ -27,6 +27,38 @@ class AuthLandingRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [AuthenticatedShellScreen]
+class AuthenticatedShellRoute extends PageRouteInfo<void> {
+  const AuthenticatedShellRoute({List<PageRouteInfo>? children})
+    : super(AuthenticatedShellRoute.name, initialChildren: children);
+
+  static const String name = 'AuthenticatedShellRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AuthenticatedShellScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [CharacterCreationScreen]
+class CharacterCreationRoute extends PageRouteInfo<void> {
+  const CharacterCreationRoute({List<PageRouteInfo>? children})
+    : super(CharacterCreationRoute.name, initialChildren: children);
+
+  static const String name = 'CharacterCreationRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const CharacterCreationScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [GameHistoryScreen]
 class GameHistoryRoute extends PageRouteInfo<void> {
   const GameHistoryRoute({List<PageRouteInfo>? children})
@@ -38,6 +70,54 @@ class GameHistoryRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const GameHistoryScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [GameScreen]
+class GameRoute extends PageRouteInfo<void> {
+  const GameRoute({List<PageRouteInfo>? children})
+    : super(GameRoute.name, initialChildren: children);
+
+  static const String name = 'GameRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const GameScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [JoinGameSessionScreen]
+class JoinGameSessionRoute extends PageRouteInfo<void> {
+  const JoinGameSessionRoute({List<PageRouteInfo>? children})
+    : super(JoinGameSessionRoute.name, initialChildren: children);
+
+  static const String name = 'JoinGameSessionRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const JoinGameSessionScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [LoadingScreen]
+class LoadingRoute extends PageRouteInfo<void> {
+  const LoadingRoute({List<PageRouteInfo>? children})
+    : super(LoadingRoute.name, initialChildren: children);
+
+  static const String name = 'LoadingRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const LoadingScreen();
     },
   );
 }
@@ -91,6 +171,38 @@ class MainMenuRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ProfileScreen]
+class ProfileRoute extends PageRouteInfo<void> {
+  const ProfileRoute({List<PageRouteInfo>? children})
+    : super(ProfileRoute.name, initialChildren: children);
+
+  static const String name = 'ProfileRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ProfileScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [SelectGameSessionScreen]
+class SelectGameSessionRoute extends PageRouteInfo<void> {
+  const SelectGameSessionRoute({List<PageRouteInfo>? children})
+    : super(SelectGameSessionRoute.name, initialChildren: children);
+
+  static const String name = 'SelectGameSessionRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const SelectGameSessionScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [SignUpScreen]
 class SignUpRoute extends PageRouteInfo<void> {
   const SignUpRoute({List<PageRouteInfo>? children})
@@ -102,6 +214,38 @@ class SignUpRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const SignUpScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [StatisticsScreen]
+class StatisticsRoute extends PageRouteInfo<void> {
+  const StatisticsRoute({List<PageRouteInfo>? children})
+    : super(StatisticsRoute.name, initialChildren: children);
+
+  static const String name = 'StatisticsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const StatisticsScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [WaitingRoomScreen]
+class WaitingRoomRoute extends PageRouteInfo<void> {
+  const WaitingRoomRoute({List<PageRouteInfo>? children})
+    : super(WaitingRoomRoute.name, initialChildren: children);
+
+  static const String name = 'WaitingRoomRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const WaitingRoomScreen();
     },
   );
 }

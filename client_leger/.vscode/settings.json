@@ -1,0 +1,1 @@
+{"files.exclude":{"**/lib/generated":true,"**/*.g.dart":true,"**/*.freezed.dart":true,"**/.gitkeep":true,"**/*_localizations_*.dart":true}}

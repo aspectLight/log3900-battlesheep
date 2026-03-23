@@ -8,7 +8,6 @@
     max-width: 100vw;
     margin: auto;
     padding: 20px;
-
 }
 
 @keyframes dropIn {
@@ -218,7 +217,7 @@ app-board {
     box-shadow: 0 2px 4px var(--theme-shadow-button);
 }
 
-li:nth-child(n+2) {
+li:nth-child(n + 2) {
     animation-delay: calc(0.1s * var(--i, 0));
 }
 

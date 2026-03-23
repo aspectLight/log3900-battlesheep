@@ -3,6 +3,7 @@ export interface UserProfile {
     email: string;
     username: string;
     avatarId: string;
+    avatarUrl?: string | null;
     theme?: string;
     language?: string;
     preferences?: Record<string, unknown>;

@@ -76,14 +76,14 @@
                                 <button class="btn btn-join" (click)="joinChannel(channel)">{{ 'channels.join' | translate }}</button>
                             }
                             @if (isCreator(channel)) {
-                                <button class="btn btn-delete" (click)="toggleConfirmation()">{{ 'channels.delete' | translate }}</button>
+                                <button class="btn btn-delete" (click)="requestDeleteChannel(channel.id)">{{ 'channels.delete' | translate }}</button>
                             }
                         </span>
                     </div>
-                    @if (showConfirmation) {
-                        <app-pop-up [popUpMessage]="quitMessage"
-                        [showSecondButton]="true" [firstOption]="'common.yes' | translate" [secondOption]="'common.no' | translate" (confirm)="deleteChannel(channel.id)" (cancel)="onCancelQuit()"></app-pop-up> 
-                    }
+                }
+                @if (showConfirmation) {
+                    <app-pop-up [popUpMessage]="quitMessage"
+                    [showSecondButton]="true" [firstOption]="'common.yes' | translate" [secondOption]="'common.no' | translate" (confirm)="confirmDeleteChannel()" (cancel)="onCancelQuit()"></app-pop-up>
                 }
             </div>
         }
@@ -117,6 +117,13 @@
                             @for (msg of channelMessages(); track $index) {
                                 <div class="message-row">
                                     <span class="time">{{ msg.time }}</span>
+                                    <span class="avatar-wrap">
+                                        @if (resolveAvatar(msg.avatarId, msg.avatarUrl); as avatarSrc) {
+                                            <img class="msg-avatar" [src]="avatarSrc" [alt]="msg.name ?? ''" />
+                                        } @else {
+                                            <span class="msg-avatar-placeholder">{{ (msg.name ?? '?')[0].toUpperCase() }}</span>
+                                        }
+                                    </span>
                                     <span class="author">{{ msg.name }}</span>
                                     <span class="content">{{ msg.content }}</span>
                                 </div>

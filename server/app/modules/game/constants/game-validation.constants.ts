@@ -1,6 +1,6 @@
 export const TILES_COVERAGE_PERCENTAGE = 0.5;
 export const TERRAIN_TILES = ['water', 'ice', 'snow'];
-export const ACCESSIBLE_TILES = ['water', 'ice', 'snow', 'door'];
+export const ACCESSIBLE_TILES = ['water', 'ice', 'snow', 'door', 'trap', 'teleportPad'];
 export const WALL_TYPE_TILES = ['wall', 'corner', 'intersection', 'stone', 'tree'];
 
 export const BOARD_SIZES = {

@@ -56,6 +56,22 @@ export const TILE_TYPES: {
         defaultState: 'default',
         defaultOrientation: '',
     },
+    teleportPad: {
+        name: 'Teleport Pad',
+        description: 'Un téléporteur qui mène à un autre téléporteur',
+        baseMoveModifier: 1,
+        images: {
+            default: './assets/tiles/teleport.png',
+            blue: './assets/tiles/teleport_blue.png',
+            green: './assets/tiles/teleport_green.png',
+            purple: './assets/tiles/teleport_purple.png',
+            red: './assets/tiles/teleport_red.png',
+            yellow: './assets/tiles/teleport_yellow.png',
+        },
+        defaultState: 'default',
+        defaultOrientation: '',
+        states: ['default', 'blue', 'green', 'purple', 'red', 'yellow'],
+    },
     ice: {
         name: 'Ice',
         description: 'Une tuile de glace',
@@ -246,22 +262,6 @@ export const TILE_TYPES: {
         defaultOrientation: 'TUp',
         rotations: ['TUp', 'TRight', 'TDown', 'TLeft', 'Cross'],
     },
-    teleportPad: {
-        name: 'Intersection',
-        description: 'Un mur infranchissable',
-        baseMoveModifier: -1,
-        images: {
-            defaultTUp: './assets/tiles/intersection_T_up.png',
-            defaultTRight: './assets/tiles/intersection_T_right.png',
-            defaultTDown: './assets/tiles/intersection_T_down.png',
-            defaultTLeft: './assets/tiles/intersection_T_left.png',
-            defaultCross: './assets/tiles/intersection_cross.png',
-            default: './assets/tiles/intersection_T_up.png',
-        },
-        defaultState: 'default',
-        defaultOrientation: 'TUp',
-        rotations: ['TUp', 'TRight', 'TDown', 'TLeft', 'Cross'],
-    },
 };
 
-export const ALLOWED_TILES = ['door', 'water', 'ice', 'wall', 'tree', 'stone', 'trap'];
+export const ALLOWED_TILES = ['door', 'water', 'ice', 'wall', 'tree', 'stone', 'trap', 'teleportPad'];

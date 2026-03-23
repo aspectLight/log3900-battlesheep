@@ -158,7 +158,7 @@
                             <button
                                 type="button"
                                 class="avatar-btn"
-                                [class.selected]="selectedAvatarId === a.id"
+                                [class.selected]="selectedAvatarId === a.id && !selectedAvatarFile"
                                 (click)="selectAvatar(a.id)"
                                 [title]="a.label"
                             >
@@ -166,9 +166,51 @@
                             </button>
                             }
                         </div>
+                        @if (form.controls.avatarId.touched && form.controls.avatarId.errors?.['required'] && !selectedAvatarFile) {
+                        <small class="error">Sélectionnez un avatar ou téléversez une image</small>
+                        }
+                    </div>
 
-                        @if (form.controls.avatarId.touched && form.controls.avatarId.errors?.['required']) {
-                        <small class="error">{{ 'validation.avatar_required' | translate }}</small>
+                    <div class="field" style="margin-top: 12px;">
+                        <label class="label">Téléverser un avatar personnalisé</label>
+                        <div class="avatar-upload-row">
+                            @if (avatarPreviewUrl) {
+                            <div class="avatar-upload-preview">
+                                <img [src]="avatarPreviewUrl" alt="Aperçu avatar" class="avatar-preview-img" />
+                            </div>
+                            }
+                            <div class="upload-input-wrapper">
+                                <div class="avatar-source-picker">
+                                    <button type="button" class="btn-choose-file" (click)="showAvatarMenu = !showAvatarMenu">
+                                        Choisir un fichier
+                                        <span class="chevron" [class.open]="showAvatarMenu">&#9660;</span>
+                                    </button>
+                                    @if (!avatarPreviewUrl) {
+                                    <span class="no-file-label">Aucun fichier choisi</span>
+                                    }
+                                    @if (showAvatarMenu) {
+                                    <div class="avatar-source-menu">
+                                        <button type="button" class="avatar-source-option" (click)="triggerFileInput()">
+                                            &#128190; Télécharger une image
+                                        </button>
+                                        <button type="button" class="avatar-source-option" (click)="openCamera()">
+                                            &#128247; Prendre un selfie
+                                        </button>
+                                    </div>
+                                    }
+                                </div>
+                                <input
+                                    #fileInput
+                                    id="avatarUpload"
+                                    type="file"
+                                    class="avatar-file-input-hidden"
+                                    (change)="onAvatarFileSelected($event)"
+                                    accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                                />
+                            </div>
+                        </div>
+                        @if (avatarFileError) {
+                        <small class="error">{{ avatarFileError }}</small>
                         }
                     </div>
                 </div>
@@ -191,3 +233,49 @@
         </form>
     </div>
 </div>
+
+@if (camera.cameraError) {
+<app-pop-up
+    [popUpMessage]="'Erreur de caméra'"
+    [description]="camera.cameraError"
+    [firstOption]="'Fermer'"
+    (confirm)="camera.cameraError = null"
+></app-pop-up>
+}
+
+@if (camera.showCameraModal) {
+<div class="camera-modal-overlay" (click)="closeCamera()">
+    <div class="camera-modal" (click)="$event.stopPropagation()">
+        <div class="camera-modal-header">
+            <h2 class="camera-modal-title">Capturer un selfie</h2>
+            <button type="button" class="camera-close-btn" (click)="closeCamera()" aria-label="Fermer">&#x2715;</button>
+        </div>
+
+        <div class="camera-body">
+            @if (!camera.capturedImageDataUrl) {
+            <div class="camera-preview-container">
+                <video #cameraVideo autoplay playsinline muted class="camera-video" [class.ready]="camera.isCameraReady"></video>
+                @if (!camera.isCameraReady) {
+                <div class="camera-loading">Initialisation de la caméra...</div>
+                }
+            </div>
+            <div class="camera-actions">
+                <button type="button" class="btn-capture" (click)="capturePhoto()" [disabled]="!camera.isCameraReady">
+                    <span class="capture-dot"></span>
+                </button>
+            </div>
+            } @else {
+            <div class="camera-preview-container">
+                <img [src]="camera.capturedImageDataUrl" alt="Photo capturée" class="camera-captured-img" />
+            </div>
+            <div class="camera-actions camera-actions-row">
+                <button type="button" class="btn-secondary camera-modal-btn" (click)="retakePhoto()">&#8635; Reprendre</button>
+                <button type="button" class="btn-primary camera-modal-btn" (click)="useCapturedPhoto()">&#10003; Utiliser cette photo</button>
+            </div>
+            }
+        </div>
+
+        <canvas #cameraCanvas class="camera-canvas-hidden"></canvas>
+    </div>
+</div>
+}

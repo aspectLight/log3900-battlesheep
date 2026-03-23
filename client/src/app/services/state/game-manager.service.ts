@@ -32,6 +32,8 @@ export class GameManagerService {
     notificationTime: number;
     isNotificationVisible: boolean = false;
 
+    illuminatedCells: Set<string> = new Set();
+
     isGameCanceled: boolean = false;
     isGameFinished: boolean = false;
     isGameLoaded: boolean = false;
@@ -396,6 +398,25 @@ export class GameManagerService {
 
     clearPaths() {
         this.pathService.clearService();
+    }
+
+    isIlluminated(x: number, y: number): boolean {
+        return this.illuminatedCells.has(`${x},${y}`);
+    }
+
+    updateIllumination(illuminatedCells: string[], players?: any[]): void {
+        this.illuminatedCells = new Set(illuminatedCells);
+
+        // Update player stats from server data if provided
+        if (players) {
+            for (const serverPlayer of players) {
+                const boardPlayer = this.board.getPlayerById(serverPlayer.id);
+                if (boardPlayer && serverPlayer.stats) {
+                    boardPlayer.setStatValue(BonusType.Attack, serverPlayer.stats['attack'].value);
+                    boardPlayer.setStatValue(BonusType.Defense, serverPlayer.stats['defense'].value);
+                }
+            }
+        }
     }
 
     getMoveInfo() {

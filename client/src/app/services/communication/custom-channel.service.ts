@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from '@app/services/communication/auth.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
+import { SocialService } from '@app/services/communication/social.service';
 import { CustomChannelEvents } from '@common/socket.constants';
 import { Subject } from 'rxjs';
 
@@ -16,6 +17,8 @@ export interface ChannelMessage {
     name?: string;
     content: string;
     time: string;
+    avatarId?: string | null;
+    avatarUrl?: string | null;
 }
 
 @Injectable({
@@ -24,6 +27,8 @@ export interface ChannelMessage {
 export class CustomChannelService {
     channels: ChannelInfo[] = [];
     channelError: string | null = null;
+    avatarId: string | null = null;
+    avatarUrl: string | null = null;
 
     channelsUpdated$ = new Subject<ChannelInfo[]>();
     channelCreated$ = new Subject<{ channelId: string; channelName: string }>();
@@ -40,6 +45,7 @@ export class CustomChannelService {
     constructor(
         private socketService: SocketService,
         private authService: AuthService,
+        private socialService: SocialService,
     ) {}
 
     get username(): string {
@@ -122,11 +128,13 @@ export class CustomChannelService {
         });
 
         socket.on(CustomChannelEvents.CustomChannelMessagesResponse, (payload: { channelId: string; messages: ChannelMessage[] }) => {
-            this.messagesByChannel[payload.channelId] = payload.messages;
-            this.messagesUpdated$.next({ channelId: payload.channelId, messages: payload.messages });
+            const filtered = payload.messages.filter((m) => !m.name || !this.socialService.isInBlockRelationship(m.name));
+            this.messagesByChannel[payload.channelId] = filtered;
+            this.messagesUpdated$.next({ channelId: payload.channelId, messages: filtered });
         });
 
         socket.on(CustomChannelEvents.CustomChannelMessage, (payload: { channelId: string; message: ChannelMessage }) => {
+            if (payload.message.name && this.socialService.isInBlockRelationship(payload.message.name)) return;
             const current = this.messagesByChannel[payload.channelId] ?? [];
             this.messagesByChannel[payload.channelId] = [...current, payload.message];
             this.messagesUpdated$.next({
@@ -185,6 +193,8 @@ export class CustomChannelService {
             channelId,
             username: this.username,
             message,
+            avatarId: this.avatarId,
+            avatarUrl: this.avatarUrl,
         });
     }
 

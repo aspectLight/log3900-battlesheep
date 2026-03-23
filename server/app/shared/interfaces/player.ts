@@ -26,6 +26,8 @@ export interface Player {
     hasBoots?: boolean;
     team?: number;
     firebaseUid?: string;
+    profileAvatarId?: string | null;
+    profileAvatarUrl?: string | null;
     fightsWon?: number;
 }
 

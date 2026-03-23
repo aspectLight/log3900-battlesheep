@@ -1,4 +1,4 @@
-﻿<div class="chatbox" [class.collapsed]="isCollapsed">
+<div class="chatbox" [class.collapsed]="isCollapsed">
     <div class="chatbox-header">
         <select class="channel-select" [ngModel]="activeChannelId" (ngModelChange)="switchChannel($event)">
             <option [ngValue]="null">{{ 'chatbox.general' | translate }}</option>
@@ -20,8 +20,15 @@
     <div class="chatbox-content" [class.hidden]="isCollapsed">
         <div class="chatbox-messages" #chatboxMessages>
             @for (msg of displayMessages; track $index) {
-                <div class="message">
+                <div class="message" [class.sent]="msg.type === 'sent'">
                     <span class="msg-time">{{ msg.time }}</span>
+                    <span class="msg-avatar-wrap">
+                        @if (resolveAvatar(msg.avatarId, msg.avatarUrl); as avatarSrc) {
+                            <img class="msg-avatar" [src]="avatarSrc" [alt]="msg.name ?? ''" />
+                        } @else {
+                            <span class="msg-avatar-placeholder">{{ (msg.name ?? '?')[0].toUpperCase() }}</span>
+                        }
+                    </span>
                     <span class="msg-author">{{ msg.name }}</span>
                     <span class="msg-content">{{ msg.content }}</span>
                 </div>

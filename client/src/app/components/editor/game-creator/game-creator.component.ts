@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { GameListComponent } from '@app/components/editor/game-list/game-list.component';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
@@ -13,7 +14,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-game-creator',
-    imports: [CommonModule, GameListComponent, PopUpComponent, RouterLink, TranslateModule],
+    imports: [CommonModule, FormsModule, GameListComponent, PopUpComponent, RouterLink, TranslateModule],
     templateUrl: './game-creator.component.html',
     styleUrl: './game-creator.component.scss',
 })
@@ -21,6 +22,7 @@ export class GameCreatorComponent implements OnInit {
     selectedGame: Game | null = null;
     gameModified = false;
     hasGames = false;
+    friendsOnly = false;
 
     constructor(
         private router: Router,
@@ -32,6 +34,8 @@ export class GameCreatorComponent implements OnInit {
     ngOnInit() {
         this.gameModified = false;
         this.gameCreationService.isHost = true;
+        this.friendsOnly = false;
+        this.gameCreationService.friendsOnly = false;
     }
 
     onSelectGame(game: Game): void {
@@ -46,6 +50,7 @@ export class GameCreatorComponent implements OnInit {
         if (this.selectedGame) {
             this.gameModified = await this.gameListService.fetchGameById(this.selectedGame._id);
             if (!this.gameModified) {
+                this.gameCreationService.friendsOnly = this.friendsOnly;
                 this.gameCreationService.setSelectedGame(this.selectedGame);
                 this.socketService.generateCode((code) => {
                     if (code) {

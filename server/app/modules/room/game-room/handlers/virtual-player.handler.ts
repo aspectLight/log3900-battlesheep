@@ -1,8 +1,10 @@
 import { GameCombatService } from '@app/modules/combat/services/game-combat.service';
+import { TileType } from '@app/modules/game/interfaces/tile';
 import { GameMovementService } from '@app/modules/movement/services/game-movement.service';
 import { MovementAlgorithmsService } from '@app/modules/movement/services/movement-algorithms.service';
 import { MIN_TURN_DELAY, MAX_TURN_DELAY } from '@app/modules/shared-room/constants/game-room.constants';
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
+import { Player } from '@app/shared/interfaces/player';
 import { GameMovementVPService } from '@app/modules/virtual-players/services/game-movement-vp.service';
 import { GameRoomEvents } from '@common/socket.constants';
 import { Injectable } from '@nestjs/common';
@@ -91,12 +93,23 @@ export class VirtualPlayerHandler {
                             opponentPlayerId: neighborPlayer.id,
                         });
                     } else {
-                        server.to(data.roomId).emit(GameRoomEvents.VirtualPlayerMoved, { ...movement, playerId: data.playerId });
-
                         // Check if destination itself is a trap
                         const destination = this.gameMovementService.extractCoord(movement.path[movement.path.length - 1]);
                         if (this.trapHandler.isTrapTile(data.roomId, destination.x, destination.y)) {
+                            server.to(data.roomId).emit(GameRoomEvents.VirtualPlayerMoved, { ...movement, playerId: data.playerId });
                             this.trapHandler.resolveForVirtualPlayer(data.roomId, data.playerId, server, player.profile);
+                        } else {
+                            // Include teleport destination in the event so the client can
+                            // teleport AFTER the movement animation completes (avoids desync).
+                            const teleportDestination = this.getTeleportDestinationForVP(data.roomId, data.playerId, room.players);
+                            server.to(data.roomId).emit(GameRoomEvents.VirtualPlayerMoved, {
+                                ...movement,
+                                playerId: data.playerId,
+                                teleportDestination,
+                            });
+                            if (teleportDestination) {
+                                this.gameMovementService.movePlayer(data.roomId, data.playerId, room.players, teleportDestination, true);
+                            }
                         }
                     }
                 },
@@ -105,5 +118,28 @@ export class VirtualPlayerHandler {
         } catch (error) {
             socket.emit(GameRoomEvents.GameRoomError, error.message);
         }
+    }
+
+    private getTeleportDestinationForVP(roomId: string, playerId: string, players: Player[]): { x: number; y: number } | null {
+        const player = players.find((p) => p.id === playerId);
+        if (!player) return null;
+
+        const currentCell = this.gameMovementService.getCell(roomId, player.position.x, player.position.y);
+        if (!currentCell || currentCell.tile.type !== TileType.TeleportPad) return null;
+
+        const board = this.gameMovementService.getBoardForGame(roomId);
+        if (!board) return null;
+
+        const partnerPad = board.matrix.flat().find(
+            (cell) =>
+                cell.tile.type === TileType.TeleportPad &&
+                cell.tile.state === currentCell.tile.state &&
+                (cell.x !== currentCell.x || cell.y !== currentCell.y) &&
+                !cell.player,
+        );
+
+        if (!partnerPad) return null;
+
+        return { x: partnerPad.x, y: partnerPad.y };
     }
 }

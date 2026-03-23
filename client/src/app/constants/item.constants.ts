@@ -10,12 +10,6 @@ export const ITEM_TYPES: { [key: string]: ItemType } = {
         imagePath: './assets/items/drug.png',
     },
 
-    torch: {
-        name: 'Adrenaline',
-        description: 'Ajoute 2 points de vie',
-        imagePath: './assets/items/drug.png',
-    },
-
     vodka: {
         name: 'Vodka',
         description: "Ajoute 2 points d'attaque, enlève 1 point de rapidité",
@@ -53,6 +47,12 @@ export const ITEM_TYPES: { [key: string]: ItemType } = {
         imagePath: './assets/items/air_strike.png',
     },
 
+    torch: {
+        name: 'Torch',
+        description: 'Une torche enflammée qui améliore les capacités',
+        imagePath: './assets/items/torch.png',
+    },
+
     // Other
     random: {
         name: 'Random',
@@ -78,3 +78,7 @@ export const PROPAGANDA_DEFENSE_BOOST = 5;
 
 export const VODKA_ATTACK_BOOST = 2;
 export const VODKA_SPEED_REDUCTION = 1;
+
+export const TORCH_ATTACK_BOOST = 1;
+export const TORCH_DEFENSE_BOOST = 1;
+export const TORCH_ILLUMINATION_RADIUS = 2;

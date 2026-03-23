@@ -1,0 +1,23 @@
+{
+  "folders": [
+    {"path": ".", "name": "client"},
+    {"path": "draft", "name": "draft"},
+    {"path": "lib/core", "name": "core"},
+    {"path": "lib/features/authentication", "name": "authentication"},
+    {"path": "lib/features/character_creation", "name": "character_creation"},
+    {"path": "lib/features/chat", "name": "chat"},
+    {"path": "lib/features/game_session", "name": "game_session"},
+    {"path": "lib/features/join_game_session", "name": "join_game_session"},
+    {"path": "lib/features/select_game_session", "name": "select_game_session"},
+    {"path": "lib/features/waiting_room", "name": "waiting_room"},
+    {"path": "lib/features/statistics", "name": "statistics"}
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/lib/generated": true,
+      "**/*.g.dart": true,
+      "**/*.freezed.dart": true,
+      "**/.gitkeep": true
+    }
+  }
+}

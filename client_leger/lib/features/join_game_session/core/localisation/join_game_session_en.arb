@@ -1,0 +1,13 @@
+{
+  "@@locale": "en",
+  "mainMenu": "Main menu",
+  "ok": "OK",
+  "joinGameTitle": "Join a game",
+  "joinGameSubtitle": "Enter the 4-digit game code",
+  "joinGameDescription": "You can find this code in the waiting room of the game",
+  "joinGameButton": "Access waiting room",
+  "joinGameFailed": "Failed to join game",
+  "waitingRoomRoomNotFound": "Game not found",
+  "waitingRoomRoomLocked": "Game is locked",
+  "joinGameMaxPlayerLimitReached": "Maximum player limit reached"
+}

@@ -1,6 +1,7 @@
 @use "./app/styles/themes";
 
-html, body {
+html,
+body {
     height: 100vh;
     margin: 0;
     padding: 0;
@@ -16,7 +17,7 @@ html, body {
 
 /* Fond global — thème default : image qui défile horizontalement */
 body::before {
-    content: "";
+    content: '';
     position: fixed;
     top: 0;
     left: 0;
@@ -81,8 +82,12 @@ body {
 }
 
 @keyframes seamlessScroll {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
 }
 
 button {
@@ -94,3 +99,4 @@ button {
     border: none;
     position: relative;
 }
+

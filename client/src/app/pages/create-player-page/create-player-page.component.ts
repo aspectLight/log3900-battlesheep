@@ -13,6 +13,7 @@ import { RoomSocketService } from '@app/services/communication/socket-handlers/r
 import { GameCreationService } from '@app/services/lobby/game-creation.service';
 import { PlayerCreationService } from '@app/services/lobby/player-creation.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-create-player-page',
@@ -89,8 +90,13 @@ export class CreatePlayerPageComponent implements OnInit {
     async createPlayer() {
         if (this.gameModified) return;
 
-        const playerName = (await this.profileService.getProfile()).username;
+        const profile = await this.profileService.getProfile();
+        const playerName = profile.username;
         const newPlayer = this.playerCreationService.createPlayer(playerName);
+        if (newPlayer) {
+            newPlayer.profileAvatarId = profile.avatarId ?? null;
+            newPlayer.profileAvatarUrl = profile.avatarUrl ? `${environment.serverUrl}${profile.avatarUrl}` : null;
+        }
         if (newPlayer) {
             if (this.gameCreationService.isDropIn) {
                 // Drop-in flow: join a game in progress

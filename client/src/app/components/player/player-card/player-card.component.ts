@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Player } from '@app/classes/entity/player';
+import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
 import { TranslateModule } from '@ngx-translate/core';
 @Component({
     selector: 'app-player-card',
@@ -13,6 +14,7 @@ export class PlayerCardComponent implements OnInit {
     @Input() isHost: boolean = false;
     @Input() showKick: boolean = false;
     avatar: string;
+    profileAvatar: string | null = null;
     isVirtualPlayer: boolean = false;
 
     onKickClick() {
@@ -27,5 +29,14 @@ export class PlayerCardComponent implements OnInit {
         if (this.player && this.player.isVirtual) {
             this.isVirtualPlayer = true;
         }
+
+        this.profileAvatar = this.resolveProfileAvatar();
+    }
+
+    private resolveProfileAvatar(): string | null {
+        if (this.player.profileAvatarUrl) return this.player.profileAvatarUrl;
+        if (!this.player.profileAvatarId) return null;
+        const avatar = ACCOUNT_CREATION_AVATARS.find((a) => a.id === this.player.profileAvatarId);
+        return avatar ? avatar.image : null;
     }
 }

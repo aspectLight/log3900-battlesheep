@@ -12,4 +12,9 @@ class EnvConfig {
   static String get firebaseApiKey {
     return dotenv.env['FIREBASE_API_KEY'] ?? '';
   }
+
+  static String get firebaseAuthBaseUrl {
+    return dotenv.env['FIREBASE_AUTH_BASE_URL'] ??
+        'https://identitytoolkit.googleapis.com/v1/accounts';
+  }
 }

@@ -1,0 +1,14 @@
+{
+  "@@locale": "fr",
+  "mainMenu": "Page d'accueil",
+  "createGame": "Créer une partie",
+  "ok": "OK",
+  "selectedGameHiddenOrDeleted": "Le jeu sélectionné est caché ou supprimé.",
+  "createGamePreviewHeader": "Aperçu",
+  "createGameNameHeader": "Nom",
+  "createGameSizeHeader": "Taille",
+  "createGameModeHeader": "Mode",
+  "createGameLastModifiedHeader": "Dernière modification",
+  "createGameModeClassic": "Classique",
+  "createGameModeCtf": "Capture du drapeau"
+}

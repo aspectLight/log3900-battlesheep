@@ -5,11 +5,15 @@ import { FirebaseAdminService } from '@app/modules/auth/services/firebase-admin.
 import { CustomChannelService } from '@app/modules/general-chat/services/custom-channel.service';
 import { GeneralChatService } from '@app/modules/general-chat/services/general-chat.service';
 import { GameService } from '@app/modules/game/services/game.service';
+import { FriendshipService } from '@app/modules/social/services/friendship.service';
+import { BlockService } from '@app/modules/social/services/block.service';
 import { ConflictException, ForbiddenException, Inject, Injectable, Logger, NotFoundException, UnauthorizedException, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { DecodedIdToken } from 'firebase-admin/auth';
 import { Model } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type {} from 'multer';
 
 const DELETED_USER_PLACEHOLDER = '[supprimé]';
 
@@ -23,6 +27,8 @@ export class AuthService {
         @Inject(forwardRef(() => GeneralChatService)) private readonly generalChatService: GeneralChatService,
         @Inject(forwardRef(() => CustomChannelService)) private readonly customChannelService: CustomChannelService,
         @Inject(forwardRef(() => GameService)) private readonly gameService: GameService,
+        @Inject(forwardRef(() => FriendshipService)) private readonly friendshipService: FriendshipService,
+        @Inject(forwardRef(() => BlockService)) private readonly blockService: BlockService,
     ) {}
 
     async verifyToken(idToken: string): Promise<DecodedIdToken> {
@@ -156,6 +162,9 @@ export class AuthService {
         // Updating avatar
         if (updateDto.avatarId && updateDto.avatarId !== user.avatarId) {
             user.avatarId = updateDto.avatarId;
+            user.avatarUrl = undefined;
+            user.avatarImageBuffer = undefined;
+            user.avatarImageMimeType = undefined;
         }
 
         // Updating theme
@@ -191,7 +200,11 @@ export class AuthService {
             await this.generalChatService.replaceUsername(username, DELETED_USER_PLACEHOLDER);
             await this.customChannelService.replaceUsername(username, DELETED_USER_PLACEHOLDER);
 
-            // 3. Delete all games owned by this user
+            // 3. Clean up social data (friendships, friend requests, blocks)
+            await this.friendshipService.cleanupForUser(username);
+            await this.blockService.cleanupForUser(username);
+
+            // 4. Delete all games owned by this user
             const deletedCount = await this.gameService.deleteGamesByOwner(username);
             this.logger.log(`Deleted ${deletedCount} game(s) owned by user: ${username}`);
 
@@ -206,6 +219,20 @@ export class AuthService {
             this.logger.error(`User deletion failed: ${error.message}`);
             throw error;
         }
+    }
+
+    async updateAvatarFromFile(uid: string, file: Express.Multer.File): Promise<UserDocument> {
+        const user = await this.getUserByUid(uid);
+
+        user.avatarImageBuffer = file.buffer;
+        user.avatarImageMimeType = file.mimetype;
+        user.avatarUrl = `/auth/avatar/${uid}`;
+
+        await user.save();
+
+        this.logger.log(`Avatar mis à jour pour l'utilisateur ${uid} (stocké en base)`);
+
+        return user;
     }
 
     async validateSession(uid: string, sessionId: string): Promise<boolean> {

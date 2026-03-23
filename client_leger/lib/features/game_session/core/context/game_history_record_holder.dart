@@ -1,0 +1,3 @@
+class GameHistoryRecordHolder {
+  String? startDate;
+}

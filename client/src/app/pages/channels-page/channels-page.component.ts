@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { AuthService } from '@app/services/communication/auth.service';
 import { ChannelInfo, ChannelMessage, CustomChannelService } from '@app/services/communication/custom-channel.service';
@@ -30,6 +31,7 @@ export class ChannelsPageComponent implements OnInit, OnDestroy {
     activeMessage = '';
 
     isCreating = false;
+    channelToDelete: string | null = null;
 
     private subscriptions = new Subscription();
 
@@ -47,10 +49,7 @@ export class ChannelsPageComponent implements OnInit, OnDestroy {
 
     onCancelQuit(): void {
         this.showConfirmation = false;
-    }
-
-    toggleConfirmation(): void {
-        this.showConfirmation = !this.showConfirmation;
+        this.channelToDelete = null;
     }
 
     ngOnInit(): void {
@@ -136,9 +135,17 @@ export class ChannelsPageComponent implements OnInit, OnDestroy {
         this.customChannelService.createChannel(name);
     }
 
-    deleteChannel(channelId: string): void {
-        this.customChannelService.deleteChannel(channelId);
-        this.toggleConfirmation();
+    requestDeleteChannel(channelId: string): void {
+        this.channelToDelete = channelId;
+        this.showConfirmation = true;
+    }
+
+    confirmDeleteChannel(): void {
+        if (this.channelToDelete) {
+            this.customChannelService.deleteChannel(this.channelToDelete);
+        }
+        this.showConfirmation = false;
+        this.channelToDelete = null;
     }
 
     isCreator(channel: ChannelInfo): boolean {
@@ -197,6 +204,13 @@ export class ChannelsPageComponent implements OnInit, OnDestroy {
 
         this.customChannelService.sendMessage(id, content);
         this.activeMessage = '';
+    }
+
+    resolveAvatar(avatarId?: string | null, avatarUrl?: string | null): string | null {
+        if (avatarUrl) return avatarUrl;
+        if (!avatarId) return null;
+        const avatar = ACCOUNT_CREATION_AVATARS.find((a) => a.id === avatarId);
+        return avatar ? avatar.image : null;
     }
 
     // --- Feedback UI ---------------------------------

@@ -95,12 +95,13 @@
 }
 
 .message {
-  display: grid;
-  grid-template-columns: auto auto 1fr;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   gap: 8px;
-  align-items: baseline;
   max-width: 100%;
-  padding: 6px 15px;
+  margin-bottom: 0;
+  padding: 8px 12px;
   background-color: var(--theme-bg-chat-message);
   word-wrap: break-word;
   font-size: 0.9rem;
@@ -111,22 +112,93 @@
   background-color: var(--theme-bg-chat-message-alt);
 }
 
+.message.sent {
+  background-color: #1a0a0a;
+}
+
+.msg-avatar-wrap {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.msg-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #5a2020;
+  display: block;
+}
+
+.msg-avatar-placeholder {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #3a1212;
+  border: 1px solid #5a2020;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #f0e0e0;
+}
+
+.message.sent {
+  background-color: #1a0a0a;
+}
+
+.msg-avatar-wrap {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.msg-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #5a2020;
+  display: block;
+}
+
+.msg-avatar-placeholder {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #3a1212;
+  border: 1px solid #5a2020;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #f0e0e0;
+}
+
 .msg-time {
   color: var(--theme-text-time);
+  font-size: 0.75rem;
   white-space: nowrap;
-  flex-shrink: 0;
+  flex: 0 0 auto;
 }
 
 .msg-author {
   color: var(--theme-text-author);
   font-weight: 600;
   white-space: nowrap;
-  flex-shrink: 0;
+  flex: 0 0 auto;
 }
 
 .msg-content {
   color: var(--theme-text-secondary);
   word-break: break-word;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .chatbox-input {
