@@ -1,10 +1,10 @@
 <div class="friends-page">
     <div class="header">
         <button class="return-button" routerLink="/home">
-            <img src="./assets/ui/left.png" alt="Retour" />
-            Page d'accueil
+            <img src="./assets/ui/left.png" alt="Back" />
+            {{ 'common.home' | translate }}
         </button>
-        <h1>Amis</h1>
+        <h1>{{ 'friends.title' | translate }}</h1>
     </div>
 
     @if (errorMessage) {
@@ -13,40 +13,40 @@
 
     <div class="tabs">
         <button class="tab" [class.active]="activeTab === 'friends'" (click)="setTab('friends')">
-            Amis ({{ friends.length }})
+            {{ 'friends.tab_friends' | translate: { count: friends.length } }}
         </button>
         <button class="tab" [class.active]="activeTab === 'requests'" (click)="setTab('requests')">
-            Demandes
+            {{ 'friends.tab_requests' | translate }}
             @if (pendingCount > 0) {
             <span class="badge">{{ pendingCount }}</span>
             }
         </button>
-        <button class="tab" [class.active]="activeTab === 'search'" (click)="setTab('search')">Rechercher</button>
-        <button class="tab" [class.active]="activeTab === 'blocked'" (click)="setTab('blocked')">Bloqués</button>
+        <button class="tab" [class.active]="activeTab === 'search'" (click)="setTab('search')">{{ 'friends.tab_search' | translate }}</button>
+        <button class="tab" [class.active]="activeTab === 'blocked'" (click)="setTab('blocked')">{{ 'friends.tab_blocked' | translate }}</button>
     </div>
 
     <div class="tab-content">
         @if (isLoading) {
-        <div class="loading">Chargement...</div>
+        <div class="loading">{{ 'common.loading' | translate }}</div>
         } @else {
 
         <!-- Friends List -->
         @if (activeTab === 'friends') {
         <div class="list">
             @if (friends.length === 0) {
-            <div class="empty-state">Aucun ami pour le moment. Recherchez des utilisateurs pour en ajouter !</div>
+            <div class="empty-state">{{ 'friends.no_friends' | translate }}</div>
             } @for (friend of friends; track friend.username) {
             <div class="user-card">
                 <div class="user-info">
                     <img [src]="getAvatarSrc(friend.avatarId, friend.avatarUrl)" alt="Avatar" class="avatar" />
                     <span class="username">{{ friend.username }}</span>
                     <span class="status" [class.online]="friend.isOnline" [class.offline]="!friend.isOnline">
-                        {{ friend.isOnline ? 'En ligne' : 'Hors ligne' }}
+                        {{ friend.isOnline ? ('friends.online' | translate) : ('friends.offline' | translate) }}
                     </span>
                 </div>
                 <div class="actions">
-                    <button class="btn btn-danger" (click)="removeFriend(friend.username)">Retirer</button>
-                    <button class="btn btn-block" (click)="blockUser(friend.username)">Bloquer</button>
+                    <button class="btn btn-danger" (click)="removeFriend(friend.username)">{{ 'friends.remove' | translate }}</button>
+                    <button class="btn btn-block" (click)="blockUser(friend.username)">{{ 'friends.block' | translate }}</button>
                 </div>
             </div>
             }
@@ -57,36 +57,36 @@
         @if (activeTab === 'requests') {
         <div class="list">
             @if (pendingRequests.length > 0) {
-            <h3 class="section-title">Demandes reçues</h3>
+            <h3 class="section-title">{{ 'friends.received' | translate }}</h3>
             @for (request of pendingRequests; track request._id) {
             <div class="user-card">
                 <div class="user-info">
                     <span class="username">{{ request.senderId }}</span>
                 </div>
                 <div class="actions">
-                    <button class="btn btn-accept" (click)="acceptRequest(request._id)">Accepter</button>
-                    <button class="btn btn-danger" (click)="refuseRequest(request._id)">Refuser</button>
+                    <button class="btn btn-accept" (click)="acceptRequest(request._id)">{{ 'friends.accept' | translate }}</button>
+                    <button class="btn btn-danger" (click)="refuseRequest(request._id)">{{ 'friends.refuse' | translate }}</button>
                 </div>
             </div>
             }
             }
 
             @if (sentRequests.length > 0) {
-            <h3 class="section-title">Demandes envoyées</h3>
+            <h3 class="section-title">{{ 'friends.sent' | translate }}</h3>
             @for (request of sentRequests; track request._id) {
             <div class="user-card">
                 <div class="user-info">
                     <span class="username">{{ request.receiverId }}</span>
                 </div>
                 <div class="actions">
-                    <button class="btn btn-danger" (click)="cancelRequest(request._id)">Annuler</button>
+                    <button class="btn btn-danger" (click)="cancelRequest(request._id)">{{ 'friends.cancel_request' | translate }}</button>
                 </div>
             </div>
             }
             }
 
             @if (pendingRequests.length === 0 && sentRequests.length === 0) {
-            <div class="empty-state">Aucune demande en cours</div>
+            <div class="empty-state">{{ 'friends.no_requests' | translate }}</div>
             }
         </div>
         }
@@ -94,7 +94,7 @@
         <!-- Search -->
         @if (activeTab === 'search') {
         <div class="search-section">
-            <input type="text" class="search-input" placeholder="Rechercher un utilisateur..." [(ngModel)]="searchQuery" (input)="onSearchInput()" />
+            <input type="text" class="search-input" [placeholder]="'friends.search_placeholder' | translate" [(ngModel)]="searchQuery" (input)="onSearchInput()" />
             <div class="list">
                 @for (user of searchResults; track user.username) {
                 <div class="user-card">
@@ -102,24 +102,24 @@
                         <img [src]="getAvatarSrc(user.avatarId, user.avatarUrl)" alt="Avatar" class="avatar" />
                         <span class="username">{{ user.username }}</span>
                         <span class="status" [class.online]="user.isOnline" [class.offline]="!user.isOnline">
-                            {{ user.isOnline ? 'En ligne' : 'Hors ligne' }}
+                            {{ user.isOnline ? ('friends.online' | translate) : ('friends.offline' | translate) }}
                         </span>
                     </div>
                     <div class="actions">
                         @if (!isBlocked(user.username)) {
                             @if (hasPendingRequestTo(user.username)) {
-                            <button class="btn btn-danger" (click)="cancelRequestByUsername(user.username)">Annuler</button>
+                            <button class="btn btn-danger" (click)="cancelRequestByUsername(user.username)">{{ 'friends.cancel_request' | translate }}</button>
                             } @else {
-                            <button class="btn btn-accept" (click)="sendRequest(user.username)">Ajouter</button>
+                            <button class="btn btn-accept" (click)="sendRequest(user.username)">{{ 'friends.add' | translate }}</button>
                             }
-                            <button class="btn btn-block" (click)="blockUserFromSearch(user.username)">Bloquer</button>
+                            <button class="btn btn-block" (click)="blockUserFromSearch(user.username)">{{ 'friends.block' | translate }}</button>
                         } @else {
-                            <button class="btn btn-accept" (click)="unblockUser(user.username)">Débloquer</button>
+                            <button class="btn btn-accept" (click)="unblockUser(user.username)">{{ 'friends.unblock' | translate }}</button>
                         }
                     </div>
                 </div>
                 } @if (searchQuery.length > 0 && searchResults.length === 0) {
-                <div class="empty-state">Aucun résultat</div>
+                <div class="empty-state">{{ 'friends.no_results' | translate }}</div>
                 }
             </div>
         </div>
@@ -129,14 +129,14 @@
         @if (activeTab === 'blocked') {
         <div class="list">
             @if (blockedUsers.length === 0) {
-            <div class="empty-state">Aucun utilisateur bloqué</div>
+            <div class="empty-state">{{ 'friends.no_blocked' | translate }}</div>
             } @for (username of blockedUsers; track username) {
             <div class="user-card">
                 <div class="user-info">
                     <span class="username">{{ username }}</span>
                 </div>
                 <div class="actions">
-                    <button class="btn btn-accept" (click)="unblockUser(username)">Débloquer</button>
+                    <button class="btn btn-accept" (click)="unblockUser(username)">{{ 'friends.unblock' | translate }}</button>
                 </div>
             </div>
             }

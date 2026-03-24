@@ -75,29 +75,29 @@
                     </div>
 
                     <div class="field">
-                        <label class="label">Téléverser un avatar personnalisé</label>
+                        <label class="label">{{ 'profile.avatar_upload' | translate }}</label>
                         <div class="avatar-upload-row">
                             @if (avatarPreviewUrl) {
                             <div class="avatar-upload-preview">
-                                <img [src]="avatarPreviewUrl" alt="Aperçu avatar" class="avatar-preview-img" />
+                                <img [src]="avatarPreviewUrl" [alt]="'profile.avatar' | translate" class="avatar-preview-img" />
                             </div>
                             }
                             <div class="upload-input-wrapper">
                                 <div class="avatar-source-picker">
                                     <button type="button" class="btn-choose-file" (click)="showAvatarMenu = !showAvatarMenu">
-                                        Choisir un fichier
+                                        {{ 'profile.choose_file' | translate }}
                                         <span class="chevron" [class.open]="showAvatarMenu">&#9660;</span>
                                     </button>
                                     @if (!avatarPreviewUrl) {
-                                    <span class="no-file-label">Aucun fichier choisi</span>
+                                    <span class="no-file-label">{{ 'profile.no_file' | translate }}</span>
                                     }
                                     @if (showAvatarMenu) {
                                     <div class="avatar-source-menu">
                                         <button type="button" class="avatar-source-option" (click)="triggerFileInput()">
-                                            &#128190; Télécharger une image
+                                            &#128190; {{ 'profile.upload_image' | translate }}
                                         </button>
                                         <button type="button" class="avatar-source-option" (click)="openCamera()">
-                                            &#128247; Prendre un selfie
+                                            &#128247; {{ 'profile.take_selfie' | translate }}
                                         </button>
                                     </div>
                                     }
@@ -112,7 +112,7 @@
                                 />
                                 @if (avatarPreviewUrl) {
                                 <span class="avatar-current-label">
-                                    @if (selectedAvatarFile) { Nouvel avatar } @else { Avatar actuel }
+                                    @if (selectedAvatarFile) { {{ 'profile.new_avatar' | translate }} } @else { {{ 'profile.current_avatar' | translate }} }
                                 </span>
                                 }
                             </div>
@@ -212,9 +212,9 @@
 
 @if (camera.cameraError) {
 <app-pop-up
-    [popUpMessage]="'Erreur de caméra'"
+    [popUpMessage]="'profile.camera_error' | translate"
     [description]="camera.cameraError"
-    [firstOption]="'Fermer'"
+    [firstOption]="'profile.close' | translate"
     (confirm)="camera.cameraError = null"
 ></app-pop-up>
 }
@@ -223,8 +223,8 @@
 <div class="camera-modal-overlay" (click)="closeCamera()">
     <div class="camera-modal" (click)="$event.stopPropagation()">
         <div class="camera-modal-header">
-            <h2 class="camera-modal-title">Capturer un selfie</h2>
-            <button type="button" class="camera-close-btn" (click)="closeCamera()" aria-label="Fermer">&#x2715;</button>
+            <h2 class="camera-modal-title">{{ 'profile.camera_title' | translate }}</h2>
+            <button type="button" class="camera-close-btn" (click)="closeCamera()" [attr.aria-label]="'profile.close' | translate">&#x2715;</button>
         </div>
 
         <div class="camera-body">
@@ -232,7 +232,7 @@
             <div class="camera-preview-container">
                 <video #cameraVideo autoplay playsinline muted class="camera-video" [class.ready]="camera.isCameraReady"></video>
                 @if (!camera.isCameraReady) {
-                <div class="camera-loading">Initialisation de la caméra...</div>
+                <div class="camera-loading">{{ 'profile.camera_loading' | translate }}</div>
                 }
             </div>
             <div class="camera-actions">
@@ -242,11 +242,11 @@
             </div>
             } @else {
             <div class="camera-preview-container">
-                <img [src]="camera.capturedImageDataUrl" alt="Photo capturée" class="camera-captured-img" />
+                <img [src]="camera.capturedImageDataUrl" [alt]="'profile.camera_title' | translate" class="camera-captured-img" />
             </div>
             <div class="camera-actions camera-actions-row">
-                <button type="button" class="btn-secondary camera-modal-btn" (click)="retakePhoto()">&#8635; Reprendre</button>
-                <button type="button" class="btn-primary camera-modal-btn" (click)="useCapturedPhoto()">&#10003; Utiliser cette photo</button>
+                <button type="button" class="btn-secondary camera-modal-btn" (click)="retakePhoto()">&#8635; {{ 'profile.retake' | translate }}</button>
+                <button type="button" class="btn-primary camera-modal-btn" (click)="useCapturedPhoto()">&#10003; {{ 'profile.use_photo' | translate }}</button>
             </div>
             }
         </div>

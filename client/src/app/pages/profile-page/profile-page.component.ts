@@ -15,7 +15,7 @@ import { LanguageService, LanguageType } from '@app/services/state/language.serv
 import { SessionService } from '@app/services/state/session.service';
 import { environment } from 'src/environments/environment';
 import { ThemeService, ThemeType } from '@app/services/state/theme.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-profile-page',
@@ -73,6 +73,7 @@ export class ProfilePageComponent implements OnInit {
     private router = inject(Router);
     themeService = inject(ThemeService);
     languageService = inject(LanguageService);
+    private translate = inject(TranslateService);
 
     get selectedAvatarId(): string {
         return this.form.controls.avatarId.value ?? '';
@@ -107,14 +108,14 @@ export class ProfilePageComponent implements OnInit {
         const validTypes = ['image/jpeg', 'image/png'];
 
         if (!validTypes.includes(file.type)) {
-            const extension = file.name.split('.').pop()?.toLowerCase() ?? 'inconnu';
-            this.avatarFileError = `Fichier de type "${extension}" non autorisé. Formats permis : JPG, JPEG, PNG (taille maximale 2 MB).`;
+            const extension = file.name.split('.').pop()?.toLowerCase() ?? '?';
+            this.avatarFileError = this.translate.instant('profile.error_file_type', { ext: extension });
             return;
         }
 
         if (file.size > maxSize) {
             const sizeMb = file.size / (1024 * 1024);
-            this.avatarFileError = `Fichier trop volumineux (${sizeMb.toFixed(2)} MB). Taille maximale autorisée : 2 MB.`;
+            this.avatarFileError = this.translate.instant('profile.error_file_size', { size: sizeMb.toFixed(2) });
             return;
         }
 
@@ -206,7 +207,7 @@ export class ProfilePageComponent implements OnInit {
         const hasAvatarFile = !!this.selectedAvatarFile;
 
         if (!hasProfileChanges && !hasAvatarFile) {
-            this.showError('Aucune modification détectée');
+            this.showError(this.translate.instant('profile.no_changes'));
             this.isSaving = false;
             return;
         }
