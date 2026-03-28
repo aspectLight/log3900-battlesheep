@@ -3,19 +3,20 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { GameListComponent } from '@app/components/editor/game-list/game-list.component';
-import { ProfileMenuComponent } from '@app/components/shared/profile-menu/profile-menu.component';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
+import { ProfileMenuComponent } from '@app/components/shared/profile-menu/profile-menu.component';
+import { VirtualCurrencyService } from '@app/services/currency/virtual-currency.service';
 import { GameCreationService } from '@app/services/lobby/game-creation.service';
 import { GameListService } from '@app/services/lobby/game-list.service';
-import { VirtualCurrencyService } from '@app/services/currency/virtual-currency.service';
 
 import { Game } from '@app/classes/game/game';
 import { ROUTES } from '@app/constants/routes.constants';
 import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-game-creator',
-    imports: [CommonModule, FormsModule, GameListComponent, PopUpComponent, RouterLink, ProfileMenuComponent],
+    imports: [CommonModule, FormsModule, GameListComponent, PopUpComponent, RouterLink, ProfileMenuComponent, TranslateModule],
     templateUrl: './game-creator.component.html',
     styleUrl: './game-creator.component.scss',
 })

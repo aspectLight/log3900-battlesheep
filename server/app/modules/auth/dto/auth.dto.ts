@@ -42,6 +42,14 @@ export class UpdateUserDto {
     avatarId?: string;
 
     @IsOptional()
+    @IsString()
+    theme?: string;
+
+    @IsOptional()
+    @IsString()
+    language?: string;
+
+    @IsOptional()
     @IsObject()
     preferences?: Record<string, unknown>;
 }

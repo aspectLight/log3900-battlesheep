@@ -5,6 +5,7 @@ import { FriendProfile, FriendRequest, SocialService, UserSearchResult } from '@
 import { Subscription, debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
 import { environment } from 'src/environments/environment';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 type Tab = 'friends' | 'requests' | 'search' | 'blocked';
 
@@ -12,7 +13,7 @@ type Tab = 'friends' | 'requests' | 'search' | 'blocked';
     selector: 'app-friends-page',
     templateUrl: './friends-page.component.html',
     styleUrls: ['./friends-page.component.scss'],
-    imports: [RouterLink, FormsModule],
+    imports: [RouterLink, FormsModule, TranslateModule],
 })
 export class FriendsPageComponent implements OnInit, OnDestroy {
     activeTab: Tab = 'friends';
@@ -28,7 +29,10 @@ export class FriendsPageComponent implements OnInit, OnDestroy {
     private searchSubject = new Subject<string>();
     private subscriptions: Subscription[] = [];
 
-    constructor(private socialService: SocialService) {}
+    constructor(
+        private socialService: SocialService,
+        private translate: TranslateService,
+    ) {}
 
     async ngOnInit(): Promise<void> {
         this.subscriptions.push(
@@ -60,7 +64,7 @@ export class FriendsPageComponent implements OnInit, OnDestroy {
         try {
             await this.socialService.loadAllSocialData();
         } catch {
-            this.errorMessage = 'Erreur lors du chargement des données sociales';
+            this.errorMessage = this.translate.instant('friends.error_load');
         } finally {
             this.isLoading = false;
         }
@@ -97,7 +101,7 @@ export class FriendsPageComponent implements OnInit, OnDestroy {
             this.searchResults = this.searchResults.filter((u) => u.username !== username);
             this.errorMessage = '';
         } catch (error: unknown) {
-            this.errorMessage = (error as { error?: { message?: string } })?.error?.message ?? "Erreur lors de l'envoi de la demande";
+            this.errorMessage = (error as { error?: { message?: string } })?.error?.message ?? this.translate.instant('friends.error_send');
         }
     }
 
@@ -106,7 +110,7 @@ export class FriendsPageComponent implements OnInit, OnDestroy {
             await this.socialService.acceptFriendRequest(requestId);
             this.errorMessage = '';
         } catch {
-            this.errorMessage = "Erreur lors de l'acceptation de la demande";
+            this.errorMessage = this.translate.instant('friends.error_accept');
         }
     }
 
@@ -115,7 +119,7 @@ export class FriendsPageComponent implements OnInit, OnDestroy {
             await this.socialService.refuseFriendRequest(requestId);
             this.errorMessage = '';
         } catch {
-            this.errorMessage = 'Erreur lors du refus de la demande';
+            this.errorMessage = this.translate.instant('friends.error_refuse');
         }
     }
 
@@ -124,7 +128,7 @@ export class FriendsPageComponent implements OnInit, OnDestroy {
             await this.socialService.cancelFriendRequest(requestId);
             this.errorMessage = '';
         } catch {
-            this.errorMessage = "Erreur lors de l'annulation de la demande";
+            this.errorMessage = this.translate.instant('friends.error_cancel');
         }
     }
 
@@ -133,7 +137,7 @@ export class FriendsPageComponent implements OnInit, OnDestroy {
             await this.socialService.removeFriend(username);
             this.errorMessage = '';
         } catch {
-            this.errorMessage = "Erreur lors de la suppression de l'ami";
+            this.errorMessage = this.translate.instant('friends.error_remove');
         }
     }
 
@@ -142,7 +146,7 @@ export class FriendsPageComponent implements OnInit, OnDestroy {
             await this.socialService.blockUser(username);
             this.errorMessage = '';
         } catch {
-            this.errorMessage = "Erreur lors du blocage de l'utilisateur";
+            this.errorMessage = this.translate.instant('friends.error_block');
         }
     }
 
@@ -151,7 +155,7 @@ export class FriendsPageComponent implements OnInit, OnDestroy {
             await this.socialService.unblockUser(username);
             this.errorMessage = '';
         } catch {
-            this.errorMessage = "Erreur lors du déblocage de l'utilisateur";
+            this.errorMessage = this.translate.instant('friends.error_unblock');
         }
     }
 
@@ -176,7 +180,7 @@ export class FriendsPageComponent implements OnInit, OnDestroy {
             this.searchResults = this.searchResults.filter((u) => u.username !== username);
             this.errorMessage = '';
         } catch {
-            this.errorMessage = "Erreur lors du blocage de l'utilisateur";
+            this.errorMessage = this.translate.instant('friends.error_block');
         }
     }
 

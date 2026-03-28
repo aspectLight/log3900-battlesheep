@@ -1,22 +1,36 @@
 @if (showError) {
-<app-pop-up popUpMessage="{{ errorMessage }}" [showSecondButton]="false" (confirm)="router.navigate([routes.home])"> </app-pop-up>
+<app-pop-up [isError]="true" popUpMessage="{{ errorMessage }}" [showSecondButton]="false" (confirm)="router.navigate([routes.home])"> </app-pop-up>
 } @if (showMessage) {
 <app-pop-up popUpMessage="{{ errorMessage }}" [showSecondButton]="false" (confirm)="onCancel()"> </app-pop-up>
 } @if (showErrorFromService) {
-<app-pop-up popUpMessage="{{ errorMessageFromService }}" [showSecondButton]="false" (confirm)="disableUnlockError()"> </app-pop-up>
+<app-pop-up [isError]="true" popUpMessage="{{ errorMessageFromService }}" [showSecondButton]="false" (confirm)="disableUnlockError()"> </app-pop-up>
 } @if (showConfirmation) {
-<app-pop-up popUpMessage="{{ errorMessage }}" [showSecondButton]="true" firstOption="Oui" secondOption="Non" (confirm)="toDo()" (cancel)="onCancel()">
+<app-pop-up
+    [isError]="true"
+    popUpMessage="{{ errorMessage }}"
+    [showSecondButton]="true"
+    [firstOption]="'common.yes' | translate"
+    [secondOption]="'common.no' | translate"
+    (confirm)="toDo()"
+    (cancel)="onCancel()"
+>
 </app-pop-up>
 } @if (!code) {
-<app-pop-up popUpMessage="Déconnexion automatique ..." [showSecondButton]="false" (confirm)="router.navigate([routes.home])"> </app-pop-up>
+<app-pop-up
+    [isError]="true"
+    [popUpMessage]="'waiting.auto_disconnect' | translate"
+    [showSecondButton]="false"
+    (confirm)="router.navigate([routes.home])"
+>
+</app-pop-up>
 }
 
 <div class="header">
     <button class="return-button" (click)="confirmAction('leave')">
         <img src="./assets/ui/left.png" />
-        <span class="return-btn-txt">Quitter la partie</span>
+        <span class="return-btn-txt">{{ 'waiting.back' | translate }}</span>
     </button>
-    <h1 class="title">Salle d'attente</h1>
+    <h1 class="title">{{ 'waiting.title' | translate }}</h1>
 </div>
 
 <div class="waiting-room-container">
@@ -34,14 +48,16 @@
 
     <div class="game-info-container">
         <div class="game-info">
-            <h3>Code de la partie :</h3>
+            <h3>{{ 'waiting.code' | translate }}</h3>
             <h1>{{ code }}</h1>
         </div>
 
         <div class="currency-panel">
             <div class="currency-row">
                 <span class="currency-label">Solde :</span>
-                <span class="currency-value"><strong>{{ currencyService.balance$ | async }}</strong> <img class="coin-icon" src="./assets/gold_coin.png" alt="pièce" /></span>
+                <span class="currency-value"
+                    ><strong>{{ currencyService.balance$ | async }}</strong> <img class="coin-icon" src="./assets/gold_coin.png" alt="pièce"
+                /></span>
             </div>
             @if ((room?.entryFee ?? 0) > 0) {
             <div class="currency-row">
@@ -56,26 +72,28 @@
             <label class="drop-in-toggle">
                 <input type="checkbox" [checked]="room?.dropInDropOut" (change)="toggleDropInDropOut()" />
                 <span class="checkmark"></span>
-                <span>Drop-in/<br/>Drop-out</span>
+                <span>{{ 'waiting.drop_in' | translate }}</span>
             </label>
             <button class="lock-btn" (click)="confirmAction('lock')">
-                {{ room?.isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
+                {{ room?.isLocked ? ('waiting.unlock' | translate) : ('waiting.lock' | translate) }}
             </button>
-            <button class="add-vp-btn" [class.isClickable]="!room?.isLocked" (click)="openProfileSection()">Ajouter un joueur virtuel</button>
-            <button class="startGame-btn" [class.isClickable]="isStartValid" (click)="startGame()">Commencer la partie</button>
+            <button class="add-vp-btn" [class.isClickable]="!room?.isLocked" (click)="openProfileSection()">
+                {{ 'waiting.add_vp' | translate }}
+            </button>
+            <button class="startGame-btn" [class.isClickable]="isStartValid" (click)="startGame()">{{ 'waiting.start' | translate }}</button>
         </div>
         @if (isProfileSectionVisible) {
         <app-pop-up
-            [popUpMessage]="'Sélectionnez le profil du joueur virtuel :'"
+            [popUpMessage]="'waiting.vp_profile' | translate"
             [showSecondButton]="true"
-            [firstOption]="'Agressif'"
-            [secondOption]="'Défensif'"
+            [firstOption]="'waiting.aggressive' | translate"
+            [secondOption]="'waiting.defensive' | translate"
             (confirm)="handleAgressiveProfileClick()"
             (cancel)="handleDefensiveProfileClick()"
         >
         </app-pop-up>
         } } @else {
-        <div class="waiting-msg">En attente de l'organisateur de la partie...</div>
+        <div class="waiting-msg">{{ 'waiting.waiting_host' | translate }}</div>
         }
     </div>
 </div>

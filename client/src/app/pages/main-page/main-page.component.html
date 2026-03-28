@@ -1,18 +1,18 @@
 @if (isGameCanceled) {
 <app-pop-up
-    popUpMessage="Partie annulée par manque de joueurs"
+    [popUpMessage]="'main.game_canceled' | translate"
     description=""
     [showSecondButton]="false"
     (confirm)="understandError()"
-    firstOption="Compris"
+    [firstOption]="'common.understood' | translate"
 ></app-pop-up>
 } @if (isGameFinished) {
 <app-pop-up
-    popUpMessage="Partie terminé, limite de 3 victoires atteintes par un personnage"
+    [popUpMessage]="'main.game_finished' | translate"
     description=""
     [showSecondButton]="false"
     (confirm)="understandMessage()"
-    firstOption="Compris"
+    [firstOption]="'common.understood' | translate"
 ></app-pop-up>
 }
 
@@ -24,10 +24,10 @@
             <img [src]="avatarDisplayUrl" alt="Profil" class="settings-icon avatar-circle" />
         </button>
         <div class="settings-dropdown" [class.show]="showSettingsMenu">
-            <button class="settings-option" routerLink="/profile">Profil</button>
-            <button class="settings-option" routerLink="/games-history">Historique des parties</button>
-            <button class="settings-option" routerLink="/logs-history">Historique de connexion</button>
-            <button class="settings-option" (click)="logout()">Se déconnecter</button>
+            <button class="settings-option" routerLink="/profile">{{ 'main.profile' | translate }}</button>
+            <button class="settings-option" routerLink="/games-history">{{ 'main.games_history' | translate }}</button>
+            <button class="settings-option" routerLink="/logs-history">{{ 'main.login_history' | translate }}</button>
+            <button class="settings-option" (click)="logout()">{{ 'main.logout' | translate }}</button>
         </div>
     </div>
 
@@ -35,15 +35,15 @@
         <h1 class="header-item"></h1>
         <img class="logo" src="./assets/ui/eastern_solace_logo-removebg-preview.png" alt="Logo Jeu" />
 
-<section id="play-option" class="button-container">
-            <button class="button" id="join-game-button" routerLink="/join-game">Joindre une partie</button>
-            <button class="button" id="create-game-button" routerLink="/create-game">Créer une partie</button>
-            <button class="button" id="admin-game-button" routerLink="/admin-game">Administrer les jeux</button>
-            <button class="button" id="channels-button" routerLink="/channels">Canaux de discussion</button>
+        <section id="play-option" class="button-container">
+            <button class="button" id="join-game-button" routerLink="/join-game">{{ 'main.join_game' | translate }}</button>
+            <button class="button" id="create-game-button" routerLink="/create-game">{{ 'main.create_game' | translate }}</button>
+            <button class="button" id="admin-game-button" routerLink="/admin-game">{{ 'main.admin_games' | translate }}</button>
+            <button class="button" id="channels-button" routerLink="/channels">{{ 'main.channels' | translate }}</button>
             <button class="button friends-button" id="friends-button" routerLink="/friends">
-                Amis
+                {{ 'main.friends' | translate }}
                 @if (pendingRequestCount > 0) {
-                    <span class="badge">{{ pendingRequestCount }}</span>
+                <span class="badge">{{ pendingRequestCount }}</span>
                 }
             </button>
             <button class="button" id="shop-button" routerLink="/shop">Boutique</button>
@@ -51,11 +51,10 @@
     </div>
 
     <footer class="footer-item">
-        <h4 class="team-name">Équipe 105</h4>
+        <h4 class="team-name">{{ 'auth.team' | translate }}</h4>
         <p>
             <span>Ahmed Sami Benabbou</span>, <span>May Guessous</span>, <span>Ayoub Marfouk</span>, <span>Pierre Carré</span>,
             <span>Anis Gadouche</span>, <span>Djihed Benaiche</span>
         </p>
     </footer>
-
 </div>

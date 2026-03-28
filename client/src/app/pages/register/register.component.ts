@@ -8,6 +8,7 @@ import { EXCLUSIVE_AVATAR_IDS } from '@common/shop.constants';
 import { CameraCaptureService } from '@app/services/communication/camera-capture.service';
 import { AuthService } from '@app/services/communication/auth.service';
 import { ProfileService } from '@app/services/communication/profile.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 const passwordContainsLetter: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     return /[a-zA-Z]/.test(control.value) ? null : { noLetter: true };
@@ -30,7 +31,7 @@ const passwordMatchValidator: ValidatorFn = (group: AbstractControl): Validation
 @Component({
     selector: 'app-signup-page',
     standalone: true,
-    imports: [ReactiveFormsModule, RouterLink, PopUpComponent],
+    imports: [ReactiveFormsModule, RouterLink, PopUpComponent, TranslateModule],
     templateUrl: './register.component.html',
     styleUrl: './register.component.scss',
 })

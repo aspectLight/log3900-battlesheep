@@ -12,11 +12,11 @@
 }
 
 .return-button:hover {
-    color: red;
+    color: var(--theme-text-hover);
 }
 
 .return-button:active {
-    color: darkred;
+    color: var(--theme-text-hover-active);
 }
 
 .return-button > img {
@@ -36,7 +36,7 @@
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: #e0d8c0;
+    color: var(--theme-text-special);
 }
 
 .waiting-room-container {
@@ -81,17 +81,17 @@
     }
 
     &::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.1);
+        background: var(--theme-shadow-sm);
         border-radius: 4px;
     }
 
     &::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
+        background: var(--theme-scrollbar-thumb-soft);
         border-radius: 4px;
     }
 
     &::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background: var(--theme-scrollbar-thumb-soft-hover);
     }
 }
 
@@ -123,13 +123,13 @@
 }
 
 .game-info h3 {
-    color: #e0d8c0;
+    color: var(--theme-text-special);
     font-weight: 500;
     margin-bottom: 5px;
 }
 
 .game-info h1 {
-    color: #fff0f0;
+    color: var(--theme-text-special-alt);
     font-weight: bold;
     letter-spacing: 1px;
     font-size: 2.5rem;
@@ -145,7 +145,9 @@
     border: 1px solid #7f1f1f;
     border-radius: 8px;
     padding: 10px 28px;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(85, 0, 0, 0.3);
+    box-shadow:
+        inset 0 0 10px rgba(0, 0, 0, 0.4),
+        0 2px 8px rgba(85, 0, 0, 0.3);
 
     .currency-row {
         display: flex;
@@ -192,7 +194,7 @@
 }
 
 .waiting-msg {
-    color: #e0d8c0;
+    color: var(--theme-text-special);
     font-weight: 500;
     letter-spacing: 1px;
     text-align: center;
@@ -213,11 +215,11 @@ button {
     width: 180px;
     text-align: center;
     padding: 0.75rem 1.5rem;
-    background-color: #550000;
-    color: #fff0f0;
-    border: 1px solid #7f1f1f;
+    background-color: var(--theme-bg-button);
+    color: var(--theme-text-special-alt);
+    border: 1px solid var(--theme-border-button);
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(85, 0, 0, 0.2);
+    box-shadow: 0 4px 6px var(--theme-shadow-button);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-weight: 500;
@@ -225,57 +227,57 @@ button {
 }
 
 .host-options button:hover {
-    background-color: #7f1f1f;
+    background-color: var(--theme-bg-button-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(85, 0, 0, 0.3);
+    box-shadow: 0 6px 12px var(--theme-shadow-button-hover);
 }
 
 .host-options button:active {
     transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(85, 0, 0, 0.2);
+    box-shadow: 0 2px 4px var(--theme-shadow-button);
 }
 
 .startGame-btn {
     opacity: 0.5;
     cursor: not-allowed;
-    background-color: #2b2b2b;
-    color: #e0d8c0;
-    border-color: #3a3a3a;
+    background-color: var(--theme-bg-card);
+    color: var(--theme-text-special);
+    border-color: var(--theme-border-tertiary);
     pointer-events: none;
 }
 
 .startGame-btn.isClickable {
     opacity: 1;
-    border-color: #7f1f1f;
+    border-color: var(--theme-border-button);
     pointer-events: auto;
 }
 
 .startGame-btn.isClickable:hover {
-    background-color: #7f1f1f;
+    background-color: var(--theme-bg-button-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(85, 0, 0, 0.3);
+    box-shadow: 0 6px 12px var(--theme-shadow-button-hover);
 }
 
 .add-vp-btn {
     opacity: 0.5;
     cursor: not-allowed;
-    background-color: #2b2b2b;
-    color: #e0d8c0;
-    border-color: #3a3a3a;
+    background-color: var(--theme-bg-card);
+    color: var(--theme-text-special);
+    border-color: var(--theme-border-tertiary);
     pointer-events: none;
 }
 
 .add-vp-btn.isClickable {
     opacity: 1;
-    border-color: #7f1f1f;
+    border-color: var(--theme-border-button);
     pointer-events: auto;
     cursor: pointer;
 }
 
 .add-vp-btn.isClickable:hover {
-    background-color: #7f1f1f;
+    background-color: var(--theme-bg-button-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(85, 0, 0, 0.3);
+    box-shadow: 0 6px 12px var(--theme-shadow-button-hover);
 }
 
 .drop-in-toggle {
@@ -286,9 +288,9 @@ button {
     gap: 6px;
     width: 180px;
     padding: 0.75rem 1.5rem;
-    background-color: #550000;
-    color: #fff0f0;
-    border: 1px solid #7f1f1f;
+    background-color: var(--theme-bg-button);
+    color: var(--theme-text-special-alt);
+    border: 1px solid var(--theme-border-button);
     border-radius: 8px;
     cursor: pointer;
     font-weight: 500;
@@ -311,7 +313,9 @@ button {
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: background 0.2s, border-color 0.2s;
+        transition:
+            background 0.2s,
+            border-color 0.2s;
 
         &::after {
             content: '';
@@ -338,7 +342,14 @@ button {
 }
 
 .drop-in-toggle:hover {
-    background-color: #7f1f1f;
+    background-color: var(--theme-bg-button-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(85, 0, 0, 0.3);
+    box-shadow: 0 6px 12px var(--theme-shadow-button-hover);
+}
+
+.drop-in-toggle input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--theme-accent-hover);
+    cursor: pointer;
 }

@@ -1,8 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Player } from '@app/classes/entity/player';
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
+import { TranslateModule } from '@ngx-translate/core';
 @Component({
     selector: 'app-player-card',
+    imports: [TranslateModule],
     templateUrl: './player-card.component.html',
     styleUrls: ['./player-card.component.scss'],
 })

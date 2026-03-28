@@ -4,13 +4,14 @@ import { Component } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@app/services/communication/auth.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 type FirebaseAuthError = { code?: string; message?: string };
 
 @Component({
     selector: 'app-login-page',
     standalone: true,
-    imports: [ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink, TranslateModule],
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss',
 })

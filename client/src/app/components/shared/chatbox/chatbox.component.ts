@@ -5,13 +5,14 @@ import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
 import { ChatService } from '@app/services/communication/chat.service';
 import { CustomChannelService } from '@app/services/communication/custom-channel.service';
 import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';
+import { TranslateModule } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
 const MAX_MESSAGE_LENGTH = 200;
 
 @Component({
     selector: 'app-chatbox',
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, TranslateModule],
     templateUrl: './chatbox.component.html',
     styleUrl: './chatbox.component.scss',
 })

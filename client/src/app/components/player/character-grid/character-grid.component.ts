@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { AVATAR_TYPES } from '@app/constants/player.constants';
 import { Reservation } from '@app/interfaces/reservation.interface';
 import { EXCLUSIVE_CHARACTER_IDS } from '@common/shop.constants';
 @Component({
-    imports: [CommonModule],
+    imports: [CommonModule, TranslateModule],
     selector: 'app-character-grid',
     templateUrl: './character-grid.component.html',
     styleUrl: './character-grid.component.scss',

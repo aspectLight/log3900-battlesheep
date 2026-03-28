@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HistoryService } from '@app/services/history/history.service';
 import { LogsHistoryItem } from '@app/interfaces/history/logs-history.interface';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-logs-history',
   standalone: true,
-  imports: [CommonModule, RouterModule], 
+  imports: [CommonModule, RouterModule, TranslateModule], 
   templateUrl: './logs-history.component.html',
   styleUrls: ['./logs-history.component.scss'],
 })

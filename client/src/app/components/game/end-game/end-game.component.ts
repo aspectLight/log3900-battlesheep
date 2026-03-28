@@ -6,6 +6,7 @@ import { PlayerStats } from '@app/classes/stats/player-stats';
 import { AVATAR_TYPES } from '@app/constants/player.constants';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 const ONE_HUNDRED = 100;
 
@@ -16,7 +17,7 @@ export interface PlayerReward {
 }
 
 @Component({
-    imports: [CommonModule],
+    imports: [CommonModule, TranslateModule],
     selector: 'app-end-game',
     templateUrl: './end-game.component.html',
     styleUrl: './end-game.component.scss',
@@ -53,7 +54,7 @@ export class EndGameComponent {
         return data.rewards.map((r) => ({
             playerName: r.name,
             coinsEarned: r.gain,
-            avatarImage: r.avatarName ? (AVATAR_TYPES[r.avatarName.toLowerCase()]?.avatar ?? null) : null,
+            avatarImage: r.avatarName ? AVATAR_TYPES[r.avatarName.toLowerCase()]?.avatar ?? null : null,
         }));
     }
 

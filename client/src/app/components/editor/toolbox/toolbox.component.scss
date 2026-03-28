@@ -4,9 +4,9 @@
     flex-direction: column;
     width: 80vh;
     height: 100%;
-    background-color: #252525;
-    border: 1px solid #3a3a3a;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: var(--theme-bg-card-dark);
+    border: 1px solid var(--theme-border-tertiary);
+    box-shadow: 0 4px 6px var(--theme-shadow-sm);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 8px;
 }
@@ -21,10 +21,10 @@
     width: 100%;
     height: 40px;
     padding: 12px 24px;
-    color: #e0d8c0;
-    background-color: #3c3c3c;
-    border: 1px solid #3a3a3a;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: var(--theme-text-special);
+    background-color: var(--theme-bg-card-hover);
+    border: 1px solid var(--theme-border-tertiary);
+    box-shadow: 0 4px 6px var(--theme-shadow-sm);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 8px 8px 0 0;
     text-transform: uppercase;
@@ -32,17 +32,17 @@
 }
 
 .tab-button:hover {
-    background-color: #444444;
-    color: #ff5a5a;
+    background-color: var(--theme-border-secondary);
+    color: var(--theme-text-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(255, 90, 90, 0.2);
+    box-shadow: 0 6px 12px var(--theme-shadow-md);
 }
 
 .tab-button.active {
-    background-color: #550000;
-    color: #fff0f0;
-    border-color: #7f1f1f;
-    box-shadow: 0 6px 12px rgba(85, 0, 0, 0.2);
+    background-color: var(--theme-bg-button);
+    color: var(--theme-text-special-alt);
+    border-color: var(--theme-border-button);
+    box-shadow: 0 6px 12px var(--theme-shadow-button);
 }
 
 .list {
@@ -50,13 +50,13 @@
     flex-direction: column;
     justify-content: flex-start;
     flex-grow: 1;
-    background-color: #2b2b2b;
-    border: 1px solid #3a3a3a;
+    background-color: var(--theme-bg-card);
+    border: 1px solid var(--theme-border-tertiary);
     padding: 12px;
     margin: 0;
     position: relative;
     border-radius: 0 0 8px 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px var(--theme-shadow-sm);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -83,9 +83,9 @@
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
-    border: 1px solid #3a3a3a;
+    border: 1px solid var(--theme-border-tertiary);
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px var(--theme-shadow-sm);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -95,13 +95,13 @@
     overflow: hidden;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    background-color: #252525;
+    background-color: var(--theme-bg-card-dark);
 }
 
 .tile-item button:hover,
 .item-item button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 12px var(--theme-shadow-md);
 }
 
 .tile-item button img,
@@ -122,16 +122,16 @@
 
 @keyframes flicker {
     0% {
-        border-color: #8a2a2a;
-        box-shadow: 0 4px 6px rgba(138, 42, 42, 0.4);
+        border-color: var(--theme-border-focus);
+        box-shadow: 0 4px 6px var(--theme-border-focus-shadow);
     }
     50% {
-        border-color: #a00000;
-        box-shadow: 0 6px 12px rgba(255, 90, 90, 0.6);
+        border-color: var(--theme-accent-hover);
+        box-shadow: 0 6px 12px var(--theme-shadow-focus);
     }
     100% {
-        border-color: #600000;
-        box-shadow: 0 4px 6px rgba(138, 42, 42, 0.4);
+        border-color: var(--theme-accent);
+        box-shadow: 0 4px 6px var(--theme-border-focus-shadow);
     }
 }
 
@@ -144,7 +144,7 @@ input,
 textarea {
     background-color: transparent;
     font-size: 1.1em;
-    color: white;
+    color: var(--theme-text-primary);
     resize: vertical;
     font-family: 'CustomFont';
 }
@@ -153,37 +153,37 @@ textarea {
     flex-grow: 1;
     min-height: 0 !important;
     height: 100%;
-    background-color: #252525;
-    border: 1px solid #3a3a3a;
+    background-color: var(--theme-bg-card-dark);
+    border: 1px solid var(--theme-border-tertiary);
     border-radius: 8px;
     box-sizing: border-box;
     padding: 12px;
     resize: none;
     outline: none;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px var(--theme-shadow-sm);
 }
 
 textarea:focus {
-    border-color: #8a2a2a;
-    box-shadow: 0 6px 12px rgba(255, 90, 90, 0.2);
+    border-color: var(--theme-border-focus);
+    box-shadow: 0 6px 12px var(--theme-shadow-focus);
 }
 
 input {
-    background-color: #252525;
-    border: 1px solid #3a3a3a;
+    background-color: var(--theme-bg-card-dark);
+    border: 1px solid var(--theme-border-tertiary);
     border-radius: 8px;
     width: 100%;
     box-sizing: border-box;
     padding: 10px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     outline: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px var(--theme-shadow-sm);
 }
 
 input:focus {
-    border-color: #8a2a2a;
-    box-shadow: 0 6px 12px rgba(255, 90, 90, 0.2);
+    border-color: var(--theme-border-focus);
+    box-shadow: 0 6px 12px var(--theme-shadow-focus);
 }
 
 .controls {
@@ -205,7 +205,7 @@ input:focus {
     left: 0;
     right: 0;
     height: 8px;
-    box-shadow: inset 0 -2px 0 #3a3a3a;
+    box-shadow: inset 0 -2px 0 var(--theme-border-tertiary);
 }
 
 .tutorial-gif {
@@ -223,9 +223,9 @@ input:focus {
     align-items: center;
     justify-content: space-between;
     padding: 12px;
-    background-color: #2b2b2b;
-    border-top: 1px solid #3a3a3a;
+    background-color: var(--theme-bg-card);
+    border-top: 1px solid var(--theme-border-tertiary);
     margin-top: auto;
     border-radius: 0 0 8px 8px;
-    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -4px 6px var(--theme-shadow-sm);
 }

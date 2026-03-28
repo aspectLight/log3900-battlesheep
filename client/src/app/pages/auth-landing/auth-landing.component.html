@@ -1,18 +1,29 @@
 <div class="container">
-    
+    <div class="lang-switcher">
+        <button
+            class="lang-btn"
+            [class.active]="languageService.getCurrentLanguage() === 'fr'"
+            (click)="setLanguage('fr')"
+        >FR</button>
+        <button
+            class="lang-btn"
+            [class.active]="languageService.getCurrentLanguage() === 'en'"
+            (click)="setLanguage('en')"
+        >EN</button>
+    </div>
+
     <div class="content-wrapper">
         <h1 class="header-item"></h1>
         <img class="logo" src="./assets/ui/eastern_solace_logo-removebg-preview.png" alt="Logo Jeu" />
-        <button class="button" (click)="navigateToLogin()">Se connecter</button>
-        <button class="button" (click)="navigateToRegister()">Créer un compte</button>
+        <button class="button" (click)="navigateToLogin()">{{ 'auth.login' | translate }}</button>
+        <button class="button" (click)="navigateToRegister()">{{ 'auth.register' | translate }}</button>
     </div>
 
     <footer class="footer-item">
-        <h4 class="team-name">Équipe 105</h4>
+        <h4 class="team-name">{{ 'auth.team' | translate }}</h4>
         <p>
-            <span>Ahmed Sami Benabbou</span>, <span>May Guessous</span>, <span>Ayoub Marfouk</span>, 
+            <span>Ahmed Sami Benabbou</span>, <span>May Guessous</span>, <span>Ayoub Marfouk</span>,
             <span>Pierre Carré</span>, <span>Anis Gadouche</span>, <span>Djihed Benaiche</span>
         </p>
     </footer>
 </div>
-

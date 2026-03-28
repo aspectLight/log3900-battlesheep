@@ -5,15 +5,16 @@ import { Player } from '@app/classes/entity/player';
 import { ItemCardComponent } from '@app/components/shared/item-card/item-card.component';
 import { BonusType } from '@app/constants/bonus.constants';
 import { CombatState, FEEDBACK_DURATION, NOTIFICATION_DURATION } from '@app/constants/combat.constants';
+import { ActionSocketService } from '@app/services/communication/socket-handlers/action-socket.service';
+import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { ActionService } from '@app/services/gameplay/action.service';
 import { CombatService } from '@app/services/gameplay/combat.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
-import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
-import { ActionSocketService } from '@app/services/communication/socket-handlers/action-socket.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 @Component({
     selector: 'app-combat',
-    imports: [TitleCasePipe, ItemCardComponent],
+    imports: [TitleCasePipe, ItemCardComponent, TranslateModule],
     templateUrl: './combat.component.html',
     styleUrl: './combat.component.scss',
 })
@@ -39,6 +40,7 @@ export class CombatComponent implements OnInit, OnDestroy {
         private actionSocketService: ActionSocketService,
         private gameManager: GameManagerService,
         private socketService: SocketService,
+        private translate: TranslateService,
     ) {}
 
     get isCombatPlayerTurn() {
@@ -219,7 +221,7 @@ export class CombatComponent implements OnInit, OnDestroy {
 
         switch (state) {
             case CombatState.Miss: {
-                title = 'Raté!';
+                title = this.translate.instant('combat.notif_miss_title');
                 message = '';
                 isSuccess = false;
                 break;
@@ -239,34 +241,34 @@ export class CombatComponent implements OnInit, OnDestroy {
                 break;
             }
             case CombatState.GetMissed: {
-                title = 'Esquivé!';
+                title = this.translate.instant('combat.notif_dodge_title');
                 message = '';
                 isSuccess = true;
                 break;
             }
             case CombatState.FlightSuccess: {
-                title = 'Tentative de fuite !';
-                message = 'Vous avez réussi à fuir!';
+                title = this.translate.instant('combat.notif_flight_title');
+                message = this.translate.instant('combat.notif_flight_success');
                 isSuccess = true;
                 duration = NOTIFICATION_DURATION;
                 break;
             }
             case CombatState.FlightFailure: {
-                title = 'Tentative de fuite !';
-                message = "Vous n'avez pas réussi à fuir!";
+                title = this.translate.instant('combat.notif_flight_title');
+                message = this.translate.instant('combat.notif_flight_failure');
                 isSuccess = false;
                 duration = NOTIFICATION_DURATION;
                 break;
             }
             case CombatState.Won: {
                 if (this.wasFlightEnd) {
-                    title = 'Tentative de fuite réussie!';
-                    message = 'Vous avez réussi à fuir!';
+                    title = this.translate.instant('combat.notif_won_flight_title');
+                    message = this.translate.instant('combat.notif_flight_success');
                     isSuccess = true;
                     duration = NOTIFICATION_DURATION;
                 } else {
-                    title = 'Victoire!';
-                    message = 'Vous avez gagné le combat!';
+                    title = this.translate.instant('combat.notif_won_title');
+                    message = this.translate.instant('combat.notif_won_message');
                     isSuccess = true;
                     duration = NOTIFICATION_DURATION;
                 }
@@ -275,13 +277,13 @@ export class CombatComponent implements OnInit, OnDestroy {
             }
             case CombatState.Lost: {
                 if (this.wasFlightEnd) {
-                    title = 'Tentative de fuite réussie!';
-                    message = `${this.enemy.name} a réussi à fuir!`;
+                    title = this.translate.instant('combat.notif_lost_flight_title');
+                    message = this.translate.instant('combat.notif_lost_flight_message', { name: this.enemy.name });
                     isSuccess = false;
                     duration = NOTIFICATION_DURATION;
                 } else {
-                    title = 'Défaite';
-                    message = `${this.enemy.name} a gagné le combat!`;
+                    title = this.translate.instant('combat.notif_lost_title');
+                    message = this.translate.instant('combat.notif_lost_message', { name: this.enemy.name });
                     isSuccess = false;
                     duration = NOTIFICATION_DURATION;
                 }

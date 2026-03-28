@@ -1,8 +1,8 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { Router, RouterLink } from '@angular/router';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
+import { ACCOUNT_CREATION_AVATARS, PROFILE_AVATARS } from '@app/constants/profile.constants';
 import { AuthService } from '@app/services/communication/auth.service';
 import { ChatService } from '@app/services/communication/chat.service';
 import { CustomChannelService } from '@app/services/communication/custom-channel.service';
@@ -11,14 +11,15 @@ import { SocialService } from '@app/services/communication/social.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { VirtualCurrencyService } from '@app/services/currency/virtual-currency.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
-import { ACCOUNT_CREATION_AVATARS, PROFILE_AVATARS } from '@app/constants/profile.constants';
+import { TranslateModule } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-main-page',
     templateUrl: './main-page.component.html',
     styleUrls: ['./main-page.component.scss'],
-    imports: [RouterLink, PopUpComponent, AsyncPipe],
+    imports: [RouterLink, PopUpComponent, AsyncPipe, TranslateModule],
 })
 export class MainPageComponent implements OnInit, OnDestroy {
     private pendingRequestsSub?: Subscription;

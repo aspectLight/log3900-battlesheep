@@ -19,6 +19,7 @@ import { HistoryService } from '@app/services/history/history.service';
 import { GameRoomService } from '@app/services/state/game-room.service';
 import { SessionService } from '@app/services/state/session.service';
 import { API_ENDPOINTS } from '@common/api-endpoints.constants';
+import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable, Subject, from, switchMap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
@@ -75,6 +76,7 @@ export class GameManagerService {
         private historyService: HistoryService,
         private auth: Auth,
         private session: SessionService,
+        private translate: TranslateService,
     ) {
         this.movementService = new MovementService();
         this.gameRoomService.room$.subscribe((room) => {
@@ -456,7 +458,7 @@ export class GameManagerService {
 
     handleTurnStarting(player: Player, countdown: number): void {
         this.clearPaths();
-        this.notificationMessage = `Le tour de ${player.name} commence dans 3 secondes!`;
+        this.notificationMessage = this.translate.instant('game_info.turn_starting', { name: player.name });
         this.notificationTime = countdown;
         this.updateCurrentPlayer(player);
     }

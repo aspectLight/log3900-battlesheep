@@ -1,46 +1,46 @@
 <div class="game-creation-container">
-    <h1>Créer un nouveau jeu</h1>
+    <h1>{{ 'game_creator.create_new' | translate }}</h1>
 
     <div class="mode-selection">
-        <h2>Mode de jeu</h2>
+        <h2>{{ 'game_creator.game_mode' | translate }}</h2>
         <div class="mode-selection-buttons">
             <label>
                 <input type="radio" name="mode" value="classique" (change)="onModeChange('classique')" checked />
-                Classique
+                {{ 'game_creator.classic' | translate }}
             </label>
             <label class="ctf-label">
                 <input type="radio" name="mode" value="ctf" (change)="onModeChange('ctf')" />
-                CTF
+                {{ 'game_creator.ctf' | translate }}
             </label>
         </div>
-        <span class="mode-description">{{ modeDescription }}</span>
+        <span class="mode-description">{{ modeDescriptionKey | translate }}</span>
     </div>
 
     <div class="size-selection">
-        <h2>Taille de la carte</h2>
+        <h2>{{ 'game_creator.board_size' | translate }}</h2>
         <div class="size-selection-buttons">
             <label>
                 <input type="radio" name="size" value="petite" (change)="onSizeChange(boardSizes.Petite)" />
-                Petite
+                {{ 'game_creator.small' | translate }}
             </label>
             <label>
                 <input type="radio" name="size" value="moyenne" (change)="onSizeChange(boardSizes.Moyenne)" checked />
-                Moyenne
+                {{ 'game_creator.medium' | translate }}
             </label>
             <label>
                 <input type="radio" name="size" value="grande" (change)="onSizeChange(boardSizes.Grande)" />
-                Grande
+                {{ 'game_creator.large' | translate }}
             </label>
         </div>
         <div class="size-description">
-            <span><strong>Grille: </strong>{{ board }}x{{ board }}</span>
-            <span><strong>Joueurs: </strong>{{ players }}</span>
-            <span><strong>Items: </strong>{{ items }}</span>
+            <span><strong>{{ 'game_creator.grid' | translate }}</strong>{{ board }}x{{ board }}</span>
+            <span><strong>{{ 'game_creator.players' | translate }}</strong>{{ players }}</span>
+            <span><strong>{{ 'game_creator.items' | translate }}</strong>{{ items }}</span>
         </div>
     </div>
 
     <div class="actions-selection">
-        <h2>Nombre de points d'actions</h2>
+        <h2>{{ 'game_creator.actions_points' | translate }}</h2>
         <div class="actions-selection-buttons">
             <label>
                 <input type="radio" name="name" value="petite" (change)="onActionsChange(1)" checked/>
@@ -64,31 +64,31 @@
             </label>
         </div>
         <div class="actions-description">
-            <span class="mode-description">{{ actionsDescription }}</span>
+            <span class="mode-description">{{ 'game_configurator.actions_desc' | translate }}</span>
         </div>
     </div>
 
     <div class="privacy-selection">
-        <h2>Confidentialité</h2>
+        <h2>{{ 'game_creator.privacy' | translate }}</h2>
         <div class="privacy-selection-buttons">
             <label>
                 <input type="radio" name="privacy" value="public" (change)="onPrivacyChange('public')" checked />
-                Public
+                {{ 'game_list.public' | translate }}
             </label>
             <label>
                 <input type="radio" name="privacy" value="private" (change)="onPrivacyChange('private')" />
-                Privé
+                {{ 'game_list.private' | translate }}
             </label>
             <label>
                 <input type="radio" name="privacy" value="protected" (change)="onPrivacyChange('protected')" />
-                Privé-partagé
+                {{ 'game_list.private_shared' | translate }}
             </label>
         </div>
     </div>
 
     <div class="actions">
         <br />
-        <button class="cancel-btn" (click)="cancel()">Annuler</button>
-        <button class="create-btn" (click)="createGame()">Créer</button>
+        <button class="cancel-btn" (click)="cancel()">{{ 'game_creator.cancel' | translate }}</button>
+        <button class="create-btn" (click)="createGame()">{{ 'game_creator.create' | translate }}</button>
     </div>
 </div>

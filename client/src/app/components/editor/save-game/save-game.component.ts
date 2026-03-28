@@ -2,22 +2,23 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { Board } from '@app/classes/board/board';
+import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
+import { HTTP_STATUS_CODES } from '@app/constants/http-status-code.constants';
+import { ROUTES } from '@app/constants/routes.constants';
+import { SaveValidationResult } from '@app/interfaces/save-validation-result.interface';
 import { GameValidationService } from '@app/services/editor/game-validation.service';
 import { GameService } from '@app/services/editor/game.service';
-import { HTTP_STATUS_CODES } from '@app/constants/http-status-code.constants';
-import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
-import { ROUTES } from '@app/constants/routes.constants';
-import { ErrorMessages, WARNING_MESSAGES } from '@common/error-messages.constants';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-save-game',
-    imports: [PopUpComponent],
+    imports: [PopUpComponent, TranslateModule],
     templateUrl: './save-game.component.html',
     styleUrl: './save-game.component.scss',
 })
 export class SaveGameComponent {
     @Input() board!: Board;
-    errors: { message?: string }[] = [];
+    errors: SaveValidationResult[] = [];
     showError: boolean;
     errorMessage: string;
     showSecondButton: boolean = false;
@@ -27,11 +28,12 @@ export class SaveGameComponent {
         private router: Router,
         private gameValidationService: GameValidationService,
         private gameService: GameService,
+        private translate: TranslateService,
     ) {}
 
     onSaveGame(): void {
         if (!this.validateBoard()) return;
-        this.errorMessage = WARNING_MESSAGES.SaveConfirmation;
+        this.errorMessage = this.translate.instant('save.confirm');
         this.showError = true;
         this.showSecondButton = true;
         this.onConfirm = this.onConfirmSave;
@@ -49,6 +51,10 @@ export class SaveGameComponent {
                 },
             });
         } else this.saveNewGame();
+    }
+
+    getErrorParams(error: SaveValidationResult): Record<string, unknown> | undefined {
+        return error.messageParams;
     }
 
     closeDialogue(): void {
@@ -88,9 +94,9 @@ export class SaveGameComponent {
     private handleSaveError(err: HttpErrorResponse): void {
         this.showError = true;
         if (err.status === HTTP_STATUS_CODES.conflict) {
-            this.errorMessage = ErrorMessages.NameAlreadyUsed;
+            this.errorMessage = this.translate.instant('save.conflict_error');
         } else {
-            this.errorMessage = ErrorMessages.GenericError;
+            this.errorMessage = this.translate.instant('save.generic_error');
         }
     }
 }

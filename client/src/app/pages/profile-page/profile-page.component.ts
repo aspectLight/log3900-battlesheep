@@ -1,3 +1,4 @@
+/* eslint-disable max-params */
 import { Component, ElementRef, HostListener, OnInit, ViewChild, inject } from '@angular/core';
 import { Auth, signOut } from '@angular/fire/auth';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -5,21 +6,24 @@ import { Router, RouterLink } from '@angular/router';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
 import { ROUTES } from '@app/constants/routes.constants';
-import { EXCLUSIVE_AVATAR_IDS } from '@common/shop.constants';
 import { UserProfile, UserStatistics } from '@app/interfaces/profile.interface';
 import { CameraCaptureService } from '@app/services/communication/camera-capture.service';
 import { ProfileService } from '@app/services/communication/profile.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { StatsService } from '@app/services/communication/stats.service';
 import { VirtualCurrencyService } from '@app/services/currency/virtual-currency.service';
+import { LanguageService, LanguageType } from '@app/services/state/language.service';
 import { SessionService } from '@app/services/state/session.service';
+import { ThemeService, ThemeType } from '@app/services/state/theme.service';
+import { EXCLUSIVE_AVATAR_IDS } from '@common/shop.constants';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-profile-page',
     templateUrl: './profile-page.component.html',
     styleUrls: ['./profile-page.component.scss'],
-    imports: [ReactiveFormsModule, RouterLink, PopUpComponent],
+    imports: [ReactiveFormsModule, RouterLink, PopUpComponent, TranslateModule],
 })
 export class ProfilePageComponent implements OnInit {
     @ViewChild('cameraVideo') cameraVideoRef!: ElementRef<HTMLVideoElement>;
@@ -40,6 +44,17 @@ export class ProfilePageComponent implements OnInit {
     showDeleteConfirm = false;
     errorMessage = '';
 
+    readonly themes: { value: ThemeType; labelKey: string; description: string; preview: string }[] = [
+        { value: 'default', labelKey: 'profile.theme_default', description: 'Rouge sombre', preview: '/assets/ui/default_preview.png' },
+        { value: 'frost', labelKey: 'profile.theme_frost', description: 'Bleu glacial', preview: '/assets/ui/froid_preview.png' },
+        { value: 'village', labelKey: 'profile.theme_village', description: 'Brun terreux', preview: '/assets/ui/village_preview.png' },
+    ];
+
+    readonly languages: { value: LanguageType; labelKey: string }[] = [
+        { value: 'fr', labelKey: 'language.fr' },
+        { value: 'en', labelKey: 'language.en' },
+    ];
+
     selectedAvatarFile: File | null = null;
     avatarFileError: string | null = null;
     avatarPreviewUrl: string | null = null;
@@ -59,6 +74,9 @@ export class ProfilePageComponent implements OnInit {
     private currencyService = inject(VirtualCurrencyService);
     private auth = inject(Auth);
     private router = inject(Router);
+    themeService = inject(ThemeService);
+    languageService = inject(LanguageService);
+    private translate = inject(TranslateService);
 
     get selectedAvatarId(): string {
         return this.form.controls.avatarId.value ?? '';
@@ -93,14 +111,14 @@ export class ProfilePageComponent implements OnInit {
         const validTypes = ['image/jpeg', 'image/png'];
 
         if (!validTypes.includes(file.type)) {
-            const extension = file.name.split('.').pop()?.toLowerCase() ?? 'inconnu';
-            this.avatarFileError = `Fichier de type "${extension}" non autorisé. Formats permis : JPG, JPEG, PNG (taille maximale 2 MB).`;
+            const extension = file.name.split('.').pop()?.toLowerCase() ?? '?';
+            this.avatarFileError = this.translate.instant('profile.error_file_type', { ext: extension });
             return;
         }
 
         if (file.size > maxSize) {
             const sizeMb = file.size / (1024 * 1024);
-            this.avatarFileError = `Fichier trop volumineux (${sizeMb.toFixed(2)} MB). Taille maximale autorisée : 2 MB.`;
+            this.avatarFileError = this.translate.instant('profile.error_file_size', { size: sizeMb.toFixed(2) });
             return;
         }
 
@@ -154,6 +172,32 @@ export class ProfilePageComponent implements OnInit {
         this.form.controls.avatarId.markAsTouched();
     }
 
+    async selectTheme(theme: ThemeType) {
+        if (!this.profile) return;
+        // Applique immédiatement (retour visuel instantané)
+        this.themeService.setTheme(theme);
+        // Sauvegarde sur le backend (lié au compte)
+        try {
+            const updated = await this.profileService.updateProfile({ theme });
+            this.profile = updated;
+        } catch {
+            // En cas d'erreur réseau, le changement visuel reste appliqué localement
+        }
+    }
+
+    async selectLanguage(language: LanguageType) {
+        // Applique immédiatement
+        this.languageService.setLanguage(language);
+        // Sauvegarde sur le backend si connecté
+        if (!this.profile) return;
+        try {
+            const updated = await this.profileService.updateProfile({ language });
+            this.profile = updated;
+        } catch {
+            // En cas d'erreur réseau, le changement reste appliqué localement
+        }
+    }
+
     async submitForm() {
         this.form.markAllAsTouched();
 
@@ -173,7 +217,7 @@ export class ProfilePageComponent implements OnInit {
         const hasAvatarFile = !!this.selectedAvatarFile;
 
         if (!hasProfileChanges && !hasAvatarFile) {
-            this.showError('Aucune modification détectée');
+            this.showError(this.translate.instant('profile.no_changes'));
             this.isSaving = false;
             return;
         }

@@ -175,6 +175,18 @@ export class AuthService {
             user.avatarImageMimeType = undefined;
         }
 
+        // Updating theme
+        const validThemes = ['default', 'frost', 'village'];
+        if (updateDto.theme && validThemes.includes(updateDto.theme) && updateDto.theme !== user.theme) {
+            user.theme = updateDto.theme;
+        }
+
+        // Updating language
+        const validLanguages = ['fr', 'en'];
+        if (updateDto.language && validLanguages.includes(updateDto.language) && updateDto.language !== user.language) {
+            user.language = updateDto.language;
+        }
+
         // Updating preferences
         if (updateDto.preferences && updateDto.preferences !== user.preferences) {
             user.preferences = { ...user.preferences, ...updateDto.preferences };
