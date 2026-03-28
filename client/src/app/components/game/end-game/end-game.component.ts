@@ -3,9 +3,17 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { GlobalStats } from '@app/classes/stats/global-stats';
 import { PlayerStats } from '@app/classes/stats/player-stats';
+import { AVATAR_TYPES } from '@app/constants/player.constants';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
+import { GameManagerService } from '@app/services/state/game-manager.service';
 
 const ONE_HUNDRED = 100;
+
+export interface PlayerReward {
+    playerName: string;
+    coinsEarned: number;
+    avatarImage: string | null;
+}
 
 @Component({
     imports: [CommonModule],
@@ -24,6 +32,7 @@ export class EndGameComponent {
     constructor(
         private router: Router,
         private socketService: SocketService,
+        private gameManagerService: GameManagerService,
     ) {
         this.socketService.on(
             'getStatisticsResponse',
@@ -36,6 +45,16 @@ export class EndGameComponent {
         );
         this.socketService.send('getStatistics', this.socketService.getRoomId());
         this.sortBy('name');
+    }
+
+    get playerRewards(): PlayerReward[] {
+        const data = this.gameManagerService.gameRewards;
+        if (!data) return [];
+        return data.rewards.map((r) => ({
+            playerName: r.name,
+            coinsEarned: r.gain,
+            avatarImage: r.avatarName ? (AVATAR_TYPES[r.avatarName.toLowerCase()]?.avatar ?? null) : null,
+        }));
     }
 
     get playersHadFlag(): number {

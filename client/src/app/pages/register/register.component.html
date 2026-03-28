@@ -159,10 +159,18 @@
                                 type="button"
                                 class="avatar-btn"
                                 [class.selected]="selectedAvatarId === a.id && !selectedAvatarFile"
+                                [class.premium-locked]="a.premium"
+                                [disabled]="a.premium"
                                 (click)="selectAvatar(a.id)"
-                                [title]="a.label"
+                                [title]="a.premium ? a.label + ' (500 pièces - Boutique)' : a.label"
                             >
-                                <img [src]="a.image" [alt]="a.label" class="avatar-img" />
+                                <img [src]="a.image" [alt]="a.label" class="avatar-img" [class.dimmed]="a.premium" />
+                                @if (a.premium) {
+                                <div class="premium-overlay">
+                                    <span class="lock-icon">&#128274;</span>
+                                    <span class="premium-price">500</span>
+                                </div>
+                                }
                             </button>
                             }
                         </div>

@@ -51,6 +51,10 @@ export class RoomListComponent implements OnInit {
         return status === 'waiting' ? 'En attente' : 'En cours';
     }
 
+    getModeLabel(mode: string): string {
+        return mode === 'ctf' ? 'CTF' : 'Classique';
+    }
+
     getAccessibilityLabel(room: RoomInfo): string {
         if (room.playerCount >= room.maxPlayers) return 'Complète';
         if (room.friendsOnly) return 'Amis seulement';

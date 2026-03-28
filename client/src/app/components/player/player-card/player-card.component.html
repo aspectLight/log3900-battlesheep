@@ -1,4 +1,9 @@
-<div class="player-container">
+<div class="player-container"
+    [class.banner-gold]="player.activeBanner === 'banner_gold'"
+    [class.banner-shadow]="player.activeBanner === 'banner_shadow'"
+    [class.banner-flame]="player.activeBanner === 'banner_flame'"
+    [class.banner-ice]="player.activeBanner === 'banner_ice'"
+    [class.banner-neon]="player.activeBanner === 'banner_neon'">
     @if (isHost){
         <div class="host-container">
             <img src="./assets/ui/crown.png" alt="Is Host" class="host-indicator"/>
@@ -15,7 +20,9 @@
         </div>
     }
     <div class="div1">
-        <img [src]="avatar" alt="Player Character" class="player-image" />
+        <div class="avatar-wrapper">
+            <img [src]="avatar" alt="Player Character" class="player-image" />
+        </div>
     </div>
     <div class="div2 player-name">
         @if (profileAvatar) {

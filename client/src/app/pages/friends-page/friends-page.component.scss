@@ -15,15 +15,11 @@
     width: 100%;
     justify-content: center;
     align-items: center;
-    padding: 10px 0 20px;
+    padding: 10px 0;
 
     h1 {
-        margin: 0;
-        color: #ffffff;
         letter-spacing: 2px;
-        font-size: 44px;
-        text-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
-        text-align: center;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     }
 }
 
@@ -32,24 +28,19 @@
     left: 10px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
     cursor: pointer;
-    background: none;
-    border: none;
-    outline: none;
-    color: inherit;
-    font-size: 18px;
-    font-weight: 600;
-    transition: color 0.2s ease;
 
     img {
-        width: 18px;
-        height: 18px;
-        object-fit: contain;
+        width: 15px;
     }
 
     &:hover {
-        color: #ff5a5a;
+        color: red;
+    }
+
+    &:active {
+        color: darkred;
     }
 }
 

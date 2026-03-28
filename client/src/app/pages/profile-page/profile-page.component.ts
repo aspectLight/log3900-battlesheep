@@ -5,11 +5,13 @@ import { Router, RouterLink } from '@angular/router';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
 import { ROUTES } from '@app/constants/routes.constants';
+import { EXCLUSIVE_AVATAR_IDS } from '@common/shop.constants';
 import { UserProfile, UserStatistics } from '@app/interfaces/profile.interface';
 import { CameraCaptureService } from '@app/services/communication/camera-capture.service';
 import { ProfileService } from '@app/services/communication/profile.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { StatsService } from '@app/services/communication/stats.service';
+import { VirtualCurrencyService } from '@app/services/currency/virtual-currency.service';
 import { SessionService } from '@app/services/state/session.service';
 import { environment } from 'src/environments/environment';
 
@@ -54,6 +56,7 @@ export class ProfilePageComponent implements OnInit {
     private statsService = inject(StatsService);
     private socketService = inject(SocketService);
     private session = inject(SessionService);
+    private currencyService = inject(VirtualCurrencyService);
     private auth = inject(Auth);
     private router = inject(Router);
 
@@ -112,6 +115,7 @@ export class ProfilePageComponent implements OnInit {
     }
 
     async ngOnInit() {
+        this.currencyService.fetchCatalogue();
         await this.loadProfile();
     }
 
@@ -136,7 +140,13 @@ export class ProfilePageComponent implements OnInit {
         }
     }
 
+    isPremiumLocked(avatarId: string): boolean {
+        if (!EXCLUSIVE_AVATAR_IDS.includes(avatarId)) return false;
+        return !this.currencyService.hasPurchased(avatarId);
+    }
+
     selectAvatar(id: string) {
+        if (this.isPremiumLocked(id)) return;
         this.selectedAvatarFile = null;
         this.avatarPreviewUrl = null;
         this.avatarFileError = null;

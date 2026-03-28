@@ -18,8 +18,10 @@
 
 <div class="container">
     <div class="settings-menu" #settingsMenu>
+        <span class="currency-inline">{{ currencyService.balance$ | async }}</span>
+        <img src="./assets/gold_coin.png" alt="pièces" class="coin-icon" />
         <button class="settings-button" (click)="toggleSettingsMenu()">
-            <img src="./assets/ui/profile.png" alt="Profil" class="settings-icon" />
+            <img [src]="avatarDisplayUrl" alt="Profil" class="settings-icon avatar-circle" />
         </button>
         <div class="settings-dropdown" [class.show]="showSettingsMenu">
             <button class="settings-option" routerLink="/profile">Profil</button>
@@ -33,7 +35,7 @@
         <h1 class="header-item"></h1>
         <img class="logo" src="./assets/ui/eastern_solace_logo-removebg-preview.png" alt="Logo Jeu" />
 
-        <section id="play-option" class="button-container">
+<section id="play-option" class="button-container">
             <button class="button" id="join-game-button" routerLink="/join-game">Joindre une partie</button>
             <button class="button" id="create-game-button" routerLink="/create-game">Créer une partie</button>
             <button class="button" id="admin-game-button" routerLink="/admin-game">Administrer les jeux</button>
@@ -44,6 +46,7 @@
                     <span class="badge">{{ pendingRequestCount }}</span>
                 }
             </button>
+            <button class="button" id="shop-button" routerLink="/shop">Boutique</button>
         </section>
     </div>
 

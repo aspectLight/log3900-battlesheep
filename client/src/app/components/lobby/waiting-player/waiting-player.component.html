@@ -37,17 +37,32 @@
             <h3>Code de la partie :</h3>
             <h1>{{ code }}</h1>
         </div>
+
+        <div class="currency-panel">
+            <div class="currency-row">
+                <span class="currency-label">Solde :</span>
+                <span class="currency-value"><strong>{{ currencyService.balance$ | async }}</strong> <img class="coin-icon" src="./assets/gold_coin.png" alt="pièce" /></span>
+            </div>
+            @if ((room?.entryFee ?? 0) > 0) {
+            <div class="currency-row">
+                <span class="currency-label">Prix d'entrée :</span>
+                <span class="currency-value">{{ room?.entryFee }} <img class="coin-icon" src="./assets/gold_coin.png" alt="pièce" /></span>
+            </div>
+            }
+        </div>
+
         @if(isHost) {
         <div class="host-options">
             <label class="drop-in-toggle">
                 <input type="checkbox" [checked]="room?.dropInDropOut" (change)="toggleDropInDropOut()" />
-                Drop-in/Drop-out
+                <span class="checkmark"></span>
+                <span>Drop-in/<br/>Drop-out</span>
             </label>
             <button class="lock-btn" (click)="confirmAction('lock')">
                 {{ room?.isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
             </button>
-            <button class="startGame-btn" [class.isClickable]="isStartValid" (click)="startGame()">Commencer la partie</button>
             <button class="add-vp-btn" [class.isClickable]="!room?.isLocked" (click)="openProfileSection()">Ajouter un joueur virtuel</button>
+            <button class="startGame-btn" [class.isClickable]="isStartValid" (click)="startGame()">Commencer la partie</button>
         </div>
         @if (isProfileSectionVisible) {
         <app-pop-up

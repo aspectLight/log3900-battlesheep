@@ -4,6 +4,7 @@
         Page d'accueil
     </button>
     <h1> Créer une partie </h1>
+    <app-profile-menu></app-profile-menu>
 </div>
 
 <app-game-list
@@ -17,10 +18,23 @@
 
 @if (hasGames) {
     <div class="create-game-actions">
-        <label class="friends-only-toggle">
-            <input type="checkbox" [(ngModel)]="friendsOnly" />
-            Amis seulement
-        </label>
+        <div class="game-options-row" [class.disabled]="!selectedGame">
+            <div class="friends-only-wrapper">
+                <span class="entry-fee-label">Accessibilité</span>
+                <label class="friends-only-toggle">
+                    <input type="checkbox" [(ngModel)]="friendsOnly" [disabled]="!selectedGame" />
+                    <span class="checkmark" [class.disabled]="!selectedGame"></span>
+                    Amis seulement
+                </label>
+            </div>
+            <div class="entry-fee-wrapper">
+                <span class="entry-fee-label">Prix d'entrée</span>
+                <div class="entry-fee-field">
+                    <input type="number" [(ngModel)]="entryFee" min="0" step="10" class="entry-fee-input" [disabled]="!selectedGame" />
+                    <img class="coin-icon" src="./assets/gold_coin.png" alt="pièce" />
+                </div>
+            </div>
+        </div>
         <button
             class="square-button"
             [disabled]="!selectedGame"
@@ -35,5 +49,14 @@
         popUpMessage="Le jeu sélectionné est caché ou supprimé."
         [showSecondButton]="false"
         (confirm)="handlePopUp()">
+    </app-pop-up>
+}
+
+@if (showInsufficientFundsPopup) {
+    <app-pop-up
+        popUpMessage="Solde insuffisant"
+        description="Vous n'avez pas assez de pièces pour créer une partie avec ce prix d'entrée."
+        [showSecondButton]="false"
+        (confirm)="showInsufficientFundsPopup = false">
     </app-pop-up>
 }

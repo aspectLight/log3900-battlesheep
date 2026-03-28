@@ -3,10 +3,11 @@
         <span>Prévisualisation</span>
         <span>Joueurs</span>
         <span>Taille</span>
-        <span>Statut</span>
         <span>Mode</span>
+        <span>Statut</span>
         <span>Accessibilité</span>
         <span>Code</span>
+        <span>Prix</span>
     </li>
     <div class="list">
         @if (isLoading) {
@@ -22,10 +23,17 @@
                 </span>
                 <span>{{ room.playerCount }}/{{ room.maxPlayers }}</span>
                 <span>{{ room.boardSize }}</span>
+                <span>{{ getModeLabel(room.mode) }}</span>
                 <span>{{ getStatusLabel(room.status) }}</span>
-                <span [class.drop-in-badge]="room.dropInDropOut">{{ room.dropInDropOut ? 'Drop-in' : '-' }}</span>
                 <span [class.friends-only-badge]="room.friendsOnly">{{ getAccessibilityLabel(room) }}</span>
                 <span class="room-code">{{ room.roomId.replace('game_', '') }}</span>
+                <span class="entry-fee">
+                    @if (room.entryFee && room.entryFee > 0) {
+                        {{ room.entryFee }}<img src="assets/gold_coin.png" alt="coins" class="coin-icon">
+                    } @else {
+                        Gratuit
+                    }
+                </span>
             </li>
             }
         </div>

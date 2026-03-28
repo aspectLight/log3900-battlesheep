@@ -13,6 +13,7 @@ import { GameCreationService } from '@app/services/lobby/game-creation.service';
 import { PlayerCreationService } from '@app/services/lobby/player-creation.service';
 import { ErrorMessages } from '@common/error-messages.constants';
 import { ProfileService } from '@app/services/communication/profile.service';
+import { VirtualCurrencyService } from '@app/services/currency/virtual-currency.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -38,10 +39,12 @@ export class CreatePlayerPageComponent implements OnInit {
         public router: Router,
         public roomSocketService: RoomSocketService,
         public profileService: ProfileService,
+        public currencyService: VirtualCurrencyService,
     ) {
         this.isHost = this.gameCreationService.isHost;
         this.socketService.getReservedAvatars(this.gameCreationService.gameCode);
         this.roomSocketService.sync();
+        this.currencyService.fetchCatalogue();
     }
 
     get selectedCharacter() {
@@ -95,6 +98,7 @@ export class CreatePlayerPageComponent implements OnInit {
         if (newPlayer) {
             newPlayer.profileAvatarId = profile.avatarId ?? null;
             newPlayer.profileAvatarUrl = profile.avatarUrl ? `${environment.serverUrl}${profile.avatarUrl}` : null;
+            newPlayer.activeBanner = (profile.preferences?.['activeBanner'] as string) ?? null;
         }
         if (newPlayer) {
             if (this.gameCreationService.isDropIn) {

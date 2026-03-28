@@ -25,6 +25,7 @@ import { RegisterPageComponent } from '@app/pages/register/register.component';
 import { WaitingPlayerPageComponent } from '@app/pages/waiting-player-page/waiting-player-page.component';
 import { ChannelsPageComponent } from '@app/pages/channels-page/channels-page.component';
 import { FriendsPageComponent } from '@app/pages/friends-page/friends-page.component';
+import { ShopPageComponent } from '@app/pages/shop-page/shop-page.component';
 import { environment } from './environments/environment';
 
 if (environment.production) {
@@ -51,6 +52,7 @@ const routes: Routes = [
     { path: 'profile', component: ProfilePageComponent, canActivate: [authGuard] },
     { path: 'channels', component: ChannelsPageComponent, canActivate: [authGuard] },
     { path: 'friends', component: FriendsPageComponent, canActivate: [authGuard] },
+    { path: 'shop', component: ShopPageComponent, canActivate: [authGuard] },
     { path: '**', redirectTo: '/home' },
 ];
 

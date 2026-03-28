@@ -64,10 +64,18 @@
                                 type="button"
                                 class="avatar-btn"
                                 [class.selected]="selectedAvatarId === a.id && !selectedAvatarFile"
+                                [class.premium-locked]="isPremiumLocked(a.id)"
+                                [disabled]="isPremiumLocked(a.id)"
                                 (click)="selectAvatar(a.id)"
-                                [title]="a.label"
+                                [title]="isPremiumLocked(a.id) ? a.label + ' - Disponible en boutique (500 pièces)' : a.label"
                             >
-                                <img [src]="a.image" [alt]="a.label" class="avatar-img" />
+                                <img [src]="a.image" [alt]="a.label" class="avatar-img" [class.dimmed]="isPremiumLocked(a.id)" />
+                                @if (isPremiumLocked(a.id)) {
+                                <div class="premium-overlay">
+                                    <span class="lock-icon">&#128274;</span>
+                                    <span class="premium-price">500</span>
+                                </div>
+                                }
                             </button>
                             }
                         </div>

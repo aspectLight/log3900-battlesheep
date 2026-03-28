@@ -129,4 +129,25 @@
             }
         </li>
     </div>
+    @if (playerRewards.length > 0) {
+    <div class="rewards-section">
+        <h2 class="rewards-title">Récompenses</h2>
+        <div class="rewards-list">
+            @for (reward of playerRewards; track reward.playerName) {
+                <div class="reward-entry">
+                    <span class="reward-name">
+                        @if (reward.avatarImage) {
+                            <img class="reward-avatar" [src]="reward.avatarImage" alt="avatar">
+                        }
+                        {{ reward.playerName }}
+                    </span>
+                    <span class="reward-coins">
+                        +{{ reward.coinsEarned }}
+                        <img class="coin-icon" src="./assets/gold_coin.png" alt="pièce">
+                    </span>
+                </div>
+            }
+        </div>
+    </div>
+    }
 </div>

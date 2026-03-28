@@ -11,4 +11,5 @@ export interface RoomInfo {
     dropInDropOut: boolean;
     friendsOnly: boolean;
     abandonedPlayerFirebaseIds?: string[];
+    entryFee?: number;
 }

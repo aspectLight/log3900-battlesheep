@@ -2,6 +2,7 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/co
 import { Auth } from '@angular/fire/auth';
 import { Router, RouterLink } from '@angular/router';
 import { RoomListComponent } from '@app/components/lobby/room-list/room-list.component';
+import { ProfileMenuComponent } from '@app/components/shared/profile-menu/profile-menu.component';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ROUTES } from '@app/constants/routes.constants';
 import { RoomInfo } from '@app/interfaces/room-info.interface';
@@ -9,11 +10,12 @@ import { MovementSocketService } from '@app/services/communication/socket-handle
 import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { GameCreationService } from '@app/services/lobby/game-creation.service';
+import { VirtualCurrencyService } from '@app/services/currency/virtual-currency.service';
 import { SocialEvents } from '@common/socket.constants';
 @Component({
     selector: 'app-game-joiner',
     templateUrl: './game-joiner.component.html',
-    imports: [RouterLink, PopUpComponent, RoomListComponent],
+    imports: [RouterLink, PopUpComponent, RoomListComponent, ProfileMenuComponent],
     styleUrl: './game-joiner.component.scss',
 })
 export class GameJoinerComponent implements OnInit, OnDestroy {
@@ -30,12 +32,14 @@ export class GameJoinerComponent implements OnInit, OnDestroy {
         private router: Router,
         private auth: Auth,
         private globalSocketService: SocketService,
+        private currencyService: VirtualCurrencyService,
     ) {
         this.gameCreationService.isHost = false;
         this.movementSocketService.sync();
     }
 
     ngOnInit(): void {
+        this.currencyService.fetchBalance();
         const socket = this.globalSocketService.socket;
         if (socket) {
             socket.on(SocialEvents.BlockedUserInRoom, (data: { blockedUsernames: string[] }) => {
@@ -68,6 +72,11 @@ export class GameJoinerComponent implements OnInit, OnDestroy {
     }
 
     onRoomSelected(room: RoomInfo) {
+        if ((room.entryFee ?? 0) > this.currencyService.balance) {
+            this.errorMessage = 'Solde insuffisant pour rejoindre cette partie';
+            this.showError = true;
+            return;
+        }
         if (room.status === 'playing' && room.dropInDropOut) {
             const currentUid = this.auth.currentUser?.uid;
             const isReturning = !!currentUid && (room.abandonedPlayerFirebaseIds ?? []).includes(currentUid);

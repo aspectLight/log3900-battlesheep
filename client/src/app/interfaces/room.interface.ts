@@ -8,4 +8,5 @@ export interface Room {
     isLocked: boolean;
     isDebugging: boolean;
     dropInDropOut?: boolean;
+    entryFee?: number;
 }
