@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Player } from '@app/classes/entity/player';
 import { Room } from '@app/interfaces/room.interface';
-import { ErrorMessages } from '@common/error-messages.constants';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -71,7 +70,7 @@ export class WaitingRoomService {
 
     maxPlayerLimitReached() {
         this.isError = true;
-        this.errorMessage = ErrorMessages.MaxPlayerLimitReached;
+        this.errorMessage = 'errors.max_player_limit'; // clé de traduction — traduite par le composant appelant
     }
 
     startGame(newRoomId: string) {

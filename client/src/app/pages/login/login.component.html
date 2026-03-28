@@ -1,23 +1,23 @@
 <div class="container">
     <button class="return-button" routerLink="/auth-landing" type="button">
         <img src="./assets/ui/left.png" alt="Back" />
-        Retour
+        {{ 'common.back' | translate }}
     </button>
 
     <div class="content-wrapper">
         <img class="logo" src="./assets/ui/eastern_solace_logo-removebg-preview.png" alt="Logo Jeu" />
         <form [formGroup]="form" (ngSubmit)="submitForm()" class="login-form">
             <div class="field">
-                <label for="username">Pseudonyme</label>
+                <label for="username">{{ 'login.username' | translate }}</label>
                 <input id="username" type="text" formControlName="username" autocomplete="username" placeholder="JohnDoe" />
 
                 @if (form.controls.username.touched && form.controls.username.errors?.['required']) {
-                <small class="error">Champ obligatoire</small>
+                <small class="error">{{ 'validation.required' | translate }}</small>
                 }
             </div>
 
             <div class="field">
-                <label for="password">Mot de passe</label>
+                <label for="password">{{ 'login.password' | translate }}</label>
                 <div class="password-wrapper">
                     <input
                         id="password"
@@ -64,23 +64,22 @@
                 </div>
 
                 @if (form.controls.password.touched && form.controls.password.errors?.['required']) {
-                <small class="error">Champ obligatoire</small>
+                <small class="error">{{ 'validation.required' | translate }}</small>
                 }
             </div>
 
             <div class="form-actions">
-                <!-- Backend error message -->
                 @if (errorMessage) {
                 <div class="form-error">{{ errorMessage }}</div>
                 }
 
                 <button type="submit" class="btn-primary" [disabled]="isSubmitting">
-                    {{ isSubmitting ? 'Connexion...' : 'Se connecter' }}
+                    {{ isSubmitting ? ('login.submitting' | translate) : ('login.submit' | translate) }}
                 </button>
 
                 <p class="register-link">
-                    Pas encore de compte ?
-                    <a routerLink="/register">S'inscrire</a>
+                    {{ 'login.no_account' | translate }}
+                    <a routerLink="/register">{{ 'login.register_link' | translate }}</a>
                 </p>
             </div>
         </form>

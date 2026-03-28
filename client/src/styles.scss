@@ -1,3 +1,5 @@
+@use "./app/styles/themes";
+
 html,
 body {
     height: 100vh;
@@ -13,8 +15,8 @@ body {
     font-style: normal;
 }
 
-/* Create a fixed background container */
-html::before {
+/* Fond global — thème default : image qui défile horizontalement */
+body::before {
     content: '';
     position: fixed;
     top: 0;
@@ -28,19 +30,49 @@ html::before {
     animation: seamlessScroll 40s linear infinite;
 }
 
-/* Create a fixed blur overlay */
-html::after {
-    content: '';
+/* Thème Froid Sibérien — image statique couvre tout */
+body.theme-frost::before {
+    width: 100%;
+    background-image: url('./assets/ui/froid_siberie.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    animation: none;
+}
+
+/* Thème Village Abandonné — image statique couvre tout */
+body.theme-village::before {
+    width: 100%;
+    background-image: url('./assets/ui/village_abadonne.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    animation: none;
+}
+
+/* Voile semi-transparent + flou par-dessus le fond */
+body::after {
+    content: "";
     position: fixed;
     top: 0;
     left: 0;
-    bottom: 0;
-    right: 0;
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(4px);
     z-index: -1;
+}
+
+/* Thème Froid Sibérien — voile bleu glacé */
+body.theme-frost::after {
+    background: rgba(10, 28, 55, 0.28);
+    backdrop-filter: blur(3px);
+}
+
+/* Thème Village Abandonné — voile sépia chaud et tamisé */
+body.theme-village::after {
+    background: rgba(28, 20, 8, 0.30);
+    backdrop-filter: blur(3px);
 }
 
 body {
@@ -67,3 +99,4 @@ button {
     border: none;
     position: relative;
 }
+

@@ -1,33 +1,34 @@
 @if (isLoading) {
 <div class="loading-container">
-    <p>Chargement...</p>
+    <p>{{ 'common.loading' | translate }}</p>
 </div>
 } @else {
 <div class="container">
     <button class="return-button" routerLink="/home" type="button">
         <img src="./assets/ui/left.png" alt="Back" />
-        Retour
+        {{ 'common.back' | translate }}
     </button>
 
     <div class="content-wrapper">
-        <h1 class="page-title">Configuration du Profil</h1>
+        <h1 class="page-title">{{ 'profile.title' | translate }}</h1>
 
         @if (showSuccessMessage) {
         <app-pop-up
-            [popUpMessage]="'Succès'"
-            [description]="'Profil mis à jour avec succès !'"
-            [firstOption]="'Ok'"
+            [popUpMessage]="'profile.success' | translate"
+            [description]="'profile.success_msg' | translate"
+            [firstOption]="'common.ok' | translate"
             (confirm)="onSuccessConfirm()"
         ></app-pop-up>
         } @if (showErrorMessage) {
-        <app-pop-up [popUpMessage]="'Erreur'" [description]="errorMessage" [firstOption]="'Ok'" (confirm)="onErrorConfirm()"></app-pop-up>
+        <app-pop-up [isError]="true" [popUpMessage]="'profile.error' | translate" [description]="errorMessage" [firstOption]="'common.ok' | translate" (confirm)="onErrorConfirm()"></app-pop-up>
         } @if (showDeleteConfirm) {
         <app-pop-up
-            [popUpMessage]="'Supprimer le compte'"
-            [description]="'Cette action est irréversible. Voulez-vous vraiment supprimer votre compte ?'"
-            [firstOption]="'Annuler'"
+            [isError]="true"
+            [popUpMessage]="'profile.delete_title' | translate"
+            [description]="'profile.delete_confirm' | translate"
+            [firstOption]="'common.cancel' | translate"
             [showSecondButton]="true"
-            [secondOption]="'Supprimer'"
+            [secondOption]="'common.delete' | translate"
             (confirm)="onDeleteCancel()"
             (cancel)="onDeleteConfirm()"
         ></app-pop-up>
@@ -37,27 +38,27 @@
             <div class="form-columns">
                 <div class="form-column-left">
                     <div class="field">
-                        <label for="username">Pseudonyme</label>
+                        <label for="username">{{ 'profile.username' | translate }}</label>
                         <input id="username" type="text" formControlName="username" autocomplete="username" />
                         @if (form.controls.username.touched && form.controls.username.errors?.['required']) {
-                        <small class="error">Champ obligatoire</small>
+                        <small class="error">{{ 'validation.required' | translate }}</small>
                         } @if (form.controls.username.touched && form.controls.username.errors?.['pattern']) {
-                        <small class="error">Caractères spéciaux non autorisés</small>
+                        <small class="error">{{ 'validation.username_special' | translate }}</small>
                         }
                     </div>
 
                     <div class="field">
-                        <label for="email">Email</label>
+                        <label for="email">{{ 'profile.email' | translate }}</label>
                         <input id="email" type="email" formControlName="email" autocomplete="email" />
                         @if (form.controls.email.touched && form.controls.email.errors?.['required']) {
-                        <small class="error">Champ obligatoire</small>
+                        <small class="error">{{ 'validation.required' | translate }}</small>
                         } @if (form.controls.email.touched && (form.controls.email.errors?.['email'] || form.controls.email.errors?.['pattern'])) {
-                        <small class="error">Format email invalide</small>
+                        <small class="error">{{ 'validation.email_invalid' | translate }}</small>
                         }
                     </div>
 
                     <div class="field">
-                        <p class="label">Avatar</p>
+                        <p class="label">{{ 'profile.avatar' | translate }}</p>
                         <div class="avatar-grid">
                             @for (a of avatars; track a.id) {
                             <button
@@ -74,29 +75,29 @@
                     </div>
 
                     <div class="field">
-                        <label class="label">Téléverser un avatar personnalisé</label>
+                        <label class="label">{{ 'profile.avatar_upload' | translate }}</label>
                         <div class="avatar-upload-row">
                             @if (avatarPreviewUrl) {
                             <div class="avatar-upload-preview">
-                                <img [src]="avatarPreviewUrl" alt="Aperçu avatar" class="avatar-preview-img" />
+                                <img [src]="avatarPreviewUrl" [alt]="'profile.avatar' | translate" class="avatar-preview-img" />
                             </div>
                             }
                             <div class="upload-input-wrapper">
                                 <div class="avatar-source-picker">
                                     <button type="button" class="btn-choose-file" (click)="showAvatarMenu = !showAvatarMenu">
-                                        Choisir un fichier
+                                        {{ 'profile.choose_file' | translate }}
                                         <span class="chevron" [class.open]="showAvatarMenu">&#9660;</span>
                                     </button>
                                     @if (!avatarPreviewUrl) {
-                                    <span class="no-file-label">Aucun fichier choisi</span>
+                                    <span class="no-file-label">{{ 'profile.no_file' | translate }}</span>
                                     }
                                     @if (showAvatarMenu) {
                                     <div class="avatar-source-menu">
                                         <button type="button" class="avatar-source-option" (click)="triggerFileInput()">
-                                            &#128190; Télécharger une image
+                                            &#128190; {{ 'profile.upload_image' | translate }}
                                         </button>
                                         <button type="button" class="avatar-source-option" (click)="openCamera()">
-                                            &#128247; Prendre un selfie
+                                            &#128247; {{ 'profile.take_selfie' | translate }}
                                         </button>
                                     </div>
                                     }
@@ -111,7 +112,7 @@
                                 />
                                 @if (avatarPreviewUrl) {
                                 <span class="avatar-current-label">
-                                    @if (selectedAvatarFile) { Nouvel avatar } @else { Avatar actuel }
+                                    @if (selectedAvatarFile) { {{ 'profile.new_avatar' | translate }} } @else { {{ 'profile.current_avatar' | translate }} }
                                 </span>
                                 }
                             </div>
@@ -123,38 +124,83 @@
 
                     <div class="form-actions">
                         <button type="submit" class="btn-primary" [disabled]="isSaving">
-                            @if (isSaving) { Enregistrement... } @else { Enregistrer les modifications }
+                            @if (isSaving) { {{ 'profile.saving' | translate }} } @else { {{ 'profile.save' | translate }} }
                         </button>
                         <button type="button" class="btn-danger" (click)="deleteAccount()" [disabled]="isDeleting">
-                            @if (isDeleting) { Suppression... } @else { Supprimer le compte }
+                            @if (isDeleting) { {{ 'profile.deleting' | translate }} } @else { {{ 'profile.delete' | translate }} }
                         </button>
                     </div>
                 </div>
 
                 <div class="form-column-right">
                     <div class="statistics-section">
-                        <h2 class="section-title">Statistiques</h2>
+                        <h2 class="section-title">{{ 'profile.statistics' | translate }}</h2>
                         <div class="statistics-grid">
                             <div class="stat-card">
-                                <h3 class="stat-label">Parties Classiques</h3>
+                                <h3 class="stat-label">{{ 'profile.stats.classic' | translate }}</h3>
                                 <p class="stat-value">{{ statistics?.classicGamesPlayed ?? 0 }}</p>
                             </div>
                             <div class="stat-card">
-                                <h3 class="stat-label">Parties CTF</h3>
+                                <h3 class="stat-label">{{ 'profile.stats.ctf' | translate }}</h3>
                                 <p class="stat-value">{{ statistics?.ctfGamesPlayed ?? 0 }}</p>
                             </div>
                             <div class="stat-card">
-                                <h3 class="stat-label">Parties gagnées</h3>
+                                <h3 class="stat-label">{{ 'profile.stats.won' | translate }}</h3>
                                 <p class="stat-value">{{ statistics?.totalGamesWon ?? 0 }}</p>
                             </div>
                             <div class="stat-card">
-                                <h3 class="stat-label">Temps moyen par partie</h3>
+                                <h3 class="stat-label">{{ 'profile.stats.avg_time' | translate }}</h3>
                                 <p class="stat-value">
                                     @if (statistics) {
                                     {{ formatTime(statistics.averagePlaytimePerGame) }}
                                     } @else { 0s }
                                 </p>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="theme-section">
+                        <h2 class="section-title">{{ 'profile.theme' | translate }}</h2>
+                        <div class="theme-picker">
+                            @for (t of themes; track t.value) {
+                            <button
+                                type="button"
+                                class="theme-btn"
+                                [class.active]="themeService.getCurrentTheme() === t.value"
+                                [attr.data-theme]="t.value"
+                                (click)="selectTheme(t.value)"
+                            >
+                                <img class="theme-preview-img" [src]="t.preview" [alt]="t.labelKey | translate" />
+                                <div class="theme-thumbnail-wrapper">
+                                    <img class="theme-thumbnail" [src]="t.preview" [alt]="t.labelKey | translate" />
+                                </div>
+                                <div class="theme-label-area">
+                                    <span class="theme-label">{{ t.labelKey | translate }}</span>
+                                </div>
+                                @if (themeService.getCurrentTheme() === t.value) {
+                                <span class="theme-check">✓</span>
+                                }
+                            </button>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="language-section">
+                        <h2 class="section-title">{{ 'profile.language' | translate }}</h2>
+                        <div class="language-picker">
+                            @for (l of languages; track l.value) {
+                            <button
+                                type="button"
+                                class="lang-btn"
+                                [class.active]="languageService.getCurrentLanguage() === l.value"
+                                (click)="selectLanguage(l.value)"
+                            >
+                                {{ l.labelKey | translate }}
+                                @if (languageService.getCurrentLanguage() === l.value) {
+                                <span class="lang-check">✓</span>
+                                }
+                            </button>
+                            }
                         </div>
                     </div>
                 </div>
@@ -166,9 +212,9 @@
 
 @if (camera.cameraError) {
 <app-pop-up
-    [popUpMessage]="'Erreur de caméra'"
+    [popUpMessage]="'profile.camera_error' | translate"
     [description]="camera.cameraError"
-    [firstOption]="'Fermer'"
+    [firstOption]="'profile.close' | translate"
     (confirm)="camera.cameraError = null"
 ></app-pop-up>
 }
@@ -177,8 +223,8 @@
 <div class="camera-modal-overlay" (click)="closeCamera()">
     <div class="camera-modal" (click)="$event.stopPropagation()">
         <div class="camera-modal-header">
-            <h2 class="camera-modal-title">Capturer un selfie</h2>
-            <button type="button" class="camera-close-btn" (click)="closeCamera()" aria-label="Fermer">&#x2715;</button>
+            <h2 class="camera-modal-title">{{ 'profile.camera_title' | translate }}</h2>
+            <button type="button" class="camera-close-btn" (click)="closeCamera()" [attr.aria-label]="'profile.close' | translate">&#x2715;</button>
         </div>
 
         <div class="camera-body">
@@ -186,7 +232,7 @@
             <div class="camera-preview-container">
                 <video #cameraVideo autoplay playsinline muted class="camera-video" [class.ready]="camera.isCameraReady"></video>
                 @if (!camera.isCameraReady) {
-                <div class="camera-loading">Initialisation de la caméra...</div>
+                <div class="camera-loading">{{ 'profile.camera_loading' | translate }}</div>
                 }
             </div>
             <div class="camera-actions">
@@ -196,11 +242,11 @@
             </div>
             } @else {
             <div class="camera-preview-container">
-                <img [src]="camera.capturedImageDataUrl" alt="Photo capturée" class="camera-captured-img" />
+                <img [src]="camera.capturedImageDataUrl" [alt]="'profile.camera_title' | translate" class="camera-captured-img" />
             </div>
             <div class="camera-actions camera-actions-row">
-                <button type="button" class="btn-secondary camera-modal-btn" (click)="retakePhoto()">&#8635; Reprendre</button>
-                <button type="button" class="btn-primary camera-modal-btn" (click)="useCapturedPhoto()">&#10003; Utiliser cette photo</button>
+                <button type="button" class="btn-secondary camera-modal-btn" (click)="retakePhoto()">&#8635; {{ 'profile.retake' | translate }}</button>
+                <button type="button" class="btn-primary camera-modal-btn" (click)="useCapturedPhoto()">&#10003; {{ 'profile.use_photo' | translate }}</button>
             </div>
             }
         </div>

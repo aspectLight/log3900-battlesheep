@@ -10,10 +10,11 @@ import { GameListService } from '@app/services/lobby/game-list.service';
 import { Game } from '@app/classes/game/game';
 import { ROUTES } from '@app/constants/routes.constants';
 import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-game-creator',
-    imports: [CommonModule, FormsModule, GameListComponent, PopUpComponent, RouterLink],
+    imports: [CommonModule, FormsModule, GameListComponent, PopUpComponent, RouterLink, TranslateModule],
     templateUrl: './game-creator.component.html',
     styleUrl: './game-creator.component.scss',
 })

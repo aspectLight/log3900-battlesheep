@@ -1,9 +1,9 @@
 <div class="header">
     <button class="return-button" routerLink="/create-game">
         <img src="./assets/ui/left.png" />
-        Créer une partie
+        {{ 'create_player.back' | translate }}
     </button>
-    <h1>Créer un joueur</h1>
+    <h1>{{ 'create_player.title' | translate }}</h1>
 </div>
 <div class="container">
     <div class="char-grid">
@@ -24,19 +24,19 @@
             </div>
             <div class="stats-row">
                 <div class="stat stat-health">
-                    <h3>Vie</h3>
+                    <h3>{{ 'bonus.health' | translate }}</h3>
                     <p>{{ previewPlayer.stats.health.value }}</p>
                 </div>
                 <div class="stat stat-speed">
-                    <h3>Rapidité</h3>
+                    <h3>{{ 'bonus.speed' | translate }}</h3>
                     <p>{{ previewPlayer.stats.speed.value }}</p>
                 </div>
                 <div class="stat stat-attack">
-                    <h3>Attaque</h3>
+                    <h3>{{ 'bonus.attack' | translate }}</h3>
                     <p>{{ previewPlayer.stats.attack.value }}</p>
                 </div>
                 <div class="stat stat-defense">
-                    <h3>Défense</h3>
+                    <h3>{{ 'bonus.defense' | translate }}</h3>
                     <p>{{ previewPlayer.stats.defense.value }}</p>
                 </div>
             </div>
@@ -47,23 +47,23 @@
                     <img src="./assets/avatars/new/emptyFull.png">
                 </div>
                 <div class="character-name">
-                    <p>Choisissez votre personnage</p>
+                    <p>{{ 'create_player.choose' | translate }}</p>
                 </div>
                 <div class="stats-row">
                     <div class="stat stat-health">
-                        <h3>Vie</h3>
+                        <h3>{{ 'bonus.health' | translate }}</h3>
                         <p>0</p>
                     </div>
                     <div class="stat stat-speed">
-                        <h3>Rapidité</h3>
+                        <h3>{{ 'bonus.speed' | translate }}</h3>
                         <p>0</p>
                     </div>
                     <div class="stat stat-attack">
-                        <h3>Attaque</h3>
+                        <h3>{{ 'bonus.attack' | translate }}</h3>
                         <p>0</p>
                     </div>
                     <div class="stat stat-defense">
-                        <h3>Défense</h3>
+                        <h3>{{ 'bonus.defense' | translate }}</h3>
                         <p>0</p>
                     </div>
                 </div>
@@ -75,10 +75,10 @@
                 (click) = "createPlayer()"
                 >
                 @if (isHost) {
-                    Créer la partie
+                    {{ 'create_player.create_game' | translate }}
                 }
                 @else {
-                    Accéder à la salle d'attente
+                    {{ 'create_player.join_waiting' | translate }}
                 }
             </button>
         </div>
@@ -90,7 +90,8 @@
 
 @if (gameModified===true) {
     <app-pop-up
-        popUpMessage="Le jeu sélectionné est caché ou supprimé."
+        [isError]="true"
+        [popUpMessage]="'create_player.hidden_deleted' | translate"
         [showSecondButton]="false"
         (confirm)="handlePopUp()">
     </app-pop-up>
@@ -98,6 +99,7 @@
 
 @if (showError===true) {
     <app-pop-up
+        [isError]="true"
         popUpMessage="{{errorMessage}}"
         [showSecondButton]="false"
         (confirm)="handlePopUp()">
@@ -106,7 +108,8 @@
 
 @if (!validCharacter) {
     <app-pop-up
-        popUpMessage="Veillez à choisir un personnage, un nom et les 2 bonus."
+        [isError]="true"
+        [popUpMessage]="'create_player.choose_all' | translate"
         [showSecondButton]="false"
         (confirm)="validCharacter=true">
     </app-pop-up>

@@ -11,18 +11,18 @@ import { RoomSocketService } from '@app/services/communication/socket-handlers/r
 import { VirtualPlayerService } from '@app/services/gameplay/virtual-player.service';
 import { GameCreationService } from '@app/services/lobby/game-creation.service';
 import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';
-import { ErrorMessages, WaitRoomWelcomeMessage } from '@common/error-messages.constants';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
 @Component({
-    imports: [CommonModule, PlayerCardComponent, PopUpComponent],
+    imports: [CommonModule, PlayerCardComponent, PopUpComponent, TranslateModule],
     selector: 'app-waiting-player',
     templateUrl: './waiting-player.component.html',
     styleUrl: './waiting-player.component.scss',
 })
 export class WaitingPlayerComponent implements OnInit, OnDestroy {
     showError: boolean = false;
-    errorMessage: string = WaitRoomWelcomeMessage;
+    errorMessage: string = '';
     showMessage: boolean = true;
     showConfirmation: boolean = false;
     room: Room | null = null;
@@ -38,6 +38,7 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
         private waitingRoomService: WaitingRoomService,
         private socketService: RoomSocketService,
         private virtualPlayerService: VirtualPlayerService,
+        private translate: TranslateService,
         public router: Router,
     ) {}
 
@@ -63,22 +64,23 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
     }
 
     get errorMessageFromService(): string {
-        return this.waitingRoomService.errorMessage;
+        return this.translate.instant(this.waitingRoomService.errorMessage);
     }
 
     ngOnInit(): void {
+        this.errorMessage = this.translate.instant('waiting.welcome');
         this.roomSubscription = this.waitingRoomService.room$.subscribe((room) => {
             this.room = room;
         });
         this.socketService.roomExists$.subscribe((roomExists) => {
             if (!roomExists) {
-                this.errorMessage = ErrorMessages.GameDeleted;
+                this.errorMessage = this.translate.instant('waiting.game_deleted');
                 this.showError = true;
             }
         });
         this.socketService.isKicked$.subscribe((isKicked) => {
             if (isKicked) {
-                this.errorMessage = ErrorMessages.PlayerKicked;
+                this.errorMessage = this.translate.instant('waiting.player_kicked');
                 this.showError = true;
             }
         });
@@ -119,21 +121,21 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
 
     confirmAction(action: string, $event?: Player) {
         if (action === 'kick') {
-            this.errorMessage = 'Voulez-vous vraiment expulser ce joueur ?';
+            this.errorMessage = this.translate.instant('waiting.confirm_kick');
             this.toDo = () => this.kickPlayer($event as Player);
             this.showConfirmation = true;
         } else if (action === 'lock') {
             if (this.room?.isLocked) {
-                this.errorMessage = 'Voulez-vous vraiment deverrouiller la salle ?';
+                this.errorMessage = this.translate.instant('waiting.confirm_unlock');
                 this.showConfirmation = true;
             } else {
-                this.errorMessage = 'Voulez-vous vraiment verrouiller la salle ?';
+                this.errorMessage = this.translate.instant('waiting.confirm_lock');
                 this.showConfirmation = false;
                 this.toggleLockRoom();
             }
             this.toDo = () => this.toggleLockRoom();
         } else if (action === 'leave') {
-            this.errorMessage = 'Voulez-vous vraiment quitter la salle ?';
+            this.errorMessage = this.translate.instant('waiting.confirm_leave');
             this.toDo = () => this.leaveRoom();
             this.showConfirmation = true;
         }
@@ -150,7 +152,7 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
             if (success) {
                 this.router.navigate([ROUTES.home]);
             } else {
-                this.errorMessage = error || ErrorMessages.QuitError;
+                this.errorMessage = error || this.translate.instant('waiting.quit_error');
                 this.showError = true;
             }
         });
@@ -161,7 +163,7 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
         if (!this.room?.isLocked) {
             this.isProfileSectionVisible = true;
         } else {
-            this.errorMessage = ErrorMessages.RoomLockedAddPlayer;
+            this.errorMessage = this.translate.instant('waiting.room_locked_add_player');
             this.showMessage = true;
         }
     }

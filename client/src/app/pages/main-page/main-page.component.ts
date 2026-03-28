@@ -10,12 +10,13 @@ import { SocialService } from '@app/services/communication/social.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
 import { environment } from 'src/environments/environment';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-main-page',
     templateUrl: './main-page.component.html',
     styleUrls: ['./main-page.component.scss'],
-    imports: [RouterLink, PopUpComponent],
+    imports: [RouterLink, PopUpComponent, TranslateModule],
 })
 export class MainPageComponent implements OnInit, OnDestroy {
     private pendingRequestsSub?: Subscription;

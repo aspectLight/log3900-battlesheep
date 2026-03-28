@@ -38,11 +38,11 @@
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--theme-text-muted);
 }
 
 .settings-button:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--theme-bg-card-light);
     transform: scale(1.1);
 
     .settings-icon {
@@ -61,12 +61,12 @@
     position: absolute;
     top: 60px;
     right: 0;
-    background: rgba(22, 7, 7, 0.95);
+    background: var(--theme-bg-dropdown);
     border-radius: 8px;
-    border: 2px solid #3a1212;
+    border: 2px solid var(--theme-border-primary);
     padding: 8px 0;
     min-width: 220px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 10px var(--theme-shadow-lg);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
@@ -84,11 +84,11 @@
     padding: 12px 18px;
     background: none;
     border: none;
-    border-bottom: 1px solid #250808;
+    border-bottom: 1px solid var(theme-border-light);
     text-align: left;
     cursor: pointer;
     font-size: 0.95rem;
-    color: #f0f0f0;
+    color: var(--theme-text-secondary);
     transition: all 0.2s ease;
 }
 
@@ -97,8 +97,8 @@
 }
 
 .settings-option:hover {
-    background-color: #550000;
-    color: #fff;
+    background-color: var(--theme-scrollbar-thumb);
+    color:var(--theme-text-primary);
 }
 
 .settings-option:disabled {
@@ -108,7 +108,7 @@
 
     &:hover {
         background-color: transparent;
-        color: #f0f0f0;
+        color: var(--theme-text-secondary);
     }
 }
 
@@ -151,7 +151,7 @@
 .button {
     text-align: center;
     cursor: pointer;
-    color: white;
+    color: var(--theme-text-primary);
     transition: all 0.3s ease;
     padding: 12px;
     border-radius: 5px;
@@ -160,7 +160,7 @@
 }
 
 .button:hover {
-    color: red;
+    color: var(--theme-text-hover);
     transform: translateY(-2px);
 }
 
@@ -170,7 +170,7 @@
     pointer-events: none;
 
     &:hover {
-        color: white;
+        color: var(--theme-text-primary);
         transform: none;
     }
 }
@@ -201,7 +201,7 @@
 .footer-item {
     text-align: center;
     font-size: 12px;
-    color: #b3b3b3;
+    color: var(--theme-text-footer);
     padding: 10px 0;
     width: 100%;
 }

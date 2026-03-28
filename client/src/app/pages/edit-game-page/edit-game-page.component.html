@@ -2,9 +2,9 @@
     <div class="header">
         <button class="return-button" (click)="onReturnClick()">
             <img src="./assets/ui/left.png" />
-            Administrer les jeux
+            {{ 'edit_game.back' | translate }}
         </button>
-        <h1>Mode édition</h1>
+        <h1>{{ 'edit_game.title' | translate }}</h1>
     </div>
     <div class="game-editor-container">
         <app-game-editor></app-game-editor>
@@ -12,8 +12,13 @@
 </div>
 
 @if (showConfirmation) {
-<app-pop-up [popUpMessage]="quitMessage"
-    [showSecondButton]="true" firstOption="Oui" secondOption="Non" (confirm)="onConfirmQuit()"
+<app-pop-up
+    [isError]="true"
+    [popUpMessage]="quitMessage | translate"
+    [showSecondButton]="true"
+    [firstOption]="'common.yes' | translate"
+    [secondOption]="'common.no' | translate"
+    (confirm)="onConfirmQuit()"
     (cancel)="onCancelQuit()">
 </app-pop-up>
 }

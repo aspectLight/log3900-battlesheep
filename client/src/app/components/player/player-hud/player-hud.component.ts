@@ -4,12 +4,13 @@ import { ItemCardComponent } from '@app/components/shared/item-card/item-card.co
 import { Item } from '@app/classes/entity/item';
 import { Player } from '@app/classes/entity/player';
 import { GameManagerService } from '@app/services/state/game-manager.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 const VALID_TORCH_DROP_TILES = ['snow', 'water', 'ice'];
 
 @Component({
     selector: 'app-player-hud',
-    imports: [CommonModule, ItemCardComponent],
+    imports: [CommonModule, ItemCardComponent, TranslateModule],
     templateUrl: './player-hud.component.html',
     styleUrl: './player-hud.component.scss',
 })

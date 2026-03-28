@@ -1,16 +1,16 @@
 <div class="game-list" [class.isAddBoardVisible]="isAddBoardVisible">
     <li class="header">
-        <span>Prévisualisation</span>
-        <span>Nom</span>
-        <span>Taille</span>
-        <span>Mode de jeu</span>
-        <span>Propriétaire</span>
-        <span>Dernière modification</span>
+        <span>{{ 'game_list.preview' | translate }}</span>
+        <span>{{ 'game_list.name' | translate }}</span>
+        <span>{{ 'game_list.size' | translate }}</span>
+        <span>{{ 'game_list.mode' | translate }}</span>
+        <span>{{ 'game_list.owner' | translate }}</span>
+        <span>{{ 'game_list.last_modified' | translate }}</span>
         @if (isModifierVisible) {
-        <span>Confidentialité</span>
-        <span>Modifier</span>
-        <span>Supprimer</span>
-        <span>Dupliquer</span>
+        <span>{{ 'game_list.privacy' | translate }}</span>
+        <span>{{ 'game_list.modify' | translate }}</span>
+        <span>{{ 'game_list.delete' | translate }}</span>
+        <span>{{ 'game_list.duplicate' | translate }}</span>
         }
     </li>
     <div class="list">
@@ -29,16 +29,16 @@
                 </span>
                 <span>{{ game.name }}</span>
                 <span>{{ game.board.size }}</span>
-                <span>{{ game.mode }}</span>
+                <span>{{ 'game_list.mode_' + game.mode | translate }}</span>
                 <span>{{ game.owner }}</span>
                 <span>{{ game.modificationDate | date: 'short' }}</span>
                 @if (isModifierVisible) {
                 <span>
                     @if (game.owner === currentUsername) {
                     <select [value]="game.privacy" (change)="onPrivacyChange(game, $any($event.target).value)">
-                        <option value="public">Public</option>
-                        <option value="private">Privé</option>
-                        <option value="protected">Privé-partagé</option>
+                        <option value="public">{{ 'game_list.public' | translate }}</option>
+                        <option value="private">{{ 'game_list.private' | translate }}</option>
+                        <option value="protected">{{ 'game_list.private_shared' | translate }}</option>
                     </select>
                     } @else {
                     {{ game.privacy }}
@@ -79,18 +79,18 @@
             }
         </div>
         } @else {
-        <p class="no-games-message">Aucun jeu disponible.</p>
+        <p class="no-games-message">{{ 'game_list.no_games' | translate }}</p>
         }
         @if (isAddBoardVisible) {
-        <button routerLink="/configure-game" class="square-button">Ajouter un jeu</button>
+        <button routerLink="/configure-game" class="square-button">{{ 'game_list.add_game' | translate }}</button>
         }
     </div>
     @if (showError) {
     <app-pop-up
-        popUpMessage="{{ errorMessage }}"
+        [isError]="true"
         [popUpMessage]="errorMessage"
         [showSecondButton]="true"
-        secondOption="Non"
+        [secondOption]="'common.no' | translate"
         (confirm)="onConfirm()"
         (cancel)="onCancel()"
     >

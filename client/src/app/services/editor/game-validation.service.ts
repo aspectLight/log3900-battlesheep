@@ -11,7 +11,6 @@ import {
 import { ITEM_TYPES } from '@app/constants/item.constants';
 import { Coords } from '@app/interfaces/coords.interface';
 import { SaveValidationResult } from '@app/interfaces/save-validation-result.interface';
-import { ErrorMessages, SPECIFIC_ERROR } from '@common/error-messages.constants';
 export const ITEMS = Object.keys(ITEM_TYPES).filter((key) => key !== 'spawnPoint');
 
 @Injectable({
@@ -45,7 +44,7 @@ export class GameValidationService {
      */
     validateName(name: string): SaveValidationResult {
         const isValidName = name.trim().length > 0;
-        return isValidName ? { isValid: true } : { isValid: false, message: ErrorMessages.GameShouldHaveName };
+        return isValidName ? { isValid: true } : { isValid: false, message: 'save.error_name' };
     }
 
     /**
@@ -55,7 +54,7 @@ export class GameValidationService {
      */
     validateDescription(description: string): SaveValidationResult {
         const isValidDescription = description.trim().length > 0;
-        return isValidDescription ? { isValid: true } : { isValid: false, message: ErrorMessages.GameShouldHaveDescription };
+        return isValidDescription ? { isValid: true } : { isValid: false, message: 'save.error_description' };
     }
 
     /**
@@ -71,7 +70,7 @@ export class GameValidationService {
 
         const isValidCoverage = basicTiles / totalTiles > TILES_COVERAGE_PERCENTAGE;
 
-        return isValidCoverage ? { isValid: true } : { isValid: false, message: ErrorMessages.HalfTilesCoverage };
+        return isValidCoverage ? { isValid: true } : { isValid: false, message: 'save.error_coverage' };
     }
 
     /**
@@ -87,7 +86,11 @@ export class GameValidationService {
         const requiredPoints = REQUIRED_OBJECTS.spawnPoints[board.size];
 
         if (spawnPoints < requiredPoints.min || spawnPoints > requiredPoints.max) {
-            return { isValid: false, message: SPECIFIC_ERROR.spawnPoints(requiredPoints) };
+            return {
+                isValid: false,
+                message: 'save.error_spawn_points',
+                messageParams: { min: requiredPoints.min, max: requiredPoints.max },
+            };
         }
 
         return { isValid: true };
@@ -113,15 +116,15 @@ export class GameValidationService {
                 return { isValid: true };
             }
             if (!hasFlag) {
-                return { isValid: false, message: ErrorMessages.GameShouldHaveFlag };
+                return { isValid: false, message: 'save.error_flag' };
             }
-            return { isValid: false, message: SPECIFIC_ERROR.items(requiredItems) };
+            return { isValid: false, message: 'save.error_items', messageParams: { count: requiredItems } };
         }
 
         if (items === requiredItems) {
             return { isValid: true };
         }
-        return { isValid: false, message: SPECIFIC_ERROR.items(requiredItems) };
+        return { isValid: false, message: 'save.error_items', messageParams: { count: requiredItems } };
     }
 
     /**
@@ -134,13 +137,13 @@ export class GameValidationService {
         const startingTile = this.findStartingTile(board);
 
         if (!startingTile) {
-            return { isValid: false, message: ErrorMessages.NoTerrainTiles };
+            return { isValid: false, message: 'save.error_no_terrain' };
         }
 
         this.performBFS(board, startingTile, visited);
 
         const areAllTerrainTilesAccessible = this.areTerrainTilesAccessible(board, visited);
-        return areAllTerrainTilesAccessible ? { isValid: true } : { isValid: false, message: ErrorMessages.AllTerrainTilesAccessible };
+        return areAllTerrainTilesAccessible ? { isValid: true } : { isValid: false, message: 'save.error_accessibility' };
     }
 
     /**
@@ -281,7 +284,7 @@ export class GameValidationService {
      */
     private isOnEdge(x: number, y: number, boardSize: number): SaveValidationResult {
         const isOnEdge = x === 0 || x === boardSize - 1 || y === 0 || y === boardSize - 1;
-        return isOnEdge ? { isValid: false, message: SPECIFIC_ERROR.notOnEdge(x, y) } : { isValid: true };
+        return isOnEdge ? { isValid: false, message: 'save.error_door_edge', messageParams: { x, y } } : { isValid: true };
     }
 
     /**
@@ -297,7 +300,9 @@ export class GameValidationService {
 
         const isSurroundedByWalls = areWallsOnXAxis || areWallsOnYAxis;
 
-        return isSurroundedByWalls ? { isValid: true } : { isValid: false, message: SPECIFIC_ERROR.surroundedByWalls(x, y) };
+        return isSurroundedByWalls
+            ? { isValid: true }
+            : { isValid: false, message: 'save.error_door_walls', messageParams: { x, y } };
     }
 
     /**
@@ -313,6 +318,8 @@ export class GameValidationService {
 
         const isSurroundedByTerrain = isTerrainOnXAxis || isTerrainOnYAxis;
 
-        return isSurroundedByTerrain ? { isValid: true } : { isValid: false, message: SPECIFIC_ERROR.surroundedByTerrain(x, y) };
+        return isSurroundedByTerrain
+            ? { isValid: true }
+            : { isValid: false, message: 'save.error_door_terrain', messageParams: { x, y } };
     }
 }

@@ -23,7 +23,7 @@ img {
 }
 
 .return-button:hover {
-    color: #550000;
+    color: var(--theme-bg-button);
     transform: scale(1.05);
 }
 
@@ -59,22 +59,22 @@ li {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    background-color: #2b2b2b;
+    background-color: var(--theme-bg-card);
     padding: 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px var(--theme-shadow-sm);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    color: white;
+    color: var(--theme-text-primary);
     letter-spacing: 1px;
-    border: 1px solid #3a3a3a;
+    border: 1px solid var(--theme-border-tertiary);
     animation: dropIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     display: grid;
     width: 100%;
 }
 
 .stats-header {
-    background-color: #3c3c3c;
-    color: #e0d8c0;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: var(--theme-bg-card-hover);
+    color: var(--theme-text-special);
+    box-shadow: 0 4px 6px var(--theme-shadow-sm);
     font-weight: bold;
     height: auto;
     padding: 15px;
@@ -128,10 +128,10 @@ li span {
 }
 
 .player:hover {
-    background-color: #333333;
+    background-color: var(--theme-bg-card-dark);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    border-color: #7f1f1f;
+    box-shadow: 0 6px 12px var(--theme-shadow-md);
+    border-color: var(--theme-border-button);
 }
 
 .players-list {
@@ -168,7 +168,7 @@ li span {
 }
 
 .clickable:hover {
-    color: #550000;
+    color: var(--theme-bg-button);
     transform: scale(1.05);
 }
 

@@ -3,16 +3,16 @@ import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
+import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { AuthService } from '@app/services/communication/auth.service';
 import { ChannelInfo, ChannelMessage, CustomChannelService } from '@app/services/communication/custom-channel.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
-import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
-import { WARNING_MESSAGES } from '@common/error-messages.constants';
 @Component({
     selector: 'app-channels-page',
     templateUrl: './channels-page.component.html',
     styleUrls: ['./channels-page.component.scss'],
-    imports: [CommonModule, FormsModule, RouterLink, PopUpComponent],
+    imports: [CommonModule, FormsModule, RouterLink, PopUpComponent, TranslateModule],
 })
 export class ChannelsPageComponent implements OnInit, OnDestroy {
     channels = signal<ChannelInfo[]>([]);
@@ -20,7 +20,7 @@ export class ChannelsPageComponent implements OnInit, OnDestroy {
     errorMessage = signal<string | null>(null);
     successMessage = signal<string | null>(null);
     showConfirmation: boolean = false;
-    quitMessage = WARNING_MESSAGES.QuitChannel;
+    quitMessage = '';
     newChannelName = '';
     filterTerm = '';
 
@@ -38,7 +38,10 @@ export class ChannelsPageComponent implements OnInit, OnDestroy {
     constructor(
         private customChannelService: CustomChannelService,
         private authService: AuthService,
-    ) {}
+        private translate: TranslateService,
+    ) {
+        this.quitMessage = this.translate.instant('channels.quit_confirm');
+    }
 
     get username(): string {
         return this.authService.currentUser?.displayName ?? 'Utilisateur';

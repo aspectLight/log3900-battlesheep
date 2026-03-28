@@ -10,12 +10,12 @@ import { HTTP_STATUS_CODES } from '@app/constants/http-status-code.constants';
 import { ProfileService } from '@app/services/communication/profile.service';
 import { GameService } from '@app/services/editor/game.service';
 import { GameListService } from '@app/services/lobby/game-list.service';
-import { ErrorMessages, WARNING_MESSAGES } from '@common/error-messages.constants';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 @Component({
     selector: 'app-game-list',
     templateUrl: './game-list.component.html',
     styleUrls: ['./game-list.component.scss'],
-    imports: [CommonModule, RouterLink, BoardComponent, PopUpComponent, LoadingScreenComponent],
+    imports: [CommonModule, RouterLink, BoardComponent, PopUpComponent, LoadingScreenComponent, TranslateModule],
 })
 export class GameListComponent implements OnInit {
     @Input() isAddBoardVisible = false;
@@ -38,6 +38,7 @@ export class GameListComponent implements OnInit {
         private gameListService: GameListService,
         private gameService: GameService,
         private profileService: ProfileService,
+        private translate: TranslateService,
     ) {}
 
     ngOnInit(): void {
@@ -53,7 +54,7 @@ export class GameListComponent implements OnInit {
 
     onDeleteClick(game: Game): void {
         this.pendingGame = game;
-        this.errorMessage = WARNING_MESSAGES.DeleteWarning;
+        this.errorMessage = this.translate.instant('game_list.delete_warning');
         this.showError = true;
         this.onConfirm = this.onConfirmDelete;
     }
@@ -96,7 +97,7 @@ export class GameListComponent implements OnInit {
             },
             error: (err: HttpErrorResponse) => {
                 this.showError = true;
-                this.errorMessage = err.error?.message || ErrorMessages.GenericError;
+                this.errorMessage = err.error?.message || this.translate.instant('errors.generic');
                 this.onConfirm = () => {
                     this.showError = false;
                 };
@@ -123,9 +124,9 @@ export class GameListComponent implements OnInit {
     private handleDeleteError(err: HttpErrorResponse): void {
         this.showError = true;
         if (err.status === HTTP_STATUS_CODES.notFound) {
-            this.errorMessage = ErrorMessages.GameDeleted;
+            this.errorMessage = this.translate.instant('errors.game_deleted');
         } else {
-            this.errorMessage = ErrorMessages.GenericError;
+            this.errorMessage = this.translate.instant('errors.generic');
         }
     }
 

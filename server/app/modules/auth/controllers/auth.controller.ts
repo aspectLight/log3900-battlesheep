@@ -105,6 +105,8 @@ export class AuthController {
             username: user.username,
             avatarId: user.avatarId,
             avatarUrl: user.avatarUrl,
+            theme: user.theme ?? 'default',
+            language: user.language ?? 'fr',
             preferences: user.preferences,
         };
     }
@@ -117,10 +119,13 @@ export class AuthController {
         return {
             message: 'Profil mis à jour',
             user: {
+                id: user._id,
                 username: user.username,
                 email: user.email,
                 avatarId: user.avatarId,
                 avatarUrl: user.avatarUrl,
+                theme: user.theme ?? 'default',
+                language: user.language ?? 'fr',
                 preferences: user.preferences,
             },
         };
