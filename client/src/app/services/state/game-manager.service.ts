@@ -59,6 +59,7 @@ export class GameManagerService {
 
     playerWithFlag: string | null = null;
     winner: string;
+    gameRewards: { rewards: { name: string; gain: number; avatarName: string | null }[]; entryFee: number; pool: number } | null = null;
 
     private game: Game;
     private board: Board;
@@ -123,6 +124,7 @@ export class GameManagerService {
         this.isGameFinished = false;
         this.isGameLoaded = false;
         this.disconnectedPlayer = [];
+        this.gameRewards = null;
         this.clearPaths();
     }
 

@@ -27,6 +27,7 @@ import { WaitingPlayerPageComponent } from '@app/pages/waiting-player-page/waiti
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { FriendsPageComponent } from '@app/pages/friends-page/friends-page.component';
+import { ShopPageComponent } from '@app/pages/shop-page/shop-page.component';
 import { environment } from './environments/environment';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -57,6 +58,7 @@ const routes: Routes = [
     { path: 'profile', component: ProfilePageComponent, canActivate: [authGuard] },
     { path: 'channels', component: ChannelsPageComponent, canActivate: [authGuard] },
     { path: 'friends', component: FriendsPageComponent, canActivate: [authGuard] },
+    { path: 'shop', component: ShopPageComponent, canActivate: [authGuard] },
     { path: '**', redirectTo: '/home' },
 ];
 

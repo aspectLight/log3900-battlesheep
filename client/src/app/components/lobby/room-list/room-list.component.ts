@@ -57,6 +57,10 @@ export class RoomListComponent implements OnInit {
             : this.translate.instant('room.status_playing');
     }
 
+    getModeLabel(mode: string): string {
+        return mode === 'ctf' ? 'CTF' : 'Classique';
+    }
+
     getAccessibilityLabel(room: RoomInfo): string {
         if (room.playerCount >= room.maxPlayers) return this.translate.instant('room.status_full');
         if (room.friendsOnly) return 'Amis seulement';

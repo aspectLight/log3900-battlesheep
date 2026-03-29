@@ -97,6 +97,12 @@ export class User {
 
     @Prop()
     lastLoginAt: Date;
+
+    @Prop({ default: 100 })
+    virtualCurrency: number;
+
+    @Prop({ type: [String], default: [] })
+    purchasedItems: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -1,9 +1,10 @@
 <div class="header">
     <button class="return-button" routerLink="/home">
-        <img src="./assets/ui/left.png">
+        <img src="./assets/ui/left.png" />
         {{ 'common.home' | translate }}
     </button>
     <h1>{{ 'game_creator.title' | translate }}</h1>
+    <app-profile-menu></app-profile-menu>
 </div>
 
 <app-game-list
@@ -12,29 +13,42 @@
     [includeProtected]="true"
     (selectedGame)="onSelectGame($event)"
     (gamesLength)="onGamesLengthChange($event)"
-    class="game-list">
+    class="game-list"
+>
 </app-game-list>
 
 @if (hasGames) {
-    <div class="create-game-actions">
-        <label class="friends-only-toggle">
-            <input type="checkbox" [(ngModel)]="friendsOnly" />
-            Amis seulement
-        </label>
-        <button
-            class="square-button"
-            [disabled]="!selectedGame"
-            (click)="createGame()">
-            {{ 'game_creator.create' | translate }}
-        </button>
+<div class="create-game-actions">
+    <div class="game-options-row" [class.disabled]="!selectedGame">
+        <div class="friends-only-wrapper">
+            <span class="entry-fee-label">Accessibilité</span>
+            <label class="friends-only-toggle">
+                <input type="checkbox" [(ngModel)]="friendsOnly" [disabled]="!selectedGame" />
+                <span class="checkmark" [class.disabled]="!selectedGame"></span>
+                Amis seulement
+            </label>
+        </div>
+        <div class="entry-fee-wrapper">
+            <span class="entry-fee-label">Prix d'entrée</span>
+            <div class="entry-fee-field">
+                <input type="number" [(ngModel)]="entryFee" min="0" step="10" class="entry-fee-input" [disabled]="!selectedGame" />
+                <img class="coin-icon" src="./assets/gold_coin.png" alt="pièce" />
+            </div>
+        </div>
     </div>
-}
-
-@if (gameModified===true) {
-    <app-pop-up
-        [isError]="true"
-        [popUpMessage]="'game_list.hidden_deleted' | translate"
-        [showSecondButton]="false"
-        (confirm)="handlePopUp()">
-    </app-pop-up>
+    <button class="square-button" [disabled]="!selectedGame" (click)="createGame()">
+        {{ 'game_creator.create' | translate }}
+    </button>
+</div>
+} @if (gameModified===true) {
+<app-pop-up [isError]="true" [popUpMessage]="'game_list.hidden_deleted' | translate" [showSecondButton]="false" (confirm)="handlePopUp()">
+</app-pop-up>
+} @if (showInsufficientFundsPopup) {
+<app-pop-up
+    popUpMessage="Solde insuffisant"
+    description="Vous n'avez pas assez de pièces pour créer une partie avec ce prix d'entrée."
+    [showSecondButton]="false"
+    (confirm)="showInsufficientFundsPopup = false"
+>
+</app-pop-up>
 }

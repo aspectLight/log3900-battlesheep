@@ -1,0 +1,13 @@
+<div class="profile-menu-wrapper" #profileMenu>
+    <span class="currency-inline">{{ currencyService.balance$ | async }}</span>
+    <img src="./assets/gold_coin.png" alt="pièces" class="coin-icon" />
+    <button class="settings-button" (click)="toggleMenu()">
+        <img [src]="avatarDisplayUrl" alt="Profil" class="settings-icon avatar-circle" />
+    </button>
+    <div class="settings-dropdown" [class.show]="showMenu">
+        <button class="settings-option" routerLink="/profile">Profil</button>
+        <button class="settings-option" routerLink="/games-history">Historique des parties</button>
+        <button class="settings-option" routerLink="/logs-history">Historique de connexion</button>
+        <button class="settings-option" (click)="logout()">Se déconnecter</button>
+    </div>
+</div>

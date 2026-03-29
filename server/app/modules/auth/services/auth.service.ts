@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RegisterUserDto, UpdateUserDto } from '@app/modules/auth/dto/auth.dto';
+import { EXCLUSIVE_AVATAR_IDS, SHOP_CATALOGUE, ShopItem } from '@common/shop.constants';
 import { User, UserDocument } from '@app/modules/auth/schemas/user.schema';
 import { FirebaseAdminService } from '@app/modules/auth/services/firebase-admin.service';
 import { CustomChannelService } from '@app/modules/general-chat/services/custom-channel.service';
@@ -45,6 +46,10 @@ export class AuthService {
         const { email, password, username, avatarId } = registerDto;
 
         await this.checkUsername(username);
+
+        if (avatarId && EXCLUSIVE_AVATAR_IDS.includes(avatarId)) {
+            throw new ForbiddenException('Cet avatar est exclusif et doit être acheté en boutique.');
+        }
 
         try {
             // 1. Create a new user in Firebase Auth
@@ -161,6 +166,9 @@ export class AuthService {
 
         // Updating avatar
         if (updateDto.avatarId && updateDto.avatarId !== user.avatarId) {
+            if (EXCLUSIVE_AVATAR_IDS.includes(updateDto.avatarId) && !(user.purchasedItems ?? []).includes(updateDto.avatarId)) {
+                throw new ForbiddenException('Cet avatar est exclusif et doit être acheté en boutique.');
+            }
             user.avatarId = updateDto.avatarId;
             user.avatarUrl = undefined;
             user.avatarImageBuffer = undefined;
@@ -320,6 +328,38 @@ export class AuthService {
         entry.hasWon = false;
 
         await user.save();
+    }
+
+    async getVirtualCurrency(firebaseUid: string): Promise<number> {
+        const user = await this.getUserByUid(firebaseUid);
+        return user.virtualCurrency ?? 0;
+    }
+
+    async updateVirtualCurrency(firebaseUid: string, delta: number): Promise<number> {
+        const user = await this.getUserByUid(firebaseUid);
+        user.virtualCurrency = (user.virtualCurrency ?? 0) + delta;
+        if (user.virtualCurrency < 0) user.virtualCurrency = 0;
+        await user.save();
+        return user.virtualCurrency;
+    }
+
+    async getPurchasedItems(firebaseUid: string): Promise<string[]> {
+        const user = await this.getUserByUid(firebaseUid);
+        return user.purchasedItems ?? [];
+    }
+
+    async purchaseItem(firebaseUid: string, itemId: string): Promise<{ newBalance: number; purchasedItems: string[] }> {
+        const item: ShopItem | undefined = SHOP_CATALOGUE.find((i) => i.id === itemId);
+        if (!item) throw new Error('Article introuvable dans la boutique');
+
+        const user = await this.getUserByUid(firebaseUid);
+        if ((user.purchasedItems ?? []).includes(itemId)) throw new Error('Article déjà acheté');
+        if ((user.virtualCurrency ?? 0) < item.price) throw new Error('Solde insuffisant');
+
+        user.virtualCurrency -= item.price;
+        user.purchasedItems = [...(user.purchasedItems ?? []), itemId];
+        await user.save();
+        return { newBalance: user.virtualCurrency, purchasedItems: user.purchasedItems };
     }
 
     async updateUserStatistics(

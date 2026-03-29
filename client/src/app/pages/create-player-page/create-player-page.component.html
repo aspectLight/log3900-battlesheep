@@ -7,9 +7,10 @@
 </div>
 <div class="container">
     <div class="char-grid">
-        <app-character-grid 
+        <app-character-grid
         (characterSelected)="onCharacterSelected($event)"
         [reservedAvatars]="reservedAvatars"
+        [purchasedItems]="currencyService.purchasedItems"
         [socketId]="getId()">
         </app-character-grid>
     </div>

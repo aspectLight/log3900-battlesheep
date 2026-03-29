@@ -1,8 +1,6 @@
 @if (showError) {
 <app-pop-up [isError]="true" popUpMessage="{{ errorMessage }}" [showSecondButton]="false" (confirm)="this.showError = false"> </app-pop-up>
-}
-
-@if (showBlockedWarning) {
+} @if (showBlockedWarning) {
 <app-pop-up
     popUpMessage="{{ blockedWarningMessage }}"
     [showSecondButton]="true"
@@ -20,6 +18,7 @@
         {{ 'join.back' | translate }}
     </button>
     <h1>{{ 'join.title' | translate }}</h1>
+    <app-profile-menu></app-profile-menu>
 </div>
 
 <app-room-list (selectedRoom)="onRoomSelected($event)"></app-room-list>

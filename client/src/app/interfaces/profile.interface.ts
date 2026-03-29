@@ -20,6 +20,7 @@ export interface UpdateProfilePayload {
     username?: string;
     email?: string;
     avatarId?: string;
+    preferences?: Record<string, unknown>;
     theme?: string;
     language?: string;
 }
@@ -28,4 +29,5 @@ export interface AvatarOption {
     id: string;
     label: string;
     image: string;
+    premium?: boolean;
 }

@@ -71,11 +71,11 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
     }
 
     @SubscribeMessage(WaitingRoomEvents.ReserveAvatar)
-    handleReserveAvatar(
-        @MessageBody() data: { roomId: string; chosenAvatar: string; playerId: string },
+    async handleReserveAvatar(
+        @MessageBody() data: { roomId: string; chosenAvatar: string; playerId: string; isVirtual?: boolean },
         @ConnectedSocket() socket: Socket,
-    ): { success: boolean; error?: string } {
-        return this.playerHandler.handleReserveAvatar(data, socket, this.server);
+    ): Promise<{ success: boolean; error?: string }> {
+        return await this.playerHandler.handleReserveAvatar(data, socket, this.server);
     }
 
     @SubscribeMessage(WaitingRoomEvents.GetReservedAvatars)

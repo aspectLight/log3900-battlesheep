@@ -12,6 +12,8 @@ export interface Room {
     dropInDropOut: boolean;
     friendsOnly: boolean;
     messages: { type: string; content: string; time: string }[];
+    entryFee: number;
+    paidPlayerFirebaseUids: string[];
 }
 
 export interface Reservation {

@@ -8,6 +8,7 @@ import { VirtualPlayerType } from '@app/constants/player.constants';
 import { ROUTES } from '@app/constants/routes.constants';
 import { Room } from '@app/interfaces/room.interface';
 import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
+import { VirtualCurrencyService } from '@app/services/currency/virtual-currency.service';
 import { VirtualPlayerService } from '@app/services/gameplay/virtual-player.service';
 import { GameCreationService } from '@app/services/lobby/game-creation.service';
 import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';
@@ -40,6 +41,7 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
         private virtualPlayerService: VirtualPlayerService,
         private translate: TranslateService,
         public router: Router,
+        public currencyService: VirtualCurrencyService,
     ) {}
 
     get code(): string {
@@ -188,7 +190,7 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
     private async addVirtualPlayer(profile: string): Promise<void> {
         const newVPlayer = this.virtualPlayerService.generateVirtualPlayer(profile);
         try {
-            await this.socketService.reserveAvatar(this.gameCreationService.gameCode, newVPlayer.avatar?.name || '', newVPlayer.id);
+            await this.socketService.reserveAvatar(this.gameCreationService.gameCode, newVPlayer.avatar?.name || '', newVPlayer.id, true);
             this.socketService.createPlayer(this.gameCreationService.gameCode, newVPlayer);
         } catch (error) {
             this.errorMessage = error instanceof Error ? error.message : 'Failed to reserve avatar';

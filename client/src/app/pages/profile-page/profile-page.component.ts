@@ -11,11 +11,13 @@ import { CameraCaptureService } from '@app/services/communication/camera-capture
 import { ProfileService } from '@app/services/communication/profile.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { StatsService } from '@app/services/communication/stats.service';
+import { VirtualCurrencyService } from '@app/services/currency/virtual-currency.service';
 import { LanguageService, LanguageType } from '@app/services/state/language.service';
 import { SessionService } from '@app/services/state/session.service';
-import { environment } from 'src/environments/environment';
 import { ThemeService, ThemeType } from '@app/services/state/theme.service';
+import { EXCLUSIVE_AVATAR_IDS } from '@common/shop.constants';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-profile-page',
@@ -69,6 +71,7 @@ export class ProfilePageComponent implements OnInit {
     private statsService = inject(StatsService);
     private socketService = inject(SocketService);
     private session = inject(SessionService);
+    private currencyService = inject(VirtualCurrencyService);
     private auth = inject(Auth);
     private router = inject(Router);
     themeService = inject(ThemeService);
@@ -130,6 +133,7 @@ export class ProfilePageComponent implements OnInit {
     }
 
     async ngOnInit() {
+        this.currencyService.fetchCatalogue();
         await this.loadProfile();
     }
 
@@ -154,7 +158,13 @@ export class ProfilePageComponent implements OnInit {
         }
     }
 
+    isPremiumLocked(avatarId: string): boolean {
+        if (!EXCLUSIVE_AVATAR_IDS.includes(avatarId)) return false;
+        return !this.currencyService.hasPurchased(avatarId);
+    }
+
     selectAvatar(id: string) {
+        if (this.isPremiumLocked(id)) return;
         this.selectedAvatarFile = null;
         this.avatarPreviewUrl = null;
         this.avatarFileError = null;

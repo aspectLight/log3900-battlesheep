@@ -10,6 +10,7 @@ import { Bonus } from '@app/interfaces/character.interface';
 import { Reservation } from '@app/interfaces/reservation.interface';
 import { ProfileService } from '@app/services/communication/profile.service';
 import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
+import { VirtualCurrencyService } from '@app/services/currency/virtual-currency.service';
 import { GameCreationService } from '@app/services/lobby/game-creation.service';
 import { PlayerCreationService } from '@app/services/lobby/player-creation.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -38,11 +39,13 @@ export class CreatePlayerPageComponent implements OnInit {
         public router: Router,
         public roomSocketService: RoomSocketService,
         public profileService: ProfileService,
+        public currencyService: VirtualCurrencyService,
         private translate: TranslateService,
     ) {
         this.isHost = this.gameCreationService.isHost;
         this.socketService.getReservedAvatars(this.gameCreationService.gameCode);
         this.roomSocketService.sync();
+        this.currencyService.fetchCatalogue();
     }
 
     get selectedCharacter() {
@@ -96,6 +99,7 @@ export class CreatePlayerPageComponent implements OnInit {
         if (newPlayer) {
             newPlayer.profileAvatarId = profile.avatarId ?? null;
             newPlayer.profileAvatarUrl = profile.avatarUrl ? `${environment.serverUrl}${profile.avatarUrl}` : null;
+            newPlayer.activeBanner = (profile.preferences?.['activeBanner'] as string) ?? null;
         }
         if (newPlayer) {
             if (this.gameCreationService.isDropIn) {

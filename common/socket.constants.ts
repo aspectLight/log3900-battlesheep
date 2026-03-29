@@ -160,6 +160,17 @@ export enum CustomChannelEvents {
     UserChannelsRestored = 'userChannelsRestored', // Envoyé à la reconnexion pour restaurer les canaux rejoints
 }
 
+export enum CurrencyEvents {
+    GetVirtualCurrency = 'getVirtualCurrency',
+    VirtualCurrencyResponse = 'virtualCurrencyResponse',
+    VirtualCurrencyUpdated = 'virtualCurrencyUpdated',
+    GetShopCatalog = 'getShopCatalog',
+    ShopCatalogResponse = 'shopCatalogResponse',
+    PurchaseItem = 'purchaseItem',
+    PurchaseItemResponse = 'purchaseItemResponse',
+    GameRewardsInfo = 'gameRewardsInfo',
+}
+
 export enum SocialEvents {
     // Friend requests
     SendFriendRequest = 'sendFriendRequest',

@@ -18,8 +18,10 @@
 
 <div class="container">
     <div class="settings-menu" #settingsMenu>
+        <span class="currency-inline">{{ currencyService.balance$ | async }}</span>
+        <img src="./assets/gold_coin.png" alt="pièces" class="coin-icon" />
         <button class="settings-button" (click)="toggleSettingsMenu()">
-            <img src="./assets/ui/profile.png" alt="Profil" class="settings-icon" />
+            <img [src]="avatarDisplayUrl" alt="Profil" class="settings-icon avatar-circle" />
         </button>
         <div class="settings-dropdown" [class.show]="showSettingsMenu">
             <button class="settings-option" routerLink="/profile">{{ 'main.profile' | translate }}</button>
@@ -41,9 +43,10 @@
             <button class="button friends-button" id="friends-button" routerLink="/friends">
                 {{ 'main.friends' | translate }}
                 @if (pendingRequestCount > 0) {
-                    <span class="badge">{{ pendingRequestCount }}</span>
+                <span class="badge">{{ pendingRequestCount }}</span>
                 }
             </button>
+            <button class="button" id="shop-button" routerLink="/shop">Boutique</button>
         </section>
     </div>
 
@@ -54,5 +57,4 @@
             <span>Anis Gadouche</span>, <span>Djihed Benaiche</span>
         </p>
     </footer>
-
 </div>

@@ -24,6 +24,22 @@
     top: 20px;
     right: 20px;
     z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.currency-inline {
+    color: #f0c040;
+    font-size: 0.95rem;
+    font-weight: bold;
+    display: flex;
+    margin-top: 5px
+}
+
+.coin-icon {
+    width: 20px;
+    height: 20px;
 }
 
 .settings-button {
@@ -55,6 +71,12 @@
     height: 45px;
     filter: brightness(0.9);
     transition: all 0.3s ease;
+}
+
+.avatar-circle {
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #cc0000;
 }
 
 .settings-dropdown {
