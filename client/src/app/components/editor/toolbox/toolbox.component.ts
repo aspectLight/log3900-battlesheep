@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { KeyValuePipe } from '@angular/common';
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Item } from '@app/classes/entity/item';
 import { Tile } from '@app/classes/board/tile';
@@ -14,12 +14,13 @@ import { TeleportService } from '@app/services/editor/teleport.service';
 import { TileService } from '@app/services/editor/tile.service';
 import { Board } from '@app/classes/board/board';
 import { SaveGameComponent } from '@app/components/editor/save-game/save-game.component';
+import { GenerateMapComponent } from '@app/components/editor/generate-map/generate-map.component';
 import { RestartGameComponent } from '@app/components/game/restart-game/restart-game.component';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-toolbox',
-    imports: [KeyValuePipe, FormsModule, SaveGameComponent, RestartGameComponent, TranslateModule],
+    imports: [KeyValuePipe, FormsModule, SaveGameComponent, GenerateMapComponent, RestartGameComponent, TranslateModule],
     templateUrl: './toolbox.component.html',
     styleUrls: ['./toolbox.component.scss'],
     animations: [
@@ -34,6 +35,7 @@ import { TranslateModule } from '@ngx-translate/core';
 export class ToolboxComponent implements OnInit, OnChanges {
     @Input() resetSignal: boolean;
     @Input() board!: Board;
+    @Output() mapGenerated = new EventEmitter<void>();
 
     items = ITEM_TYPES;
 
@@ -147,6 +149,11 @@ export class ToolboxComponent implements OnInit, OnChanges {
 
     onRestartConfirmed(): void {
         this.resetInputs();
+    }
+
+    onMapGenerated(): void {
+        this.resetInputs();
+        this.mapGenerated.emit();
     }
 
     getGameName(): string {

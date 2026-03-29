@@ -365,6 +365,13 @@
     "yes": "Yes",
     "no": "No"
   },
+  "generate": {
+    "title": "Generate Map",
+    "water_percent": "Water percentage",
+    "ice_percent": "Ice percentage",
+    "generate": "Generate",
+    "cancel": "Cancel"
+  },
   "chatbox": {
     "general": "General",
     "game_channel": "Channel for ",

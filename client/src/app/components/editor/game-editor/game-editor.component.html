@@ -1,7 +1,7 @@
 @defer {
 <div class="game-editor">
     <div class="left-side">
-        <app-toolbox [resetSignal]="resetToolboxFlag" [board]="board"></app-toolbox>
+        <app-toolbox [resetSignal]="resetToolboxFlag" [board]="board" (mapGenerated)="onMapGenerated()"></app-toolbox>
     </div>
     <div class="right-side">
         <app-board [board]="board" mode="edit"></app-board>

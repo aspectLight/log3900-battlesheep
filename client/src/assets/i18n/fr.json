@@ -364,6 +364,13 @@
     "yes": "Oui",
     "no": "Non"
   },
+  "generate": {
+    "title": "Générer une carte",
+    "water_percent": "Pourcentage d'eau",
+    "ice_percent": "Pourcentage de glace",
+    "generate": "Générer",
+    "cancel": "Annuler"
+  },
   "chatbox": {
     "general": "Général",
     "game_channel": "Canal de ",

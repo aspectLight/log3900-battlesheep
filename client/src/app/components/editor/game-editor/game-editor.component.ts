@@ -37,6 +37,11 @@ export class GameEditorComponent implements OnInit {
         this.resetToolboxFlag = !this.resetToolboxFlag;
     }
 
+    onMapGenerated() {
+        this.teleportService.initializePairsFromBoard(this.board);
+        this.resetToolboxFlag = !this.resetToolboxFlag;
+    }
+
     getGameName() {
         return this.gameService.getName();
     }
