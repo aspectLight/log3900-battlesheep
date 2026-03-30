@@ -74,8 +74,8 @@
         </div>
     </div>
     <div class="footer">
+        <app-generate-map [board]="board" (mapGenerated)="onMapGenerated()"></app-generate-map>
         <app-save-game [board]="board"></app-save-game>
-        {{ getGameName() }}
         <app-restart-game [board]="board" (restartConfirmed)="onRestartConfirmed()"></app-restart-game>
     </div>
 </div>
