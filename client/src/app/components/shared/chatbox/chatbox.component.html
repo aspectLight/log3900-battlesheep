@@ -23,8 +23,8 @@
                 <div class="message" [class.sent]="msg.type === 'sent'">
                     <span class="msg-time">{{ msg.time }}</span>
                     <span class="msg-avatar-wrap">
-                        @if (resolveAvatar(msg.avatarId, msg.avatarUrl); as avatarSrc) {
-                            <img class="msg-avatar" [src]="avatarSrc" [alt]="msg.name ?? ''" />
+                        @if (resolveAvatar(msg.avatarId, msg.avatarUrl, msg.name); as avatarSrc) {
+                            <img class="msg-avatar" [class.msg-avatar--deleted]="msg.name === '[supprimé]'" [src]="avatarSrc" [alt]="msg.name ?? ''" />
                         } @else {
                             <span class="msg-avatar-placeholder">{{ (msg.name ?? '?')[0].toUpperCase() }}</span>
                         }

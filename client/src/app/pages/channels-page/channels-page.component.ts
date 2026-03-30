@@ -203,7 +203,8 @@ export class ChannelsPageComponent implements OnInit, OnDestroy {
         this.activeMessage = '';
     }
 
-    resolveAvatar(avatarId?: string | null, avatarUrl?: string | null): string | null {
+    resolveAvatar(avatarId?: string | null, avatarUrl?: string | null, name?: string | null): string | null {
+        if (name === '[supprimé]') return './assets/avatars/account-creation/compte-supprimer.png';
         if (avatarUrl) return avatarUrl;
         if (!avatarId) return null;
         const avatar = ACCOUNT_CREATION_AVATARS.find((a) => a.id === avatarId);
