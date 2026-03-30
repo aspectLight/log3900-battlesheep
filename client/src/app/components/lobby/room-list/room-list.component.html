@@ -1,18 +1,19 @@
 <div class="room-list">
     <li class="header">
-        <span>Prévisualisation</span>
-        <span>Joueurs</span>
-        <span>Taille</span>
-        <span>Statut</span>
-        <span>Mode</span>
-        <span>Accessibilité</span>
-        <span>Code</span>
+        <span>{{ 'room.preview' | translate }}</span>
+        <span>{{ 'room.players' | translate }}</span>
+        <span>{{ 'room.size' | translate }}</span>
+        <span>{{ 'room.mode' | translate }}</span>
+        <span>{{ 'room.status' | translate }}</span>
+        <span>{{ 'room.accessibility' | translate }}</span>
+        <span>{{ 'room.code' | translate }}</span>
+        <span>Prix</span>
     </li>
     <div class="list">
         @if (isLoading) {
         <app-loading-screen></app-loading-screen>
         } @else if (rooms.length === 0) {
-        <p class="no-rooms">Aucune partie disponible</p>
+        <p class="no-rooms">{{ 'room.no_rooms' | translate }}</p>
         } @else {
         <div class="rooms">
             @for (room of rooms; track room.roomId) {
@@ -22,10 +23,15 @@
                 </span>
                 <span>{{ room.playerCount }}/{{ room.maxPlayers }}</span>
                 <span>{{ room.boardSize }}</span>
+                <span>{{ getModeLabel(room.mode) }}</span>
                 <span>{{ getStatusLabel(room.status) }}</span>
-                <span [class.drop-in-badge]="room.dropInDropOut">{{ room.dropInDropOut ? 'Drop-in' : '-' }}</span>
                 <span [class.friends-only-badge]="room.friendsOnly">{{ getAccessibilityLabel(room) }}</span>
                 <span class="room-code">{{ room.roomId.replace('game_', '') }}</span>
+                <span class="entry-fee">
+                    @if (room.entryFee && room.entryFee > 0) {
+                    {{ room.entryFee }}<img src="assets/gold_coin.png" alt="coins" class="coin-icon" />
+                    } @else { Gratuit }
+                </span>
             </li>
             }
         </div>

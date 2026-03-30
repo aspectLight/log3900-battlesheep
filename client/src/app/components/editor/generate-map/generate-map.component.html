@@ -1,0 +1,26 @@
+<div class="generate-map">
+    <button class="generate-btn" (click)="onOpenDialog()">{{ 'generate.generate' | translate }}</button>
+
+    @if (isDialogOpen) {
+    <div class="dialogue">
+        <div class="config-panel">
+            <h2>{{ 'generate.title' | translate }}</h2>
+
+            <div class="slider-group">
+                <label>{{ 'generate.water_percent' | translate }}: {{ waterPercent }}%</label>
+                <input type="range" min="0" [max]="maxWaterPercent" [(ngModel)]="waterPercent" />
+            </div>
+
+            <div class="slider-group">
+                <label>{{ 'generate.ice_percent' | translate }}: {{ icePercent }}%</label>
+                <input type="range" min="0" [max]="maxIcePercent" [(ngModel)]="icePercent" />
+            </div>
+
+            <div class="options">
+                <button (click)="onGenerate()">{{ 'generate.generate' | translate }}</button>
+                <button (click)="onCancel()">{{ 'generate.cancel' | translate }}</button>
+            </div>
+        </div>
+    </div>
+    }
+</div>

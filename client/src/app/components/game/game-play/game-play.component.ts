@@ -11,13 +11,14 @@ import { ChatboxComponent } from '@app/components/shared/chatbox/chatbox.compone
 import { LoadingScreenComponent } from '@app/components/shared/loading-screen/loading-screen.component';
 import { NotificationComponent } from '@app/components/shared/notification/notification.component';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
-import { GAME_RESULT_MESSAGES, MODES, OUTCOME } from '@app/constants/game.constants';
+import { GAME_RESULT_KEYS, MODES, OUTCOME } from '@app/constants/game.constants';
 import { ROUTES } from '@app/constants/routes.constants';
 import { ActionSocketService } from '@app/services/communication/socket-handlers/action-socket.service';
 import { MovementSocketService } from '@app/services/communication/socket-handlers/movement-socket.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { CombatService } from '@app/services/gameplay/combat.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 @Component({
     selector: 'app-game-play',
     imports: [
@@ -30,6 +31,7 @@ import { GameManagerService } from '@app/services/state/game-manager.service';
         PopUpComponent,
         LoadingScreenComponent,
         ChatboxComponent,
+        TranslateModule,
     ],
     templateUrl: './game-play.component.html',
     styleUrl: './game-play.component.scss',
@@ -52,6 +54,7 @@ export class GamePlayComponent implements OnInit {
         private socketService: SocketService,
         private actionSocketService: ActionSocketService,
         private movementSocketService: MovementSocketService,
+        private translate: TranslateService,
     ) {}
 
     get board(): Board {
@@ -159,6 +162,7 @@ export class GamePlayComponent implements OnInit {
         const mode = this.gameManager.isCTF ? MODES.CTF : MODES.CLASSIQUE;
         const winner = this.gameManager.getWinner();
 
-        return GAME_RESULT_MESSAGES[outcome][mode]({ winner });
+        const { key, params } = GAME_RESULT_KEYS[outcome][mode]({ winner });
+        return this.translate.instant(key, params);
     }
 }

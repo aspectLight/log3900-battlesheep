@@ -76,7 +76,8 @@ export class RoomSocketService implements ISocketService {
 
     async createRoom(roomId: string, gameId: string, host: Player): Promise<void> {
         const friendsOnly = this.gameCreationService.friendsOnly;
-        const result = await this.socket.emitWithAck(WaitingRoomEvents.CreateWaitingRoom, { roomId, gameId, host, friendsOnly });
+        const entryFee = this.gameCreationService.entryFee ?? 0;
+        const result = await this.socket.emitWithAck(WaitingRoomEvents.CreateWaitingRoom, { roomId, gameId, host, friendsOnly, entryFee });
         if (!result.success) {
             throw new Error(result.error || 'Failed to create waiting room');
         }
@@ -123,14 +124,14 @@ export class RoomSocketService implements ISocketService {
         this.socket.emit(WaitingRoomEvents.KickPlayer, { roomId, player });
     }
 
-    async reserveAvatar(roomId: string, chosenAvatar: string, playerId: string): Promise<void> {
+    async reserveAvatar(roomId: string, chosenAvatar: string, playerId: string, isVirtual: boolean = false): Promise<void> {
         const currentRoom = this.waitingPlayerService.currentRoom.getValue();
         if (!currentRoom.hostId) return;
         if (!this.socket.id) {
             throw new Error(ErrorMessages.SocketIdNotDefined);
         }
 
-        const result = await this.socket.emitWithAck(WaitingRoomEvents.ReserveAvatar, { roomId, chosenAvatar, playerId });
+        const result = await this.socket.emitWithAck(WaitingRoomEvents.ReserveAvatar, { roomId, chosenAvatar, playerId, isVirtual });
         if (!result.success) {
             throw new Error(result.error || 'Failed to reserve avatar');
         }

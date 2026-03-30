@@ -8,6 +8,7 @@ import { Item } from '@app/classes/entity/item';
     styleUrl: './pop-up.component.scss',
 })
 export class PopUpComponent {
+    @Input() isError: boolean = false;
     @Input() showSecondButton: boolean = false;
     @Input() popUpMessage: string;
     @Input() description: string;

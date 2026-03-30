@@ -6,12 +6,12 @@
     @if (isToggled) {
     <div class="dialogue">
         <div class="errors">
-            <h2>Êtes-vous sûr de vouloir recommencer l'édition ?</h2>
-            <h3>Toute modification non sauvegardée sera perdue.</h3>
+            <h2>{{ 'restart.confirm' | translate }}</h2>
+            <h3>{{ 'restart.warning' | translate }}</h3>
 
             <div class="options">
-                <button (click)="onConfirmRestart()">Oui</button>
-                <button (click)="onCancelRestart()">Non</button>
+                <button (click)="onConfirmRestart()">{{ 'restart.yes' | translate }}</button>
+                <button (click)="onCancelRestart()">{{ 'restart.no' | translate }}</button>
             </div>
         </div>
     </div>

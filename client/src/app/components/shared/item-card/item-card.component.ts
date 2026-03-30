@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Item } from '@app/classes/entity/item';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-item-card',
-    imports: [CommonModule],
+    imports: [CommonModule, TranslateModule],
     templateUrl: './item-card.component.html',
     styleUrls: ['./item-card.component.scss'],
 })

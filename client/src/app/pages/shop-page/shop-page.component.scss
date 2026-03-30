@@ -1,0 +1,747 @@
+:host {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.header {
+    position: relative;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+
+    h1 {
+        letter-spacing: 2px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    .return-button {
+        position: absolute;
+        left: 10px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        cursor: pointer;
+
+        img {
+            width: 15px;
+        }
+
+        &:hover {
+            color: red;
+        }
+
+        &:active {
+            color: darkred;
+        }
+    }
+
+    .balance {
+        position: absolute;
+        right: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #f0c040;
+        font-weight: bold;
+        font-size: 1.25rem;
+        background: rgba(22, 7, 7, 0.85);
+        padding: 8px 16px;
+        border-radius: 20px;
+        border: 2px solid #b71c1c;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+
+        .coin-icon {
+            width: 26px;
+            height: 26px;
+        }
+    }
+}
+
+.shop-container {
+    padding: 16px 24px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.shop-section {
+    h2 {
+        margin: 0 0 14px 0;
+        font-size: 1.4rem;
+        letter-spacing: 1px;
+        color: #e0d8c0;
+        border-bottom: 1px solid #3a1212;
+        padding-bottom: 8px;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+    }
+}
+
+.items-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.shop-item {
+    background: rgba(22, 7, 7, 0.85);
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    padding: 14px;
+    width: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+
+    &:hover {
+        border-color: #7f1f1f;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+    }
+
+    &.owned {
+        border-color: #2e7d32;
+        background: rgba(7, 22, 7, 0.85);
+    }
+
+    &.equipped {
+        border-color: #2e7d32;
+    }
+
+    .item-name {
+        font-weight: bold;
+        font-size: 1rem;
+        color: #f0f0f0;
+    }
+
+    .item-desc {
+        font-size: 0.75rem;
+        color: #aaa;
+        line-height: 1.3;
+    }
+
+    .item-price {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 1rem;
+        color: #f0c040;
+        font-weight: bold;
+        margin-top: 2px;
+        line-height: 1;
+
+        .coin-icon {
+            width: 20px;
+            height: 20px;
+        }
+    }
+
+    .item-avatar-preview {
+        width: 100%;
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 4px;
+
+        .item-avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    }
+
+    .owned-badge {
+        color: #4caf50;
+        font-weight: bold;
+        font-size: 0.8rem;
+        margin-top: auto;
+        text-align: center;
+    }
+
+    .btn-buy {
+        margin-top: auto;
+        padding: 7px 12px;
+        cursor: pointer;
+        border-radius: 4px;
+        border: 1px solid #b71c1c;
+        background: rgba(211, 47, 47, 0.85);
+        color: white;
+        font-size: 0.85rem;
+        font-weight: bold;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+
+        &:hover {
+            background: rgba(229, 57, 53, 0.95);
+            border-color: #ef5350;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        &:active {
+            transform: scale(0.97);
+        }
+    }
+
+    .btn-equip {
+        margin-top: auto;
+        padding: 7px 12px;
+        cursor: pointer;
+        border-radius: 4px;
+        border: 1px solid #1b5e20;
+        background: rgba(46, 125, 50, 0.85);
+        color: white;
+        font-size: 0.85rem;
+        font-weight: bold;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+
+        &.equipped {
+            border-color: #2e7d32;
+            background: transparent;
+            color: #4caf50;
+        }
+
+        &:hover {
+            opacity: 0.9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        &:active {
+            transform: scale(0.97);
+        }
+    }
+}
+
+// === Banner preview cards in shop ===
+
+.banner-preview {
+    width: 100%;
+    border-radius: 8px;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.3);
+    position: relative;
+    margin-bottom: 6px;
+    aspect-ratio: 3 / 4;
+    isolation: isolate;
+
+    .preview-avatar-zone {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.1);
+        padding: 8px;
+
+        .preview-avatar-placeholder {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+    }
+
+    .preview-name-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 4px 0;
+        background: rgba(0, 0, 0, 0.7);
+        font-size: 0.7rem;
+        font-weight: bold;
+        color: white;
+
+        .preview-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    }
+
+    .preview-stats-bar {
+        display: flex;
+        justify-content: space-around;
+        padding: 4px 0;
+        background: rgba(0, 0, 0, 0.7);
+        font-size: 0.6rem;
+        color: white;
+    }
+}
+
+// --- Gold preview ---
+.banner-preview.preview-banner_gold {
+    border: 2px solid transparent;
+    animation: goldenPulse 3s ease-in-out infinite;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #ffd700, #daa520, #fff8dc, #b8860b, #ffd700);
+        background-size: 300% 300%;
+        animation: goldenBorderShift 4s ease infinite;
+        z-index: -1;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 8px;
+        background: linear-gradient(
+            105deg,
+            transparent 40%,
+            rgba(255, 215, 0, 0.15) 45%,
+            rgba(255, 248, 220, 0.25) 50%,
+            rgba(255, 215, 0, 0.15) 55%,
+            transparent 60%
+        );
+        background-size: 200% 100%;
+        animation: goldenShimmer 3s ease-in-out infinite;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .preview-avatar-zone {
+        background: linear-gradient(180deg, rgba(184, 134, 11, 0.08) 0%, rgba(255, 215, 0, 0.12) 100%);
+    }
+
+    .preview-name-bar {
+        background: linear-gradient(90deg, rgba(184, 134, 11, 0.4), rgba(0, 0, 0, 0.7), rgba(184, 134, 11, 0.4));
+        text-shadow: 0 0 6px rgba(255, 215, 0, 0.5);
+    }
+
+    .preview-stats-bar {
+        background: linear-gradient(90deg, rgba(184, 134, 11, 0.3), rgba(0, 0, 0, 0.7), rgba(184, 134, 11, 0.3));
+    }
+}
+
+// --- Shadow preview ---
+.banner-preview.preview-banner_shadow {
+    border: 2px solid #1a0a2e;
+    animation: shadowPulse 4s ease-in-out infinite;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #0d0015, #2d1b69, #1a0a2e, #4a2c8a, #0d0015);
+        background-size: 300% 300%;
+        animation: shadowBorderShift 5s ease infinite;
+        z-index: -1;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 8px;
+        background: radial-gradient(ellipse at 50% 100%, rgba(75, 0, 130, 0.3) 0%, rgba(25, 0, 50, 0.2) 40%, transparent 70%);
+        animation: shadowMist 5s ease-in-out infinite;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .preview-avatar-zone {
+        background: linear-gradient(180deg, rgba(13, 0, 21, 0.3) 0%, rgba(45, 27, 105, 0.15) 100%);
+    }
+
+    .preview-name-bar {
+        background: linear-gradient(90deg, rgba(13, 0, 21, 0.8), rgba(45, 27, 105, 0.5), rgba(13, 0, 21, 0.8));
+        color: #c9b3ff;
+        text-shadow:
+            0 0 8px rgba(138, 43, 226, 0.6),
+            0 0 3px rgba(0, 0, 0, 0.9);
+    }
+
+    .preview-stats-bar {
+        background: linear-gradient(90deg, rgba(13, 0, 21, 0.8), rgba(45, 27, 105, 0.4), rgba(13, 0, 21, 0.8));
+        color: #d4c4ff;
+    }
+}
+
+// --- Flame preview ---
+.banner-preview.preview-banner_flame {
+    border: 2px solid transparent;
+    animation: flamePulse 2s ease-in-out infinite;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #ff4500, #ff6a00, #ffd700, #ff6a00, #ff0000, #ff4500);
+        background-size: 400% 400%;
+        animation: flameBorderShift 2s ease infinite;
+        z-index: -1;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 8px;
+        background: radial-gradient(ellipse at 50% 100%, rgba(255, 69, 0, 0.3) 0%, transparent 50%),
+            radial-gradient(ellipse at 30% 100%, rgba(255, 165, 0, 0.2) 0%, transparent 40%),
+            radial-gradient(ellipse at 70% 100%, rgba(255, 0, 0, 0.2) 0%, transparent 40%);
+        animation: flameFlicker 1.5s ease-in-out infinite alternate;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .preview-avatar-zone {
+        background: linear-gradient(180deg, rgba(255, 69, 0, 0.05) 0%, rgba(255, 69, 0, 0.2) 100%);
+    }
+
+    .preview-name-bar {
+        background: linear-gradient(90deg, rgba(139, 0, 0, 0.6), rgba(0, 0, 0, 0.7), rgba(139, 0, 0, 0.6));
+        text-shadow:
+            0 0 6px rgba(255, 69, 0, 0.7),
+            0 0 12px rgba(255, 0, 0, 0.3);
+    }
+
+    .preview-stats-bar {
+        background: linear-gradient(90deg, rgba(139, 0, 0, 0.5), rgba(0, 0, 0, 0.7), rgba(139, 0, 0, 0.5));
+    }
+}
+
+// --- Ice preview ---
+.banner-preview.preview-banner_ice {
+    border: 2px solid transparent;
+    animation: icePulse 4s ease-in-out infinite;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #a8d8ea, #87ceeb, #e0f7fa, #4fc3f7, #a8d8ea);
+        background-size: 300% 300%;
+        animation: iceBorderShift 5s ease infinite;
+        z-index: -1;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 8px;
+        background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.3) 0%, transparent 20%),
+            radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.2) 0%, transparent 15%),
+            radial-gradient(circle at 50% 70%, rgba(255, 255, 255, 0.25) 0%, transparent 18%);
+        animation: iceSparkle 3s ease-in-out infinite alternate;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .preview-avatar-zone {
+        background: linear-gradient(180deg, rgba(135, 206, 235, 0.1) 0%, rgba(79, 195, 247, 0.15) 100%);
+    }
+
+    .preview-name-bar {
+        background: linear-gradient(90deg, rgba(100, 181, 246, 0.4), rgba(0, 0, 0, 0.7), rgba(100, 181, 246, 0.4));
+        color: #e0f7fa;
+        text-shadow: 0 0 6px rgba(135, 206, 235, 0.6);
+    }
+
+    .preview-stats-bar {
+        background: linear-gradient(90deg, rgba(100, 181, 246, 0.3), rgba(0, 0, 0, 0.7), rgba(100, 181, 246, 0.3));
+        color: #e0f7fa;
+    }
+}
+
+// --- Neon preview ---
+.banner-preview.preview-banner_neon {
+    border: 2px solid transparent;
+    animation: neonPulse 2.5s ease-in-out infinite;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #ff00ff, #00ffff, #ff00ff, #00ff88, #ff00ff);
+        background-size: 400% 400%;
+        animation: neonBorderShift 3s linear infinite;
+        z-index: -1;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 8px;
+        background: linear-gradient(180deg, rgba(255, 0, 255, 0.05) 0%, rgba(0, 255, 255, 0.08) 50%, rgba(255, 0, 255, 0.05) 100%);
+        animation: neonFlicker 4s ease-in-out infinite;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .preview-avatar-zone {
+        background: linear-gradient(180deg, rgba(255, 0, 255, 0.05) 0%, rgba(0, 255, 255, 0.1) 100%);
+    }
+
+    .preview-name-bar {
+        background: linear-gradient(90deg, rgba(255, 0, 255, 0.3), rgba(0, 0, 0, 0.8), rgba(0, 255, 255, 0.3));
+        color: #e0ffff;
+        text-shadow:
+            0 0 8px rgba(0, 255, 255, 0.7),
+            0 0 16px rgba(255, 0, 255, 0.4);
+    }
+
+    .preview-stats-bar {
+        background: linear-gradient(90deg, rgba(255, 0, 255, 0.25), rgba(0, 0, 0, 0.8), rgba(0, 255, 255, 0.25));
+        color: #e0ffff;
+    }
+}
+
+// === Banner preview animations (duplicated from player-card since styles are scoped) ===
+
+@keyframes goldenPulse {
+    0%,
+    100% {
+        box-shadow:
+            0 0 12px rgba(255, 215, 0, 0.4),
+            0 0 24px rgba(255, 215, 0, 0.2);
+    }
+    50% {
+        box-shadow:
+            0 0 20px rgba(255, 215, 0, 0.7),
+            0 0 40px rgba(255, 215, 0, 0.3);
+    }
+}
+
+@keyframes goldenBorderShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes goldenShimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@keyframes shadowPulse {
+    0%,
+    100% {
+        box-shadow:
+            0 0 15px rgba(75, 0, 130, 0.5),
+            0 0 30px rgba(0, 0, 0, 0.6),
+            inset 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+    50% {
+        box-shadow:
+            0 0 25px rgba(75, 0, 130, 0.7),
+            0 0 50px rgba(0, 0, 0, 0.8),
+            inset 0 0 25px rgba(0, 0, 0, 0.3);
+    }
+}
+
+@keyframes shadowBorderShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    33% {
+        background-position: 100% 0%;
+    }
+    66% {
+        background-position: 50% 100%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes shadowMist {
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+@keyframes flamePulse {
+    0%,
+    100% {
+        box-shadow:
+            0 0 12px rgba(255, 69, 0, 0.5),
+            0 0 24px rgba(255, 0, 0, 0.2);
+    }
+    50% {
+        box-shadow:
+            0 0 24px rgba(255, 69, 0, 0.8),
+            0 0 48px rgba(255, 0, 0, 0.4);
+    }
+}
+
+@keyframes flameBorderShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes flameFlicker {
+    0% {
+        opacity: 0.7;
+        transform: scaleY(1);
+    }
+    100% {
+        opacity: 1;
+        transform: scaleY(1.02);
+    }
+}
+
+// Ice animations
+@keyframes icePulse {
+    0%,
+    100% {
+        box-shadow:
+            0 0 12px rgba(135, 206, 235, 0.4),
+            0 0 24px rgba(79, 195, 247, 0.2);
+    }
+    50% {
+        box-shadow:
+            0 0 20px rgba(135, 206, 235, 0.7),
+            0 0 40px rgba(79, 195, 247, 0.3);
+    }
+}
+
+@keyframes iceBorderShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes iceSparkle {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.6;
+    }
+}
+
+// Neon animations
+@keyframes neonPulse {
+    0%,
+    100% {
+        box-shadow:
+            0 0 10px rgba(255, 0, 255, 0.4),
+            0 0 20px rgba(0, 255, 255, 0.3);
+    }
+    50% {
+        box-shadow:
+            0 0 20px rgba(255, 0, 255, 0.7),
+            0 0 40px rgba(0, 255, 255, 0.5);
+    }
+}
+
+@keyframes neonBorderShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    25% {
+        background-position: 100% 0%;
+    }
+    50% {
+        background-position: 50% 100%;
+    }
+    75% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes neonFlicker {
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+    10% {
+        opacity: 1;
+    }
+    12% {
+        opacity: 0.4;
+    }
+    14% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    70% {
+        opacity: 1;
+    }
+    72% {
+        opacity: 0.5;
+    }
+    74% {
+        opacity: 1;
+    }
+}
+
+.success-banner {
+    background: rgba(27, 94, 32, 0.85);
+    border: 1px solid #2e7d32;
+    color: #a5d6a7;
+    padding: 10px 20px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin: 0 24px;
+    border-radius: 4px;
+}

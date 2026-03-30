@@ -2,7 +2,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
 import { UpdateProfilePayload, UserProfile, UserStatistics } from '@app/interfaces/profile.interface';
+import { LanguageService } from '@app/services/state/language.service';
 import { SessionService } from '@app/services/state/session.service';
+import { ThemeService } from '@app/services/state/theme.service';
 import { firstValueFrom } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
@@ -10,15 +12,39 @@ import { environment } from 'src/environments/environment';
 export class ProfileService {
     private apiUrl = `${environment.serverUrl}/auth`;
 
+    /** Cache en mémoire du profil — invalidé à la déconnexion */
+    private cachedProfile: UserProfile | null = null;
+
     constructor(
         private http: HttpClient,
         private auth: Auth,
         private session: SessionService,
+        private themeService: ThemeService,
+        private languageService: LanguageService,
     ) {}
 
+    /**
+     * Retourne le profil depuis le cache ou le backend.
+     * Applique automatiquement le thème du compte au premier appel.
+     */
     async getProfile(): Promise<UserProfile> {
-        const headers = await this.getAuthHeaders();
-        return await firstValueFrom(this.http.get<UserProfile>(`${this.apiUrl}/profile`, { headers }));
+        if (!this.cachedProfile) {
+            const headers = await this.getAuthHeaders();
+            this.cachedProfile = await firstValueFrom(this.http.get<UserProfile>(`${this.apiUrl}/profile`, { headers }));
+            this.themeService.applyFromProfile(this.cachedProfile.theme);
+            this.languageService.applyFromProfile(this.cachedProfile.language);
+        }
+        return this.cachedProfile;
+    }
+
+    /** Charge le profil et applique le thème (idempotent grâce au cache). */
+    async loadAndApplyTheme(): Promise<void> {
+        await this.getProfile();
+    }
+
+    /** Invalide le cache (à appeler lors de la déconnexion). */
+    invalidateCache(): void {
+        this.cachedProfile = null;
     }
 
     async updateProfile(payload: UpdateProfilePayload): Promise<UserProfile> {
@@ -26,6 +52,8 @@ export class ProfileService {
         const response = await firstValueFrom(
             this.http.patch<{ message: string; user: UserProfile }>(`${this.apiUrl}/profile`, payload, { headers }),
         );
+        // Met à jour le cache local
+        this.cachedProfile = response.user;
         return response.user;
     }
 
@@ -43,7 +71,10 @@ export class ProfileService {
         return response.user;
     }
 
-    buildUpdatePayload(currentProfile: UserProfile, formValues: { username: string; email: string; avatarId: string }): UpdateProfilePayload {
+    buildUpdatePayload(
+        currentProfile: UserProfile,
+        formValues: { username: string; email: string; avatarId: string; theme?: string; language?: string },
+    ): UpdateProfilePayload {
         const updatePayload: UpdateProfilePayload = {};
 
         if (formValues.username !== currentProfile.username) {
@@ -54,6 +85,13 @@ export class ProfileService {
         }
         if (formValues.avatarId && formValues.avatarId !== currentProfile.avatarId) {
             updatePayload.avatarId = formValues.avatarId;
+        }
+        if (formValues.theme !== undefined && formValues.theme !== currentProfile.theme) {
+            updatePayload.theme = formValues.theme;
+        }
+
+        if (formValues.language !== undefined && formValues.language !== currentProfile.language) { // ← ajouter
+            updatePayload.language = formValues.language;
         }
 
         return updatePayload;
@@ -77,7 +115,7 @@ export class ProfileService {
 
     async submitProfileUpdate(
         currentProfile: UserProfile,
-        formValues: { username: string; email: string; avatarId: string },
+        formValues: { username: string; email: string; avatarId: string; theme?: string; language?: string },
     ): Promise<{ success: boolean; updatedProfile?: UserProfile; error?: string }> {
         const updatePayload = this.buildUpdatePayload(currentProfile, formValues);
 

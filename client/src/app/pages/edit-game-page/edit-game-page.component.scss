@@ -24,11 +24,11 @@
 }
 
 .return-button:hover {
-    color: red;
+    color: var(--theme-text-hover);
 }
 
 .return-button:active {
-    color: darkred;
+    color: var(--theme-text-hover-active);
 }
 
 img {

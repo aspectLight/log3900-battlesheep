@@ -1,7 +1,9 @@
+import { AuthService } from '@app/modules/auth/services/auth.service';
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
 import { WaitingRoomService } from '@app/modules/shared-room/services/waiting-room.service';
 import { Player } from '@app/shared/interfaces/player';
-import { WaitingRoomEvents } from '@common/socket.constants';
+import { CurrencyEvents, WaitingRoomEvents } from '@common/socket.constants';
+import { EXCLUSIVE_CHARACTER_IDS } from '@common/shop.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 
@@ -15,6 +17,7 @@ export class WaitingRoomPlayerHandler {
     constructor(
         private readonly waitingRoomService: WaitingRoomService,
         private readonly gameRoomService: GameRoomService,
+        private readonly authService: AuthService,
     ) {}
 
     /**
@@ -54,12 +57,25 @@ export class WaitingRoomPlayerHandler {
     /**
      * Handles avatar reservation
      */
-    handleReserveAvatar(
-        data: { roomId: string; chosenAvatar: string; playerId: string },
+    async handleReserveAvatar(
+        data: { roomId: string; chosenAvatar: string; playerId: string; isVirtual?: boolean },
         socket: Socket,
         server: Server,
-    ): { success: boolean; error?: string } {
+    ): Promise<{ success: boolean; error?: string }> {
         try {
+            const characterKey = data.chosenAvatar.toLowerCase();
+            if (!data.isVirtual && EXCLUSIVE_CHARACTER_IDS.includes(characterKey)) {
+                const token = (socket.handshake.auth as { token?: string }).token;
+                if (!token) {
+                    return { success: false, error: 'Ce personnage est exclusif et doit être acheté en boutique.' };
+                }
+                const decoded = await this.authService.verifyToken(token);
+                const purchasedItems = await this.authService.getPurchasedItems(decoded.uid);
+                if (!purchasedItems.includes(characterKey)) {
+                    return { success: false, error: 'Ce personnage est exclusif et doit être acheté en boutique.' };
+                }
+            }
+
             this.waitingRoomService.reserveCharacter(data.roomId, data.playerId, data.chosenAvatar);
             const room = this.waitingRoomService.findRoomById(data.roomId);
 
@@ -106,14 +122,28 @@ export class WaitingRoomPlayerHandler {
     /**
      * Handles player kick
      */
-    handleKickPlayer(data: { roomId: string; player: Player }, socket: Socket, server: Server): void {
+    async handleKickPlayer(data: { roomId: string; player: Player }, socket: Socket, server: Server): Promise<void> {
         try {
+            const room = this.waitingRoomService.findRoomById(data.roomId);
+            const entryFee = room?.entryFee ?? 0;
+            const kickedUid = data.player.firebaseUid;
+
             const isKicked = this.waitingRoomService.kickPlayer(data.roomId, socket.id, data.player);
 
             if (isKicked) {
+                // Refund entry fee to kicked player
+                if (entryFee > 0 && kickedUid && room?.paidPlayerFirebaseUids.includes(kickedUid)) {
+                    try {
+                        const newBalance = await this.authService.updateVirtualCurrency(kickedUid, entryFee);
+                        server.to(data.player.id).emit(CurrencyEvents.VirtualCurrencyUpdated, { balance: newBalance });
+                        room.paidPlayerFirebaseUids = room.paidPlayerFirebaseUids.filter((uid) => uid !== kickedUid);
+                    } catch (e) {
+                        this.logger.warn(`Kick refund failed for uid ${kickedUid}: ${e.message}`);
+                    }
+                }
                 server.to(data.roomId).emit(WaitingRoomEvents.PlayerLeft, { playerId: data.player.id });
-                const room = this.waitingRoomService.findRoomById(data.roomId);
-                server.to(data.roomId).emit(WaitingRoomEvents.UpdateAvatarReserved, { reservedAvatars: room.reservedAvatars });
+                const updatedRoom = this.waitingRoomService.findRoomById(data.roomId);
+                server.to(data.roomId).emit(WaitingRoomEvents.UpdateAvatarReserved, { reservedAvatars: updatedRoom.reservedAvatars });
                 server.to(data.player.id).emit(WaitingRoomEvents.PlayerKicked);
                 this.logger.log(`Joueur ${data.player.name} expulsé de la salle ${data.roomId}`);
             }

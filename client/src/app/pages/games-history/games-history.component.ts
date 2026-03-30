@@ -3,12 +3,13 @@ import { Component, inject, signal } from '@angular/core';
 import { HistoryService } from '@app/services/history/history.service'; 
 import { GameHistoryItem } from '@app/interfaces/history/game-history.interface';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 @Component({
   selector: 'app-games-history',
   standalone: true,
-  imports: [CommonModule, DatePipe, RouterLink],
+  imports: [CommonModule, DatePipe, RouterLink, TranslateModule],
   templateUrl: './games-history.component.html',
   styleUrl: './games-history.component.scss',
 })

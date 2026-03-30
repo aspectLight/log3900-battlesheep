@@ -36,81 +36,90 @@ export class VirtualPlayerHandler {
 
             setTimeout(
                 () => {
-                    const originalMovementPoints = player.movementPoints;
-                    const originalPosition = { ...player.position };
+                    try {
+                        // Guard: if the board was removed (e.g. game ended / user left), bail out silently
+                        if (!this.gameMovementService.getBoardForGame(data.roomId)) return;
 
-                    const movement = this.gameMovementVPService.determineVPMovement(data.roomId, player, room.players, data.isCTF);
-                    const neighborPlayer = this.movementAlgorithms.findNeighborPlayer(data.roomId, player);
+                        const originalMovementPoints = player.movementPoints;
+                        const originalPosition = { ...player.position };
 
-                    if (movement.path.length <= 1) {
-                        if (neighborPlayer && this.gameRoomService.isOpponent(player, neighborPlayer, data.isCTF)) {
-                            this.gameCombatService.setServer(server);
-                            return this.gameCombatService.startVirtualCombat(data.roomId, data.playerId, neighborPlayer.id, true);
-                        } else {
-                            return this.gameRoomService.endTurn(data.roomId);
-                        }
-                    }
+                        const movement = this.gameMovementVPService.determineVPMovement(data.roomId, player, room.players, data.isCTF);
+                        if (!movement) return;
+                        const neighborPlayer = this.movementAlgorithms.findNeighborPlayer(data.roomId, player);
 
-                    // Scan the VP path for trap tiles (skip index 0 = starting position)
-                    let trapIndex = -1;
-                    for (let i = 1; i < movement.path.length; i++) {
-                        const c = this.gameMovementService.extractCoord(movement.path[i]);
-                        if (this.trapHandler.isTrapTile(data.roomId, c.x, c.y)) {
-                            trapIndex = i;
-                            break;
-                        }
-                    }
-
-                    // If a trap is found mid-path, correct the VP position to the trap tile
-                    if (trapIndex !== -1 && trapIndex < movement.path.length - 1) {
-                        const trapCoord = this.gameMovementService.extractCoord(movement.path[trapIndex]);
-                        const truncatedPath = movement.path.slice(0, trapIndex + 1);
-
-                        // Restore original state: determineVPMovement already moved VP to final
-                        // destination and deducted full cost. We need to undo that.
-                        player.movementPoints = originalMovementPoints;
-                        this.gameMovementService.movePlayer(data.roomId, data.playerId, room.players, originalPosition, true);
-
-                        // Now move properly to the trap tile — this deducts only the cost up to the trap
-                        const correctedMP = this.gameMovementService.movePlayer(data.roomId, data.playerId, room.players, trapCoord);
-
-                        server.to(data.roomId).emit(GameRoomEvents.VirtualPlayerMoved, {
-                            path: truncatedPath,
-                            remainingMovementPoints: correctedMP,
-                            playerId: data.playerId,
-                        });
-
-                        this.trapHandler.resolveForVirtualPlayer(data.roomId, data.playerId, server, player.profile);
-            
-                        return;
-                    }
-
-                    // No mid-path trap — check destination for trap
-                    if (neighborPlayer && this.gameRoomService.isOpponent(player, neighborPlayer, data.isCTF)) {
-                        return server.to(data.roomId).emit(GameRoomEvents.VirtualPlayerMoved, {
-                            ...movement,
-                            playerId: data.playerId,
-                            opponentPlayerId: neighborPlayer.id,
-                        });
-                    } else {
-                        // Check if destination itself is a trap
-                        const destination = this.gameMovementService.extractCoord(movement.path[movement.path.length - 1]);
-                        if (this.trapHandler.isTrapTile(data.roomId, destination.x, destination.y)) {
-                            server.to(data.roomId).emit(GameRoomEvents.VirtualPlayerMoved, { ...movement, playerId: data.playerId });
-                            this.trapHandler.resolveForVirtualPlayer(data.roomId, data.playerId, server, player.profile);
-                        } else {
-                            // Include teleport destination in the event so the client can
-                            // teleport AFTER the movement animation completes (avoids desync).
-                            const teleportDestination = this.getTeleportDestinationForVP(data.roomId, data.playerId, room.players);
-                            server.to(data.roomId).emit(GameRoomEvents.VirtualPlayerMoved, {
-                                ...movement,
-                                playerId: data.playerId,
-                                teleportDestination,
-                            });
-                            if (teleportDestination) {
-                                this.gameMovementService.movePlayer(data.roomId, data.playerId, room.players, teleportDestination, true);
+                        if (movement.path.length <= 1) {
+                            if (neighborPlayer && this.gameRoomService.isOpponent(player, neighborPlayer, data.isCTF)) {
+                                this.gameCombatService.setServer(server);
+                                return this.gameCombatService.startVirtualCombat(data.roomId, data.playerId, neighborPlayer.id, true);
+                            } else {
+                                return this.gameRoomService.endTurn(data.roomId);
                             }
                         }
+
+                        // Scan the VP path for trap tiles (skip index 0 = starting position)
+                        let trapIndex = -1;
+                        for (let i = 1; i < movement.path.length; i++) {
+                            const c = this.gameMovementService.extractCoord(movement.path[i]);
+                            if (this.trapHandler.isTrapTile(data.roomId, c.x, c.y)) {
+                                trapIndex = i;
+                                break;
+                            }
+                        }
+
+                        // If a trap is found mid-path, correct the VP position to the trap tile
+                        if (trapIndex !== -1 && trapIndex < movement.path.length - 1) {
+                            const trapCoord = this.gameMovementService.extractCoord(movement.path[trapIndex]);
+                            const truncatedPath = movement.path.slice(0, trapIndex + 1);
+
+                            // Restore original state: determineVPMovement already moved VP to final
+                            // destination and deducted full cost. We need to undo that.
+                            player.movementPoints = originalMovementPoints;
+                            this.gameMovementService.movePlayer(data.roomId, data.playerId, room.players, originalPosition, true);
+
+                            // Now move properly to the trap tile — this deducts only the cost up to the trap
+                            const correctedMP = this.gameMovementService.movePlayer(data.roomId, data.playerId, room.players, trapCoord);
+
+                            server.to(data.roomId).emit(GameRoomEvents.VirtualPlayerMoved, {
+                                path: truncatedPath,
+                                remainingMovementPoints: correctedMP,
+                                playerId: data.playerId,
+                            });
+
+                            this.trapHandler.resolveForVirtualPlayer(data.roomId, data.playerId, server, player.profile);
+
+                            return;
+                        }
+
+                        // No mid-path trap — check destination for trap
+                        if (neighborPlayer && this.gameRoomService.isOpponent(player, neighborPlayer, data.isCTF)) {
+                            return server.to(data.roomId).emit(GameRoomEvents.VirtualPlayerMoved, {
+                                ...movement,
+                                playerId: data.playerId,
+                                opponentPlayerId: neighborPlayer.id,
+                            });
+                        } else {
+                            // Check if destination itself is a trap
+                            const destination = this.gameMovementService.extractCoord(movement.path[movement.path.length - 1]);
+                            if (this.trapHandler.isTrapTile(data.roomId, destination.x, destination.y)) {
+                                server.to(data.roomId).emit(GameRoomEvents.VirtualPlayerMoved, { ...movement, playerId: data.playerId });
+                                this.trapHandler.resolveForVirtualPlayer(data.roomId, data.playerId, server, player.profile);
+                            } else {
+                                // Include teleport destination in the event so the client can
+                                // teleport AFTER the movement animation completes (avoids desync).
+                                const teleportDestination = this.getTeleportDestinationForVP(data.roomId, data.playerId, room.players);
+                                server.to(data.roomId).emit(GameRoomEvents.VirtualPlayerMoved, {
+                                    ...movement,
+                                    playerId: data.playerId,
+                                    teleportDestination,
+                                });
+                                if (teleportDestination) {
+                                    this.gameMovementService.movePlayer(data.roomId, data.playerId, room.players, teleportDestination, true);
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        // Game was cleaned up before the VP timer fired — safe to ignore
+                        return;
                     }
                 },
                 data.skipTimeout ? 0 : this.gameRoomService.getRandomDelay(MIN_TURN_DELAY, MAX_TURN_DELAY),

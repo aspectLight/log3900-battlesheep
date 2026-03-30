@@ -33,11 +33,11 @@
   }
   
   .return-button:hover {
-    color: #ff5a5a;
+    color: var(--theme-text-hover);
   }
   
   .return-button:active {
-    color: #7f1f1f;
+    color: var(--theme-accent-hover);
   }
   
   .return-button img {
@@ -47,10 +47,10 @@
   
   .title {
     margin: 0;
-    color: #ffffff;
+    color: var(--theme-text-primary);
     letter-spacing: 2px;
     font-size: 44px;
-    text-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
+    text-shadow: 0 3px 12px var(--theme-shadow-strong);
   }
   
   .history-list {
@@ -79,21 +79,21 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    background-color: #2b2b2b;
+    background-color: var(--theme-bg-card);
     padding: 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px var(--theme-shadow-sm);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     height: 100px;
-    color: white;
+    color: var(--theme-text-primary);
     letter-spacing: 1px;
-    border: 1px solid #3a3a3a;
+    border: 1px solid var(--theme-border-tertiary);
     animation: dropIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
   
   li.header {
-    background-color: #3c3c3c;
-    color: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: var(--theme-bg-card-hover);
+    color: var(--theme-text-primary);
+    box-shadow: 0 4px 6px var(--theme-shadow-sm);
     font-weight: bold;
     height: auto;
     padding: 15px;
@@ -106,10 +106,10 @@
   }
   
   li:not(.header):hover {
-    background-color: #333333;
+    background-color: var(--theme-bg-card-dark);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    border-color: #7f1f1f;
+    box-shadow: 0 6px 12px var(--theme-shadow-md);
+    border-color: var(--theme-border-button);
   }
   
   li span {
@@ -129,7 +129,7 @@
   }
   
   li.header span {
-    color: #e0d8c0;
+    color: var(--theme-text-special);
   }
   
   .action {
@@ -149,11 +149,11 @@
   }
   
   .badge.login {
-    color: #c9ffe4;
+    color: var(--theme-text-badge-success);
   }
   
   .badge.logout {
-    color: #fb8585;
+    color: var(--theme-text-badge-error);
   }
   
   .list {
@@ -172,8 +172,8 @@
     margin-top: 12px;
     padding: 18px;
     text-align: center;
-    color: #e0d8c0;
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid #3a3a3a;
+    color: var(--theme-text-special);
+    background: var(--theme-bg-overlay-light);
+    border: 1px solid var(--theme-border-tertiary);
     border-radius: 10px;
   }

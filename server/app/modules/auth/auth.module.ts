@@ -8,6 +8,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { User, UserSchema } from './schemas/user.schema';
 import { AuthService } from './services/auth.service';
 import { FirebaseAdminService } from './services/firebase-admin.service';
+import { ShopGateway } from './shop.gateway';
 
 @Module({
     // Use forwardRef to avoid circular dependency between AuthModule and GeneralChatModule/GameModule/SocialModule
@@ -18,7 +19,7 @@ import { FirebaseAdminService } from './services/firebase-admin.service';
         forwardRef(() => SocialModule),
     ],
     controllers: [AuthController],
-    providers: [FirebaseAdminService, AuthService, AuthGuard],
+    providers: [FirebaseAdminService, AuthService, AuthGuard, ShopGateway],
     exports: [FirebaseAdminService, AuthService, AuthGuard],
 })
 export class AuthModule {}

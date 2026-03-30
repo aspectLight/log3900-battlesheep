@@ -7,7 +7,7 @@ import { Injectable } from '@nestjs/common';
 export class WaitingRoomService {
     private waitingRooms: Room[] = [];
 
-    createRoom(roomId: string, gameId: string, host: Player, sockedId: string, friendsOnly: boolean = false, hostUsername?: string): Room {
+    createRoom(roomId: string, gameId: string, host: Player, sockedId: string, friendsOnly: boolean = false, hostUsername?: string, entryFee: number = 0): Room {
         host.id = sockedId;
         const newRoom: Room = {
             roomId,
@@ -20,6 +20,8 @@ export class WaitingRoomService {
             dropInDropOut: false,
             friendsOnly,
             messages: [],
+            entryFee,
+            paidPlayerFirebaseUids: [],
         };
         newRoom.reservedAvatars = [{ reservorId: host.id, chosenAvatar: host.avatar.name }];
         this.waitingRooms.push(newRoom);

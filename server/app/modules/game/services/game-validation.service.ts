@@ -110,11 +110,12 @@ export class GameValidationService {
         const requiredItemsCount = REQUIRED_OBJECTS.items[board.size];
 
         if (isCTF) {
-            if (itemsCount === requiredItemsCount && hasFlag) {
-                return { isValid: true };
-            }
             if (!hasFlag) {
                 return { isValid: false, message: ErrorMessages.GameShouldHaveFlag };
+            }
+            const expectedWithFlag = requiredItemsCount + 1;
+            if (itemsCount === expectedWithFlag) {
+                return { isValid: true };
             }
             return { isValid: false, message: SPECIFIC_ERROR.items(requiredItemsCount) };
         }

@@ -60,6 +60,7 @@ export class Player extends Entity {
     firebaseUid?: string;
     profileAvatarId?: string | null;
     profileAvatarUrl?: string | null;
+    activeBanner?: string | null;
     private profile: VirtualPlayerType | undefined;
     private bonusChoice: Stats | null;
     private appliedItemEffects: { [itemId: string]: boolean } = {};
@@ -107,6 +108,7 @@ export class Player extends Entity {
         player.isVirtual = obj.isVirtual;
         player.profileAvatarId = obj.profileAvatarId;
         player.profileAvatarUrl = obj.profileAvatarUrl;
+        player.activeBanner = obj.activeBanner;
         if ((obj as any).fightsWon !== undefined) {
             player.fightsWon = (obj as any).fightsWon;
         }

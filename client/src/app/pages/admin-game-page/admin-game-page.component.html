@@ -1,9 +1,10 @@
 <div class="header">
     <button class="return-button" routerLink="/home">
-        <img src="./assets/ui/left.png">
-        Page d'accueil
+        <img src="./assets/ui/left.png" />
+        {{ 'common.home' | translate }}
     </button>
-    <h1> Administration </h1>
+    <h1>{{ 'admin.title' | translate }}</h1>
+    <app-profile-menu></app-profile-menu>
 </div>
 
 <app-game-list [isAddBoardVisible]="true" [isModifierVisible]="true" class="game-list"></app-game-list>
