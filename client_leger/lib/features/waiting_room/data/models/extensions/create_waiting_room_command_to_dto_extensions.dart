@@ -8,5 +8,6 @@ extension CreateWaitingRoomCommandToDto on CreateWaitingRoomCommand {
         roomId: roomId,
         gameId: gameId,
         host: host.toDto(),
+        friendsOnly: friendsOnly,
       );
 }

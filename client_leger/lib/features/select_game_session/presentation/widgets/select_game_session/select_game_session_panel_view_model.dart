@@ -30,6 +30,8 @@ class SelectGameSessionPanelViewModel {
     const SelectGameSessionState.loading(),
   );
 
+  final friendsOnly = signal<bool>(false);
+
   Signal<SelectGameSessionState> get state => _state;
 
   Future<void> load() async {
@@ -53,6 +55,8 @@ class SelectGameSessionPanelViewModel {
     _state.value = current.copyWith(selectedGameId: Option.of(gameId));
   }
 
+  void toggleFriendsOnly() => friendsOnly.value = !friendsOnly.value;
+
   Future<void> confirmSelectionSubmit() async {
     final current = _state.value;
     if (current is! SelectGameSessionStateLoaded) return;
@@ -68,25 +72,29 @@ class SelectGameSessionPanelViewModel {
         )
         .run();
 
-    result.match((failure) {
-      final failedId = current.selectedGameId.assumePresent();
-      _state.value = current.copyWith(
-        isConfirming: false,
-        selectedGameId: const Option.none(),
-        games: current.games.where((g) => g.id != failedId).toList(),
-      );
-      _eventBus.fire(ConfirmSelectionFailed(failure));
-    }, (model) {
-      _state.value = current.copyWith(isConfirming: false);
-      _appTransitionEventBus.fire(
-        SelectGameSessionExitAppEvent.gameSelected(
-          gameId: model.id,
-          gameName: model.name,
-          gameDescription: model.description,
-          gameMode: model.mode,
-          boardSize: model.boardSize,
-        ),
-      );
-    });
+    result.match(
+      (failure) {
+        final failedId = current.selectedGameId.assumePresent();
+        _state.value = current.copyWith(
+          isConfirming: false,
+          selectedGameId: const Option.none(),
+          games: current.games.where((g) => g.id != failedId).toList(),
+        );
+        _eventBus.fire(ConfirmSelectionFailed(failure));
+      },
+      (model) {
+        _state.value = current.copyWith(isConfirming: false);
+        _appTransitionEventBus.fire(
+          SelectGameSessionExitAppEvent.gameSelected(
+            gameId: model.id,
+            gameName: model.name,
+            gameDescription: model.description,
+            gameMode: model.mode,
+            boardSize: model.boardSize,
+            friendsOnly: friendsOnly.value,
+          ),
+        );
+      },
+    );
   }
 }
