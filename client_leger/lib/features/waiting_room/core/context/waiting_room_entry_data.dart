@@ -14,6 +14,7 @@ sealed class WaitingRoomEntryData with _$WaitingRoomEntryData {
     required String gameDescription,
     required int boardSize,
     required bool isCTF,
+    @Default(false) bool friendsOnly,
   }) = WaitingRoomHostEntryData;
 
   const factory WaitingRoomEntryData.join({

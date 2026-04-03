@@ -12,6 +12,7 @@ CreateWaitingRoomPayloadDto _$CreateWaitingRoomPayloadDtoFromJson(
   roomId: json['roomId'] as String,
   gameId: json['gameId'] as String,
   host: WaitingRoomPlayerDto.fromJson(json['host'] as Map<String, dynamic>),
+  friendsOnly: json['friendsOnly'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$CreateWaitingRoomPayloadDtoToJson(
@@ -20,4 +21,5 @@ Map<String, dynamic> _$CreateWaitingRoomPayloadDtoToJson(
   'roomId': instance.roomId,
   'gameId': instance.gameId,
   'host': instance.host.toJson(),
+  'friendsOnly': instance.friendsOnly,
 };

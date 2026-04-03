@@ -33,6 +33,6 @@ sealed class SelectGameSessionExitAppEvent
     required String gameDescription,
     required GameMode gameMode,
     required int boardSize,
+    required bool friendsOnly,
   }) = SelectGameSessionGameSelected;
 }
-
