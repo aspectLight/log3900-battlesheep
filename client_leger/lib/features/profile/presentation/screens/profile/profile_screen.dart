@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
 import '../../../../../core/constants/auth_avatar_assets.dart';
 import '../../../../../core/enums/auth_avatar.dart';
@@ -49,6 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _usernameController.text = state.profile.username;
       _emailController.text = state.profile.email;
       _viewModel.setSelectedAvatarId(state.profile.avatarId);
+      _viewModel.syncPreferencesFromProfile(state.profile);
     }
   }
 
@@ -70,6 +72,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     final state = _viewModel.state.value;
                     final isSaving = _viewModel.isSaving.value;
                     final selectedAvatarId = _viewModel.selectedAvatarId.value;
+                    _viewModel.selectedThemeId.value;
+                    _viewModel.selectedLanguage.value;
                     if (state is ProfileStateLoading) {
                       return const Center(
                         child: CircularProgressIndicator(color: Colors.white),
@@ -94,6 +98,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               statistics,
                               isSaving,
                               selectedAvatarId,
+                              _viewModel.selectedThemeId.value,
+                              _viewModel.selectedLanguage.value,
                             ),
                           ],
                         ),
@@ -183,13 +189,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ProfileStatisticsModel statistics,
     bool isSaving,
     String selectedAvatarId,
+    String selectedThemeId,
+    String selectedLanguage,
   ) {
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            child: _buildFormColumn(l10n, isSaving, selectedAvatarId),
+            child: _buildFormColumn(
+              l10n,
+              isSaving,
+              selectedAvatarId,
+              selectedThemeId,
+              selectedLanguage,
+            ),
           ),
           const SizedBox(width: 32),
           Expanded(
@@ -204,6 +218,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ProfileLocalizations l10n,
     bool isSaving,
     String selectedAvatarId,
+    String selectedThemeId,
+    String selectedLanguage,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,6 +247,81 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: 8),
         _buildAvatarGrid(selectedAvatarId),
+        const SizedBox(height: 20),
+        Text(
+          l10n.profileThemeLabel,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'CustomFont',
+          ),
+        ),
+        const SizedBox(height: 8),
+        _buildPreferenceDropdown(
+          value: selectedThemeId,
+          enabled: !isSaving,
+          items: [
+            DropdownMenuItem(
+              value: 'default',
+              child: Text(
+                l10n.themeNameDefault,
+                style: const TextStyle(fontFamily: 'CustomFont'),
+              ),
+            ),
+            DropdownMenuItem(
+              value: 'frost',
+              child: Text(
+                l10n.themeNameFrost,
+                style: const TextStyle(fontFamily: 'CustomFont'),
+              ),
+            ),
+            DropdownMenuItem(
+              value: 'village',
+              child: Text(
+                l10n.themeNameVillage,
+                style: const TextStyle(fontFamily: 'CustomFont'),
+              ),
+            ),
+          ],
+          onChanged: (v) {
+            if (v != null) _viewModel.setSelectedThemeId(v);
+          },
+        ),
+        const SizedBox(height: 16),
+        Text(
+          l10n.profileLanguageLabel,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'CustomFont',
+          ),
+        ),
+        const SizedBox(height: 8),
+        _buildPreferenceDropdown(
+          value: selectedLanguage,
+          enabled: !isSaving,
+          items: [
+            DropdownMenuItem(
+              value: 'fr',
+              child: Text(
+                l10n.languageNameFr,
+                style: const TextStyle(fontFamily: 'CustomFont'),
+              ),
+            ),
+            DropdownMenuItem(
+              value: 'en',
+              child: Text(
+                l10n.languageNameEn,
+                style: const TextStyle(fontFamily: 'CustomFont'),
+              ),
+            ),
+          ],
+          onChanged: (v) {
+            if (v != null) _viewModel.setSelectedLanguage(v);
+          },
+        ),
         const SizedBox(height: 24),
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -238,15 +329,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ElevatedButton(
               onPressed: isSaving ? null : _handleSave,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF550000),
-                foregroundColor: const Color(0xFFF5E6E6),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(
                   vertical: 12,
                   horizontal: 24,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5),
-                  side: const BorderSide(color: Color(0xFF7F1F1F), width: 2),
+                  side: BorderSide(
+                    color: context.interactionColors.outline,
+                    width: 2,
+                  ),
                 ),
               ),
               child: Text(
@@ -261,15 +355,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ElevatedButton(
               onPressed: isSaving ? null : _handleDelete,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF8B0000),
-                foregroundColor: const Color(0xFFF5E6E6),
+                backgroundColor: context.interactionColors.danger,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(
                   vertical: 12,
                   horizontal: 24,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5),
-                  side: const BorderSide(color: Color(0xFFDC3545), width: 2),
+                  side: BorderSide(
+                    color: context.interactionColors.dangerBorder,
+                    width: 2,
+                  ),
                 ),
               ),
               child: Text(
@@ -286,7 +383,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _buildPreferenceDropdown({
+    required String value,
+    required List<DropdownMenuItem<String>> items,
+    required void Function(String?)? onChanged,
+    required bool enabled,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      height: 44,
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: context.interactionColors.outline.withValues(alpha: 0.55),
+          width: 1.5,
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          isExpanded: true,
+          dropdownColor: scheme.surface,
+          style: TextStyle(
+            color: scheme.onSurface,
+            fontFamily: 'CustomFont',
+            fontSize: 16,
+          ),
+          iconEnabledColor: scheme.onSurface,
+          items: items,
+          onChanged: enabled ? onChanged : null,
+        ),
+      ),
+    );
+  }
+
   Widget _buildAvatarGrid(String selectedAvatarId) {
+    final scheme = Theme.of(context).colorScheme;
+    final outline = context.interactionColors.outline;
     const avatars = AuthAvatar.values;
     const crossAxisCount = 4;
     final rows = <Widget>[];
@@ -308,18 +443,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2B2B2B),
+                        color: scheme.surface,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: isSelected
-                              ? const Color(0xFF7F1F1F)
+                              ? outline
                               : const Color(0xFF444444),
                           width: 2,
                         ),
                         boxShadow: isSelected
-                            ? const [
+                            ? [
                                 BoxShadow(
-                                  color: Color.fromRGBO(227, 75, 75, 0.7),
+                                  color: scheme.primary.withValues(alpha: 0.65),
                                   blurRadius: 8,
                                   spreadRadius: 2,
                                 ),
@@ -459,6 +594,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         username: username,
         email: email,
         avatarId: avatarId,
+        theme: _viewModel.selectedThemeId.value,
+        language: _viewModel.selectedLanguage.value,
       ),
     );
   }
@@ -507,14 +644,16 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
   @override
   Widget build(BuildContext context) {
     final bool isFocused = _focusNode.hasFocus;
+    final scheme = Theme.of(context).colorScheme;
+    final interaction = context.interactionColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (widget.label.isNotEmpty) ...[
           Text(
             widget.label,
-            style: const TextStyle(
-              color: Color(0xFFF5E6E6),
+            style: TextStyle(
+              color: scheme.onSurface,
               fontSize: 20,
               fontFamily: 'CustomFont',
               fontWeight: FontWeight.bold,
@@ -527,12 +666,12 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
             Container(
               height: 44,
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A),
+                color: scheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(
                   color: isFocused
-                      ? const Color(0xFFC60D0D)
-                      : const Color(0xFF333333),
+                      ? interaction.focus
+                      : interaction.outline.withValues(alpha: 0.45),
                   width: 1.5,
                 ),
               ),
@@ -547,7 +686,7 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          const Color(0xFFDC3545).withValues(alpha: 0.3),
+                          interaction.dangerBorder.withValues(alpha: 0.28),
                           Colors.transparent,
                         ],
                         stops: const [0.0, 0.5],
@@ -560,12 +699,12 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
               controller: widget.controller,
               focusNode: _focusNode,
               keyboardType: widget.keyboardType,
-              style: const TextStyle(
-                color: Color(0xFFF5E6E6),
+              style: TextStyle(
+                color: scheme.onSurface,
                 fontFamily: 'CustomFont',
                 fontSize: 18,
               ),
-              cursorColor: const Color(0xFFF5E6E6),
+              cursorColor: scheme.primary,
               decoration: const InputDecoration(
                 filled: true,
                 fillColor: Colors.transparent,

@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/constants/character_assets.dart';
 import '../../../../../core/constants/stat_assets.dart';
 import '../../../../../core/constants/ui_assets.dart';
 import '../../../../../core/enums/character.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
 import '../../../core/constants/character_creation_constants.dart';
-import '../../../core/helpers/character_creation_form_validator.dart';
 import '../../../core/context/character_creation_scope_holder.dart';
+import '../../../core/helpers/character_creation_form_validator.dart';
 import '../../../core/localisation/character_creation_localizations.dart';
 import 'character_creation_view_model.dart';
 
@@ -329,10 +330,11 @@ class _CharacterCard extends StatelessWidget {
                       child: Image.asset(
                         CharacterAssets.characterAvatarPath(character),
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Image.asset(
-                          UiAssets.characterCreationEmptyPortrait,
-                          fit: BoxFit.cover,
-                        ),
+                        errorBuilder: (context, error, stackTrace) =>
+                            Image.asset(
+                              UiAssets.characterCreationEmptyPortrait,
+                              fit: BoxFit.cover,
+                            ),
                       ),
                     ),
                   ),
@@ -407,10 +409,11 @@ class _CenterColumn extends StatelessWidget {
                       child: Image.asset(
                         avatarPath,
                         fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) => Image.asset(
-                          UiAssets.characterCreationEmptyPortrait,
-                          fit: BoxFit.contain,
-                        ),
+                        errorBuilder: (context, error, stackTrace) =>
+                            Image.asset(
+                              UiAssets.characterCreationEmptyPortrait,
+                              fit: BoxFit.contain,
+                            ),
                       ),
                     ),
                   ),
@@ -536,23 +539,26 @@ class _SubmitButton extends StatelessWidget {
                   await viewModel.submitCharacter();
                 },
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF550000),
-            foregroundColor: const Color(0xFFf5e6e6),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
             padding: const EdgeInsets.symmetric(vertical: 12),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5),
-              side: const BorderSide(color: Color(0xFF7f1f1f), width: 2),
+              side: BorderSide(
+                color: context.interactionColors.outline,
+                width: 2,
+              ),
             ),
             elevation: 0,
           ),
           child: isSubmitting
-              ? const SizedBox(
+              ? SizedBox(
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2.5,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      Color(0xFFf5e6e6),
+                      Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                 )
@@ -647,9 +653,11 @@ class _BonusSection extends StatelessWidget {
                     label: l10n.statAttack,
                     description: l10n.statAttackDescription,
                     value: form.attackDice,
-                    isD4Selected: hasDicePair &&
+                    isD4Selected:
+                        hasDicePair &&
                         form.attackDice == CharacterCreationConstants.d4Value,
-                    isD6Selected: hasDicePair &&
+                    isD6Selected:
+                        hasDicePair &&
                         form.attackDice == CharacterCreationConstants.d6Value,
                     onSelectD4: () => viewModel.selectAttackDice(
                       CharacterCreationConstants.d4Value,
@@ -663,9 +671,11 @@ class _BonusSection extends StatelessWidget {
                     label: l10n.statDefense,
                     description: l10n.statDefenseDescription,
                     value: form.defenseDice,
-                    isD4Selected: hasDicePair &&
+                    isD4Selected:
+                        hasDicePair &&
                         form.defenseDice == CharacterCreationConstants.d4Value,
-                    isD6Selected: hasDicePair &&
+                    isD6Selected:
+                        hasDicePair &&
                         form.defenseDice == CharacterCreationConstants.d6Value,
                     onSelectD4: () => viewModel.selectDefenseDice(
                       CharacterCreationConstants.d4Value,

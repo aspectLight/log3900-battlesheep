@@ -35,6 +35,7 @@ import '../config/env_config.dart';
 import '../connected_scope/session_scope_manager.dart';
 import '../modal/modal_module.dart';
 import '../notification/notification_module.dart';
+import 'appearance_sync_module.dart';
 import 'app_event_handler_module.dart';
 import 'service_module.dart';
 import 'view_model_module.dart';
@@ -85,6 +86,7 @@ Future<void> setupDependencies() async {
   registerLogsHistoryRoot(getIt);
   registerGameHistoryRoot(getIt);
   registerProfileRoot(getIt);
+  registerAppearanceSync(getIt);
   registerFriendsRoot(getIt);
   registerCharacterCreationRoot(getIt);
   registerWaitingRoomRoot(getIt);
@@ -93,6 +95,7 @@ Future<void> setupDependencies() async {
   await getIt.allReady();
   getIt.get<AppEventHandler>();
   bootstrapAuthSideEffects(getIt);
+  bootstrapAppearanceSync(getIt);
   bootstrapSelectGameSessionSideEffects(getIt);
   bootstrapJoinGameSessionSideEffects(getIt);
   getIt<AppInitialization>().setReady();

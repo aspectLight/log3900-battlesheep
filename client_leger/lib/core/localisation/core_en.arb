@@ -41,5 +41,22 @@
   "logout": "Logout",
   "won": "Won",
   "lost": "Lost",
-  "loading": "Loading..."
+  "loading": "Loading...",
+  "noFriends": "No friends yet. Search for users to add!",
+  "noRequests": "No friend requests at the moment.",
+  "removeFriend": "Remove",
+  "blockUser": "Block",
+  "searchUser": "Search for a user...",
+  "unblockUser": "Unblock",
+  "cancel": "Cancel",
+  "addFriend": "Add",
+  "noBlockedUsers": "No blocked users",
+  "receivedRequests": "Requests received",
+  "accept": "Accept",
+  "refuse": "Refuse",
+  "sentRequests": "Sent Requests",
+  "noResults": "No results",
+  "demands": "Demands",
+  "search": "Search",
+  "blocked": "Blocked"
 }

@@ -5,6 +5,7 @@ import 'package:fpdart/fpdart.dart' as fp;
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/extensions/game_mode_localized_extension.dart';
 import '../../../../../core/modal/modal_intent_sink.dart';
 import '../../../core/helpers/format_last_modified.dart';
@@ -127,10 +128,10 @@ class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
                     onChanged: (_) => _viewModel.toggleFriendsOnly(),
                     fillColor: WidgetStateProperty.resolveWith(
                       (states) => states.contains(WidgetState.selected)
-                          ? const Color(0xFF550000)
-                          : const Color(0xFF2B2B2B),
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.surface,
                     ),
-                    side: const BorderSide(color: Color(0xFF7F1F1F)),
+                    side: BorderSide(color: context.interactionColors.outline),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -152,14 +153,14 @@ class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
               ? () => unawaited(_viewModel.confirmSelectionSubmit())
               : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF550000),
-            foregroundColor: const Color(0xFFFFF0F0),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
             disabledBackgroundColor: const Color(0xFF333333),
             disabledForegroundColor: const Color(0xFF666666),
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 32),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
-              side: const BorderSide(color: Color(0xFF7F1F1F)),
+              side: BorderSide(color: context.interactionColors.outline),
             ),
             elevation: 4,
             textStyle: const TextStyle(
@@ -215,16 +216,16 @@ class _GameListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final outline = context.interactionColors.outline;
     final bool isSelected = selectedGameId.match(
       () => false,
       (value) => value == game.id,
     );
     final backgroundColor = isSelected
-        ? const Color(0xFF550000)
-        : const Color(0xFF2B2B2B);
-    final borderColor = isSelected
-        ? const Color(0xFF7F1F1F)
-        : const Color(0xFF3A3A3A);
+        ? scheme.primary
+        : scheme.surface;
+    final borderColor = isSelected ? outline : const Color(0xFF3A3A3A);
 
     return InkWell(
       onTap: () => viewModel.selectGame(game.id),

@@ -78,7 +78,14 @@ class HttpProfileService {
         if (data == null) {
           return const None();
         }
-        return Option.of(ProfileDto.fromJson(data));
+        final Map<String, dynamic> payload;
+        final user = data['user'];
+        if (user is Map<String, dynamic>) {
+          payload = user;
+        } else {
+          payload = data;
+        }
+        return Option.of(ProfileDto.fromJson(payload));
       },
     );
   }

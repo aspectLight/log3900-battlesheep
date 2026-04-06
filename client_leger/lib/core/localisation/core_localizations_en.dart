@@ -135,4 +135,55 @@ class CoreLocalizationsEn extends CoreLocalizations {
 
   @override
   String get loading => 'Loading...';
+
+  @override
+  String get noFriends => 'No friends yet. Search for users to add!';
+
+  @override
+  String get noRequests => 'No friend requests at the moment.';
+
+  @override
+  String get removeFriend => 'Remove';
+
+  @override
+  String get blockUser => 'Block';
+
+  @override
+  String get searchUser => 'Search for a user...';
+
+  @override
+  String get unblockUser => 'Unblock';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get addFriend => 'Add';
+
+  @override
+  String get noBlockedUsers => 'No blocked users';
+
+  @override
+  String get receivedRequests => 'Requests received';
+
+  @override
+  String get accept => 'Accept';
+
+  @override
+  String get refuse => 'Refuse';
+
+  @override
+  String get sentRequests => 'Sent Requests';
+
+  @override
+  String get noResults => 'No results';
+
+  @override
+  String get demands => 'Demands';
+
+  @override
+  String get search => 'Search';
+
+  @override
+  String get blocked => 'Blocked';
 }

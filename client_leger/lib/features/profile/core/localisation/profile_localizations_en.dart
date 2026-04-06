@@ -50,4 +50,25 @@ class ProfileLocalizationsEn extends ProfileLocalizations {
 
   @override
   String get profileDeleteAccount => 'Delete account';
+
+  @override
+  String get profileThemeLabel => 'Visual theme';
+
+  @override
+  String get profileLanguageLabel => 'Language';
+
+  @override
+  String get themeNameDefault => 'Main';
+
+  @override
+  String get themeNameFrost => 'Siberian frost';
+
+  @override
+  String get themeNameVillage => 'Abandoned village';
+
+  @override
+  String get languageNameFr => 'French';
+
+  @override
+  String get languageNameEn => 'English';
 }

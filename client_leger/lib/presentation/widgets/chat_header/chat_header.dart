@@ -11,9 +11,11 @@ class ChatHeader extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: const BoxDecoration(
-        color: Color(0xFF2A0E0E),
-        border: Border(bottom: BorderSide(color: Color(0xFF3A1212))),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary,
+        border: Border(
+          bottom: BorderSide(color: Theme.of(context).colorScheme.outline),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

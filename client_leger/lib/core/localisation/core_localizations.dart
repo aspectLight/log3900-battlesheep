@@ -349,6 +349,108 @@ abstract class CoreLocalizations {
   /// In en, this message translates to:
   /// **'Loading...'**
   String get loading;
+
+  /// No description provided for @noFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'No friends yet. Search for users to add!'**
+  String get noFriends;
+
+  /// No description provided for @noRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'No friend requests at the moment.'**
+  String get noRequests;
+
+  /// No description provided for @removeFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get removeFriend;
+
+  /// No description provided for @blockUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Block'**
+  String get blockUser;
+
+  /// No description provided for @searchUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for a user...'**
+  String get searchUser;
+
+  /// No description provided for @unblockUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Unblock'**
+  String get unblockUser;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @addFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get addFriend;
+
+  /// No description provided for @noBlockedUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'No blocked users'**
+  String get noBlockedUsers;
+
+  /// No description provided for @receivedRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Requests received'**
+  String get receivedRequests;
+
+  /// No description provided for @accept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get accept;
+
+  /// No description provided for @refuse.
+  ///
+  /// In en, this message translates to:
+  /// **'Refuse'**
+  String get refuse;
+
+  /// No description provided for @sentRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent Requests'**
+  String get sentRequests;
+
+  /// No description provided for @noResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No results'**
+  String get noResults;
+
+  /// No description provided for @demands.
+  ///
+  /// In en, this message translates to:
+  /// **'Demands'**
+  String get demands;
+
+  /// No description provided for @search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get search;
+
+  /// No description provided for @blocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked'**
+  String get blocked;
 }
 
 class _CoreLocalizationsDelegate

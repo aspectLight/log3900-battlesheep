@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/localisation/core_localizations.dart';
 import '../screens/friends_view_model.dart';
 
-const _kActive = Color(0xFF8b0000);
-const _kBorder = Color(0xFF3a3a3a);
 const _kHeaderText = Color(0xFFe0d8c0);
 
 class FriendsTabBar extends StatelessWidget {
@@ -22,29 +21,30 @@ class FriendsTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = CoreLocalizations.of(context)!;
     return Row(
       children: [
         _Tab(
-          label: 'Amis ($friendsCount)',
+          label: '${l10n.friends} ($friendsCount)',
           tab: FriendsTab.friends,
           activeTab: activeTab,
           onTab: onTab,
         ),
         _Tab(
-          label: 'Demandes',
+          label: l10n.demands,
           tab: FriendsTab.requests,
           activeTab: activeTab,
           onTab: onTab,
           badge: pendingCount,
         ),
         _Tab(
-          label: 'Rechercher',
+          label: l10n.search,
           tab: FriendsTab.search,
           activeTab: activeTab,
           onTab: onTab,
         ),
         _Tab(
-          label: 'Bloqués',
+          label: l10n.blocked,
           tab: FriendsTab.blocked,
           activeTab: activeTab,
           onTab: onTab,
@@ -78,8 +78,14 @@ class _Tab extends StatelessWidget {
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isActive ? _kActive : Colors.transparent,
-          border: Border.all(color: isActive ? _kActive : _kBorder),
+          color: isActive
+              ? Theme.of(context).colorScheme.primary
+              : Colors.transparent,
+          border: Border.all(
+            color: isActive
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.outline,
+          ),
           borderRadius: BorderRadius.circular(6),
         ),
         child: Row(

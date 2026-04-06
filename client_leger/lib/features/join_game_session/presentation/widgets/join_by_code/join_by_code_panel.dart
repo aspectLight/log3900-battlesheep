@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../core/localisation/join_game_session_localizations.dart';
 import '../../../core/constants/join_game_session_input_limits.dart';
 import 'join_by_code_panel_view_model.dart';
@@ -84,8 +85,8 @@ class _JoinByCodePanelState extends State<JoinByCodePanel> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(5),
-                borderSide: const BorderSide(
-                  color: Color(0xFF7f1f1f),
+                borderSide: BorderSide(
+                  color: context.interactionColors.outline,
                   width: 2,
                 ),
               ),
@@ -110,25 +111,30 @@ class _JoinByCodePanelState extends State<JoinByCodePanel> {
                 onPressed: _viewModel.isJoining ? null : _onJoinTap,
                 style: ButtonStyle(
                   backgroundColor: WidgetStateProperty.resolveWith((states) {
+                    final scheme = Theme.of(context).colorScheme;
+                    final strong = context.interactionColors.primaryStrong;
                     if (states.contains(WidgetState.disabled)) {
                       return const Color(0xFF3f3f3f);
                     }
                     if (states.contains(WidgetState.pressed)) {
-                      return const Color(0xFF3f0000);
+                      return Color.lerp(scheme.primary, Colors.black, 0.22)!;
                     }
                     if (states.contains(WidgetState.hovered)) {
-                      return const Color(0xFF7f1f1f);
+                      return strong;
                     }
-                    return const Color(0xFF550000);
+                    return scheme.primary;
                   }),
                   foregroundColor: WidgetStateProperty.resolveWith((states) {
+                    final onPrimary = Theme.of(context).colorScheme.onPrimary;
                     if (states.contains(WidgetState.hovered) ||
                         states.contains(WidgetState.pressed)) {
-                      return const Color(0xFFFFFFFF);
+                      return Colors.white;
                     }
-                    return const Color(0xFFf5e6e6);
+                    return onPrimary;
                   }),
-                  shadowColor: const WidgetStatePropertyAll(Color(0xB3E34B4B)),
+                  shadowColor: WidgetStatePropertyAll(
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.45),
+                  ),
                   elevation: WidgetStateProperty.resolveWith((states) {
                     if (states.contains(WidgetState.pressed)) {
                       return 0;
