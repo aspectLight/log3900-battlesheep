@@ -6,11 +6,11 @@ import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/appearance/app_interaction_colors.dart';
-import '../../../../../core/presentation/widgets/app_background/app_background.dart';
 import '../../../../../core/constants/auth_avatar_assets.dart';
 import '../../../../../core/enums/auth_avatar.dart';
-import '../../../core/localisation/profile_localizations.dart';
+import '../../../../../core/presentation/widgets/app_background/app_background.dart';
 import '../../../core/extensions/profile_failure_ext.dart';
+import '../../../core/localisation/profile_localizations.dart';
 import '../../../domain/commands/profile_commands.dart';
 import '../../../domain/models/profile_statistics_model.dart';
 import '../../../domain/state/profile_state.dart';
@@ -81,34 +81,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     }
                     return switch (state) {
                       ProfileStateError(:final failure) => Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildHeader(l10n),
-                            const SizedBox(height: 24),
-                            _buildErrorBanner(failure.localize(l10n)),
-                          ],
-                        ),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildHeader(l10n),
+                          const SizedBox(height: 24),
+                          _buildErrorBanner(failure.localize(l10n)),
+                        ],
+                      ),
                       ProfileStateLoaded(:final statistics) => Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildHeader(l10n),
-                            const SizedBox(height: 24),
-                            _buildContent(
-                              l10n,
-                              statistics,
-                              isSaving,
-                              selectedAvatarId,
-                              _viewModel.selectedThemeId.value,
-                              _viewModel.selectedLanguage.value,
-                            ),
-                          ],
-                        ),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildHeader(l10n),
+                          const SizedBox(height: 24),
+                          _buildContent(
+                            l10n,
+                            statistics,
+                            isSaving,
+                            selectedAvatarId,
+                            _viewModel.selectedThemeId.value,
+                            _viewModel.selectedLanguage.value,
+                          ),
+                        ],
+                      ),
                       _ => Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildHeader(l10n),
-                          ],
-                        ),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [_buildHeader(l10n)],
+                      ),
                     };
                   }),
                 ),
@@ -132,7 +130,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const Icon(Icons.chevron_left, color: Colors.white, size: 22),
               const SizedBox(width: 4),
               Text(
-              l10n.profileBack,
+                l10n.profileBack,
                 style: const TextStyle(
                   color: Colors.white,
                   fontFamily: 'CustomFont',
@@ -206,9 +204,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(width: 32),
-          Expanded(
-            child: _buildStatsColumn(l10n, statistics),
-          ),
+          Expanded(child: _buildStatsColumn(l10n, statistics)),
         ],
       ),
     );
@@ -426,8 +422,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     const crossAxisCount = 4;
     final rows = <Widget>[];
     for (var i = 0; i < avatars.length; i += crossAxisCount) {
-      final rowAvatars =
-          avatars.skip(i).take(crossAxisCount).toList();
+      final rowAvatars = avatars.skip(i).take(crossAxisCount).toList();
       rows.add(
         Row(
           children: rowAvatars.map((AuthAvatar avatar) {
@@ -446,9 +441,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: scheme.surface,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: isSelected
-                              ? outline
-                              : const Color(0xFF444444),
+                          color: isSelected ? outline : const Color(0xFF444444),
                           width: 2,
                         ),
                         boxShadow: isSelected
@@ -489,9 +482,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         color: const Color.fromRGBO(255, 255, 255, 0.1),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: const Color.fromRGBO(255, 255, 255, 0.2),
-        ),
+        border: Border.all(color: const Color.fromRGBO(255, 255, 255, 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -531,18 +522,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildStatCard({
-    required String label,
-    required String value,
-  }) {
+  Widget _buildStatCard({required String label, required String value}) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: const Color.fromRGBO(255, 255, 255, 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: const Color.fromRGBO(255, 255, 255, 0.2),
-        ),
+        border: Border.all(color: const Color.fromRGBO(255, 255, 255, 0.2)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -652,8 +638,8 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
         if (widget.label.isNotEmpty) ...[
           Text(
             widget.label,
-            style: TextStyle(
-              color: scheme.onSurface,
+            style: const TextStyle(
+              color: Colors.white,
               fontSize: 20,
               fontFamily: 'CustomFont',
               fontWeight: FontWeight.bold,
@@ -720,4 +706,3 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
     );
   }
 }
-

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import 'core/app_transition/app_initialization.dart';
+import 'core/app_transition/app_transition_bus.dart';
 import 'core/appearance/app_appearance_service.dart';
 import 'core/appearance/app_interaction_colors.dart';
 import 'core/appearance/app_visual_theme.dart';
-import 'core/app_transition/app_initialization.dart';
-import 'core/app_transition/app_transition_bus.dart';
 import 'core/di/injection_container.dart';
 import 'core/localisation/core_localizations.dart';
 import 'core/modal/modal_overlay.dart';
@@ -43,7 +43,7 @@ ThemeData _appMaterialTheme(AppVisualTheme visual) {
       interaction = AppInteractionColors.defaultPalette;
     case AppVisualTheme.frost:
       scheme = const ColorScheme.dark(
-        primary: Color(0xFF1C3D55),
+        primary: Color(0xFF152535),
         onPrimary: Color(0xFFE0F2FF),
         secondary: Color(0xFF28526E),
         onSecondary: Color(0xFFE0F2FF),

@@ -15,8 +15,8 @@
   "settings": "Settings",
   "profile": "Profile",
   "signOut": "Sign Out",
-  "connectionHistory": "Connection History",
-  "gameHistory": "Games History",
+  "connectionHistory": "Login History",
+  "gameHistory": "Game History",
   "filter": "Filter",
   "none": "None",
   "teamName": "Team 105",
@@ -56,7 +56,9 @@
   "refuse": "Refuse",
   "sentRequests": "Sent Requests",
   "noResults": "No results",
-  "demands": "Demands",
+  "demands": "Requests",
   "search": "Search",
-  "blocked": "Blocked"
+  "blocked": "Blocked",
+  "online": "Online",
+  "offline": "Offline"
 }

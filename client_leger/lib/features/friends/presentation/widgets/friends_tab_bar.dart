@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/localisation/core_localizations.dart';
+import '../../../../core/appearance/app_interaction_colors.dart';
 import '../screens/friends_view_model.dart';
 
 const _kHeaderText = Color(0xFFe0d8c0);
@@ -84,7 +85,7 @@ class _Tab extends StatelessWidget {
           border: Border.all(
             color: isActive
                 ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.outline,
+                : context.interactionColors.outline,
           ),
           borderRadius: BorderRadius.circular(6),
         ),

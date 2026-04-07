@@ -30,15 +30,15 @@ class AppInteractionColors extends ThemeExtension<AppInteractionColors> {
   static const AppInteractionColors frostPalette = AppInteractionColors(
     primary: Color(0xFF0A1420),
     primaryStrong: Color(0xFF060F18),
-    outline: Color(0xFF28526E),
+    outline: Color(0xFF1E3858),
     danger: Color(0xFF8B0000),
     dangerBorder: Color(0xFFDC3545),
     focus: Color(0xFF4A9CC4),
   );
 
   static const AppInteractionColors villagePalette = AppInteractionColors(
-    primary: Color(0xFF160E06),
-    primaryStrong: Color(0xFF100A04),
+    primary: Color(0xFF2a2720),
+    primaryStrong: Color(0xFF201e17),
     outline: Color(0xFF4A3018),
     danger: Color(0xFF8B0000),
     dangerBorder: Color(0xFFDC3545),

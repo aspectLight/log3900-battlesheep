@@ -188,4 +188,10 @@ class CoreLocalizationsFr extends CoreLocalizations {
 
   @override
   String get blocked => 'Bloqués';
+
+  @override
+  String get online => 'En ligne';
+
+  @override
+  String get offline => 'Hors ligne';
 }

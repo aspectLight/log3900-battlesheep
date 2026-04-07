@@ -58,5 +58,7 @@
   "noResults": "Aucun résultats",
   "demands": "Demandes",
   "search": "Rechercher",
-  "blocked": "Bloqués"
+  "blocked": "Bloqués",
+  "online": "En ligne",
+  "offline": "Hors ligne"
 }

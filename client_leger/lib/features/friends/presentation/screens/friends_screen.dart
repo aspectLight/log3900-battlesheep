@@ -268,15 +268,11 @@ class _FriendsScreenState extends State<FriendsScreen> {
             fillColor: const Color(0x66000000),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.outline,
-              ),
+              borderSide: BorderSide(color: context.interactionColors.outline),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.outline,
-              ),
+              borderSide: BorderSide(color: context.interactionColors.outline),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),

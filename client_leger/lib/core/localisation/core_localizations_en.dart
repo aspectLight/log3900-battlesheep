@@ -54,10 +54,10 @@ class CoreLocalizationsEn extends CoreLocalizations {
   String get signOut => 'Sign Out';
 
   @override
-  String get connectionHistory => 'Connection History';
+  String get connectionHistory => 'Login History';
 
   @override
-  String get gameHistory => 'Games History';
+  String get gameHistory => 'Game History';
 
   @override
   String get filter => 'Filter';
@@ -179,11 +179,17 @@ class CoreLocalizationsEn extends CoreLocalizations {
   String get noResults => 'No results';
 
   @override
-  String get demands => 'Demands';
+  String get demands => 'Requests';
 
   @override
   String get search => 'Search';
 
   @override
   String get blocked => 'Blocked';
+
+  @override
+  String get online => 'Online';
+
+  @override
+  String get offline => 'Offline';
 }

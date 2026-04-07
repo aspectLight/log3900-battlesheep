@@ -191,13 +191,13 @@ abstract class CoreLocalizations {
   /// No description provided for @connectionHistory.
   ///
   /// In en, this message translates to:
-  /// **'Connection History'**
+  /// **'Login History'**
   String get connectionHistory;
 
   /// No description provided for @gameHistory.
   ///
   /// In en, this message translates to:
-  /// **'Games History'**
+  /// **'Game History'**
   String get gameHistory;
 
   /// No description provided for @filter.
@@ -437,7 +437,7 @@ abstract class CoreLocalizations {
   /// No description provided for @demands.
   ///
   /// In en, this message translates to:
-  /// **'Demands'**
+  /// **'Requests'**
   String get demands;
 
   /// No description provided for @search.
@@ -451,6 +451,18 @@ abstract class CoreLocalizations {
   /// In en, this message translates to:
   /// **'Blocked'**
   String get blocked;
+
+  /// No description provided for @online.
+  ///
+  /// In en, this message translates to:
+  /// **'Online'**
+  String get online;
+
+  /// No description provided for @offline.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get offline;
 }
 
 class _CoreLocalizationsDelegate
