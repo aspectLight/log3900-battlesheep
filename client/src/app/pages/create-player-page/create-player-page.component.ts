@@ -66,6 +66,7 @@ export class CreatePlayerPageComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.playerCreationService.reset();
         this.socketService.roomLocked$.subscribe((locked) => {
             if (locked) {
                 this.errorMessage = this.translate.instant('errors.game_deleted_or_locked');
@@ -84,6 +85,7 @@ export class CreatePlayerPageComponent implements OnInit {
     onCharacterSelected(chosenAvatar: { name: string; id: number }): void {
         this.playerCreationService.selectedCharacter = chosenAvatar;
         this.socketService.reserveAvatar(this.gameCreationService.gameCode, chosenAvatar.name, this.getId());
+        this.validCharacter = true;
     }
 
     onBonusSelected(chosenBonus: Bonus): void {
