@@ -7,6 +7,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/constants/auth_avatar_assets.dart';
+import '../../../../../core/constants/ui_assets.dart';
 import '../../../../../core/enums/auth_avatar.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
 import '../../../core/extensions/profile_failure_ext.dart';
@@ -194,17 +195,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Expanded(child: _buildFormColumn(l10n, isSaving, selectedAvatarId)),
+          const SizedBox(width: 32),
           Expanded(
-            child: _buildFormColumn(
+            child: _buildStatsColumn(
               l10n,
-              isSaving,
-              selectedAvatarId,
+              statistics,
               selectedThemeId,
               selectedLanguage,
             ),
           ),
-          const SizedBox(width: 32),
-          Expanded(child: _buildStatsColumn(l10n, statistics)),
         ],
       ),
     );
@@ -214,8 +214,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ProfileLocalizations l10n,
     bool isSaving,
     String selectedAvatarId,
-    String selectedThemeId,
-    String selectedLanguage,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,80 +242,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 8),
         _buildAvatarGrid(selectedAvatarId),
         const SizedBox(height: 20),
-        Text(
-          l10n.profileThemeLabel,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'CustomFont',
-          ),
-        ),
-        const SizedBox(height: 8),
-        _buildPreferenceDropdown(
-          value: selectedThemeId,
-          enabled: !isSaving,
-          items: [
-            DropdownMenuItem(
-              value: 'default',
-              child: Text(
-                l10n.themeNameDefault,
-                style: const TextStyle(fontFamily: 'CustomFont'),
-              ),
-            ),
-            DropdownMenuItem(
-              value: 'frost',
-              child: Text(
-                l10n.themeNameFrost,
-                style: const TextStyle(fontFamily: 'CustomFont'),
-              ),
-            ),
-            DropdownMenuItem(
-              value: 'village',
-              child: Text(
-                l10n.themeNameVillage,
-                style: const TextStyle(fontFamily: 'CustomFont'),
-              ),
-            ),
-          ],
-          onChanged: (v) {
-            if (v != null) _viewModel.setSelectedThemeId(v);
-          },
-        ),
-        const SizedBox(height: 16),
-        Text(
-          l10n.profileLanguageLabel,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'CustomFont',
-          ),
-        ),
-        const SizedBox(height: 8),
-        _buildPreferenceDropdown(
-          value: selectedLanguage,
-          enabled: !isSaving,
-          items: [
-            DropdownMenuItem(
-              value: 'fr',
-              child: Text(
-                l10n.languageNameFr,
-                style: const TextStyle(fontFamily: 'CustomFont'),
-              ),
-            ),
-            DropdownMenuItem(
-              value: 'en',
-              child: Text(
-                l10n.languageNameEn,
-                style: const TextStyle(fontFamily: 'CustomFont'),
-              ),
-            ),
-          ],
-          onChanged: (v) {
-            if (v != null) _viewModel.setSelectedLanguage(v);
-          },
-        ),
         const SizedBox(height: 24),
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -379,39 +303,157 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildPreferenceDropdown({
-    required String value,
-    required List<DropdownMenuItem<String>> items,
-    required void Function(String?)? onChanged,
-    required bool enabled,
-  }) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      height: 44,
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          color: context.interactionColors.outline.withValues(alpha: 0.55),
-          width: 1.5,
+  Widget _buildThemeSelector(
+    String selectedThemeId,
+    ProfileLocalizations l10n,
+  ) {
+    final themes = [
+      ('default', l10n.themeNameDefault, UiAssets.background),
+      ('frost', l10n.themeNameFrost, UiAssets.backgroundFrost),
+      ('village', l10n.themeNameVillage, UiAssets.backgroundVillage),
+    ];
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildThemeCard(themes[0], selectedThemeId),
+            const SizedBox(width: 10),
+            _buildThemeCard(themes[1], selectedThemeId),
+          ],
         ),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isExpanded: true,
-          dropdownColor: scheme.surface,
-          style: TextStyle(
-            color: scheme.onSurface,
-            fontFamily: 'CustomFont',
-            fontSize: 16,
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [_buildThemeCard(themes[2], selectedThemeId)],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildThemeCard((String, String, String) t, String selectedThemeId) {
+    final isSelected = selectedThemeId == t.$1;
+    return GestureDetector(
+      onTap: () {
+        _viewModel.setSelectedThemeId(t.$1);
+        unawaited(_savePreferences(themeId: t.$1));
+      },
+      child: Container(
+        width: 100,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected
+                ? context.interactionColors.outline
+                : const Color(0xFF444444),
+            width: isSelected ? 2 : 1,
           ),
-          iconEnabledColor: scheme.onSurface,
-          items: items,
-          onChanged: enabled ? onChanged : null,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.5),
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                  ),
+                ]
+              : null,
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(7),
+          child: Stack(
+            children: [
+              Image.asset(t.$3, width: 100, height: 70, fit: BoxFit.cover),
+              if (isSelected)
+                Positioned(
+                  top: 4,
+                  right: 4,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: context.interactionColors.outline,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.check,
+                      color: Colors.white,
+                      size: 12,
+                    ),
+                  ),
+                ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  color: const Color(0xAA000000),
+                  child: Text(
+                    t.$2,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontFamily: 'CustomFont',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLanguageSelector(String selectedLanguage) {
+    final languages = [('fr', 'French'), ('en', 'English')];
+    return Row(
+      children: languages.map((l) {
+        final isSelected = selectedLanguage == l.$1;
+        return Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: GestureDetector(
+              onTap: () {
+                _viewModel.setSelectedLanguage(l.$1);
+                unawaited(_savePreferences(language: l.$1));
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? context.interactionColors.primary
+                      : const Color(0xFF2B2B2B),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: isSelected
+                        ? context.interactionColors.outline
+                        : const Color(0xFF444444),
+                    width: isSelected ? 2 : 1,
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    l.$2,
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : Colors.grey,
+                      fontFamily: 'CustomFont',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -476,6 +518,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildStatsColumn(
     ProfileLocalizations l10n,
     ProfileStatisticsModel stats,
+    String selectedThemeId,
+    String selectedLanguage,
   ) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -517,6 +561,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
             label: l10n.profileAverageTime,
             value: '${stats.averagePlaytimePerGame}s',
           ),
+          const SizedBox(height: 8),
+          Text(
+            l10n.profileThemeLabel,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'CustomFont',
+            ),
+          ),
+          _buildThemeSelector(selectedThemeId, l10n),
+          const SizedBox(height: 16),
+          Text(
+            l10n.profileLanguageLabel,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'CustomFont',
+            ),
+          ),
+          const SizedBox(height: 8),
+          _buildLanguageSelector(selectedLanguage),
         ],
       ),
     );
@@ -580,14 +647,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
         username: username,
         email: email,
         avatarId: avatarId,
-        theme: _viewModel.selectedThemeId.value,
-        language: _viewModel.selectedLanguage.value,
       ),
     );
   }
 
   Future<void> _handleDelete() async {
     await _viewModel.deleteAccount();
+  }
+
+  Future<void> _savePreferences({String? themeId, String? language}) async {
+    final state = _viewModel.state.value;
+    if (state is! ProfileStateLoaded) return;
+    await _viewModel.submitUpdate(
+      UpdateProfileCommand(
+        theme: themeId ?? _viewModel.selectedThemeId.value,
+        language: language ?? _viewModel.selectedLanguage.value,
+      ),
+    );
   }
 }
 
