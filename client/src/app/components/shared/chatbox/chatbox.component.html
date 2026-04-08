@@ -1,3 +1,102 @@
+<!-- Panel Canaux de discussion (flottant à gauche du chatbox) -->
+@if (showChannelsPanel) {
+    <div class="channels-panel">
+        <div class="cp-header">
+            <span class="cp-title">{{ 'channels.title' | translate }}</span>
+            <button class="cp-close-btn" (click)="toggleChannelsPanel()">✕</button>
+        </div>
+
+        @if (cp_successMessage()) {
+            <div class="cp-alert cp-success">{{ cp_successMessage() }}</div>
+        }
+        @if (cp_errorMessage()) {
+            <div class="cp-alert cp-error">{{ cp_errorMessage() }}</div>
+        }
+
+        <div class="cp-body">
+            <!-- Création de canal -->
+            <div class="cp-section">
+                <div class="cp-section-title">{{ 'channels.create' | translate }}</div>
+                <div class="cp-create-form">
+                    <input
+                        type="text"
+                        class="cp-input"
+                        [placeholder]="'channels.create_input' | translate"
+                        [(ngModel)]="cp_newChannelName"
+                        maxlength="50"
+                        (keydown.enter)="cp_createChannel()"
+                    />
+                    <button class="cp-btn cp-btn-create" (click)="cp_createChannel()" [disabled]="cp_isCreating || !cp_newChannelName.trim()">
+                        @if (cp_isCreating) {
+                            {{ 'channels.creating' | translate }}
+                        } @else {
+                            {{ 'channels.create_btn' | translate }}
+                        }
+                    </button>
+                </div>
+            </div>
+
+            <!-- Liste des canaux disponibles -->
+            <div class="cp-section">
+                <div class="cp-section-title">{{ 'channels.available' | translate }}</div>
+                <input
+                    type="text"
+                    class="cp-input cp-search"
+                    [placeholder]="'channels.search' | translate"
+                    [(ngModel)]="cp_filterTerm"
+                />
+
+                @if (cp_isLoading()) {
+                    <div class="cp-state">{{ 'channels.loading' | translate }}</div>
+                } @else if (cp_filteredChannels().length === 0) {
+                    <div class="cp-state">{{ 'channels.no_results' | translate }}</div>
+                } @else {
+                    <div class="cp-channel-list">
+                        <div class="cp-channel-list-header">
+                            <span>{{ 'channels.name' | translate }}</span>
+                            <span>{{ 'channels.creator' | translate }}</span>
+                            <span>{{ 'channels.actions' | translate }}</span>
+                        </div>
+                        @for (channel of cp_filteredChannels(); track channel.id) {
+                            <div class="cp-channel-row" [class.cp-own-channel]="cp_isCreator(channel)">
+                                <span class="cp-channel-name">
+                                    {{ channel.name }}
+                                    @if (cp_isCreator(channel)) {
+                                        <span class="cp-creator-badge">{{ 'channels.you' | translate }}</span>
+                                    }
+                                </span>
+                                <span class="cp-channel-creator">{{ channel.creator }}</span>
+                                <span class="cp-channel-actions">
+                                    @if (cp_isJoined(channel)) {
+                                        <button class="cp-btn cp-btn-leave" (click)="cp_leaveChannel(channel.id)">{{ 'channels.leave' | translate }}</button>
+                                    } @else {
+                                        <button class="cp-btn cp-btn-join" (click)="cp_joinChannel(channel)">{{ 'channels.join' | translate }}</button>
+                                    }
+                                    @if (cp_isCreator(channel)) {
+                                        <button class="cp-btn cp-btn-delete" (click)="cp_requestDeleteChannel(channel.id)">{{ 'channels.delete' | translate }}</button>
+                                    }
+                                </span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+}
+
+@if (cp_showConfirmation) {
+    <app-pop-up
+        [popUpMessage]="cp_quitMessage"
+        [showSecondButton]="true"
+        [firstOption]="'common.yes' | translate"
+        [secondOption]="'common.no' | translate"
+        (confirm)="cp_confirmDeleteChannel()"
+        (cancel)="cp_onCancelQuit()"
+    ></app-pop-up>
+}
+
 <div class="chatbox" [class.collapsed]="isCollapsed">
     <div class="chatbox-header">
         <select class="channel-select" [ngModel]="activeChannelId" (ngModelChange)="switchChannel($event)">
@@ -7,6 +106,9 @@
             }
         </select>
         <div class="header-buttons">
+            <button class="channels-panel-btn" (click)="toggleChannelsPanel()" [class.active]="showChannelsPanel" title="{{ 'channels.title' | translate }}">
+                ☰
+            </button>
             <div class="toggle-button" (click)="toggleChatbox()">
                 @if (isCollapsed) {
                     <span>▼</span>
