@@ -262,7 +262,16 @@ export class PlayerConnectionHandler {
             this.gameMovementService.removeBoard(roomId);
             server.to(roomId).emit(GameRoomEvents.GameCanceled, { playerId });
         } else {
-            server.to(roomId).emit(GameRoomEvents.PlayerAbandoned, playerId);
+            // Check if only virtual players remain — if so, cancel the game
+            const currentRoom = this.gameRoomService.findRoomById(roomId);
+            const onlyVirtualsRemain = currentRoom?.players.every((p) => p.isVirtual) ?? false;
+            if (onlyVirtualsRemain) {
+                this.gameRoomService.deleteRoomById(roomId);
+                this.gameMovementService.removeBoard(roomId);
+                server.to(roomId).emit(GameRoomEvents.GameCanceled, { playerId });
+            } else {
+                server.to(roomId).emit(GameRoomEvents.PlayerAbandoned, playerId);
+            }
         }
 
         return isRoomDeleted;
