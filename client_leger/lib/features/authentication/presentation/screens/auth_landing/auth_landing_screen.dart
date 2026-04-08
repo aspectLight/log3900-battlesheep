@@ -14,7 +14,7 @@ import 'auth_landing_view_model.dart';
 class AuthLandingScreen extends StatelessWidget {
   const AuthLandingScreen({super.key});
 
-  static const _languages = [('fr', '🇫🇷 Français'), ('en', '🇬🇧 English')];
+  static const _languages = [('fr', 'FR'), ('en', 'EN')];
 
   @override
   Widget build(BuildContext context) {
@@ -61,35 +61,36 @@ class AuthLandingScreen extends StatelessWidget {
             left: 16,
             child: Watch((context) {
               final current = appearance.locale.value.languageCode;
-              return PopupMenuButton<String>(
-                initialValue: current,
-                onSelected: appearance.setLocaleLocally,
-                itemBuilder: (_) => _languages
-                    .map(
-                      (l) => PopupMenuItem(
-                        value: l.$1,
-                        child: Text(
-                          l.$2,
-                          style: const TextStyle(fontFamily: 'CustomFont'),
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: _languages.map((l) {
+                  final isSelected = l.$1 == current;
+                  return GestureDetector(
+                    onTap: () => appearance.setLocaleLocally(l.$1),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? const Color(0xFF550000)
+                            : Colors.transparent,
+                        border: Border.all(color: const Color(0xFF7F1F1F)),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        l.$2,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.grey,
+                          fontFamily: 'CustomFont',
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    )
-                    .toList(),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.language, color: Colors.white, size: 20),
-                    const SizedBox(width: 6),
-                    Text(
-                      _languages.firstWhere((l) => l.$1 == current).$2,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'CustomFont',
-                        fontSize: 14,
-                      ),
                     ),
-                  ],
-                ),
+                  );
+                }).toList(),
               );
             }),
           ),
