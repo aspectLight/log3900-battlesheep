@@ -93,14 +93,25 @@ export class ActionSocketService implements ISocketService {
         });
 
         this.socket.on(GameRoomEvents.EndCombat, (winnerId, loserId, isByFlight) => {
+            const localId = this.socketService.getId();
+            const isInvolved = localId === winnerId || localId === loserId;
+
             if (isByFlight) {
-                this.combatService.flightAttemptsLeft = 2;
-                setTimeout(() => {
-                    this.combatService.resetCombat();
-                }, NOTIFICATION_DURATION);
+                if (isInvolved) {
+                    this.combatService.flightAttemptsLeft = 2;
+                    setTimeout(() => {
+                        this.combatService.resetCombat();
+                    }, NOTIFICATION_DURATION);
+                }
                 return;
             }
-            this.combatService.handleEnd(winnerId, loserId);
+
+            if (isInvolved) {
+                this.combatService.handleEnd(winnerId, loserId);
+            } else {
+                this.gameManagerService.combatLost(loserId);
+            }
+
             const loser = this.gameManagerService.room.players.find((p) => p.id === loserId);
             const hostId = this.gameManagerService.room.hostId;
             if (this.socket.id === this.combatService.loserId || (loser?.isVirtual && this.socket.id === hostId)) {

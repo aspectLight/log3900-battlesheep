@@ -105,28 +105,35 @@ export class GameCombatService {
             this.server.to(combatRoomId).emit(GameRoomEvents.UpdateCombatCountDown, countdown);
             countdown--;
             if (countdown < 0 || (currentPlayer.isVirtual && countdown === randomDelay)) {
-                this.logger.warn(`[${combatId}] 🛑 Timer stopping condition met - countdown=${countdown}, clearing own timer ${currentTimerId}`);
+                this.logger.log(`[${combatId}] 🛑 Timer stopping condition met - countdown=${countdown}, stopping timer ${currentTimerId}`);
                 clearInterval(currentTimerId);
-                currentRoom.turnTimer = undefined;
 
                 if (!this.findCombatRoomById(combatId)) {
+                    currentRoom.turnTimer = undefined;
                     return;
                 }
 
-                if (currentPlayer.isVirtual) {
-                    if (
-                        currentPlayer.profile === 'defensive' &&
-                        currentPlayer.stats['health'].value < playerInitialHealth &&
-                        currentPlayer.evasionPoints > 0
-                    ) {
-                        this.attemptFlight(combatId);
-                    } else {
-                        this.attack(combatId);
+                const executeAction = async () => {
+                    try {
+                        if (currentPlayer.isVirtual) {
+                            if (
+                                currentPlayer.profile === 'defensive' &&
+                                currentPlayer.stats['health'].value < playerInitialHealth &&
+                                currentPlayer.evasionPoints > 0
+                            ) {
+                                await this.attemptFlight(combatId);
+                            } else {
+                                await this.attack(combatId);
+                            }
+                        } else {
+                            // Real player did not act in time — auto-attack on their behalf
+                            await this.attack(combatId);
+                        }
+                    } catch (err) {
+                        this.logger.error(`[${combatId}] Unhandled error in timer action: ${err?.message ?? err}`);
                     }
-                } else {
-                    // Real player did not act in time — auto-attack on their behalf
-                    this.attack(combatId);
-                }
+                };
+                executeAction();
             }
         }, COUNTDOWN_INTERVAL);
         currentRoom.turnTimer = currentTimerId;
@@ -137,7 +144,7 @@ export class GameCombatService {
         this.logger.log(`[${combatId}] ⚔️ ATTACK action requested - attempting to acquire lock`);
         if (!this.acquireLock(combatId)) {
             this.logger.error(`[${combatId}] ❌ ATTACK failed - lock acquisition refused`);
-            throw new Error('Combat action already in progress');
+            return;
         }
 
         try {
@@ -148,13 +155,9 @@ export class GameCombatService {
             }
 
             if (currentRoom.turnTimer) {
-                this.logger.log(`[${combatId}] 🔧 ATTACK clearing timer ${currentRoom.turnTimer}`);
                 clearInterval(currentRoom.turnTimer);
-                currentRoom.turnTimer = undefined;
-                this.logger.log(`[${combatId}] ✓ ATTACK cleared timer, now undefined`);
-            } else {
-                this.logger.warn(`[${combatId}] ⚠️  ATTACK called but turnTimer is already ${currentRoom.turnTimer}`);
             }
+            currentRoom.turnTimer = undefined;
 
             const currentPlayer = this.findPlayerById(combatId, currentRoom.currentPlayerId);
             const currentOpponent = this.findPlayerById(combatId, currentRoom.currentOpponentId);
@@ -216,7 +219,7 @@ export class GameCombatService {
         this.logger.log(`[${combatId}] 🏃 FLIGHT action requested - attempting to acquire lock`);
         if (!this.acquireLock(combatId)) {
             this.logger.error(`[${combatId}] ❌ FLIGHT failed - lock acquisition refused`);
-            throw new Error('Combat action already in progress');
+            return;
         }
 
         try {
@@ -227,13 +230,9 @@ export class GameCombatService {
             }
 
             if (currentRoom.turnTimer) {
-                this.logger.log(`[${combatId}] 🔧 FLIGHT clearing timer ${currentRoom.turnTimer}`);
                 clearInterval(currentRoom.turnTimer);
-                currentRoom.turnTimer = undefined;
-                this.logger.log(`[${combatId}] ✓ FLIGHT cleared timer, now undefined`);
-            } else {
-                this.logger.warn(`[${combatId}] ⚠️  FLIGHT called but turnTimer is already ${currentRoom.turnTimer}`);
             }
+            currentRoom.turnTimer = undefined;
 
             const currentPlayer = this.findPlayerById(combatId, currentRoom.currentPlayerId);
 
@@ -277,14 +276,9 @@ export class GameCombatService {
     prepareNextTurn(combatId: string): void {
         const currentRoom = this.findCombatRoomById(combatId);
         const currentOpponent = this.findPlayerById(combatId, currentRoom.currentOpponentId);
-        this.logger.log(`[${combatId}] 🔄 PREPARE_NEXT_TURN - current turnTimer=${currentRoom.turnTimer}`);
-        if (currentRoom && currentRoom.turnTimer) {
-            this.logger.log(`[${combatId}] 🔧 PREPARE_NEXT_TURN clearing timer ${currentRoom.turnTimer}`);
+        if (currentRoom?.turnTimer) {
             clearInterval(currentRoom.turnTimer);
             currentRoom.turnTimer = undefined;
-            this.logger.log(`[${combatId}] ✓ PREPARE_NEXT_TURN cleared timer`);
-        } else {
-            this.logger.warn(`[${combatId}] ⚠️  PREPARE_NEXT_TURN called but turnTimer is ${currentRoom.turnTimer}`);
         }
         if (currentOpponent.stats['health'].value <= 0) {
             this.logger.log(`[${combatId}] 💀 Opponent defeated, ending combat`);
@@ -308,11 +302,10 @@ export class GameCombatService {
         }
 
         this.updateHealthPoints(combatId);
-        const rooms = this.gameRoomService.findRoomsByPlayerId(currentRoom.currentPlayerId);
-        const gameRoomId = rooms[0].roomId;
+        const gameRoomId = currentRoom.associatedRoomId;
         this.server.to(gameRoomId).emit(GameRoomEvents.EndCombat, currentRoom.currentPlayerId, currentRoom.currentOpponentId, isByFlight);
         if (!this.isVirtualCombatOnly(combatId)) this.server.socketsLeave(currentRoom.combatRoomId);
-        this.updateScore(combatId, currentRoom.currentPlayerId, currentRoom.attackerId, isByFlight);
+        this.updateScore(combatId, currentRoom.currentPlayerId, currentRoom.attackerId, isByFlight, gameRoomId);
 
         const room = this.gameRoomService.findRoomById(currentRoom.associatedRoomId);
         const winner = currentRoom.players.find((player) => player.id === currentRoom.currentPlayerId);
@@ -345,20 +338,26 @@ export class GameCombatService {
         this.updateScore(combatId, currentRoom.currentOpponentId, currentRoom.attackerId, isByDeath);
     }
 
-    updateScore(combatId: string, winnerId: string, attackerId: string, isByFlight: boolean) {
+    updateScore(combatId: string, winnerId: string, attackerId: string, isByFlight: boolean, gameRoomId?: string) {
         const rooms = this.gameRoomService.findRoomsByPlayerId(winnerId);
-        const winner = rooms[0].players.find((p) => p.id === winnerId);
-        const attacker = rooms[0].players.find((p) => p.id === attackerId);
-        const gameRoomId = rooms[0].roomId;
+        const resolvedGameRoomId = gameRoomId ?? (rooms.length > 0 ? rooms[0].roomId : undefined);
+        if (!resolvedGameRoomId) {
+            this.logger.error(`[${combatId}] ❌ updateScore - no room found for player ${winnerId}, cannot update score`);
+            this.activeCombats = this.activeCombats.filter((r) => r.combatRoomId !== combatId);
+            return;
+        }
+        const sourceRooms = rooms.length > 0 ? rooms : [];
+        const winner = sourceRooms[0]?.players.find((p) => p.id === winnerId);
+        const attacker = sourceRooms[0]?.players.find((p) => p.id === attackerId);
         this.activeCombats = this.activeCombats.filter((r) => r.combatRoomId !== combatId);
         if (isByFlight && attacker) {
-            return attacker.isVirtual ? this.gameRoomService.endTurn(gameRoomId) : this.gameRoomService.resumeTurn(gameRoomId);
+            return attacker.isVirtual ? this.gameRoomService.endTurn(resolvedGameRoomId) : this.gameRoomService.resumeTurn(resolvedGameRoomId);
         }
-        this.server.to(gameRoomId).emit(GameRoomEvents.UpdateScore, winnerId);
+        this.server.to(resolvedGameRoomId).emit(GameRoomEvents.UpdateScore, winnerId);
         if (winnerId === attackerId) {
-            return winner.isVirtual ? this.gameRoomService.endTurn(gameRoomId) : this.gameRoomService.resumeTurn(gameRoomId);
+            return winner?.isVirtual ? this.gameRoomService.endTurn(resolvedGameRoomId) : this.gameRoomService.resumeTurn(resolvedGameRoomId);
         } else {
-            return this.gameRoomService.endTurn(gameRoomId);
+            return this.gameRoomService.endTurn(resolvedGameRoomId);
         }
     }
 
