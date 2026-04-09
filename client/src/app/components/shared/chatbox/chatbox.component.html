@@ -102,7 +102,7 @@
         <select class="channel-select" [ngModel]="activeChannelId" (ngModelChange)="switchChannel($event)">
             <option [ngValue]="null">{{ 'chatbox.general' | translate }}</option>
             @for (ch of joinedChannelInfos; track ch.id) {
-                <option [ngValue]="ch.id">{{ ch.isGameChannel ? (('chatbox.game_channel' | translate) + ch.name) : ch.name }}</option>
+                <option [ngValue]="ch.id">{{ cp_getChannelDisplayLabel(ch) }}</option>
             }
         </select>
         <div class="header-buttons">

@@ -7,7 +7,7 @@ import { AuthService } from '@app/services/communication/auth.service';
 import { ChatService } from '@app/services/communication/chat.service';
 import { ChannelInfo, ChannelMessage, CustomChannelService } from '@app/services/communication/custom-channel.service';
 import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';
-import { isReservedGeneralChannelName } from '@common/channel-name.utils';
+import { isReservedGameChannelName, isReservedGeneralChannelName } from '@common/channel-name.utils';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
@@ -63,7 +63,6 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
         private translate: TranslateService,
     ) {
         this.scrollToBottom();
-        this.cp_quitMessage = this.translate.instant('channels.quit_confirm');
     }
 
     /** Messages à afficher selon le canal actif */
@@ -77,7 +76,8 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
     /** Libellé du canal actif pour le placeholder */
     get activeChannelLabel(): string {
         if (!this.activeChannelId) return 'Général';
-        return this.joinedChannelInfos.find((c) => c.id === this.activeChannelId)?.name ?? this.activeChannelId;
+        const activeChannel = this.joinedChannelInfos.find((c) => c.id === this.activeChannelId);
+        return activeChannel ? this.cp_getChannelDisplayLabel(activeChannel) : this.activeChannelId;
     }
 
     get name() {
@@ -104,10 +104,10 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
         this.joinedChannelInfos = this.customChannelService.getJoinedChannelInfos();
 
         // Auto-sélectionner le canal de partie s'il est déjà disponible (ex: reconnexion)
-        const gameChannelId = this.waitingRoomService.gameChannelId;
-        if (gameChannelId && this.customChannelService.isJoined(gameChannelId)) {
-            this.activeChannelId = gameChannelId;
-            this.customChannelService.fetchMessages(gameChannelId);
+        const initialGameChannelId = this.cp_getPreferredGameChannelId();
+        if (initialGameChannelId && this.customChannelService.isJoined(initialGameChannelId)) {
+            this.activeChannelId = initialGameChannelId;
+            this.customChannelService.fetchMessages(initialGameChannelId);
         }
 
         // Mettre à jour le dropdown quand les canaux changent
@@ -121,14 +121,14 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
                 }
 
                 // Auto-sélectionner le canal de partie dès qu'il est rejoint
-                const currentGameChannelId = this.waitingRoomService.gameChannelId;
+                const preferredGameChannelId = this.cp_getPreferredGameChannelId();
                 if (
-                    currentGameChannelId &&
-                    this.customChannelService.isJoined(currentGameChannelId) &&
-                    this.activeChannelId !== currentGameChannelId
+                    preferredGameChannelId &&
+                    this.customChannelService.isJoined(preferredGameChannelId) &&
+                    this.activeChannelId !== preferredGameChannelId
                 ) {
-                    this.activeChannelId = currentGameChannelId;
-                    this.customChannelService.fetchMessages(currentGameChannelId);
+                    this.activeChannelId = preferredGameChannelId;
+                    this.customChannelService.fetchMessages(preferredGameChannelId);
                 }
             }),
         );
@@ -158,7 +158,7 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.subscriptions.add(
             this.customChannelService.channelCreated$.subscribe((data) => {
-                this.cp_showSuccess(`Canal "${data.channelName}" créé avec succès !`);
+                this.cp_showSuccess(this.translate.instant('channels.success_created', { name: data.channelName }));
                 this.cp_newChannelName = '';
                 this.cp_isCreating = false;
             }),
@@ -166,7 +166,7 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.subscriptions.add(
             this.customChannelService.channelDeleted$.subscribe(() => {
-                this.cp_showSuccess('Canal supprimé.');
+                this.cp_showSuccess(this.translate.instant('channels.success_deleted'));
             }),
         );
 
@@ -260,15 +260,19 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
     cp_createChannel(): void {
         const name = this.cp_newChannelName.trim();
         if (!name) {
-            this.cp_showError('Le nom du canal ne peut pas être vide.');
+            this.cp_showError(this.translate.instant('channels.errors.empty_name'));
             return;
         }
         if (name.length > 50) {
-            this.cp_showError('Le nom du canal ne peut pas dépasser 50 caractères.');
+            this.cp_showError(this.translate.instant('channels.errors.name_too_long'));
             return;
         }
         if (isReservedGeneralChannelName(name)) {
-            this.cp_showError('Le nom du canal est réservé pour le chat général.');
+            this.cp_showError(this.translate.instant('channels.errors.reserved_general'));
+            return;
+        }
+        if (isReservedGameChannelName(name)) {
+            this.cp_showError(this.translate.instant('channels.errors.reserved_game'));
             return;
         }
         this.cp_isCreating = true;
@@ -278,6 +282,7 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
 
     cp_requestDeleteChannel(channelId: string): void {
         this.cp_channelToDelete = channelId;
+        this.cp_quitMessage = this.translate.instant('channels.quit_confirm');
         this.cp_showConfirmation = true;
     }
 
@@ -331,6 +336,15 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
         return this.cp_channels().find((c) => c.id === channelId)?.name ?? channelId;
     }
 
+    cp_getChannelDisplayLabel(channel: { id: string; name: string; isGameChannel: boolean }): string {
+        if (!channel.isGameChannel) {
+            return channel.name;
+        }
+
+        const gameId = this.cp_extractGameChannelId(channel);
+        return this.translate.instant('chatbox.game_channel', { id: gameId });
+    }
+
     cp_getActiveChannelName(): string {
         const id = this.cp_activeChannelId();
         if (!id) return '';
@@ -353,5 +367,18 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
     private cp_showError(msg: string): void {
         this.cp_errorMessage.set(msg);
         setTimeout(() => this.cp_errorMessage.set(null), 4000);
+    }
+
+    private cp_extractGameChannelId(channel: { id: string; name: string }): string {
+        const match = channel.name.match(/^partie\s+(.+)$/i);
+        return match?.[1]?.trim() || channel.id;
+    }
+
+    private cp_getPreferredGameChannelId(): string | null {
+        const fromWaitingRoom = this.waitingRoomService.gameChannelId;
+        if (fromWaitingRoom) {
+            return fromWaitingRoom;
+        }
+        return this.joinedChannelInfos.find((c) => c.isGameChannel)?.id ?? null;
     }
 }

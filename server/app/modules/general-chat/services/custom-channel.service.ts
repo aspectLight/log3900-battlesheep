@@ -1,7 +1,7 @@
 import { GENERAL_CHAT_MESSAGES_LIMIT } from '@app/modules/general-chat/constants/general-chat.constants';
 import { ChatMessage } from '@app/modules/general-chat/interfaces/chat';
 import { CustomChannel, CustomChannelDocument } from '@app/modules/general-chat/schemas/custom-channel.schema';
-import { isReservedGeneralChannelName } from '@common/channel-name.utils';
+import { isReservedGameChannelName, isReservedGeneralChannelName } from '@common/channel-name.utils';
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { MongoServerError } from 'mongodb';
@@ -26,6 +26,9 @@ export class CustomChannelService {
 
         if (isReservedGeneralChannelName(channelName)) {
             throw new Error('Le nom du canal est réservé pour le chat général');
+        }
+        if (isReservedGameChannelName(channelName)) {
+            throw new Error('Le nom du canal est réservé pour les canaux de partie');
         }
 
         const normalizedName = channelName.trim();
