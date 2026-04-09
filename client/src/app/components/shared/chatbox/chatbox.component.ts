@@ -7,6 +7,7 @@ import { AuthService } from '@app/services/communication/auth.service';
 import { ChatService } from '@app/services/communication/chat.service';
 import { ChannelInfo, ChannelMessage, CustomChannelService } from '@app/services/communication/custom-channel.service';
 import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';
+import { isReservedGeneralChannelName } from '@common/channel-name.utils';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
@@ -264,6 +265,10 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         if (name.length > 50) {
             this.cp_showError('Le nom du canal ne peut pas dépasser 50 caractères.');
+            return;
+        }
+        if (isReservedGeneralChannelName(name)) {
+            this.cp_showError('Le nom du canal est réservé pour le chat général.');
             return;
         }
         this.cp_isCreating = true;
