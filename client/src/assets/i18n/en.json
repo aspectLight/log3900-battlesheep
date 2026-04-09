@@ -55,6 +55,7 @@
     "channels": "Discussion channels",
     "profile": "Profile",
     "friends": "Friends",
+    "shop": "Shop",
     "games_history": "Game history",
     "login_history": "Login history",
     "logout": "Sign out",
@@ -102,7 +103,12 @@
     "use_photo": "Use this photo",
     "error_file_type": "File type \"{{ ext }}\" not allowed. Allowed formats: JPG, JPEG, PNG (max 2 MB).",
     "error_file_size": "File too large ({{ size }} MB). Maximum allowed size: 2 MB.",
-    "no_changes": "No changes detected"
+    "no_changes": "No changes detected",
+    "errors": {
+      "load_profile": "Error while loading profile",
+      "update_profile": "Error while saving profile changes",
+      "unauthenticated": "User not authenticated"
+    }
   },
   "friends": {
     "title": "Friends",
@@ -134,6 +140,49 @@
     "error_remove": "Error removing the friend",
     "error_block": "Error blocking the user",
     "error_unblock": "Error unblocking the user"
+  },
+  "shop": {
+    "title": "Shop",
+    "insufficient_funds_title": "Insufficient funds",
+    "insufficient_funds_desc": "You do not have enough coins to buy this item.",
+    "sections": {
+      "banners": "Banners",
+      "characters": "Exclusive characters",
+      "avatars": "Exclusive avatars"
+    },
+    "preview": {
+      "player": "Player",
+      "health": "Health",
+      "speed": "Speed",
+      "attack": "Attack",
+      "defense": "Defense"
+    },
+    "actions": {
+      "buy": "Buy",
+      "equip": "Equip",
+      "unequip": "Unequip"
+    },
+    "items": {
+      "banner_gold": "Golden Banner",
+      "banner_shadow": "Shadow Banner",
+      "banner_flame": "Flame Banner",
+      "banner_ice": "Icy Banner",
+      "banner_neon": "Neon Banner",
+      "streetFighter": "Street Fighter",
+      "tacticalOperator": "Tactical Operator",
+      "screamGhostface": "Ghostface",
+      "sergei": "Sergei",
+      "sokolov": "Sokolov",
+      "viktor": "Viktor",
+      "volkov": "Volkov"
+    },
+    "owned": "Owned",
+    "coins_alt": "coins",
+    "success": {
+      "purchase": "Purchase successful!",
+      "equipped": "Cosmetic equipped!",
+      "unequipped": "Cosmetic unequipped."
+    }
   },
   "admin": {
     "title": "Administration"

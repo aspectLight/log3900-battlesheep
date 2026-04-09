@@ -280,19 +280,33 @@ app-pop-up {
   font-size: 14px;
   cursor: pointer;
   border-radius: 4px;
-  padding: 2px 7px;
+  width: 30px;
+  height: 24px;
+  padding: 0;
   line-height: 1;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
+}
+
+.channels-panel-icon {
+  display: block;
+  line-height: 1;
+  transform: translateY(-0.5px);
 }
 
 .channels-panel-btn:hover,
 .channels-panel-btn.active {
-  background: var(--theme-bg-danger);
+  background: var(--theme-accent);
   color: var(--theme-text-primary);
-  border-color: var(--theme-border-danger);
+  border-color: var(--theme-accent);
+}
+
+.channels-panel-btn:hover {
+  background: var(--theme-accent-hover);
+  border-color: var(--theme-accent-hover);
 }
 
 // ── Channels Panel ────────────────────────────────────────────────
@@ -437,6 +451,8 @@ app-pop-up {
   font-size: 0.88rem;
   outline: none;
   transition: border-color 0.2s;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .cp-input:focus {
@@ -448,8 +464,9 @@ app-pop-up {
 }
 
 .cp-search {
+  display: block;
   width: 100%;
-  margin-bottom: 8px;
+  margin: 0 0 8px;
 }
 
 .cp-btn {
@@ -469,12 +486,12 @@ app-pop-up {
 }
 
 .cp-btn-create {
-  background: var(--theme-bg-danger);
+  background: var(--theme-accent);
   color: var(--theme-text-primary);
 }
 
 .cp-btn-create:not(:disabled):hover {
-  background: var(--theme-bg-danger-hover);
+  background: var(--theme-accent-hover);
 }
 
 .cp-btn-join {
@@ -497,13 +514,21 @@ app-pop-up {
 }
 
 .cp-btn-delete {
-  background: transparent;
-  color: var(--theme-text-hover);
-  border: 1px solid var(--theme-border-button);
+  background: #ff1f3d !important;
+  color: #ffffff !important;
+  border: 1px solid #ff1f3d !important;
+  box-shadow: 0 0 10px rgba(255, 31, 61, 0.45);
 }
 
 .cp-btn-delete:hover {
-  background: var(--theme-bg-warning-soft);
+  background: #ff0026 !important;
+  border-color: #ff0026 !important;
+  box-shadow: 0 0 12px rgba(255, 0, 38, 0.65);
+}
+
+.cp-btn-delete:focus-visible {
+  outline: 2px solid #ffd3d9;
+  outline-offset: 1px;
 }
 
 .cp-state {
@@ -549,7 +574,7 @@ app-pop-up {
 }
 
 .cp-channel-row.cp-own-channel {
-  border-left: 3px solid var(--theme-border-danger);
+  border-left: 3px solid var(--theme-accent);
 }
 
 .cp-channel-name {
@@ -566,9 +591,9 @@ app-pop-up {
   font-size: 0.65rem;
   padding: 1px 5px;
   border-radius: 999px;
-  background: var(--theme-bg-danger-badge);
-  border: 1px solid var(--theme-border-danger);
-  color: var(--theme-text-error-soft);
+  background: var(--theme-accent);
+  border: 1px solid var(--theme-accent);
+  color: var(--theme-text-primary);
   font-weight: 700;
   flex-shrink: 0;
 }

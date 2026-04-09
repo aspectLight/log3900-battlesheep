@@ -107,7 +107,7 @@
         </select>
         <div class="header-buttons">
             <button class="channels-panel-btn" (click)="toggleChannelsPanel()" [class.active]="showChannelsPanel" title="{{ 'channels.title' | translate }}">
-                ☰
+                <span class="channels-panel-icon" aria-hidden="true">&#9776;</span>
             </button>
             <div class="toggle-button" (click)="toggleChatbox()">
                 @if (isCollapsed) {

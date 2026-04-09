@@ -55,6 +55,7 @@
     "channels": "Canaux de discussion",
     "profile": "Profil",
     "friends": "Amis",
+    "shop": "Boutique",
     "games_history": "Historique des parties",
     "login_history": "Historique de connexion",
     "logout": "Se déconnecter",
@@ -102,7 +103,12 @@
     "use_photo": "Utiliser cette photo",
     "error_file_type": "Fichier de type \"{{ ext }}\" non autorisé. Formats permis : JPG, JPEG, PNG (taille maximale 2 MB).",
     "error_file_size": "Fichier trop volumineux ({{ size }} MB). Taille maximale autorisée : 2 MB.",
-    "no_changes": "Aucune modification détectée"
+    "no_changes": "Aucune modification détectée",
+    "errors": {
+      "load_profile": "Erreur lors du chargement du profil",
+      "update_profile": "Erreur lors de la sauvegarde des changements du profil",
+      "unauthenticated": "Utilisateur non authentifié"
+    }
   },
   "friends": {
     "title": "Amis",
@@ -134,6 +140,49 @@
     "error_remove": "Erreur lors de la suppression de l'ami",
     "error_block": "Erreur lors du blocage de l'utilisateur",
     "error_unblock": "Erreur lors du déblocage de l'utilisateur"
+  },
+  "shop": {
+    "title": "Boutique",
+    "insufficient_funds_title": "Solde insuffisant",
+    "insufficient_funds_desc": "Vous n'avez pas assez de pièces pour acheter cet article.",
+    "sections": {
+      "banners": "Bannières",
+      "characters": "Personnages exclusifs",
+      "avatars": "Avatars exclusifs"
+    },
+    "preview": {
+      "player": "Joueur",
+      "health": "Vie",
+      "speed": "Rapidité",
+      "attack": "Attaque",
+      "defense": "Défense"
+    },
+    "actions": {
+      "buy": "Acheter",
+      "equip": "Équiper",
+      "unequip": "Déséquiper"
+    },
+    "items": {
+      "banner_gold": "Bannière dorée",
+      "banner_shadow": "Bannière sombre",
+      "banner_flame": "Bannière flamme",
+      "banner_ice": "Bannière glaciale",
+      "banner_neon": "Bannière néon",
+      "streetFighter": "Street Fighter",
+      "tacticalOperator": "Tactical Operator",
+      "screamGhostface": "Ghostface",
+      "sergei": "Sergei",
+      "sokolov": "Sokolov",
+      "viktor": "Viktor",
+      "volkov": "Volkov"
+    },
+    "owned": "Possédé",
+    "coins_alt": "pièces",
+    "success": {
+      "purchase": "Achat effectué !",
+      "equipped": "Cosmétique équipé !",
+      "unequipped": "Cosmétique déséquipé."
+    }
   },
   "admin": {
     "title": "Administration"
