@@ -338,10 +338,12 @@ export class GameManagerService {
         }
     }
 
-    updateScore(playerId: string): number {
+    updateScore(playerId: string, fightsWon?: number): number {
         const foundPlayer = this.room.players.find((p) => p.id === playerId);
         if (!foundPlayer) return 0;
-        foundPlayer.fightsWon++;
+        if (fightsWon !== undefined) {
+            foundPlayer.fightsWon = fightsWon;
+        }
         return foundPlayer.fightsWon;
     }
 

@@ -169,8 +169,11 @@ export class SocketService implements ISocketService {
             this.gameManagerService.turnCountdown.next(countdown);
         });
 
-        this.socket.on(GameRoomEvents.UpdateScore, (winnerId) => {
-            const result = this.gameManagerService.updateScore(winnerId);
+        this.socket.on(GameRoomEvents.UpdateScore, (data: { winnerId: string; fightsWon: number } | string) => {
+            // Support both old string and new object payload for backwards compatibility
+            const winnerId = typeof data === 'string' ? data : data.winnerId;
+            const fightsWon = typeof data === 'string' ? undefined : data.fightsWon;
+            const result = this.gameManagerService.updateScore(winnerId, fightsWon);
             const winner = this.gameManagerService.room.players.find((p) => p.id === winnerId);
             const mainPlayer = this.gameManagerService.getMainPlayer();
             if (!mainPlayer) return;

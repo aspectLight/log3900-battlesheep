@@ -353,7 +353,8 @@ export class GameCombatService {
         if (isByFlight && attacker) {
             return attacker.isVirtual ? this.gameRoomService.endTurn(resolvedGameRoomId) : this.gameRoomService.resumeTurn(resolvedGameRoomId);
         }
-        this.server.to(resolvedGameRoomId).emit(GameRoomEvents.UpdateScore, winnerId);
+        if (winner) winner.fightsWon = (winner.fightsWon ?? 0) + 1;
+        this.server.to(resolvedGameRoomId).emit(GameRoomEvents.UpdateScore, { winnerId, fightsWon: winner?.fightsWon ?? 1 });
         if (winnerId === attackerId) {
             return winner?.isVirtual ? this.gameRoomService.endTurn(resolvedGameRoomId) : this.gameRoomService.resumeTurn(resolvedGameRoomId);
         } else {
