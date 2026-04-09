@@ -323,35 +323,33 @@ export class GameRoomService {
         const abandonedEntry = player.firebaseUid ? room.abandonedPlayers.find((ap) => ap.firebaseUid === player.firebaseUid) : null;
 
         if (abandonedEntry) {
-            // Returning player: restore their original config with full HP and empty inventory
-            const restoredPlayer = {
-                ...abandonedEntry.player,
-                id: socketId,
-                inventory: [],
-                fightsWon: abandonedEntry.stats?.victories ?? 0,
-            };
-            if (restoredPlayer.stats?.['life']) {
-                restoredPlayer.stats = {
-                    ...restoredPlayer.stats,
-                    life: { ...restoredPlayer.stats['life'], value: restoredPlayer.stats['life'].maxValue },
-                };
-            }
-            room.players.push(restoredPlayer);
+            // Returning player: use their new character/bonuses from character creation,
+            // but preserve their original color, team, and previous stats.
+            const usedColors = room.players.map((p) => p.color);
+            const allColors = ['yellow', 'blue', 'green', 'pink', 'purple', 'red'];
+            const originalColor = abandonedEntry.player.color;
+            player.id = socketId;
+            player.color = !usedColors.includes(originalColor) ? originalColor : (allColors.find((c) => !usedColors.includes(c)) ?? allColors[0]);
+            player.team = abandonedEntry.player.team;
+            player.inventory = [];
+            player.fightsWon = abandonedEntry.stats?.victories ?? 0;
+            room.players.push(player);
 
-            // Restore stats
+            // Restore previous stats (update name to match newly chosen character)
             if (abandonedEntry.stats) {
-                const existingStatsIndex = room.playersStats?.findIndex((s) => s.name === restoredPlayer.name);
+                const restoredStats = { ...abandonedEntry.stats, name: player.name };
+                const existingStatsIndex = room.playersStats?.findIndex((s) => s.name === abandonedEntry.player.name);
                 if (existingStatsIndex >= 0) {
-                    room.playersStats[existingStatsIndex] = { ...abandonedEntry.stats };
+                    room.playersStats[existingStatsIndex] = restoredStats;
                 } else {
-                    room.playersStats?.push({ ...abandonedEntry.stats });
+                    room.playersStats?.push(restoredStats);
                 }
             }
 
             // Remove from abandoned list
             room.abandonedPlayers = room.abandonedPlayers.filter((ap) => ap.firebaseUid !== player.firebaseUid);
 
-            return { player: restoredPlayer, isReturning: true, restoredStats: abandonedEntry.stats };
+            return { player, isReturning: true, restoredStats: abandonedEntry.stats };
         } else {
             // New player: assign color and add fresh stats
             const usedColors = room.players.map((p) => p.color);

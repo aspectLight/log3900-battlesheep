@@ -105,6 +105,10 @@ export class CreatePlayerPageComponent implements OnInit {
         }
         if (newPlayer) {
             if (this.gameCreationService.isDropIn) {
+                // Attach the firebaseUid for returning players so the server can restore their stats
+                if (this.gameCreationService.returningDropInUid) {
+                    newPlayer.firebaseUid = this.gameCreationService.returningDropInUid;
+                }
                 // Drop-in flow: join a game in progress
                 this.socketService.joinGameRoom(this.gameCreationService.gameCode, newPlayer, (success, error) => {
                     if (!success) {

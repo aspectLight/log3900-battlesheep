@@ -92,27 +92,19 @@ export class PlayerConnectionHandler {
                 return { success: false, error: "Le drop-in n'est pas activé pour cette partie" };
             }
 
-            // Returning player identified only by firebaseUid (no character creation)
-            if (data.firebaseUid && !data.player) {
-                const abandonedEntry = room.abandonedPlayers.find((ap) => ap.firebaseUid === data.firebaseUid);
-                if (!abandonedEntry) {
-                    return { success: false, error: 'Player not found in abandoned players list' };
-                }
-                data.player = { ...abandonedEntry.player, firebaseUid: data.firebaseUid };
-            }
-
             if (!data.player) {
                 return { success: false, error: 'Missing player data' };
             }
 
             // Drop-in fee: charge only if this uid has not yet paid (first join)
-            if (room.entryFee > 0 && data.firebaseUid && !room.paidPlayerFirebaseUids.includes(data.firebaseUid)) {
-                const balance = await this.authService.getVirtualCurrency(data.firebaseUid);
+            const uid = data.firebaseUid ?? data.player?.firebaseUid;
+            if (room.entryFee > 0 && uid && !room.paidPlayerFirebaseUids.includes(uid)) {
+                const balance = await this.authService.getVirtualCurrency(uid);
                 if (balance < room.entryFee) {
                     return { success: false, error: 'Solde insuffisant pour rejoindre cette partie' };
                 }
-                const newBalance = await this.authService.updateVirtualCurrency(data.firebaseUid, -room.entryFee);
-                room.paidPlayerFirebaseUids.push(data.firebaseUid);
+                const newBalance = await this.authService.updateVirtualCurrency(uid, -room.entryFee);
+                room.paidPlayerFirebaseUids.push(uid);
                 socket.emit(CurrencyEvents.VirtualCurrencyUpdated, { balance: newBalance });
             }
 
