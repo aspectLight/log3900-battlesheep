@@ -55,6 +55,7 @@ export class GameRoomService {
             startTime: new Date(),
             entryFee: (waitingRoom as any).entryFee ?? 0,
             paidPlayerFirebaseUids: [...((waitingRoom as any).paidPlayerFirebaseUids ?? [])],
+            actionPointsPerTurn: 1,
         };
         for (const player of newRoom.players) {
             newRoom.playersStats.push({
@@ -74,6 +75,7 @@ export class GameRoomService {
         newRoom.players = this.assignColor(newRoom.players);
 
         const gameInfo = await this.gameService.getGameById(waitingRoom.gameId);
+        newRoom.actionPointsPerTurn = gameInfo.actionPoints ?? 1;
         if (gameInfo.mode === 'ctf') {
             newRoom.players = this.assignTeam(newRoom.players);
         }
@@ -152,6 +154,7 @@ export class GameRoomService {
 
         for (const player of room.players) {
             player.movementPoints = player.stats['speed'].value;
+            player.actionPoints = room.actionPointsPerTurn;
         }
 
         let countdown = TURN_BREAK;
@@ -268,9 +271,17 @@ export class GameRoomService {
         if (!room) throw new Error(ErrorMessages.GameDoesNotExist);
 
         const playerTurn = room.players[0];
+        const hasMovementPoints = (playerTurn.movementPoints ?? 0) >= 1;
+        const hasActionPoints = (playerTurn.actionPoints ?? 0) >= 1;
 
-        if (playerTurn.movementPoints >= 1) {
-            let countdown = room.timeRemaining;
+        if (hasMovementPoints || hasActionPoints) {
+            // Notify all clients that the attacker's turn is resuming with remaining time
+            this.server.to(roomId).emit(GameRoomEvents.ResumeTurn, {
+                playerId: playerTurn.id,
+                timeRemaining: room.timeRemaining,
+            });
+
+            let countdown = room.timeRemaining ?? 0;
             room.turnTimer = setInterval(() => {
                 countdown--;
                 room.timeRemaining = countdown;

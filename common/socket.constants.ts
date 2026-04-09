@@ -66,6 +66,7 @@ export enum GameRoomEvents {
     StartTurn = 'startTurn',
     TurnStarting = 'turnStarting',
     EndTurn = 'endTurn',
+    ResumeTurn = 'resumeTurn',
     UpdateCountdown = 'updateCountdown',
 
     UpdateStartingCountdown = 'updateStartingCountdown',

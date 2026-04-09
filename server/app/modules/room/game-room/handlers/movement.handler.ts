@@ -185,6 +185,8 @@ export class MovementHandler {
     handleDoorToggled(data: { roomId: string; x: number; y: number }, socket: Socket, server: Server): void {
         try {
             const room = this.gameRoomService.findRoomById(data.roomId);
+            const currentPlayer = room?.players.find((p) => p.id === socket.id);
+            if (currentPlayer) currentPlayer.actionPoints = Math.max(0, (currentPlayer.actionPoints ?? room?.actionPointsPerTurn ?? 1) - 1);
             this.gameMovementService.toggleDoor(data.roomId, data.x, data.y, room);
             server.to(data.roomId).emit(GameRoomEvents.DoorToggled, data);
 
