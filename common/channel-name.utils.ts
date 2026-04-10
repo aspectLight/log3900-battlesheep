@@ -1,11 +1,11 @@
 const RESERVED_GENERAL_CHANNEL_NAMES = new Set(['general', 'generale']);
 
 const GAME_CHANNEL_NAME_PATTERNS = [
-    /^partie(?: [a-z0-9]+)?$/,
-    /^canal de partie(?: [a-z0-9]+)?$/,
-    /^channel for partie(?: [a-z0-9]+)?$/,
-    /^game channel(?: [a-z0-9]+)?$/,
-    /^games channel(?: [a-z0-9]+)?$/,
+    /^partie(?: ?\d+)?$/,
+    /^canal de partie(?: ?\d+)?$/,
+    /^channel for partie(?: ?\d+)?$/,
+    /^game channel(?: ?\d+)?$/,
+    /^games channel(?: ?\d+)?$/,
 ];
 
 /**
