@@ -3,11 +3,12 @@ import 'dart:async';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
-import '../../../constants/ui_assets.dart';
 import '../../../../../core/localisation/core_localizations.dart';
 import '../../../../../routing/app_navigator.dart';
 import '../../../../../routing/navigation_command.dart';
+import '../../../constants/ui_assets.dart';
 import '../../widgets/app_background/app_background.dart';
 import 'main_menu_view_model.dart';
 
@@ -30,6 +31,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>
     super.initState();
     _viewModel = GetIt.I<MainMenuViewModel>();
     _appNavigator = GetIt.I<AppNavigator>();
+    _viewModel.loadPendingRequests();
   }
 
   void _openSettings() {
@@ -48,6 +50,11 @@ class _MainMenuScreenState extends State<MainMenuScreen>
   }
 
   @override
+  void didPopNext() {
+    _viewModel.loadPendingRequests();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AppBackground(
       child: Stack(
@@ -63,10 +70,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(bottom: 50),
-                          child: Image.asset(
-                            UiAssets.logo,
-                            width: 300,
-                          ),
+                          child: Image.asset(UiAssets.logo, width: 300),
                         ),
                         _buildMenuButton(
                           label: CoreLocalizations.of(context)!.joinGame,
@@ -81,6 +85,39 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                           onPressed: () {
                             _closeSettings();
                             _viewModel.administerGames();
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        _buildMenuButtonWithBadge(
+                          label: CoreLocalizations.of(context)!.friends,
+                          badge: Watch.builder(
+                            builder: (ctx) {
+                              final count =
+                                  _viewModel.pendingRequestCount.value;
+                              if (count == 0) return const SizedBox.shrink();
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Text(
+                                  '$count',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          onPressed: () {
+                            _closeSettings();
+                            _viewModel.administerFriends();
                           },
                         ),
                       ],
@@ -153,10 +190,10 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                         children: [
                           _buildSettingsOption(
                             label: CoreLocalizations.of(context)!.profile,
-                                onTap: () {
-                                  _closeSettings();
-                                  _viewModel.openProfile();
-                                },
+                            onTap: () {
+                              _closeSettings();
+                              _viewModel.openProfile();
+                            },
                           ),
                           const Divider(height: 1),
                           _buildSettingsOption(
@@ -169,8 +206,9 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                           ),
                           const Divider(height: 1),
                           _buildSettingsOption(
-                            label:
-                                CoreLocalizations.of(context)!.connectionHistory,
+                            label: CoreLocalizations.of(
+                              context,
+                            )!.connectionHistory,
                             onTap: () {
                               _closeSettings();
                               _viewModel.openConnectionHistory();
@@ -215,6 +253,41 @@ class _MainMenuScreenState extends State<MainMenuScreen>
           textStyle: const TextStyle(fontSize: 20, fontFamily: 'CustomFont'),
         ),
         child: Text(label),
+      ),
+    );
+  }
+
+  Widget _buildMenuButtonWithBadge({
+    required String label,
+    required Widget badge,
+    required VoidCallback? onPressed,
+  }) {
+    return SizedBox(
+      width: 400,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          SizedBox(
+            width: 400,
+            child: ElevatedButton(
+              onPressed: onPressed,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                disabledBackgroundColor: Colors.black38,
+                foregroundColor: Colors.white,
+                shadowColor: Colors.transparent,
+                side: const BorderSide(color: Colors.transparent),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                textStyle: const TextStyle(
+                  fontSize: 20,
+                  fontFamily: 'CustomFont',
+                ),
+              ),
+              child: Text(label),
+            ),
+          ),
+          Positioned(top: 4, right: 60, child: badge),
+        ],
       ),
     );
   }

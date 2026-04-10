@@ -32,6 +32,7 @@ mixin _$WaitingRoomEntryAppEvent {
       String gameDescription,
       int boardSize,
       bool isCTF,
+      bool friendsOnly,
     )
     enteredAsHost,
     required TResult Function(
@@ -54,6 +55,7 @@ mixin _$WaitingRoomEntryAppEvent {
       String gameDescription,
       int boardSize,
       bool isCTF,
+      bool friendsOnly,
     )?
     enteredAsHost,
     TResult? Function(
@@ -76,6 +78,7 @@ mixin _$WaitingRoomEntryAppEvent {
       String gameDescription,
       int boardSize,
       bool isCTF,
+      bool friendsOnly,
     )?
     enteredAsHost,
     TResult Function(
@@ -198,6 +201,7 @@ abstract class _$$WaitingRoomEnteredAsHostImplCopyWith<$Res>
     String gameDescription,
     int boardSize,
     bool isCTF,
+    bool friendsOnly,
   });
 }
 
@@ -226,6 +230,7 @@ class __$$WaitingRoomEnteredAsHostImplCopyWithImpl<$Res>
     Object? gameDescription = null,
     Object? boardSize = null,
     Object? isCTF = null,
+    Object? friendsOnly = null,
   }) {
     return _then(
       _$WaitingRoomEnteredAsHostImpl(
@@ -257,6 +262,10 @@ class __$$WaitingRoomEnteredAsHostImplCopyWithImpl<$Res>
             ? _value.isCTF
             : isCTF // ignore: cast_nullable_to_non_nullable
                   as bool,
+        friendsOnly: null == friendsOnly
+            ? _value.friendsOnly
+            : friendsOnly // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -273,6 +282,7 @@ class _$WaitingRoomEnteredAsHostImpl implements WaitingRoomEnteredAsHost {
     required this.gameDescription,
     required this.boardSize,
     required this.isCTF,
+    this.friendsOnly = false,
   });
 
   @override
@@ -289,10 +299,13 @@ class _$WaitingRoomEnteredAsHostImpl implements WaitingRoomEnteredAsHost {
   final int boardSize;
   @override
   final bool isCTF;
+  @override
+  @JsonKey()
+  final bool friendsOnly;
 
   @override
   String toString() {
-    return 'WaitingRoomEntryAppEvent.enteredAsHost(roomId: $roomId, hostId: $hostId, socketId: $socketId, gameName: $gameName, gameDescription: $gameDescription, boardSize: $boardSize, isCTF: $isCTF)';
+    return 'WaitingRoomEntryAppEvent.enteredAsHost(roomId: $roomId, hostId: $hostId, socketId: $socketId, gameName: $gameName, gameDescription: $gameDescription, boardSize: $boardSize, isCTF: $isCTF, friendsOnly: $friendsOnly)';
   }
 
   @override
@@ -310,7 +323,9 @@ class _$WaitingRoomEnteredAsHostImpl implements WaitingRoomEnteredAsHost {
                 other.gameDescription == gameDescription) &&
             (identical(other.boardSize, boardSize) ||
                 other.boardSize == boardSize) &&
-            (identical(other.isCTF, isCTF) || other.isCTF == isCTF));
+            (identical(other.isCTF, isCTF) || other.isCTF == isCTF) &&
+            (identical(other.friendsOnly, friendsOnly) ||
+                other.friendsOnly == friendsOnly));
   }
 
   @override
@@ -323,6 +338,7 @@ class _$WaitingRoomEnteredAsHostImpl implements WaitingRoomEnteredAsHost {
     gameDescription,
     boardSize,
     isCTF,
+    friendsOnly,
   );
 
   /// Create a copy of WaitingRoomEntryAppEvent
@@ -347,6 +363,7 @@ class _$WaitingRoomEnteredAsHostImpl implements WaitingRoomEnteredAsHost {
       String gameDescription,
       int boardSize,
       bool isCTF,
+      bool friendsOnly,
     )
     enteredAsHost,
     required TResult Function(
@@ -367,6 +384,7 @@ class _$WaitingRoomEnteredAsHostImpl implements WaitingRoomEnteredAsHost {
       gameDescription,
       boardSize,
       isCTF,
+      friendsOnly,
     );
   }
 
@@ -381,6 +399,7 @@ class _$WaitingRoomEnteredAsHostImpl implements WaitingRoomEnteredAsHost {
       String gameDescription,
       int boardSize,
       bool isCTF,
+      bool friendsOnly,
     )?
     enteredAsHost,
     TResult? Function(
@@ -401,6 +420,7 @@ class _$WaitingRoomEnteredAsHostImpl implements WaitingRoomEnteredAsHost {
       gameDescription,
       boardSize,
       isCTF,
+      friendsOnly,
     );
   }
 
@@ -415,6 +435,7 @@ class _$WaitingRoomEnteredAsHostImpl implements WaitingRoomEnteredAsHost {
       String gameDescription,
       int boardSize,
       bool isCTF,
+      bool friendsOnly,
     )?
     enteredAsHost,
     TResult Function(
@@ -437,6 +458,7 @@ class _$WaitingRoomEnteredAsHostImpl implements WaitingRoomEnteredAsHost {
         gameDescription,
         boardSize,
         isCTF,
+        friendsOnly,
       );
     }
     return orElse();
@@ -483,6 +505,7 @@ abstract class WaitingRoomEnteredAsHost implements WaitingRoomEntryAppEvent {
     required final String gameDescription,
     required final int boardSize,
     required final bool isCTF,
+    final bool friendsOnly,
   }) = _$WaitingRoomEnteredAsHostImpl;
 
   @override
@@ -497,6 +520,7 @@ abstract class WaitingRoomEnteredAsHost implements WaitingRoomEntryAppEvent {
   String get gameDescription;
   int get boardSize;
   bool get isCTF;
+  bool get friendsOnly;
 
   /// Create a copy of WaitingRoomEntryAppEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -661,6 +685,7 @@ class _$WaitingRoomEnteredAsJoinImpl implements WaitingRoomEnteredAsJoin {
       String gameDescription,
       int boardSize,
       bool isCTF,
+      bool friendsOnly,
     )
     enteredAsHost,
     required TResult Function(
@@ -694,6 +719,7 @@ class _$WaitingRoomEnteredAsJoinImpl implements WaitingRoomEnteredAsJoin {
       String gameDescription,
       int boardSize,
       bool isCTF,
+      bool friendsOnly,
     )?
     enteredAsHost,
     TResult? Function(
@@ -727,6 +753,7 @@ class _$WaitingRoomEnteredAsJoinImpl implements WaitingRoomEnteredAsJoin {
       String gameDescription,
       int boardSize,
       bool isCTF,
+      bool friendsOnly,
     )?
     enteredAsHost,
     TResult Function(
