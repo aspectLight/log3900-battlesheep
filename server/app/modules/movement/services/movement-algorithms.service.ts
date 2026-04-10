@@ -246,6 +246,11 @@ export class MovementAlgorithmsService {
             const tileType = cell.tile.type.replace(/^\w/, (c) => c.toUpperCase());
             const moveCost = coord.x === startPoint.x && coord.y === startPoint.y ? 0 : MoveCosts[tileType];
             if (accumulatedCost + moveCost > movementPoints) break;
+
+            if ((coord.x !== startPoint.x || coord.y !== startPoint.y) && !this.gameMovementService.isCellFree(cell)) {
+                break;
+            }
+
             accumulatedCost += moveCost;
             truncatedPath.push({ coord, cost: accumulatedCost });
         }
@@ -264,6 +269,6 @@ export class MovementAlgorithmsService {
                 return { path: truncatedPath, cost: totalCost };
             }
         }
-        return { path, cost: totalCost };
+        return null;
     }
 }
