@@ -6,7 +6,7 @@ import { PlayerStats } from '@app/classes/stats/player-stats';
 import { AVATAR_TYPES } from '@app/constants/player.constants';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 const ONE_HUNDRED = 100;
 
@@ -29,12 +29,15 @@ export class EndGameComponent {
     globalStats: GlobalStats = new GlobalStats();
     walkableTiles: number = 0;
     toggableDoors: number = 0;
+    hasWon: boolean = false;
 
     constructor(
         private router: Router,
         private socketService: SocketService,
         private gameManagerService: GameManagerService,
+        private translate: TranslateService,
     ) {
+        this.hasWon = this.gameManagerService.hasWon();
         this.socketService.on(
             'getStatisticsResponse',
             (data: { playerStats: PlayerStats[]; globalStats: GlobalStats; walkableTiles: number; toggableDoors: number }) => {
@@ -116,5 +119,54 @@ export class EndGameComponent {
     quitGame(): void {
         this.socketService.quitEndGame();
         this.router.navigate(['/home']);
+    }
+
+    get currentPlayerStats(): PlayerStats | undefined {
+        const name = this.gameManagerService.mainPlayer?.name;
+        if (!name) return undefined;
+        return this.playersStats.find((p) => p.name === name);
+    }
+
+    get currentPlayerCombatWinPercentage(): number {
+        const stats = this.currentPlayerStats;
+        if (!stats || stats.combats === 0) return 0;
+        return Math.floor((stats.victories / stats.combats) * ONE_HUNDRED);
+    }
+
+    get currentPlayerDefeats(): number {
+        return this.currentPlayerStats?.defeats ?? 0;
+    }
+
+    get currentPlayerTilePercentage(): number {
+        const name = this.gameManagerService.mainPlayer?.name;
+        if (!name) return 0;
+        return this.getPlayersTilePercentage(name);
+    }
+
+    shareOnX(): void {
+        const text = this.buildShareText();
+        const url = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
+    shareOnInstagram(): void {
+        navigator.clipboard.writeText(this.buildShareText()).then(() => {
+            window.open('https://www.instagram.com/create/story', '_blank', 'noopener,noreferrer');
+        });
+    }
+
+    private buildShareText(): string {
+        const resultKey = this.hasWon ? 'end_game.share.victory' : 'end_game.share.defeat';
+        const result = this.translate.instant(resultKey);
+        const deaths = this.currentPlayerDefeats;
+        const combatPct = this.currentPlayerCombatWinPercentage;
+        const tilePct = this.currentPlayerTilePercentage;
+
+        return this.translate.instant('end_game.share.text', {
+            result,
+            deaths,
+            combatPct,
+            tilePct,
+        });
     }
 }

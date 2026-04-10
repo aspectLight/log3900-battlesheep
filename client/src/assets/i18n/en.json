@@ -439,7 +439,21 @@
     "turns": "Number of game turns",
     "tiles_global": "Percentage of terrain tiles visited by at least one player",
     "doors": "Percentage of doors manipulated at least once",
-    "flag_players": "Number of different players who held the flag"
+    "flag_players": "Number of different players who held the flag",
+    "share": {
+      "title": "Share my results",
+      "subtitle": "Share your game statistics on social media",
+      "copy": "Copy text",
+      "copied": "Copied!",
+      "share_x": "Post on X",
+      "share_instagram": "Instagram Story",
+      "hint_x": "Your tweet will be pre-filled. Sign in to X if not already.",
+      "hint_instagram": "Text will be copied. Paste it in your story or post.",
+      "clipboard_notice": "✓ Text copied!",
+      "victory": "Victory",
+      "defeat": "Defeat",
+      "text": "🎮 Game result: {{ result }}!\n💀 Deaths: {{ deaths }}\n⚔️ Combats won: {{ combatPct }}%\n🗺️ Map explored: {{ tilePct }}%\n#LOG3900 #Gaming"
+    }
   },
   "player_card": {
     "playing": "Playing...",

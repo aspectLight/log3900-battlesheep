@@ -438,7 +438,21 @@
     "turns": "Nombre de tours de jeu",
     "tiles_global": "Pourcentage des tuiles de terrain visitées par au moins un joueur",
     "doors": "Pourcentage des portes ayant été manipulées au moins une fois",
-    "flag_players": "Nombre de joueurs différents ayant détenu le drapeau"
+    "flag_players": "Nombre de joueurs différents ayant détenu le drapeau",
+    "share": {
+      "title": "Partager mes résultats",
+      "subtitle": "Partagez vos statistiques de partie sur les réseaux sociaux",
+      "copy": "Copier le texte",
+      "copied": "Copié !",
+      "share_x": "Publier sur X",
+      "share_instagram": "Story Instagram",
+      "hint_x": "Votre tweet sera pré-rempli. Connectez-vous à X si ce n'est pas déjà fait.",
+      "hint_instagram": "Le texte sera copié. Collez-le dans votre story ou post.",
+      "clipboard_notice": "✓ Texte copié !",
+      "victory": "Victoire",
+      "defeat": "Défaite",
+      "text": "🎮 Résultat de partie : {{ result }} !\n💀 Morts : {{ deaths }}\n⚔️ Combats gagnés : {{ combatPct }}%\n🗺️ Carte parcourue : {{ tilePct }}%\n#LOG3900 #Jeux"
+    }
   },
   "player_card": {
     "playing": "Joue...",
