@@ -6,8 +6,8 @@ import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/appearance/app_interaction_colors.dart';
-import '../../../core/localisation/join_game_session_localizations.dart';
 import '../../../core/constants/join_game_session_input_limits.dart';
+import '../../../core/localisation/join_game_session_localizations.dart';
 import 'join_by_code_panel_view_model.dart';
 
 class JoinByCodePanel extends StatefulWidget {
@@ -38,7 +38,7 @@ class _JoinByCodePanelState extends State<JoinByCodePanel> {
           Text(
             l10n.joinGameSubtitle,
             style: const TextStyle(
-              color: Color(0xFFf5e6e6),
+              color: Colors.white,
               fontFamily: 'CustomFont',
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -85,10 +85,7 @@ class _JoinByCodePanelState extends State<JoinByCodePanel> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(5),
-                borderSide: BorderSide(
-                  color: context.interactionColors.outline,
-                  width: 2,
-                ),
+                borderSide: const BorderSide(color: Colors.white, width: 2),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
@@ -96,7 +93,7 @@ class _JoinByCodePanelState extends State<JoinByCodePanel> {
               ),
             ),
             style: const TextStyle(
-              color: Color(0xFFf5e6e6),
+              color: Colors.white,
               fontFamily: 'CustomFont',
               fontSize: 20,
               letterSpacing: 8,
@@ -133,7 +130,9 @@ class _JoinByCodePanelState extends State<JoinByCodePanel> {
                     return onPrimary;
                   }),
                   shadowColor: WidgetStatePropertyAll(
-                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.45),
+                    Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.45),
                   ),
                   elevation: WidgetStateProperty.resolveWith((states) {
                     if (states.contains(WidgetState.pressed)) {
@@ -147,8 +146,8 @@ class _JoinByCodePanelState extends State<JoinByCodePanel> {
                   shape: WidgetStatePropertyAll(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5),
-                      side: const BorderSide(
-                        color: Color(0xFF7f1f1f),
+                      side: BorderSide(
+                        color: context.interactionColors.outline,
                         width: 2,
                       ),
                     ),
@@ -158,12 +157,12 @@ class _JoinByCodePanelState extends State<JoinByCodePanel> {
                   ),
                 ),
                 child: _viewModel.isJoining
-                    ? const SizedBox(
+                    ? SizedBox(
                         height: 24,
                         width: 24,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Color(0xFFf5e6e6),
+                          color: context.interactionColors.primaryStrong,
                         ),
                       )
                     : Text(

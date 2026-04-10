@@ -78,14 +78,14 @@ class _JoinGameSessionScreenState extends State<JoinGameSessionScreen> {
                       children: [
                         const Icon(
                           Icons.chevron_left,
-                          color: Color(0xFFf5e6e6),
+                          color: Colors.white,
                           size: 28,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           l10n.mainMenu,
                           style: const TextStyle(
-                            color: Color(0xFFf5e6e6),
+                            color: Colors.white,
                             fontFamily: 'CustomFont',
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -103,7 +103,7 @@ class _JoinGameSessionScreenState extends State<JoinGameSessionScreen> {
             child: Text(
               l10n.joinGameTitle,
               style: const TextStyle(
-                color: Color(0xFFf5e6e6),
+                color: Colors.white,
                 fontFamily: 'CustomFont',
                 fontSize: 26,
               ),

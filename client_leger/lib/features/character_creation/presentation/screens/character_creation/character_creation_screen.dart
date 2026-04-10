@@ -166,7 +166,7 @@ class _CharacterCreationHeader extends StatelessWidget {
                         Text(
                           l10n.backToCreateGame,
                           style: const TextStyle(
-                            color: Color(0xFFf5e6e6),
+                            color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'CustomFont',
@@ -182,7 +182,7 @@ class _CharacterCreationHeader extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              color: Color(0xFFf5e6e6),
+              color: Colors.white,
               fontFamily: 'CustomFont',
               fontSize: 24,
             ),
@@ -224,7 +224,7 @@ class _CharacterGrid extends StatelessWidget {
           Text(
             l10n.charactersSectionTitle,
             style: const TextStyle(
-              color: Color(0xFFf5e6e6),
+              color: Colors.white,
               fontSize: 22,
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
@@ -236,7 +236,9 @@ class _CharacterGrid extends StatelessWidget {
               data: ScrollbarThemeData(
                 thickness: WidgetStateProperty.all(6),
                 radius: const Radius.circular(5),
-                thumbColor: WidgetStateProperty.all(const Color(0xFF7f1f1f)),
+                thumbColor: WidgetStateProperty.all(
+                  context.interactionColors.outline,
+                ),
                 trackColor: WidgetStateProperty.all(const Color(0xFF2b2b2b)),
                 trackBorderColor: WidgetStateProperty.all(
                   const Color(0xFF2b2b2b),
@@ -601,7 +603,7 @@ class _BonusSection extends StatelessWidget {
           Text(
             l10n.playerHudStatsSection,
             style: const TextStyle(
-              color: Color(0xFFf5e6e6),
+              color: Colors.white,
               fontSize: 24,
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
@@ -722,7 +724,7 @@ class _StatRow extends StatelessWidget {
                 Text(
                   label,
                   style: const TextStyle(
-                    color: Color(0xFFf5e6e6),
+                    color: Colors.white,
                     fontSize: 19,
                     fontFamily: 'CustomFont',
                   ),
@@ -733,7 +735,7 @@ class _StatRow extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: Color(0xFFc0c0c0),
+                    color: Colors.white,
                     fontSize: 12,
                     fontStyle: FontStyle.italic,
                     fontFamily: 'CustomFont',
@@ -746,7 +748,7 @@ class _StatRow extends StatelessWidget {
         Text(
           '$value',
           style: const TextStyle(
-            color: Color(0xFFf5e6e6),
+            color: Colors.white,
             fontSize: 19,
             fontFamily: 'CustomFont',
           ),
@@ -779,7 +781,9 @@ class _StatBonusButton extends StatelessWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.red.withValues(alpha: 0.5),
+                    color: context.interactionColors.primaryStrong.withValues(
+                      alpha: 0.5,
+                    ),
                     blurRadius: 5,
                     spreadRadius: 2,
                   ),
@@ -827,7 +831,7 @@ class _DiceRow extends StatelessWidget {
                 Text(
                   label,
                   style: const TextStyle(
-                    color: Color(0xFFf5e6e6),
+                    color: Colors.white,
                     fontSize: 19,
                     fontFamily: 'CustomFont',
                   ),
@@ -851,7 +855,7 @@ class _DiceRow extends StatelessWidget {
         Text(
           '$value',
           style: const TextStyle(
-            color: Color(0xFFf5e6e6),
+            color: Colors.white,
             fontSize: 19,
             fontFamily: 'CustomFont',
           ),
@@ -899,7 +903,9 @@ class _DiceButton extends StatelessWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.red.withValues(alpha: 0.5),
+                    color: context.interactionColors.primaryStrong.withValues(
+                      alpha: 0.5,
+                    ),
                     blurRadius: 5,
                     spreadRadius: 2,
                   ),
