@@ -59,6 +59,22 @@ class CharacterCreationRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [DiscussionCanalsScreen]
+class DiscussionCanalsRoute extends PageRouteInfo<void> {
+  const DiscussionCanalsRoute({List<PageRouteInfo>? children})
+    : super(DiscussionCanalsRoute.name, initialChildren: children);
+
+  static const String name = 'DiscussionCanalsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const DiscussionCanalsScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [FriendsScreen]
 class FriendsRoute extends PageRouteInfo<void> {
   const FriendsRoute({List<PageRouteInfo>? children})
