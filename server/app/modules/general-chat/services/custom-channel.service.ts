@@ -1,6 +1,7 @@
 import { GENERAL_CHAT_MESSAGES_LIMIT } from '@app/modules/general-chat/constants/general-chat.constants';
 import { ChatMessage } from '@app/modules/general-chat/interfaces/chat';
 import { CustomChannel, CustomChannelDocument } from '@app/modules/general-chat/schemas/custom-channel.schema';
+import { ChatModerationService } from '@app/modules/general-chat/services/chat-moderation.service';
 import { isReservedGameChannelName, isReservedGeneralChannelName } from '@common/channel-name.utils';
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -14,6 +15,7 @@ export class CustomChannelService {
     constructor(
         @InjectModel(CustomChannel.name)
         private readonly channelModel: Model<CustomChannelDocument>,
+        private readonly chatModerationService: ChatModerationService,
     ) {}
 
     async createChannel(channelName: string, creator: string): Promise<CustomChannelDocument> {
@@ -32,6 +34,10 @@ export class CustomChannelService {
         }
 
         const normalizedName = channelName.trim();
+        const censoredName = this.chatModerationService.censor(normalizedName);
+        if (censoredName !== normalizedName) {
+            throw new Error('Le nom du canal contient des mots interdits');
+        }
         const channelId = this.generateChannelId(normalizedName);
 
         const existing = await this.channelModel.findOne({ channelId, isActive: true });
@@ -57,7 +63,7 @@ export class CustomChannelService {
             }
             throw error;
         }
-        this.logger.log(`Canal créé: ${channelName} par ${creator}`);
+        this.logger.log(`Canal créé: ${normalizedName} par ${creator}`);
         return channel;
     }
 

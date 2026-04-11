@@ -247,6 +247,7 @@ export class CustomChannelService {
         if (normalized.includes('depasser 50 caracteres')) return 'channels.errors.name_too_long';
         if (normalized.includes('reserve pour le chat general')) return 'channels.errors.reserved_general';
         if (normalized.includes('reserve pour les canaux de partie')) return 'channels.errors.reserved_game';
+        if (normalized.includes('mots interdits')) return 'channels.errors.forbidden_words';
         if (normalized.includes('deja pris') || normalized.includes('existe deja')) return 'channels.errors.name_taken';
         if (normalized.includes('n existe plus') || normalized.includes('introuvable') || normalized.includes('a ete supprime'))
             return 'channels.errors.not_found';

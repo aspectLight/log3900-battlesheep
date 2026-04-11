@@ -265,6 +265,7 @@
       "name_too_long": "Channel name cannot exceed 50 characters.",
       "reserved_general": "This channel name is reserved for general chat.",
       "reserved_game": "This channel name is reserved for game channels.",
+      "forbidden_words": "Channel name contains forbidden words.",
       "name_taken": "Channel name is already taken. Please choose another one.",
       "not_found": "This channel no longer exists or has been deleted.",
       "only_creator_delete": "Only the channel creator can delete it.",

@@ -383,6 +383,9 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
             if (error.message.includes('réservé pour les canaux de partie') || error.message.includes('reserve pour les canaux de partie')) {
                 return 'Le nom du canal est réservé pour les canaux de partie';
             }
+            if (error.message.includes('mots interdits')) {
+                return 'Le nom du canal contient des mots interdits';
+            }
             if (error.message.includes('Seul le créateur')) {
                 return 'Seul le créateur du canal peut le supprimer';
             }

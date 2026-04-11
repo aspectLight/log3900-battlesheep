@@ -265,6 +265,7 @@
       "name_too_long": "Le nom du canal ne peut pas dépasser 50 caractères.",
       "reserved_general": "Le nom du canal est réservé pour le chat général.",
       "reserved_game": "Le nom du canal est réservé pour les canaux de partie.",
+      "forbidden_words": "Le nom du canal contient des mots interdits.",
       "name_taken": "Le nom du canal est déjà pris, veuillez en choisir un autre.",
       "not_found": "Ce canal n'existe plus ou a été supprimé.",
       "only_creator_delete": "Seul le créateur du canal peut le supprimer.",
