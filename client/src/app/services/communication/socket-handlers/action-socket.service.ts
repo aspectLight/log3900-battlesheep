@@ -114,7 +114,8 @@ export class ActionSocketService implements ISocketService {
         this.socket.on(GameRoomEvents.DebugModeEnabled, () => {
             this.gameRoomService.setDebugMode(true);
             this.gameManagerService.clearPaths();
-            this.gameManagerService.setActionPoints(1);
+            const actionPoints = this.gameManagerService.getGame()?.actionPoints ?? 1;
+            this.gameManagerService.setActionPoints(actionPoints);
         });
 
         this.socket.on(GameRoomEvents.DebugModeDisabled, () => {

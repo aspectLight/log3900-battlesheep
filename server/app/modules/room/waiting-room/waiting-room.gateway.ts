@@ -1,5 +1,5 @@
 import { Player } from '@app/shared/interfaces/player';
-import { WaitingRoomEvents } from '@common/socket.constants';
+import { SocialEvents, WaitingRoomEvents } from '@common/socket.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import {
     ConnectedSocket,
@@ -71,11 +71,11 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
     }
 
     @SubscribeMessage(WaitingRoomEvents.ReserveAvatar)
-    handleReserveAvatar(
-        @MessageBody() data: { roomId: string; chosenAvatar: string; playerId: string },
+    async handleReserveAvatar(
+        @MessageBody() data: { roomId: string; chosenAvatar: string; playerId: string; isVirtual?: boolean },
         @ConnectedSocket() socket: Socket,
-    ): { success: boolean; error?: string } {
-        return this.playerHandler.handleReserveAvatar(data, socket, this.server);
+    ): Promise<{ success: boolean; error?: string }> {
+        return await this.playerHandler.handleReserveAvatar(data, socket, this.server);
     }
 
     @SubscribeMessage(WaitingRoomEvents.GetReservedAvatars)
@@ -110,6 +110,16 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
     @SubscribeMessage(WaitingRoomEvents.GetMessagesFromWaitingRoom)
     async handleGetMessagesFromWaitingRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
         return this.chatHandler.handleGetMessagesFromWaitingRoom(roomId, socket);
+    }
+
+    // ===== Block Choice Events =====
+
+    @SubscribeMessage(SocialEvents.BlockedUserRoomChoice)
+    async handleBlockedUserRoomChoice(
+        @MessageBody() data: { choice: 'enter' | 'cancel' },
+        @ConnectedSocket() socket: Socket,
+    ) {
+        return this.managementHandler.handleBlockedUserRoomChoice(socket, data);
     }
 
     // ===== Room Listing Events =====

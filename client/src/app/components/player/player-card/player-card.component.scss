@@ -5,8 +5,8 @@
     max-height: min(65vh, 460px);
     border-radius: 10px;
     overflow: hidden;
-    filter: brightness(1.0);
-    background-color: rgba(0, 0, 0, 0.278);
+    filter: brightness(1);
+    background-color: var(--theme-bg-overlay);
     width: 100%;
     max-width: 300px;
     min-width: 150px;
@@ -14,7 +14,7 @@
     transform-origin: center;
     animation: fadeIn 0.5s ease-out;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px var(--theme-shadow-md);
     flex: 1 1 auto;
 
     .div1 {
@@ -25,7 +25,7 @@
         height: 14em;
         width: 100%;
         animation: slideUp 0.5s ease-out;
-        background-color: rgba(0, 0, 0, 0.1);
+        background-color: var(--theme-bg-overlay);
         padding-bottom: 0.5rem;
         transition: all 0.3s ease;
     }
@@ -47,8 +47,8 @@
         gap: 0.4rem;
         font-size: 1.1rem;
         font-weight: bold;
-        color: white;
-        background: rgba(0, 0, 0, 0.7);
+        color: var(--theme-text-primary);
+        background: var(--theme-bg-overlay-dark);
         padding: 0.25rem 0;
         margin: 0;
         line-height: 1.1rem;
@@ -83,19 +83,19 @@
             padding: 0;
         }
     }
-    
+
     .stats-row {
         flex: 0 0 auto;
         display: flex;
         width: 100%;
         margin: 0;
         padding: 0;
-        background: rgba(0, 0, 0, 0.7);
+        background: var(--theme-bg-overlay-dark);
     }
 
     .stat {
         flex: 1;
-        color: white;
+        color: var(--theme-text-primary);
         padding: 0.25rem 0;
         display: flex;
         flex-direction: column;
@@ -105,9 +105,9 @@
         margin-top: -1px;
         animation: fadeIn 0.5s ease-out 0.4s both;
         transition: transform 0.2s ease;
-        
+
         &:not(:last-child) {
-            border-right: 1px solid rgba(30, 30, 30, 0.5);
+            border-right: 1px solid var(--theme-border-secondary);
         }
 
         h3 {
@@ -131,23 +131,23 @@
     top: 10px;
     right: 5px;
     z-index: 10;
-    
+
     button {
         cursor: pointer;
         background: none;
         border: none;
-        color: white;
+        color: var(--theme-text-primary);
         font-weight: bold;
         font-size: 1.2rem;
         padding: 5px;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        
+
         &:hover {
-            color: #ff3333;
-            text-shadow: 0 0 8px rgba(255, 51, 51, 0.8);
+            color: var(--theme-text-hover);
+            text-shadow: 0 0 8px var(--theme-border-focus-shadow);
             transform: scale(1.2);
         }
-        
+
         &:active {
             transform: scale(0.95);
         }
@@ -168,7 +168,7 @@
 
 .host-indicator {
     position: absolute;
-    left: .75rem;
+    left: 0.75rem;
     width: 3rem;
     height: auto;
     filter: drop-shadow(0 0 5px gold) brightness(1.2);
@@ -193,7 +193,7 @@
 
 .virtual-player-indicator {
     position: absolute;
-    left: .75rem;
+    left: 0.75rem;
     width: 3rem;
     height: auto;
     filter: drop-shadow(0 0 5px #00bfff) brightness(1.2);
@@ -207,7 +207,277 @@
 /* Style for virtual player names */
 .player-container:has(.virtual-player-container) .div2 {
     color: #00bfff;
-    text-shadow: 0 0 8px rgba(0, 191, 255, 0.8), 0 0 5px rgba(0, 0, 0, 0.5);
+    text-shadow:
+        0 0 8px rgba(0, 191, 255, 0.8),
+        0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+// Banner cosmetics — enhanced visual variants
+
+// --- GOLD BANNER ---
+.player-container.banner-gold {
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+    animation:
+        fadeIn 0.5s ease-out,
+        goldenPulse 3s ease-in-out infinite;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #ffd700, #daa520, #fff8dc, #b8860b, #ffd700);
+        background-size: 300% 300%;
+        animation: goldenBorderShift 4s ease infinite;
+        z-index: -1;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 10px;
+        background: linear-gradient(
+            105deg,
+            transparent 40%,
+            rgba(255, 215, 0, 0.15) 45%,
+            rgba(255, 248, 220, 0.25) 50%,
+            rgba(255, 215, 0, 0.15) 55%,
+            transparent 60%
+        );
+        background-size: 200% 100%;
+        animation: goldenShimmer 3s ease-in-out infinite;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .div1 {
+        background: linear-gradient(180deg, rgba(184, 134, 11, 0.08) 0%, rgba(255, 215, 0, 0.12) 100%);
+    }
+
+    .div2 {
+        background: linear-gradient(90deg, rgba(184, 134, 11, 0.4), rgba(0, 0, 0, 0.7), rgba(184, 134, 11, 0.4));
+        text-shadow: 0 0 6px rgba(255, 215, 0, 0.5);
+    }
+
+    .stats-row {
+        background: linear-gradient(90deg, rgba(184, 134, 11, 0.3), rgba(0, 0, 0, 0.7), rgba(184, 134, 11, 0.3));
+    }
+}
+
+// --- SHADOW BANNER ---
+.player-container.banner-shadow {
+    border: 2px solid #1a0a2e;
+    position: relative;
+    animation:
+        fadeIn 0.5s ease-out,
+        shadowPulse 4s ease-in-out infinite;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #0d0015, #2d1b69, #1a0a2e, #4a2c8a, #0d0015);
+        background-size: 300% 300%;
+        animation: shadowBorderShift 5s ease infinite;
+        z-index: -1;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 10px;
+        background: radial-gradient(ellipse at 50% 100%, rgba(75, 0, 130, 0.3) 0%, rgba(25, 0, 50, 0.2) 40%, transparent 70%);
+        animation: shadowMist 5s ease-in-out infinite;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .div1 {
+        background: linear-gradient(180deg, rgba(13, 0, 21, 0.3) 0%, rgba(45, 27, 105, 0.15) 100%);
+    }
+
+    .div2 {
+        background: linear-gradient(90deg, rgba(13, 0, 21, 0.8), rgba(45, 27, 105, 0.5), rgba(13, 0, 21, 0.8));
+        color: #c9b3ff;
+        text-shadow:
+            0 0 8px rgba(138, 43, 226, 0.6),
+            0 0 3px rgba(0, 0, 0, 0.9);
+    }
+
+    .stats-row {
+        background: linear-gradient(90deg, rgba(13, 0, 21, 0.8), rgba(45, 27, 105, 0.4), rgba(13, 0, 21, 0.8));
+        color: #d4c4ff;
+    }
+
+    .stat h3 {
+        color: #9a7ecc;
+    }
+}
+
+// --- FLAME BANNER ---
+.player-container.banner-flame {
+    border: 2px solid transparent;
+    position: relative;
+    animation:
+        fadeIn 0.5s ease-out,
+        flamePulse 2s ease-in-out infinite;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #ff4500, #ff6a00, #ffd700, #ff6a00, #ff0000, #ff4500);
+        background-size: 400% 400%;
+        animation: flameBorderShift 2s ease infinite;
+        z-index: -1;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 10px;
+        background: radial-gradient(ellipse at 50% 100%, rgba(255, 69, 0, 0.3) 0%, transparent 50%),
+            radial-gradient(ellipse at 30% 100%, rgba(255, 165, 0, 0.2) 0%, transparent 40%),
+            radial-gradient(ellipse at 70% 100%, rgba(255, 0, 0, 0.2) 0%, transparent 40%);
+        animation: flameFlicker 1.5s ease-in-out infinite alternate;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .div1 {
+        background: linear-gradient(180deg, rgba(255, 69, 0, 0.05) 0%, rgba(255, 69, 0, 0.2) 100%);
+    }
+
+    .div2 {
+        background: linear-gradient(90deg, rgba(139, 0, 0, 0.6), rgba(0, 0, 0, 0.7), rgba(139, 0, 0, 0.6));
+        text-shadow:
+            0 0 6px rgba(255, 69, 0, 0.7),
+            0 0 12px rgba(255, 0, 0, 0.3);
+    }
+
+    .stats-row {
+        background: linear-gradient(90deg, rgba(139, 0, 0, 0.5), rgba(0, 0, 0, 0.7), rgba(139, 0, 0, 0.5));
+    }
+}
+
+// --- ICE BANNER ---
+.player-container.banner-ice {
+    border: 2px solid transparent;
+    position: relative;
+    animation:
+        fadeIn 0.5s ease-out,
+        icePulse 4s ease-in-out infinite;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #a8d8ea, #87ceeb, #e0f7fa, #4fc3f7, #a8d8ea);
+        background-size: 300% 300%;
+        animation: iceBorderShift 5s ease infinite;
+        z-index: -1;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 10px;
+        background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.3) 0%, transparent 20%),
+            radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.2) 0%, transparent 15%),
+            radial-gradient(circle at 50% 70%, rgba(255, 255, 255, 0.25) 0%, transparent 18%),
+            radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 12%);
+        animation: iceSparkle 3s ease-in-out infinite alternate;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .div1 {
+        background: linear-gradient(180deg, rgba(135, 206, 235, 0.1) 0%, rgba(79, 195, 247, 0.15) 100%);
+    }
+
+    .div2 {
+        background: linear-gradient(90deg, rgba(100, 181, 246, 0.4), rgba(0, 0, 0, 0.7), rgba(100, 181, 246, 0.4));
+        color: #e0f7fa;
+        text-shadow: 0 0 6px rgba(135, 206, 235, 0.6);
+    }
+
+    .stats-row {
+        background: linear-gradient(90deg, rgba(100, 181, 246, 0.3), rgba(0, 0, 0, 0.7), rgba(100, 181, 246, 0.3));
+        color: #e0f7fa;
+    }
+
+    .stat h3 {
+        color: #90caf9;
+    }
+}
+
+// --- NEON BANNER ---
+.player-container.banner-neon {
+    border: 2px solid transparent;
+    position: relative;
+    animation:
+        fadeIn 0.5s ease-out,
+        neonPulse 2.5s ease-in-out infinite;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #ff00ff, #00ffff, #ff00ff, #00ff88, #ff00ff);
+        background-size: 400% 400%;
+        animation: neonBorderShift 3s linear infinite;
+        z-index: -1;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 10px;
+        background: linear-gradient(180deg, rgba(255, 0, 255, 0.05) 0%, rgba(0, 255, 255, 0.08) 50%, rgba(255, 0, 255, 0.05) 100%);
+        animation: neonFlicker 4s ease-in-out infinite;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .div1 {
+        background: linear-gradient(180deg, rgba(255, 0, 255, 0.05) 0%, rgba(0, 255, 255, 0.1) 100%);
+    }
+
+    .div2 {
+        background: linear-gradient(90deg, rgba(255, 0, 255, 0.3), rgba(0, 0, 0, 0.8), rgba(0, 255, 255, 0.3));
+        color: #e0ffff;
+        text-shadow:
+            0 0 8px rgba(0, 255, 255, 0.7),
+            0 0 16px rgba(255, 0, 255, 0.4);
+    }
+
+    .stats-row {
+        background: linear-gradient(90deg, rgba(255, 0, 255, 0.25), rgba(0, 0, 0, 0.8), rgba(0, 255, 255, 0.25));
+        color: #e0ffff;
+    }
+
+    .stat h3 {
+        color: #80ffff;
+    }
+}
+
+.avatar-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    width: 100%;
+    height: 100%;
 }
 
 @keyframes fadeIn {
@@ -238,5 +508,231 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+// === Banner cosmetic animations ===
+
+// Gold animations
+@keyframes goldenPulse {
+    0%,
+    100% {
+        box-shadow:
+            0 0 12px rgba(255, 215, 0, 0.4),
+            0 0 24px rgba(255, 215, 0, 0.2),
+            0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    50% {
+        box-shadow:
+            0 0 20px rgba(255, 215, 0, 0.7),
+            0 0 40px rgba(255, 215, 0, 0.3),
+            0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+}
+
+@keyframes goldenBorderShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes goldenShimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+// Shadow animations
+@keyframes shadowPulse {
+    0%,
+    100% {
+        box-shadow:
+            0 0 15px rgba(75, 0, 130, 0.5),
+            0 0 30px rgba(0, 0, 0, 0.6),
+            inset 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+    50% {
+        box-shadow:
+            0 0 25px rgba(75, 0, 130, 0.7),
+            0 0 50px rgba(0, 0, 0, 0.8),
+            inset 0 0 25px rgba(0, 0, 0, 0.3);
+    }
+}
+
+@keyframes shadowBorderShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    33% {
+        background-position: 100% 0%;
+    }
+    66% {
+        background-position: 50% 100%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes shadowMist {
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+// Flame animations
+@keyframes flamePulse {
+    0%,
+    100% {
+        box-shadow:
+            0 0 12px rgba(255, 69, 0, 0.5),
+            0 0 24px rgba(255, 0, 0, 0.2),
+            0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    50% {
+        box-shadow:
+            0 0 24px rgba(255, 69, 0, 0.8),
+            0 0 48px rgba(255, 0, 0, 0.4),
+            0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+}
+
+@keyframes flameBorderShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes flameFlicker {
+    0% {
+        opacity: 0.7;
+        transform: scaleY(1);
+    }
+    100% {
+        opacity: 1;
+        transform: scaleY(1.02);
+    }
+}
+
+// Ice animations
+@keyframes icePulse {
+    0%,
+    100% {
+        box-shadow:
+            0 0 12px rgba(135, 206, 235, 0.4),
+            0 0 24px rgba(79, 195, 247, 0.2),
+            0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    50% {
+        box-shadow:
+            0 0 20px rgba(135, 206, 235, 0.7),
+            0 0 40px rgba(79, 195, 247, 0.3),
+            0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+}
+
+@keyframes iceBorderShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes iceSparkle {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.6;
+    }
+}
+
+// Neon animations
+@keyframes neonPulse {
+    0%,
+    100% {
+        box-shadow:
+            0 0 10px rgba(255, 0, 255, 0.4),
+            0 0 20px rgba(0, 255, 255, 0.3),
+            0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    50% {
+        box-shadow:
+            0 0 20px rgba(255, 0, 255, 0.7),
+            0 0 40px rgba(0, 255, 255, 0.5),
+            0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+}
+
+@keyframes neonBorderShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    25% {
+        background-position: 100% 0%;
+    }
+    50% {
+        background-position: 50% 100%;
+    }
+    75% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes neonFlicker {
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+    10% {
+        opacity: 1;
+    }
+    12% {
+        opacity: 0.4;
+    }
+    14% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    70% {
+        opacity: 1;
+    }
+    72% {
+        opacity: 0.5;
+    }
+    74% {
+        opacity: 1;
     }
 }

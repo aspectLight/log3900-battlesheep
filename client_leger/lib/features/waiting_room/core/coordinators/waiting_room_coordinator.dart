@@ -36,6 +36,9 @@ class WaitingRoomCoordinator
   final String scopeName = 'waiting_room';
 
   @override
+  bool get tearDownStaleFeatureScopeOnEntry => true;
+
+  @override
   void onScopeCreated(GetIt scope) {
     scopeHolder.setScope(scope);
     registerWaitingRoomScope(scope, getIt, entryData: entryData);
@@ -61,6 +64,7 @@ class WaitingRoomCoordinator
         :final gameDescription,
         :final boardSize,
         :final isCTF,
+        :final friendsOnly,
       ) =>
         WaitingRoomEntryData.host(
           roomId: roomId,
@@ -70,6 +74,7 @@ class WaitingRoomCoordinator
           gameDescription: gameDescription,
           boardSize: boardSize,
           isCTF: isCTF,
+          friendsOnly: friendsOnly,
         ),
       WaitingRoomEnteredAsJoin(
         :final roomId,

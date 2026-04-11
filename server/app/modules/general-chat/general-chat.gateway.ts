@@ -374,8 +374,14 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
             if (error.message.includes('ne peut pas être vide')) {
                 return 'Le nom du canal ne peut pas être vide';
             }
-            if (error.message.includes('dépasser 50 caractères')) {
+            if (error.message.includes('dépasser 50 caractères') || error.message.includes('depasser 50 caracteres')) {
                 return 'Le nom du canal ne peut pas dépasser 50 caractères';
+            }
+            if (error.message.includes('réservé pour le chat général') || error.message.includes('reserve pour le chat general')) {
+                return 'Le nom du canal est réservé pour le chat général';
+            }
+            if (error.message.includes('réservé pour les canaux de partie') || error.message.includes('reserve pour les canaux de partie')) {
+                return 'Le nom du canal est réservé pour les canaux de partie';
             }
             if (error.message.includes('Seul le créateur')) {
                 return 'Seul le créateur du canal peut le supprimer';

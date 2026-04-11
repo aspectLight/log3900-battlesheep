@@ -53,6 +53,8 @@ export class GameRoomService {
                 doorsToggled: [],
             },
             startTime: new Date(),
+            entryFee: (waitingRoom as any).entryFee ?? 0,
+            paidPlayerFirebaseUids: [...((waitingRoom as any).paidPlayerFirebaseUids ?? [])],
         };
         for (const player of newRoom.players) {
             newRoom.playersStats.push({
@@ -478,6 +480,9 @@ export class GameRoomService {
                     this.propagandaActivePlayers.add(player.id);
                 }
                 break;
+            case 'torch':
+                // Torch bonus is positional (handled by TorchService), not a permanent pickup effect
+                break;
         }
     }
 
@@ -498,12 +503,16 @@ export class GameRoomService {
                     this.propagandaActivePlayers.delete(player.id);
                 }
                 break;
+            case 'torch':
+                // Torch bonus is positional (handled by TorchService), not a permanent pickup effect
+                break;
         }
     }
 
     dropItemsWhenDisconnected(roomId: string, playerId: string) {
         const room = this.findRoomById(roomId);
         const player = room.players.find((p) => p.id === playerId);
+        if (!player || !player.position) return;
         this.server.to(room.players[0].id).emit(GameRoomEvents.ItemDroppedDisconnected, {
             roomId,
             coords: player.position,

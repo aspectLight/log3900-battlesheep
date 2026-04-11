@@ -1,5 +1,5 @@
 <div class="dialogue">
-    <div class="errors">
+    <div class="errors" [class.error-popup]="isError">
         <h2>{{ popUpMessage }}</h2>
         @if(description) {
         <h3> {{description}}</h3>

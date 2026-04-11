@@ -1,11 +1,13 @@
+import { AuthService } from '@app/modules/auth/services/auth.service';
 import { GameCombatService } from '@app/modules/combat/services/game-combat.service';
 import { GameService } from '@app/modules/game/services/game.service';
 import { CustomChannelService } from '@app/modules/general-chat/services/custom-channel.service';
 import { GameMovementService } from '@app/modules/movement/services/game-movement.service';
 import { SIZE_LIMITS } from '@app/modules/shared-room/constants/waiting-room.constants';
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
+import { BlockService } from '@app/modules/social/services/block.service';
 import { Player } from '@app/shared/interfaces/player';
-import { CustomChannelEvents, GameRoomEvents } from '@common/socket.constants';
+import { CurrencyEvents, CustomChannelEvents, GameRoomEvents } from '@common/socket.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 
@@ -22,6 +24,8 @@ export class PlayerConnectionHandler {
         private readonly gameMovementService: GameMovementService,
         private readonly gameService: GameService,
         private readonly customChannelService: CustomChannelService,
+        private readonly blockService: BlockService,
+        private readonly authService: AuthService,
     ) {}
 
     /**
@@ -30,7 +34,7 @@ export class PlayerConnectionHandler {
     handleLeaveRoom(roomId: string, socket: Socket, server: Server): void {
         this.logger.log(`${GameRoomEvents.AbandonGame} called by ${socket.id}`);
         try {
-            this.handlePlayerAbandonment(roomId, socket.id, server);
+            void this.handlePlayerAbandonment(roomId, socket.id, server);
             socket.emit(GameRoomEvents.GameAbandoned);
 
             // Faire quitter le canal de partie (roomId = "game_XXX", canal = "XXX")
@@ -59,7 +63,7 @@ export class PlayerConnectionHandler {
 
             rooms.forEach((room) => {
                 if (room && room.roomId) {
-                    this.handlePlayerAbandonment(room.roomId, socket.id, server);
+                    void this.handlePlayerAbandonment(room.roomId, socket.id, server);
                     // Faire quitter le canal de partie (roomId = "game_XXX", canal = "XXX")
                     const channelId = room.roomId.startsWith('game_') ? room.roomId.slice(5) : room.roomId;
                     socket.leave(`custom-channel-${channelId}`);
@@ -99,6 +103,28 @@ export class PlayerConnectionHandler {
 
             if (!data.player) {
                 return { success: false, error: 'Missing player data' };
+            }
+
+            // Drop-in fee: charge only if this uid has not yet paid (first join)
+            if (room.entryFee > 0 && data.firebaseUid && !room.paidPlayerFirebaseUids.includes(data.firebaseUid)) {
+                const balance = await this.authService.getVirtualCurrency(data.firebaseUid);
+                if (balance < room.entryFee) {
+                    return { success: false, error: 'Solde insuffisant pour rejoindre cette partie' };
+                }
+                const newBalance = await this.authService.updateVirtualCurrency(data.firebaseUid, -room.entryFee);
+                room.paidPlayerFirebaseUids.push(data.firebaseUid);
+                socket.emit(CurrencyEvents.VirtualCurrencyUpdated, { balance: newBalance });
+            }
+
+            // Block check: resolve joining user's username and check against room players
+            const joinerUsername = await this.resolveUsername(socket);
+            if (joinerUsername) {
+                const roomPlayerUsernames = await this.resolveRoomPlayerUsernames(room.players);
+                for (const playerUsername of roomPlayerUsernames) {
+                    if (await this.blockService.isBlockedBidirectional(joinerUsername, playerUsername)) {
+                        return { success: false, error: 'Vous ne pouvez pas rejoindre cette partie en raison d\'un blocage' };
+                    }
+                }
             }
 
             const game = await this.gameService.getGameById(room.gameId);
@@ -157,10 +183,37 @@ export class PlayerConnectionHandler {
         }
     }
 
+    private async resolveUsername(socket: Socket): Promise<string | null> {
+        try {
+            const { token } = socket.handshake.auth as { token?: string };
+            if (!token) return null;
+            const decoded = await this.authService.verifyToken(token);
+            const user = await this.authService.getUserByUid(decoded.uid);
+            return user?.username ?? null;
+        } catch {
+            return null;
+        }
+    }
+
+    private async resolveRoomPlayerUsernames(players: Player[]): Promise<string[]> {
+        const usernames: string[] = [];
+        for (const player of players) {
+            if (player.firebaseUid) {
+                try {
+                    const user = await this.authService.getUserByUid(player.firebaseUid);
+                    if (user?.username) usernames.push(user.username);
+                } catch {
+                    // Virtual players won't have a firebaseUid
+                }
+            }
+        }
+        return usernames;
+    }
+
     /**
      * Handles player abandonment logic (private helper)
      */
-    private handlePlayerAbandonment(roomId: string, playerId: string, server: Server): boolean {
+    private async handlePlayerAbandonment(roomId: string, playerId: string, server: Server): Promise<boolean> {
         const room = this.gameRoomService.findRoomById(roomId);
         const combatRooms = this.gameCombatService.findCombatsByPlayerId(playerId);
         if (combatRooms && combatRooms.length > 0) {
@@ -172,15 +225,40 @@ export class PlayerConnectionHandler {
 
         if (this.gameRoomService.isHost(roomId, playerId)) {
             server.to(roomId).emit(GameRoomEvents.DebugModeDisabled);
-            this.gameRoomService.changeHost(roomId);
+            const remainingRealPlayers = room.players.filter((p) => !p.isVirtual && p.id !== playerId);
+            if (remainingRealPlayers.length > 0) {
+                this.gameRoomService.changeHost(roomId);
+            }
+            // If no real players remain, abandonGame will delete the room
         }
 
         if (this.gameRoomService.isPlayerTurn(roomId, playerId)) {
             this.gameRoomService.endTurn(roomId);
         }
 
+        // Capture last remaining player before abandonGame may delete the room
+        const remainingPlayers = room?.players.filter((p) => p.id !== playerId) ?? [];
+        const lastPlayer = remainingPlayers.length === 1 ? remainingPlayers[0] : null;
+
         const isRoomDeleted = this.gameRoomService.abandonGame(roomId, playerId);
         if (isRoomDeleted) {
+            // Last player standing wins — distribute prizes (only if game wasn't already finished)
+            if (lastPlayer?.firebaseUid && room && !room.isFinished) {
+                try {
+                    const BASE_WIN = 200;
+                    const pool = (room.entryFee ?? 0) * (room.paidPlayerFirebaseUids?.length ?? 0);
+                    const winnerGain = BASE_WIN + Math.round(pool * 2 / 3);
+                    const newBalance = await this.authService.updateVirtualCurrency(lastPlayer.firebaseUid, winnerGain);
+                    server.to(lastPlayer.id).emit(CurrencyEvents.VirtualCurrencyUpdated, { balance: newBalance });
+                    server.to(lastPlayer.id).emit(CurrencyEvents.GameRewardsInfo, {
+                        rewards: [{ name: lastPlayer.name, gain: winnerGain, avatarName: lastPlayer.avatar?.name ?? null }],
+                        entryFee: room.entryFee ?? 0,
+                        pool,
+                    });
+                } catch (e) {
+                    this.logger.warn(`Last-player prize failed: ${e.message}`);
+                }
+            }
             this.gameMovementService.removeBoard(roomId);
             server.to(roomId).emit(GameRoomEvents.GameCanceled, { playerId });
         } else {

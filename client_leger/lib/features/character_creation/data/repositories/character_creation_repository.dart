@@ -48,6 +48,12 @@ class CharacterCreationRepository {
     );
   }
 
+  void setHealthAndSpeed({required int health, required int speed}) {
+    state.value = state.value.copyWith(
+      form: state.value.form.copyWith(health: health, speed: speed),
+    );
+  }
+
   void setAttackDice(int value) {
     state.value = state.value.copyWith(
       form: state.value.form.copyWith(attackDice: value),

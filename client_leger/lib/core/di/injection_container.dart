@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:get_it/get_it.dart';
 
-import '../../features/authentication/core/app_events/auth_events.dart';
 import '../../features/authentication/core/di/auth_module.dart';
 import '../../features/authentication/core/di/auth_repository_module.dart';
 import '../../features/authentication/core/di/auth_service_module.dart';
@@ -10,10 +9,10 @@ import '../../features/authentication/core/di/auth_side_effect_module.dart';
 import '../../features/authentication/core/di/auth_use_case_module.dart';
 import '../../features/authentication/core/di/auth_view_model_module.dart';
 import '../../features/authentication/core/interfaces/auth_repository.dart';
-import '../../features/authentication/domain/commands/auth_commands.dart';
 import '../../features/character_creation/core/di/character_creation_module.dart';
 import '../../features/chat/core/di/chat_module.dart';
 import '../../features/discussion_canals/core/di/discussion_canals_module.dart';
+import '../../features/friends/core/di/friends_module.dart';
 import '../../features/game_history/core/di/game_history_module.dart';
 import '../../features/game_session/core/di/game_session_module.dart';
 import '../../features/join_game_session/core/di/join_game_session_module.dart';
@@ -33,12 +32,10 @@ import '../../routing/route_to_navigation_state_mapper.dart';
 import '../app_transition/app_event_handler.dart';
 import '../app_transition/app_initialization.dart';
 import '../app_transition/app_transition_bus.dart';
-import '../config/app_flavor.dart';
 import '../config/env_config.dart';
 import '../connected_scope/session_scope_manager.dart';
 import '../modal/modal_module.dart';
 import '../notification/notification_module.dart';
-import '../services/log_service.dart';
 import 'app_event_handler_module.dart';
 import 'service_module.dart';
 import 'view_model_module.dart';
@@ -90,6 +87,7 @@ Future<void> setupDependencies() async {
   registerDiscussionCanalsRoot(getIt);
   registerGameHistoryRoot(getIt);
   registerProfileRoot(getIt);
+  registerFriendsRoot(getIt);
   registerCharacterCreationRoot(getIt);
   registerWaitingRoomRoot(getIt);
   registerAppEventHandler(getIt);
@@ -100,27 +98,5 @@ Future<void> setupDependencies() async {
   bootstrapSelectGameSessionSideEffects(getIt);
   bootstrapJoinGameSessionSideEffects(getIt);
   getIt<AppInitialization>().setReady();
-  if (AppFlavor.isDev &&
-      EnvConfig.devUsername.isNotEmpty &&
-      EnvConfig.devPassword.isNotEmpty) {
-    final result = await getIt<AuthRepository>()
-        .signIn(
-          SignInCommand(
-            username: EnvConfig.devUsername,
-            password: EnvConfig.devPassword,
-          ),
-        )
-        .run();
-    result.fold(
-      (exception) {
-        LogService.e('Dev auto sign-in failed', exception);
-        getIt<AppNavigator>().request(ForceUnauthenticated());
-      },
-      (user) => getIt<AppTransitionEventBus>().fire(
-        AuthEntryAppEvent.signInSuccess(user),
-      ),
-    );
-  } else {
-    getIt<AppNavigator>().request(ForceUnauthenticated());
-  }
+  getIt<AppNavigator>().request(ForceUnauthenticated());
 }

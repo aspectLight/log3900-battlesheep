@@ -1,4 +1,6 @@
 import { GeneralChatModule } from '@app/modules/general-chat/general-chat.module';
+import { GameModule } from '@app/modules/game/game.module';
+import { SocialModule } from '@app/modules/social/social.module';
 import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthController } from './controllers/auth.controller';
@@ -6,12 +8,18 @@ import { AuthGuard } from './guards/auth.guard';
 import { User, UserSchema } from './schemas/user.schema';
 import { AuthService } from './services/auth.service';
 import { FirebaseAdminService } from './services/firebase-admin.service';
+import { ShopGateway } from './shop.gateway';
 
 @Module({
-    // Use forwardRef to avoid circular dependency between AuthModule and GeneralChatModule
-    imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]), forwardRef(() => GeneralChatModule)],
+    // Use forwardRef to avoid circular dependency between AuthModule and GeneralChatModule/GameModule/SocialModule
+    imports: [
+        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+        forwardRef(() => GeneralChatModule),
+        forwardRef(() => GameModule),
+        forwardRef(() => SocialModule),
+    ],
     controllers: [AuthController],
-    providers: [FirebaseAdminService, AuthService, AuthGuard],
+    providers: [FirebaseAdminService, AuthService, AuthGuard, ShopGateway],
     exports: [FirebaseAdminService, AuthService, AuthGuard],
 })
 export class AuthModule {}

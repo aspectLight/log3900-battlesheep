@@ -27,7 +27,7 @@ export class ItemService {
             throw new Error(ErrorMessages.InvalidItem + type);
         }
         this.inventory[type]--;
-        if (type !== 'spawnPoint') {
+        if (type !== 'spawnPoint' && type !== 'flag') {
             this.totalItemsPlaced++;
             this.inventory['random'] = this.maxItemCount - this.totalItemsPlaced;
         }
@@ -38,7 +38,7 @@ export class ItemService {
             throw new Error(ErrorMessages.InvalidItem + type);
         }
         this.inventory[type]++;
-        if (type !== 'spawnPoint') {
+        if (type !== 'spawnPoint' && type !== 'flag') {
             this.totalItemsPlaced--;
             this.inventory['random'] = this.maxItemCount - this.totalItemsPlaced;
         }
@@ -72,7 +72,7 @@ export class ItemService {
             row.forEach((cell) => {
                 if (!cell.item) return;
                 this.inventory[cell.item.type]--;
-                if (cell.item.type !== 'spawnPoint') {
+                if (cell.item.type !== 'spawnPoint' && cell.item.type !== 'flag') {
                     this.totalItemsPlaced++;
                     this.inventory['random'] = this.maxItemCount - this.totalItemsPlaced;
                 }

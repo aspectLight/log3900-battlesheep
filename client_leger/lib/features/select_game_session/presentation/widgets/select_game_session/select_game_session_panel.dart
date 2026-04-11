@@ -12,6 +12,7 @@ import '../../../core/localisation/select_game_session_localizations.dart';
 import '../../../core/modal/select_game_session_modal_intents.dart';
 import '../../../domain/models/game_info_model.dart';
 import '../../../domain/state/select_game_session_state.dart';
+import 'select_game_session_board_preview_widget.dart';
 import 'select_game_session_panel_view_model.dart';
 
 class SelectGameSessionPanel extends StatefulWidget {
@@ -112,6 +113,40 @@ class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
           ),
         ),
         const SizedBox(height: 20),
+        Watch(
+          (context) => GestureDetector(
+            onTap: _viewModel.toggleFriendsOnly,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: Checkbox(
+                    value: _viewModel.friendsOnly.value,
+                    onChanged: (_) => _viewModel.toggleFriendsOnly(),
+                    fillColor: WidgetStateProperty.resolveWith(
+                      (states) => states.contains(WidgetState.selected)
+                          ? const Color(0xFF550000)
+                          : const Color(0xFF2B2B2B),
+                    ),
+                    side: const BorderSide(color: Color(0xFF7F1F1F)),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                const Text(
+                  'Amis seulement',
+                  style: TextStyle(
+                    color: Color(0xFFFFF0F0),
+                    fontSize: 18,
+                    fontFamily: 'CustomFont',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
         ElevatedButton(
           onPressed: (hasSelection && !isConfirming)
               ? () => unawaited(_viewModel.confirmSelectionSubmit())
@@ -194,7 +229,7 @@ class _GameListItem extends StatelessWidget {
     return InkWell(
       onTap: () => viewModel.selectGame(game.id),
       child: Container(
-        height: 100,
+        height: 116,
         decoration: BoxDecoration(
           color: backgroundColor,
           border: Border(
@@ -203,24 +238,29 @@ class _GameListItem extends StatelessWidget {
             bottom: BorderSide(color: borderColor),
           ),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Row(
           children: [
             Expanded(
               child: Center(
                 child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
                   onTap: () => GetIt.I<ModalIntentSink>().addIntent(
                     SelectGameSessionGamePreviewModalIntent(
                       description: game.description,
                       imagePath: '',
+                      boardSize: game.boardSize,
+                      boardMatrix: game.boardMatrix,
                     ),
                   ),
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(8),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: SizedBox.square(
+                      dimension: 100,
+                      child: SelectGameSessionBoardPreviewWidget(
+                        boardSize: game.boardSize,
+                        boardMatrix: game.boardMatrix,
+                      ),
                     ),
                   ),
                 ),

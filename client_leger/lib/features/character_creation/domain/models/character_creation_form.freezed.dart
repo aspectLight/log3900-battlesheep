@@ -186,7 +186,7 @@ class _$CharacterCreationFormImpl implements _CharacterCreationForm {
     this.health = 4,
     this.speed = 4,
     this.attackDice = 4,
-    this.defenseDice = 4,
+    this.defenseDice = 6,
   });
 
   @override

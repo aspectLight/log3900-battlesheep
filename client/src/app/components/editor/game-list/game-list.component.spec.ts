@@ -18,7 +18,7 @@ describe('GameListComponent', () => {
     let httpClientSpy: jasmine.SpyObj<HttpClient>;
 
     beforeEach(async () => {
-        gameListServiceSpy = jasmine.createSpyObj('GameListService', ['onCheckboxClick', 'onModifyClick', 'onDeleteClick', 'getDate']);
+        gameListServiceSpy = jasmine.createSpyObj('GameListService', ['onModifyClick', 'onDeleteClick', 'getDate']);
 
         httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'put', 'delete']);
 
@@ -33,7 +33,7 @@ describe('GameListComponent', () => {
             description: 'Description 1',
             mode: 'ctf',
             board: new Board(MEDIUM_BOARD_SIZE),
-            isVisible: true,
+
             modificationDate: new Date().toISOString(),
         } as Game);
 
@@ -55,7 +55,7 @@ describe('GameListComponent', () => {
             description: 'Description 2',
             mode: 'classique',
             board: new Board(LARGE_BOARD_SIZE),
-            isVisible: false,
+
             modificationDate: new Date().toISOString(),
         } as Game);
 
@@ -106,33 +106,11 @@ describe('GameListComponent', () => {
             description: 'Description 1',
             mode: 'ctf',
             board: new Board(MEDIUM_BOARD_SIZE),
-            isVisible: true,
+
             modificationDate: new Date('2025-02-06').toISOString(),
         } as Game);
 
         expect(mockGame.modificationDate).toBe(new Date('2025-02-06').toISOString());
-    });
-
-    it('should call onCheckboxClick and fetchGames', () => {
-        const mockGame = new Game();
-        mockGame['setData']({
-            _id: '1',
-            name: 'Game 1',
-            description: 'Description 1',
-            mode: 'ctf',
-            board: new Board(MEDIUM_BOARD_SIZE),
-            isVisible: true,
-            modificationDate: new Date().toISOString(),
-        } as Game);
-
-        gameListServiceSpy.onCheckboxClick.and.returnValue(of(mockGame));
-
-        const mockEvent = new MouseEvent('click');
-        component.onCheckboxClick(mockGame, mockEvent);
-        component.onConfirmVisibility();
-
-        expect(gameListServiceSpy.onCheckboxClick).toHaveBeenCalledWith(mockGame);
-        expect(gameServiceSpy.fetchGames).toHaveBeenCalled();
     });
 
     it('should call onModifyClick', () => {
@@ -143,7 +121,7 @@ describe('GameListComponent', () => {
             description: 'Description 1',
             mode: 'ctf',
             board: new Board(MEDIUM_BOARD_SIZE),
-            isVisible: true,
+
             modificationDate: new Date().toISOString(),
         } as Game);
 
@@ -160,7 +138,7 @@ describe('GameListComponent', () => {
             description: 'Description 1',
             mode: 'ctf',
             board: new Board(MEDIUM_BOARD_SIZE),
-            isVisible: true,
+
             modificationDate: new Date().toISOString(),
         } as Game);
 
@@ -171,7 +149,7 @@ describe('GameListComponent', () => {
             description: 'Description 2',
             mode: 'classique',
             board: new Board(LARGE_BOARD_SIZE),
-            isVisible: false,
+
             modificationDate: new Date().toISOString(),
         } as Game);
 
@@ -189,7 +167,7 @@ describe('GameListComponent', () => {
             description: 'Description 1',
             mode: 'ctf',
             board: new Board(MEDIUM_BOARD_SIZE),
-            isVisible: true,
+
             modificationDate: new Date().toISOString(),
         } as Game);
 
@@ -210,7 +188,7 @@ describe('GameListComponent', () => {
             description: 'Description 1',
             mode: 'ctf',
             board: new Board(MEDIUM_BOARD_SIZE),
-            isVisible: true,
+
             modificationDate: new Date().toISOString(),
         } as Game);
 
@@ -274,43 +252,6 @@ describe('GameListComponent', () => {
         expect(component.errorMessage).toBe('');
     });
 
-    it('should not call onCheckboxClick when pendingGame is null', () => {
-        // Set pendingGame to null
-        component['pendingGame'] = null;
-
-        // Call onConfirmVisibility
-        component.onConfirmVisibility();
-
-        // Verify onCheckboxClick was not called
-        expect(gameListServiceSpy.onCheckboxClick).not.toHaveBeenCalled();
-    });
-
-    it('should call onCheckboxClick when pendingGame exists', () => {
-        // Set up a mock game
-        const mockGame = new Game();
-        mockGame['setData']({
-            _id: '1',
-            name: 'Test Game',
-            description: 'Test Description',
-            mode: 'classique',
-            board: new Board(MEDIUM_BOARD_SIZE),
-            isVisible: true,
-            modificationDate: new Date().toISOString(),
-        } as Game);
-
-        // Set pendingGame
-        component['pendingGame'] = mockGame;
-
-        // Set up the spy to return success
-        gameListServiceSpy.onCheckboxClick.and.returnValue(of(mockGame));
-
-        // Call onConfirmVisibility
-        component.onConfirmVisibility();
-
-        // Verify onCheckboxClick was called with the mock game
-        expect(gameListServiceSpy.onCheckboxClick).toHaveBeenCalledWith(mockGame);
-    });
-
     it('should not call onDeleteClick when pendingGame is null', () => {
         // Set pendingGame to null
         component['pendingGame'] = null;
@@ -331,7 +272,7 @@ describe('GameListComponent', () => {
             description: 'Test Description',
             mode: 'classique',
             board: new Board(MEDIUM_BOARD_SIZE),
-            isVisible: true,
+
             modificationDate: new Date().toISOString(),
         } as Game);
 

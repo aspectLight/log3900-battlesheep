@@ -5,25 +5,20 @@
                 <div class="card-content">
                     <p class="action-wins"> {{playerCard.player.fightsWon}} </p>
                     @if (playerCard.isActive) {
-                        
-                        <p class="action-description" > Joue... </p>
-
+                        <p class="action-description">{{ 'player_card.playing' | translate }}</p>
                     }
                     @if (playerCard.isHost) {
                         <img class="host-img" src="./assets/ui/host.png">
                     }
                     @if(playerCard.player.isVirtual) {
-                        <div class="virtual-badge">Virtuel</div>
+                        <div class="virtual-badge">{{ 'player_card.virtual' | translate }}</div>
                     }
                     <div class="player-circle" [ngStyle]="{'background-color': playerCard.playerColor}"></div>
                     @if (playerCard.hasFlag) {
-                        <img src="/assets/items/flag.png" alt="Drapeau" class="flag-icon">
+                        <img src="/assets/items/flag.png" [alt]="'player_card.flag' | translate" class="flag-icon">
                     }
                     <div class="card-name">
                         {{ playerCard.player.name }}
-                        <!-- @if (playerCard.playerTeam) {
-                            <br>Équipe: {{playerCard.playerTeam}}
-                        } -->
                     </div>
                     <div class="card-image">
                         <img [src]="playerCard.player.avatar?.avatar" alt="Card Image">

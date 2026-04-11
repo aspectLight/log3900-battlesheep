@@ -59,17 +59,17 @@ class CharacterCreationRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [DiscussionCanalsScreen]
-class DiscussionCanalsRoute extends PageRouteInfo<void> {
-  const DiscussionCanalsRoute({List<PageRouteInfo>? children})
-    : super(DiscussionCanalsRoute.name, initialChildren: children);
+/// [FriendsScreen]
+class FriendsRoute extends PageRouteInfo<void> {
+  const FriendsRoute({List<PageRouteInfo>? children})
+    : super(FriendsRoute.name, initialChildren: children);
 
-  static const String name = 'DiscussionCanalsRoute';
+  static const String name = 'FriendsRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const DiscussionCanalsScreen();
+      return const FriendsScreen();
     },
   );
 }

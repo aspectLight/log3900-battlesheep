@@ -36,6 +36,11 @@ export class DragDropService {
             return;
         }
 
+        if (cell.tile.type === "trap" || cell.tile.type === "teleportPad") {
+            this.resetInteractionState();
+            return;
+        }
+
         if (this.sourceCell?.x === cell.x && this.sourceCell?.y === cell.y) {
             this.sourceCell.removeItem();
             this.itemService.putBackItem(this.draggedItem.type);

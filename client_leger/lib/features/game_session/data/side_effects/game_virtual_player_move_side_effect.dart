@@ -5,13 +5,11 @@ import '../../../../core/interfaces/disposable_side_effect.dart';
 import '../../core/event_bus/game_session_event_bus.dart';
 import '../../data/repositories/game_actions_repository.dart';
 import '../../data/repositories/game_combat_repository.dart';
-import '../../data/repositories/game_inventory_repository.dart';
 import '../../data/repositories/game_item_repository.dart';
 import '../../data/repositories/game_metadata_repository.dart';
 import '../../domain/commands/game_action_commands.dart';
 import '../../domain/commands/game_combat_commands.dart';
 import '../../domain/commands/game_item_commands.dart';
-import '../../domain/events/game_item_events.dart';
 import '../../domain/events/game_movement_events.dart';
 import '../../domain/models/game_board_position.dart';
 import '../../domain/models/game_item.dart';
@@ -24,7 +22,6 @@ class GameVirtualPlayerMoveSideEffect with DisposableSideEffect {
   final GameActionsRepository _actionsRepository;
   final GameCombatRepository _combatRepository;
   final GameItemRepository _itemRepository;
-  final GameInventoryRepository _inventoryRepository;
 
   GameVirtualPlayerMoveSideEffect({
     required String roomId,
@@ -34,14 +31,12 @@ class GameVirtualPlayerMoveSideEffect with DisposableSideEffect {
     required GameActionsRepository actionsRepository,
     required GameCombatRepository combatRepository,
     required GameItemRepository itemRepository,
-    required GameInventoryRepository inventoryRepository,
   }) : _roomId = roomId,
        _socketId = socketId,
        _gameMetadataRepository = gameMetadataRepository,
        _actionsRepository = actionsRepository,
        _combatRepository = combatRepository,
-       _itemRepository = itemRepository,
-       _inventoryRepository = inventoryRepository {
+       _itemRepository = itemRepository {
     trackSubscription(
       gameSessionEventBus.on<VirtualPlayerMoveCompleted>().listen(
         _onVirtualPlayerMoveCompleted,
@@ -52,6 +47,7 @@ class GameVirtualPlayerMoveSideEffect with DisposableSideEffect {
   void _onVirtualPlayerMoveCompleted(VirtualPlayerMoveCompleted ev) {
     final metadata = _gameMetadataRepository.state.value;
     if (metadata is! GameSessionActive) return;
+    final isHost = _socketId == metadata.hostId;
 
     final event = ev.event;
 
@@ -65,6 +61,7 @@ class GameVirtualPlayerMoveSideEffect with DisposableSideEffect {
     );
 
     if (event.opponentPlayerId.isNotEmpty) {
+      if (!isHost) return;
       _combatRepository.startVirtualCombat(
         StartVirtualCombatCommand(
           roomId: _roomId,
@@ -76,6 +73,7 @@ class GameVirtualPlayerMoveSideEffect with DisposableSideEffect {
     }
 
     if (event.remainingMovementPoints > 0) {
+      if (!isHost) return;
       _actionsRepository.runVirtualPlayerTurn(
         VirtualPlayerTurnCommand(
           roomId: _roomId,
@@ -87,7 +85,6 @@ class GameVirtualPlayerMoveSideEffect with DisposableSideEffect {
       return;
     }
 
-    final isHost = _socketId == metadata.hostId;
     if (isHost) {
       _actionsRepository.forwardTurn(ForwardTurnCommand(roomId: _roomId));
     }
@@ -107,9 +104,6 @@ class GameVirtualPlayerMoveSideEffect with DisposableSideEffect {
           item: dest.item,
           position: dest.position,
         ),
-      );
-      _inventoryRepository.applyItemCollected(
-        ItemCollectedEvent(playerId: event.playerId, item: dest.item),
       );
     });
   }

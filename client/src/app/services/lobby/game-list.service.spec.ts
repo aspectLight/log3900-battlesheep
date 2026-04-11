@@ -36,15 +36,6 @@ describe('GameListService', () => {
         expect(formattedDate).toContain('jeudi'); // Vérifie que le jour de la semaine est présent en français
     });
 
-    it('should toggle visibility on checkbox click', () => {
-        const mockGame = { _id: '123', isVisible: true } as Game;
-        service.onCheckboxClick(mockGame).subscribe();
-
-        const req = httpTestingController.expectOne(`${environment.serverUrl}/games/123`);
-        expect(req.request.method).toBe('PATCH');
-        expect(req.request.body).toEqual({ isVisible: false });
-    });
-
     it('should call delete API on delete click', () => {
         const mockGame = { _id: '123' } as Game;
         service.onDeleteClick(mockGame).subscribe();
@@ -59,8 +50,8 @@ describe('GameListService', () => {
 
         expect(gameServiceSpy.setGame).toHaveBeenCalledWith(mockGame);
     });
-    it('should return false if the game is found and visible', fakeAsync(() => {
-        const mockGame: Game = { _id: '123', name: 'Test Game', isVisible: true } as Game;
+    it('should return false if the game is found', fakeAsync(() => {
+        const mockGame: Game = { _id: '123', name: 'Test Game' } as Game;
 
         let result: boolean | undefined;
         service.fetchGameById('123').then((res) => {

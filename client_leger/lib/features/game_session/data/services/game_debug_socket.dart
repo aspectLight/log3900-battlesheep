@@ -26,6 +26,9 @@ class GameDebugSocket {
       if (!connected) return;
       _setupListeners();
     });
+    if (_socketService.isConnected) {
+      _setupListeners();
+    }
   }
 
   static const List<String> _ownedEvents = [

@@ -1,19 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RegisterUserDto, UpdateUserDto } from '@app/modules/auth/dto/auth.dto';
+import { EXCLUSIVE_AVATAR_IDS, SHOP_CATALOGUE, ShopItem } from '@common/shop.constants';
 import { User, UserDocument } from '@app/modules/auth/schemas/user.schema';
 import { FirebaseAdminService } from '@app/modules/auth/services/firebase-admin.service';
 import { CustomChannelService } from '@app/modules/general-chat/services/custom-channel.service';
 import { GeneralChatService } from '@app/modules/general-chat/services/general-chat.service';
-import {
-    ConflictException,
-    ForbiddenException,
-    Inject,
-    Injectable,
-    Logger,
-    NotFoundException,
-    UnauthorizedException,
-    forwardRef,
-} from '@nestjs/common';
+import { GameService } from '@app/modules/game/services/game.service';
+import { FriendshipService } from '@app/modules/social/services/friendship.service';
+import { BlockService } from '@app/modules/social/services/block.service';
+import { ConflictException, ForbiddenException, Inject, Injectable, Logger, NotFoundException, UnauthorizedException, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { DecodedIdToken } from 'firebase-admin/auth';
 import { Model } from 'mongoose';
@@ -32,6 +27,9 @@ export class AuthService {
         @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
         @Inject(forwardRef(() => GeneralChatService)) private readonly generalChatService: GeneralChatService,
         @Inject(forwardRef(() => CustomChannelService)) private readonly customChannelService: CustomChannelService,
+        @Inject(forwardRef(() => GameService)) private readonly gameService: GameService,
+        @Inject(forwardRef(() => FriendshipService)) private readonly friendshipService: FriendshipService,
+        @Inject(forwardRef(() => BlockService)) private readonly blockService: BlockService,
     ) {}
 
     async verifyToken(idToken: string): Promise<DecodedIdToken> {
@@ -48,6 +46,10 @@ export class AuthService {
         const { email, password, username, avatarId } = registerDto;
 
         await this.checkUsername(username);
+
+        if (avatarId && EXCLUSIVE_AVATAR_IDS.includes(avatarId)) {
+            throw new ForbiddenException('Cet avatar est exclusif et doit être acheté en boutique.');
+        }
 
         try {
             // 1. Create a new user in Firebase Auth
@@ -164,10 +166,25 @@ export class AuthService {
 
         // Updating avatar
         if (updateDto.avatarId && updateDto.avatarId !== user.avatarId) {
+            if (EXCLUSIVE_AVATAR_IDS.includes(updateDto.avatarId) && !(user.purchasedItems ?? []).includes(updateDto.avatarId)) {
+                throw new ForbiddenException('Cet avatar est exclusif et doit être acheté en boutique.');
+            }
             user.avatarId = updateDto.avatarId;
             user.avatarUrl = undefined;
             user.avatarImageBuffer = undefined;
             user.avatarImageMimeType = undefined;
+        }
+
+        // Updating theme
+        const validThemes = ['default', 'frost', 'village'];
+        if (updateDto.theme && validThemes.includes(updateDto.theme) && updateDto.theme !== user.theme) {
+            user.theme = updateDto.theme;
+        }
+
+        // Updating language
+        const validLanguages = ['fr', 'en'];
+        if (updateDto.language && validLanguages.includes(updateDto.language) && updateDto.language !== user.language) {
+            user.language = updateDto.language;
         }
 
         // Updating preferences
@@ -191,10 +208,18 @@ export class AuthService {
             await this.generalChatService.replaceUsername(username, DELETED_USER_PLACEHOLDER);
             await this.customChannelService.replaceUsername(username, DELETED_USER_PLACEHOLDER);
 
-            // 3. Delete user from Firebase Auth
+            // 3. Clean up social data (friendships, friend requests, blocks)
+            await this.friendshipService.cleanupForUser(username);
+            await this.blockService.cleanupForUser(username);
+
+            // 4. Delete all games owned by this user
+            const deletedCount = await this.gameService.deleteGamesByOwner(username);
+            this.logger.log(`Deleted ${deletedCount} game(s) owned by user: ${username}`);
+
+            // 4. Delete user from Firebase Auth
             await this.firebaseAdminService.getAuth().deleteUser(uid);
 
-            // 4. Delete user from MongoDB
+            // 5. Delete user from MongoDB
             await this.userModel.deleteOne({ firebaseUid: uid });
 
             this.logger.log(`User deleted: ${uid}`);
@@ -303,6 +328,38 @@ export class AuthService {
         entry.hasWon = false;
 
         await user.save();
+    }
+
+    async getVirtualCurrency(firebaseUid: string): Promise<number> {
+        const user = await this.getUserByUid(firebaseUid);
+        return user.virtualCurrency ?? 0;
+    }
+
+    async updateVirtualCurrency(firebaseUid: string, delta: number): Promise<number> {
+        const user = await this.getUserByUid(firebaseUid);
+        user.virtualCurrency = (user.virtualCurrency ?? 0) + delta;
+        if (user.virtualCurrency < 0) user.virtualCurrency = 0;
+        await user.save();
+        return user.virtualCurrency;
+    }
+
+    async getPurchasedItems(firebaseUid: string): Promise<string[]> {
+        const user = await this.getUserByUid(firebaseUid);
+        return user.purchasedItems ?? [];
+    }
+
+    async purchaseItem(firebaseUid: string, itemId: string): Promise<{ newBalance: number; purchasedItems: string[] }> {
+        const item: ShopItem | undefined = SHOP_CATALOGUE.find((i) => i.id === itemId);
+        if (!item) throw new Error('Article introuvable dans la boutique');
+
+        const user = await this.getUserByUid(firebaseUid);
+        if ((user.purchasedItems ?? []).includes(itemId)) throw new Error('Article déjà acheté');
+        if ((user.virtualCurrency ?? 0) < item.price) throw new Error('Solde insuffisant');
+
+        user.virtualCurrency -= item.price;
+        user.purchasedItems = [...(user.purchasedItems ?? []), itemId];
+        await user.save();
+        return { newBalance: user.virtualCurrency, purchasedItems: user.purchasedItems };
     }
 
     async updateUserStatistics(

@@ -12,27 +12,27 @@ import '../../data/services/game_debug_socket.dart';
 import '../../data/services/game_item_socket.dart';
 import '../../data/services/game_player_movement_socket.dart';
 
-void registerGameRepositories(GetIt getIt) {
-  getIt.registerLazySingleton<GameActionsRepository>(
+void registerGameScopeRepositories(GetIt scope) {
+  scope.registerLazySingleton<GameActionsRepository>(
     () => GameActionsRepository(
-      actionsSocket: getIt<GameActionsSocket>(),
+      actionsSocket: scope.get<GameActionsSocket>(),
     ),
   );
-  getIt.registerLazySingleton<GameCombatRepository>(
+  scope.registerLazySingleton<GameCombatRepository>(
     () => GameCombatRepository(
-      combatSocket: getIt<GameCombatSocket>(),
-      reducer: getIt<GameCombatStateReducer>(),
+      combatSocket: scope.get<GameCombatSocket>(),
+      reducer: scope.get<GameCombatStateReducer>(),
     ),
   );
-  getIt.registerLazySingleton<GameItemRepository>(
-    () => GameItemRepository(itemSocket: getIt<GameItemSocket>()),
+  scope.registerLazySingleton<GameItemRepository>(
+    () => GameItemRepository(itemSocket: scope.get<GameItemSocket>()),
   );
-  getIt.registerLazySingleton<GamePlayerMovementRepository>(
+  scope.registerLazySingleton<GamePlayerMovementRepository>(
     () => GamePlayerMovementRepository(
-      movementSocket: getIt<GamePlayerMovementSocket>(),
+      movementSocket: scope.get<GamePlayerMovementSocket>(),
     ),
   );
-  getIt.registerLazySingleton<GameDebugRepository>(
-    () => GameDebugRepository(debugSocket: getIt<GameDebugSocket>()),
+  scope.registerLazySingleton<GameDebugRepository>(
+    () => GameDebugRepository(debugSocket: scope.get<GameDebugSocket>()),
   );
 }

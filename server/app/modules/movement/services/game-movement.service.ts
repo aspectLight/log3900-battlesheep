@@ -386,6 +386,10 @@ export class GameMovementService {
         return player;
     }
 
+    extractCoord(element: Coords | { coord: Coords; cost: number }): Coords {
+        return 'coord' in element ? element.coord : element;
+    }
+
     private findNearestFreeWalkableCell(roomId: string, startX: number, startY: number): Cell | null {
         const visited = new Set<string>();
         const queue: { x: number; y: number }[] = [{ x: startX, y: startY }];

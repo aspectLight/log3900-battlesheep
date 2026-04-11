@@ -9,7 +9,7 @@ import '../../data/services/waiting_room_socket.dart';
 import '../event_bus/waiting_room_event_bus.dart';
 
 void registerWaitingRoomProjections(GetIt scope, GetIt rootGetIt) {
-  final socket = rootGetIt<WaitingRoomSocket>();
+  final socket = scope.get<WaitingRoomSocket>();
   final eventBus = rootGetIt<WaitingRoomEventBus>();
   scope.registerLazySingleton<WaitingRoomRoomProjection>(
     () => WaitingRoomRoomProjection(

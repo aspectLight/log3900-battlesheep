@@ -5,5 +5,4 @@ export interface MapInfo {
     size: string;
     mode: string;
     date: string;
-    visibility: boolean;
 }

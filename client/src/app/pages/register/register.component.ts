@@ -4,9 +4,11 @@ import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Va
 import { Router, RouterLink } from '@angular/router';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
+import { EXCLUSIVE_AVATAR_IDS } from '@common/shop.constants';
 import { CameraCaptureService } from '@app/services/communication/camera-capture.service';
 import { AuthService } from '@app/services/communication/auth.service';
 import { ProfileService } from '@app/services/communication/profile.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 const passwordContainsLetter: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     return /[a-zA-Z]/.test(control.value) ? null : { noLetter: true };
@@ -29,7 +31,7 @@ const passwordMatchValidator: ValidatorFn = (group: AbstractControl): Validation
 @Component({
     selector: 'app-signup-page',
     standalone: true,
-    imports: [ReactiveFormsModule, RouterLink, PopUpComponent],
+    imports: [ReactiveFormsModule, RouterLink, PopUpComponent, TranslateModule],
     templateUrl: './register.component.html',
     styleUrl: './register.component.scss',
 })
@@ -122,7 +124,12 @@ export class RegisterPageComponent {
         this.form.controls.avatarId.markAsTouched();
     }
 
+    isPremiumLocked(avatarId: string): boolean {
+        return EXCLUSIVE_AVATAR_IDS.includes(avatarId);
+    }
+
     selectAvatar(id: string) {
+        if (this.isPremiumLocked(id)) return;
         this.selectedAvatarFile = null;
         this.avatarPreviewUrl = null;
         this.avatarFileError = null;

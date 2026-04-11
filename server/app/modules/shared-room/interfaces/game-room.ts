@@ -22,4 +22,7 @@ export interface GameRoom {
     playersStats?: PlayerStats[];
     globalStats?: GlobalStats;
     startTime?: Date;
+    entryFee: number;
+    paidPlayerFirebaseUids: string[];
+    isFinished?: boolean;
 }

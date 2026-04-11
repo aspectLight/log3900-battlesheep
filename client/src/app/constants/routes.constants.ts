@@ -10,6 +10,7 @@ export const ROUTES: { [key: string]: string } = {
     endGame: '/end-game',
     signin: '/signin',
     signup: '/signup',
+    shop: '/shop',
 };
 
 export const LOADING_SCREEN_DELAY = 800;

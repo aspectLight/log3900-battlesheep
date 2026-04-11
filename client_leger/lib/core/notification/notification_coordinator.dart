@@ -13,6 +13,10 @@ class NotificationCoordinator implements NotificationIntentSink {
 
   @override
   void addIntent(NotificationIntent intent) {
+    final type = intent.runtimeType;
+    if (_entries.value.any((e) => e.intent.runtimeType == type)) {
+      return;
+    }
     final id = '${_nextId++}';
     _entries.value = [
       ..._entries.value,

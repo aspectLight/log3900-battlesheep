@@ -4,10 +4,13 @@ import { ItemCardComponent } from '@app/components/shared/item-card/item-card.co
 import { Item } from '@app/classes/entity/item';
 import { Player } from '@app/classes/entity/player';
 import { GameManagerService } from '@app/services/state/game-manager.service';
+import { TranslateModule } from '@ngx-translate/core';
+
+const VALID_TORCH_DROP_TILES = ['snow', 'water', 'ice'];
 
 @Component({
     selector: 'app-player-hud',
-    imports: [CommonModule, ItemCardComponent],
+    imports: [CommonModule, ItemCardComponent, TranslateModule],
     templateUrl: './player-hud.component.html',
     styleUrl: './player-hud.component.scss',
 })
@@ -77,5 +80,37 @@ export class PlayerHudComponent {
         if (this.expandedCards[index]) {
             this.expandedCards[index] = false;
         }
+    }
+
+    get canDropOnCurrentTile(): boolean {
+        const player = this.player;
+        if (!player || !this.gameManager.isPlayerTurn) return false;
+
+        const coords = this.gameManager.getBoard().getPlayerCoordsById(player.id);
+        if (!coords) return false;
+
+        const cell = this.gameManager.getBoard().getCell(coords.x, coords.y);
+        if (!cell) return false;
+
+        return VALID_TORCH_DROP_TILES.includes(cell.tile.type);
+    }
+
+    isTorch(item: Item): boolean {
+        return item.type === 'torch';
+    }
+
+    onDropTorch(item: Item): void {
+        const player = this.player;
+        if (!player) return;
+
+        const coords = this.gameManager.getBoard().getPlayerCoordsById(player.id);
+        if (!coords) return;
+
+        const index = player.inventory.findIndex((i) => i === item);
+        if (index !== -1) {
+            player.inventory[index] = null;
+        }
+
+        this.gameManager.dropItem(item, coords);
     }
 }

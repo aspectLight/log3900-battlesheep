@@ -20,6 +20,7 @@ mixin _$CreateWaitingRoomCommand {
   String get roomId => throw _privateConstructorUsedError;
   String get gameId => throw _privateConstructorUsedError;
   WaitingRoomPlayerModel get host => throw _privateConstructorUsedError;
+  bool get friendsOnly => throw _privateConstructorUsedError;
 
   /// Create a copy of CreateWaitingRoomCommand
   /// with the given fields replaced by the non-null parameter values.
@@ -35,7 +36,12 @@ abstract class $CreateWaitingRoomCommandCopyWith<$Res> {
     $Res Function(CreateWaitingRoomCommand) then,
   ) = _$CreateWaitingRoomCommandCopyWithImpl<$Res, CreateWaitingRoomCommand>;
   @useResult
-  $Res call({String roomId, String gameId, WaitingRoomPlayerModel host});
+  $Res call({
+    String roomId,
+    String gameId,
+    WaitingRoomPlayerModel host,
+    bool friendsOnly,
+  });
 
   $WaitingRoomPlayerModelCopyWith<$Res> get host;
 }
@@ -61,6 +67,7 @@ class _$CreateWaitingRoomCommandCopyWithImpl<
     Object? roomId = null,
     Object? gameId = null,
     Object? host = null,
+    Object? friendsOnly = null,
   }) {
     return _then(
       _value.copyWith(
@@ -76,6 +83,10 @@ class _$CreateWaitingRoomCommandCopyWithImpl<
                 ? _value.host
                 : host // ignore: cast_nullable_to_non_nullable
                       as WaitingRoomPlayerModel,
+            friendsOnly: null == friendsOnly
+                ? _value.friendsOnly
+                : friendsOnly // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -101,7 +112,12 @@ abstract class _$$CreateWaitingRoomCommandImplCopyWith<$Res>
   ) = __$$CreateWaitingRoomCommandImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String roomId, String gameId, WaitingRoomPlayerModel host});
+  $Res call({
+    String roomId,
+    String gameId,
+    WaitingRoomPlayerModel host,
+    bool friendsOnly,
+  });
 
   @override
   $WaitingRoomPlayerModelCopyWith<$Res> get host;
@@ -128,6 +144,7 @@ class __$$CreateWaitingRoomCommandImplCopyWithImpl<$Res>
     Object? roomId = null,
     Object? gameId = null,
     Object? host = null,
+    Object? friendsOnly = null,
   }) {
     return _then(
       _$CreateWaitingRoomCommandImpl(
@@ -143,6 +160,10 @@ class __$$CreateWaitingRoomCommandImplCopyWithImpl<$Res>
             ? _value.host
             : host // ignore: cast_nullable_to_non_nullable
                   as WaitingRoomPlayerModel,
+        friendsOnly: null == friendsOnly
+            ? _value.friendsOnly
+            : friendsOnly // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -155,6 +176,7 @@ class _$CreateWaitingRoomCommandImpl implements _CreateWaitingRoomCommand {
     required this.roomId,
     required this.gameId,
     required this.host,
+    this.friendsOnly = false,
   });
 
   @override
@@ -163,10 +185,13 @@ class _$CreateWaitingRoomCommandImpl implements _CreateWaitingRoomCommand {
   final String gameId;
   @override
   final WaitingRoomPlayerModel host;
+  @override
+  @JsonKey()
+  final bool friendsOnly;
 
   @override
   String toString() {
-    return 'CreateWaitingRoomCommand(roomId: $roomId, gameId: $gameId, host: $host)';
+    return 'CreateWaitingRoomCommand(roomId: $roomId, gameId: $gameId, host: $host, friendsOnly: $friendsOnly)';
   }
 
   @override
@@ -176,11 +201,14 @@ class _$CreateWaitingRoomCommandImpl implements _CreateWaitingRoomCommand {
             other is _$CreateWaitingRoomCommandImpl &&
             (identical(other.roomId, roomId) || other.roomId == roomId) &&
             (identical(other.gameId, gameId) || other.gameId == gameId) &&
-            (identical(other.host, host) || other.host == host));
+            (identical(other.host, host) || other.host == host) &&
+            (identical(other.friendsOnly, friendsOnly) ||
+                other.friendsOnly == friendsOnly));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, roomId, gameId, host);
+  int get hashCode =>
+      Object.hash(runtimeType, roomId, gameId, host, friendsOnly);
 
   /// Create a copy of CreateWaitingRoomCommand
   /// with the given fields replaced by the non-null parameter values.
@@ -199,6 +227,7 @@ abstract class _CreateWaitingRoomCommand implements CreateWaitingRoomCommand {
     required final String roomId,
     required final String gameId,
     required final WaitingRoomPlayerModel host,
+    final bool friendsOnly,
   }) = _$CreateWaitingRoomCommandImpl;
 
   @override
@@ -207,6 +236,8 @@ abstract class _CreateWaitingRoomCommand implements CreateWaitingRoomCommand {
   String get gameId;
   @override
   WaitingRoomPlayerModel get host;
+  @override
+  bool get friendsOnly;
 
   /// Create a copy of CreateWaitingRoomCommand
   /// with the given fields replaced by the non-null parameter values.

@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import '../../core/event_bus/game_session_event_bus.dart';
 import '../../../../core/interfaces/event_projection.dart';
+import '../../core/event_bus/game_session_event_bus.dart';
 import '../../domain/events/game_combat_events.dart';
 import '../../domain/state/game_combat_state.dart';
 import '../repositories/game_combat_repository.dart';
@@ -35,11 +35,8 @@ class GameCombatEventsProjection implements EventProjection {
         _combatSocket.attackResultStream.listen(_onAttackResult),
         _combatSocket.flightAttemptResultStream
             .listen(_onFlightAttemptResult),
-        _combatSocket.endCombatStream
-            .where((_) => _combatRepository.state.value is CombatActive)
-            .listen(_onEndCombat),
+        _combatSocket.endCombatStream.listen(_onEndCombat),
         _combatSocket.combatCountdownStream
-            .where((_) => _combatRepository.state.value is CombatActive)
             .map((seconds) => CombatCountdownEvent(seconds: seconds))
             .listen(_combatRepository.applyCombatCountdown),
       ];
@@ -88,23 +85,44 @@ class GameCombatEventsProjection implements EventProjection {
   }
 
   void _onFlightAttemptResult(FlightAttemptResultEvent event) {
-    if (_combatRepository.state.value is! CombatActive) {
+    final currentState = _combatRepository.state.value;
+    if (currentState is! CombatActive) {
       _pendingFlightAttemptResults.add(event);
       return;
     }
     _combatRepository.applyFlightAttemptResult(event);
+    if (!event.isSuccess) return;
+    _finalizeCombatOnSuccessfulFlight(currentState);
+  }
+
+  void _finalizeCombatOnSuccessfulFlight(CombatActive combatState) {
+    final fleeingPlayerId = combatState.currentPlayerIdRaw;
+    final opponentPlayerId = combatState.currentOpponentIdRaw;
+    _onEndCombat(
+      EndCombatResultEvent(
+        winnerId: fleeingPlayerId,
+        loserId: opponentPlayerId,
+        isByFlight: true,
+      ),
+    );
   }
 
   void _onEndCombat(EndCombatResultEvent event) {
-    if (_combatRepository.state.value is! CombatActive) return;
-    _combatRepository.applyEndCombat(event);
-    _gameSessionEventBus.fire(
-      GameCombatEnded(
-        winnerId: event.winnerId,
-        loserId: event.loserId,
-        isByFlight: event.isByFlight,
-      ),
-    );
+    final trackedLocally = _combatRepository.state.value is! CombatIdle;
+    final localPlayerWasParticipant =
+        event.winnerId == _socketId || event.loserId == _socketId;
+    if (trackedLocally) {
+      _combatRepository.applyEndCombat(event);
+    }
+    if (trackedLocally || !localPlayerWasParticipant) {
+      _gameSessionEventBus.fire(
+        GameCombatEnded(
+          winnerId: event.winnerId,
+          loserId: event.loserId,
+          isByFlight: event.isByFlight,
+        ),
+      );
+    }
     _pendingAttackResults.clear();
     _pendingFlightAttemptResults.clear();
   }

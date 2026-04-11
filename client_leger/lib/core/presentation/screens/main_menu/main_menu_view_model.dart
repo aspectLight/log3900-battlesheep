@@ -7,6 +7,8 @@ import '../../../../features/authentication/core/app_events/auth_events.dart';
 import '../../../../features/authentication/core/interfaces/auth_repository.dart';
 import '../../../../features/authentication/domain/models/user.dart';
 import '../../../../features/discussion_canals/core/app_transition/discussion_canals_events.dart';
+import '../../../../features/friends/core/app_transition/friends_events.dart';
+import '../../../../features/friends/domain/interfaces/friends_repository.dart';
 import '../../../../features/game_history/core/app_events/game_history_events.dart';
 import '../../../../features/join_game_session/core/app_events/join_game_session_events.dart';
 import '../../../../features/logs_history/core/app_events/logs_history_events.dart';
@@ -19,8 +21,10 @@ class MainMenuViewModel {
   MainMenuViewModel({
     required AuthRepository authRepository,
     required AppTransitionEventBus appTransitionEventBus,
+    required FriendsRepository friendsRepository,
   }) : _authRepository = authRepository,
-       _appTransitionEventBus = appTransitionEventBus {
+       _appTransitionEventBus = appTransitionEventBus,
+       _friendsRepository = friendsRepository {
     _authSub = _authRepository.authStateChanges.listen((userOption) {
       _currentUser.value = userOption;
     });
@@ -28,6 +32,8 @@ class MainMenuViewModel {
 
   final AuthRepository _authRepository;
   final AppTransitionEventBus _appTransitionEventBus;
+  final FriendsRepository _friendsRepository;
+  final pendingRequestCount = signal<int>(0);
   StreamSubscription<Option<UserModel>>? _authSub;
 
   final _currentUser = signal<Option<UserModel>>(const Option.none());
@@ -44,6 +50,11 @@ class MainMenuViewModel {
     _appTransitionEventBus.fire(const AuthExitAppEvent.signOut());
   }
 
+  Future<void> loadPendingRequests() async {
+    final requests = await _friendsRepository.loadPendingRequests();
+    pendingRequestCount.value = requests.length;
+  }
+
   void joinGame() {
     _appTransitionEventBus.fire(
       const JoinGameSessionEntryAppEvent.joinGameSessionRequested(),
@@ -54,6 +65,10 @@ class MainMenuViewModel {
     _appTransitionEventBus.fire(
       const SelectGameSessionEntryAppEvent.startSelection(),
     );
+  }
+
+  void administerFriends() {
+    _appTransitionEventBus.fire(const FriendsEntryAppEvent.requested());
   }
 
   void openConnectionHistory() {

@@ -21,7 +21,7 @@ class CharacterCreationFormValidator {
     if (form.name.trim().isEmpty) {
       errors.add(CharacterCreationValidationError.nameRequired);
     }
-    if (!_hasValidBonus(form)) {
+    if (!hasValidStatBonusPairing(form)) {
       errors.add(CharacterCreationValidationError.bonusRequired);
     }
     if (!isValidDiceValue(form.attackDice) ||
@@ -31,6 +31,23 @@ class CharacterCreationFormValidator {
     }
     return errors;
   }
+
+  /// Exactly one of health or speed has the +2 bonus (6); the other is base (4).
+  static bool hasValidStatBonusPairing(CharacterCreationForm form) =>
+      _hasValidBonus(form);
+
+  static bool isHealthBonusChoiceActive(CharacterCreationForm form) =>
+      hasValidStatBonusPairing(form) &&
+      form.health == CharacterCreationConstants.statWithBonusValue;
+
+  static bool isSpeedBonusChoiceActive(CharacterCreationForm form) =>
+      hasValidStatBonusPairing(form) &&
+      form.speed == CharacterCreationConstants.statWithBonusValue;
+
+  static bool hasValidDicePairing(CharacterCreationForm form) =>
+      isValidDiceValue(form.attackDice) &&
+      isValidDiceValue(form.defenseDice) &&
+      form.attackDice != form.defenseDice;
 
   static bool _hasValidBonus(CharacterCreationForm form) {
     final hasHealthBonus =

@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { KeyValuePipe } from '@angular/common';
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Item } from '@app/classes/entity/item';
 import { Tile } from '@app/classes/board/tile';
@@ -10,14 +10,17 @@ import { DragDropService } from '@app/services/editor/drag-drop.service';
 import { GameService } from '@app/services/editor/game.service';
 import { ItemService } from '@app/services/editor/item.service';
 import { PaintService } from '@app/services/editor/paint.service';
+import { TeleportService } from '@app/services/editor/teleport.service';
 import { TileService } from '@app/services/editor/tile.service';
 import { Board } from '@app/classes/board/board';
 import { SaveGameComponent } from '@app/components/editor/save-game/save-game.component';
+import { GenerateMapComponent } from '@app/components/editor/generate-map/generate-map.component';
 import { RestartGameComponent } from '@app/components/game/restart-game/restart-game.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-toolbox',
-    imports: [KeyValuePipe, FormsModule, SaveGameComponent, RestartGameComponent],
+    imports: [KeyValuePipe, FormsModule, SaveGameComponent, GenerateMapComponent, RestartGameComponent, TranslateModule],
     templateUrl: './toolbox.component.html',
     styleUrls: ['./toolbox.component.scss'],
     animations: [
@@ -32,6 +35,7 @@ import { RestartGameComponent } from '@app/components/game/restart-game/restart-
 export class ToolboxComponent implements OnInit, OnChanges {
     @Input() resetSignal: boolean;
     @Input() board!: Board;
+    @Output() mapGenerated = new EventEmitter<void>();
 
     items = ITEM_TYPES;
 
@@ -55,6 +59,7 @@ export class ToolboxComponent implements OnInit, OnChanges {
         private dragDrop: DragDropService,
         private itemService: ItemService,
         private gameService: GameService,
+        private teleportService: TeleportService,
     ) {}
 
     get gameMode() {
@@ -88,6 +93,7 @@ export class ToolboxComponent implements OnInit, OnChanges {
     }
 
     setActiveTile(tileKey: string): void {
+        this.teleportService.cancelPending(this.board);
         const tileData = TILE_TYPES[tileKey];
         if (!tileData) return;
         const defaultOrientation = tileData.defaultOrientation;
@@ -111,6 +117,7 @@ export class ToolboxComponent implements OnInit, OnChanges {
     }
 
     toggleTab(tab: string): void {
+        this.teleportService.cancelPending(this.board);
         this.activeTab = tab;
         if (tab !== 'tiles') {
             this.tileService.clearActiveTile();
@@ -142,6 +149,11 @@ export class ToolboxComponent implements OnInit, OnChanges {
 
     onRestartConfirmed(): void {
         this.resetInputs();
+    }
+
+    onMapGenerated(): void {
+        this.resetInputs();
+        this.mapGenerated.emit();
     }
 
     getGameName(): string {

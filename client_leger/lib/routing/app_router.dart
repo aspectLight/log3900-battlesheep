@@ -7,7 +7,10 @@ import '../features/authentication/presentation/screens/auth_landing/auth_landin
 import '../features/authentication/presentation/screens/login/login_screen.dart';
 import '../features/authentication/presentation/screens/sign_up/sign_up_screen.dart';
 import '../features/character_creation/presentation/screens/character_creation/character_creation_screen.dart';
+import '../features/character_creation/presentation/screens/character_creation/character_creation_screen.dart';
 import '../features/discussion_canals/presentation/screens/discussion_canals_screen.dart';
+import '../features/friends/presentation/screens/friends_screen.dart';
+import '../features/game_history/presentation/screens/game_history/game_history_screen.dart';
 import '../features/game_history/presentation/screens/game_history/game_history_screen.dart';
 import '../features/game_session/presentation/screens/game_screen/game_screen.dart';
 import '../features/join_game_session/presentation/screens/join_game_session/join_game_session_screen.dart';
@@ -103,6 +106,11 @@ class AppRouter extends RootStackRouter {
         CustomRoute(
           page: ProfileRoute.page,
           path: 'profile',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+        ),
+        CustomRoute(
+          page: FriendsRoute.page,
+          path: 'friends',
           transitionsBuilder: TransitionsBuilders.fadeIn,
         ),
         CustomRoute(

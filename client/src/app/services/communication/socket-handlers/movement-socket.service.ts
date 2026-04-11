@@ -161,6 +161,13 @@ export class MovementSocketService implements ISocketService {
         }
     }
 
+    sendTrapChoice(choice: 'avoid' | 'traverse'): void {
+        const roomId = this.gameManagerService.room.roomId;
+        const playerId = this.socket.id;
+        this.socket.emit(GameRoomEvents.TrapChoice, { roomId, playerId, choice });
+        this.gameManagerService.isTrapPopupVisible = false;
+    }
+
     private setUpListeners(): void {
         this.socket.on(GameRoomEvents.GameRoomError, (error) => {
             // eslint-disable-next-line no-console
@@ -187,7 +194,7 @@ export class MovementSocketService implements ISocketService {
         this.socket.on(GameRoomEvents.PlayerMoved, (data) => {
             const player = this.gameManagerService.getBoard().getPlayerById(data.playerId);
             if (!player) return;
-            
+
             const map = new Map<Coords, Coords[]>(data.map);
             const lastCoord = data.selectedPath[data.selectedPath.length - 1];
 
@@ -212,16 +219,19 @@ export class MovementSocketService implements ISocketService {
 
                         this.synchronizeMovement(data.playerId, lastCoord.x, lastCoord.y);
 
+                        // If a trap was hit, skip auto-end-turn — the trap flow handles it
+                        if (data.isTrap) return;
+
                         const mainPlayer = this.gameManagerService.getMainPlayer();
                         if (!mainPlayer) return;
                         if (this.checkForAvailablePoints(mainPlayer)) return;
                         if (this.checkForFlag(mainPlayer)) return;
                         if (!this.canMoveOrAct(mainPlayer, item ?? undefined)) this.socketService.endPlayerTurn(this.gameManagerService.getRoomId());
                     }
-                }
+                },
             );
 
-            if (this.gameManagerService.currentPlayerId === this.socket.id) this.getPlayerMovements();
+            if (this.gameManagerService.currentPlayerId === this.socket.id && !data.isTrap) this.getPlayerMovements();
         });
 
         this.socket.on(GameRoomEvents.PlayerTeleported, (data) => {
@@ -273,6 +283,17 @@ export class MovementSocketService implements ISocketService {
                         });
                     }
                 }
+
+                // Teleport VP after animation completes to stay in sync with server
+                if (data.teleportDestination) {
+                    this.movementService.teleportPlayer(
+                        this.gameManagerService.getBoard(),
+                        player,
+                        data.teleportDestination.x,
+                        data.teleportDestination.y,
+                    );
+                }
+
                 const gameRoomId = this.gameManagerService.getRoomId();
                 if (data.opponentPlayerId) {
                     this.startVirtualCombat(gameRoomId, data.playerId, data.opponentPlayerId);
@@ -329,6 +350,46 @@ export class MovementSocketService implements ISocketService {
             // Teleport player directly
             this.movementService.teleportPlayer(this.gameManagerService.getBoard(), player, cell.x, cell.y);
         });
+
+        this.socket.on(GameRoomEvents.TrapPending, (data: { roomId: string; playerId: string; canAvoid: boolean }) => {
+            if (data.playerId === this.socket.id) {
+                this.gameManagerService.trapCanAvoid = data.canAvoid;
+                this.gameManagerService.isTrapPopupVisible = true;
+            }
+        });
+
+        this.socket.on(
+            GameRoomEvents.TrapResult,
+            (data: { roomId: string; playerId: string; choice: string; activated: boolean; remainingMovementPoints: number }) => {
+                if (data.playerId === this.socket.id && this.gameManagerService.currentPlayerId === this.socket.id) {
+                    this.gameManagerService.isTrapPopupVisible = false;
+
+                    const mainPlayer = this.gameManagerService.getMainPlayer();
+                    if (!mainPlayer) return;
+                    mainPlayer.movementPoints = data.remainingMovementPoints;
+
+                    if (data.activated) {
+                        console.log('Fin du tour du joueur');
+                        mainPlayer.movementPoints = 0;
+                        mainPlayer.actionPoints = 0;
+                        const gameRoomId = this.gameManagerService.getRoomId();
+                        this.socketService.endPlayerTurn(gameRoomId);
+                    } else {
+                        console.log('Le joueur peut continuer son tour');
+                        this.getPlayerMovements();
+                        if (!this.canMoveOrAct(mainPlayer)) {
+                            console.log('Mais le joueur ne peut plus rien faire. Fin du tour');
+                            this.socketService.endPlayerTurn(this.gameManagerService.getRoomId());
+                        }
+                    }
+                }
+            },
+        );
+
+        // Torch illumination: server broadcasts updated illumination state
+        this.socket.on(GameRoomEvents.TorchIlluminationUpdate, (data: { roomId: string; illuminatedCells: string[]; players: any[] }) => {
+            this.gameManagerService.updateIllumination(data.illuminatedCells, data.players);
+        });
     }
 
     // Accept a pending item that is not yet in the player's inventory
@@ -343,6 +404,11 @@ export class MovementSocketService implements ISocketService {
         if (!player.cell) {
             return false;
         }
+
+        if (player.actionPoints > 0 && player.cell.tile.type === 'teleportPad') {
+            return true;
+        }
+
         const directions = [
             { x: 0, y: 1 },
             { x: 0, y: -1 },

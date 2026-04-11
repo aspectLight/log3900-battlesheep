@@ -1,22 +1,26 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { GameService } from '@app/services/editor/game.service';
 import { BOARD_CONFIGS, BoardSizes } from '@app/constants/board.constants';
 import { MODES, MODE_DESCRIPTIONS } from '@app/constants/game.constants';
 import { ROUTES } from '@app/constants/routes.constants';
+import { GameService } from '@app/services/editor/game.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-game-configurator',
     templateUrl: './game-configurator.component.html',
     styleUrl: './game-configurator.component.scss',
+    imports: [TranslateModule],
 })
 export class GameConfiguratorComponent {
     mode: string = 'classique';
-    modeDescription: string = MODE_DESCRIPTIONS[this.mode as MODES];
+    privacy: 'public' | 'private' | 'protected' = 'public';
+    modeDescriptionKey: string = MODE_DESCRIPTIONS[this.mode as MODES];
     boardSize: BoardSizes = BoardSizes.Moyenne;
     board: number = BOARD_CONFIGS[this.boardSize].board;
     players: string = BOARD_CONFIGS[this.boardSize].players;
     items: number = BOARD_CONFIGS[this.boardSize].items;
+    actionsPoints: number = 1;
 
     readonly boardSizes = BoardSizes;
 
@@ -27,7 +31,7 @@ export class GameConfiguratorComponent {
 
     onModeChange(mode: string): void {
         this.mode = mode;
-        this.modeDescription = MODE_DESCRIPTIONS[this.mode as MODES];
+        this.modeDescriptionKey = MODE_DESCRIPTIONS[this.mode as MODES];
     }
 
     onSizeChange(boardSize: BoardSizes): void {
@@ -37,10 +41,18 @@ export class GameConfiguratorComponent {
         this.items = BOARD_CONFIGS[this.boardSize].items;
     }
 
+    onPrivacyChange(privacy: string): void {
+        this.privacy = privacy as 'public' | 'private' | 'protected';
+    }
+
+    onActionsChange(actions: number): void {
+        this.actionsPoints = actions;
+    }
+
     createGame(): void {
         this.router.navigate([ROUTES.edit]);
         this.gameService.setNewGame();
-        this.gameService.setGameSettings(this.mode, this.board);
+        this.gameService.setGameSettings(this.mode, this.board, this.privacy, this.actionsPoints);
     }
 
     cancel(): void {

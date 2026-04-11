@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Board } from '@app/classes/board/board';
 import { Cell } from '@app/classes/board/cell';
 import { Item } from '@app/classes/entity/item';
@@ -8,6 +8,7 @@ import { DragDropService } from '@app/services/editor/drag-drop.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
 import { MovementService } from '@app/services/gameplay/movement.service';
 import { PaintService } from '@app/services/editor/paint.service';
+import { TeleportService } from '@app/services/editor/teleport.service';
 import { MovementSocketService } from '@app/services/communication/socket-handlers/movement-socket.service';
 import { Subscription } from 'rxjs';
 
@@ -42,7 +43,15 @@ export class BoardComponent implements OnInit, OnDestroy {
         public gameManagerService: GameManagerService,
         private movementSocketService: MovementSocketService,
         private movementService: MovementService,
+        private teleportService: TeleportService,
     ) {}
+
+    @HostListener('document:keydown.escape')
+    onEscapeKey(): void {
+        if (this.mode === 'edit') {
+            this.teleportService.cancelPending(this.board);
+        }
+    }
 
     get selectedPath() {
         return this.gameManagerService.getSelectedPath();

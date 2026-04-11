@@ -21,6 +21,10 @@
             <img class="tile-image" [src]="cell.tile.imagePath" [alt]="cell.tile.type" draggable="false" />
           }
 
+          @if (mode === 'play' && gameManagerService.isIlluminated(cell.x, cell.y)) {
+            <div class="torch-glow"></div>
+          }
+
           @if (cell.player) {
             <app-player [player]="cell.player"></app-player>
           }

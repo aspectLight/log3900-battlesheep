@@ -16,16 +16,16 @@ export const PROFILE_AVATARS: AvatarOption[] = [
 ];
 
 export const ACCOUNT_CREATION_AVATARS: AvatarOption[] = [
-    { id: 'USNavySEAL', label: 'US Navy SEAL', image: './assets/avatars/account-creation/USNavySEAL.png' },
-    { id: 'agentSpetsnaz', label: 'Agent Spetsnaz', image: './assets/avatars/account-creation/agentSpetsnaz.png' },
-    { id: 'commandoSAS', label: 'Commando SAS', image: './assets/avatars/account-creation/commandoSAS.png' },
-    { id: 'gardeFrontiere', label: 'Garde-frontière', image: './assets/avatars/account-creation/garde-frontiere.png' },
-    { id: 'milicien', label: 'Milicien', image: './assets/avatars/account-creation/milicien.png' },
-    { id: 'officierAllemand', label: 'Officier Allemand', image: './assets/avatars/account-creation/officierAllemand.png' },
-    { id: 'operateurRadio', label: 'Operateur Radio', image: './assets/avatars/account-creation/operateurRadio.png' },
-    { id: 'parachutiste', label: 'Parachutiste', image: './assets/avatars/account-creation/parachutiste.png' },
-    { id: 'pilote', label: 'Pilote', image: './assets/avatars/account-creation/pilote.png' },
-    { id: 'sergent', label: 'Sergent', image: './assets/avatars/account-creation/sergent.png' },
-    { id: 'specialisteSovietique', label: 'Spécialiste Soviétique', image: './assets/avatars/account-creation/specialisteSovietique.png' },
-    { id: 'tankiste', label: 'Tankiste', image: './assets/avatars/account-creation/tankiste.png' },
+    { id: 'esportsGamer', label: 'Esports Gamer', image: './assets/avatars/account-creation/esports-gamer.png' },
+    { id: 'raceCarDriver', label: 'Race Car Driver', image: './assets/avatars/account-creation/race-car-driver.png' },
+    { id: 'cyberpunkTechie', label: 'Cyberpunk Techie', image: './assets/avatars/account-creation/cyberpunk-techie.png' },
+    { id: 'secretAgent', label: 'Secret Agent', image: './assets/avatars/account-creation/secret-agent.png' },
+    { id: 'survivalist', label: 'Survivalist', image: './assets/avatars/account-creation/survivalist.png' },
+    { id: 'dj', label: 'DJ', image: './assets/avatars/account-creation/dj.png' },
+    { id: 'skateboarder', label: 'Skateboarder', image: './assets/avatars/account-creation/skateboarder.png' },
+    { id: 'mechanic', label: 'Mechanic', image: './assets/avatars/account-creation/mechanic.png' },
+    { id: 'detective', label: 'Detective', image: './assets/avatars/account-creation/detective.png' },
+    { id: 'streetFighter', label: 'Street Fighter', image: './assets/avatars/account-creation/street-fighter.png', premium: true },
+    { id: 'tacticalOperator', label: 'Tactical Operator', image: './assets/avatars/account-creation/tactical-operator.png', premium: true },
+    { id: 'screamGhostface', label: 'Ghostface', image: './assets/avatars/account-creation/scream-ghostface.png', premium: true },
 ];

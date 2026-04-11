@@ -1,0 +1,90 @@
+import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { ProfileMenuComponent } from '@app/components/shared/profile-menu/profile-menu.component';
+import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
+import { ShopItem } from '@common/shop.constants';
+import { VirtualCurrencyService } from '@app/services/currency/virtual-currency.service';
+import { ProfileService } from '@app/services/communication/profile.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+
+@Component({
+    selector: 'app-shop-page',
+    templateUrl: './shop-page.component.html',
+    styleUrl: './shop-page.component.scss',
+    imports: [CommonModule, RouterLink, ProfileMenuComponent, PopUpComponent, TranslateModule],
+})
+export class ShopPageComponent implements OnInit {
+    purchaseSuccess: string = '';
+    showInsufficientFundsPopup: boolean = false;
+    activePreferences: Record<string, string> = {};
+
+    constructor(
+        public currencyService: VirtualCurrencyService,
+        private profileService: ProfileService,
+        private translate: TranslateService,
+    ) {}
+
+    async ngOnInit(): Promise<void> {
+        this.currencyService.fetchBalance();
+        this.currencyService.fetchCatalogue();
+        try {
+            const profile = await this.profileService.getProfile();
+            this.activePreferences = (profile.preferences as Record<string, string>) ?? {};
+        } catch {
+            // continue with empty preferences
+        }
+    }
+
+    get avatars(): ShopItem[] {
+        return this.currencyService.catalogue.filter((i) => i.type === 'avatar');
+    }
+
+    get banners(): ShopItem[] {
+        return this.currencyService.catalogue.filter((i) => i.type === 'banner');
+    }
+
+    get characters(): ShopItem[] {
+        return this.currencyService.catalogue.filter((i) => i.type === 'character');
+    }
+
+    getItemDisplayName(item: ShopItem): string {
+        const key = `shop.items.${item.id}`;
+        const translated = this.translate.instant(key);
+        return translated !== key ? translated : item.name;
+    }
+
+    requestPurchase(item: ShopItem): void {
+        if (this.currencyService.hasPurchased(item.id)) return;
+        if (this.currencyService.balance < item.price) {
+            this.showInsufficientFundsPopup = true;
+            return;
+        }
+        this.currencyService.purchaseItem(item.id);
+        this.purchaseSuccess = this.translate.instant('shop.success.purchase');
+        setTimeout(() => { this.purchaseSuccess = ''; }, 3000);
+    }
+
+    isEquipped(item: ShopItem): boolean {
+        const key = item.type === 'banner' ? 'activeBanner' : null;
+        return key ? this.activePreferences[key] === item.id : false;
+    }
+
+    async toggleEquip(item: ShopItem): Promise<void> {
+        const key = item.type === 'banner' ? 'activeBanner' : null;
+        if (!key) return;
+
+        const newValue = this.isEquipped(item) ? null : item.id;
+        const prefs: Record<string, unknown> = { ...this.activePreferences, [key]: newValue };
+        await this.profileService.updateProfile({ preferences: prefs });
+        if (newValue) {
+            this.activePreferences = { ...this.activePreferences, [key]: newValue };
+        } else {
+            const updated = { ...this.activePreferences };
+            delete updated[key];
+            this.activePreferences = updated;
+        }
+        this.purchaseSuccess = newValue ? this.translate.instant('shop.success.equipped') : this.translate.instant('shop.success.unequipped');
+        setTimeout(() => { this.purchaseSuccess = ''; }, 3000);
+    }
+}

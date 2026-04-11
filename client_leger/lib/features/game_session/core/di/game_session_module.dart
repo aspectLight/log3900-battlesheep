@@ -46,13 +46,16 @@ import 'game_state_repository_module.dart' as state_repo;
 import 'game_use_case_module.dart' as uc;
 import 'game_view_model_module.dart' as vm;
 
+class _GameSessionScopeBootstrapped {
+  const _GameSessionScopeBootstrapped();
+}
+
 void registerGameSessionRoot(GetIt getIt) {
   getIt.registerLazySingleton<GameSessionScopeHolder>(
     GameSessionScopeHolder.new,
   );
-  registerGameServices(getIt);
+  registerGameRootServices(getIt);
   registerGameReducers(getIt);
-  registerGameRepositories(getIt);
   registerGameSessionEventBus(getIt);
   registerGameSessionCoordinator(getIt);
   se.registerGameSessionEventSideEffect(getIt);
@@ -77,6 +80,8 @@ void registerGameSessionScope(
   scope.registerLazySingleton<GameHistoryRecordHolder>(
     GameHistoryRecordHolder.new,
   );
+  registerGameScopeServices(scope, rootGetIt);
+  registerGameScopeRepositories(scope);
   state_repo.registerGameStateRepositories(scope);
   vm.registerGameSessionScopeViewModels(scope, rootGetIt, socketId: socketId);
   proj.registerGameProjections(scope, rootGetIt, socketId: socketId);
@@ -95,6 +100,12 @@ void bootstrapGameSessionScope(
   required String roomId,
   required bool isHost,
 }) {
+  if (scope.isRegistered<_GameSessionScopeBootstrapped>()) {
+    return;
+  }
+  scope.registerSingleton<_GameSessionScopeBootstrapped>(
+    const _GameSessionScopeBootstrapped(),
+  );
   scope.get<GameSessionPlayGameSideEffect>();
   registerScopedProjectionSubscriptions(scope, [
     ...scope.get<GameTurnEventsProjection>().subscribe(),

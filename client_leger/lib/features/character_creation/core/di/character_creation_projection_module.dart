@@ -9,7 +9,7 @@ import '../../data/services/character_creation_socket.dart';
 void registerCharacterCreationProjections(GetIt scope, GetIt rootGetIt) {
   scope.registerLazySingleton<CharacterCreationEventsProjection>(
     () => CharacterCreationEventsProjection(
-      socket: rootGetIt.get<CharacterCreationSocket>(),
+      socket: scope.get<CharacterCreationSocket>(),
       repository: scope.get<CharacterCreationRepository>(),
       eventBus: rootGetIt.get<CharacterCreationEventBus>(),
     ),

@@ -1,6 +1,7 @@
 import { GENERAL_CHAT_MESSAGES_LIMIT } from '@app/modules/general-chat/constants/general-chat.constants';
 import { ChatMessage } from '@app/modules/general-chat/interfaces/chat';
 import { CustomChannel, CustomChannelDocument } from '@app/modules/general-chat/schemas/custom-channel.schema';
+import { isReservedGameChannelName, isReservedGeneralChannelName } from '@common/channel-name.utils';
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { MongoServerError } from 'mongodb';
@@ -19,9 +20,15 @@ export class CustomChannelService {
         if (!channelName || channelName.trim().length === 0) {
             throw new Error('Le nom du canal ne peut pas être vide');
         }
-
         if (channelName.length > 50) {
             throw new Error('Le nom du canal ne peut pas dépasser 50 caractères');
+        }
+
+        if (isReservedGeneralChannelName(channelName)) {
+            throw new Error('Le nom du canal est réservé pour le chat général');
+        }
+        if (isReservedGameChannelName(channelName)) {
+            throw new Error('Le nom du canal est réservé pour les canaux de partie');
         }
 
         const normalizedName = channelName.trim();

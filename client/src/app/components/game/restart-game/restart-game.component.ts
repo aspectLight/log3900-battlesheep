@@ -1,9 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Board } from '@app/classes/board/board';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-restart-game',
-    imports: [],
+    imports: [TranslateModule],
     templateUrl: './restart-game.component.html',
     styleUrl: './restart-game.component.scss',
 })

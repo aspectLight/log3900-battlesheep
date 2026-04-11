@@ -50,4 +50,8 @@ export enum GameRoomEvents {
     UpdateScore = 'updateScore',
     DoorToggled = 'doorToggled',
     FinishGame = 'finishGame',
+
+    TrapPending = 'trapPending',
+    TrapChoice = 'trapChoice',
+    TrapResult = 'trapResult',
 }

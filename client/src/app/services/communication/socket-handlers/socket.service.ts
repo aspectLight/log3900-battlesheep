@@ -13,7 +13,7 @@ import { CombatService } from '@app/services/gameplay/combat.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
 import { GameRoomService } from '@app/services/state/game-room.service';
 import { SessionService } from '@app/services/state/session.service';
-import { GameRoomEvents } from '@common/socket.constants';
+import { CurrencyEvents, GameRoomEvents } from '@common/socket.constants';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
@@ -242,6 +242,10 @@ export class SocketService implements ISocketService {
         this.socket.on(GameRoomEvents.OrganizatorChanged, (data) => {
             this.gameManagerService.room.hostId = data.newhostId;
         });
+
+        this.socket.on(CurrencyEvents.GameRewardsInfo, (data: { rewards: { name: string; gain: number; avatarName: string | null }[]; entryFee: number; pool: number }) => {
+            this.gameManagerService.gameRewards = data;
+        });
     }
 
     private handleTurnStart(data: { nextPlayer: Player; startTime: number }): void {
@@ -257,7 +261,8 @@ export class SocketService implements ISocketService {
 
     private setupPlayerPoints(player: Player): void {
         this.gameManagerService.setMovementPoints(player.movementPoints);
-        this.gameManagerService.setActionPoints(1);
+        const actionPoints = this.gameManagerService.getGame()?.actionPoints ?? 1;
+        this.gameManagerService.setActionPoints(actionPoints);
     }
 
     private handlePlayerTurn(nextPlayer: Player, currentPlayer: Player, room: Room): void {

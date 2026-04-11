@@ -63,7 +63,7 @@ Map<String, dynamic> _$ItemCollectedDtoToJson(ItemCollectedDto instance) =>
 ItemDroppedDto _$ItemDroppedDtoFromJson(Map<String, dynamic> json) =>
     ItemDroppedDto(
       roomId: json['roomId'] as String,
-      playerId: json['playerId'] as String,
+      playerId: json['playerId'] as String?,
       item: GameItemDto.fromJson(json['item'] as Map<String, dynamic>),
       coords: GameBoardPositionDto.fromJson(
         json['coords'] as Map<String, dynamic>,

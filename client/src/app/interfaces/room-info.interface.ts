@@ -9,5 +9,7 @@ export interface RoomInfo {
     status: 'waiting' | 'playing';
     isLocked: boolean;
     dropInDropOut: boolean;
+    friendsOnly: boolean;
     abandonedPlayerFirebaseIds?: string[];
+    entryFee?: number;
 }

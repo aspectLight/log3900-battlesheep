@@ -6,6 +6,7 @@ import '../../data/repositories/waiting_room_reservations_repository.dart';
 import '../../data/repositories/waiting_room_room_repository.dart';
 import '../../data/services/waiting_room_socket.dart';
 import '../../domain/models/waiting_room_model.dart';
+import '../context/waiting_room_entry_data.dart';
 
 void registerWaitingRoomRepositories(
   GetIt scope,
@@ -13,11 +14,16 @@ void registerWaitingRoomRepositories(
   required String roomId,
   required String hostId,
   required String socketId,
+  required WaitingRoomEntryData entryData,
   WaitingRoomModel? initialRoom,
 }) {
-  final socket = rootGetIt<WaitingRoomSocket>();
+  final socket = scope.get<WaitingRoomSocket>();
   final initialRoomState = initialRoom ??
       WaitingRoomModel.initial(roomId: roomId, hostId: hostId);
+  final clientStartedWaitingRoom = switch (entryData) {
+    WaitingRoomHostEntryData() => true,
+    WaitingRoomJoinEntryData() => false,
+  };
   scope.registerLazySingleton<WaitingRoomRoomStateReducer>(
     WaitingRoomRoomStateReducer.new,
   );
@@ -30,6 +36,7 @@ void registerWaitingRoomRepositories(
       socketId: socketId,
       socket: socket,
       reducer: scope.get<WaitingRoomRoomStateReducer>(),
+      clientStartedWaitingRoom: clientStartedWaitingRoom,
     ),
   );
   scope.registerLazySingleton<WaitingRoomReservationsRepository>(

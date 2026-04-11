@@ -2,6 +2,7 @@ import 'package:fpdart/fpdart.dart';
 
 import '../../../../core/helpers/functional_programming.dart';
 import '../../../../core/helpers/map_utils.dart';
+import '../../core/enums/tile_type.dart';
 import 'autotile_mapper.dart';
 import '../../core/definitions/item_definition.dart';
 import '../../core/definitions/tile_definition.dart';
@@ -49,10 +50,16 @@ GameCellDetailUiState _selectedToDetail(
   final positionToPlayerId = invertMap(boardState.playerPositions);
   final rawCell = board.matrix[x][y];
   final autotile = autotileResultForCell(board, x, y, rawCell.tile.type);
-  final resolvedOrientation = Option.fromNullable(rawCell.tileOrientation)
-      .alt(() => autotile.map((r) => r.orientation));
-  final displayTileType = autotile.flatMap((r) => r.displayType);
-  final diagonalSuffix = autotile.flatMap((r) => r.diagonalSuffix);
+  final hasPersistedOrientation = rawCell.tileOrientation != null;
+  final resolvedOrientation = hasPersistedOrientation
+      ? Option.of(rawCell.tileOrientation!)
+      : autotile.map((r) => r.orientation);
+  final displayTileType = hasPersistedOrientation
+      ? const Option<TileType>.none()
+      : autotile.flatMap((r) => r.displayType);
+  final diagonalSuffix = hasPersistedOrientation
+      ? const Option<String>.none()
+      : autotile.flatMap((r) => r.diagonalSuffix);
   final cell = toGameBoardCellUi(
     rawCell,
     playerState,

@@ -5,7 +5,6 @@
     justify-content: center;
     align-items: center;
     padding: 10px 0;
-    overflow: hidden;
 }
 
 .return-button {
@@ -18,15 +17,15 @@
 }
 
 .return-button:active {
-    color: darkred;
+    color: var(--theme-text-hover-active);
 }
 
 .return-button:hover {
-    color: red;
+    color: var(--theme-text-hover);
 }
 
 img {
     width: 15px;
     max-width: 15px;
-    color: red;
+    color: var(--theme-text-hover);
 }

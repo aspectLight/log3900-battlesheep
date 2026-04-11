@@ -4,7 +4,7 @@ import '../../../../../core/services/socket_service.dart';
 import '../../data/services/join_game_session_socket.dart';
 
 void registerJoinGameSessionServices(GetIt getIt) {
-  getIt.registerLazySingleton<JoinGameSessionSocket>(
+  getIt.registerFactory<JoinGameSessionSocket>(
     () => JoinGameSessionSocket(socketService: getIt<SocketService>()),
   );
 }

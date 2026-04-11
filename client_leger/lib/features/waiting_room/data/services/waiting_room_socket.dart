@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:fpdart/fpdart.dart';
 
+import '../../../../core/helpers/replay_latest_broadcast_controller.dart';
 import '../../../../core/helpers/socket_listener_helper.dart';
 import '../../../../core/services/socket_service.dart';
 import '../../core/exceptions/waiting_room_failure.dart';
@@ -42,12 +43,15 @@ class WaitingRoomSocket {
       if (!connected) return;
       await _setupListeners();
     });
+    if (_socketService.isConnected) {
+      unawaited(_setupListeners());
+    }
   }
 
   final SocketService _socketService;
 
   final _waitingRoomCreatedController =
-      StreamController<WaitingRoomModel>.broadcast();
+      ReplayLatestBroadcastController<WaitingRoomModel>();
   final _roomCanceledController = StreamController<void>.broadcast();
   final _roomLockedController = StreamController<void>.broadcast();
   final _roomUnlockedController = StreamController<void>.broadcast();
@@ -56,7 +60,7 @@ class WaitingRoomSocket {
       StreamController<List<WaitingRoomPlayerModel>>.broadcast();
   final _playerKickedController = StreamController<void>.broadcast();
   final _updateCharacterReservedController =
-      StreamController<List<ReservationModel>>.broadcast();
+      ReplayLatestBroadcastController<List<ReservationModel>>();
   final _waitingRoomErrorController =
       StreamController<WaitingRoomFailure>.broadcast();
   final _gameRoomCreatedController =
@@ -99,12 +103,15 @@ class WaitingRoomSocket {
   Future<void> _setupListeners() async {
     await _cancelEventListeners();
     _eventSubscriptions.addAll([
-      subscribeSocketEvent<Map<String, dynamic>>(
-        _socketService,
-        WaitingRoomSocketEvents.inbound.waitingRoomCreated,
-        _waitingRoomCreatedController,
-        (data) => WaitingRoomDto.fromJson(data).toModel(),
-      ),
+      _socketService
+          .on<Map<String, dynamic>>(
+            WaitingRoomSocketEvents.inbound.waitingRoomCreated,
+          )
+          .listen((data) {
+            _waitingRoomCreatedController.add(
+              WaitingRoomDto.fromJson(data).toModel(),
+            );
+          }),
       subscribeSocketEvent<Object?>(
         _socketService,
         WaitingRoomSocketEvents.inbound.roomCanceled,
@@ -135,14 +142,18 @@ class WaitingRoomSocket {
         _playerKickedController,
         (_) => null,
       ),
-      subscribeSocketEvent<Map<String, dynamic>>(
-        _socketService,
+      _socketService
+          .on<Map<String, dynamic>>(
         WaitingRoomSocketEvents.inbound.updateAvatarReserved,
-        _updateCharacterReservedController,
-        (data) => UpdateCharacterReservedPayloadDto.fromJson(
-          data,
-        ).reservedCharacters.map((d) => d.toModel()).toList(),
-      ),
+      )
+          .listen((data) {
+        _updateCharacterReservedController.add(
+          UpdateCharacterReservedPayloadDto.fromJson(data)
+              .reservedCharacters
+              .map((d) => d.toModel())
+              .toList(),
+        );
+      }),
       subscribeSocketEvent<Object?>(
         _socketService,
         WaitingRoomSocketEvents.inbound.waitingRoomError,
@@ -155,12 +166,15 @@ class WaitingRoomSocket {
         _playerCreatedController,
         (data) => PlayerCreatedPayloadDto.fromList(data).toModels(),
       ),
-      subscribeSocketEvent<Map<String, dynamic>>(
-        _socketService,
-        WaitingRoomSocketEvents.inbound.gameRoomCreated,
-        _gameRoomCreatedController,
-        GameRoomCreatedPayloadDto.fromJson,
-      ),
+      _socketService
+          .on<Map<String, dynamic>>(
+            WaitingRoomSocketEvents.inbound.gameRoomCreated,
+          )
+          .listen((data) {
+            _gameRoomCreatedController.add(
+              GameRoomCreatedPayloadDto.fromJson(data),
+            );
+          }),
     ]);
   }
 

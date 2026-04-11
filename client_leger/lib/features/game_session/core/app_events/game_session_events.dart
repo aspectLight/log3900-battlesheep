@@ -23,6 +23,7 @@ sealed class GameSessionEntryAppEvent
     required String gameId,
     required String socketId,
     required bool isHost,
+    required String gameRoomHostId,
     required String gameName,
     required String gameDescription,
   }) = GameSessionStartConfirmedEvent;

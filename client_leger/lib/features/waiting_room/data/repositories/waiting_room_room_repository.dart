@@ -25,18 +25,21 @@ class WaitingRoomRoomRepository {
     required String socketId,
     required WaitingRoomSocket socket,
     required WaitingRoomRoomStateReducer reducer,
+    required bool clientStartedWaitingRoom,
   }) : _socket = socket,
        _reducer = reducer,
+       _clientStartedWaitingRoom = clientStartedWaitingRoom,
        state = signal(
          WaitingRoomRoomState(room: initialRoom, socketId: socketId),
        );
 
   final WaitingRoomSocket _socket;
   final WaitingRoomRoomStateReducer _reducer;
+  final bool _clientStartedWaitingRoom;
 
   final Signal<WaitingRoomRoomState> state;
 
-  bool get isHost => state.value.isHost;
+  bool get isHost => _clientStartedWaitingRoom;
 
   void applyRoomCreated(RoomCreatedEvent event) {
     state.value = _reducer.reduce(state.value, event);

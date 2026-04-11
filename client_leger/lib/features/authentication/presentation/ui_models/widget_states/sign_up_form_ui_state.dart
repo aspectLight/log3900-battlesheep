@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:fpdart/fpdart.dart';
 
-import '../../../../../core/enums/avatar.dart';
+import '../../../../../core/enums/auth_avatar.dart';
 
 part 'sign_up_form_ui_state.freezed.dart';
 
@@ -12,7 +12,7 @@ class SignUpFormUiState with _$SignUpFormUiState {
     required String email,
     required String password,
     required String confirmPassword,
-    required Option<Avatar> avatar,
+    required Option<AuthAvatar> avatar,
     required bool hasAttemptedSubmit,
   }) = _SignUpFormUiState;
 

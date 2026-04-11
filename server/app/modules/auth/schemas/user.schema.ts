@@ -70,6 +70,12 @@ export class User {
     @Prop()
     avatarImageMimeType?: string;
 
+    @Prop({ default: 'default', enum: ['default', 'frost', 'village'] })
+    theme: string;
+
+    @Prop({ default: 'fr', enum: ['fr', 'en'] })
+    language: string;
+
     @Prop({ default: null })
     currentSessionId: string | null;
 
@@ -91,6 +97,12 @@ export class User {
 
     @Prop()
     lastLoginAt: Date;
+
+    @Prop({ default: 100 })
+    virtualCurrency: number;
+
+    @Prop({ type: [String], default: [] })
+    purchasedItems: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

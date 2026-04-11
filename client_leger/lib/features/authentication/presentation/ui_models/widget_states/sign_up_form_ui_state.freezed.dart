@@ -21,7 +21,7 @@ mixin _$SignUpFormUiState {
   String get email => throw _privateConstructorUsedError;
   String get password => throw _privateConstructorUsedError;
   String get confirmPassword => throw _privateConstructorUsedError;
-  Option<Avatar> get avatar => throw _privateConstructorUsedError;
+  Option<AuthAvatar> get avatar => throw _privateConstructorUsedError;
   bool get hasAttemptedSubmit => throw _privateConstructorUsedError;
 
   /// Create a copy of SignUpFormUiState
@@ -43,7 +43,7 @@ abstract class $SignUpFormUiStateCopyWith<$Res> {
     String email,
     String password,
     String confirmPassword,
-    Option<Avatar> avatar,
+    Option<AuthAvatar> avatar,
     bool hasAttemptedSubmit,
   });
 }
@@ -91,7 +91,7 @@ class _$SignUpFormUiStateCopyWithImpl<$Res, $Val extends SignUpFormUiState>
             avatar: null == avatar
                 ? _value.avatar
                 : avatar // ignore: cast_nullable_to_non_nullable
-                      as Option<Avatar>,
+                      as Option<AuthAvatar>,
             hasAttemptedSubmit: null == hasAttemptedSubmit
                 ? _value.hasAttemptedSubmit
                 : hasAttemptedSubmit // ignore: cast_nullable_to_non_nullable
@@ -116,7 +116,7 @@ abstract class _$$SignUpFormUiStateImplCopyWith<$Res>
     String email,
     String password,
     String confirmPassword,
-    Option<Avatar> avatar,
+    Option<AuthAvatar> avatar,
     bool hasAttemptedSubmit,
   });
 }
@@ -163,7 +163,7 @@ class __$$SignUpFormUiStateImplCopyWithImpl<$Res>
         avatar: null == avatar
             ? _value.avatar
             : avatar // ignore: cast_nullable_to_non_nullable
-                  as Option<Avatar>,
+                  as Option<AuthAvatar>,
         hasAttemptedSubmit: null == hasAttemptedSubmit
             ? _value.hasAttemptedSubmit
             : hasAttemptedSubmit // ignore: cast_nullable_to_non_nullable
@@ -194,7 +194,7 @@ class _$SignUpFormUiStateImpl implements _SignUpFormUiState {
   @override
   final String confirmPassword;
   @override
-  final Option<Avatar> avatar;
+  final Option<AuthAvatar> avatar;
   @override
   final bool hasAttemptedSubmit;
 
@@ -249,7 +249,7 @@ abstract class _SignUpFormUiState implements SignUpFormUiState {
     required final String email,
     required final String password,
     required final String confirmPassword,
-    required final Option<Avatar> avatar,
+    required final Option<AuthAvatar> avatar,
     required final bool hasAttemptedSubmit,
   }) = _$SignUpFormUiStateImpl;
 
@@ -262,7 +262,7 @@ abstract class _SignUpFormUiState implements SignUpFormUiState {
   @override
   String get confirmPassword;
   @override
-  Option<Avatar> get avatar;
+  Option<AuthAvatar> get avatar;
   @override
   bool get hasAttemptedSubmit;
 

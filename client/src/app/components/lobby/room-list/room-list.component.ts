@@ -5,12 +5,13 @@ import { BoardComponent } from '@app/components/shared/board/board.component';
 import { LoadingScreenComponent } from '@app/components/shared/loading-screen/loading-screen.component';
 import { RoomInfo } from '@app/interfaces/room-info.interface';
 import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-room-list',
     templateUrl: './room-list.component.html',
     styleUrls: ['./room-list.component.scss'],
-    imports: [CommonModule, BoardComponent, LoadingScreenComponent],
+    imports: [CommonModule, BoardComponent, LoadingScreenComponent, TranslateModule],
 })
 export class RoomListComponent implements OnInit {
     @Output() selectedRoom = new EventEmitter<RoomInfo>();
@@ -19,7 +20,10 @@ export class RoomListComponent implements OnInit {
     selectedRoomId: string | null = null;
     isLoading = true;
 
-    constructor(private roomSocketService: RoomSocketService) {}
+    constructor(
+        private roomSocketService: RoomSocketService,
+        private translate: TranslateService,
+    ) {}
 
     ngOnInit(): void {
         this.loadRooms();
@@ -48,12 +52,19 @@ export class RoomListComponent implements OnInit {
     }
 
     getStatusLabel(status: 'waiting' | 'playing'): string {
-        return status === 'waiting' ? 'En attente' : 'En cours';
+        return status === 'waiting'
+            ? this.translate.instant('room.status_waiting')
+            : this.translate.instant('room.status_playing');
+    }
+
+    getModeLabel(mode: string): string {
+        return mode === 'ctf' ? 'CTF' : 'Classique';
     }
 
     getAccessibilityLabel(room: RoomInfo): string {
-        if (room.playerCount >= room.maxPlayers) return 'Complète';
+        if (room.playerCount >= room.maxPlayers) return this.translate.instant('room.status_full');
+        if (room.friendsOnly) return 'Amis seulement';
         if (room.status === 'playing' && room.dropInDropOut) return 'Drop-in';
-        return 'Ouverte';
+        return this.translate.instant('room.status_open');
     }
 }

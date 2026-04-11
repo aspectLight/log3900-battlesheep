@@ -30,8 +30,8 @@ class GameSessionEventsProjection implements EventProjection {
     ),
   ];
 
-  void _onGameCanceled(GameCanceledEvent _) {
-    _gameSessionEventBus.fire(const GameSessionCanceled());
+  void _onGameCanceled(GameCanceledEvent event) {
+    _gameSessionEventBus.fire(GameSessionCanceled(playerId: event.playerId));
   }
 
   void _onGameAbandoned(GameAbandonedEvent _) {

@@ -13,7 +13,7 @@ function createWindow() {
     }
   });
 
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
 
   win.loadURL(
     `file://${path.join(__dirname, 'dist', 'client', 'index.html')}`

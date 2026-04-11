@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Auth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { Board } from '@app/classes/board/board';
 import { Cell } from '@app/classes/board/cell';
@@ -16,8 +17,10 @@ import { MovementService } from '@app/services/gameplay/movement.service';
 import { PathService } from '@app/services/gameplay/path.service';
 import { HistoryService } from '@app/services/history/history.service';
 import { GameRoomService } from '@app/services/state/game-room.service';
+import { SessionService } from '@app/services/state/session.service';
 import { API_ENDPOINTS } from '@common/api-endpoints.constants';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
+import { BehaviorSubject, Observable, Subject, from, switchMap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -28,6 +31,8 @@ export class GameManagerService {
 
     notificationTime: number;
     isNotificationVisible: boolean = false;
+
+    illuminatedCells: Set<string> = new Set();
 
     isGameCanceled: boolean = false;
     isGameFinished: boolean = false;
@@ -46,11 +51,15 @@ export class GameManagerService {
     pendingReplacement: { player: Player; newItem: Item; candidateItems: Item[]; cellCoords: Coords } | null = null;
     dropItem: (item: Item, coords: Coords) => void;
 
+    isTrapPopupVisible: boolean = false;
+    trapCanAvoid: boolean = false;
+
     movementService: MovementService;
     room: Room;
 
     playerWithFlag: string | null = null;
     winner: string;
+    gameRewards: { rewards: { name: string; gain: number; avatarName: string | null }[]; entryFee: number; pool: number } | null = null;
 
     private game: Game;
     private board: Board;
@@ -65,6 +74,9 @@ export class GameManagerService {
         private pathService: PathService,
         private router: Router,
         private historyService: HistoryService,
+        private auth: Auth,
+        private session: SessionService,
+        private translate: TranslateService,
     ) {
         this.movementService = new MovementService();
         this.gameRoomService.room$.subscribe((room) => {
@@ -112,6 +124,7 @@ export class GameManagerService {
         this.isGameFinished = false;
         this.isGameLoaded = false;
         this.disconnectedPlayer = [];
+        this.gameRewards = null;
         this.clearPaths();
     }
 
@@ -173,7 +186,21 @@ export class GameManagerService {
     }
 
     fetchGame(gameId: string): Observable<Game> {
-        return this.http.get<Game>(environment.serverUrl + API_ENDPOINTS.games + gameId);
+        return from(this.getAuthHeaders()).pipe(
+            switchMap((headers) => this.http.get<Game>(environment.serverUrl + API_ENDPOINTS.games + gameId, { headers })),
+        );
+    }
+
+    private async getAuthHeaders(): Promise<HttpHeaders> {
+        const user = this.auth.currentUser;
+        const sessionId = this.session.sessionId;
+
+        if (!user || !sessionId) {
+            throw new Error('Utilisateur non authentifié');
+        }
+
+        const token = await user.getIdToken();
+        return new HttpHeaders().set('Authorization', `Bearer ${token}`).set('x-session-id', sessionId);
     }
 
     getIsGameLoaded(): boolean {
@@ -375,6 +402,25 @@ export class GameManagerService {
         this.pathService.clearService();
     }
 
+    isIlluminated(x: number, y: number): boolean {
+        return this.illuminatedCells.has(`${x},${y}`);
+    }
+
+    updateIllumination(illuminatedCells: string[], players?: any[]): void {
+        this.illuminatedCells = new Set(illuminatedCells);
+
+        // Update player stats from server data if provided
+        if (players) {
+            for (const serverPlayer of players) {
+                const boardPlayer = this.board.getPlayerById(serverPlayer.id);
+                if (boardPlayer && serverPlayer.stats) {
+                    boardPlayer.setStatValue(BonusType.Attack, serverPlayer.stats['attack'].value);
+                    boardPlayer.setStatValue(BonusType.Defense, serverPlayer.stats['defense'].value);
+                }
+            }
+        }
+    }
+
     getMoveInfo() {
         if (!this.movementService.selectedPlayer) return;
         const roomId = this.room.roomId;
@@ -412,7 +458,7 @@ export class GameManagerService {
 
     handleTurnStarting(player: Player, countdown: number): void {
         this.clearPaths();
-        this.notificationMessage = `Le tour de ${player.name} commence dans 3 secondes!`;
+        this.notificationMessage = this.translate.instant('game_info.turn_starting', { name: player.name });
         this.notificationTime = countdown;
         this.updateCurrentPlayer(player);
     }

@@ -25,11 +25,11 @@ class GameTurnStartNotificationSideEffect with DisposableSideEffect {
         .where((p) => p.id == event.nextPlayerId)
         .map((p) => p.name)
         .firstOrNull;
-    final playerName = name ?? event.nextPlayerId;
+    if (name == null) return;
     final countdownSeconds = event.startTime <= 0 ? 1 : event.startTime;
     _notificationIntentSink.addIntent(
       TurnStartNotificationIntent(
-        playerName: playerName,
+        playerName: name,
         countdownSeconds: countdownSeconds,
       ),
     );

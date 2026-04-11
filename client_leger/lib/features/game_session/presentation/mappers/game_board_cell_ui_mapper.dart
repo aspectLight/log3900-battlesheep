@@ -54,10 +54,16 @@ GameBoardUi toGameBoardUi(
     for (var j = 0; j < board.size; j++) {
       final cell = board.matrix[i][j];
       final autotile = autotileResultForCell(board, i, j, cell.tile.type);
-      final resolvedOrientation = Option.fromNullable(cell.tileOrientation)
-          .alt(() => autotile.map((r) => r.orientation));
-      final displayTileType = autotile.flatMap((r) => r.displayType);
-      final diagonalSuffix = autotile.flatMap((r) => r.diagonalSuffix);
+      final hasPersistedOrientation = cell.tileOrientation != null;
+      final resolvedOrientation = hasPersistedOrientation
+          ? Option.of(cell.tileOrientation!)
+          : autotile.map((r) => r.orientation);
+      final displayTileType = hasPersistedOrientation
+          ? const Option<TileType>.none()
+          : autotile.flatMap((r) => r.displayType);
+      final diagonalSuffix = hasPersistedOrientation
+          ? const Option<String>.none()
+          : autotile.flatMap((r) => r.diagonalSuffix);
       row.add(
         toGameBoardCellUi(
           cell,

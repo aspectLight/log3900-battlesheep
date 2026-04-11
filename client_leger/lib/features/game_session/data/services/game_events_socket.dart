@@ -4,15 +4,17 @@ import '../models/dto/game_events_dto.dart';
 import '../models/extensions/game_events_dto_extensions.dart';
 import '../models/events/game_events_socket_events.dart';
 import '../../domain/events/game_events.dart';
+import '../../../../core/helpers/replay_latest_broadcast_controller.dart';
+import '../../../../core/helpers/socket_numeric_payload.dart';
 import '../../../../core/services/socket_service.dart';
 
 class GameEventsSocket {
   final SocketService _socketService;
 
   final _playerSpawnedController =
-      StreamController<PlayerSpawnedEvent>.broadcast();
+      ReplayLatestBroadcastController<PlayerSpawnedEvent>();
   final _turnStartingController =
-      StreamController<TurnStartingEvent>.broadcast();
+      ReplayLatestBroadcastController<TurnStartingEvent>();
   final _updateCountdownController =
       StreamController<UpdateCountdownEvent>.broadcast();
   final _updateStartingCountdownController =
@@ -39,6 +41,9 @@ class GameEventsSocket {
       if (!connected) return;
       _setupListeners();
     });
+    if (_socketService.isConnected) {
+      _setupListeners();
+    }
   }
 
   static const List<String> _ownedEvents = [
@@ -104,18 +109,22 @@ class GameEventsSocket {
               TurnStartingDto.fromObject(data).toEntity(),
             );
           }),
-      _socketService.on<int>(GameEventsSocketEvents.updateCountdown).listen((
-        data,
-      ) {
-        _updateCountdownController.add(
-          UpdateCountdownDto.fromObject(data).toEntity(),
-        );
-      }),
       _socketService
-          .on<int>(GameEventsSocketEvents.updateStartingCountdown)
+          .on<Object?>(GameEventsSocketEvents.updateCountdown)
           .listen((data) {
+            final v = tryParseSocketWholeNumber(data);
+            if (v == null) return;
+            _updateCountdownController.add(
+              UpdateCountdownDto(countdown: v).toEntity(),
+            );
+          }),
+      _socketService
+          .on<Object?>(GameEventsSocketEvents.updateStartingCountdown)
+          .listen((data) {
+            final v = tryParseSocketWholeNumber(data);
+            if (v == null) return;
             _updateStartingCountdownController.add(
-              UpdateStartingCountdownDto.fromObject(data).toEntity(),
+              UpdateStartingCountdownDto(countdown: v).toEntity(),
             );
           }),
       _socketService.on<String>(GameEventsSocketEvents.updateScore).listen((

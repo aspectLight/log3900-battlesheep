@@ -29,7 +29,7 @@ void registerWaitingRoomSideEffect(GetIt scope, GetIt rootGetIt) {
   final modalIntentSink = rootGetIt<ModalIntentSink>();
   scope.registerSingleton<WaitingRoomGameStartedSideEffect>(
     WaitingRoomGameStartedSideEffect(
-      waitingRoomSocket: rootGetIt<WaitingRoomSocket>(),
+      waitingRoomSocket: scope.get<WaitingRoomSocket>(),
       appTransitionEventBus: appTransitionEventBus,
       sessionScopeManager: rootGetIt<SessionScopeManager>(),
       entryData: scope.get<WaitingRoomEntryData>(),
@@ -38,7 +38,7 @@ void registerWaitingRoomSideEffect(GetIt scope, GetIt rootGetIt) {
   );
   scope.registerSingleton<WaitingRoomAutoLockOnMaxPlayersSideEffect>(
     WaitingRoomAutoLockOnMaxPlayersSideEffect(
-      waitingRoomSocket: rootGetIt<WaitingRoomSocket>(),
+      waitingRoomSocket: scope.get<WaitingRoomSocket>(),
       roomRepository: scope.get<WaitingRoomRoomRepository>(),
       startParams: scope.get<WaitingRoomStartValidationParams>(),
     ),

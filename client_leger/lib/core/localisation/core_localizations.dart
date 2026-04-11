@@ -164,6 +164,12 @@ abstract class CoreLocalizations {
   /// **'Administer Games'**
   String get administerGames;
 
+  /// No description provided for @friends.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get friends;
+
   /// No description provided for @settings.
   ///
   /// In en, this message translates to:

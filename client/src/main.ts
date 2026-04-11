@@ -1,5 +1,5 @@
-import { provideHttpClient } from '@angular/common/http';
-import { enableProdMode } from '@angular/core';
+import { HttpClient, provideHttpClient } from '@angular/common/http';
+import { enableProdMode, importProvidersFrom } from '@angular/core';
 import { getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { browserSessionPersistence, initializeAuth, provideAuth } from '@angular/fire/auth';
 import { bootstrapApplication } from '@angular/platform-browser';
@@ -23,8 +23,15 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { ProfilePageComponent } from '@app/pages/profile-page/profile-page.component';
 import { RegisterPageComponent } from '@app/pages/register/register.component';
 import { WaitingPlayerPageComponent } from '@app/pages/waiting-player-page/waiting-player-page.component';
-import { ChannelsPageComponent } from '@app/pages/channels-page/channels-page.component';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { FriendsPageComponent } from '@app/pages/friends-page/friends-page.component';
+import { ShopPageComponent } from '@app/pages/shop-page/shop-page.component';
 import { environment } from './environments/environment';
+
+export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
+    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
 
 if (environment.production) {
     enableProdMode();
@@ -48,7 +55,8 @@ const routes: Routes = [
     { path: 'logs-history', component: LogsHistoryComponent, canActivate: [authGuard] },
     { path: 'games-history', component: GamesHistoryComponent, canActivate: [authGuard] },
     { path: 'profile', component: ProfilePageComponent, canActivate: [authGuard] },
-    { path: 'channels', component: ChannelsPageComponent, canActivate: [authGuard] },
+    { path: 'friends', component: FriendsPageComponent, canActivate: [authGuard] },
+    { path: 'shop', component: ShopPageComponent, canActivate: [authGuard] },
     { path: '**', redirectTo: '/home' },
 ];
 
@@ -59,5 +67,15 @@ bootstrapApplication(AppComponent, {
         provideAnimations(),
         provideFirebaseApp(() => initializeApp(environment.firebase)),
         provideAuth(() => initializeAuth(getApp(), { persistence: browserSessionPersistence })),
+        importProvidersFrom(
+            TranslateModule.forRoot({
+                defaultLanguage: 'fr',
+                loader: {
+                    provide: TranslateLoader,
+                    useFactory: HttpLoaderFactory,
+                    deps: [HttpClient],
+                },
+            }),
+        ),
     ],
 });

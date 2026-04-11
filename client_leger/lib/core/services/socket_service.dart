@@ -44,7 +44,7 @@ class SocketService {
         });
         _setupCoreListeners();
         for (final e in _eventControllers.entries) {
-          _socket!.on(e.key, e.value.add);
+          _bindEventListener(e.key, e.value);
         }
         _socket!.connect();
         await _waitForConnection();
@@ -130,12 +130,18 @@ class SocketService {
     return _eventControllers
         .putIfAbsent(event, () {
           final controller = StreamController<Object?>.broadcast();
-          _socket?.on(event, controller.add);
+          _bindEventListener(event, controller);
           return controller;
         })
         .stream
         .where((data) => data is T)
         .map((data) => data as T);
+  }
+
+  void _bindEventListener(String event, StreamController<Object?> controller) {
+    _socket?.on(event, (dynamic data) {
+      controller.add(data);
+    });
   }
 
   void off(String event) {

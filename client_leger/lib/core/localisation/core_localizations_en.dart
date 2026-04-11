@@ -42,6 +42,9 @@ class CoreLocalizationsEn extends CoreLocalizations {
   String get administerGames => 'Administer Games';
 
   @override
+  String get friends => 'Friends';
+
+  @override
   String get settings => 'Settings';
 
   @override
