@@ -4,13 +4,15 @@
 </div>
 } @else {
 <div class="container">
-    <button class="return-button" routerLink="/home" type="button">
-        <img src="./assets/ui/left.png" alt="Back" />
-        {{ 'common.back' | translate }}
-    </button>
+    <div class="header">
+        <button class="return-button" routerLink="/home" type="button">
+            <img src="./assets/ui/left.png" alt="Back" />
+            {{ 'common.home' | translate }}
+        </button>
+        <h1>{{ 'profile.title' | translate }}</h1>
+    </div>
 
     <div class="content-wrapper">
-        <h1 class="page-title">{{ 'profile.title' | translate }}</h1>
 
         @if (showSuccessMessage) {
         <app-pop-up
@@ -141,29 +143,22 @@
                 </div>
 
                 <div class="form-column-right">
-                    <div class="statistics-section">
-                        <h2 class="section-title">{{ 'profile.statistics' | translate }}</h2>
-                        <div class="statistics-grid">
-                            <div class="stat-card">
-                                <h3 class="stat-label">{{ 'profile.stats.classic' | translate }}</h3>
-                                <p class="stat-value">{{ statistics?.classicGamesPlayed ?? 0 }}</p>
-                            </div>
-                            <div class="stat-card">
-                                <h3 class="stat-label">{{ 'profile.stats.ctf' | translate }}</h3>
-                                <p class="stat-value">{{ statistics?.ctfGamesPlayed ?? 0 }}</p>
-                            </div>
-                            <div class="stat-card">
-                                <h3 class="stat-label">{{ 'profile.stats.won' | translate }}</h3>
-                                <p class="stat-value">{{ statistics?.totalGamesWon ?? 0 }}</p>
-                            </div>
-                            <div class="stat-card">
-                                <h3 class="stat-label">{{ 'profile.stats.avg_time' | translate }}</h3>
-                                <p class="stat-value">
-                                    @if (statistics) {
-                                    {{ formatTime(statistics.averagePlaytimePerGame) }}
-                                    } @else { 0s }
-                                </p>
-                            </div>
+                    <div class="language-section">
+                        <h2 class="section-title">{{ 'profile.language' | translate }}</h2>
+                        <div class="language-picker">
+                            @for (l of languages; track l.value) {
+                            <button
+                                type="button"
+                                class="lang-btn"
+                                [class.active]="languageService.getCurrentLanguage() === l.value"
+                                (click)="selectLanguage(l.value)"
+                            >
+                                {{ l.labelKey | translate }}
+                                @if (languageService.getCurrentLanguage() === l.value) {
+                                <span class="lang-check">✓</span>
+                                }
+                            </button>
+                            }
                         </div>
                     </div>
 
@@ -193,22 +188,29 @@
                         </div>
                     </div>
 
-                    <div class="language-section">
-                        <h2 class="section-title">{{ 'profile.language' | translate }}</h2>
-                        <div class="language-picker">
-                            @for (l of languages; track l.value) {
-                            <button
-                                type="button"
-                                class="lang-btn"
-                                [class.active]="languageService.getCurrentLanguage() === l.value"
-                                (click)="selectLanguage(l.value)"
-                            >
-                                {{ l.labelKey | translate }}
-                                @if (languageService.getCurrentLanguage() === l.value) {
-                                <span class="lang-check">✓</span>
-                                }
-                            </button>
-                            }
+                    <div class="statistics-section">
+                        <h2 class="section-title">{{ 'profile.statistics' | translate }}</h2>
+                        <div class="statistics-grid">
+                            <div class="stat-card">
+                                <h3 class="stat-label">{{ 'profile.stats.classic' | translate }}</h3>
+                                <p class="stat-value">{{ statistics?.classicGamesPlayed ?? 0 }}</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 class="stat-label">{{ 'profile.stats.ctf' | translate }}</h3>
+                                <p class="stat-value">{{ statistics?.ctfGamesPlayed ?? 0 }}</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 class="stat-label">{{ 'profile.stats.won' | translate }}</h3>
+                                <p class="stat-value">{{ statistics?.totalGamesWon ?? 0 }}</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 class="stat-label">{{ 'profile.stats.avg_time' | translate }}</h3>
+                                <p class="stat-value">
+                                    @if (statistics) {
+                                    {{ formatTime(statistics.averagePlaytimePerGame) }}
+                                    } @else { 0s }
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
