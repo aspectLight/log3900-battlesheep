@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/appearance/app_interaction_colors.dart';
 import '../../../generated/l10n/app_localizations.dart';
 
 class ChatHeader extends StatelessWidget {
@@ -11,9 +12,11 @@ class ChatHeader extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: const BoxDecoration(
-        color: Color(0xFF2A0E0E),
-        border: Border(bottom: BorderSide(color: Color(0xFF3A1212))),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary,
+        border: Border(
+          bottom: BorderSide(color: context.interactionColors.outline),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -21,7 +24,7 @@ class ChatHeader extends StatelessWidget {
           Text(
             l10n.chat,
             style: const TextStyle(
-              color: Color(0xFFE0E0FF),
+              color: Color(0xFFFFFFFF),
               fontSize: 18,
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',

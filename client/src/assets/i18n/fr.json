@@ -327,7 +327,18 @@
     "hidden_deleted": "Le jeu sélectionné est caché ou supprimé.",
     "mode_classique": "Classique",
     "mode_ctf": "CTF",
-    "delete_warning": "Vous allez supprimer ce jeu, voulez-vous continuer ?"
+    "delete_warning": "Vous allez supprimer ce jeu, voulez-vous continuer ?",
+    "filter_title": "Filtres",
+    "filter_size": "Taille",
+    "filter_size_all": "Toutes tailles",
+    "filter_mode": "Mode de jeu",
+    "filter_mode_all": "Tous les modes",
+    "filter_sort": "Tri par date",
+    "filter_sort_none": "Sans tri",
+    "filter_sort_newest": "Plus récent",
+    "filter_sort_oldest": "Plus ancien",
+    "filter_reset": "Effacer",
+    "search_placeholder": "Rechercher un jeu..."
   },
   "game_creator": {
     "title": "Créer une partie",

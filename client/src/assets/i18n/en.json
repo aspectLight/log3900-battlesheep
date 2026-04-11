@@ -327,7 +327,18 @@
     "hidden_deleted": "The selected game is hidden or deleted.",
     "mode_classique": "Classic",
     "mode_ctf": "CTF",
-    "delete_warning": "You are about to delete this game, do you want to continue?"
+    "delete_warning": "You are about to delete this game, do you want to continue?",
+    "filter_title": "Filters",
+    "filter_size": "Size",
+    "filter_size_all": "All sizes",
+    "filter_mode": "Game mode",
+    "filter_mode_all": "All modes",
+    "filter_sort": "Sort by date",
+    "filter_sort_none": "No sort",
+    "filter_sort_newest": "Newest first",
+    "filter_sort_oldest": "Oldest first",
+    "filter_reset": "Clear",
+    "search_placeholder": "Search a game..."
   },
   "game_creator": {
     "title": "Create a game",

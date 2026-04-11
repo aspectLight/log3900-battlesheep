@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/constants/character_assets.dart';
 import '../../../../../core/constants/stat_assets.dart';
 import '../../../../../core/constants/ui_assets.dart';
 import '../../../../../core/enums/character.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
 import '../../../core/constants/character_creation_constants.dart';
-import '../../../core/helpers/character_creation_form_validator.dart';
 import '../../../core/context/character_creation_scope_holder.dart';
+import '../../../core/helpers/character_creation_form_validator.dart';
 import '../../../core/localisation/character_creation_localizations.dart';
 import 'character_creation_view_model.dart';
 
@@ -165,7 +166,7 @@ class _CharacterCreationHeader extends StatelessWidget {
                         Text(
                           l10n.backToCreateGame,
                           style: const TextStyle(
-                            color: Color(0xFFf5e6e6),
+                            color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'CustomFont',
@@ -181,7 +182,7 @@ class _CharacterCreationHeader extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              color: Color(0xFFf5e6e6),
+              color: Colors.white,
               fontFamily: 'CustomFont',
               fontSize: 24,
             ),
@@ -223,7 +224,7 @@ class _CharacterGrid extends StatelessWidget {
           Text(
             l10n.charactersSectionTitle,
             style: const TextStyle(
-              color: Color(0xFFf5e6e6),
+              color: Colors.white,
               fontSize: 22,
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
@@ -235,7 +236,9 @@ class _CharacterGrid extends StatelessWidget {
               data: ScrollbarThemeData(
                 thickness: WidgetStateProperty.all(6),
                 radius: const Radius.circular(5),
-                thumbColor: WidgetStateProperty.all(const Color(0xFF7f1f1f)),
+                thumbColor: WidgetStateProperty.all(
+                  context.interactionColors.outline,
+                ),
                 trackColor: WidgetStateProperty.all(const Color(0xFF2b2b2b)),
                 trackBorderColor: WidgetStateProperty.all(
                   const Color(0xFF2b2b2b),
@@ -329,10 +332,11 @@ class _CharacterCard extends StatelessWidget {
                       child: Image.asset(
                         CharacterAssets.characterAvatarPath(character),
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Image.asset(
-                          UiAssets.characterCreationEmptyPortrait,
-                          fit: BoxFit.cover,
-                        ),
+                        errorBuilder: (context, error, stackTrace) =>
+                            Image.asset(
+                              UiAssets.characterCreationEmptyPortrait,
+                              fit: BoxFit.cover,
+                            ),
                       ),
                     ),
                   ),
@@ -407,10 +411,11 @@ class _CenterColumn extends StatelessWidget {
                       child: Image.asset(
                         avatarPath,
                         fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) => Image.asset(
-                          UiAssets.characterCreationEmptyPortrait,
-                          fit: BoxFit.contain,
-                        ),
+                        errorBuilder: (context, error, stackTrace) =>
+                            Image.asset(
+                              UiAssets.characterCreationEmptyPortrait,
+                              fit: BoxFit.contain,
+                            ),
                       ),
                     ),
                   ),
@@ -536,23 +541,26 @@ class _SubmitButton extends StatelessWidget {
                   await viewModel.submitCharacter();
                 },
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF550000),
-            foregroundColor: const Color(0xFFf5e6e6),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
             padding: const EdgeInsets.symmetric(vertical: 12),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5),
-              side: const BorderSide(color: Color(0xFF7f1f1f), width: 2),
+              side: BorderSide(
+                color: context.interactionColors.outline,
+                width: 2,
+              ),
             ),
             elevation: 0,
           ),
           child: isSubmitting
-              ? const SizedBox(
+              ? SizedBox(
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2.5,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      Color(0xFFf5e6e6),
+                      Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                 )
@@ -595,7 +603,7 @@ class _BonusSection extends StatelessWidget {
           Text(
             l10n.playerHudStatsSection,
             style: const TextStyle(
-              color: Color(0xFFf5e6e6),
+              color: Colors.white,
               fontSize: 24,
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
@@ -647,9 +655,11 @@ class _BonusSection extends StatelessWidget {
                     label: l10n.statAttack,
                     description: l10n.statAttackDescription,
                     value: form.attackDice,
-                    isD4Selected: hasDicePair &&
+                    isD4Selected:
+                        hasDicePair &&
                         form.attackDice == CharacterCreationConstants.d4Value,
-                    isD6Selected: hasDicePair &&
+                    isD6Selected:
+                        hasDicePair &&
                         form.attackDice == CharacterCreationConstants.d6Value,
                     onSelectD4: () => viewModel.selectAttackDice(
                       CharacterCreationConstants.d4Value,
@@ -663,9 +673,11 @@ class _BonusSection extends StatelessWidget {
                     label: l10n.statDefense,
                     description: l10n.statDefenseDescription,
                     value: form.defenseDice,
-                    isD4Selected: hasDicePair &&
+                    isD4Selected:
+                        hasDicePair &&
                         form.defenseDice == CharacterCreationConstants.d4Value,
-                    isD6Selected: hasDicePair &&
+                    isD6Selected:
+                        hasDicePair &&
                         form.defenseDice == CharacterCreationConstants.d6Value,
                     onSelectD4: () => viewModel.selectDefenseDice(
                       CharacterCreationConstants.d4Value,
@@ -712,7 +724,7 @@ class _StatRow extends StatelessWidget {
                 Text(
                   label,
                   style: const TextStyle(
-                    color: Color(0xFFf5e6e6),
+                    color: Colors.white,
                     fontSize: 19,
                     fontFamily: 'CustomFont',
                   ),
@@ -723,7 +735,7 @@ class _StatRow extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: Color(0xFFc0c0c0),
+                    color: Colors.white,
                     fontSize: 12,
                     fontStyle: FontStyle.italic,
                     fontFamily: 'CustomFont',
@@ -736,7 +748,7 @@ class _StatRow extends StatelessWidget {
         Text(
           '$value',
           style: const TextStyle(
-            color: Color(0xFFf5e6e6),
+            color: Colors.white,
             fontSize: 19,
             fontFamily: 'CustomFont',
           ),
@@ -769,7 +781,9 @@ class _StatBonusButton extends StatelessWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.red.withValues(alpha: 0.5),
+                    color: context.interactionColors.primaryStrong.withValues(
+                      alpha: 0.5,
+                    ),
                     blurRadius: 5,
                     spreadRadius: 2,
                   ),
@@ -817,7 +831,7 @@ class _DiceRow extends StatelessWidget {
                 Text(
                   label,
                   style: const TextStyle(
-                    color: Color(0xFFf5e6e6),
+                    color: Colors.white,
                     fontSize: 19,
                     fontFamily: 'CustomFont',
                   ),
@@ -841,7 +855,7 @@ class _DiceRow extends StatelessWidget {
         Text(
           '$value',
           style: const TextStyle(
-            color: Color(0xFFf5e6e6),
+            color: Colors.white,
             fontSize: 19,
             fontFamily: 'CustomFont',
           ),
@@ -889,7 +903,9 @@ class _DiceButton extends StatelessWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.red.withValues(alpha: 0.5),
+                    color: context.interactionColors.primaryStrong.withValues(
+                      alpha: 0.5,
+                    ),
                     blurRadius: 5,
                     spreadRadius: 2,
                   ),

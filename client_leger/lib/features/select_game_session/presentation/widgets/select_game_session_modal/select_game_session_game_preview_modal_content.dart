@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../core/localisation/select_game_session_localizations.dart';
 import '../../../core/modal/select_game_session_modal_intents.dart';
 import '../select_game_session/select_game_session_board_preview_widget.dart';
@@ -39,9 +40,10 @@ class _SelectGameSessionGamePreviewModalContentState
     final l10n = SelectGameSessionLocalizations.of(context)!;
     final maxPreview =
         (MediaQuery.sizeOf(context).width - 80).clamp(200.0, 360.0);
-    const panelBg = Color(0xFF2B2B2B);
-    const headerBarBg = Color(0xFF3C3C3C);
-    const accentBorder = Color(0xFF7F1F1F);
+    final scheme = Theme.of(context).colorScheme;
+    final panelBg = scheme.surface;
+    final headerBarBg = scheme.surfaceContainerHighest;
+    final accentBorder = context.interactionColors.outline;
     const titleColor = Color(0xFFE0D8C0);
     const descriptionStyle = TextStyle(
       color: Color(0xFFf5e6e6),
@@ -75,9 +77,9 @@ class _SelectGameSessionGamePreviewModalContentState
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: headerBarBg,
-                  border: Border(
+                  border: const Border(
                     bottom: BorderSide(color: Color(0xFF3A3A3A)),
                   ),
                 ),
@@ -179,15 +181,15 @@ class _SelectGameSessionGamePreviewModalContentState
                   child: ElevatedButton(
                     onPressed: _viewModel.close,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF550000),
-                      foregroundColor: const Color(0xFFFFF0F0),
+                      backgroundColor: scheme.primary,
+                      foregroundColor: scheme.onPrimary,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 32,
                         vertical: 12,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
-                        side: const BorderSide(color: accentBorder),
+                        side: BorderSide(color: accentBorder),
                       ),
                       elevation: 4,
                       textStyle: const TextStyle(
