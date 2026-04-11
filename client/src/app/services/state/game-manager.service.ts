@@ -500,7 +500,8 @@ export class GameManagerService {
         if (coords.x < 0 || coords.y < 0 || coords.x >= this.board.matrix.length || coords.y >= this.board.matrix[0].length) {
             return;
         }
-        this.board.matrix[coords.x][coords.y].addItem(item);
+        const fullItem = ITEM_TYPES[item.type] ? new Item(item.type) : item;
+        this.board.matrix[coords.x][coords.y].addItem(fullItem);
     }
 
     combatLost(loserId: string): void {
@@ -552,7 +553,7 @@ export class GameManagerService {
     collectItem(playerId: string, item: Item, position: Coords, inventoryFull: boolean): void {
         // Remove the item from the board cell — the server has already removed it
         const cell = this.board.getCell(position.x, position.y);
-        if (cell?.item) {
+        if (cell?.item && cell.item.type === item.type) {
             cell.removeItem();
         }
 
