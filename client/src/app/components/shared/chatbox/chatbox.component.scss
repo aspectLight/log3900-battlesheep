@@ -16,9 +16,13 @@
 }
 
 .chatbox.collapsed {
-  max-height: 40px;
-  min-height: 40px;
+  max-height: 44px;
+  min-height: 44px;
   overflow: hidden;
+}
+
+.chatbox.collapsed .chatbox-header {
+  padding: 7px 15px 8px;
 }
 
 .chatbox-header {
@@ -285,16 +289,24 @@ app-pop-up {
   padding: 0;
   line-height: 1;
   transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .channels-panel-icon {
   display: block;
-  line-height: 1;
-  transform: translateY(-0.5px);
+  width: 14px;
+  height: 10px;
+  overflow: hidden;
+  text-indent: -9999px;
+  white-space: nowrap;
+  background:
+    linear-gradient(currentColor 0 0) center 0 / 14px 2px no-repeat,
+    linear-gradient(currentColor 0 0) center 4px / 14px 2px no-repeat,
+    linear-gradient(currentColor 0 0) center 8px / 14px 2px no-repeat;
 }
 
 .channels-panel-btn:hover,
