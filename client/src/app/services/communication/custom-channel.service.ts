@@ -137,13 +137,11 @@ export class CustomChannelService {
         });
 
         socket.on(CustomChannelEvents.CustomChannelMessage, (payload: { channelId: string; message: ChannelMessage }) => {
-            if (payload.message.name && this.socialService.isInBlockRelationship(payload.message.name)) return;
-            const current = this.messagesByChannel[payload.channelId] ?? [];
-            this.messagesByChannel[payload.channelId] = [...current, payload.message];
-            this.messagesUpdated$.next({
-                channelId: payload.channelId,
-                messages: this.messagesByChannel[payload.channelId],
-            });
+            this.appendIncomingMessage(payload.channelId, payload.message);
+        });
+
+        socket.on(CustomChannelEvents.CustomChannelEmoji, (payload: { channelId: string; emoji: ChannelMessage }) => {
+            this.appendIncomingMessage(payload.channelId, payload.emoji);
         });
 
         // Restauration des canaux à la (re)connexion : le serveur envoie automatiquement
@@ -201,6 +199,14 @@ export class CustomChannelService {
         });
     }
 
+    sendEmoji(channelId: string, emoji: string): void {
+        this.socketService.send(CustomChannelEvents.SendEmojiToCustomChannel, {
+            channelId,
+            username: this.username,
+            emoji,
+        });
+    }
+
     getMessages(channelId: string): ChannelMessage[] {
         return this.messagesByChannel[channelId] ?? [];
     }
@@ -226,6 +232,16 @@ export class CustomChannelService {
     /** Retourne les IDs des canaux rejoints (snapshot synchrone). */
     getJoinedChannelIds(): string[] {
         return [...this.joinedChannelIds];
+    }
+
+    private appendIncomingMessage(channelId: string, message: ChannelMessage): void {
+        if (message.name && this.socialService.isInBlockRelationship(message.name)) return;
+        const current = this.messagesByChannel[channelId] ?? [];
+        this.messagesByChannel[channelId] = [...current, message];
+        this.messagesUpdated$.next({
+            channelId,
+            messages: this.messagesByChannel[channelId],
+        });
     }
 
     private translateChannelError(serverMessage: string): string {
