@@ -67,6 +67,12 @@ input {
     color: var(--theme-text-primary);
 }
 
+.square-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+}
+
 .join-game-container {
     display: flex;
     flex-direction: column;

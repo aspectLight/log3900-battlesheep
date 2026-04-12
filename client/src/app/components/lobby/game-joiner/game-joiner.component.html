@@ -26,7 +26,16 @@
 <div class="join-game-container">
     <h2>{{ 'join.code_prompt' | translate }}</h2>
     <div class="code-input-column">
-        <input #gameCode type="text" pattern="\d{4}" maxlength="4" [title]="'join.code_placeholder' | translate" required />
-        <button class="square-button" (click)="joinGame()">{{ 'join.join_btn' | translate }}</button>
+        <input
+            #gameCode
+            type="text"
+            pattern="\d{4}"
+            inputmode="numeric"
+            maxlength="4"
+            [title]="'join.code_placeholder' | translate"
+            required
+            (input)="onGameCodeInput(gameCode)"
+        />
+        <button class="square-button" (click)="joinGame()" [disabled]="!isJoinButtonEnabled">{{ 'join.join_btn' | translate }}</button>
     </div>
 </div>
