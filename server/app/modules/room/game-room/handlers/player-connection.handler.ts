@@ -7,7 +7,7 @@ import { SIZE_LIMITS } from '@app/modules/shared-room/constants/waiting-room.con
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
 import { BlockService } from '@app/modules/social/services/block.service';
 import { Player } from '@app/shared/interfaces/player';
-import { CurrencyEvents, CustomChannelEvents, GameRoomEvents } from '@common/socket.constants';
+import { CurrencyEvents, CustomChannelEvents, GameRoomEvents, WaitingRoomEvents } from '@common/socket.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 
@@ -167,6 +167,7 @@ export class PlayerConnectionHandler {
             });
 
             this.logger.log(`Joueur ${socket.id} a rejoint la partie ${data.roomId} (${result.isReturning ? 'retour' : 'nouveau'})`);
+            server.emit(WaitingRoomEvents.AvailableRoomsChanged);
 
             return { success: true };
         } catch (error) {
@@ -266,6 +267,7 @@ export class PlayerConnectionHandler {
             }
         }
 
+        server.emit(WaitingRoomEvents.AvailableRoomsChanged);
         return isRoomDeleted;
     }
 }

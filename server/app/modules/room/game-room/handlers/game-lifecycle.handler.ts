@@ -5,7 +5,7 @@ import { GameMovementService } from '@app/modules/movement/services/game-movemen
 import { MS_IN_SECOND, SECONDS_IN_MINUTE } from '@app/modules/shared-room/constants/game-room.constants';
 import { GameRoom } from '@app/modules/shared-room/interfaces/game-room';
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
-import { CurrencyEvents, CustomChannelEvents, GameRoomEvents } from '@common/socket.constants';
+import { CurrencyEvents, CustomChannelEvents, GameRoomEvents, WaitingRoomEvents } from '@common/socket.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 
@@ -95,6 +95,7 @@ export class GameLifecycleHandler {
             if (!room || room.players.length === 0) {
                 if (room) this.gameMovementService.removeBoard(roomId);
                 this.gameRoomService.deleteRoomById(roomId);
+                server.emit(WaitingRoomEvents.AvailableRoomsChanged);
 
                 // Supprimer définitivement le canal de partie
                 try {

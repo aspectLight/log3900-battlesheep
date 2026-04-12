@@ -35,6 +35,7 @@ export enum WaitingRoomEvents {
 
     GetAvailableRooms = 'getAvailableRooms',
     AvailableRoomsResponse = 'availableRoomsResponse',
+    AvailableRoomsChanged = 'availableRoomsChanged',
 
     ToggleDropInDropOut = 'toggleDropInDropOut',
     DropInDropOutToggled = 'dropInDropOutToggled',

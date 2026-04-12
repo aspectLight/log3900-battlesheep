@@ -45,7 +45,7 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
 
     @SubscribeMessage(WaitingRoomEvents.JoinWaitingRoom)
     async handleJoinRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
-        return this.managementHandler.handleJoinRoom(roomId, socket);
+        return this.managementHandler.handleJoinRoom(roomId, socket, this.server);
     }
 
     @SubscribeMessage(WaitingRoomEvents.LeaveWaitingRoom)
@@ -119,7 +119,7 @@ export class WaitingRoomGateway implements OnGatewayConnection, OnGatewayDisconn
         @MessageBody() data: { choice: 'enter' | 'cancel' },
         @ConnectedSocket() socket: Socket,
     ) {
-        return this.managementHandler.handleBlockedUserRoomChoice(socket, data);
+        return this.managementHandler.handleBlockedUserRoomChoice(socket, data, this.server);
     }
 
     // ===== Room Listing Events =====
