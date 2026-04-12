@@ -54,14 +54,14 @@
 
         <div class="currency-panel">
             <div class="currency-row">
-                <span class="currency-label">Solde :</span>
+                <span class="currency-label">{{ 'waiting.balance' | translate }}:</span>
                 <span class="currency-value"
                     ><strong>{{ currencyService.balance$ | async }}</strong> <img class="coin-icon" src="./assets/gold_coin.png" alt="pièce"
                 /></span>
             </div>
             @if ((room?.entryFee ?? 0) > 0) {
             <div class="currency-row">
-                <span class="currency-label">Prix d'entrée :</span>
+                <span class="currency-label">{{ 'waiting.entry_fee' | translate }}:</span>
                 <span class="currency-value">{{ room?.entryFee }} <img class="coin-icon" src="./assets/gold_coin.png" alt="pièce" /></span>
             </div>
             }

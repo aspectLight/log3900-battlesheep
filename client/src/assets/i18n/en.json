@@ -162,6 +162,8 @@
     "back": "Leave game",
     "title": "Waiting room",
     "code": "Game code:",
+    "balance": "Balance",
+    "entry_fee": "Entry fee",
     "drop_in": "Drop-in/Drop-out",
     "lock": "Lock room",
     "unlock": "Unlock room",
@@ -239,11 +241,15 @@
     "mode": "Mode",
     "accessibility": "Accessibility",
     "code": "Code",
+    "price": "Price",
     "no_rooms": "No games available",
     "status_waiting": "Waiting",
     "status_playing": "In progress",
     "status_full": "Full",
-    "status_open": "Open"
+    "status_open": "Open",
+    "accessibility_friends_only": "Friends only",
+    "accessibility_drop_in": "Drop-in",
+    "free": "Free"
   },
   "game_list": {
     "preview": "Preview",
@@ -426,6 +432,7 @@
   },
   "end_game": {
     "title": "Statistics",
+    "rewards": "Rewards",
     "players": "Players",
     "combats": "Number of combats",
     "evasions": "Number of evasions",

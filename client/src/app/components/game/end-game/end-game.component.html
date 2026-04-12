@@ -120,7 +120,7 @@
     </div>
     @if (playerRewards.length > 0) {
     <div class="rewards-section">
-        <h2 class="rewards-title">Récompenses</h2>
+        <h2 class="rewards-title">{{ 'end_game.rewards' | translate }}</h2>
         <div class="rewards-list">
             @for (reward of playerRewards; track reward.playerName) {
             <div class="reward-entry">

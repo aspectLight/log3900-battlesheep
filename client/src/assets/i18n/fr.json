@@ -162,6 +162,8 @@
     "back": "Quitter la partie",
     "title": "Salle d'attente",
     "code": "Code de la partie :",
+    "balance": "Solde",
+    "entry_fee": "Prix d'entrée",
     "drop_in": "Drop-in/Drop-out",
     "lock": "Verrouiller la salle",
     "unlock": "Déverrouiller la salle",
@@ -239,11 +241,15 @@
     "mode": "Mode",
     "accessibility": "Accessibilité",
     "code": "Code",
+    "price": "Prix",
     "no_rooms": "Aucune partie disponible",
     "status_waiting": "En attente",
     "status_playing": "En cours",
     "status_full": "Complète",
-    "status_open": "Ouverte"
+    "status_open": "Ouverte",
+    "accessibility_friends_only": "Amis seulement",
+    "accessibility_drop_in": "Drop-in",
+    "free": "Gratuit"
   },
   "game_list": {
     "preview": "Prévisualisation",
@@ -425,6 +431,7 @@
   },
   "end_game": {
     "title": "Statistiques",
+    "rewards": "Récompenses",
     "players": "Joueurs",
     "combats": "Nombre de combats",
     "evasions": "Nombre d'évasions",

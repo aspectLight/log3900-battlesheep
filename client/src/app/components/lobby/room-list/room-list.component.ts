@@ -72,13 +72,14 @@ export class RoomListComponent implements OnInit, OnDestroy {
     }
 
     getModeLabel(mode: string): string {
-        return mode === 'ctf' ? 'CTF' : 'Classique';
+        const normalizedMode = mode?.toLowerCase() === 'ctf' ? 'ctf' : 'classique';
+        return this.translate.instant(`game_list.mode_${normalizedMode}`);
     }
 
     getAccessibilityLabel(room: RoomInfo): string {
         if (room.playerCount >= room.maxPlayers) return this.translate.instant('room.status_full');
-        if (room.friendsOnly) return 'Amis seulement';
-        if (room.status === 'playing' && room.dropInDropOut) return 'Drop-in';
+        if (room.friendsOnly) return this.translate.instant('room.accessibility_friends_only');
+        if (room.status === 'playing' && room.dropInDropOut) return this.translate.instant('room.accessibility_drop_in');
         return this.translate.instant('room.status_open');
     }
 }
