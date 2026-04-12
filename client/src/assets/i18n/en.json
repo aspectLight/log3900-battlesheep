@@ -58,6 +58,7 @@
     "games_history": "Game history",
     "login_history": "Login history",
     "logout": "Sign out",
+    "game_left": "You left the game!",
     "game_canceled": "Game cancelled due to lack of players",
     "game_finished": "Game over, victory limit of 3 reached by a character"
   },

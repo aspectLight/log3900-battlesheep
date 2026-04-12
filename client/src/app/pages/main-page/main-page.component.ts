@@ -50,6 +50,10 @@ export class MainPageComponent implements OnInit, OnDestroy {
         return this.gameManagerService.isGameFinished;
     }
 
+    get gameCanceledMessageKey(): string {
+        return this.gameManagerService.gameCanceledMessageKey;
+    }
+
     @HostListener('document:click', ['$event'])
     onDocumentClick(event: MouseEvent) {
         if (this.showSettingsMenu && this.settingsMenu && !this.settingsMenu.nativeElement.contains(event.target)) {
@@ -105,6 +109,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
     understandError() {
         this.gameManagerService.isGameCanceled = false;
+        this.gameManagerService.gameCanceledMessageKey = 'main.game_canceled';
     }
 
     understandMessage() {

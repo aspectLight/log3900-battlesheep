@@ -58,6 +58,7 @@
     "games_history": "Historique des parties",
     "login_history": "Historique de connexion",
     "logout": "Se déconnecter",
+    "game_left": "Vous avez quitté la partie!",
     "game_canceled": "Partie annulée par manque de joueurs",
     "game_finished": "Partie terminée, limite de 3 victoires atteintes par un personnage"
   },

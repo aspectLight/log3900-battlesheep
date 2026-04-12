@@ -35,6 +35,7 @@ export class GameManagerService {
     illuminatedCells: Set<string> = new Set();
 
     isGameCanceled: boolean = false;
+    gameCanceledMessageKey: string = 'main.game_canceled';
     isGameFinished: boolean = false;
     isGameLoaded: boolean = false;
     gameCountdown: Subject<number> = new Subject<number>();
@@ -121,6 +122,7 @@ export class GameManagerService {
 
     resetManager() {
         this.isGameCanceled = false;
+        this.gameCanceledMessageKey = 'main.game_canceled';
         this.isGameFinished = false;
         this.isGameLoaded = false;
         this.disconnectedPlayer = [];
@@ -130,6 +132,7 @@ export class GameManagerService {
 
     cancelGame() {
         this.isGameCanceled = true;
+        this.gameCanceledMessageKey = 'main.game_left';
         const startDate = this.historyStartDateIso;
         if (startDate) {
             this.historyService.abandonGameHistory(startDate).catch((e) => console.warn('abandonGameHistory failed', e));
@@ -602,6 +605,7 @@ export class GameManagerService {
 
     endCanceledGame() {
         this.isGameCanceled = true;
+        this.gameCanceledMessageKey = 'main.game_canceled';
         const startDate = this.historyStartDateIso;
 
         if (startDate) {

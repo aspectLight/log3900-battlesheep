@@ -1,6 +1,6 @@
 @if (isGameCanceled) {
 <app-pop-up
-    [popUpMessage]="'main.game_canceled' | translate"
+    [popUpMessage]="gameCanceledMessageKey | translate"
     description=""
     [showSecondButton]="false"
     (confirm)="understandError()"
