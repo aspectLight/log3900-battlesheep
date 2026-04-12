@@ -208,6 +208,10 @@ export class PlayerConnectionHandler {
      */
     private async handlePlayerAbandonment(roomId: string, playerId: string, server: Server): Promise<boolean> {
         const room = this.gameRoomService.findRoomById(roomId);
+        if (!room) {
+            return false;
+        }
+
         const combatRooms = this.gameCombatService.findCombatsByPlayerId(playerId);
         if (combatRooms && combatRooms.length > 0) {
             combatRooms.forEach((combat) => this.gameCombatService.endCombat(combat.combatRoomId, false));
@@ -215,6 +219,40 @@ export class PlayerConnectionHandler {
 
         this.gameRoomService.dropItemsWhenDisconnected(roomId, playerId);
         this.gameMovementService.removePlayerFromBoard(roomId, playerId);
+
+        if (room.isFinished) {
+            const wasHost = room.hostId === playerId;
+            const wasInPlayers = room.players.some((p) => p.id === playerId);
+            room.players = room.players.filter((p) => p.id !== playerId);
+
+            if (wasHost && room.players.length > 0) {
+                const nextHost = room.players.find((p) => !p.isVirtual) ?? room.players[0];
+                room.hostId = nextHost.id;
+                server.to(roomId).emit(GameRoomEvents.OrganizatorChanged, {
+                    roomId,
+                    newhostId: room.hostId,
+                });
+            }
+
+            const isRoomDeleted = room.players.length === 0;
+            if (isRoomDeleted) {
+                this.gameRoomService.deleteRoomById(roomId);
+                this.gameMovementService.removeBoard(roomId);
+
+                const channelId = roomId.startsWith('game_') ? roomId.slice(5) : roomId;
+                try {
+                    server.to(`custom-channel-${channelId}`).emit(CustomChannelEvents.CustomChannelDeleted, { channelId });
+                    await this.customChannelService.deleteGameChannel(channelId);
+                } catch (channelError) {
+                    this.logger.error(`Erreur suppression canal de partie ${channelId}: ${channelError.message}`);
+                }
+            } else if (wasInPlayers) {
+                server.to(roomId).emit(GameRoomEvents.PlayerAbandoned, playerId);
+            }
+
+            server.emit(WaitingRoomEvents.AvailableRoomsChanged);
+            return isRoomDeleted;
+        }
 
         if (this.gameRoomService.isHost(roomId, playerId)) {
             server.to(roomId).emit(GameRoomEvents.DebugModeDisabled);
