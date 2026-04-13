@@ -286,13 +286,13 @@ p {
 }
 
 .card[data-team="1"] {
-    background-image: url('/assets/ui/ussr.png');
+    background-image: url('./assets/ui/ussr.png');
     background-size: cover;
     background-position: center;
 }
 
 .card[data-team="2"] {
-    background-image: url('/assets/ui/american.png');
+    background-image: url('./assets/ui/american.png');
     background-size: cover;
     background-position: center;
 }
