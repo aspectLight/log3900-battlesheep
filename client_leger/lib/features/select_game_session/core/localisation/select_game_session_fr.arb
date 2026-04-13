@@ -10,5 +10,6 @@
   "createGameModeHeader": "Mode",
   "createGameLastModifiedHeader": "Dernière modification",
   "createGameModeClassic": "Classique",
-  "createGameModeCtf": "Capture du drapeau"
+  "createGameModeCtf": "Capture du drapeau",
+  "noGames": "Aucun jeu disponible."
 }

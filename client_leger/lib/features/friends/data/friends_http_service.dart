@@ -19,7 +19,7 @@ class FriendsHttpService implements FriendsRepository {
   Options _authOptions() {
     final creds = _authRepository.getSocketAuthCredentials();
     return creds.match(
-      () => Options(),
+      Options.new,
       (c) => Options(
         headers: {
           'Authorization': 'Bearer ${c.token}',

@@ -10,5 +10,6 @@
   "createGameModeHeader": "Mode",
   "createGameLastModifiedHeader": "Last modified",
   "createGameModeClassic": "Classic",
-  "createGameModeCtf": "Capture the flag"
+  "createGameModeCtf": "Capture the flag",
+  "noGames": "No games available."
 }

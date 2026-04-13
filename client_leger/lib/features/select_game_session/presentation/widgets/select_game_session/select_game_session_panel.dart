@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:fpdart/fpdart.dart' as fp;
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
@@ -12,7 +11,6 @@ import '../../../core/helpers/format_last_modified.dart';
 import '../../../core/localisation/select_game_session_localizations.dart';
 import '../../../core/modal/select_game_session_modal_intents.dart';
 import '../../../domain/models/game_info_model.dart';
-import '../../../domain/state/select_game_session_state.dart';
 import 'select_game_session_board_preview_widget.dart';
 import 'select_game_session_panel_view_model.dart';
 
@@ -36,141 +34,184 @@ class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
   @override
   Widget build(BuildContext context) {
     return Watch((context) {
-      return switch (_viewModel.state.value) {
-        SelectGameSessionStateLoading() => const Center(
-          child: CircularProgressIndicator(),
+      return _viewModel.state.value.when(
+        loaded: (games, isConfirming, isLoadingGames) => _buildList(
+          context,
+          games,
+          isConfirming,
+          isLoadingGames,
         ),
-        SelectGameSessionStateLoaded(
-          :final games,
-          :final selectedGameId,
-          :final isConfirming,
-        ) =>
-          _buildList(context, games, selectedGameId, isConfirming),
-      };
+      );
     });
   }
 
   Widget _buildList(
     BuildContext context,
     List<GameModelInfo> games,
-    fp.Option<String> selectedGameId,
     bool isConfirming,
+    bool isLoadingGames,
   ) {
     final l10n = SelectGameSessionLocalizations.of(context)!;
-    final bool hasSelection = selectedGameId.isSome();
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: const Color(0xFF3C3C3C),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
-                blurRadius: 6,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          child: Row(
-            children: [
-              _headerCell(l10n.createGamePreviewHeader),
-              _headerCell(l10n.createGameNameHeader),
-              _headerCell(l10n.createGameSizeHeader),
-              _headerCell(l10n.createGameModeHeader),
-              _headerCell(l10n.createGameLastModifiedHeader),
-            ],
-          ),
-        ),
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.vertical(
-              bottom: Radius.circular(8),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 6,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: games.length,
-            itemBuilder: (context, index) {
-              final game = games[index];
-              return _GameListItem(
-                game: game,
-                selectedGameId: selectedGameId,
-                viewModel: _viewModel,
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 20),
-        Watch(
-          (context) => GestureDetector(
-            onTap: _viewModel.toggleFriendsOnly,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: Checkbox(
-                    value: _viewModel.friendsOnly.value,
-                    onChanged: (_) => _viewModel.toggleFriendsOnly(),
-                    fillColor: WidgetStateProperty.resolveWith(
-                      (states) => states.contains(WidgetState.selected)
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.surface,
-                    ),
-                    side: BorderSide(color: context.interactionColors.outline),
-                  ),
+    final bool showFooter = !isLoadingGames && games.isNotEmpty;
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(child: _buildTableHeader(l10n)),
+        if (isLoadingGames)
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 280,
+              child: Center(
+                child: Image.asset(
+                  'assets/images/loading.gif',
+                  height: 120,
+                  fit: BoxFit.contain,
+                  gaplessPlayback: true,
                 ),
-                const SizedBox(width: 10),
-                const Text(
-                  'Amis seulement',
-                  style: TextStyle(
+              ),
+            ),
+          )
+        else if (games.isEmpty)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+              child: Center(
+                child: Text(
+                  l10n.noGames,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
                     color: Color(0xFFFFF0F0),
                     fontSize: 18,
                     fontFamily: 'CustomFont',
                   ),
                 ),
+              ),
+            ),
+          )
+        else
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final game = games[index];
+                  return _GameListItem(
+                    key: ValueKey(game.id),
+                    game: game,
+                    viewModel: _viewModel,
+                  );
+                },
+                childCount: games.length,
+              ),
+            ),
+          ),
+        if (showFooter)
+          SliverToBoxAdapter(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 20),
+                Watch(
+                  (context) => GestureDetector(
+                    onTap: _viewModel.toggleFriendsOnly,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: Checkbox(
+                            value: _viewModel.friendsOnly.value,
+                            onChanged: (_) => _viewModel.toggleFriendsOnly(),
+                            fillColor: WidgetStateProperty.resolveWith(
+                              (states) => states.contains(WidgetState.selected)
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.surface,
+                            ),
+                            side: BorderSide(
+                              color: context.interactionColors.outline,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        const Text(
+                          'Amis seulement',
+                          style: TextStyle(
+                            color: Color(0xFFFFF0F0),
+                            fontSize: 18,
+                            fontFamily: 'CustomFont',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Watch(
+                  (context) {
+                    final hasSelection =
+                        _viewModel.selectedGameId.value.isSome();
+                    final confirming = _viewModel.state.value.isConfirming;
+                    return ElevatedButton(
+                      onPressed: (hasSelection && !confirming)
+                          ? () => unawaited(_viewModel.confirmSelectionSubmit())
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
+                        disabledBackgroundColor: const Color(0xFF333333),
+                        disabledForegroundColor: const Color(0xFF666666),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 32,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(
+                            color: context.interactionColors.outline,
+                          ),
+                        ),
+                        elevation: 4,
+                        textStyle: const TextStyle(
+                          fontFamily: 'CustomFont',
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      child: Text(l10n.createGame),
+                    );
+                  },
+                ),
               ],
             ),
           ),
-        ),
-        const SizedBox(height: 12),
-        ElevatedButton(
-          onPressed: (hasSelection && !isConfirming)
-              ? () => unawaited(_viewModel.confirmSelectionSubmit())
-              : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
-            disabledBackgroundColor: const Color(0xFF333333),
-            disabledForegroundColor: const Color(0xFF666666),
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 32),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-              side: BorderSide(color: context.interactionColors.outline),
-            ),
-            elevation: 4,
-            textStyle: const TextStyle(
-              fontFamily: 'CustomFont',
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          child: Text(l10n.createGame),
-        ),
       ],
+    );
+  }
+
+  Widget _buildTableHeader(SelectGameSessionLocalizations l10n) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF3C3C3C),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 6,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      child: Row(
+        children: [
+          _headerCell(l10n.createGamePreviewHeader),
+          _headerCell(l10n.createGameNameHeader),
+          _headerCell(l10n.createGameSizeHeader),
+          _headerCell(l10n.createGameModeHeader),
+          _headerCell(l10n.createGameLastModifiedHeader),
+        ],
+      ),
     );
   }
 
@@ -190,89 +231,164 @@ class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
 
 class _GameListItem extends StatelessWidget {
   const _GameListItem({
+    super.key,
     required this.game,
-    required this.selectedGameId,
     required this.viewModel,
   });
 
   final GameModelInfo game;
-  final fp.Option<String> selectedGameId;
   final SelectGameSessionPanelViewModel viewModel;
 
-  Widget _cell(String text, {required bool isSelected}) => Expanded(
-    child: Center(
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: isSelected ? 20 : 18,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-          fontFamily: 'CustomFont',
-        ),
-      ),
-    ),
+  static const _textStyleBase = TextStyle(
+    color: Colors.white,
+    fontSize: 18,
+    fontFamily: 'CustomFont',
   );
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final outline = context.interactionColors.outline;
-    final bool isSelected = selectedGameId.match(
-      () => false,
-      (value) => value == game.id,
-    );
-    final backgroundColor = isSelected
-        ? scheme.primary
-        : scheme.surface;
-    final borderColor = isSelected ? outline : const Color(0xFF3A3A3A);
 
     return InkWell(
       onTap: () => viewModel.selectGame(game.id),
-      child: Container(
+      child: SizedBox(
         height: 116,
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          border: Border(
-            left: BorderSide(color: borderColor),
-            right: BorderSide(color: borderColor),
-            bottom: BorderSide(color: borderColor),
-          ),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-              child: Center(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => GetIt.I<ModalIntentSink>().addIntent(
-                    SelectGameSessionGamePreviewModalIntent(
-                      description: game.description,
-                      imagePath: '',
-                      boardSize: game.boardSize,
-                      boardMatrix: game.boardMatrix,
-                    ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: SizedBox.square(
-                      dimension: 100,
-                      child: SelectGameSessionBoardPreviewWidget(
-                        boardSize: game.boardSize,
-                        boardMatrix: game.boardMatrix,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Watch((context) {
+                    final isSelected = viewModel.selectedGameId.value.match(
+                      () => false,
+                      (id) => id == game.id,
+                    );
+                    final borderColor =
+                        isSelected ? outline : const Color(0xFF3A3A3A);
+                    return Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: isSelected ? scheme.primary : scheme.surface,
+                          border: Border(
+                            left: BorderSide(color: borderColor),
+                            bottom: BorderSide(color: borderColor),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                  Center(
+                    child: RepaintBoundary(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => GetIt.I<ModalIntentSink>().addIntent(
+                          SelectGameSessionGamePreviewModalIntent(
+                            description: game.description,
+                            imagePath: '',
+                            boardSize: game.boardSize,
+                            boardMatrix: game.boardMatrix,
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: SizedBox.square(
+                            dimension: 100,
+                            child: DeferredSelectGameSessionBoardPreview(
+                              boardSize: game.boardSize,
+                              boardMatrix: game.boardMatrix,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
-            _cell(game.name, isSelected: isSelected),
-            _cell(game.boardSize.toString(), isSelected: isSelected),
-            _cell(game.mode.toLocalizedLabel(context), isSelected: isSelected),
-            _cell(
-              Format.selectGameLastModified(game.lastModified),
-              isSelected: isSelected,
+            Expanded(
+              flex: 4,
+              child: Watch((context) {
+                final isSelected = viewModel.selectedGameId.value.match(
+                  () => false,
+                  (id) => id == game.id,
+                );
+                final borderColor =
+                    isSelected ? outline : const Color(0xFF3A3A3A);
+                return DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: isSelected ? scheme.primary : scheme.surface,
+                    border: Border(
+                      right: BorderSide(color: borderColor),
+                      bottom: BorderSide(color: borderColor),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              game.name,
+                              textAlign: TextAlign.center,
+                              style: _textStyleBase.copyWith(
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              game.boardSize.toString(),
+                              textAlign: TextAlign.center,
+                              style: _textStyleBase.copyWith(
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              game.mode.toLocalizedLabel(context),
+                              textAlign: TextAlign.center,
+                              style: _textStyleBase.copyWith(
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              Format.selectGameLastModified(game.lastModified),
+                              textAlign: TextAlign.center,
+                              style: _textStyleBase.copyWith(
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
             ),
           ],
         ),

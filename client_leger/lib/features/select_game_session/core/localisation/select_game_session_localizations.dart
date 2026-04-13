@@ -166,6 +166,8 @@ abstract class SelectGameSessionLocalizations {
   /// In en, this message translates to:
   /// **'Capture the flag'**
   String get createGameModeCtf;
+
+  String get noGames;
 }
 
 class _SelectGameSessionLocalizationsDelegate

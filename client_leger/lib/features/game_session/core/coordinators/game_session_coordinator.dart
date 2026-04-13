@@ -180,32 +180,31 @@ class GameSessionCoordinator
     final currentBoardRaw = holder.currentBoardRaw;
     if (currentBoardRaw != null) {
       try {
-        // `currentBoard` reflète l'état actuel des items/portes/etc. dans la partie.
         final boardSizeRaw = currentBoardRaw['size'];
         final matrixRaw = currentBoardRaw['matrix'];
         if (boardSizeRaw is! num || matrixRaw is! List<dynamic>) {
           throw const FormatException('Invalid currentBoard snapshot');
         }
         final boardDto = BoardDto.fromJson(currentBoardRaw);
-        // Rebuild a full Board + items map from server snapshot.
         final game = scope.get<Game>();
-        final modeStr = game.isCTF ? 'CTF' : 'Classique';
         final gameDto = GameDto(
           id: game.id,
           name: game.name,
           description: game.description,
-          mode: modeStr,
+          mode: game.isCTF ? 'ctf' : 'classique',
           board: boardDto,
-          isVisible: true,
-          modificationDate: '',
+          modificationDate: game.modificationDate,
+          privacy: game.privacy,
+          owner: game.owner,
+          actionPoints: game.actionPoints,
         );
         final rebuiltGame = gameDto.toEntity();
         scope.get<GameBoardRepository>().replaceBoardAndItems(
           board: rebuiltGame.board,
           items: rebuiltGame.initialItems,
         );
-      } on Object {
-        // If parsing fails, keep scoped initial state.
+      } on Object catch (_) {
+        unawaited(Future<void>.value());
       }
     }
     final spawned = raw.toPlayerSpawnedDto().toEntity();

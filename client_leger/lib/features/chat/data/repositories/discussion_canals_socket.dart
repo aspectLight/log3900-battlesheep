@@ -6,6 +6,11 @@ import '../models/channel_info.dart';
 import '../models/channel_message.dart';
 import 'discussion_canals_repository.dart';
 
+Map<String, dynamic>? _tryJsonMap(Object? raw) {
+  if (raw is! Map) return null;
+  return Map<String, dynamic>.from(raw);
+}
+
 class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   DiscussionCanalsSocket({
     required SocketService socketService,
@@ -93,27 +98,36 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   }
 
   void _onChannelsList(Object? raw) {
-    final list = raw as List<dynamic>;
-    final channels = list.map((e) {
-      final m = e as Map<String, dynamic>;
-      return ChannelInfo(
-        id: m['id'] as String,
-        name: m['name'] as String,
-        creator: m['creator'] as String,
-        memberCount: m['memberCount'] as int,
+    if (raw is! List) return;
+    final channels = <ChannelInfo>[];
+    for (final e in raw) {
+      final m = _tryJsonMap(e);
+      if (m == null) continue;
+      channels.add(
+        ChannelInfo(
+          id: m['id'] as String,
+          name: m['name'] as String,
+          creator: m['creator'] as String,
+          memberCount: m['memberCount'] as int,
+        ),
       );
-    }).toList();
+    }
     _channelsController.add(channels);
   }
 
   void _onChannelCreated(Object? raw) {
-    final m = raw as Map<String, dynamic>;
-    _channelCreatedController.add(m['channelName'] as String);
+    final m = _tryJsonMap(raw);
+    if (m == null) return;
+    final name = m['channelName'] as String?;
+    if (name == null) return;
+    _channelCreatedController.add(name);
   }
 
   void _onChannelDeleted(Object? raw) {
-    final m = raw as Map<String, dynamic>;
-    final channelId = m['channelId'] as String;
+    final m = _tryJsonMap(raw);
+    if (m == null) return;
+    final channelId = m['channelId'] as String?;
+    if (channelId == null) return;
     _joinedIds.remove(channelId);
     _messagesByChannel.remove(channelId);
     _channelDeletedController.add(null);
@@ -121,27 +135,40 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   }
 
   void _onChannelError(Object? raw) {
-    final m = raw as Map<String, dynamic>;
-    _channelErrorController.add(m['message'] as String);
+    final m = _tryJsonMap(raw);
+    if (m == null) return;
+    final message = m['message'] as String?;
+    if (message == null) return;
+    _channelErrorController.add(message);
   }
 
   void _onChannelJoined(Object? raw) {
-    final m = raw as Map<String, dynamic>;
-    final channelId = m['channelId'] as String;
+    final m = _tryJsonMap(raw);
+    if (m == null) return;
+    final channelId = m['channelId'] as String?;
+    if (channelId == null) return;
     _joinedIds.add(channelId);
     _joinedChannelsController.add([..._joinedIds]);
   }
 
   void _onChannelLeft(Object? raw) {
-    final m = raw as Map<String, dynamic>;
-    _joinedIds.remove(m['channelId'] as String);
+    final m = _tryJsonMap(raw);
+    if (m == null) return;
+    final channelId = m['channelId'] as String?;
+    if (channelId == null) return;
+    _joinedIds.remove(channelId);
     _joinedChannelsController.add([..._joinedIds]);
   }
 
   void _onChannelMessage(Object? raw) {
-    final m = raw as Map<String, dynamic>;
-    final channelId = m['channelId'] as String;
-    final msg = _parseMessage(m['message'] as Map<String, dynamic>);
+    final m = _tryJsonMap(raw);
+    if (m == null) return;
+    final channelId = m['channelId'] as String?;
+    if (channelId == null) return;
+    final msgRaw = m['message'];
+    final msgMap = _tryJsonMap(msgRaw);
+    if (msgMap == null) return;
+    final msg = _parseMessage(msgMap);
     _messagesByChannel[channelId] = [
       ...(_messagesByChannel[channelId] ?? []),
       msg,
@@ -155,11 +182,18 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   }
 
   void _onMessagesResponse(Object? raw) {
-    final m = raw as Map<String, dynamic>;
-    final channelId = m['channelId'] as String;
-    final messages = (m['messages'] as List<dynamic>)
-        .map((e) => _parseMessage(e as Map<String, dynamic>))
-        .toList();
+    final m = _tryJsonMap(raw);
+    if (m == null) return;
+    final channelId = m['channelId'] as String?;
+    if (channelId == null) return;
+    final listRaw = m['messages'];
+    if (listRaw is! List) return;
+    final messages = <ChannelMessage>[];
+    for (final e in listRaw) {
+      final msgMap = _tryJsonMap(e);
+      if (msgMap == null) continue;
+      messages.add(_parseMessage(msgMap));
+    }
     _messagesByChannel[channelId] = messages;
     _messagesUpdatedController.add(
       MessagesUpdatedEvent(channelId: channelId, messages: messages),
@@ -167,10 +201,12 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   }
 
   void _onUserChannelsRestored(Object? raw) {
-    final list = raw as List<dynamic>;
-    for (final e in list) {
-      final m = e as Map<String, dynamic>;
-      final channelId = m['channelId'] as String;
+    if (raw is! List) return;
+    for (final e in raw) {
+      final m = _tryJsonMap(e);
+      if (m == null) continue;
+      final channelId = m['channelId'] as String?;
+      if (channelId == null) continue;
       _joinedIds.add(channelId);
       _socketService.emit(
         DiscussionCanalsSocketEvents.getCustomChannelMessages,

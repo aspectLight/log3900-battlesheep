@@ -83,7 +83,10 @@ class GameSummaryDto {
   @GameModeConverter()
   final GameMode mode;
   final GameSummaryBoardDto board;
-  final bool isVisible;
+  final String privacy;
+  final String owner;
+  @JsonKey(defaultValue: 1)
+  final int actionPoints;
   final String modificationDate;
 
   const GameSummaryDto({
@@ -92,7 +95,9 @@ class GameSummaryDto {
     required this.description,
     required this.mode,
     required this.board,
-    required this.isVisible,
+    required this.privacy,
+    required this.owner,
+    required this.actionPoints,
     required this.modificationDate,
   });
 

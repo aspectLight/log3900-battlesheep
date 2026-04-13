@@ -348,7 +348,7 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
         ],
       ),
     );
-    if (confirmed == true) widget.viewModel.deleteChannel(channelId);
+    if (confirmed ?? false) widget.viewModel.deleteChannel(channelId);
   }
 
   @override
