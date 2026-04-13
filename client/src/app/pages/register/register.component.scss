@@ -66,19 +66,22 @@
     animation: scaleBackground 20s ease-in-out infinite alternate;
 }
 
+.header {
+    position: relative;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+}
+
 .return-button {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    left: 10px;
     display: flex;
     align-items: center;
     gap: 15px;
     cursor: pointer;
-    background: none;
-    border: none;
-    font-size: 16px;
-    color: var(--theme-text-muted);
-    z-index: 10;
 }
 
 .return-button:active {
@@ -92,7 +95,7 @@
 .return-button img {
     width: 15px;
     max-width: 15px;
-    filter: brightness(0) invert(1);
+    color: var(--theme-text-hover);
 }
 
 .logo {

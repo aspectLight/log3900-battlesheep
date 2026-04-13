@@ -41,43 +41,6 @@
     font-size: 1.2em;
 }
 
-.return-button {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    cursor: pointer;
-    background: none;
-    border: none;
-    font-size: 16px;
-    color: var(--theme-text-muted);
-    z-index: 10;
-
-    &:active {
-        color: var(--theme-text-hover-active);
-    }
-
-    &:hover {
-        color: var(--theme-text-hover);
-    }
-
-    img {
-        width: 15px;
-        max-width: 15px;
-        filter: brightness(0) invert(1);
-    }
-}
-
-.page-title {
-    color: var(--theme-text-primary);
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 2rem;
-    text-align: center;
-    text-shadow: 2px 2px 4px var(--theme-shadow-strong);
-}
 
 .content-wrapper {
     flex: 1;

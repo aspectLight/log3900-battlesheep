@@ -1,10 +1,10 @@
 <div class="channels-page">
-    <div class="header">
+    <div class="page-header">
         <button class="return-button" routerLink="/home">
             <img src="./assets/ui/left.png" alt="Retour" />
             {{ 'common.home' | translate }}
         </button>
-        <h1>{{ 'channels.title' | translate }}</h1>
+        <h1 class="page-title">{{ 'channels.title' | translate }}</h1>
     </div>
 
     @if (successMessage()) {

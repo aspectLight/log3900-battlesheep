@@ -1,10 +1,10 @@
 <div class="friends-page">
-    <div class="header">
+    <div class="page-header">
         <button class="return-button" routerLink="/home">
             <img src="./assets/ui/left.png" alt="Back" />
             {{ 'common.home' | translate }}
         </button>
-        <h1>{{ 'friends.title' | translate }}</h1>
+        <h1 class="page-title">{{ 'friends.title' | translate }}</h1>
     </div>
 
     @if (errorMessage) {

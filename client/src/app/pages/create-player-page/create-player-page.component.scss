@@ -198,40 +198,6 @@
     box-shadow: 0 2px 4px var(--theme-shadow-button);
 }
 
-.header {
-    position: relative;
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-    padding: 10px 0;
-    overflow: hidden;
-}
-
-.return-button {
-    position: absolute;
-    left: 10px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-    &:hover {
-        color: var(--theme-text-hover);
-        transform: translateX(-5px);
-    }
-
-    &:active {
-        color: var(--theme-text-hover-active);
-        transform: translateX(0);
-    }
-}
-
-img {
-    width: 15px;
-}
-
 // Media queries for better responsiveness
 @media screen and (max-width: 1200px) {
     .container {

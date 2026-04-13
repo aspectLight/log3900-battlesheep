@@ -7,52 +7,6 @@
     box-sizing: border-box;
 }
 
-/* ── Header ─────────────────────────────────────── */
-
-.header {
-    position: relative;
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-    padding: 10px 0 20px;
-}
-
-.header h1 {
-    margin: 0;
-    color: var(--theme-text-primary);
-    letter-spacing: 2px;
-    font-size: 44px;
-    text-shadow: 0 3px 12px var(--theme-shadow-strong);
-    text-align: center;
-}
-
-.return-button {
-    position: absolute;
-    left: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    background: none;
-    border: none;
-    outline: none;
-    color: inherit;
-    font-size: 18px;
-    font-weight: 600;
-    transition: color 0.2s ease;
-}
-
-.return-button img {
-    width: 18px;
-    height: 18px;
-    object-fit: contain;
-}
-
-.return-button:hover {
-    color: var(--theme-text-hover);
-}
-
 /* ── Alerts ──────────────────────────────────────── */
 
 .alert {

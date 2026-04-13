@@ -25,12 +25,12 @@
 </app-pop-up>
 }
 
-<div class="header">
+<div class="page-header">
     <button class="return-button" (click)="confirmAction('leave')">
         <img src="./assets/ui/left.png" />
-        <span class="return-btn-txt">{{ 'waiting.back' | translate }}</span>
+        {{ 'waiting.back' | translate }}
     </button>
-    <h1 class="title">{{ 'waiting.title' | translate }}</h1>
+    <h1 class="page-title">{{ 'waiting.title' | translate }}</h1>
 </div>
 
 <div class="waiting-room-container">

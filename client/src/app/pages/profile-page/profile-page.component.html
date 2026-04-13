@@ -4,10 +4,12 @@
 </div>
 } @else {
 <div class="container">
-    <button class="return-button" routerLink="/home" type="button">
-        <img src="./assets/ui/left.png" alt="Back" />
-        {{ 'common.back' | translate }}
-    </button>
+    <div class="page-header">
+        <button class="return-button" routerLink="/home" type="button">
+            <img src="./assets/ui/left.png" alt="Back" />
+            {{ 'common.back' | translate }}
+        </button>
+    </div>
 
     <div class="content-wrapper">
         <h1 class="page-title">{{ 'profile.title' | translate }}</h1>

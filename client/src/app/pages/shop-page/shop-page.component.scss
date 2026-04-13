@@ -9,62 +9,6 @@
     overflow-x: hidden;
 }
 
-.header {
-    position: relative;
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-    padding: 10px 0;
-
-    h1 {
-        letter-spacing: 2px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-    }
-
-    .return-button {
-        position: absolute;
-        left: 10px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        cursor: pointer;
-
-        img {
-            width: 15px;
-        }
-
-        &:hover {
-            color: red;
-        }
-
-        &:active {
-            color: darkred;
-        }
-    }
-
-    .balance {
-        position: absolute;
-        right: 20px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #f0c040;
-        font-weight: bold;
-        font-size: 1.25rem;
-        background: rgba(22, 7, 7, 0.85);
-        padding: 8px 16px;
-        border-radius: 20px;
-        border: 2px solid #b71c1c;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-
-        .coin-icon {
-            width: 26px;
-            height: 26px;
-        }
-    }
-}
-
 .shop-container {
     padding: 16px 24px 40px;
     display: flex;

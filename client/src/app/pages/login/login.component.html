@@ -12,10 +12,13 @@
         >EN</button>
     </div>
 
-    <button class="return-button" routerLink="/auth-landing" type="button">
-        <img src="./assets/ui/left.png" alt="Back" />
-        {{ 'common.back' | translate }}
-    </button>
+    <div class="header">
+        <button class="return-button" routerLink="/auth-landing" type="button">
+            <img src="./assets/ui/left.png" alt="Back" />
+            {{ 'common.back' | translate }}
+        </button>
+        <h1 style="visibility: hidden;">A</h1>
+    </div>
 
     <div class="content-wrapper">
         <img class="logo" src="./assets/ui/eastern_solace_logo-removebg-preview.png" alt="Logo Jeu" />
