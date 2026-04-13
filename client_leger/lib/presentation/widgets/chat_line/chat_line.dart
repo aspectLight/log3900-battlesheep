@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../ui_models/chat_ui_message.dart';
 
 class ChatLine extends StatelessWidget {
@@ -13,7 +14,9 @@ class ChatLine extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: index.isEven ? const Color(0xFF180505) : const Color(0xFF220808),
+        color: index.isEven
+            ? context.interactionColors.primary
+            : context.interactionColors.primaryStrong,
         border: const Border(bottom: BorderSide(color: Color(0xFF250808))),
       ),
       child: RichText(

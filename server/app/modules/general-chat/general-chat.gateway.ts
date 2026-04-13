@@ -243,6 +243,46 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         }
     }
 
+    @SubscribeMessage(CustomChannelEvents.SendEmojiToCustomChannel)
+    async handleSendEmojiToCustomChannel(
+        @ConnectedSocket() socket: Socket,
+        @MessageBody() data: { channelId: string; username: string; emoji: string },
+    ): Promise<void> {
+        try {
+            // Les canaux de partie n'ont pas de membres en BD — on skippe la vérification
+            const isGame = await this.customChannelService.checkIsGameChannel(data.channelId);
+            if (!isGame) {
+                const isMember = await this.customChannelService.isMember(data.channelId, data.username);
+                if (!isMember) {
+                    socket.emit(CustomChannelEvents.CustomChannelError, {
+                        message: 'Vous devez être membre du canal pour envoyer des messages',
+                    });
+                    return;
+                }
+            }
+
+            const chatEmoji: ChatMessage = {
+                type: 'emoji-received',
+                name: data.username,
+                content: data.emoji,
+                time: new Date().toLocaleTimeString('en-GB', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false,
+                }),
+            };
+
+            await this.customChannelService.addMessage(data.channelId, chatEmoji);
+
+            socket.to(`custom-channel-${data.channelId}`).emit(CustomChannelEvents.CustomChannelEmoji, {
+                channelId: data.channelId,
+                emoji: chatEmoji,
+            });
+        } catch (error) {
+            socket.emit(CustomChannelEvents.CustomChannelError, { message: this.getFriendlyError(error) });
+        }
+    }
     @SubscribeMessage(CustomChannelEvents.GetCustomChannelMessages)
     async handleGetCustomChannelMessages(@ConnectedSocket() socket: Socket, @MessageBody() data: { channelId: string }): Promise<void> {
         try {
@@ -374,8 +414,17 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
             if (error.message.includes('ne peut pas être vide')) {
                 return 'Le nom du canal ne peut pas être vide';
             }
-            if (error.message.includes('dépasser 50 caractères')) {
+            if (error.message.includes('dépasser 50 caractères') || error.message.includes('depasser 50 caracteres')) {
                 return 'Le nom du canal ne peut pas dépasser 50 caractères';
+            }
+            if (error.message.includes('réservé pour le chat général') || error.message.includes('reserve pour le chat general')) {
+                return 'Le nom du canal est réservé pour le chat général';
+            }
+            if (error.message.includes('réservé pour les canaux de partie') || error.message.includes('reserve pour les canaux de partie')) {
+                return 'Le nom du canal est réservé pour les canaux de partie';
+            }
+            if (error.message.includes('mots interdits')) {
+                return 'Le nom du canal contient des mots interdits';
             }
             if (error.message.includes('Seul le créateur')) {
                 return 'Seul le créateur du canal peut le supprimer';

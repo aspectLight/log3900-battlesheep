@@ -24,7 +24,7 @@ import { Subscription } from 'rxjs';
 export class WaitingPlayerComponent implements OnInit, OnDestroy {
     showError: boolean = false;
     errorMessage: string = '';
-    showMessage: boolean = true;
+    showMessage: boolean = false;
     showConfirmation: boolean = false;
     room: Room | null = null;
     isProfileSectionVisible: boolean = false;
@@ -70,7 +70,6 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.errorMessage = this.translate.instant('waiting.welcome');
         this.roomSubscription = this.waitingRoomService.room$.subscribe((room) => {
             this.room = room;
         });

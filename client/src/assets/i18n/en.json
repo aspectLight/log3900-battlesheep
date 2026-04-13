@@ -55,6 +55,7 @@
     "channels": "Discussion channels",
     "profile": "Profile",
     "friends": "Friends",
+    "shop": "Shop",
     "games_history": "Game history",
     "login_history": "Login history",
     "logout": "Sign out",
@@ -103,7 +104,12 @@
     "use_photo": "Use this photo",
     "error_file_type": "File type \"{{ ext }}\" not allowed. Allowed formats: JPG, JPEG, PNG (max 2 MB).",
     "error_file_size": "File too large ({{ size }} MB). Maximum allowed size: 2 MB.",
-    "no_changes": "No changes detected"
+    "no_changes": "No changes detected",
+    "errors": {
+      "load_profile": "Error while loading profile",
+      "update_profile": "Error while saving profile changes",
+      "unauthenticated": "User not authenticated"
+    }
   },
   "friends": {
     "title": "Friends",
@@ -135,6 +141,49 @@
     "error_remove": "Error removing the friend",
     "error_block": "Error blocking the user",
     "error_unblock": "Error unblocking the user"
+  },
+  "shop": {
+    "title": "Shop",
+    "insufficient_funds_title": "Insufficient funds",
+    "insufficient_funds_desc": "You do not have enough coins to buy this item.",
+    "sections": {
+      "banners": "Banners",
+      "characters": "Exclusive characters",
+      "avatars": "Exclusive avatars"
+    },
+    "preview": {
+      "player": "Player",
+      "health": "Health",
+      "speed": "Speed",
+      "attack": "Attack",
+      "defense": "Defense"
+    },
+    "actions": {
+      "buy": "Buy",
+      "equip": "Equip",
+      "unequip": "Unequip"
+    },
+    "items": {
+      "banner_gold": "Golden Banner",
+      "banner_shadow": "Shadow Banner",
+      "banner_flame": "Flame Banner",
+      "banner_ice": "Icy Banner",
+      "banner_neon": "Neon Banner",
+      "streetFighter": "Street Fighter",
+      "tacticalOperator": "Tactical Operator",
+      "screamGhostface": "Ghostface",
+      "sergei": "Sergei",
+      "sokolov": "Sokolov",
+      "viktor": "Viktor",
+      "volkov": "Volkov"
+    },
+    "owned": "Owned",
+    "coins_alt": "coins",
+    "success": {
+      "purchase": "Purchase successful!",
+      "equipped": "Cosmetic equipped!",
+      "unequipped": "Cosmetic unequipped."
+    }
   },
   "admin": {
     "title": "Administration"
@@ -211,7 +260,21 @@
     "write_msg": "Write a message in #{{ name }}...",
     "member_singular": "member",
     "member_plural": "members",
-    "quit_confirm": "Do you really want to delete this channel?"
+    "quit_confirm": "Do you really want to delete this channel?",
+    "success_created": "Channel \"{{name}}\" created successfully!",
+    "success_deleted": "Channel deleted.",
+    "errors": {
+      "empty_name": "Channel name cannot be empty.",
+      "name_too_long": "Channel name cannot exceed 50 characters.",
+      "reserved_general": "This channel name is reserved for general chat.",
+      "reserved_game": "This channel name is reserved for game channels.",
+      "forbidden_words": "Channel name contains forbidden words.",
+      "name_taken": "Channel name is already taken. Please choose another one.",
+      "not_found": "This channel no longer exists or has been deleted.",
+      "only_creator_delete": "Only the channel creator can delete it.",
+      "must_be_member_to_send": "You must be a channel member to send messages.",
+      "generic": "An error occurred. Please try again."
+    }
   },
   "history": {
     "games": {
@@ -271,7 +334,18 @@
     "hidden_deleted": "The selected game is hidden or deleted.",
     "mode_classique": "Classic",
     "mode_ctf": "CTF",
-    "delete_warning": "You are about to delete this game, do you want to continue?"
+    "delete_warning": "You are about to delete this game, do you want to continue?",
+    "filter_title": "Filters",
+    "filter_size": "Size",
+    "filter_size_all": "All sizes",
+    "filter_mode": "Game mode",
+    "filter_mode_all": "All modes",
+    "filter_sort": "Sort by date",
+    "filter_sort_none": "No sort",
+    "filter_sort_newest": "Newest first",
+    "filter_sort_oldest": "Oldest first",
+    "filter_reset": "Clear",
+    "search_placeholder": "Search a game..."
   },
   "game_creator": {
     "title": "Create a game",
@@ -381,7 +455,7 @@
   },
   "chatbox": {
     "general": "General",
-    "game_channel": "Channel for ",
+    "game_channel": "Game's Channel {{id}}",
     "send": "Send",
     "placeholder_general": "Write a message...",
     "placeholder_channel": "Write in {{ name }}..."
@@ -476,7 +550,10 @@
   "game_configurator": {
     "mode_desc_classic": "Win 3 combats to be declared the winner and end the game.",
     "mode_desc_ctf": "Capture the enemy flag and bring it back to your starting point to win the game.",
-    "actions_desc": "Number of action points allocated to each player each turn"
+    "actions_desc": "Number of action points allocated to each player each turn",
+    "privacy_desc_public": "Can be modified, deleted, and used to create a game by any user. The owner is always the original creator.",
+    "privacy_desc_private": "Can only be modified, deleted, or used to create a game by its owner. A game using this map can still be joined by other users.",
+    "privacy_desc_protected": "Can only be modified or deleted by its owner. Can be used by any user to create a game."
   },
   "game_result": {
     "win_classic": "Victory! You won three combats",

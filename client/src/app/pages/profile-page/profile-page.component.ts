@@ -152,7 +152,7 @@ export class ProfilePageComponent implements OnInit {
                 this.form.controls.avatarId.setValue('');
             }
         } catch (error) {
-            this.showError(this.profileService.getDefaultErrorMessage());
+            this.showError(this.resolveErrorMessage(this.profileService.getDefaultErrorMessage()));
         } finally {
             this.isLoading = false;
         }
@@ -246,7 +246,7 @@ export class ProfilePageComponent implements OnInit {
                 this.showSuccessMessage = false;
             }, 3000);
         } catch (error: unknown) {
-            this.showError(this.profileService.extractErrorMessage(error));
+            this.showError(this.resolveErrorMessage(this.profileService.extractErrorMessage(error)));
         } finally {
             this.isSaving = false;
         }
@@ -336,9 +336,14 @@ export class ProfilePageComponent implements OnInit {
             await signOut(this.auth);
             this.router.navigate([ROUTES.signin]);
         } else if (result.error) {
-            this.showError(result.error);
+            this.showError(this.resolveErrorMessage(result.error));
         }
 
         this.isDeleting = false;
+    }
+
+    private resolveErrorMessage(messageOrKey: string): string {
+        const translated = this.translate.instant(messageOrKey);
+        return translated !== messageOrKey ? translated : messageOrKey;
     }
 }
