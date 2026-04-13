@@ -1,13 +1,11 @@
 <div class="header">
     <button class="return-button" routerLink="/home">
         <img src="./assets/ui/left.png" />
-        Page d'accueil
+        {{ 'common.home' | translate }}
     </button>
-    <h1>Boutique</h1>
+    <h1>{{ 'shop.title' | translate }}</h1>
     <app-profile-menu></app-profile-menu>
 </div>
-
-
 
 @if (purchaseSuccess) {
 <div class="success-banner">{{ purchaseSuccess }}</div>
@@ -15,16 +13,16 @@
 
 @if (showInsufficientFundsPopup) {
 <app-pop-up
-    popUpMessage="Solde insuffisant"
-    description="Vous n'avez pas assez de pièces pour acheter cet article."
-    firstOption="Ok"
+    [popUpMessage]="'shop.insufficient_funds_title' | translate"
+    [description]="'shop.insufficient_funds_desc' | translate"
+    [firstOption]="'common.ok' | translate"
     (confirm)="showInsufficientFundsPopup = false"
 ></app-pop-up>
 }
 
 <div class="shop-container">
     <section class="shop-section">
-        <h2>Bannières</h2>
+        <h2>{{ 'shop.sections.banners' | translate }}</h2>
         <div class="items-grid">
             @for (item of banners; track item.id) {
             <div class="shop-item" [class.owned]="currencyService.hasPurchased(item.id)" [class.equipped]="isEquipped(item)">
@@ -34,20 +32,20 @@
                     </div>
                     <div class="preview-name-bar">
                         <div class="preview-dot"></div>
-                        <span>Joueur</span>
+                        <span>{{ 'shop.preview.player' | translate }}</span>
                     </div>
                     <div class="preview-stats-bar">
-                        <span>Vie</span><span>Rapidité</span><span>Attaque</span><span>Défense</span>
+                        <span>{{ 'shop.preview.health' | translate }}</span><span>{{ 'shop.preview.speed' | translate }}</span><span>{{ 'shop.preview.attack' | translate }}</span><span>{{ 'shop.preview.defense' | translate }}</span>
                     </div>
                 </div>
-                <div class="item-name">{{ item.name }}</div>
-                <div class="item-price">{{ item.price }} <img class="coin-icon" src="./assets/gold_coin.png" alt="pièces" /></div>
+                <div class="item-name">{{ getItemDisplayName(item) }}</div>
+                <div class="item-price">{{ item.price }} <img class="coin-icon" src="./assets/gold_coin.png" [alt]="'shop.coins_alt' | translate" /></div>
                 @if (currencyService.hasPurchased(item.id)) {
                     <button class="btn-equip" [class.equipped]="isEquipped(item)" (click)="toggleEquip(item)">
-                        {{ isEquipped(item) ? 'Déséquiper' : 'Équiper' }}
+                        {{ isEquipped(item) ? ('shop.actions.unequip' | translate) : ('shop.actions.equip' | translate) }}
                     </button>
                 } @else {
-                <button class="btn-buy" (click)="requestPurchase(item)">Acheter</button>
+                <button class="btn-buy" (click)="requestPurchase(item)">{{ 'shop.actions.buy' | translate }}</button>
                 }
             </div>
             }
@@ -55,21 +53,21 @@
     </section>
 
     <section class="shop-section">
-        <h2>Personnages exclusifs</h2>
+        <h2>{{ 'shop.sections.characters' | translate }}</h2>
         <div class="items-grid">
             @for (item of characters; track item.id) {
             <div class="shop-item" [class.owned]="currencyService.hasPurchased(item.id)">
                 @if (item.imagePath) {
                 <div class="item-avatar-preview">
-                    <img [src]="item.imagePath" [alt]="item.name" class="item-avatar-img" />
+                    <img [src]="item.imagePath" [alt]="getItemDisplayName(item)" class="item-avatar-img" />
                 </div>
                 }
-                <div class="item-name">{{ item.name }}</div>
-                <div class="item-price">{{ item.price }} <img class="coin-icon" src="./assets/gold_coin.png" alt="pièces" /></div>
+                <div class="item-name">{{ getItemDisplayName(item) }}</div>
+                <div class="item-price">{{ item.price }} <img class="coin-icon" src="./assets/gold_coin.png" [alt]="'shop.coins_alt' | translate" /></div>
                 @if (currencyService.hasPurchased(item.id)) {
-                <span class="owned-badge">Possédé</span>
+                <span class="owned-badge">{{ 'shop.owned' | translate }}</span>
                 } @else {
-                <button class="btn-buy" (click)="requestPurchase(item)">Acheter</button>
+                <button class="btn-buy" (click)="requestPurchase(item)">{{ 'shop.actions.buy' | translate }}</button>
                 }
             </div>
             }
@@ -77,21 +75,21 @@
     </section>
 
     <section class="shop-section">
-        <h2>Avatars exclusifs</h2>
+        <h2>{{ 'shop.sections.avatars' | translate }}</h2>
         <div class="items-grid">
             @for (item of avatars; track item.id) {
             <div class="shop-item" [class.owned]="currencyService.hasPurchased(item.id)">
                 @if (item.imagePath) {
                 <div class="item-avatar-preview">
-                    <img [src]="item.imagePath" [alt]="item.name" class="item-avatar-img" />
+                    <img [src]="item.imagePath" [alt]="getItemDisplayName(item)" class="item-avatar-img" />
                 </div>
                 }
-                <div class="item-name">{{ item.name }}</div>
-                <div class="item-price">{{ item.price }} <img class="coin-icon" src="./assets/gold_coin.png" alt="pièces" /></div>
+                <div class="item-name">{{ getItemDisplayName(item) }}</div>
+                <div class="item-price">{{ item.price }} <img class="coin-icon" src="./assets/gold_coin.png" [alt]="'shop.coins_alt' | translate" /></div>
                 @if (currencyService.hasPurchased(item.id)) {
-                <span class="owned-badge">Possédé</span>
+                <span class="owned-badge">{{ 'shop.owned' | translate }}</span>
                 } @else {
-                <button class="btn-buy" (click)="requestPurchase(item)">Acheter</button>
+                <button class="btn-buy" (click)="requestPurchase(item)">{{ 'shop.actions.buy' | translate }}</button>
                 }
             </div>
             }
