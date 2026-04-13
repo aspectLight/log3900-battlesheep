@@ -8,12 +8,18 @@ class ProfileDto {
   final String username;
   final String email;
   final String avatarId;
+  @JsonKey(defaultValue: 'default')
+  final String theme;
+  @JsonKey(defaultValue: 'fr')
+  final String language;
 
   const ProfileDto({
     required this.id,
     required this.username,
     required this.email,
     required this.avatarId,
+    this.theme = 'default',
+    this.language = 'fr',
   });
 
   factory ProfileDto.fromJson(Map<String, dynamic> json) =>
@@ -27,11 +33,15 @@ class ProfileUpdateRequestDto {
   final String? username;
   final String? email;
   final String? avatarId;
+  final String? theme;
+  final String? language;
 
   const ProfileUpdateRequestDto({
     this.username,
     this.email,
     this.avatarId,
+    this.theme,
+    this.language,
   });
 
   factory ProfileUpdateRequestDto.fromJson(Map<String, dynamic> json) =>

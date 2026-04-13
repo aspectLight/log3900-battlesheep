@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
+import '../../../core/constants/chat_constants.dart';
 import '../../../core/event_bus/chat_event_bus.dart';
 import '../../../core/localisation/chat_localizations.dart';
 import '../../../data/models/channel_info.dart';
@@ -65,12 +67,15 @@ class _SlidingChatBoxState extends State<SlidingChatBox> {
             width: width,
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: const Color(0xFF160707).withValues(alpha: 0.9),
+                color: context.interactionColors.primary.withValues(alpha: 0.9),
                 borderRadius: const BorderRadius.only(
                   topRight: Radius.circular(8),
                   bottomRight: Radius.circular(8),
                 ),
-                border: Border.all(color: const Color(0xFF3A1212), width: 2),
+                border: Border.all(
+                  color: context.interactionColors.primary,
+                  width: 2,
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.5),
@@ -137,12 +142,15 @@ class _SlidingChatBoxState extends State<SlidingChatBox> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2A0E0E),
+                  color: context.interactionColors.primary,
                   borderRadius: const BorderRadius.only(
                     topRight: Radius.circular(24),
                     bottomRight: Radius.circular(24),
                   ),
-                  border: Border.all(color: const Color(0xFF3A1212), width: 2),
+                  border: Border.all(
+                    color: context.interactionColors.outline,
+                    width: 2,
+                  ),
                 ),
                 child: const Icon(Icons.chat_bubble, color: Colors.white),
               ),
@@ -166,9 +174,11 @@ class _ChatHeader extends StatelessWidget {
     final l10n = ChatLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      decoration: const BoxDecoration(
-        color: Color(0xFF2A0E0E),
-        border: Border(bottom: BorderSide(color: Color(0xFF3A1212))),
+      decoration: BoxDecoration(
+        color: context.interactionColors.primary,
+        border: Border(
+          bottom: BorderSide(color: context.interactionColors.primaryStrong),
+        ),
       ),
       child: Watch((context) {
         final joinedIds = viewModel.joinedChannelIds.value;
@@ -214,14 +224,10 @@ class _ChatHeader extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: isPanelOpen
-                      ? const Color(0xFF550000)
-                      : Colors.transparent,
+                  color: Colors.transparent,
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(
-                    color: isPanelOpen
-                        ? const Color(0xFF7F1F1F)
-                        : const Color(0xFF3A1212),
+                    color: context.interactionColors.primaryStrong,
                   ),
                 ),
                 child: const Icon(Icons.menu, color: Colors.white, size: 18),
@@ -253,10 +259,14 @@ class _ChannelTab extends StatelessWidget {
         margin: const EdgeInsets.only(right: 4),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: isActive ? const Color(0xFF550000) : Colors.transparent,
+          color: isActive
+              ? context.interactionColors.primaryStrong
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(4),
           border: Border.all(
-            color: isActive ? const Color(0xFF7F1F1F) : const Color(0xFF3A1212),
+            color: isActive
+                ? context.interactionColors.primary
+                : context.interactionColors.primaryStrong,
           ),
         ),
         child: Text(
@@ -344,8 +354,8 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
   @override
   Widget build(BuildContext context) {
     final l10n = ChatLocalizations.of(context)!;
-    return Container(
-      color: const Color(0xFF160707),
+    return ColoredBox(
+      color: context.interactionColors.primary,
       child: Column(
         children: [
           _buildPanelHeader(l10n),
@@ -380,9 +390,11 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
   Widget _buildPanelHeader(ChatLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: const BoxDecoration(
-        color: Color(0xFF2A0E0E),
-        border: Border(bottom: BorderSide(color: Color(0xFF3A1212))),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary,
+        border: Border(
+          bottom: BorderSide(color: context.interactionColors.outline),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -390,15 +402,11 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
           Text(
             l10n.discussionCanals,
             style: const TextStyle(
-              color: Color(0xFFE0E0FF),
-              fontSize: 16,
+              color: Color(0xFFFFFFFF),
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
             ),
-          ),
-          GestureDetector(
-            onTap: widget.viewModel.toggleChannelsPanel,
-            child: const Icon(Icons.close, color: Color(0xFFAAAAAA), size: 20),
           ),
         ],
       ),
@@ -449,8 +457,8 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xD91E0A0A),
-        border: Border.all(color: const Color(0xFF3a1212)),
+        color: context.interactionColors.primary,
+        border: Border.all(color: context.interactionColors.outline),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -459,7 +467,7 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
           Text(
             l10n.createChannel,
             style: const TextStyle(
-              color: Color(0xFFe0d8c0),
+              color: Colors.white,
               fontSize: 12,
               fontFamily: 'CustomFont',
               fontWeight: FontWeight.bold,
@@ -481,7 +489,7 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
               _PanelButton(
                 label: l10n.create,
                 textColor: Colors.white,
-                backgroundColor: const Color(0xFF8b0000),
+                backgroundColor: context.interactionColors.primary,
                 onPressed: _submitCreate,
               ),
             ],
@@ -504,7 +512,7 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
         Text(
           l10n.availableChannels,
           style: const TextStyle(
-            color: Color(0xFFe0d8c0),
+            color: Colors.white,
             fontSize: 12,
             fontFamily: 'CustomFont',
             fontWeight: FontWeight.bold,
@@ -621,8 +629,10 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
                       vertical: 1,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0x598b0000),
-                      border: Border.all(color: const Color(0xFF8b0000)),
+                      color: context.interactionColors.primary,
+                      border: Border.all(
+                        color: context.interactionColors.outline,
+                      ),
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
@@ -696,7 +706,7 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
         text,
         textAlign: TextAlign.center,
         style: const TextStyle(
-          color: Color(0xFFe0d8c0),
+          color: Colors.white,
           fontFamily: 'CustomFont',
           fontSize: 14,
         ),
@@ -738,15 +748,7 @@ class _StyledTextField extends StatelessWidget {
         fillColor: const Color(0x66000000),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(4),
-          borderSide: const BorderSide(color: Color(0xFF3a1212)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4),
-          borderSide: const BorderSide(color: Color(0xFF3a1212)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4),
-          borderSide: const BorderSide(color: Color(0xFF8b0000)),
+          borderSide: BorderSide(color: context.interactionColors.primary),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       ),
@@ -802,7 +804,7 @@ class _TableHeaderCell extends StatelessWidget {
       text,
       textAlign: align,
       style: const TextStyle(
-        color: Color(0xFFe0d8c0),
+        color: Colors.white,
         fontFamily: 'CustomFont',
         fontWeight: FontWeight.bold,
         letterSpacing: 1,
@@ -854,6 +856,7 @@ class _ChannelChatPanelState extends State<_ChannelChatPanel> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = ChatLocalizations.of(context)!;
     return Expanded(
       child: Column(
         children: [
@@ -891,10 +894,12 @@ class _ChannelChatPanelState extends State<_ChannelChatPanel> {
                     ),
                     decoration: BoxDecoration(
                       color: i.isEven
-                          ? const Color(0xFF180505)
-                          : const Color(0xFF220808),
-                      border: const Border(
-                        bottom: BorderSide(color: Color(0xFF250808)),
+                          ? context.interactionColors.primary
+                          : context.interactionColors.primaryStrong,
+                      border: Border(
+                        bottom: BorderSide(
+                          color: context.interactionColors.primaryStrong,
+                        ),
                       ),
                     ),
                     child: RichText(
@@ -928,18 +933,22 @@ class _ChannelChatPanelState extends State<_ChannelChatPanel> {
               );
             }),
           ),
-          _buildInput(),
+          _buildInput(l10n),
         ],
       ),
     );
   }
 
-  Widget _buildInput() {
+  Widget _buildInput(ChatLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: const BoxDecoration(
-        color: Color(0xFF1E0707),
-        border: Border(top: BorderSide(color: Color(0xFF3A1212))),
+      decoration: BoxDecoration(
+        color: context.interactionColors.primaryStrong,
+        border: Border(
+          top: BorderSide(
+            color: context.interactionColors.outline.withValues(alpha: 0.65),
+          ),
+        ),
       ),
       child: Row(
         children: [
@@ -955,13 +964,17 @@ class _ChannelChatPanelState extends State<_ChannelChatPanel> {
                 controller: _controller,
                 focusNode: _focusNode,
                 style: const TextStyle(
-                  color: Color(0xFFF5E6E6),
+                  color: Colors.white,
                   fontSize: 14,
                   fontFamily: 'CustomFont',
                 ),
-                cursorColor: const Color(0xFF7F1F1F),
+                cursorColor: context.interactionColors.outline,
                 backgroundCursorColor: Colors.grey,
-                inputFormatters: [LengthLimitingTextInputFormatter(200)],
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(
+                    ChatConstants.messageMaxLength,
+                  ),
+                ],
                 onSubmitted: (_) => _send(),
               ),
             ),
@@ -977,12 +990,12 @@ class _ChannelChatPanelState extends State<_ChannelChatPanel> {
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? const Color(0xFF550000)
-                        : const Color(0xFF2B2B2B),
+                        ? context.interactionColors.primaryStrong
+                        : context.interactionColors.primary,
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(
                       color: isSelected
-                          ? const Color(0xFF7F1F1F)
+                          ? context.interactionColors.outline
                           : const Color(0xFF444444),
                       width: isSelected ? 2 : 1,
                     ),
@@ -1001,14 +1014,14 @@ class _ChannelChatPanelState extends State<_ChannelChatPanel> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFF550000),
+                color: context.interactionColors.primary,
                 borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: const Color(0xFF7F1F1F)),
+                border: Border.all(color: context.interactionColors.outline),
               ),
-              child: const Text(
-                'Envoyer',
-                style: TextStyle(
-                  color: Color(0xFFF5E6E6),
+              child: Text(
+                l10n.send,
+                style: const TextStyle(
+                  color: Colors.white,
                   fontSize: 14,
                   fontFamily: 'CustomFont',
                 ),

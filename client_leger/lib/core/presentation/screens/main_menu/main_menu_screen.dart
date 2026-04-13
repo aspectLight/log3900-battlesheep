@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/localisation/core_localizations.dart';
 import '../../../../../routing/app_navigator.dart';
 import '../../../../../routing/navigation_command.dart';
@@ -182,8 +183,12 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                     child: Container(
                       width: 220,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: context.interactionColors.outline,
+                          width: 1.5,
+                        ),
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -238,17 +243,19 @@ class _MainMenuScreenState extends State<MainMenuScreen>
     required String label,
     required VoidCallback? onPressed,
   }) {
+    final scheme = Theme.of(context).colorScheme;
+    final outline = context.interactionColors.outline;
     return SizedBox(
       width: 400,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
+          backgroundColor: scheme.primary.withValues(alpha: 0.42),
           disabledBackgroundColor: Colors.black38,
-          foregroundColor: Colors.white,
+          foregroundColor: scheme.onPrimary,
           disabledForegroundColor: Colors.grey,
           shadowColor: Colors.transparent,
-          side: const BorderSide(color: Colors.transparent),
+          side: BorderSide(color: outline, width: 2),
           padding: const EdgeInsets.symmetric(vertical: 16),
           textStyle: const TextStyle(fontSize: 20, fontFamily: 'CustomFont'),
         ),
@@ -262,6 +269,8 @@ class _MainMenuScreenState extends State<MainMenuScreen>
     required Widget badge,
     required VoidCallback? onPressed,
   }) {
+    final scheme = Theme.of(context).colorScheme;
+    final outline = context.interactionColors.outline;
     return SizedBox(
       width: 400,
       child: Stack(
@@ -272,11 +281,11 @@ class _MainMenuScreenState extends State<MainMenuScreen>
             child: ElevatedButton(
               onPressed: onPressed,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
+                backgroundColor: scheme.primary.withValues(alpha: 0.42),
                 disabledBackgroundColor: Colors.black38,
-                foregroundColor: Colors.white,
+                foregroundColor: scheme.onPrimary,
                 shadowColor: Colors.transparent,
-                side: const BorderSide(color: Colors.transparent),
+                side: BorderSide(color: outline, width: 2),
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 textStyle: const TextStyle(
                   fontSize: 20,
@@ -296,8 +305,11 @@ class _MainMenuScreenState extends State<MainMenuScreen>
     required String label,
     required VoidCallback? onTap,
   }) {
+    final scheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
+      splashColor: scheme.primary.withValues(alpha: 0.25),
+      highlightColor: scheme.primary.withValues(alpha: 0.12),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
@@ -307,7 +319,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                 label,
                 style: TextStyle(
                   fontSize: 16,
-                  color: onTap == null ? Colors.grey : Colors.black87,
+                  color: onTap == null ? Colors.grey : scheme.onSurface,
                   fontFamily: 'CustomFont',
                 ),
               ),

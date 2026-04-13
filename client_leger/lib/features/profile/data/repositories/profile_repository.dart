@@ -42,6 +42,8 @@ class ProfileRepository {
           username: profileDto.username,
           email: profileDto.email,
           avatarId: profileDto.avatarId,
+          theme: profileDto.theme,
+          language: profileDto.language,
         );
         final statistics = ProfileStatisticsModel(
           classicGamesPlayed: statsDto.classicGamesPlayed,
@@ -72,6 +74,8 @@ class ProfileRepository {
           username: command.username,
           email: command.email,
           avatarId: command.avatarId,
+          theme: command.theme,
+          language: command.language,
         );
         final Option<ProfileDto> updatedOption =
             await _httpProfileService.updateProfile(dto);
@@ -84,6 +88,8 @@ class ProfileRepository {
           username: updatedDto.username,
           email: updatedDto.email,
           avatarId: updatedDto.avatarId,
+          theme: updatedDto.theme,
+          language: updatedDto.language,
         );
         final s = state.value;
         if (s is ProfileStateLoaded) {
