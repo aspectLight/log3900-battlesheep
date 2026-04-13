@@ -138,5 +138,5 @@ class CoreLocalizationsFr extends CoreLocalizations {
   String get loading => 'Chargement...';
 
   @override
-  String get discussionCanals => 'Canaux de discussion';
+  String get discussionCanals => 'Discussion Channels';
 }

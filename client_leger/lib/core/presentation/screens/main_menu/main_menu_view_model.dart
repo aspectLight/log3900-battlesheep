@@ -6,7 +6,6 @@ import 'package:signals_flutter/signals_flutter.dart';
 import '../../../../features/authentication/core/app_events/auth_events.dart';
 import '../../../../features/authentication/core/interfaces/auth_repository.dart';
 import '../../../../features/authentication/domain/models/user.dart';
-import '../../../../features/discussion_canals/core/app_transition/discussion_canals_events.dart';
 import '../../../../features/friends/core/app_transition/friends_events.dart';
 import '../../../../features/friends/domain/interfaces/friends_repository.dart';
 import '../../../../features/game_history/core/app_events/game_history_events.dart';
@@ -81,11 +80,5 @@ class MainMenuViewModel {
 
   void openProfile() {
     _appTransitionEventBus.fire(const ProfileEntryAppEvent.requested());
-  }
-
-  void administerCanals() {
-    _appTransitionEventBus.fire(
-      const DiscussionCanalsEntryAppEvent.discussionCanalsRequested(),
-    );
   }
 }

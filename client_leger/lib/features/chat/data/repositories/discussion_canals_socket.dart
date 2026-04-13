@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import '../../../../core/services/socket_service.dart';
-import '../core/constants/discussion_canals_events.dart';
-import '../domain/interfaces/discussion_canals_repository.dart';
-import '../domain/models/channel_info.dart';
-import '../domain/models/channel_message.dart';
+import '../../../../../core/services/socket_service.dart';
+import '../../core/constants/discussion_canals_events.dart';
+import '../models/channel_info.dart';
+import '../models/channel_message.dart';
+import 'discussion_canals_repository.dart';
 
 class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   DiscussionCanalsSocket({

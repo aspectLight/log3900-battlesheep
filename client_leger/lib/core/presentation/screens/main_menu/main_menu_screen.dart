@@ -87,16 +87,6 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                             _viewModel.administerGames();
                           },
                         ),
-                        const SizedBox(height: 15),
-                        _buildMenuButton(
-                          label: CoreLocalizations.of(
-                            context,
-                          )!.discussionCanals,
-                          onPressed: () {
-                            _closeSettings();
-                            _viewModel.administerCanals();
-                          },
-                        ),
                         const SizedBox(height: 16),
                         _buildMenuButtonWithBadge(
                           label: CoreLocalizations.of(context)!.friends,

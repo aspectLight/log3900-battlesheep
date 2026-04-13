@@ -11,7 +11,6 @@ import '../../features/authentication/core/di/auth_view_model_module.dart';
 import '../../features/authentication/core/interfaces/auth_repository.dart';
 import '../../features/character_creation/core/di/character_creation_module.dart';
 import '../../features/chat/core/di/chat_module.dart';
-import '../../features/discussion_canals/core/di/discussion_canals_module.dart';
 import '../../features/friends/core/di/friends_module.dart';
 import '../../features/game_history/core/di/game_history_module.dart';
 import '../../features/game_session/core/di/game_session_module.dart';
@@ -84,7 +83,6 @@ Future<void> setupDependencies() async {
   registerSelectGameSessionRoot(getIt);
   registerJoinGameSessionRoot(getIt);
   registerLogsHistoryRoot(getIt);
-  registerDiscussionCanalsRoot(getIt);
   registerGameHistoryRoot(getIt);
   registerProfileRoot(getIt);
   registerFriendsRoot(getIt);

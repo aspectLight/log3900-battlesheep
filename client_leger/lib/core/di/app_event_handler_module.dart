@@ -6,8 +6,6 @@ import '../../features/character_creation/core/app_events/character_creation_eve
 import '../../features/character_creation/core/coordinators/character_creation_coordinator.dart';
 import '../../features/chat/core/app_events/chat_events.dart';
 import '../../features/chat/core/coordinators/chat_coordinator.dart';
-import '../../features/discussion_canals/core/app_transition/discussion_canals_events.dart';
-import '../../features/discussion_canals/core/coordinators/discussion_canals_coordinator.dart';
 import '../../features/friends/core/app_transition/friends_events.dart';
 import '../../features/friends/core/coordinators/friends_coordinator.dart';
 import '../../features/game_history/core/app_events/game_history_events.dart';
@@ -46,7 +44,6 @@ void registerAppEventHandler(GetIt getIt) {
       waitingRoom: getIt<WaitingRoomCoordinator>(),
       profile: getIt<ProfileCoordinator>(),
       friends: getIt<FriendsCoordinator>(),
-      discussionCanals: getIt<DiscussionCanalsCoordinator>(),
     ),
   );
 }
@@ -75,7 +72,6 @@ AppEventHandler _buildHandler({
   required WaitingRoomCoordinator waitingRoom,
   required ProfileCoordinator profile,
   required FriendsCoordinator friends,
-  required DiscussionCanalsCoordinator discussionCanals,
 }) {
   return AppEventHandler(
     appTransitionEventBus: bus,
@@ -226,15 +222,6 @@ AppEventHandler _buildHandler({
       GenericHandlerDelegate<FriendsExitAppEvent>.simple(
         FriendsExitAppEvent,
         friends.onExit,
-      ),
-      // --- Discussion Canals ---
-      GenericHandlerDelegate<DiscussionCanalsEntryAppEvent>.simple(
-        DiscussionCanalsEntryAppEvent,
-        discussionCanals.onEntry,
-      ),
-      GenericHandlerDelegate<DiscussionCanalsExitAppEvent>.simple(
-        DiscussionCanalsExitAppEvent,
-        discussionCanals.onExit,
       ),
     ],
   );

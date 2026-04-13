@@ -20,8 +20,6 @@ class ExitToMainMenu extends NavigationCommand {}
 
 class GoToJoinGameSession extends NavigationCommand {}
 
-class GoToDiscussionCanals extends NavigationCommand {}
-
 class GoToCharacterCreation extends NavigationCommand {}
 
 class GoToSelectGameSession extends NavigationCommand {}
