@@ -109,6 +109,38 @@ abstract class ChatLocalizations {
   /// In en, this message translates to:
   /// **'Send'**
   String get send;
+
+  String get chatGeneralTab;
+
+  String get discussionCanals;
+
+  String get createChannel;
+
+  String get channelNameHint;
+
+  String get create;
+
+  String get availableChannels;
+
+  String get searchChannelsHint;
+
+  String get loadingChannels;
+
+  String get noChannelsFound;
+
+  String get channelName;
+
+  String get channelCreator;
+
+  String get channelActions;
+
+  String get creatorBadge;
+
+  String get leaveChannel;
+
+  String get joinChannel;
+
+  String get deleteChannel;
 }
 
 class _ChatLocalizationsDelegate
