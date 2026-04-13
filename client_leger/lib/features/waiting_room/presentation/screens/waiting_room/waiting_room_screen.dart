@@ -238,6 +238,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                 l10n,
                 isHost,
                 isLocked,
+                room.dropInDropOut,
                 _viewModel.canAddVirtualPlayer.value,
                 _viewModel.isAtMaxPlayers.value,
               )
@@ -373,6 +374,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
     WaitingRoomLocalizations l10n,
     bool isHost,
     bool isLocked,
+    bool isDropInDropOutEnabled,
     bool canAddVirtualPlayer,
     bool isAtMaxPlayers,
   ) {
@@ -387,6 +389,11 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
               ? l10n.waitingRoomUnlockRoom
               : l10n.waitingRoomLockRoom,
           onPressed: canToggleLock ? _requestToggleLockConfirmationIfNeeded : null,
+        ),
+        _buildDropInToggle(
+          enabled: isDropInDropOutEnabled,
+          onChanged: (_) => _viewModel.toggleDropInDropOut(),
+          label: l10n.waitingRoomDropInDropOut,
         ),
         _buildMenuButton(
           label: l10n.startGame,
@@ -426,6 +433,48 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
           label,
           style: const TextStyle(fontFamily: 'CustomFont', fontSize: 16),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDropInToggle({
+    required bool enabled,
+    required ValueChanged<bool> onChanged,
+    required String label,
+  }) {
+    return Container(
+      width: 250,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF550000),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFF7f1f1f)),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 18,
+            height: 18,
+            child: Checkbox(
+              value: enabled,
+              onChanged: (value) => onChanged(value ?? false),
+              activeColor: const Color(0xFF7f1f1f),
+              checkColor: const Color(0xFFfff0f0),
+              side: const BorderSide(color: Color(0xFFfff0f0)),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Color(0xFFfff0f0),
+                fontFamily: 'CustomFont',
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

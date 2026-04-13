@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 
 import '../../../../../../core/presentation/widgets/app_background/app_background.dart';
 import '../../../core/localisation/join_game_session_localizations.dart';
+import '../../widgets/available_rooms/available_rooms_panel.dart';
 import '../../widgets/join_by_code/join_by_code_panel.dart';
 import 'join_game_session_view_model.dart';
 
@@ -41,7 +42,13 @@ class _JoinGameSessionScreenState extends State<JoinGameSessionScreen> {
               child: Center(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                  child: JoinByCodePanel(),
+                  child: Column(
+                    children: [
+                      AvailableRoomsPanel(),
+                      SizedBox(height: 28),
+                      JoinByCodePanel(),
+                    ],
+                  ),
                 ),
               ),
             ),

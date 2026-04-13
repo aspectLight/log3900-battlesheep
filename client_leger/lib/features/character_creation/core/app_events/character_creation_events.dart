@@ -24,6 +24,7 @@ sealed class CharacterCreationEntryAppEvent
     required String roomCode,
     required String hostId,
     required LobbyRoomModel initialRoom,
+    @Default(false) bool isDropIn,
   }) = CharacterCreationJoinEntered;
 }
 

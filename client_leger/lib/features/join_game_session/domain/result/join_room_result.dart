@@ -6,10 +6,12 @@ class JoinRoomResult {
     required this.socketId,
     required this.hostId,
     required this.initialRoom,
+    this.isDropIn = false,
   });
 
   final String roomCode;
   final String socketId;
   final String hostId;
   final LobbyRoomModel initialRoom;
+  final bool isDropIn;
 }

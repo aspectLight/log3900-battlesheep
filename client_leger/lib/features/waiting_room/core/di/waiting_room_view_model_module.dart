@@ -6,6 +6,7 @@ import '../../domain/use_cases/add_virtual_player_use_case.dart';
 import '../../domain/use_cases/kick_player_use_case.dart';
 import '../../domain/use_cases/leave_waiting_room_use_case.dart';
 import '../../domain/use_cases/start_waiting_room_game_use_case.dart';
+import '../../domain/use_cases/toggle_drop_in_drop_out_use_case.dart';
 import '../../domain/use_cases/toggle_lock_waiting_room_use_case.dart';
 import '../../presentation/screens/waiting_room/waiting_room_view_model.dart';
 
@@ -20,6 +21,7 @@ void registerWaitingRoomScopeViewModels(
       addVirtualPlayerUseCase: scope.get<AddVirtualPlayerUseCase>(),
       leaveWaitingRoomUseCase: scope.get<LeaveWaitingRoomUseCase>(),
       toggleLockWaitingRoomUseCase: scope.get<ToggleLockWaitingRoomUseCase>(),
+      toggleDropInDropOutUseCase: scope.get<ToggleDropInDropOutUseCase>(),
       kickPlayerUseCase: scope.get<KickPlayerUseCase>(),
       startWaitingRoomGameUseCase: scope.get<StartWaitingRoomGameUseCase>(),
     ),

@@ -16,6 +16,7 @@
   "lockRoom": "Verrouiller la salle",
   "startGame": "Commencer la partie",
   "waitingRoomAddVirtualPlayer": "Ajouter un joueur virtuel",
+  "waitingRoomDropInDropOut": "Drop-in/Drop-out",
   "addVirtualPlayer": "Ajouter un joueur virtuel",
   "selectVirtualProfile": "Sélectionnez le profil du joueur virtuel :",
   "waitingRoomVirtualPlayerName": "Nom du joueur virtuel",

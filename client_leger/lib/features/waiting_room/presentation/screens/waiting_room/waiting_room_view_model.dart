@@ -13,6 +13,7 @@ import '../../../domain/use_cases/add_virtual_player_use_case.dart';
 import '../../../domain/use_cases/kick_player_use_case.dart';
 import '../../../domain/use_cases/leave_waiting_room_use_case.dart';
 import '../../../domain/use_cases/start_waiting_room_game_use_case.dart';
+import '../../../domain/use_cases/toggle_drop_in_drop_out_use_case.dart';
 import '../../../domain/use_cases/toggle_lock_waiting_room_use_case.dart';
 
 class WaitingRoomViewModel {
@@ -22,6 +23,7 @@ class WaitingRoomViewModel {
     required AddVirtualPlayerUseCase addVirtualPlayerUseCase,
     required LeaveWaitingRoomUseCase leaveWaitingRoomUseCase,
     required ToggleLockWaitingRoomUseCase toggleLockWaitingRoomUseCase,
+    required ToggleDropInDropOutUseCase toggleDropInDropOutUseCase,
     required KickPlayerUseCase kickPlayerUseCase,
     required StartWaitingRoomGameUseCase startWaitingRoomGameUseCase,
   })  : _roomRepository = roomRepository,
@@ -29,6 +31,7 @@ class WaitingRoomViewModel {
         _addVirtualPlayerUseCase = addVirtualPlayerUseCase,
         _leaveWaitingRoomUseCase = leaveWaitingRoomUseCase,
         _toggleLockWaitingRoomUseCase = toggleLockWaitingRoomUseCase,
+        _toggleDropInDropOutUseCase = toggleDropInDropOutUseCase,
         _kickPlayerUseCase = kickPlayerUseCase,
         _startWaitingRoomGameUseCase = startWaitingRoomGameUseCase;
 
@@ -37,6 +40,7 @@ class WaitingRoomViewModel {
   final AddVirtualPlayerUseCase _addVirtualPlayerUseCase;
   final LeaveWaitingRoomUseCase _leaveWaitingRoomUseCase;
   final ToggleLockWaitingRoomUseCase _toggleLockWaitingRoomUseCase;
+  final ToggleDropInDropOutUseCase _toggleDropInDropOutUseCase;
   final KickPlayerUseCase _kickPlayerUseCase;
   final StartWaitingRoomGameUseCase _startWaitingRoomGameUseCase;
 
@@ -81,6 +85,11 @@ class WaitingRoomViewModel {
     if (!isHost.value) return Future.value(none());
     _kickPlayerUseCase.execute(player);
     return Future.value(none());
+  }
+
+  void toggleDropInDropOut() {
+    if (!isHost.value) return;
+    _toggleDropInDropOutUseCase.execute();
   }
 
   Future<Option<WaitingRoomFailure>> addVirtualPlayer({

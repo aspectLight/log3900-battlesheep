@@ -8,6 +8,7 @@ import '../../../../../core/enums/character.dart';
 import '../../../../../core/helpers/functional_programming.dart';
 import '../../../../../core/notification/notification_intent.dart';
 import '../../../../../core/notification/notification_intent_sink.dart';
+import '../../../../join_game_session/core/exceptions/join_game_session_failure.dart';
 import '../../../core/app_events/character_creation_events.dart';
 import '../../../core/constants/character_creation_constants.dart';
 import '../../../core/event_bus/character_creation_event_bus.dart';
@@ -85,6 +86,10 @@ class CharacterCreationViewModel {
   bool get isSubmitting =>
       createSubmitState.value is CreateCharacterSubmitStateSubmitting;
   bool get isHost => _entryMode is CharacterCreationHostEntryMode;
+  bool get isDropIn => switch (_entryMode) {
+        CharacterCreationJoinEntryMode(:final isDropIn) => isDropIn,
+        _ => false,
+      };
   String get username => _username;
 
   List<Character> get charactersForGrid => Character.values;
@@ -107,6 +112,9 @@ class CharacterCreationViewModel {
     if (isCharacterDisabled(character)) return;
     _repository.setSelectedCharacterId(Option.of(character.id));
     if (isHost) return;
+    // In drop-in (game already started), the waiting room may not exist.
+    // Avoid calling `reserveAvatar` to prevent server errors.
+    if (isDropIn) return;
     unawaited(_reserveSelectedCharacter(character.id));
   }
 
@@ -152,7 +160,13 @@ class CharacterCreationViewModel {
     if (isSubmitting) return;
     createSubmitState.value = const CreateCharacterSubmitState.submitting();
     final command = toCommand(form, _repository.roomCode);
-    await _createCharacterUseCase.execute(command);
+    try {
+      await _createCharacterUseCase.execute(command);
+    } on JoinGameSessionFailure catch (failure) {
+      _notificationIntentSink.addIntent(
+        JoinGameSessionFailureNotificationIntent(failure),
+      );
+    }
     createSubmitState.value = const CreateCharacterSubmitState.initial();
   }
 

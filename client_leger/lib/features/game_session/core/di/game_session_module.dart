@@ -32,6 +32,7 @@ import '../../data/side_effects/game_turn_start_notification_side_effect.dart';
 import '../../data/side_effects/game_virtual_player_move_side_effect.dart';
 import '../../data/side_effects/game_virtual_player_turn_side_effect.dart';
 import '../../data/side_effects/game_win_condition_side_effect.dart';
+import '../context/drop_in_join_sync_holder.dart';
 import '../context/game_history_record_holder.dart';
 import '../context/game_session_scope_holder.dart';
 import '../event_bus/game_session_event_bus.dart';
@@ -51,6 +52,7 @@ class _GameSessionScopeBootstrapped {
 }
 
 void registerGameSessionRoot(GetIt getIt) {
+  getIt.registerLazySingleton<DropInJoinSyncHolder>(DropInJoinSyncHolder.new);
   getIt.registerLazySingleton<GameSessionScopeHolder>(
     GameSessionScopeHolder.new,
   );

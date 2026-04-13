@@ -17,6 +17,7 @@ class SpawnedPlayerEvent with _$SpawnedPlayerEvent {
     required int movementPoints,
     required int actionPoints,
     required GameBoardPosition spawnPoint,
+    required GameBoardPosition currentBoardPosition,
     @Default([]) List<GameItem> inventory,
     required Map<StatType, int> stats,
     required StatType diceChoice,

@@ -11,12 +11,15 @@ class WaitingRoomDto {
   final String hostId;
   final List<WaitingRoomPlayerDto> players;
   final bool isLocked;
+  @JsonKey(defaultValue: false)
+  final bool dropInDropOut;
 
   const WaitingRoomDto({
     required this.roomId,
     required this.hostId,
     required this.players,
     required this.isLocked,
+    required this.dropInDropOut,
   });
 
   factory WaitingRoomDto.fromJson(Map<String, dynamic> json) =>

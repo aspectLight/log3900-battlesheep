@@ -39,11 +39,9 @@ class GameBoardStateReducer {
     PlayerSpawnedEvent event,
   ) {
     final board = previous.board;
-    final nextPositions = Map<String, GameBoardPosition>.from(
-      previous.playerPositions,
-    );
+    final nextPositions = <String, GameBoardPosition>{};
     for (final player in event.players) {
-      final pos = player.spawnPoint;
+      final pos = player.currentBoardPosition;
       if (!board.isInBounds(pos.x, pos.y)) continue;
       nextPositions[player.id] = pos;
     }

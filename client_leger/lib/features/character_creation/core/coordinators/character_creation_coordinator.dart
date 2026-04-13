@@ -83,15 +83,16 @@ class CharacterCreationCoordinator
         :final roomCode,
         :final hostId,
         :final initialRoom,
-      ) =>
-        (
-          socketId,
-          roomCode,
-          CharacterCreationJoinEntryMode(
-            hostId: hostId,
-            initialRoom: initialRoom,
-          ),
+        :final isDropIn,
+      ) => (
+        socketId,
+        roomCode,
+        CharacterCreationJoinEntryMode(
+          hostId: hostId,
+          initialRoom: initialRoom,
+          isDropIn: isDropIn,
         ),
+      ),
     };
     return CharacterCreationData(
       roomCode: roomCode,
