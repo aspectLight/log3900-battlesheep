@@ -473,7 +473,10 @@
   "game_configurator": {
     "mode_desc_classic": "Gagnez 3 combats pour être déclaré vainqueur et mettre fin à la partie.",
     "mode_desc_ctf": "Capturez le drapeau adverse et ramenez-le à votre point de départ pour gagner la partie.",
-    "actions_desc": "Nombre de points d'actions alloués à chaque joueur à chaque tour"
+    "actions_desc": "Nombre de points d'actions alloués à chaque joueur à chaque tour",
+    "privacy_desc_public": "Peut être modifié, supprimé et utilisé pour créer une partie par n'importe quel utilisateur. Le propriétaire est toujours le créateur original.",
+    "privacy_desc_private": "Ne peut être modifié, supprimé ou utilisé pour créer une partie que par son propriétaire. Une partie utilisant ce jeu est joignable par les autres utilisateurs.",
+    "privacy_desc_protected": "Ne peut être modifié ou supprimé que par son propriétaire. Peut être utilisé par n'importe quel utilisateur pour créer une partie."
   },
   "game_result": {
     "win_classic": "Victoire ! Tu as gagné trois combats",

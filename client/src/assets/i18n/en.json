@@ -474,7 +474,10 @@
   "game_configurator": {
     "mode_desc_classic": "Win 3 combats to be declared the winner and end the game.",
     "mode_desc_ctf": "Capture the enemy flag and bring it back to your starting point to win the game.",
-    "actions_desc": "Number of action points allocated to each player each turn"
+    "actions_desc": "Number of action points allocated to each player each turn",
+    "privacy_desc_public": "Can be modified, deleted, and used to create a game by any user. The owner is always the original creator.",
+    "privacy_desc_private": "Can only be modified, deleted, or used to create a game by its owner. A game using this map can still be joined by other users.",
+    "privacy_desc_protected": "Can only be modified or deleted by its owner. Can be used by any user to create a game."
   },
   "game_result": {
     "win_classic": "Victory! You won three combats",
