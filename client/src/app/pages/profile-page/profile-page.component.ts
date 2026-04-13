@@ -308,7 +308,6 @@ export class ProfilePageComponent implements OnInit {
 
     onSuccessConfirm() {
         this.showSuccessMessage = false;
-        window.location.reload();
     }
 
     formatTime(seconds: number): string {
