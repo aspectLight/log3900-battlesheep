@@ -529,7 +529,9 @@
     "flag": "Flag"
   },
   "player_hud": {
-    "dice": "DICE"
+    "dice": "DICE",
+    "movements": "movements",
+    "actions": "actions"
   },
   "game_info": {
     "continue": "continue",

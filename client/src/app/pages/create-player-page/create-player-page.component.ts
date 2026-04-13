@@ -5,6 +5,7 @@ import { BonusChoicesComponent } from '@app/components/player/bonus-choices/bonu
 import { CharacterGridComponent } from '@app/components/player/character-grid/character-grid.component';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { BonusType, STAT_WITH_BONUS } from '@app/constants/bonus.constants';
+import { DEFAULT_STATS_VALUE } from '@app/constants/player.constants';
 import { ROUTES } from '@app/constants/routes.constants';
 import { Bonus } from '@app/interfaces/character.interface';
 import { Reservation } from '@app/interfaces/reservation.interface';
@@ -31,6 +32,7 @@ export class CreatePlayerPageComponent implements OnInit {
 
     gameModified: boolean = false;
     isHost: boolean = false;
+    isCreateButtonEnabled: boolean = false;
 
     constructor(
         public playerCreationService: PlayerCreationService,
@@ -67,6 +69,7 @@ export class CreatePlayerPageComponent implements OnInit {
 
     ngOnInit() {
         this.playerCreationService.reset();
+        this.updateCreateButtonState();
         this.socketService.roomLocked$.subscribe((locked) => {
             if (locked) {
                 this.errorMessage = this.translate.instant('errors.game_deleted_or_locked');
@@ -86,10 +89,12 @@ export class CreatePlayerPageComponent implements OnInit {
         this.playerCreationService.selectedCharacter = chosenAvatar;
         this.socketService.reserveAvatar(this.gameCreationService.gameCode, chosenAvatar.name, this.getId());
         this.validCharacter = true;
+        this.updateCreateButtonState();
     }
 
     onBonusSelected(chosenBonus: Bonus): void {
         this.playerCreationService.selectedBonus = chosenBonus;
+        this.updateCreateButtonState();
     }
 
     async createPlayer() {
@@ -133,5 +138,14 @@ export class CreatePlayerPageComponent implements OnInit {
         this.gameModified = false;
         this.showError = false;
         this.router.navigate([ROUTES.home]);
+    }
+
+    private updateCreateButtonState(): void {
+        const { character, bonus } = this.selectedCharacter;
+        this.isCreateButtonEnabled =
+            character.name.trim() !== '' &&
+            (bonus.life !== DEFAULT_STATS_VALUE || bonus.speed !== DEFAULT_STATS_VALUE) &&
+            bonus.defense !== null &&
+            bonus.attack !== null;
     }
 }

@@ -1,7 +1,7 @@
 <div class="page-header">
-    <button class="return-button" routerLink="/join-game">
+    <button class="return-button" routerLink="/home">
         <img src="./assets/ui/left.png" />
-        {{ 'main.join_game' | translate }}
+        {{ 'common.home' | translate }}
     </button>
     <h1 class="page-title">{{ 'create_player.title' | translate }}</h1>
 </div>
@@ -74,6 +74,7 @@
             <button
                 class="square-button"
                 (click) = "createPlayer()"
+                [disabled]="!isCreateButtonEnabled"
                 >
                 @if (isHost) {
                     {{ 'create_player.create_game' | translate }}

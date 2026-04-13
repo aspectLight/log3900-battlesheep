@@ -45,9 +45,9 @@ export class ProfilePageComponent implements OnInit {
     errorMessage = '';
 
     readonly themes: { value: ThemeType; labelKey: string; description: string; preview: string }[] = [
-        { value: 'default', labelKey: 'profile.theme_default', description: 'Rouge sombre', preview: '/assets/ui/default_preview.png' },
-        { value: 'frost', labelKey: 'profile.theme_frost', description: 'Bleu glacial', preview: '/assets/ui/froid_preview.png' },
-        { value: 'village', labelKey: 'profile.theme_village', description: 'Brun terreux', preview: '/assets/ui/village_preview.png' },
+        { value: 'default', labelKey: 'profile.theme_default', description: 'Rouge sombre', preview: './assets/ui/default_preview.png' },
+        { value: 'frost', labelKey: 'profile.theme_frost', description: 'Bleu glacial', preview: './assets/ui/froid_preview.png' },
+        { value: 'village', labelKey: 'profile.theme_village', description: 'Brun terreux', preview: './assets/ui/village_preview.png' },
     ];
 
     readonly languages: { value: LanguageType; labelKey: string }[] = [
