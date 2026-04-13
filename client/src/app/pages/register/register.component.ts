@@ -9,6 +9,7 @@ import { CameraCaptureService } from '@app/services/communication/camera-capture
 import { AuthService } from '@app/services/communication/auth.service';
 import { ProfileService } from '@app/services/communication/profile.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { LanguageService, LanguageType } from '@app/services/state/language.service';
 
 const passwordContainsLetter: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     return /[a-zA-Z]/.test(control.value) ? null : { noLetter: true };
@@ -46,7 +47,7 @@ export class RegisterPageComponent {
     showConfirmPassword = false;
     showAvatarMenu = false;
 
-    avatars = ACCOUNT_CREATION_AVATARS;
+    avatars = ACCOUNT_CREATION_AVATARS.filter(a => !EXCLUSIVE_AVATAR_IDS.includes(a.id));
 
     selectedAvatarFile: File | null = null;
     avatarFileError: string | null = null;
@@ -69,7 +70,12 @@ export class RegisterPageComponent {
         private profileService: ProfileService,
         private router: Router,
         public camera: CameraCaptureService,
+        public languageService: LanguageService,
     ) {}
+
+    setLanguage(lang: LanguageType) {
+        this.languageService.setLanguage(lang);
+    }
 
     get selectedAvatarId(): string {
         return this.form.controls.avatarId.value ?? '';

@@ -5,6 +5,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@app/services/communication/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { LanguageService, LanguageType } from '@app/services/state/language.service';
 
 type FirebaseAuthError = { code?: string; message?: string };
 
@@ -29,7 +30,12 @@ export class LoginPageComponent {
         private fb: FormBuilder,
         private authService: AuthService,
         private router: Router,
+        public languageService: LanguageService,
     ) {}
+
+    setLanguage(lang: LanguageType) {
+        this.languageService.setLanguage(lang);
+    }
 
     togglePasswordVisibility() {
         this.showPassword = !this.showPassword;
