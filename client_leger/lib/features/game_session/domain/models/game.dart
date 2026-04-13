@@ -10,7 +10,9 @@ class Game {
   final GameMode mode;
   final Board board;
   final Map<GameBoardPosition, GameItem> initialItems;
-  final bool isVisible;
+  final String privacy;
+  final String owner;
+  final int actionPoints;
   final String modificationDate;
 
   const Game({
@@ -20,7 +22,9 @@ class Game {
     required this.mode,
     required this.board,
     required this.initialItems,
-    required this.isVisible,
+    required this.privacy,
+    required this.owner,
+    required this.actionPoints,
     required this.modificationDate,
   });
 

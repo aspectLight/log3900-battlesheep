@@ -41,4 +41,7 @@ class SelectGameSessionLocalizationsFr extends SelectGameSessionLocalizations {
 
   @override
   String get createGameModeCtf => 'Capture du drapeau';
+
+  @override
+  String get noGames => 'Aucun jeu disponible.';
 }

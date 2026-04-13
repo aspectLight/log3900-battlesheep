@@ -22,11 +22,6 @@ class GameNotFoundSelectGameSessionFailure extends SelectGameSessionFailure {
     : super('Game not found or was deleted');
 }
 
-class GameNotVisibleSelectGameSessionFailure extends SelectGameSessionFailure {
-  const GameNotVisibleSelectGameSessionFailure()
-    : super('Game is not visible');
-}
-
 class UnknownSelectGameSessionFailure extends SelectGameSessionFailure {
   const UnknownSelectGameSessionFailure(super.devMessage);
 }

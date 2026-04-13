@@ -41,4 +41,7 @@ class SelectGameSessionLocalizationsEn extends SelectGameSessionLocalizations {
 
   @override
   String get createGameModeCtf => 'Capture the flag';
+
+  @override
+  String get noGames => 'No games available.';
 }

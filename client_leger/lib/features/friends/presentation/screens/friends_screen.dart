@@ -16,8 +16,6 @@ const _kBorder = Color(0xFF3a3a3a);
 const _kHeaderText = Color(0xFFe0d8c0);
 const _kStateBg = Color(0x40000000);
 const _kAccept = Color(0xFF145214);
-const _kDanger = Color(0xFFff6b6b);
-const _kDangerBorder = Color(0xFF7f1f1f);
 const _kBlock = Color(0xFFffb347);
 const _kBlockBorder = Color(0xFF8b5a00);
 
@@ -38,7 +36,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
   void initState() {
     super.initState();
     _viewModel = GetIt.I<FriendsViewModel>();
-    _viewModel.loadAll();
+    unawaited(_viewModel.loadAll());
   }
 
   @override
@@ -189,8 +187,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
             FriendActionButton(
               label: l10n.removeFriend,
               onPressed: () => _viewModel.removeFriend(f.username),
-              color: _kDanger,
-              borderColor: _kDangerBorder,
             ),
             FriendActionButton(
               label: l10n.blockUser,
@@ -226,8 +222,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
                 FriendActionButton(
                   label: l10n.refuse,
                   onPressed: () => _viewModel.refuseRequest(r.id),
-                  color: _kDanger,
-                  borderColor: _kDangerBorder,
                 ),
               ],
             ),
@@ -242,8 +236,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
                 FriendActionButton(
                   label: l10n.cancel,
                   onPressed: () => _viewModel.cancelRequest(r.id),
-                  color: _kDanger,
-                  borderColor: _kDangerBorder,
                 ),
               ],
             ),
@@ -315,8 +307,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
                               label: l10n.cancel,
                               onPressed: () => _viewModel
                                   .cancelRequestByUsername(u.username),
-                              color: _kDanger,
-                              borderColor: _kDangerBorder,
                             )
                           else
                             FriendActionButton(

@@ -80,7 +80,9 @@ extension GameSummaryDtoToModel on GameSummaryDto {
         mode: mode,
         boardSize: board.size,
         boardMatrix: previewMatrixFromGameSummaryBoard(board),
-        isVisible: isVisible,
+        privacy: privacy,
+        owner: owner,
+        actionPoints: actionPoints,
         lastModified: modificationDate,
       );
 }

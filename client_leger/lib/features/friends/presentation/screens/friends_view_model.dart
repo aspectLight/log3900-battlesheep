@@ -45,7 +45,7 @@ class FriendsViewModel {
       pendingRequests.value = results[1] as List<FriendRequest>;
       sentRequests.value = results[2] as List<FriendRequest>;
       blockedUsers.value = results[3] as List<String>;
-    } catch (e) {
+    } on Object {
       errorMessage.value = 'Erreur lors du chargement des données sociales';
     } finally {
       isLoading.value = false;
@@ -82,7 +82,7 @@ class FriendsViewModel {
     }
     try {
       searchResults.value = await _repository.searchUsers(query);
-    } catch (_) {
+    } on Object {
       searchResults.value = [];
     }
   }
@@ -95,7 +95,7 @@ class FriendsViewModel {
           .toList();
       await reloadSentRequests();
       errorMessage.value = null;
-    } catch (e) {
+    } on Object {
       errorMessage.value = "Erreur lors de l'envoi de la demande";
     }
   }
@@ -105,7 +105,7 @@ class FriendsViewModel {
       await _repository.acceptFriendRequest(requestId);
       await Future.wait([reloadFriends(), reloadPendingRequests()]);
       errorMessage.value = null;
-    } catch (_) {
+    } on Object {
       errorMessage.value = "Erreur lors de l'acceptation de la demande";
     }
   }
@@ -115,7 +115,7 @@ class FriendsViewModel {
       await _repository.refuseFriendRequest(requestId);
       await reloadPendingRequests();
       errorMessage.value = null;
-    } catch (_) {
+    } on Object {
       errorMessage.value = 'Erreur lors du refus de la demande';
     }
   }
@@ -125,7 +125,7 @@ class FriendsViewModel {
       await _repository.cancelFriendRequest(requestId);
       await reloadSentRequests();
       errorMessage.value = null;
-    } catch (_) {
+    } on Object {
       errorMessage.value = "Erreur lors de l'annulation de la demande";
     }
   }
@@ -142,7 +142,7 @@ class FriendsViewModel {
       await _repository.removeFriend(username);
       await reloadFriends();
       errorMessage.value = null;
-    } catch (_) {
+    } on Object {
       errorMessage.value = "Erreur lors de la suppression de l'ami";
     }
   }
@@ -152,7 +152,7 @@ class FriendsViewModel {
       await _repository.blockUser(username);
       await Future.wait([reloadFriends(), _reloadBlockedUsers()]);
       errorMessage.value = null;
-    } catch (_) {
+    } on Object {
       errorMessage.value = "Erreur lors du blocage de l'utilisateur";
     }
   }
@@ -169,7 +169,7 @@ class FriendsViewModel {
       await _repository.unblockUser(username);
       await _reloadBlockedUsers();
       errorMessage.value = null;
-    } catch (_) {
+    } on Object {
       errorMessage.value = "Erreur lors du déblocage de l'utilisateur";
     }
   }

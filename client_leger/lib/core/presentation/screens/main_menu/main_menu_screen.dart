@@ -32,7 +32,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>
     super.initState();
     _viewModel = GetIt.I<MainMenuViewModel>();
     _appNavigator = GetIt.I<AppNavigator>();
-    _viewModel.loadPendingRequests();
+    unawaited(_viewModel.loadPendingRequests());
   }
 
   void _openSettings() {
@@ -52,7 +52,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>
 
   @override
   void didPopNext() {
-    _viewModel.loadPendingRequests();
+    unawaited(_viewModel.loadPendingRequests());
   }
 
   @override

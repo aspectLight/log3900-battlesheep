@@ -36,7 +36,9 @@ extension GameDtoToEntity on GameDto {
       mode: const GameModeConverter().fromJson(mode),
       board: Board(matrix: matrix, size: board.size),
       initialItems: items,
-      isVisible: isVisible,
+      privacy: privacy,
+      owner: owner,
+      actionPoints: actionPoints,
       modificationDate: modificationDate,
     );
   }

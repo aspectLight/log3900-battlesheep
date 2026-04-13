@@ -1,3 +1,0 @@
-class AuthTextFieldViewModel {
-  const AuthTextFieldViewModel();
-}

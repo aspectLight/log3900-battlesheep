@@ -1,3 +1,0 @@
-class AppBackgroundViewModel {
-  const AppBackgroundViewModel();
-}

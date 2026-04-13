@@ -4,6 +4,11 @@ import '../../../core/services/socket_service.dart';
 import '../core/constants/social_socket_events.dart';
 import '../presentation/screens/friends_view_model.dart';
 
+Map<String, dynamic>? _asStringKeyMap(Object? raw) {
+  if (raw is! Map) return null;
+  return Map<String, dynamic>.from(raw);
+}
+
 class FriendsSocketListener {
   FriendsSocketListener({
     required SocketService socketService,
@@ -33,8 +38,8 @@ class FriendsSocketListener {
       _socketService
           .on<Object?>(SocialSocketEvents.friendRequestAccepted)
           .listen((_) {
-            _viewModel.reloadFriends();
-            _viewModel.reloadSentRequests();
+            unawaited(_viewModel.reloadFriends());
+            unawaited(_viewModel.reloadSentRequests());
           }),
       _socketService
           .on<Object?>(SocialSocketEvents.friendRequestRefused)
@@ -46,20 +51,20 @@ class FriendsSocketListener {
           .on<Object?>(SocialSocketEvents.friendRemoved)
           .listen((_) => _viewModel.reloadFriends()),
       _socketService.on<Object?>(SocialSocketEvents.friendOnline).listen((raw) {
-        final m = raw as Map<String, dynamic>;
-        _viewModel.updateFriendPresence(
-          m['username'] as String,
-          isOnline: true,
-        );
+        final m = _asStringKeyMap(raw);
+        if (m == null) return;
+        final username = m['username'] as String?;
+        if (username == null) return;
+        _viewModel.updateFriendPresence(username, isOnline: true);
       }),
       _socketService.on<Object?>(SocialSocketEvents.friendOffline).listen((
         raw,
       ) {
-        final m = raw as Map<String, dynamic>;
-        _viewModel.updateFriendPresence(
-          m['username'] as String,
-          isOnline: false,
-        );
+        final m = _asStringKeyMap(raw);
+        if (m == null) return;
+        final username = m['username'] as String?;
+        if (username == null) return;
+        _viewModel.updateFriendPresence(username, isOnline: false);
       }),
     ]);
   }

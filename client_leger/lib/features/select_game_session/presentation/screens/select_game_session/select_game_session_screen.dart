@@ -38,11 +38,9 @@ class _SelectGameSessionScreenState extends State<SelectGameSessionScreen> {
           children: [
             _buildHeader(l10n),
             const Expanded(
-              child: Center(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.all(32),
-                  child: SelectGameSessionPanel(),
-                ),
+              child: Padding(
+                padding: EdgeInsets.all(32),
+                child: SelectGameSessionPanel(),
               ),
             ),
           ],
