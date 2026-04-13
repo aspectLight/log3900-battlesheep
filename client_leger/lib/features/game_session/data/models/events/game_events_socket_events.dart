@@ -2,6 +2,7 @@ abstract class GameEventsSocketEvents {
   GameEventsSocketEvents._();
 
   static const String playerSpawned = 'playerSpawned';
+  static const String playerJoinedGame = 'playerJoinedGame';
   static const String turnStarting = 'turnStarting';
   static const String updateCountdown = 'updateCountdown';
   static const String updateStartingCountdown = 'updateStartingCountdown';

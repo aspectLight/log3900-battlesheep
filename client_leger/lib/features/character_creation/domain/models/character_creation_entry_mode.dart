@@ -26,8 +26,10 @@ class CharacterCreationJoinEntryMode extends CharacterCreationEntryMode {
   const CharacterCreationJoinEntryMode({
     required this.hostId,
     required this.initialRoom,
+    this.isDropIn = false,
   });
 
   final String hostId;
   final LobbyRoomModel initialRoom;
+  final bool isDropIn;
 }

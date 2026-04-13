@@ -197,6 +197,12 @@ abstract class WaitingRoomLocalizations {
   /// **'Add virtual player'**
   String get waitingRoomAddVirtualPlayer;
 
+  /// No description provided for @waitingRoomDropInDropOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop-in/Drop-out'**
+  String get waitingRoomDropInDropOut;
+
   /// No description provided for @addVirtualPlayer.
   ///
   /// In en, this message translates to:

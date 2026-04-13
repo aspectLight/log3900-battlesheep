@@ -69,6 +69,7 @@ void registerGameSideEffects(
     GamePlayerAbandonedBoardSideEffect(
       gameSessionEventBus: scope.get<GameSessionEventBus>(),
       boardRepository: scope.get<GameBoardRepository>(),
+      inventoryRepository: scope.get<GameInventoryRepository>(),
     ),
     dispose: (se) => se.dispose(),
   );

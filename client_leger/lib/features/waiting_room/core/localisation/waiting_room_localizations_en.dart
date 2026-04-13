@@ -57,6 +57,9 @@ class WaitingRoomLocalizationsEn extends WaitingRoomLocalizations {
   String get waitingRoomAddVirtualPlayer => 'Add virtual player';
 
   @override
+  String get waitingRoomDropInDropOut => 'Drop-in/Drop-out';
+
+  @override
   String get addVirtualPlayer => 'Add virtual player';
 
   @override

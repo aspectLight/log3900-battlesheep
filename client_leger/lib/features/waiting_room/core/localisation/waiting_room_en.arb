@@ -16,6 +16,7 @@
   "lockRoom": "Lock room",
   "startGame": "Start game",
   "waitingRoomAddVirtualPlayer": "Add virtual player",
+  "waitingRoomDropInDropOut": "Drop-in/Drop-out",
   "addVirtualPlayer": "Add virtual player",
   "selectVirtualProfile": "Select the virtual player's profile:",
   "waitingRoomVirtualPlayerName": "Virtual player name",

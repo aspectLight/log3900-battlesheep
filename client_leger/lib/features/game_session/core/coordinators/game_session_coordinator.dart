@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:get_it/get_it.dart';
 
 import '../app_events/game_session_events.dart';
+import '../context/drop_in_join_sync_holder.dart';
 import '../context/game_history_record_holder.dart';
 import '../context/game_session_data.dart';
 import '../context/game_session_scope_holder.dart';
@@ -17,9 +18,17 @@ import '../../../../routing/app_navigator.dart';
 import '../../../../routing/navigation_command.dart';
 import '../../../game_history/data/repositories/game_history_repository.dart';
 import '../../../statistics/core/app_events/statistics_events.dart';
+import '../../data/models/extensions/game_events_dto_extensions.dart';
+import '../../data/models/dto/game_dto.dart';
+import '../../data/models/extensions/game_dto_extensions.dart';
 import '../../data/reducers/game_metadata_state_reducer.dart';
+import '../../data/repositories/game_board_repository.dart';
+import '../../data/repositories/game_inventory_repository.dart';
 import '../../data/repositories/game_metadata_repository.dart';
+import '../../data/repositories/game_player_repository.dart';
+import '../../data/repositories/game_turn_repository.dart';
 import '../../data/services/game_service.dart';
+import '../../domain/events/game_events.dart';
 import '../../domain/models/game.dart';
 import '../../domain/state/game_board_state.dart';
 
@@ -123,18 +132,22 @@ class GameSessionCoordinator
     final game = await gameService.getGame(data.gameId);
     scope.registerLazySingleton<Game>(() => game);
     scope.registerLazySingleton<Board>(() => game.board);
+    final dropInSync = getIt<DropInJoinSyncHolder>();
+    final effectiveHostId = data.gameRoomHostId.isNotEmpty
+        ? data.gameRoomHostId
+        : dropInSync.gameRoomHostId;
     scope.registerLazySingleton<GameMetadataRepository>(
       () => GameMetadataRepository(
         reducer: _gameMetadataStateReducer,
         roomId: data.roomId,
         isCTF: game.isCTF,
-        initialHostId: data.gameRoomHostId.isNotEmpty
-            ? data.gameRoomHostId
+        initialHostId: effectiveHostId.isNotEmpty
+            ? effectiveHostId
             : (data.isHost ? data.socketId : ''),
       ),
     );
-    final shouldEmitPlayGame = data.gameRoomHostId.isNotEmpty
-        ? data.socketId == data.gameRoomHostId
+    final shouldEmitPlayGame = effectiveHostId.isNotEmpty
+        ? data.socketId == effectiveHostId
         : data.isHost;
     registerGameSessionScope(
       scope,
@@ -153,7 +166,75 @@ class GameSessionCoordinator
       roomId: data.roomId,
       isHost: shouldEmitPlayGame,
     );
+    _applyDropInJoinSyncIfNeeded(scope);
     appTransitionEventBus.fire(const GameSessionEntryAppEvent.loaded());
+  }
+
+  void _applyDropInJoinSyncIfNeeded(GetIt scope) {
+    final holder = getIt<DropInJoinSyncHolder>();
+    final raw = holder.playersRaw;
+    if (raw == null || raw.isEmpty) {
+      holder.clear();
+      return;
+    }
+    final currentBoardRaw = holder.currentBoardRaw;
+    if (currentBoardRaw != null) {
+      try {
+        // `currentBoard` reflète l'état actuel des items/portes/etc. dans la partie.
+        final boardSizeRaw = currentBoardRaw['size'];
+        final matrixRaw = currentBoardRaw['matrix'];
+        if (boardSizeRaw is! num || matrixRaw is! List<dynamic>) {
+          throw const FormatException('Invalid currentBoard snapshot');
+        }
+        final boardDto = BoardDto.fromJson(currentBoardRaw);
+        // Rebuild a full Board + items map from server snapshot.
+        final game = scope.get<Game>();
+        final modeStr = game.isCTF ? 'CTF' : 'Classique';
+        final gameDto = GameDto(
+          id: game.id,
+          name: game.name,
+          description: game.description,
+          mode: modeStr,
+          board: boardDto,
+          isVisible: true,
+          modificationDate: '',
+        );
+        final rebuiltGame = gameDto.toEntity();
+        scope.get<GameBoardRepository>().replaceBoardAndItems(
+          board: rebuiltGame.board,
+          items: rebuiltGame.initialItems,
+        );
+      } on Object {
+        // If parsing fails, keep scoped initial state.
+      }
+    }
+    final spawned = raw.toPlayerSpawnedDto().toEntity();
+    scope.get<GamePlayerRepository>().applyPlayersSpawned(spawned);
+    scope.get<GameBoardRepository>().applyPlayersSpawned(spawned);
+    scope.get<GameInventoryRepository>().applyPlayersSpawned(spawned);
+    final currentId = holder.currentPlayerId;
+    if (currentId != null && currentId.isNotEmpty) {
+      scope.get<GamePlayerRepository>().applyCurrentPlayerChanged(
+        CurrentPlayerChangedEvent(playerId: currentId),
+      );
+      final turnRepo = scope.get<GameTurnRepository>();
+      turnRepo.state.value = turnRepo.state.value.copyWith(
+        currentPlayerId: currentId,
+      );
+    }
+    final tr = holder.turnTimeRemaining;
+    final phase = holder.turnCountdownPhase;
+    if (tr != null && (phase == 'break' || phase == 'play')) {
+      final turnRepo = scope.get<GameTurnRepository>();
+      if (phase == 'break') {
+        turnRepo.applyStartingCountdown(
+          UpdateStartingCountdownEvent(countdown: tr),
+        );
+      } else {
+        turnRepo.applyGameCountdown(UpdateCountdownEvent(countdown: tr));
+      }
+    }
+    holder.clear();
   }
 
   @override

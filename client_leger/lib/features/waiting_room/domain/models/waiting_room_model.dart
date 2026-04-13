@@ -11,6 +11,7 @@ class WaitingRoomModel with _$WaitingRoomModel {
     required String hostId,
     required List<WaitingRoomPlayerModel> players,
     @Default(false) bool isLocked,
+    @Default(false) bool dropInDropOut,
   }) = _WaitingRoomModel;
 
   factory WaitingRoomModel.initial({

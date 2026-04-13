@@ -23,6 +23,8 @@ extension SpawnedPlayerDtoToEntity on SpawnedPlayerDto {
         movementPoints: movementPoints,
         actionPoints: actionPoints,
         spawnPoint: spawnPoint.toEntity(),
+        currentBoardPosition:
+            (boardPosition ?? spawnPoint).toEntity(),
         inventory: inventory.map((d) => d.toEntity()).toList(),
         stats: stats,
         diceChoice: diceChoice,

@@ -31,6 +31,45 @@ class JoinGameSessionLocalizationsFr extends JoinGameSessionLocalizations {
   String get joinGameFailed => 'Impossible de rejoindre la partie';
 
   @override
+  String get joinGameNoRooms => 'Aucune partie disponible';
+
+  @override
+  String get joinGameRoomListPreview => 'Prévisualisation';
+
+  @override
+  String get joinGameRoomListPlayers => 'Joueurs';
+
+  @override
+  String get joinGameRoomListSize => 'Taille';
+
+  @override
+  String get joinGameRoomListStatus => 'Statut';
+
+  @override
+  String get joinGameRoomListMode => 'Mode';
+
+  @override
+  String get joinGameRoomListAccessibility => 'Accessibilité';
+
+  @override
+  String get joinGameRoomListCode => 'Code';
+
+  @override
+  String get joinGameStatusWaiting => 'En attente';
+
+  @override
+  String get joinGameStatusPlaying => 'En cours';
+
+  @override
+  String get joinGameModeDropIn => 'Drop-in';
+
+  @override
+  String get joinGameAccessibilityOpen => 'Ouverte';
+
+  @override
+  String get joinGameAccessibilityFull => 'Complète';
+
+  @override
   String get waitingRoomRoomNotFound => 'Partie introuvable';
 
   @override
