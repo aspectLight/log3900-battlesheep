@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
 import { ChatService } from '@app/services/communication/chat.service';
@@ -16,8 +16,9 @@ const MAX_MESSAGE_LENGTH = 200;
     templateUrl: './chatbox.component.html',
     styleUrl: './chatbox.component.scss',
 })
-export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ChatboxComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
     @Input() roomType: 'GeneralChat' | 'WaitingRoom' | 'GameRoom' | 'EndRoom' = 'GeneralChat';
+    @Input() collapseOnLoad: boolean = false;
     @ViewChild('chatboxMessages') private messagesContainer!: ElementRef<HTMLDivElement>;
     @ViewChild('messageInput') private messageInput!: ElementRef<HTMLInputElement>;
 
@@ -110,6 +111,12 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
                 }
             }),
         );
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['collapseOnLoad']?.currentValue) {
+            this.isCollapsed = true;
+        }
     }
 
     ngAfterViewInit() {

@@ -454,7 +454,9 @@
     "flag": "Drapeau"
   },
   "player_hud": {
-    "dice": "DÉS"
+    "dice": "DÉS",
+    "movements": "déplacements",
+    "actions": "actions"
   },
   "game_info": {
     "continue": "continuer",
