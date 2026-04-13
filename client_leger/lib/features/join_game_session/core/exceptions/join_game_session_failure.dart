@@ -20,6 +20,11 @@ class MaxPlayerLimitReachedJoinGameSessionFailure extends JoinGameSessionFailure
       : super('Max player limit reached');
 }
 
+class InsufficientBalanceJoinGameSessionFailure extends JoinGameSessionFailure {
+  const InsufficientBalanceJoinGameSessionFailure()
+      : super('Insufficient balance to join');
+}
+
 class UnknownJoinGameSessionFailure extends JoinGameSessionFailure {
   const UnknownJoinGameSessionFailure(super.devMessage);
 }

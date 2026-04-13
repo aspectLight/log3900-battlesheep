@@ -206,7 +206,7 @@ abstract class CharacterCreationLocalizations {
   /// No description provided for @characterCreationValidationMessage.
   ///
   /// In en, this message translates to:
-  /// **'Please choose a character and the 2 bonuses.'**
+  /// **'Veillez à choisir un personnage et les 2 bonus.'**
   String get characterCreationValidationMessage;
 
   /// No description provided for @selectedGameHiddenOrDeleted.

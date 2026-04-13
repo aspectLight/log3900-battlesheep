@@ -39,7 +39,14 @@ class SelectGameSessionCoordinator
     switch (event) {
       case SelectGameSessionCancelled():
         appNavigator.request(ExitToMainMenu());
-      case SelectGameSessionGameSelected(:final gameId, :final gameName, :final gameDescription, :final gameMode, :final boardSize):
+      case SelectGameSessionGameSelected(
+        :final gameId,
+        :final gameName,
+        :final gameDescription,
+        :final gameMode,
+        :final boardSize,
+        :final entryFee,
+      ):
         final scope = sessionScopeManager.currentScope;
         if (scope == null) return;
         final sessionState = scope.get<SessionRepository>().state.value;
@@ -53,6 +60,7 @@ class SelectGameSessionCoordinator
               gameDescription: gameDescription,
               boardSize: boardSize,
               isCTF: gameMode == GameMode.captureTheFlag,
+              entryFee: entryFee,
             ),
           );
         }

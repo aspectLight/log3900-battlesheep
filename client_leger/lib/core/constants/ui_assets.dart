@@ -19,6 +19,8 @@ class UiAssets {
   static const String teamAmericanBg = '$path/team_american_bg.png';
 
   static const String flagIcon = '$path/flag_icon.png';
+  /// Same asset as Angular `./assets/gold_coin.png` (in-game economy).
+  static const String goldCoin = '$path/gold_coin.png';
   static const String settingsGear = '$path/settings_gear.png';
   static const String characterCreationBackArrowIcon =
       '$path/character_creation_back_arrow.png';

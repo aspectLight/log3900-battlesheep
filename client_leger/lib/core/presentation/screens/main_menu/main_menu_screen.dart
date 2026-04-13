@@ -160,6 +160,14 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                           ),
                           const Divider(height: 1),
                           _buildSettingsOption(
+                            label: CoreLocalizations.of(context)!.shop,
+                            onTap: () {
+                              _closeSettings();
+                              _viewModel.openShop();
+                            },
+                          ),
+                          const Divider(height: 1),
+                          _buildSettingsOption(
                             label: CoreLocalizations.of(context)!.signOut,
                             onTap: () {
                               _closeSettings();

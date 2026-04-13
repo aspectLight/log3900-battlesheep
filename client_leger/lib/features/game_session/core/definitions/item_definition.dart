@@ -20,6 +20,7 @@ class ItemDefinition {
     ItemType.camouflage: ItemDefinition._(type: ItemType.camouflage),
     ItemType.waterproofBoots: ItemDefinition._(type: ItemType.waterproofBoots),
     ItemType.airStrike: ItemDefinition._(type: ItemType.airStrike),
+    ItemType.torch: ItemDefinition._(type: ItemType.torch),
     ItemType.random: ItemDefinition._(type: ItemType.random),
     ItemType.flag: ItemDefinition._(type: ItemType.flag),
     ItemType.spawnPoint: ItemDefinition._(type: ItemType.spawnPoint),

@@ -13,7 +13,9 @@ import '../../data/repositories/game_board_repository.dart';
 import '../../data/repositories/game_combat_repository.dart';
 import '../../data/repositories/game_debug_repository.dart';
 import '../../data/repositories/game_inventory_repository.dart';
+import '../../data/repositories/game_item_repository.dart';
 import '../../data/repositories/game_metadata_repository.dart';
+import '../../data/repositories/game_player_movement_repository.dart';
 import '../../data/repositories/game_player_repository.dart';
 import '../../data/repositories/game_turn_repository.dart';
 import '../../data/services/game_board_socket.dart';
@@ -23,8 +25,9 @@ import '../../data/services/game_events_socket.dart';
 import '../../data/services/game_item_socket.dart';
 import '../../data/services/game_player_movement_socket.dart';
 import '../event_bus/game_session_event_bus.dart';
+import '../../../../core/notification/notification_coordinator.dart';
 
-void registerGameProjections(GetIt scope, GetIt rootGetIt, {required String socketId}) {
+void registerGameProjections(GetIt scope, GetIt rootGetIt, {required String socketId, required String roomId}) {
   scope.registerLazySingleton<GameTurnEventsProjection>(
     () => GameTurnEventsProjection(
       eventsSocket: scope.get<GameEventsSocket>(),
@@ -87,6 +90,12 @@ void registerGameProjections(GetIt scope, GetIt rootGetIt, {required String sock
       inventoryRepository: scope.get<GameInventoryRepository>(),
       playerRepository: scope.get<GamePlayerRepository>(),
       gameSessionEventBus: rootGetIt.get<GameSessionEventBus>(),
+      roomId: roomId,
+      socketId: socketId,
+      notificationCoordinator: rootGetIt.get<NotificationCoordinator>(),
+      itemRepository: scope.get<GameItemRepository>(),
+      movementRepository: scope.get<GamePlayerMovementRepository>(),
+      turnRepository: scope.get<GameTurnRepository>(),
     ),
   );
   scope.registerLazySingleton<GameDebugEventsProjection>(

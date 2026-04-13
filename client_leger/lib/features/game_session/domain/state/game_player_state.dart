@@ -98,6 +98,7 @@ class GamePlayer with _$GamePlayer {
       case ItemType.camouflage:
       case ItemType.waterproofBoots:
       case ItemType.airStrike:
+      case ItemType.torch:
       case ItemType.random:
       case ItemType.flag:
       case ItemType.spawnPoint:
@@ -148,6 +149,7 @@ class GamePlayer with _$GamePlayer {
       case ItemType.camouflage:
       case ItemType.waterproofBoots:
       case ItemType.airStrike:
+      case ItemType.torch:
       case ItemType.random:
       case ItemType.flag:
       case ItemType.spawnPoint:

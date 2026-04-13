@@ -7,6 +7,7 @@ import '../../domain/models/game_item.dart';
 import '../../domain/events/game_movement_events.dart';
 import '../../domain/state/game_board_state.dart';
 import '../../domain/events/game_events.dart';
+import '../../domain/events/game_environment_events.dart';
 
 class GameBoardStateReducer {
   GameBoardState reduce(GameBoardState previous, Object event) {
@@ -30,6 +31,11 @@ class GameBoardStateReducer {
     }
     if (event is SpawnPointClearedEvent) {
       return _reduceSpawnPointCleared(previous, event);
+    }
+    if (event is BoardIlluminationUpdatedEvent) {
+      return previous.copyWith(
+        illuminatedCellKeys: event.illuminatedCellKeys,
+      );
     }
     return previous;
   }

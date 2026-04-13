@@ -15,6 +15,7 @@ sealed class WaitingRoomPlayerModel with _$WaitingRoomPlayerModel {
     required Character character,
     required WaitingRoomPlayerStatsModel stats,
     String? avatarDisplayPath,
+    String? activeBanner,
   }) = HumanWaitingRoomPlayerModel;
 
   const factory WaitingRoomPlayerModel.virtual({
@@ -26,5 +27,6 @@ sealed class WaitingRoomPlayerModel with _$WaitingRoomPlayerModel {
     DiceStatChoice? d6Choice,
     DiceStatChoice? d4Choice,
     String? avatarDisplayPath,
+    String? activeBanner,
   }) = VirtualWaitingRoomPlayerModel;
 }

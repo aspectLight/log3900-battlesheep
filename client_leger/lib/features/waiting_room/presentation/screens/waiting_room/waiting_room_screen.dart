@@ -15,6 +15,8 @@ import '../../../core/exceptions/waiting_room_failure.dart';
 import '../../../core/localisation/waiting_room_localizations.dart';
 import '../../../domain/models/waiting_room_player_model.dart';
 import '../../mappers/waiting_room_player_ui_mapper.dart';
+import '../../styles/waiting_room_player_banner_shell.dart';
+import '../../styles/waiting_room_player_banner_styles.dart';
 import '../../ui_models/components/waiting_room_player_ui.dart';
 import 'waiting_room_view_model.dart';
 
@@ -472,165 +474,260 @@ class _WaitingRoomPlayerCard extends StatelessWidget {
           ),
         );
       },
-      child: DecoratedBox(
-        decoration: const BoxDecoration(
-          color: Color.fromRGBO(0, 0, 0, 0.28),
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          boxShadow: [
-            BoxShadow(
-              color: Color(0x33000000),
-              blurRadius: 8,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  height: 210,
-                  width: double.infinity,
-                  padding: const EdgeInsets.only(bottom: 8, top: 8),
-                  alignment: Alignment.bottomCenter,
-                  decoration: const BoxDecoration(
-                    color: Color.fromRGBO(0, 0, 0, 0.1),
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(10),
+      child: WaitingRoomPlayerBannerShell(
+        activeBanner: playerUi.activeBanner,
+        builder: (context, theme, borderPhase, _, overlayPhase) {
+          return ClipRRect(
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
+            child: theme == null
+                ? DecoratedBox(
+                    decoration: const BoxDecoration(
+                      color: Color.fromRGBO(0, 0, 0, 0.28),
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
-                  ),
-                  child: Image.asset(
-                    playerUi.avatarFullPath,
-                    width: 170,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => Image.asset(
-                      UiAssets.characterCreationEmptyPortrait,
-                      width: 170,
-                      fit: BoxFit.contain,
+                    child: _WaitingRoomPlayerCardInnerStack(
+                      playerUi: playerUi,
+                      l10n: l10n,
+                      isHost: isHost,
+                      showKickButton: showKickButton,
+                      onKickPressed: onKickPressed,
+                      theme: null,
+                      borderPhase: borderPhase,
+                      overlayPhase: overlayPhase,
                     ),
+                  )
+                : _WaitingRoomPlayerCardInnerStack(
+                    playerUi: playerUi,
+                    l10n: l10n,
+                    isHost: isHost,
+                    showKickButton: showKickButton,
+                    onKickPressed: onKickPressed,
+                    theme: theme,
+                    borderPhase: borderPhase,
+                    overlayPhase: overlayPhase,
                   ),
-                ),
-                Container(
-                  width: double.infinity,
-                  color: const Color.fromRGBO(0, 0, 0, 0.7),
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  child: Text(
-                    playerUi.name,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: playerUi.isVirtual
-                          ? const Color(0xFF00BFFF)
-                          : Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      fontFamily: 'CustomFont',
-                    ),
-                  ),
-                ),
-                Container(
-                  color: const Color.fromRGBO(0, 0, 0, 0.7),
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    children: [
-                      _StatCell(
-                        label: l10n.waitingRoomStatHealth,
-                        value: '${playerUi.health}',
-                      ),
-                      _StatCell(
-                        label: l10n.waitingRoomStatSpeed,
-                        value: '${playerUi.speed}',
-                      ),
-                      _StatCell(
-                        label: l10n.waitingRoomStatAttack,
-                        value: '${playerUi.attack}',
-                      ),
-                      _StatCell(
-                        label: l10n.waitingRoomStatDefense,
-                        value: '${playerUi.defense}',
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            if (isHost)
-              Positioned(
-                left: 8,
-                top: 10,
-                child: Image.asset(
-                  UiAssets.crownBadge,
-                  width: 42,
-                  height: 42,
-                  errorBuilder: (_, _, _) =>
-                      const SizedBox(width: 42, height: 42),
-                ),
-              ),
-            if (playerUi.isVirtual)
-              Positioned(
-                left: 8,
-                top: 10,
-                child: Image.asset(
-                  UiAssets.robotBadge,
-                  width: 42,
-                  height: 42,
-                  errorBuilder: (_, _, _) =>
-                      const SizedBox(width: 42, height: 42),
-                ),
-              ),
-            if (showKickButton)
-              Positioned(
-                right: 6,
-                top: 4,
-                child: IconButton(
-                  onPressed: onKickPressed,
-                  icon: const Text(
-                    'X',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'CustomFont',
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 }
 
+class _WaitingRoomPlayerCardInnerStack extends StatelessWidget {
+  const _WaitingRoomPlayerCardInnerStack({
+    required this.playerUi,
+    required this.l10n,
+    required this.isHost,
+    required this.showKickButton,
+    required this.onKickPressed,
+    required this.theme,
+    required this.borderPhase,
+    required this.overlayPhase,
+  });
+
+  final WaitingRoomPlayerUi playerUi;
+  final WaitingRoomLocalizations l10n;
+  final bool isHost;
+  final bool showKickButton;
+  final VoidCallback onKickPressed;
+  final WaitingRoomBannerTheme? theme;
+  final double borderPhase;
+  final double overlayPhase;
+
+  @override
+  Widget build(BuildContext context) {
+    final bannerTheme = theme;
+    final nameColor = playerUi.isVirtual
+        ? const Color(0xFF00BFFF)
+        : (bannerTheme?.nameColor ?? Colors.white);
+    final nameShadows =
+        playerUi.isVirtual ? null : bannerTheme?.nameShadows;
+    final statLabel = bannerTheme?.statLabelColor ?? Colors.white70;
+    final statValue = bannerTheme?.statValueColor ?? Colors.white;
+
+    return Stack(
+      children: [
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: 210,
+              width: double.infinity,
+              padding: const EdgeInsets.only(bottom: 8, top: 8),
+              alignment: Alignment.bottomCenter,
+              decoration: BoxDecoration(
+                gradient: bannerTheme?.div1Gradient,
+                color: bannerTheme == null
+                    ? const Color.fromRGBO(0, 0, 0, 0.1)
+                    : null,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(10),
+                ),
+              ),
+              child: Image.asset(
+                playerUi.avatarFullPath,
+                width: 170,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => Image.asset(
+                  UiAssets.characterCreationEmptyPortrait,
+                  width: 170,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              decoration: BoxDecoration(
+                gradient: bannerTheme?.div2Gradient,
+                color: bannerTheme == null
+                    ? const Color.fromRGBO(0, 0, 0, 0.7)
+                    : null,
+              ),
+              child: Text(
+                playerUi.name,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: nameColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  fontFamily: 'CustomFont',
+                  shadows: nameShadows,
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              decoration: BoxDecoration(
+                gradient: bannerTheme?.statsGradient,
+                color: bannerTheme == null
+                    ? const Color.fromRGBO(0, 0, 0, 0.7)
+                    : null,
+              ),
+              child: Row(
+                children: [
+                  _StatCell(
+                    label: l10n.waitingRoomStatHealth,
+                    value: '${playerUi.health}',
+                    labelColor: statLabel,
+                    valueColor: statValue,
+                  ),
+                  _StatCell(
+                    label: l10n.waitingRoomStatSpeed,
+                    value: '${playerUi.speed}',
+                    labelColor: statLabel,
+                    valueColor: statValue,
+                  ),
+                  _StatCell(
+                    label: l10n.waitingRoomStatAttack,
+                    value: '${playerUi.attack}',
+                    labelColor: statLabel,
+                    valueColor: statValue,
+                  ),
+                  _StatCell(
+                    label: l10n.waitingRoomStatDefense,
+                    value: '${playerUi.defense}',
+                    labelColor: statLabel,
+                    valueColor: statValue,
+                    showRightBorder: false,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        if (bannerTheme != null)
+          waitingRoomBannerOverlayLayer(
+            bannerTheme,
+            borderPhase,
+            overlayPhase,
+          ),
+        if (isHost)
+          Positioned(
+            left: 8,
+            top: 10,
+            child: Image.asset(
+              UiAssets.crownBadge,
+              width: 42,
+              height: 42,
+              errorBuilder: (_, _, _) =>
+                  const SizedBox(width: 42, height: 42),
+            ),
+          ),
+        if (playerUi.isVirtual)
+          Positioned(
+            left: 8,
+            top: 10,
+            child: Image.asset(
+              UiAssets.robotBadge,
+              width: 42,
+              height: 42,
+              errorBuilder: (_, _, _) =>
+                  const SizedBox(width: 42, height: 42),
+            ),
+          ),
+        if (showKickButton)
+          Positioned(
+            right: 6,
+            top: 4,
+            child: IconButton(
+              onPressed: onKickPressed,
+              icon: const Text(
+                'X',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'CustomFont',
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
 class _StatCell extends StatelessWidget {
-  const _StatCell({required this.label, required this.value});
+  const _StatCell({
+    required this.label,
+    required this.value,
+    this.labelColor = Colors.white70,
+    this.valueColor = Colors.white,
+    this.showRightBorder = true,
+  });
 
   final String label;
   final String value;
+  final Color labelColor;
+  final Color valueColor;
+  final bool showRightBorder;
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 2),
-        decoration: const BoxDecoration(
-          border: Border(
-            right: BorderSide(color: Color.fromRGBO(30, 30, 30, 0.5)),
-          ),
+        decoration: BoxDecoration(
+          border: showRightBorder
+              ? const Border(
+                  right: BorderSide(color: Color.fromRGBO(30, 30, 30, 0.5)),
+                )
+              : null,
         ),
         child: Column(
           children: [
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.white70,
+              style: TextStyle(
+                color: labelColor,
                 fontSize: 12,
                 fontFamily: 'CustomFont',
               ),
             ),
             Text(
               value,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: valueColor,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'CustomFont',
               ),

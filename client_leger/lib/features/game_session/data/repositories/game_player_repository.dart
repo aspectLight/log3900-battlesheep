@@ -3,6 +3,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 import '../../domain/events/game_events.dart';
 import '../../domain/events/game_item_events.dart';
 import '../../domain/events/game_movement_events.dart';
+import '../../domain/events/game_environment_events.dart';
 import '../../domain/state/game_player_state.dart';
 import '../reducers/game_player_state_reducer.dart';
 
@@ -62,6 +63,14 @@ class GamePlayerRepository {
   }
 
   void applyItemCollected(ItemCollectedEvent event) {
+    state.value = _reducer.reduce(state.value, event);
+  }
+
+  void applyTrapResult(TrapResultSyncEvent event) {
+    state.value = _reducer.reduce(state.value, event);
+  }
+
+  void applyTorchPlayerStats(PlayerTorchStatsSyncEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
 

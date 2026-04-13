@@ -64,7 +64,7 @@ class CharacterCreationLocalizationsEn extends CharacterCreationLocalizations {
 
   @override
   String get characterCreationValidationMessage =>
-      'Please choose a character and the 2 bonuses.';
+      'Veillez à choisir un personnage et les 2 bonus.';
 
   @override
   String get selectedGameHiddenOrDeleted =>

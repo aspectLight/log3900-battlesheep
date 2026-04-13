@@ -37,8 +37,12 @@ extension ItemCollectedCommandToDto on ItemCollectedCommand {
 }
 
 extension ItemCollectedDtoToEntity on ItemCollectedDto {
-  ItemCollectedEvent toEntity() =>
-      ItemCollectedEvent(playerId: playerId, item: item.toEntity());
+  ItemCollectedEvent toEntity() => ItemCollectedEvent(
+        playerId: playerId,
+        item: item.toEntity(),
+        position: position?.toEntity(),
+        inventoryFull: inventoryFull,
+      );
 }
 
 extension ItemDroppedDtoToEntity on ItemDroppedDto {

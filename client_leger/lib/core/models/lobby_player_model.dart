@@ -11,6 +11,7 @@ class LobbyPlayerModel {
     required this.speed,
     required this.attack,
     required this.defense,
+    this.activeBanner,
   });
 
   final String id;
@@ -22,4 +23,5 @@ class LobbyPlayerModel {
   final int speed;
   final int attack;
   final int defense;
+  final String? activeBanner;
 }

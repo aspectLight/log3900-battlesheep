@@ -19,7 +19,7 @@ extension GameSummaryDtoToModel on GameSummaryDto {
                   .map(
                     (cell) => GameBoardPreviewCell(
                       tileType: _tileTypeFromServer(cell.tileType),
-                      tileState: _tileStateFromServer(cell.tileState),
+                      tileState: cell.tileState,
                       orientation: _tileOrientationFromServer(
                         cell.tileOrientation,
                       ),
@@ -49,14 +49,6 @@ extension GameSummaryDtoToModel on GameSummaryDto {
       if (t.name == serverType) return t;
     }
     return TileType.snow;
-  }
-
-  TileState? _tileStateFromServer(String? serverState) {
-    if (serverState == null) return null;
-    for (final s in TileState.values) {
-      if (s.name == serverState) return s;
-    }
-    return null;
   }
 
   TileOrientation? _tileOrientationFromServer(String? serverOrientation) {

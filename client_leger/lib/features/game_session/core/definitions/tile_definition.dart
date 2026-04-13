@@ -23,9 +23,11 @@ class TileDefinition {
     WallTile() => TileDefinition._(baseMoveModifier: -1, tile: tile),
     CornerTile() => TileDefinition._(baseMoveModifier: -1, tile: tile),
     IntersectionTile() => TileDefinition._(baseMoveModifier: -1, tile: tile),
+    TrapTile() => TileDefinition._(baseMoveModifier: 1, tile: tile),
+    TeleportPadTile() => TileDefinition._(baseMoveModifier: 1, tile: tile),
   };
 
-  factory TileDefinition.fromType(TileType type, [TileState? state]) {
-    return TileDefinition.fromTile(Tile.fromType(type, state));
+  factory TileDefinition.fromType(TileType type, [String? stateString]) {
+    return TileDefinition.fromTile(Tile.fromType(type, stateString));
   }
 }

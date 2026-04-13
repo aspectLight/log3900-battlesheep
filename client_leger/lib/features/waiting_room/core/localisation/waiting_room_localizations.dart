@@ -344,7 +344,7 @@ abstract class WaitingRoomLocalizations {
   /// No description provided for @waitingRoomWelcomeMessage.
   ///
   /// In en, this message translates to:
-  /// **'Bienvenue dans la salle d'attente, partagez le code de la partie avec vos amis !'**
+  /// **'Bienvenue dans la salle d\'attente, partagez le code de la partie avec vos amis !'**
   String get waitingRoomWelcomeMessage;
 }
 

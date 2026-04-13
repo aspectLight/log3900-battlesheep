@@ -33,6 +33,7 @@ sealed class SelectGameSessionExitAppEvent
     required String gameDescription,
     required GameMode gameMode,
     required int boardSize,
+    @Default(0) int entryFee,
   }) = SelectGameSessionGameSelected;
 }
 

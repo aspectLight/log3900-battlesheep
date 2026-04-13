@@ -27,6 +27,8 @@ GameBoardCellUi toGameBoardCellUi(
       .map(_toGameBoardUiCharacter);
   final cellItem = boardState.items[cell.position];
   final item = Option.fromNullable(cellItem).map((i) => GameBoardUiItem(type: i.type));
+  final illumKey = '${cell.x},${cell.y}';
+  final isIlluminated = boardState.illuminatedCellKeys.contains(illumKey);
   return GameBoardCellUi(
     tile: cell.tile,
     positionUi: GameBoardPositionUi(x: cell.x, y: cell.y),
@@ -39,6 +41,7 @@ GameBoardCellUi toGameBoardCellUi(
     hasPathDown: cell.hasPathDown,
     hasPathLeft: cell.hasPathLeft,
     hasPathRight: cell.hasPathRight,
+    isIlluminated: isIlluminated,
   );
 }
 

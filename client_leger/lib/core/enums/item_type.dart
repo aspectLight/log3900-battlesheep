@@ -6,6 +6,7 @@ enum ItemType {
   camouflage,
   waterproofBoots,
   airStrike,
+  torch,
   random,
   flag,
   spawnPoint,

@@ -24,6 +24,7 @@ extension CreateCharacterPlayerDataToDto on CreateCharacterPlayerData {
           CharacterCreationStatKey.defense.toServerValue:
               _createServerCompatibleFixedStat(defenseDice),
         },
+        activeBanner: activeBanner,
       );
 }
 

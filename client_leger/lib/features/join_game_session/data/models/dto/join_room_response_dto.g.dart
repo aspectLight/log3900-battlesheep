@@ -37,6 +37,7 @@ JoinRoomPlayerDto _$JoinRoomPlayerDtoFromJson(Map<String, dynamic> json) =>
       stats: JoinRoomPlayerStatsDto.fromJson(
         json['stats'] as Map<String, dynamic>,
       ),
+      activeBanner: json['activeBanner'] as String?,
     );
 
 Map<String, dynamic> _$JoinRoomPlayerDtoToJson(JoinRoomPlayerDto instance) =>
@@ -50,6 +51,7 @@ Map<String, dynamic> _$JoinRoomPlayerDtoToJson(JoinRoomPlayerDto instance) =>
         const VirtualPlayerTypeConverter().toJson,
       ),
       'stats': instance.stats,
+      'activeBanner': instance.activeBanner,
     };
 
 Value? _$JsonConverterFromJson<Json, Value>(

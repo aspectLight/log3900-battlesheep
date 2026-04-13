@@ -62,6 +62,7 @@ class CharacterCreationCoordinator
         :final gameDescription,
         :final boardSize,
         :final isCTF,
+        :final entryFee,
       ) => (
         socketId,
         roomCode,
@@ -71,6 +72,7 @@ class CharacterCreationCoordinator
           gameDescription: gameDescription,
           boardSize: boardSize,
           isCTF: isCTF,
+          entryFee: entryFee,
         ),
       ),
       CharacterCreationJoinEntered(

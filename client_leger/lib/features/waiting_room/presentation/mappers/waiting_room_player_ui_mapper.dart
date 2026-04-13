@@ -10,6 +10,7 @@ WaitingRoomPlayerUi toWaitingRoomPlayerUi(WaitingRoomPlayerModel model) {
       :final character,
       :final stats,
       :final avatarDisplayPath,
+      :final activeBanner,
     ) =>
       WaitingRoomPlayerUi(
         id: id,
@@ -22,6 +23,7 @@ WaitingRoomPlayerUi toWaitingRoomPlayerUi(WaitingRoomPlayerModel model) {
         speed: stats.speed.value,
         attack: stats.attack.value,
         defense: stats.defense.value,
+        activeBanner: activeBanner,
       ),
     VirtualWaitingRoomPlayerModel(
       :final id,
@@ -29,6 +31,7 @@ WaitingRoomPlayerUi toWaitingRoomPlayerUi(WaitingRoomPlayerModel model) {
       :final character,
       :final stats,
       :final avatarDisplayPath,
+      :final activeBanner,
     ) =>
       WaitingRoomPlayerUi(
         id: id,
@@ -41,6 +44,7 @@ WaitingRoomPlayerUi toWaitingRoomPlayerUi(WaitingRoomPlayerModel model) {
         speed: stats.speed.value,
         attack: stats.attack.value,
         defense: stats.defense.value,
+        activeBanner: activeBanner,
       ),
   };
 }

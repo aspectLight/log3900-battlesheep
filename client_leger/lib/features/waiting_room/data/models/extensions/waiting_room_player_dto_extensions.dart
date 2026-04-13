@@ -53,6 +53,7 @@ extension WaitingRoomPlayerDtoToModel on WaitingRoomPlayerDto {
         character: character,
         stats: stats.toModel(),
         avatarDisplayPath: avatarDisplayPath,
+        activeBanner: activeBanner,
       );
     }
     return WaitingRoomPlayerModel.virtual(
@@ -64,6 +65,7 @@ extension WaitingRoomPlayerDtoToModel on WaitingRoomPlayerDto {
       d6Choice: d6Choice,
       d4Choice: d4Choice,
       avatarDisplayPath: avatarDisplayPath,
+      activeBanner: activeBanner,
     );
   }
 }

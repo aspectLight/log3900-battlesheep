@@ -5,17 +5,37 @@ sealed class Tile {
 
   TileType get type;
 
-  factory Tile.fromType(TileType type, [TileState? state]) => switch (type) {
+  factory Tile.fromType(TileType type, [String? stateString]) => switch (type) {
     TileType.snow => const SnowTile(),
     TileType.tree => const TreeTile(),
     TileType.stone => const StoneTile(),
     TileType.ice => const IceTile(),
     TileType.water => const WaterTile(),
-    TileType.door => DoorTile(state ?? TileState.closed),
+    TileType.door => DoorTile(_doorStateFromString(stateString)),
     TileType.wall => const WallTile(),
     TileType.corner => const CornerTile(),
     TileType.intersection => const IntersectionTile(),
+    TileType.trap => const TrapTile(),
+    TileType.teleportPad =>
+      TeleportPadTile(_normalizeTeleportState(stateString)),
   };
+}
+
+TileState _doorStateFromString(String? s) {
+  if (s == null) return TileState.closed;
+  switch (s.toLowerCase()) {
+    case 'opened':
+      return TileState.opened;
+    default:
+      return TileState.closed;
+  }
+}
+
+String _normalizeTeleportState(String? s) {
+  final v = (s ?? 'default').toLowerCase();
+  const known = {'default', 'blue', 'green', 'purple', 'red', 'yellow'};
+  if (known.contains(v)) return v;
+  return 'default';
 }
 
 final class SnowTile extends Tile {
@@ -74,4 +94,17 @@ final class IntersectionTile extends Tile {
   const IntersectionTile();
   @override
   TileType get type => TileType.intersection;
+}
+
+final class TrapTile extends Tile {
+  const TrapTile();
+  @override
+  TileType get type => TileType.trap;
+}
+
+final class TeleportPadTile extends Tile {
+  final String state;
+  const TeleportPadTile(this.state);
+  @override
+  TileType get type => TileType.teleportPad;
 }

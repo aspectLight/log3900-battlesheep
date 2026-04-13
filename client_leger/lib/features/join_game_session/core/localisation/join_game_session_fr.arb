@@ -9,5 +9,6 @@
   "joinGameFailed": "Impossible de rejoindre la partie",
   "waitingRoomRoomNotFound": "Partie introuvable",
   "waitingRoomRoomLocked": "Partie verrouillée",
-  "joinGameMaxPlayerLimitReached": "Nombre maximum de joueurs atteint"
+  "joinGameMaxPlayerLimitReached": "Nombre maximum de joueurs atteint",
+  "joinGameInsufficientBalance": "Solde insuffisant pour rejoindre cette partie"
 }

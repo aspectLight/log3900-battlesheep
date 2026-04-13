@@ -9,6 +9,7 @@ import '../../features/game_session/presentation/widgets/game_abandoned_notifica
 import '../../features/game_session/presentation/widgets/game_canceled_notification/game_canceled_notification_widget.dart';
 import '../../features/game_session/presentation/widgets/game_finish_notification/game_finish_notification_widget.dart';
 import '../../features/game_session/presentation/widgets/game_inventory_full_discard_notification/game_inventory_full_discard_notification_widget.dart';
+import '../../features/game_session/presentation/widgets/game_trap_choice_notification/game_trap_choice_notification_widget.dart';
 import '../../features/game_session/presentation/widgets/game_turn_notification/game_turn_notification_widget.dart';
 import '../../features/join_game_session/presentation/widgets/join_game_session_failure_notification/join_game_session_failure_notification_widget.dart';
 import '../../features/select_game_session/presentation/widgets/select_game_session_error_notification/select_game_session_error_notification_widget.dart';
@@ -17,6 +18,7 @@ import '../../features/waiting_room/presentation/widgets/game_deleted_notificati
 import '../../features/waiting_room/presentation/widgets/player_kicked_notification/player_kicked_notification_widget.dart';
 import '../../features/waiting_room/presentation/widgets/waiting_room_failure_notification/waiting_room_failure_notification_widget.dart';
 import '../../features/waiting_room/presentation/widgets/waiting_room_room_locked_notification/waiting_room_room_locked_notification_widget.dart';
+import '../../features/shop/presentation/widgets/shop_purchase_failed_notification/shop_purchase_failed_notification_widget.dart';
 import '../../features/waiting_room/presentation/widgets/waiting_room_welcome_notification/waiting_room_welcome_notification_widget.dart';
 import 'notification_coordinator.dart';
 import 'notification_intent.dart';
@@ -59,6 +61,12 @@ void registerNotificationModule(GetIt getIt) {
   );
   registry.register<InventoryFullDiscardIntent>(
     (c, intent, onDismiss) => GameInventoryFullDiscardNotificationWidget(
+      intent: intent,
+      onDismiss: onDismiss,
+    ),
+  );
+  registry.register<TrapChoiceIntent>(
+    (c, intent, onDismiss) => GameTrapChoiceNotificationWidget(
       intent: intent,
       onDismiss: onDismiss,
     ),
@@ -123,6 +131,12 @@ void registerNotificationModule(GetIt getIt) {
   );
   registry.register<WaitingRoomWelcomeNotificationIntent>(
     (c, intent, onDismiss) => WaitingRoomWelcomeNotificationWidget(
+      intent: intent,
+      onDismiss: onDismiss,
+    ),
+  );
+  registry.register<ShopPurchaseFailedNotificationIntent>(
+    (c, intent, onDismiss) => ShopPurchaseFailedNotificationWidget(
       intent: intent,
       onDismiss: onDismiss,
     ),

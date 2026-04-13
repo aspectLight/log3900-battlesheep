@@ -17,6 +17,7 @@ sealed class CharacterCreationEntryAppEvent
     required String gameDescription,
     required int boardSize,
     required bool isCTF,
+    @Default(0) int entryFee,
   }) = CharacterCreationHostEntered;
   const factory CharacterCreationEntryAppEvent.joinEntered({
     required String socketId,

@@ -4,6 +4,7 @@ import '../../features/character_creation/core/enums/character_creation_validati
 import '../../features/character_creation/core/exceptions/reserve_character_failure.dart';
 import '../../features/join_game_session/core/exceptions/join_game_session_failure.dart';
 import '../../features/select_game_session/core/exceptions/select_game_session_failure.dart';
+import '../../features/shop/core/exceptions/shop_purchase_exception.dart';
 import '../../features/waiting_room/core/exceptions/waiting_room_failure.dart';
 import '../enums/item_type.dart';
 
@@ -95,6 +96,16 @@ class InventoryFullDiscardIntent extends NotificationIntent {
   InventoryFullDiscardIntent({
     required this.candidateItems,
     required this.onComplete,
+  });
+}
+
+class TrapChoiceIntent extends NotificationIntent {
+  final bool canAvoid;
+  final void Function(String choice) onChoice;
+
+  TrapChoiceIntent({
+    required this.canAvoid,
+    required this.onChoice,
   });
 }
 
@@ -209,4 +220,10 @@ class WaitingRoomFailureNotificationIntent extends NotificationIntent {
 
 class WaitingRoomWelcomeNotificationIntent extends NotificationIntent {
   const WaitingRoomWelcomeNotificationIntent();
+}
+
+class ShopPurchaseFailedNotificationIntent extends NotificationIntent {
+  const ShopPurchaseFailedNotificationIntent(this.failure);
+
+  final ShopPurchaseException failure;
 }

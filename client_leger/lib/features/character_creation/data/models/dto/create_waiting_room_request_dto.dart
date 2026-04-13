@@ -10,11 +10,13 @@ class CreateWaitingRoomRequestDto {
     required this.roomId,
     required this.gameId,
     required this.host,
+    this.entryFee = 0,
   });
 
   final String roomId;
   final String gameId;
   final PlayerPayloadDto host;
+  final int entryFee;
 
   factory CreateWaitingRoomRequestDto.fromJson(Map<String, dynamic> json) =>
       _$CreateWaitingRoomRequestDtoFromJson(json);

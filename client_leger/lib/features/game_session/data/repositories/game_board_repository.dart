@@ -5,6 +5,7 @@ import '../../domain/commands/game_door_commands.dart';
 import '../../domain/events/game_events.dart';
 import '../../domain/events/game_item_events.dart';
 import '../../domain/events/game_movement_events.dart';
+import '../../domain/events/game_environment_events.dart';
 import '../../domain/models/game_board_position.dart';
 import '../../domain/models/game_item.dart';
 import '../../domain/state/game_board_state.dart';
@@ -110,6 +111,21 @@ class GameBoardRepository {
     if (!current.board.isInBounds(event.coords.x, event.coords.y)) return;
     final nextItems = Map<GameBoardPosition, GameItem>.from(current.items)
       ..[event.coords] = event.item;
+    state.value = current.copyWith(items: nextItems);
+  }
+
+  void applyIlluminationUpdate(BoardIlluminationUpdatedEvent event) {
+    state.value = _reducer.reduce(state.value, event);
+  }
+
+  void applyItemCollected(ItemCollectedEvent event) {
+    final pos = event.position;
+    if (pos == null) return;
+    final current = state.value;
+    if (!current.board.isInBounds(pos.x, pos.y)) return;
+    if (!current.items.containsKey(pos)) return;
+    final nextItems = Map<GameBoardPosition, GameItem>.from(current.items)
+      ..remove(pos);
     state.value = current.copyWith(items: nextItems);
   }
 }

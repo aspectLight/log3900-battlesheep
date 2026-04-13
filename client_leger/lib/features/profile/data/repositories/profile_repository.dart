@@ -1,7 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
-import '../../../../core/helpers/functional_programming.dart';
 import '../../core/exceptions/profile_failure.dart';
 import '../../domain/commands/profile_commands.dart';
 import '../../domain/models/profile_model.dart';
@@ -25,18 +24,9 @@ class ProfileRepository {
     state.value = const ProfileState.loading();
     final result = await TaskEither<ProfileFailure, (ProfileModel, ProfileStatisticsModel)>.tryCatch(
       () async {
-        final Option<ProfileDto> profileDtoOption =
-            await _httpProfileService.fetchProfile();
-        final Option<ProfileStatisticsDto> statsDtoOption =
+        final ProfileDto profileDto = await _httpProfileService.fetchProfile();
+        final ProfileStatisticsDto statsDto =
             await _httpProfileService.fetchProfileStatistics();
-        final ProfileDto profileDto = requireOption(
-          profileDtoOption,
-          orElse: const UnknownProfileFailure(),
-        );
-        final ProfileStatisticsDto statsDto = requireOption(
-          statsDtoOption,
-          orElse: const UnknownProfileFailure(),
-        );
         final profile = ProfileModel(
           id: profileDto.id,
           username: profileDto.username,
@@ -68,28 +58,36 @@ class ProfileRepository {
   ) {
     final task = TaskEither<ProfileFailure, ProfileModel>.tryCatch(
       () async {
+        final s = state.value;
+        if (s is! ProfileStateLoaded) {
+          throw const UnknownProfileFailure('Profile not loaded');
+        }
+        final current = s.profile;
         final dto = ProfileUpdateRequestDto(
-          username: command.username,
-          email: command.email,
-          avatarId: command.avatarId,
+          username: command.username != current.username ? command.username : null,
+          email: command.email != current.email ? command.email : null,
+          avatarId:
+              command.avatarId != current.avatarId ? command.avatarId : null,
         );
-        final Option<ProfileDto> updatedOption =
+        final hasChange = dto.username != null ||
+            dto.email != null ||
+            dto.avatarId != null;
+        if (!hasChange) {
+          throw const NoChangesProfileFailure();
+        }
+        final ProfileDto updatedDto =
             await _httpProfileService.updateProfile(dto);
-        final ProfileDto updatedDto = requireOption(
-          updatedOption,
-          orElse: const UnknownProfileFailure(),
-        );
         final model = ProfileModel(
           id: updatedDto.id,
           username: updatedDto.username,
           email: updatedDto.email,
           avatarId: updatedDto.avatarId,
         );
-        final s = state.value;
-        if (s is ProfileStateLoaded) {
+        final loaded = state.value;
+        if (loaded is ProfileStateLoaded) {
           state.value = ProfileState.loaded(
             profile: model,
-            statistics: s.statistics,
+            statistics: loaded.statistics,
           );
         }
         return model;
@@ -103,10 +101,7 @@ class ProfileRepository {
   Future<Either<ProfileFailure, Unit>> deleteAccount() {
     final task = TaskEither<ProfileFailure, Unit>.tryCatch(
       () async {
-        final deleted = await _httpProfileService.deleteAccount();
-        if (!deleted) {
-          throw const UnknownProfileFailure();
-        }
+        await _httpProfileService.deleteAccount();
         return unit;
       },
       (error, _) =>
@@ -115,4 +110,3 @@ class ProfileRepository {
     return task.run();
   }
 }
-

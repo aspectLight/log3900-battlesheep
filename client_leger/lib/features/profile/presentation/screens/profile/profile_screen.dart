@@ -44,12 +44,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _init() async {
     await _viewModel.load();
+    _syncFormFromState();
+  }
+
+  void _syncFormFromState() {
     final state = _viewModel.state.value;
     if (state is ProfileStateLoaded) {
       _usernameController.text = state.profile.username;
       _emailController.text = state.profile.email;
       _viewModel.setSelectedAvatarId(state.profile.avatarId);
     }
+  }
+
+  Future<void> _retryLoad() async {
+    await _viewModel.load();
+    _syncFormFromState();
+  }
+
+  void _showSnackBar(String message, {required bool isError}) {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(
+            fontFamily: 'CustomFont',
+            fontSize: 15,
+            color: Color(0xFFF5E6E6),
+          ),
+        ),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        backgroundColor: isError
+            ? const Color(0xFF8B0000)
+            : const Color(0xFF1B5E20),
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   @override
@@ -69,10 +102,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Watch((context) {
                     final state = _viewModel.state.value;
                     final isSaving = _viewModel.isSaving.value;
+                    final isDeleting = _viewModel.isDeleting.value;
                     final selectedAvatarId = _viewModel.selectedAvatarId.value;
                     if (state is ProfileStateLoading) {
-                      return const Center(
-                        child: CircularProgressIndicator(color: Colors.white),
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildHeader(l10n),
+                          const SizedBox(height: 48),
+                          const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       );
                     }
                     return switch (state) {
@@ -82,6 +125,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             _buildHeader(l10n),
                             const SizedBox(height: 24),
                             _buildErrorBanner(failure.localize(l10n)),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: _retryLoad,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF550000),
+                                foregroundColor: const Color(0xFFF5E6E6),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                  horizontal: 24,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                  side: const BorderSide(
+                                    color: Color(0xFF7F1F1F),
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                              child: Text(
+                                l10n.profileRetry,
+                                style: const TextStyle(
+                                  fontFamily: 'CustomFont',
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ProfileStateLoaded(:final statistics) => Column(
@@ -93,6 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               l10n,
                               statistics,
                               isSaving,
+                              isDeleting,
                               selectedAvatarId,
                             ),
                           ],
@@ -153,27 +223,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildErrorBanner(String message) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
       decoration: BoxDecoration(
-        color: const Color(0x33FF0000),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.redAccent),
+        color: const Color(0xFFDC3545).withValues(alpha: 0.2),
+        border: Border.all(color: const Color(0xFFDC3545)),
+        borderRadius: BorderRadius.circular(5),
       ),
-      child: Row(
-        children: [
-          const Icon(Icons.error_outline, color: Colors.redAccent),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              message,
-              style: const TextStyle(
-                color: Colors.white,
-                fontFamily: 'CustomFont',
-              ),
-            ),
-          ),
-        ],
+      child: Text(
+        message,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: Color(0xFFDC3545),
+          fontSize: 16,
+          fontFamily: 'CustomFont',
+        ),
       ),
     );
   }
@@ -182,6 +246,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ProfileLocalizations l10n,
     ProfileStatisticsModel statistics,
     bool isSaving,
+    bool isDeleting,
     String selectedAvatarId,
   ) {
     return IntrinsicHeight(
@@ -189,7 +254,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            child: _buildFormColumn(l10n, isSaving, selectedAvatarId),
+            child: _buildFormColumn(
+              l10n,
+              isSaving,
+              isDeleting,
+              selectedAvatarId,
+            ),
           ),
           const SizedBox(width: 32),
           Expanded(
@@ -203,6 +273,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildFormColumn(
     ProfileLocalizations l10n,
     bool isSaving,
+    bool isDeleting,
     String selectedAvatarId,
   ) {
     return Column(
@@ -236,7 +307,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ElevatedButton(
-              onPressed: isSaving ? null : _handleSave,
+              onPressed: (isSaving || isDeleting) ? null : _handleSave,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF550000),
                 foregroundColor: const Color(0xFFF5E6E6),
@@ -259,7 +330,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 12),
             ElevatedButton(
-              onPressed: isSaving ? null : _handleDelete,
+              onPressed: (isSaving || isDeleting) ? null : _handleDelete,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF8B0000),
                 foregroundColor: const Color(0xFFF5E6E6),
@@ -273,7 +344,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               child: Text(
-                l10n.profileDeleteAccount,
+                isDeleting ? l10n.profileDeleting : l10n.profileDeleteAccount,
                 style: const TextStyle(
                   fontFamily: 'CustomFont',
                   fontWeight: FontWeight.w600,
@@ -442,29 +513,107 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final username = _usernameController.text.trim();
     final email = _emailController.text.trim();
     final avatarId = _viewModel.selectedAvatarId.value;
+    final l10n = ProfileLocalizations.of(context)!;
     if (username.isEmpty || email.isEmpty || avatarId.isEmpty) {
-      final l10n = ProfileLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.profileFillAllFieldsError,
-            style: const TextStyle(fontFamily: 'CustomFont'),
-          ),
-        ),
-      );
+      _showSnackBar(l10n.profileFillAllFieldsError, isError: true);
       return;
     }
-    await _viewModel.submitUpdate(
+    final result = await _viewModel.submitUpdate(
       UpdateProfileCommand(
         username: username,
         email: email,
         avatarId: avatarId,
       ),
     );
+    if (!mounted) return;
+    result.match(
+      (failure) => _showSnackBar(
+        failure.localize(l10n),
+        isError: true,
+      ),
+      (_) => _showSnackBar(
+        l10n.profileSaveSuccess,
+        isError: false,
+      ),
+    );
   }
 
   Future<void> _handleDelete() async {
-    await _viewModel.deleteAccount();
+    final l10n = ProfileLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF2B2B2B),
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: const BorderSide(color: Color(0xFF444444)),
+        ),
+        title: Text(
+          l10n.profileDeleteConfirmTitle,
+          style: const TextStyle(
+            color: Colors.white,
+            fontFamily: 'CustomFont',
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        content: Text(
+          l10n.profileDeleteConfirmBody,
+          style: const TextStyle(
+            color: Color(0xFFF5E6E6),
+            fontFamily: 'CustomFont',
+            fontSize: 15,
+            height: 1.35,
+          ),
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFFF5E6E6),
+            ),
+            child: Text(
+              l10n.profileCancel,
+              style: const TextStyle(
+                fontFamily: 'CustomFont',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF8B0000),
+              foregroundColor: const Color(0xFFF5E6E6),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+                side: const BorderSide(color: Color(0xFFDC3545), width: 2),
+              ),
+            ),
+            child: Text(
+              l10n.profileConfirmDelete,
+              style: const TextStyle(
+                fontFamily: 'CustomFont',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final result = await _viewModel.deleteAccount();
+    if (!mounted) return;
+    result.match(
+      (failure) => _showSnackBar(
+        failure.localize(l10n),
+        isError: true,
+      ),
+      (_) {},
+    );
   }
 }
 

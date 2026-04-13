@@ -27,6 +27,7 @@ extension LobbyPlayerToWaitingRoomPlayer on LobbyPlayerModel {
         character: character,
         stats: stats,
         virtualType: virtualType,
+        activeBanner: activeBanner,
       );
     }
     return WaitingRoomPlayerModel.human(
@@ -34,6 +35,7 @@ extension LobbyPlayerToWaitingRoomPlayer on LobbyPlayerModel {
       name: name,
       character: character,
       stats: stats,
+      activeBanner: activeBanner,
     );
   }
 

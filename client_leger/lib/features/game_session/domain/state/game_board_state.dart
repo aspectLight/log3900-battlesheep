@@ -115,6 +115,7 @@ class GameBoardState with _$GameBoardState {
         reachablePathsByDestination,
     required List<GameBoardPosition> selectedPathCoords,
     @Default(Option.none()) Option<PendingItemPickup> pendingItemPickup,
+    @Default({}) Set<String> illuminatedCellKeys,
   }) = _GameBoardState;
 
   const GameBoardState._();

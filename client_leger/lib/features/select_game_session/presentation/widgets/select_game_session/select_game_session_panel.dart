@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fpdart/fpdart.dart' as fp;
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/constants/ui_assets.dart';
 import '../../../../../core/extensions/game_mode_localized_extension.dart';
 import '../../../../../core/modal/modal_intent_sink.dart';
 import '../../../core/helpers/format_last_modified.dart';
@@ -24,12 +26,40 @@ class SelectGameSessionPanel extends StatefulWidget {
 
 class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
   late final SelectGameSessionPanelViewModel _viewModel;
+  late final TextEditingController _entryFeeController;
 
   @override
   void initState() {
     super.initState();
     _viewModel = GetIt.I<SelectGameSessionPanelViewModel>();
+    _entryFeeController = TextEditingController(
+      text: '${_viewModel.entryFee.value}',
+    );
+    _entryFeeController.addListener(_onEntryFeeTextChanged);
     unawaited(_viewModel.load());
+  }
+
+  @override
+  void dispose() {
+    _entryFeeController.removeListener(_onEntryFeeTextChanged);
+    _entryFeeController.dispose();
+    super.dispose();
+  }
+
+  void _onEntryFeeTextChanged() {
+    final raw = _entryFeeController.text.trim();
+    if (raw.isEmpty) {
+      _viewModel.setEntryFee(0);
+      return;
+    }
+    final n = int.tryParse(raw);
+    _viewModel.setEntryFee(n ?? 0);
+  }
+
+  void _bumpEntryFeeByStep(int delta) {
+    final n = int.tryParse(_entryFeeController.text.trim()) ?? 0;
+    final v = (n + delta).clamp(0, 999999999);
+    _entryFeeController.text = '$v';
   }
 
   @override
@@ -57,6 +87,8 @@ class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
   ) {
     final l10n = SelectGameSessionLocalizations.of(context)!;
     final bool hasSelection = selectedGameId.isSome();
+    _viewModel.entryFee.value;
+    final balance = _viewModel.coinBalance.value;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -110,6 +142,143 @@ class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
                 viewModel: _viewModel,
               );
             },
+          ),
+        ),
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _entryFeeController,
+                            enabled: hasSelection,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            style: TextStyle(
+                              color: hasSelection
+                                  ? Colors.white
+                                  : Colors.white.withValues(alpha: 0.38),
+                              fontFamily: 'CustomFont',
+                            ),
+                            decoration: InputDecoration(
+                              labelText: l10n.createGameEntryFeeLabel,
+                              hintText: l10n.createGameEntryFeeHint,
+                              labelStyle: TextStyle(
+                                color: hasSelection
+                                    ? const Color(0xFFE0D8C0)
+                                    : const Color(0xFFE0D8C0)
+                                        .withValues(alpha: 0.38),
+                              ),
+                              hintStyle: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.5),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFF5A5A5A)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFF7F1F1F)),
+                              ),
+                              disabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (hasSelection) ...[
+                          const SizedBox(width: 4),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                visualDensity: VisualDensity.compact,
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(
+                                  minWidth: 32,
+                                  minHeight: 28,
+                                ),
+                                icon: const Icon(
+                                  Icons.keyboard_arrow_up,
+                                  color: Colors.white54,
+                                ),
+                                onPressed: () => _bumpEntryFeeByStep(10),
+                              ),
+                              IconButton(
+                                visualDensity: VisualDensity.compact,
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(
+                                  minWidth: 32,
+                                  minHeight: 28,
+                                ),
+                                icon: const Icon(
+                                  Icons.keyboard_arrow_down,
+                                  color: Colors.white54,
+                                ),
+                                onPressed: () => _bumpEntryFeeByStep(-10),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    flex: 2,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            l10n.createGameBalanceLabel,
+                            style: const TextStyle(
+                              color: Color(0xFFE0D8C0),
+                              fontFamily: 'CustomFont',
+                              fontSize: 14,
+                            ),
+                            textAlign: TextAlign.end,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Image.asset(
+                          UiAssets.goldCoin,
+                          width: 22,
+                          height: 22,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '$balance',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'CustomFont',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 20),

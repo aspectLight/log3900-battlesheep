@@ -1,8 +1,9 @@
+import 'package:fpdart/fpdart.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../../core/app_transition/app_transition_bus.dart';
-import '../../../../../../core/helpers/functional_programming.dart';
 import '../../../../authentication/core/app_events/auth_events.dart';
+import '../../../core/exceptions/profile_failure.dart';
 import '../../../data/repositories/profile_repository.dart';
 import '../../../domain/commands/profile_commands.dart';
 import '../../../domain/state/profile_state.dart';
@@ -20,6 +21,7 @@ class ProfileViewModel {
 
   final Computed<ProfileState> state;
   final Signal<bool> isSaving = signal<bool>(false);
+  final Signal<bool> isDeleting = signal<bool>(false);
   final Signal<String> selectedAvatarId = signal<String>('');
 
   void setSelectedAvatarId(String avatarId) {
@@ -28,26 +30,22 @@ class ProfileViewModel {
 
   Future<void> load() => _repository.loadProfileAndStatistics();
 
-  Future<void> submitUpdate(UpdateProfileCommand command) async {
-    if (isSaving.value) return;
+  Future<Either<ProfileFailure, Unit>> submitUpdate(
+    UpdateProfileCommand command,
+  ) async {
     isSaving.value = true;
     final result = await _repository.updateProfile(command);
-    result.when(
-      left: (_) {
-        isSaving.value = false;
-      },
-      right: (_) {
-        isSaving.value = false;
-      },
-    );
+    isSaving.value = false;
+    return result.map((_) => unit);
   }
 
-  Future<void> deleteAccount() async {
+  Future<Either<ProfileFailure, Unit>> deleteAccount() async {
+    isDeleting.value = true;
     final result = await _repository.deleteAccount();
-    result.when(
-      left: (_) {},
-      right: (_) =>
-          _appTransitionEventBus.fire(const AuthExitAppEvent.signOut()),
-    );
+    isDeleting.value = false;
+    return result.map((_) {
+      _appTransitionEventBus.fire(const AuthExitAppEvent.signOut());
+      return unit;
+    });
   }
 }

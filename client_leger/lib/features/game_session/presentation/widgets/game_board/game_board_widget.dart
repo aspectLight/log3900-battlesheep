@@ -81,11 +81,34 @@ class _GameBoardWidgetState extends State<GameBoardWidget> {
                     width: cellSize,
                     height: cellSize,
                     child: ClipRect(
-                      child: Image.asset(
-                        tileUi.imagePath,
-                        fit: BoxFit.fill,
-                        errorBuilder: (_, _, _) =>
-                            Image.asset(tileUi.imagePathBase, fit: BoxFit.fill),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.asset(
+                            tileUi.imagePath,
+                            fit: BoxFit.fill,
+                            errorBuilder: (_, _, _) => Image.asset(
+                              tileUi.imagePathBase,
+                              fit: BoxFit.fill,
+                            ),
+                          ),
+                          if (cell.isIlluminated)
+                            Positioned.fill(
+                              child: IgnorePointer(
+                                child: DecoratedBox(
+                                  decoration: const BoxDecoration(
+                                    gradient: RadialGradient(
+                                      radius: 0.95,
+                                      colors: [
+                                        Color.fromRGBO(255, 220, 100, 0.5),
+                                        Color.fromRGBO(255, 200, 50, 0),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   );
@@ -163,6 +186,7 @@ class _GameBoardWidgetState extends State<GameBoardWidget> {
       _ => const Option<TileState>.none(),
     };
     return GameBoardUiTile(
+      sourceTile: cell.tile,
       displayType: cell.displayTileType.fold(() => cell.tile.type, (t) => t),
       orientation: cell.tileOrientation,
       doorState: doorState,
@@ -258,6 +282,7 @@ class _GameBoardCellWidget extends StatelessWidget {
       _ => const Option<TileState>.none(),
     };
     final tileUi = GameBoardUiTile(
+      sourceTile: cell.tile,
       displayType: cell.displayTileType.fold(() => cell.tile.type, (t) => t),
       orientation: cell.tileOrientation,
       doorState: doorState,

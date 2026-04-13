@@ -356,6 +356,7 @@ mixin _$SelectGameSessionExitAppEvent {
       String gameDescription,
       GameMode gameMode,
       int boardSize,
+      int entryFee,
     )
     gameSelected,
   }) => throw _privateConstructorUsedError;
@@ -368,6 +369,7 @@ mixin _$SelectGameSessionExitAppEvent {
       String gameDescription,
       GameMode gameMode,
       int boardSize,
+      int entryFee,
     )?
     gameSelected,
   }) => throw _privateConstructorUsedError;
@@ -380,6 +382,7 @@ mixin _$SelectGameSessionExitAppEvent {
       String gameDescription,
       GameMode gameMode,
       int boardSize,
+      int entryFee,
     )?
     gameSelected,
     required TResult orElse(),
@@ -486,6 +489,7 @@ class _$SelectGameSessionCancelledImpl implements SelectGameSessionCancelled {
       String gameDescription,
       GameMode gameMode,
       int boardSize,
+      int entryFee,
     )
     gameSelected,
   }) {
@@ -502,6 +506,7 @@ class _$SelectGameSessionCancelledImpl implements SelectGameSessionCancelled {
       String gameDescription,
       GameMode gameMode,
       int boardSize,
+      int entryFee,
     )?
     gameSelected,
   }) {
@@ -518,6 +523,7 @@ class _$SelectGameSessionCancelledImpl implements SelectGameSessionCancelled {
       String gameDescription,
       GameMode gameMode,
       int boardSize,
+      int entryFee,
     )?
     gameSelected,
     required TResult orElse(),
@@ -578,6 +584,7 @@ abstract class _$$SelectGameSessionGameSelectedImplCopyWith<$Res> {
     String gameDescription,
     GameMode gameMode,
     int boardSize,
+    int entryFee,
   });
 }
 
@@ -604,6 +611,7 @@ class __$$SelectGameSessionGameSelectedImplCopyWithImpl<$Res>
     Object? gameDescription = null,
     Object? gameMode = null,
     Object? boardSize = null,
+    Object? entryFee = null,
   }) {
     return _then(
       _$SelectGameSessionGameSelectedImpl(
@@ -627,6 +635,10 @@ class __$$SelectGameSessionGameSelectedImplCopyWithImpl<$Res>
             ? _value.boardSize
             : boardSize // ignore: cast_nullable_to_non_nullable
                   as int,
+        entryFee: null == entryFee
+            ? _value.entryFee
+            : entryFee // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -642,6 +654,7 @@ class _$SelectGameSessionGameSelectedImpl
     required this.gameDescription,
     required this.gameMode,
     required this.boardSize,
+    this.entryFee = 0,
   });
 
   @override
@@ -654,10 +667,13 @@ class _$SelectGameSessionGameSelectedImpl
   final GameMode gameMode;
   @override
   final int boardSize;
+  @override
+  @JsonKey()
+  final int entryFee;
 
   @override
   String toString() {
-    return 'SelectGameSessionExitAppEvent.gameSelected(gameId: $gameId, gameName: $gameName, gameDescription: $gameDescription, gameMode: $gameMode, boardSize: $boardSize)';
+    return 'SelectGameSessionExitAppEvent.gameSelected(gameId: $gameId, gameName: $gameName, gameDescription: $gameDescription, gameMode: $gameMode, boardSize: $boardSize, entryFee: $entryFee)';
   }
 
   @override
@@ -673,7 +689,9 @@ class _$SelectGameSessionGameSelectedImpl
             (identical(other.gameMode, gameMode) ||
                 other.gameMode == gameMode) &&
             (identical(other.boardSize, boardSize) ||
-                other.boardSize == boardSize));
+                other.boardSize == boardSize) &&
+            (identical(other.entryFee, entryFee) ||
+                other.entryFee == entryFee));
   }
 
   @override
@@ -684,6 +702,7 @@ class _$SelectGameSessionGameSelectedImpl
     gameDescription,
     gameMode,
     boardSize,
+    entryFee,
   );
 
   /// Create a copy of SelectGameSessionExitAppEvent
@@ -709,10 +728,18 @@ class _$SelectGameSessionGameSelectedImpl
       String gameDescription,
       GameMode gameMode,
       int boardSize,
+      int entryFee,
     )
     gameSelected,
   }) {
-    return gameSelected(gameId, gameName, gameDescription, gameMode, boardSize);
+    return gameSelected(
+      gameId,
+      gameName,
+      gameDescription,
+      gameMode,
+      boardSize,
+      entryFee,
+    );
   }
 
   @override
@@ -725,6 +752,7 @@ class _$SelectGameSessionGameSelectedImpl
       String gameDescription,
       GameMode gameMode,
       int boardSize,
+      int entryFee,
     )?
     gameSelected,
   }) {
@@ -734,6 +762,7 @@ class _$SelectGameSessionGameSelectedImpl
       gameDescription,
       gameMode,
       boardSize,
+      entryFee,
     );
   }
 
@@ -747,6 +776,7 @@ class _$SelectGameSessionGameSelectedImpl
       String gameDescription,
       GameMode gameMode,
       int boardSize,
+      int entryFee,
     )?
     gameSelected,
     required TResult orElse(),
@@ -758,6 +788,7 @@ class _$SelectGameSessionGameSelectedImpl
         gameDescription,
         gameMode,
         boardSize,
+        entryFee,
       );
     }
     return orElse();
@@ -803,6 +834,7 @@ abstract class SelectGameSessionGameSelected
     required final String gameDescription,
     required final GameMode gameMode,
     required final int boardSize,
+    final int entryFee,
   }) = _$SelectGameSessionGameSelectedImpl;
 
   String get gameId;
@@ -810,6 +842,7 @@ abstract class SelectGameSessionGameSelected
   String get gameDescription;
   GameMode get gameMode;
   int get boardSize;
+  int get entryFee;
 
   /// Create a copy of SelectGameSessionExitAppEvent
   /// with the given fields replaced by the non-null parameter values.

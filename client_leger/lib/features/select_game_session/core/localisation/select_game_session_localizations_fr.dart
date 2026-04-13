@@ -41,4 +41,20 @@ class SelectGameSessionLocalizationsFr extends SelectGameSessionLocalizations {
 
   @override
   String get createGameModeCtf => 'Capture du drapeau';
+
+  @override
+  String get createGameEntryFeeLabel => 'Frais d\'entrée';
+
+  @override
+  String get createGameEntryFeeHint => '0 = gratuit';
+
+  @override
+  String get createGameBalanceLabel => 'Votre solde';
+
+  @override
+  String get createGameInsufficientFundsTitle => 'Solde insuffisant';
+
+  @override
+  String get createGameInsufficientFundsMessage =>
+      'Vous n\'avez pas assez de pièces pour ce montant. Réduisez les frais ou gagnez des pièces à la boutique.';
 }

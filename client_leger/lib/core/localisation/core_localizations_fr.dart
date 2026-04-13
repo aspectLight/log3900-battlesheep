@@ -133,4 +133,7 @@ class CoreLocalizationsFr extends CoreLocalizations {
 
   @override
   String get loading => 'Chargement...';
+
+  @override
+  String get shop => 'Boutique';
 }

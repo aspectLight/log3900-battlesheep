@@ -160,6 +160,12 @@ abstract class JoinGameSessionLocalizations {
   /// In en, this message translates to:
   /// **'Maximum player limit reached'**
   String get joinGameMaxPlayerLimitReached;
+
+  /// No description provided for @joinGameInsufficientBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient balance to join this game'**
+  String get joinGameInsufficientBalance;
 }
 
 class _JoinGameSessionLocalizationsDelegate

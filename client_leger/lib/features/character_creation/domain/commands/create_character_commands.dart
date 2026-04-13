@@ -17,6 +17,7 @@ class CreateCharacterPlayerData with _$CreateCharacterPlayerData {
     required int speed,
     required int attackDice,
     required int defenseDice,
+    String? activeBanner,
   }) = _CreateCharacterPlayerData;
 }
 
@@ -34,5 +35,6 @@ class CreateWaitingRoomCommand with _$CreateWaitingRoomCommand {
     required String roomCode,
     required String gameId,
     required CreateCharacterPlayerData host,
+    @Default(0) int entryFee,
   }) = _CreateWaitingRoomCommand;
 }

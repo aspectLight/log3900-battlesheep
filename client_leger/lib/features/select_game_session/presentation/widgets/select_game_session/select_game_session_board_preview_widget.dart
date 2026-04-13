@@ -132,6 +132,7 @@ class _CellUiRenderer extends StatelessWidget {
           children: [
             Image.asset(
               GameBoardUiTile(
+                sourceTile: cell.tile,
                 displayType: cell.displayTileType
                     .fold(() => cell.tile.type, (t) => t),
                 orientation: cell.tileOrientation,
@@ -146,6 +147,7 @@ class _CellUiRenderer extends StatelessWidget {
               fit: BoxFit.fill,
               errorBuilder: (context, error, stackTrace) => Image.asset(
                 GameBoardUiTile(
+                  sourceTile: cell.tile,
                   displayType: cell.displayTileType
                       .fold(() => cell.tile.type, (t) => t),
                   orientation: cell.tileOrientation,

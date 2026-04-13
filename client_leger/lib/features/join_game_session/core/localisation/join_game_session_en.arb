@@ -9,5 +9,6 @@
   "joinGameFailed": "Failed to join game",
   "waitingRoomRoomNotFound": "Game not found",
   "waitingRoomRoomLocked": "Game is locked",
-  "joinGameMaxPlayerLimitReached": "Maximum player limit reached"
+  "joinGameMaxPlayerLimitReached": "Maximum player limit reached",
+  "joinGameInsufficientBalance": "Insufficient balance to join this game"
 }

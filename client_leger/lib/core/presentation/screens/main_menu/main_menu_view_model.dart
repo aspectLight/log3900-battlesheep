@@ -10,6 +10,7 @@ import '../../../../features/join_game_session/core/app_events/join_game_session
 import '../../../../features/game_history/core/app_events/game_history_events.dart';
 import '../../../../features/logs_history/core/app_events/logs_history_events.dart';
 import '../../../../features/profile/core/app_events/profile_events.dart';
+import '../../../../features/shop/core/app_events/shop_events.dart';
 import '../../../../features/select_game_session/core/app_events/select_game_session_events.dart';
 import '../../../app_transition/app_transition_bus.dart';
 import '../../../helpers/functional_programming.dart';
@@ -65,5 +66,9 @@ class MainMenuViewModel {
 
   void openProfile() {
     _appTransitionEventBus.fire(const ProfileEntryAppEvent.requested());
+  }
+
+  void openShop() {
+    _appTransitionEventBus.fire(const ShopEntryAppEvent.requested());
   }
 }

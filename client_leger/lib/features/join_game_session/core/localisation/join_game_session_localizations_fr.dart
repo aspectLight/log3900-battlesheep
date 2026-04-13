@@ -39,4 +39,8 @@ class JoinGameSessionLocalizationsFr extends JoinGameSessionLocalizations {
   @override
   String get joinGameMaxPlayerLimitReached =>
       'Nombre maximum de joueurs atteint';
+
+  @override
+  String get joinGameInsufficientBalance =>
+      'Solde insuffisant pour rejoindre cette partie';
 }

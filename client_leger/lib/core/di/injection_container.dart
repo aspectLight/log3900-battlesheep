@@ -17,6 +17,8 @@ import '../../features/join_game_session/core/di/join_game_session_side_effect_m
 import '../../features/game_history/core/di/game_history_module.dart';
 import '../../features/logs_history/core/di/logs_history_module.dart';
 import '../../features/profile/core/di/profile_module.dart';
+import '../../features/shop/core/di/shop_module.dart';
+import '../../features/shop/core/di/shop_side_effect_module.dart';
 import '../../features/select_game_session/core/di/select_game_session_module.dart';
 import '../../features/select_game_session/core/di/select_game_session_side_effect_module.dart';
 import '../../features/statistics/core/di/statistics_module.dart';
@@ -84,6 +86,7 @@ Future<void> setupDependencies() async {
   registerLogsHistoryRoot(getIt);
   registerGameHistoryRoot(getIt);
   registerProfileRoot(getIt);
+  registerShopRoot(getIt);
   registerCharacterCreationRoot(getIt);
   registerWaitingRoomRoot(getIt);
   registerAppEventHandler(getIt);
@@ -93,6 +96,7 @@ Future<void> setupDependencies() async {
   bootstrapAuthSideEffects(getIt);
   bootstrapSelectGameSessionSideEffects(getIt);
   bootstrapJoinGameSessionSideEffects(getIt);
+  bootstrapShopSideEffects(getIt);
   getIt<AppInitialization>().setReady();
   getIt<AppNavigator>().request(ForceUnauthenticated());
 }

@@ -58,7 +58,7 @@ Map<String, dynamic> _$CellDtoToJson(CellDto instance) => <String, dynamic>{
 
 TileDataDto _$TileDataDtoFromJson(Map<String, dynamic> json) => TileDataDto(
   type: const TileTypeConverter().fromJson(json['type'] as String),
-  state: const TileStateConverter().fromJson(json['state'] as String?),
+  state: json['state'] as String?,
   orientation: const TileOrientationConverter().fromJson(
     json['orientation'] as String?,
   ),
@@ -68,7 +68,7 @@ Map<String, dynamic> _$TileDataDtoToJson(
   TileDataDto instance,
 ) => <String, dynamic>{
   'type': const TileTypeConverter().toJson(instance.type),
-  'state': const TileStateConverter().toJson(instance.state),
+  'state': instance.state,
   'orientation': const TileOrientationConverter().toJson(instance.orientation),
 };
 
@@ -86,6 +86,7 @@ const _$ItemTypeEnumMap = {
   ItemType.camouflage: 'camouflage',
   ItemType.waterproofBoots: 'waterproofBoots',
   ItemType.airStrike: 'airStrike',
+  ItemType.torch: 'torch',
   ItemType.random: 'random',
   ItemType.flag: 'flag',
   ItemType.spawnPoint: 'spawnPoint',

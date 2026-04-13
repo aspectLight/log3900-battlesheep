@@ -343,6 +343,12 @@ abstract class CoreLocalizations {
   /// In en, this message translates to:
   /// **'Loading...'**
   String get loading;
+
+  /// No description provided for @shop.
+  ///
+  /// In en, this message translates to:
+  /// **'Shop'**
+  String get shop;
 }
 
 class _CoreLocalizationsDelegate

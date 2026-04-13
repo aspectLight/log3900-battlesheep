@@ -7,6 +7,7 @@ class WaitingRoomPlayerUi {
   final int speed;
   final int attack;
   final int defense;
+  final String? activeBanner;
 
   const WaitingRoomPlayerUi({
     required this.id,
@@ -17,5 +18,6 @@ class WaitingRoomPlayerUi {
     required this.speed,
     required this.attack,
     required this.defense,
+    this.activeBanner,
   });
 }

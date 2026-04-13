@@ -29,6 +29,7 @@ mixin _$CreateCharacterPlayerData {
   int get speed => throw _privateConstructorUsedError;
   int get attackDice => throw _privateConstructorUsedError;
   int get defenseDice => throw _privateConstructorUsedError;
+  String? get activeBanner => throw _privateConstructorUsedError;
 
   /// Create a copy of CreateCharacterPlayerData
   /// with the given fields replaced by the non-null parameter values.
@@ -54,6 +55,7 @@ abstract class $CreateCharacterPlayerDataCopyWith<$Res> {
     int speed,
     int attackDice,
     int defenseDice,
+    String? activeBanner,
   });
 }
 
@@ -84,6 +86,7 @@ class _$CreateCharacterPlayerDataCopyWithImpl<
     Object? speed = null,
     Object? attackDice = null,
     Object? defenseDice = null,
+    Object? activeBanner = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -123,6 +126,10 @@ class _$CreateCharacterPlayerDataCopyWithImpl<
                 ? _value.defenseDice
                 : defenseDice // ignore: cast_nullable_to_non_nullable
                       as int,
+            activeBanner: freezed == activeBanner
+                ? _value.activeBanner
+                : activeBanner // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -148,6 +155,7 @@ abstract class _$$CreateCharacterPlayerDataImplCopyWith<$Res>
     int speed,
     int attackDice,
     int defenseDice,
+    String? activeBanner,
   });
 }
 
@@ -178,6 +186,7 @@ class __$$CreateCharacterPlayerDataImplCopyWithImpl<$Res>
     Object? speed = null,
     Object? attackDice = null,
     Object? defenseDice = null,
+    Object? activeBanner = freezed,
   }) {
     return _then(
       _$CreateCharacterPlayerDataImpl(
@@ -217,6 +226,10 @@ class __$$CreateCharacterPlayerDataImplCopyWithImpl<$Res>
             ? _value.defenseDice
             : defenseDice // ignore: cast_nullable_to_non_nullable
                   as int,
+        activeBanner: freezed == activeBanner
+            ? _value.activeBanner
+            : activeBanner // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -235,6 +248,7 @@ class _$CreateCharacterPlayerDataImpl implements _CreateCharacterPlayerData {
     required this.speed,
     required this.attackDice,
     required this.defenseDice,
+    this.activeBanner,
   });
 
   @override
@@ -255,10 +269,12 @@ class _$CreateCharacterPlayerDataImpl implements _CreateCharacterPlayerData {
   final int attackDice;
   @override
   final int defenseDice;
+  @override
+  final String? activeBanner;
 
   @override
   String toString() {
-    return 'CreateCharacterPlayerData(name: $name, characterId: $characterId, bonusChoice: $bonusChoice, d6Choice: $d6Choice, d4Choice: $d4Choice, health: $health, speed: $speed, attackDice: $attackDice, defenseDice: $defenseDice)';
+    return 'CreateCharacterPlayerData(name: $name, characterId: $characterId, bonusChoice: $bonusChoice, d6Choice: $d6Choice, d4Choice: $d4Choice, health: $health, speed: $speed, attackDice: $attackDice, defenseDice: $defenseDice, activeBanner: $activeBanner)';
   }
 
   @override
@@ -280,7 +296,9 @@ class _$CreateCharacterPlayerDataImpl implements _CreateCharacterPlayerData {
             (identical(other.attackDice, attackDice) ||
                 other.attackDice == attackDice) &&
             (identical(other.defenseDice, defenseDice) ||
-                other.defenseDice == defenseDice));
+                other.defenseDice == defenseDice) &&
+            (identical(other.activeBanner, activeBanner) ||
+                other.activeBanner == activeBanner));
   }
 
   @override
@@ -295,6 +313,7 @@ class _$CreateCharacterPlayerDataImpl implements _CreateCharacterPlayerData {
     speed,
     attackDice,
     defenseDice,
+    activeBanner,
   );
 
   /// Create a copy of CreateCharacterPlayerData
@@ -320,6 +339,7 @@ abstract class _CreateCharacterPlayerData implements CreateCharacterPlayerData {
     required final int speed,
     required final int attackDice,
     required final int defenseDice,
+    final String? activeBanner,
   }) = _$CreateCharacterPlayerDataImpl;
 
   @override
@@ -340,6 +360,8 @@ abstract class _CreateCharacterPlayerData implements CreateCharacterPlayerData {
   int get attackDice;
   @override
   int get defenseDice;
+  @override
+  String? get activeBanner;
 
   /// Create a copy of CreateCharacterPlayerData
   /// with the given fields replaced by the non-null parameter values.
@@ -529,6 +551,7 @@ mixin _$CreateWaitingRoomCommand {
   String get roomCode => throw _privateConstructorUsedError;
   String get gameId => throw _privateConstructorUsedError;
   CreateCharacterPlayerData get host => throw _privateConstructorUsedError;
+  int get entryFee => throw _privateConstructorUsedError;
 
   /// Create a copy of CreateWaitingRoomCommand
   /// with the given fields replaced by the non-null parameter values.
@@ -544,7 +567,12 @@ abstract class $CreateWaitingRoomCommandCopyWith<$Res> {
     $Res Function(CreateWaitingRoomCommand) then,
   ) = _$CreateWaitingRoomCommandCopyWithImpl<$Res, CreateWaitingRoomCommand>;
   @useResult
-  $Res call({String roomCode, String gameId, CreateCharacterPlayerData host});
+  $Res call({
+    String roomCode,
+    String gameId,
+    CreateCharacterPlayerData host,
+    int entryFee,
+  });
 
   $CreateCharacterPlayerDataCopyWith<$Res> get host;
 }
@@ -570,6 +598,7 @@ class _$CreateWaitingRoomCommandCopyWithImpl<
     Object? roomCode = null,
     Object? gameId = null,
     Object? host = null,
+    Object? entryFee = null,
   }) {
     return _then(
       _value.copyWith(
@@ -585,6 +614,10 @@ class _$CreateWaitingRoomCommandCopyWithImpl<
                 ? _value.host
                 : host // ignore: cast_nullable_to_non_nullable
                       as CreateCharacterPlayerData,
+            entryFee: null == entryFee
+                ? _value.entryFee
+                : entryFee // ignore: cast_nullable_to_non_nullable
+                      as int,
           )
           as $Val,
     );
@@ -610,7 +643,12 @@ abstract class _$$CreateWaitingRoomCommandImplCopyWith<$Res>
   ) = __$$CreateWaitingRoomCommandImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String roomCode, String gameId, CreateCharacterPlayerData host});
+  $Res call({
+    String roomCode,
+    String gameId,
+    CreateCharacterPlayerData host,
+    int entryFee,
+  });
 
   @override
   $CreateCharacterPlayerDataCopyWith<$Res> get host;
@@ -637,6 +675,7 @@ class __$$CreateWaitingRoomCommandImplCopyWithImpl<$Res>
     Object? roomCode = null,
     Object? gameId = null,
     Object? host = null,
+    Object? entryFee = null,
   }) {
     return _then(
       _$CreateWaitingRoomCommandImpl(
@@ -652,6 +691,10 @@ class __$$CreateWaitingRoomCommandImplCopyWithImpl<$Res>
             ? _value.host
             : host // ignore: cast_nullable_to_non_nullable
                   as CreateCharacterPlayerData,
+        entryFee: null == entryFee
+            ? _value.entryFee
+            : entryFee // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -664,6 +707,7 @@ class _$CreateWaitingRoomCommandImpl implements _CreateWaitingRoomCommand {
     required this.roomCode,
     required this.gameId,
     required this.host,
+    this.entryFee = 0,
   });
 
   @override
@@ -672,10 +716,13 @@ class _$CreateWaitingRoomCommandImpl implements _CreateWaitingRoomCommand {
   final String gameId;
   @override
   final CreateCharacterPlayerData host;
+  @override
+  @JsonKey()
+  final int entryFee;
 
   @override
   String toString() {
-    return 'CreateWaitingRoomCommand(roomCode: $roomCode, gameId: $gameId, host: $host)';
+    return 'CreateWaitingRoomCommand(roomCode: $roomCode, gameId: $gameId, host: $host, entryFee: $entryFee)';
   }
 
   @override
@@ -686,11 +733,14 @@ class _$CreateWaitingRoomCommandImpl implements _CreateWaitingRoomCommand {
             (identical(other.roomCode, roomCode) ||
                 other.roomCode == roomCode) &&
             (identical(other.gameId, gameId) || other.gameId == gameId) &&
-            (identical(other.host, host) || other.host == host));
+            (identical(other.host, host) || other.host == host) &&
+            (identical(other.entryFee, entryFee) ||
+                other.entryFee == entryFee));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, roomCode, gameId, host);
+  int get hashCode =>
+      Object.hash(runtimeType, roomCode, gameId, host, entryFee);
 
   /// Create a copy of CreateWaitingRoomCommand
   /// with the given fields replaced by the non-null parameter values.
@@ -709,6 +759,7 @@ abstract class _CreateWaitingRoomCommand implements CreateWaitingRoomCommand {
     required final String roomCode,
     required final String gameId,
     required final CreateCharacterPlayerData host,
+    final int entryFee,
   }) = _$CreateWaitingRoomCommandImpl;
 
   @override
@@ -717,6 +768,8 @@ abstract class _CreateWaitingRoomCommand implements CreateWaitingRoomCommand {
   String get gameId;
   @override
   CreateCharacterPlayerData get host;
+  @override
+  int get entryFee;
 
   /// Create a copy of CreateWaitingRoomCommand
   /// with the given fields replaced by the non-null parameter values.

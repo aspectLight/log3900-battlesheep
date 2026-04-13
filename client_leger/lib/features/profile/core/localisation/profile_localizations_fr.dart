@@ -30,8 +30,50 @@ class ProfileLocalizationsFr extends ProfileLocalizations {
   String get profileSaveInProgress => 'Enregistrement...';
 
   @override
+  String get profileSaveSuccess => 'Profil mis à jour avec succès.';
+
+  @override
   String get profileFillAllFieldsError =>
       'Veuillez remplir tous les champs et sélectionner un avatar.';
+
+  @override
+  String get profileNetworkError =>
+      'Problème de connexion réseau. Vérifiez votre connexion et réessayez.';
+
+  @override
+  String get profileUnauthorizedError =>
+      'Session expirée ou non autorisée. Veuillez vous reconnecter.';
+
+  @override
+  String get profileUsernameTaken => 'Ce pseudonyme est déjà utilisé.';
+
+  @override
+  String get profileEmailTaken => 'Cette adresse courriel est déjà utilisée.';
+
+  @override
+  String get profileInvalidDataError =>
+      'Les informations saisies sont invalides. Vérifiez les champs et réessayez.';
+
+  @override
+  String get profileForbiddenError =>
+      'Cette action n\'est pas autorisée. Vous devez peut-être débloquer cet élément à la boutique.';
+
+  @override
+  String get profileNotFoundError => 'Le profil est introuvable.';
+
+  @override
+  String get profileServerError =>
+      'Erreur du serveur. Veuillez réessayer plus tard.';
+
+  @override
+  String get profileUnexpectedError =>
+      'Une erreur s\'est produite. Veuillez réessayer.';
+
+  @override
+  String get profileNoChanges => 'Aucune modification à enregistrer.';
+
+  @override
+  String get profileRetry => 'Réessayer';
 
   @override
   String get profileStatisticsTitle => 'Statistiques';
@@ -50,4 +92,20 @@ class ProfileLocalizationsFr extends ProfileLocalizations {
 
   @override
   String get profileDeleteAccount => 'Supprimer le compte';
+
+  @override
+  String get profileDeleteConfirmTitle => 'Supprimer le compte ?';
+
+  @override
+  String get profileDeleteConfirmBody =>
+      'Cette action est permanente. Votre compte et vos données seront supprimés.';
+
+  @override
+  String get profileCancel => 'Annuler';
+
+  @override
+  String get profileConfirmDelete => 'Supprimer';
+
+  @override
+  String get profileDeleting => 'Suppression...';
 }

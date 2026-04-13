@@ -12,6 +12,7 @@ import '../../../core/app_events/character_creation_events.dart';
 import '../../../core/constants/character_creation_constants.dart';
 import '../../../core/event_bus/character_creation_event_bus.dart';
 import '../../../core/helpers/character_creation_form_validator.dart';
+import '../../../../profile/data/services/http_profile_service.dart';
 import '../../../data/repositories/character_creation_repository.dart';
 import '../../../domain/models/character_creation_entry_mode.dart';
 import '../../../domain/state/character_creation_state.dart';
@@ -25,6 +26,7 @@ class CharacterCreationViewModel {
     required CreateCharacterUseCase createCharacterUseCase,
     required ReserveCharacterUseCase reserveCharacterUseCase,
     required CharacterCreationRepository repository,
+    required HttpProfileService profileService,
     required NotificationIntentSink notificationIntentSink,
     required CharacterCreationEventBus eventBus,
     required AppTransitionEventBus appTransitionEventBus,
@@ -34,6 +36,7 @@ class CharacterCreationViewModel {
   }) : _createCharacterUseCase = createCharacterUseCase,
        _reserveCharacterUseCase = reserveCharacterUseCase,
        _repository = repository,
+       _profileService = profileService,
        _notificationIntentSink = notificationIntentSink,
        _eventBus = eventBus,
        _appTransitionEventBus = appTransitionEventBus,
@@ -44,6 +47,7 @@ class CharacterCreationViewModel {
   final CreateCharacterUseCase _createCharacterUseCase;
   final ReserveCharacterUseCase _reserveCharacterUseCase;
   final CharacterCreationRepository _repository;
+  final HttpProfileService _profileService;
   final NotificationIntentSink _notificationIntentSink;
   final CharacterCreationEventBus _eventBus;
   final AppTransitionEventBus _appTransitionEventBus;
@@ -151,7 +155,12 @@ class CharacterCreationViewModel {
     }
     if (isSubmitting) return;
     createSubmitState.value = const CreateCharacterSubmitState.submitting();
-    final command = toCommand(form, _repository.roomCode);
+    final activeBanner = await _fetchActiveBannerPreference();
+    final command = toCommand(
+      form,
+      _repository.roomCode,
+      activeBanner: activeBanner,
+    );
     await _createCharacterUseCase.execute(command);
     createSubmitState.value = const CreateCharacterSubmitState.initial();
   }
@@ -168,6 +177,19 @@ class CharacterCreationViewModel {
     }
     _repository.setDefenseDice(sides);
     _repository.setAttackDice(opposite);
+  }
+
+  Future<String?> _fetchActiveBannerPreference() async {
+    try {
+      final profile = await _profileService.fetchProfile();
+      final raw = profile.preferences['activeBanner'];
+      if (raw is String && raw.isNotEmpty) {
+        return raw;
+      }
+    } on Exception {
+      // Submit still proceeds without cosmetic banner.
+    }
+    return null;
   }
 
   Future<void> _reserveSelectedCharacter(String characterId) async {

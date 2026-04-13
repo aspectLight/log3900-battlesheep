@@ -11,6 +11,7 @@ ProfileDto _$ProfileDtoFromJson(Map<String, dynamic> json) => ProfileDto(
   username: json['username'] as String,
   email: json['email'] as String,
   avatarId: json['avatarId'] as String,
+  preferences: json['preferences'] as Map<String, dynamic>? ?? const {},
 );
 
 Map<String, dynamic> _$ProfileDtoToJson(ProfileDto instance) =>
@@ -19,6 +20,7 @@ Map<String, dynamic> _$ProfileDtoToJson(ProfileDto instance) =>
       'username': instance.username,
       'email': instance.email,
       'avatarId': instance.avatarId,
+      'preferences': instance.preferences,
     };
 
 ProfileUpdateRequestDto _$ProfileUpdateRequestDtoFromJson(
@@ -27,6 +29,7 @@ ProfileUpdateRequestDto _$ProfileUpdateRequestDtoFromJson(
   username: json['username'] as String?,
   email: json['email'] as String?,
   avatarId: json['avatarId'] as String?,
+  preferences: json['preferences'] as Map<String, dynamic>?,
 );
 
 Map<String, dynamic> _$ProfileUpdateRequestDtoToJson(
@@ -35,4 +38,5 @@ Map<String, dynamic> _$ProfileUpdateRequestDtoToJson(
   if (instance.username case final value?) 'username': value,
   if (instance.email case final value?) 'email': value,
   if (instance.avatarId case final value?) 'avatarId': value,
+  if (instance.preferences case final value?) 'preferences': value,
 };
