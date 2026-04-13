@@ -147,12 +147,14 @@ export enum CustomChannelEvents {
     LeaveCustomChannel = 'leaveCustomChannel',
     DeleteCustomChannel = 'deleteCustomChannel',
     SendMessageToCustomChannel = 'sendMessageToCustomChannel',
+    SendEmojiToCustomChannel = 'sendEmojiToCustomChannel',
     GetCustomChannelMessages = 'getCustomChannelMessages',
     ListCustomChannels = 'listCustomChannels',
 
     // Émis par le serveur
     CustomChannelCreated = 'customChannelCreated',
     CustomChannelMessage = 'customChannelMessage',
+    CustomChannelEmoji = 'customChannelEmoji',
     CustomChannelMessagesResponse = 'customChannelMessagesResponse',
     CustomChannelsListResponse = 'customChannelsListResponse',
     CustomChannelJoined = 'customChannelJoined',

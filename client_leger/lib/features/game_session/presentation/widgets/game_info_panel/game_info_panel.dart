@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../core/context/game_session_scope_holder.dart';
 import '../../../core/localisation/game_session_localizations.dart';
 import 'game_info_panel_view_model.dart';
@@ -23,8 +24,9 @@ class GameInfoPanel extends StatelessWidget {
     final vm = scope.get<GameInfoPanelViewModel>();
     final l10n = GameSessionLocalizations.of(context)!;
     final model = vm.infoModel.watch(context);
-    const titleStyle = TextStyle(
-      color: Color(0xFF550000),
+    final scheme = Theme.of(context).colorScheme;
+    final titleStyle = TextStyle(
+      color: scheme.primary,
       fontSize: 22,
       fontWeight: FontWeight.bold,
       fontFamily: 'CustomFont',
@@ -39,12 +41,12 @@ class GameInfoPanel extends StatelessWidget {
       decoration: TextDecoration.none,
     );
     final pillButtonStyle = ElevatedButton.styleFrom(
-      backgroundColor: const Color(0xFF550000),
-      foregroundColor: const Color(0xFFFFF0F0),
+      backgroundColor: scheme.primary,
+      foregroundColor: scheme.onPrimary,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 28),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(24),
-        side: const BorderSide(color: Color(0xFF7F1F1F)),
+        side: BorderSide(color: context.interactionColors.outline),
       ),
       elevation: 2,
       textStyle: const TextStyle(

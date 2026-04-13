@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../core/constants/chat_constants.dart';
 import '../../../core/event_bus/chat_event_bus.dart';
 import '../../../core/localisation/chat_localizations.dart';
@@ -204,7 +205,7 @@ class _ChatPanelContentView extends StatelessWidget {
   final ScrollController scrollController;
   final bool Function() isAtBottom;
   final void Function(int length, {required bool shouldScrollToBottom})
-      onMessagesChanged;
+  onMessagesChanged;
   final void Function(double height) onListLayout;
 
   @override
@@ -216,8 +217,10 @@ class _ChatPanelContentView extends StatelessWidget {
         final selectedIndex = selectedEmojiIndex.value;
         if (messages.isNotEmpty) {
           final shouldScrollToBottom = isAtBottom() || messages.last.isMe;
-          onMessagesChanged(messages.length,
-              shouldScrollToBottom: shouldScrollToBottom);
+          onMessagesChanged(
+            messages.length,
+            shouldScrollToBottom: shouldScrollToBottom,
+          );
         }
         return Expanded(
           child: Column(
@@ -244,9 +247,15 @@ class _ChatPanelContentView extends StatelessWidget {
               ),
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF1E0707),
-                  border: Border(top: BorderSide(color: Color(0xFF3A1212))),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  border: Border(
+                    top: BorderSide(
+                      color: context.interactionColors.outline.withValues(
+                        alpha: 0.65,
+                      ),
+                    ),
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -257,19 +266,19 @@ class _ChatPanelContentView extends StatelessWidget {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF2B2B2B),
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(4),
                           border: Border.all(color: const Color(0xFF444444)),
                         ),
                         child: EditableText(
                           controller: messageController,
                           focusNode: focusNode,
-                          style: const TextStyle(
-                            color: Color(0xFFF5E6E6),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 14,
                             fontFamily: 'CustomFont',
                           ),
-                          cursorColor: const Color(0xFF7F1F1F),
+                          cursorColor: context.interactionColors.outline,
                           backgroundCursorColor: Colors.grey,
                           inputFormatters: [
                             LengthLimitingTextInputFormatter(
@@ -295,12 +304,12 @@ class _ChatPanelContentView extends StatelessWidget {
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? const Color(0xFF550000)
-                                    : const Color(0xFF2B2B2B),
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context).colorScheme.surface,
                                 borderRadius: BorderRadius.circular(4),
                                 border: Border.all(
                                   color: isSelected
-                                      ? const Color(0xFF7F1F1F)
+                                      ? context.interactionColors.outline
                                       : const Color(0xFF444444),
                                   width: isSelected ? 2 : 1,
                                 ),
@@ -326,14 +335,16 @@ class _ChatPanelContentView extends StatelessWidget {
                           vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF550000),
+                          color: Theme.of(context).colorScheme.primary,
                           borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: const Color(0xFF7F1F1F)),
+                          border: Border.all(
+                            color: context.interactionColors.outline,
+                          ),
                         ),
                         child: Text(
                           l10n.send,
-                          style: const TextStyle(
-                            color: Color(0xFFF5E6E6),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimary,
                             fontSize: 14,
                             fontFamily: 'CustomFont',
                           ),
@@ -362,8 +373,12 @@ class _ChatLine extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: index.isEven ? const Color(0xFF180505) : const Color(0xFF220808),
-        border: const Border(bottom: BorderSide(color: Color(0xFF250808))),
+        color: index.isEven
+            ? context.interactionColors.primary
+            : context.interactionColors.primaryStrong,
+        border: Border(
+          bottom: BorderSide(color: context.interactionColors.primaryStrong),
+        ),
       ),
       child: RichText(
         text: TextSpan(

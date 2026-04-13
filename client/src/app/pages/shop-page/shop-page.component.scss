@@ -7,6 +7,10 @@
     bottom: 0;
     overflow-y: auto;
     overflow-x: hidden;
+    color: var(--theme-text-primary);
+    background:
+        linear-gradient(180deg, var(--theme-bg-overlay-dark) 0%, var(--theme-bg-overlay-medium) 100%),
+        var(--theme-bg-chat);
 }
 
 .shop-container {
@@ -25,10 +29,10 @@
         margin: 0 0 14px 0;
         font-size: 1.4rem;
         letter-spacing: 1px;
-        color: #e0d8c0;
-        border-bottom: 1px solid #3a1212;
+        color: var(--theme-text-special);
+        border-bottom: 1px solid var(--theme-border-primary);
         padding-bottom: 8px;
-        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+        text-shadow: 1px 1px 3px var(--theme-shadow-strong);
     }
 }
 
@@ -39,8 +43,8 @@
 }
 
 .shop-item {
-    background: rgba(22, 7, 7, 0.85);
-    border: 1px solid #3a3a3a;
+    background: var(--theme-bg-dropdown-light);
+    border: 1px solid var(--theme-border-secondary);
     border-radius: 6px;
     padding: 14px;
     width: 180px;
@@ -48,32 +52,32 @@
     flex-direction: column;
     gap: 6px;
     transition: all 0.25s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 8px var(--theme-shadow-lg);
 
     &:hover {
-        border-color: #7f1f1f;
+        border-color: var(--theme-border-button);
         transform: translateY(-2px);
-        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 6px 14px var(--theme-shadow-strong);
     }
 
     &.owned {
-        border-color: #2e7d32;
-        background: rgba(7, 22, 7, 0.85);
+        border-color: var(--theme-border-success);
+        background: var(--theme-bg-success-soft);
     }
 
     &.equipped {
-        border-color: #2e7d32;
+        border-color: var(--theme-border-success);
     }
 
     .item-name {
         font-weight: bold;
         font-size: 1rem;
-        color: #f0f0f0;
+        color: var(--theme-text-secondary);
     }
 
     .item-desc {
         font-size: 0.75rem;
-        color: #aaa;
+        color: var(--theme-text-time);
         line-height: 1.3;
     }
 
@@ -82,7 +86,7 @@
         align-items: center;
         gap: 6px;
         font-size: 1rem;
-        color: #f0c040;
+        color: var(--theme-game-gold);
         font-weight: bold;
         margin-top: 2px;
         line-height: 1;
@@ -99,7 +103,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(0, 0, 0, 0.3);
+        background: var(--theme-bg-overlay-medium);
         border-radius: 4px;
         overflow: hidden;
         margin-bottom: 4px;
@@ -112,7 +116,7 @@
     }
 
     .owned-badge {
-        color: #4caf50;
+        color: var(--theme-success-text);
         font-weight: bold;
         font-size: 0.8rem;
         margin-top: auto;
@@ -124,18 +128,18 @@
         padding: 7px 12px;
         cursor: pointer;
         border-radius: 4px;
-        border: 1px solid #b71c1c;
-        background: rgba(211, 47, 47, 0.85);
-        color: white;
+        border: 1px solid var(--theme-border-button);
+        background: var(--theme-accent);
+        color: var(--theme-text-primary);
         font-size: 0.85rem;
         font-weight: bold;
         transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 2px 4px var(--theme-shadow-lg);
 
         &:hover {
-            background: rgba(229, 57, 53, 0.95);
-            border-color: #ef5350;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+            background: var(--theme-accent-hover);
+            border-color: var(--theme-border-button);
+            box-shadow: 0 4px 8px var(--theme-shadow-strong);
         }
 
         &:active {
@@ -148,23 +152,23 @@
         padding: 7px 12px;
         cursor: pointer;
         border-radius: 4px;
-        border: 1px solid #1b5e20;
-        background: rgba(46, 125, 50, 0.85);
-        color: white;
+        border: 1px solid var(--theme-border-success);
+        background: var(--theme-bg-success);
+        color: var(--theme-text-primary);
         font-size: 0.85rem;
         font-weight: bold;
         transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 2px 4px var(--theme-shadow-lg);
 
         &.equipped {
-            border-color: #2e7d32;
+            border-color: var(--theme-border-success);
             background: transparent;
-            color: #4caf50;
+            color: var(--theme-success-text);
         }
 
         &:hover {
             opacity: 0.9;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 4px 8px var(--theme-shadow-strong);
         }
 
         &:active {
@@ -679,9 +683,9 @@
 }
 
 .success-banner {
-    background: rgba(27, 94, 32, 0.85);
-    border: 1px solid #2e7d32;
-    color: #a5d6a7;
+    background: var(--theme-bg-success-soft);
+    border: 1px solid var(--theme-border-success);
+    color: var(--theme-success-text);
     padding: 10px 20px;
     text-align: center;
     font-weight: bold;

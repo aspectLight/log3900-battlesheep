@@ -2,24 +2,26 @@ import 'package:get_it/get_it.dart';
 
 import '../../features/authentication/core/app_events/auth_events.dart';
 import '../../features/authentication/core/coordinators/authentication_coordinator.dart';
-import '../../features/chat/core/app_events/chat_events.dart';
-import '../../features/chat/core/coordinators/chat_coordinator.dart';
-import '../../features/game_session/core/app_events/game_session_events.dart';
-import '../../features/game_session/core/coordinators/game_session_coordinator.dart';
 import '../../features/character_creation/core/app_events/character_creation_events.dart';
 import '../../features/character_creation/core/coordinators/character_creation_coordinator.dart';
-import '../../features/join_game_session/core/app_events/join_game_session_events.dart';
-import '../../features/join_game_session/core/coordinators/join_game_session_coordinator.dart';
+import '../../features/chat/core/app_events/chat_events.dart';
+import '../../features/chat/core/coordinators/chat_coordinator.dart';
+import '../../features/friends/core/app_transition/friends_events.dart';
+import '../../features/friends/core/coordinators/friends_coordinator.dart';
 import '../../features/game_history/core/app_events/game_history_events.dart';
 import '../../features/game_history/core/coordinators/game_history_coordinator.dart';
+import '../../features/game_session/core/app_events/game_session_events.dart';
+import '../../features/game_session/core/coordinators/game_session_coordinator.dart';
+import '../../features/join_game_session/core/app_events/join_game_session_events.dart';
+import '../../features/join_game_session/core/coordinators/join_game_session_coordinator.dart';
 import '../../features/logs_history/core/app_events/logs_history_events.dart';
 import '../../features/logs_history/core/coordinators/logs_history_coordinator.dart';
-import '../../features/statistics/core/app_events/statistics_events.dart';
-import '../../features/statistics/core/coordinators/statistics_coordinator.dart';
-import '../../features/select_game_session/core/app_events/select_game_session_events.dart';
-import '../../features/select_game_session/core/coordinators/select_game_session_coordinator.dart';
 import '../../features/profile/core/app_events/profile_events.dart';
 import '../../features/profile/core/coordinators/profile_coordinator.dart';
+import '../../features/select_game_session/core/app_events/select_game_session_events.dart';
+import '../../features/select_game_session/core/coordinators/select_game_session_coordinator.dart';
+import '../../features/statistics/core/app_events/statistics_events.dart';
+import '../../features/statistics/core/coordinators/statistics_coordinator.dart';
 import '../../features/waiting_room/core/app_events/waiting_room_events.dart';
 import '../../features/waiting_room/core/coordinators/waiting_room_coordinator.dart';
 import '../app_transition/app_event_handler.dart';
@@ -41,6 +43,7 @@ void registerAppEventHandler(GetIt getIt) {
       characterCreation: getIt<CharacterCreationCoordinator>(),
       waitingRoom: getIt<WaitingRoomCoordinator>(),
       profile: getIt<ProfileCoordinator>(),
+      friends: getIt<FriendsCoordinator>(),
     ),
   );
 }
@@ -68,6 +71,7 @@ AppEventHandler _buildHandler({
   required CharacterCreationCoordinator characterCreation,
   required WaitingRoomCoordinator waitingRoom,
   required ProfileCoordinator profile,
+  required FriendsCoordinator friends,
 }) {
   return AppEventHandler(
     appTransitionEventBus: bus,
@@ -209,6 +213,15 @@ AppEventHandler _buildHandler({
       GenericHandlerDelegate<ProfileExitAppEvent>.simple(
         ProfileExitAppEvent,
         profile.onExit,
+      ),
+      // --- Friends ---
+      GenericHandlerDelegate<FriendsEntryAppEvent>.simple(
+        FriendsEntryAppEvent,
+        friends.onEntry,
+      ),
+      GenericHandlerDelegate<FriendsExitAppEvent>.simple(
+        FriendsExitAppEvent,
+        friends.onExit,
       ),
     ],
   );

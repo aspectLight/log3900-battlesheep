@@ -4,6 +4,9 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import 'core/app_transition/app_initialization.dart';
 import 'core/app_transition/app_transition_bus.dart';
+import 'core/appearance/app_appearance_service.dart';
+import 'core/appearance/app_interaction_colors.dart';
+import 'core/appearance/app_visual_theme.dart';
 import 'core/di/injection_container.dart';
 import 'core/localisation/core_localizations.dart';
 import 'core/modal/modal_overlay.dart';
@@ -22,6 +25,85 @@ import 'features/statistics/core/localisation/statistics_localizations.dart';
 import 'features/waiting_room/core/localisation/waiting_room_localizations.dart';
 import 'routing/app_router.dart';
 import 'routing/app_router_observer.dart';
+
+ThemeData _appMaterialTheme(AppVisualTheme visual) {
+  final ColorScheme scheme;
+  final AppInteractionColors interaction;
+  switch (visual) {
+    case AppVisualTheme.defaultTheme:
+      scheme = const ColorScheme.dark(
+        primary: Color(0xFF550000),
+        onPrimary: Color(0xFFF5E6E6),
+        secondary: Color(0xFF7F1F1F),
+        onSecondary: Color(0xFFF5E6E6),
+        surface: Color(0xFF2B2B2B),
+        onSurface: Color(0xFFF5E6E6),
+        surfaceContainerHighest: Color(0xFF1A1A1A),
+      );
+      interaction = AppInteractionColors.defaultPalette;
+    case AppVisualTheme.frost:
+      scheme = const ColorScheme.dark(
+        primary: Color(0xFF152535),
+        onPrimary: Color(0xFFE0F2FF),
+        secondary: Color(0xFF28526E),
+        onSecondary: Color(0xFFE0F2FF),
+        surface: Color(0xFF152535),
+        onSurface: Color(0xFFD0EAF8),
+        surfaceContainerHighest: Color(0xFF0E1C2C),
+      );
+      interaction = AppInteractionColors.frostPalette;
+    case AppVisualTheme.village:
+      scheme = const ColorScheme.dark(
+        primary: Color(0xFF4A3018),
+        onPrimary: Color(0xFFEDE4C8),
+        secondary: Color(0xFF624028),
+        onSecondary: Color(0xFFEDE4C8),
+        surface: Color(0xFF201E17),
+        onSurface: Color(0xFFDDD4AE),
+        surfaceContainerHighest: Color(0xFF161410),
+      );
+      interaction = AppInteractionColors.villagePalette;
+  }
+
+  return ThemeData(
+    useMaterial3: true,
+    brightness: Brightness.dark,
+    colorScheme: scheme,
+    scaffoldBackgroundColor: Colors.black,
+    extensions: <ThemeExtension<dynamic>>[interaction],
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return scheme.surface.withValues(alpha: 0.35);
+          }
+          return scheme.primary;
+        }),
+        foregroundColor: WidgetStatePropertyAll(scheme.onPrimary),
+        side: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) return null;
+          return BorderSide(color: interaction.outline, width: 2);
+        }),
+        textStyle: const WidgetStatePropertyAll(
+          TextStyle(fontFamily: 'CustomFont', fontWeight: FontWeight.w600),
+        ),
+      ),
+    ),
+    popupMenuTheme: PopupMenuThemeData(
+      color: scheme.surface,
+      surfaceTintColor: Colors.transparent,
+      textStyle: TextStyle(
+        color: scheme.onSurface,
+        fontFamily: 'CustomFont',
+        fontSize: 16,
+      ),
+    ),
+    dividerTheme: DividerThemeData(
+      color: interaction.outline.withValues(alpha: 0.45),
+      thickness: 1,
+    ),
+  );
+}
 
 class AppRoot extends StatefulWidget {
   const AppRoot({super.key});
@@ -72,10 +154,15 @@ class _AppRootState extends State<AppRoot> with WidgetsBindingObserver {
         );
       }
 
+      final appearance = getIt<AppAppearanceService>();
+      appearance.locale.value;
+      appearance.visualTheme.value;
+
       return MaterialApp.router(
         title: 'Eastern Solace',
         debugShowCheckedModeBanner: false,
-        locale: const Locale('fr'),
+        locale: appearance.locale.value,
+        theme: _appMaterialTheme(appearance.visualTheme.value),
         routerConfig: _appRouter.config(
           navigatorObservers: () => [
             AppRouterObserver(

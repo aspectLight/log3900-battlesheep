@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../core/event_bus/chat_event_bus.dart';
 import '../../../core/localisation/chat_localizations.dart';
 import '../chat_panel_content/chat_panel_content.dart';
@@ -68,12 +69,17 @@ class _SlidingChatBoxState extends State<SlidingChatBox> {
             width: width,
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: const Color(0xFF160707).withValues(alpha: 0.9),
+                color: Theme.of(
+                  context,
+                ).colorScheme.surface.withValues(alpha: 0.9),
                 borderRadius: const BorderRadius.only(
                   topRight: Radius.circular(8),
                   bottomRight: Radius.circular(8),
                 ),
-                border: Border.all(color: const Color(0xFF3A1212), width: 2),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.5),
@@ -109,12 +115,15 @@ class _SlidingChatBoxState extends State<SlidingChatBox> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2A0E0E),
+                  color: Theme.of(context).colorScheme.primary,
                   borderRadius: const BorderRadius.only(
                     topRight: Radius.circular(24),
                     bottomRight: Radius.circular(24),
                   ),
-                  border: Border.all(color: const Color(0xFF3A1212), width: 2),
+                  border: Border.all(
+                    color: context.interactionColors.outline,
+                    width: 2,
+                  ),
                 ),
                 child: const Icon(Icons.chat_bubble, color: Colors.white),
               ),
@@ -135,9 +144,11 @@ class _ChatHeader extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: const BoxDecoration(
-        color: Color(0xFF2A0E0E),
-        border: Border(bottom: BorderSide(color: Color(0xFF3A1212))),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary,
+        border: Border(
+          bottom: BorderSide(color: context.interactionColors.outline),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -145,7 +156,7 @@ class _ChatHeader extends StatelessWidget {
           Text(
             l10n.chat,
             style: const TextStyle(
-              color: Color(0xFFE0E0FF),
+              color: Color(0xFFFFFFFF),
               fontSize: 18,
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',

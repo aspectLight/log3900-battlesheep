@@ -52,7 +52,9 @@ class CharacterCreationCoordinator
   Future<CharacterCreationData?> onEntryImpl(
     CharacterCreationEntryAppEvent event,
   ) async {
-    appTransitionEventBus.fire(const CharacterCreationCompletedAppEvent.ready());
+    appTransitionEventBus.fire(
+      const CharacterCreationCompletedAppEvent.ready(),
+    );
     final (socketId, roomCode, entryMode) = switch (event) {
       CharacterCreationHostEntered(
         :final socketId,
@@ -62,30 +64,34 @@ class CharacterCreationCoordinator
         :final gameDescription,
         :final boardSize,
         :final isCTF,
-      ) => (
-        socketId,
-        roomCode,
-        CharacterCreationHostEntryMode(
-          gameId: gameId,
-          gameName: gameName,
-          gameDescription: gameDescription,
-          boardSize: boardSize,
-          isCTF: isCTF,
+        :final friendsOnly,
+      ) =>
+        (
+          socketId,
+          roomCode,
+          CharacterCreationHostEntryMode(
+            gameId: gameId,
+            gameName: gameName,
+            gameDescription: gameDescription,
+            boardSize: boardSize,
+            isCTF: isCTF,
+            friendsOnly: friendsOnly,
+          ),
         ),
-      ),
       CharacterCreationJoinEntered(
         :final socketId,
         :final roomCode,
         :final hostId,
         :final initialRoom,
-      ) => (
-        socketId,
-        roomCode,
-        CharacterCreationJoinEntryMode(
-          hostId: hostId,
-          initialRoom: initialRoom,
+      ) =>
+        (
+          socketId,
+          roomCode,
+          CharacterCreationJoinEntryMode(
+            hostId: hostId,
+            initialRoom: initialRoom,
+          ),
         ),
-      ),
     };
     return CharacterCreationData(
       roomCode: roomCode,
@@ -135,7 +141,13 @@ class CharacterCreationCoordinator
 
   void _onExitToWaitingRoom(String roomCode, CharacterCreationData data) {
     switch (data.entryMode) {
-      case CharacterCreationHostEntryMode(:final boardSize, :final isCTF, :final gameName, :final gameDescription):
+      case CharacterCreationHostEntryMode(
+        :final boardSize,
+        :final isCTF,
+        :final gameName,
+        :final gameDescription,
+        :final friendsOnly,
+      ):
         appTransitionEventBus.fire(
           WaitingRoomEntryAppEvent.enteredAsHost(
             roomId: roomCode,
@@ -145,6 +157,7 @@ class CharacterCreationCoordinator
             gameDescription: gameDescription,
             boardSize: boardSize,
             isCTF: isCTF,
+            friendsOnly: friendsOnly,
           ),
         );
       case CharacterCreationJoinEntryMode(:final hostId, :final initialRoom):
