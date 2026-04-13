@@ -41,6 +41,9 @@ class SpawnedPlayerDto {
   final int movementPoints;
   final int actionPoints;
   final GameBoardPositionDto spawnPoint;
+  /// Case courante sur le plateau (`position` côté serveur). Si null, on utilise [spawnPoint].
+  @JsonKey(name: 'position')
+  final GameBoardPositionDto? boardPosition;
   final List<GameItemDto> inventory;
   @StatTypeMapConverter()
   final Map<StatType, int> stats;
@@ -61,6 +64,7 @@ class SpawnedPlayerDto {
     required this.movementPoints,
     required this.actionPoints,
     required this.spawnPoint,
+    this.boardPosition,
     required this.inventory,
     required this.stats,
     required this.diceChoice,
@@ -76,8 +80,16 @@ class SpawnedPlayerDto {
     const avatarConverter = AvatarToCharacterTypeConverter();
     const colorConverter = BoardCharacterColorConverter();
     const statTypeConverter = StatTypeConverter();
-    final spawnRaw = map['spawnPoint'] ?? map['position'];
-    final spawnPoint = _readCoords(spawnRaw);
+    final spawnRaw = map['spawnPoint'];
+    final posRaw = map['position'];
+    final GameBoardPositionDto logicalSpawn;
+    if (spawnRaw != null) {
+      logicalSpawn = _readCoords(spawnRaw);
+    } else {
+      logicalSpawn = _readCoords(posRaw);
+    }
+    final GameBoardPositionDto? boardPosition =
+        posRaw != null ? _readCoords(posRaw) : null;
     final invRaw = map['inventory'] as List<Object?>? ?? [];
     final inventory = invRaw
         .whereType<Map<String, dynamic>>()
@@ -131,7 +143,8 @@ class SpawnedPlayerDto {
       color: color,
       movementPoints: movementPoints,
       actionPoints: actionPoints,
-      spawnPoint: spawnPoint,
+      spawnPoint: logicalSpawn,
+      boardPosition: boardPosition,
       inventory: inventory,
       stats: stats,
       diceChoice: diceChoice,

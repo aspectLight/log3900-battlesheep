@@ -357,6 +357,7 @@ mixin _$SelectGameSessionExitAppEvent {
       GameMode gameMode,
       int boardSize,
       int entryFee,
+      bool friendsOnly,
     )
     gameSelected,
   }) => throw _privateConstructorUsedError;
@@ -370,6 +371,7 @@ mixin _$SelectGameSessionExitAppEvent {
       GameMode gameMode,
       int boardSize,
       int entryFee,
+      bool friendsOnly,
     )?
     gameSelected,
   }) => throw _privateConstructorUsedError;
@@ -383,6 +385,7 @@ mixin _$SelectGameSessionExitAppEvent {
       GameMode gameMode,
       int boardSize,
       int entryFee,
+      bool friendsOnly,
     )?
     gameSelected,
     required TResult orElse(),
@@ -490,6 +493,7 @@ class _$SelectGameSessionCancelledImpl implements SelectGameSessionCancelled {
       GameMode gameMode,
       int boardSize,
       int entryFee,
+      bool friendsOnly,
     )
     gameSelected,
   }) {
@@ -507,6 +511,7 @@ class _$SelectGameSessionCancelledImpl implements SelectGameSessionCancelled {
       GameMode gameMode,
       int boardSize,
       int entryFee,
+      bool friendsOnly,
     )?
     gameSelected,
   }) {
@@ -524,6 +529,7 @@ class _$SelectGameSessionCancelledImpl implements SelectGameSessionCancelled {
       GameMode gameMode,
       int boardSize,
       int entryFee,
+      bool friendsOnly,
     )?
     gameSelected,
     required TResult orElse(),
@@ -585,6 +591,7 @@ abstract class _$$SelectGameSessionGameSelectedImplCopyWith<$Res> {
     GameMode gameMode,
     int boardSize,
     int entryFee,
+    bool friendsOnly,
   });
 }
 
@@ -612,6 +619,7 @@ class __$$SelectGameSessionGameSelectedImplCopyWithImpl<$Res>
     Object? gameMode = null,
     Object? boardSize = null,
     Object? entryFee = null,
+    Object? friendsOnly = null,
   }) {
     return _then(
       _$SelectGameSessionGameSelectedImpl(
@@ -639,6 +647,10 @@ class __$$SelectGameSessionGameSelectedImplCopyWithImpl<$Res>
             ? _value.entryFee
             : entryFee // ignore: cast_nullable_to_non_nullable
                   as int,
+        friendsOnly: null == friendsOnly
+            ? _value.friendsOnly
+            : friendsOnly // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -655,6 +667,7 @@ class _$SelectGameSessionGameSelectedImpl
     required this.gameMode,
     required this.boardSize,
     this.entryFee = 0,
+    required this.friendsOnly,
   });
 
   @override
@@ -670,10 +683,12 @@ class _$SelectGameSessionGameSelectedImpl
   @override
   @JsonKey()
   final int entryFee;
+  @override
+  final bool friendsOnly;
 
   @override
   String toString() {
-    return 'SelectGameSessionExitAppEvent.gameSelected(gameId: $gameId, gameName: $gameName, gameDescription: $gameDescription, gameMode: $gameMode, boardSize: $boardSize, entryFee: $entryFee)';
+    return 'SelectGameSessionExitAppEvent.gameSelected(gameId: $gameId, gameName: $gameName, gameDescription: $gameDescription, gameMode: $gameMode, boardSize: $boardSize, entryFee: $entryFee, friendsOnly: $friendsOnly)';
   }
 
   @override
@@ -691,7 +706,9 @@ class _$SelectGameSessionGameSelectedImpl
             (identical(other.boardSize, boardSize) ||
                 other.boardSize == boardSize) &&
             (identical(other.entryFee, entryFee) ||
-                other.entryFee == entryFee));
+                other.entryFee == entryFee) &&
+            (identical(other.friendsOnly, friendsOnly) ||
+                other.friendsOnly == friendsOnly));
   }
 
   @override
@@ -703,6 +720,7 @@ class _$SelectGameSessionGameSelectedImpl
     gameMode,
     boardSize,
     entryFee,
+    friendsOnly,
   );
 
   /// Create a copy of SelectGameSessionExitAppEvent
@@ -729,6 +747,7 @@ class _$SelectGameSessionGameSelectedImpl
       GameMode gameMode,
       int boardSize,
       int entryFee,
+      bool friendsOnly,
     )
     gameSelected,
   }) {
@@ -739,6 +758,7 @@ class _$SelectGameSessionGameSelectedImpl
       gameMode,
       boardSize,
       entryFee,
+      friendsOnly,
     );
   }
 
@@ -753,6 +773,7 @@ class _$SelectGameSessionGameSelectedImpl
       GameMode gameMode,
       int boardSize,
       int entryFee,
+      bool friendsOnly,
     )?
     gameSelected,
   }) {
@@ -763,6 +784,7 @@ class _$SelectGameSessionGameSelectedImpl
       gameMode,
       boardSize,
       entryFee,
+      friendsOnly,
     );
   }
 
@@ -777,6 +799,7 @@ class _$SelectGameSessionGameSelectedImpl
       GameMode gameMode,
       int boardSize,
       int entryFee,
+      bool friendsOnly,
     )?
     gameSelected,
     required TResult orElse(),
@@ -789,6 +812,7 @@ class _$SelectGameSessionGameSelectedImpl
         gameMode,
         boardSize,
         entryFee,
+        friendsOnly,
       );
     }
     return orElse();
@@ -835,6 +859,7 @@ abstract class SelectGameSessionGameSelected
     required final GameMode gameMode,
     required final int boardSize,
     final int entryFee,
+    required final bool friendsOnly,
   }) = _$SelectGameSessionGameSelectedImpl;
 
   String get gameId;
@@ -843,6 +868,7 @@ abstract class SelectGameSessionGameSelected
   GameMode get gameMode;
   int get boardSize;
   int get entryFee;
+  bool get friendsOnly;
 
   /// Create a copy of SelectGameSessionExitAppEvent
   /// with the given fields replaced by the non-null parameter values.

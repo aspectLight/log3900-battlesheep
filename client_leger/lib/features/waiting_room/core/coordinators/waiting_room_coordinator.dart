@@ -64,6 +64,7 @@ class WaitingRoomCoordinator
         :final gameDescription,
         :final boardSize,
         :final isCTF,
+        :final friendsOnly,
       ) =>
         WaitingRoomEntryData.host(
           roomId: roomId,
@@ -73,6 +74,7 @@ class WaitingRoomCoordinator
           gameDescription: gameDescription,
           boardSize: boardSize,
           isCTF: isCTF,
+          friendsOnly: friendsOnly,
         ),
       WaitingRoomEnteredAsJoin(
         :final roomId,

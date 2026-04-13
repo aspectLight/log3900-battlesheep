@@ -4,67 +4,77 @@ import '../../../../game_session/core/enums/tile_type.dart';
 import '../../../../game_session/core/enums/tile_orientation.dart';
 import '../../../../../core/enums/item_type.dart';
 
-extension GameSummaryDtoToModel on GameSummaryDto {
-  GameModelInfo toModel() => GameModelInfo(
-    id: id,
-    name: name,
-    description: description,
-    mode: mode,
-    boardSize: board.size,
-    boardMatrix: board.matrix == null
-        ? _defaultBoardMatrix(board.size)
-        : board.matrix!
+List<List<GameBoardPreviewCell>> previewMatrixFromGameSummaryBoard(
+  GameSummaryBoardDto board,
+) {
+  if (board.matrix == null || board.matrix!.isEmpty) {
+    return defaultPreviewBoardMatrix(board.size);
+  }
+  return board.matrix!
+      .map(
+        (row) => row
             .map(
-              (row) => row
-                  .map(
-                    (cell) => GameBoardPreviewCell(
-                      tileType: _tileTypeFromServer(cell.tileType),
-                      tileState: cell.tileState,
-                      orientation: _tileOrientationFromServer(
-                        cell.tileOrientation,
-                      ),
-                      itemType: _itemTypeFromServer(cell.itemType),
-                    ),
-                  )
-                  .toList(),
+              (cell) => GameBoardPreviewCell(
+                tileType: tileTypeFromServerString(cell.tileType),
+                tileState: cell.tileState,
+                orientation: tileOrientationFromServerString(
+                  cell.tileOrientation,
+                ),
+                itemType: itemTypeFromServerString(cell.itemType),
+              ),
             )
             .toList(),
-    isVisible: isVisible,
-    lastModified: modificationDate,
+      )
+      .toList();
+}
+
+List<List<GameBoardPreviewCell>> defaultPreviewBoardMatrix(int size) {
+  if (size <= 0) return [];
+  final row = List<GameBoardPreviewCell>.generate(
+    size,
+    (_) => const GameBoardPreviewCell(tileType: TileType.snow),
   );
+  return List<List<GameBoardPreviewCell>>.generate(
+    size,
+    (_) => List<GameBoardPreviewCell>.from(row),
+  );
+}
 
-  List<List<GameBoardPreviewCell>> _defaultBoardMatrix(int size) {
-    final row = List<GameBoardPreviewCell>.generate(
-      size,
-      (_) => const GameBoardPreviewCell(tileType: TileType.snow),
-    );
-    return List<List<GameBoardPreviewCell>>.generate(
-      size,
-      (_) => List<GameBoardPreviewCell>.from(row),
-    );
+TileType tileTypeFromServerString(String serverType) {
+  for (final t in TileType.values) {
+    if (t.name == serverType) return t;
   }
+  return TileType.snow;
+}
 
-  TileType _tileTypeFromServer(String serverType) {
-    for (final t in TileType.values) {
-      if (t.name == serverType) return t;
-    }
-    return TileType.snow;
+TileOrientation? tileOrientationFromServerString(String? serverOrientation) {
+  if (serverOrientation == null) return null;
+  final lower = serverOrientation.toLowerCase();
+  for (final o in TileOrientation.values) {
+    if (o.serverValue.toLowerCase() == lower) return o;
   }
+  return null;
+}
 
-  TileOrientation? _tileOrientationFromServer(String? serverOrientation) {
-    if (serverOrientation == null) return null;
-    final lower = serverOrientation.toLowerCase();
-    for (final o in TileOrientation.values) {
-      if (o.serverValue.toLowerCase() == lower) return o;
-    }
-    return null;
+ItemType? itemTypeFromServerString(String? serverItemType) {
+  if (serverItemType == null) return null;
+  for (final i in ItemType.values) {
+    if (i.name == serverItemType) return i;
   }
+  return null;
+}
 
-  ItemType? _itemTypeFromServer(String? serverItemType) {
-    if (serverItemType == null) return null;
-    for (final i in ItemType.values) {
-      if (i.name == serverItemType) return i;
-    }
-    return null;
-  }
+extension GameSummaryDtoToModel on GameSummaryDto {
+  GameModelInfo toModel() => GameModelInfo(
+        id: id,
+        name: name,
+        description: description,
+        mode: mode,
+        boardSize: board.size,
+        boardMatrix: previewMatrixFromGameSummaryBoard(board),
+        privacy: privacy,
+        owner: owner,
+        actionPoints: actionPoints,
+        lastModified: modificationDate,
+      );
 }

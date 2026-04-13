@@ -32,28 +32,32 @@ class SelectGameSessionPanelViewModel {
   final SelectGameSessionCurrencyRepository _currencyRepository;
 
   final _state = signal<SelectGameSessionState>(
-    const SelectGameSessionState.loading(),
+    const SelectGameSessionState.loaded(
+      games: [],
+      isLoadingGames: true,
+    ),
   );
 
   final entryFee = signal<int>(0);
 
   late final coinBalance = computed(() => _currencyRepository.balance.value);
 
+  final _selectedGameId = signal<Option<String>>(const Option.none());
+
+  final friendsOnly = signal<bool>(false);
+
   Signal<SelectGameSessionState> get state => _state;
+
+  Signal<Option<String>> get selectedGameId => _selectedGameId;
 
   Future<void> load() async {
     _currencyRepository.refreshBalance();
-    _state.value = const SelectGameSessionState.loading();
-    final result = await _repository.loadVisibleGames().run();
+    _state.value = _state.value.copyWith(isLoadingGames: true);
+    _selectedGameId.value = const Option.none();
+    final result = await _repository.loadGames().run();
     _state.value = result.match(
-      (_) => const SelectGameSessionState.loaded(
-        games: [],
-        selectedGameId: Option.none(),
-      ),
-      (games) => SelectGameSessionState.loaded(
-        games: games,
-        selectedGameId: const Option.none(),
-      ),
+      (_) => const SelectGameSessionState.loaded(games: []),
+      (games) => SelectGameSessionState.loaded(games: games),
     );
   }
 
@@ -62,15 +66,14 @@ class SelectGameSessionPanelViewModel {
   }
 
   void selectGame(String gameId) {
-    final current = _state.value;
-    if (current is! SelectGameSessionStateLoaded) return;
-    _state.value = current.copyWith(selectedGameId: Option.of(gameId));
+    _selectedGameId.value = Option.of(gameId);
   }
+
+  void toggleFriendsOnly() => friendsOnly.value = !friendsOnly.value;
 
   Future<void> confirmSelectionSubmit() async {
     final current = _state.value;
-    if (current is! SelectGameSessionStateLoaded) return;
-    if (current.selectedGameId.isNone()) return;
+    if (_selectedGameId.value.isNone()) return;
 
     final fee = entryFee.value;
     final balance = coinBalance.value;
@@ -88,31 +91,35 @@ class SelectGameSessionPanelViewModel {
     final result = await _confirmSelectionUseCase
         .execute(
           ConfirmSelectionCommand(
-            selectedGameId: current.selectedGameId.assumePresent(),
+            selectedGameId: _selectedGameId.value.assumePresent(),
           ),
         )
         .run();
 
-    result.match((failure) {
-      final failedId = current.selectedGameId.assumePresent();
-      _state.value = current.copyWith(
-        isConfirming: false,
-        selectedGameId: const Option.none(),
-        games: current.games.where((g) => g.id != failedId).toList(),
-      );
-      _eventBus.fire(ConfirmSelectionFailed(failure));
-    }, (model) {
-      _state.value = current.copyWith(isConfirming: false);
-      _appTransitionEventBus.fire(
-        SelectGameSessionExitAppEvent.gameSelected(
-          gameId: model.id,
-          gameName: model.name,
-          gameDescription: model.description,
-          gameMode: model.mode,
-          boardSize: model.boardSize,
-          entryFee: fee,
-        ),
-      );
-    });
+    result.match(
+      (failure) {
+        final failedId = _selectedGameId.value.assumePresent();
+        _selectedGameId.value = const Option.none();
+        _state.value = current.copyWith(
+          isConfirming: false,
+          games: current.games.where((g) => g.id != failedId).toList(),
+        );
+        _eventBus.fire(ConfirmSelectionFailed(failure));
+      },
+      (model) {
+        _state.value = _state.value.copyWith(isConfirming: false);
+        _appTransitionEventBus.fire(
+          SelectGameSessionExitAppEvent.gameSelected(
+            gameId: model.id,
+            gameName: model.name,
+            gameDescription: model.description,
+            gameMode: model.mode,
+            boardSize: model.boardSize,
+            entryFee: fee,
+            friendsOnly: friendsOnly.value,
+          ),
+        );
+      },
+    );
   }
 }

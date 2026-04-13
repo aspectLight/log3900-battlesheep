@@ -3,6 +3,8 @@ class UiAssets {
   static const String avatarsPath = 'assets/images/avatars';
 
   static const String background = 'assets/images/background.png';
+  static const String backgroundFrost = 'assets/images/themes/froid_siberie.png';
+  static const String backgroundVillage = 'assets/images/themes/village_abadonne.png';
   static const String snow = 'assets/images/snow.gif';
   static const String loading = 'assets/images/loading.gif';
   static const String logo = 'assets/images/logo.png';

@@ -93,10 +93,10 @@ class _GameBoardWidgetState extends State<GameBoardWidget> {
                             ),
                           ),
                           if (cell.isIlluminated)
-                            Positioned.fill(
+                            const Positioned.fill(
                               child: IgnorePointer(
                                 child: DecoratedBox(
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
                                     gradient: RadialGradient(
                                       radius: 0.95,
                                       colors: [

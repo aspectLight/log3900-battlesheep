@@ -46,6 +46,7 @@ class SelectGameSessionCoordinator
         :final gameMode,
         :final boardSize,
         :final entryFee,
+        :final friendsOnly,
       ):
         final scope = sessionScopeManager.currentScope;
         if (scope == null) return;
@@ -61,6 +62,7 @@ class SelectGameSessionCoordinator
               boardSize: boardSize,
               isCTF: gameMode == GameMode.captureTheFlag,
               entryFee: entryFee,
+              friendsOnly: friendsOnly,
             ),
           );
         }

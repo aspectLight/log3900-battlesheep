@@ -108,4 +108,25 @@ class ProfileLocalizationsFr extends ProfileLocalizations {
 
   @override
   String get profileDeleting => 'Suppression...';
+
+  @override
+  String get profileThemeLabel => 'Thème visuel';
+
+  @override
+  String get profileLanguageLabel => 'Langue';
+
+  @override
+  String get themeNameDefault => 'Principal';
+
+  @override
+  String get themeNameFrost => 'Froid sibérien';
+
+  @override
+  String get themeNameVillage => 'Village abandonné';
+
+  @override
+  String get languageNameFr => 'Français';
+
+  @override
+  String get languageNameEn => 'Anglais';
 }

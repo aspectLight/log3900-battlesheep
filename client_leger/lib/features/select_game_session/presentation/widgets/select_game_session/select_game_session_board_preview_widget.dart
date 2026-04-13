@@ -13,6 +13,45 @@ import '../../../../game_session/presentation/ui_models/components/game_board_ce
 import '../../../../game_session/presentation/ui_models/components/game_board_ui_tile.dart';
 import '../../../../game_session/presentation/ui_models/components/game_board_ui.dart';
 
+class DeferredSelectGameSessionBoardPreview extends StatefulWidget {
+  const DeferredSelectGameSessionBoardPreview({
+    super.key,
+    required this.boardSize,
+    required this.boardMatrix,
+  });
+
+  final int boardSize;
+  final List<List<GameBoardPreviewCell>> boardMatrix;
+
+  @override
+  State<DeferredSelectGameSessionBoardPreview> createState() =>
+      _DeferredSelectGameSessionBoardPreviewState();
+}
+
+class _DeferredSelectGameSessionBoardPreviewState
+    extends State<DeferredSelectGameSessionBoardPreview> {
+  bool _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _ready = true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_ready) {
+      return const ColoredBox(color: Color(0xFF2A2A2A));
+    }
+    return SelectGameSessionBoardPreviewWidget(
+      boardSize: widget.boardSize,
+      boardMatrix: widget.boardMatrix,
+    );
+  }
+}
+
 class SelectGameSessionBoardPreviewWidget extends StatefulWidget {
   const SelectGameSessionBoardPreviewWidget({
     super.key,

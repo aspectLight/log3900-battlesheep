@@ -65,18 +65,33 @@ class GamePlayerStateReducer {
     PlayerSpawnedEvent event,
   ) {
     final players = event.players.map(GamePlayer.fromSpawned).toList();
-    return previous.copyWith(players: players);
+    final playerIds = players.map((p) => p.id).toSet();
+    final prunedDisconnected =
+        previous.disconnectedPlayerIds.where(playerIds.contains).toList();
+    return previous.copyWith(
+      players: players,
+      disconnectedPlayerIds: prunedDisconnected,
+    );
   }
 
   GamePlayerState _reducePlayerAbandoned(
     GamePlayerState previous,
     PlayerAbandonedEvent event,
   ) {
-    if (previous.disconnectedPlayerIds.contains(event.playerId)) {
-      return previous;
-    }
-    final disconnected = [...previous.disconnectedPlayerIds, event.playerId];
-    return previous.copyWith(disconnectedPlayerIds: disconnected);
+    final idx = previous.indexOf(event.playerId);
+    if (idx < 0) return previous;
+    final players = List<GamePlayer>.from(previous.players)..removeAt(idx);
+    final disconnected = [
+      for (final id in previous.disconnectedPlayerIds)
+        if (id != event.playerId) id,
+    ];
+    final wins = Map<String, int>.from(previous.winsByPlayerId)
+      ..remove(event.playerId);
+    return previous.copyWith(
+      players: players,
+      disconnectedPlayerIds: disconnected,
+      winsByPlayerId: wins,
+    );
   }
 
   GamePlayerState _reduceCurrentPlayerChanged(

@@ -16,7 +16,10 @@ class GameDto {
   final String description;
   final String mode;
   final BoardDto board;
-  final bool isVisible;
+  final String privacy;
+  final String owner;
+  @JsonKey(defaultValue: 1)
+  final int actionPoints;
   final String modificationDate;
 
   const GameDto({
@@ -25,7 +28,9 @@ class GameDto {
     required this.description,
     required this.mode,
     required this.board,
-    required this.isVisible,
+    required this.privacy,
+    required this.owner,
+    required this.actionPoints,
     required this.modificationDate,
   });
 

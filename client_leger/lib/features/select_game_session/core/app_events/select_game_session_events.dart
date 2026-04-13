@@ -34,6 +34,6 @@ sealed class SelectGameSessionExitAppEvent
     required GameMode gameMode,
     required int boardSize,
     @Default(0) int entryFee,
+    required bool friendsOnly,
   }) = SelectGameSessionGameSelected;
 }
-

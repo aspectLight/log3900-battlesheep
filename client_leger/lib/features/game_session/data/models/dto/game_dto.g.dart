@@ -12,7 +12,9 @@ GameDto _$GameDtoFromJson(Map<String, dynamic> json) => GameDto(
   description: json['description'] as String,
   mode: json['mode'] as String,
   board: BoardDto.fromJson(json['board'] as Map<String, dynamic>),
-  isVisible: json['isVisible'] as bool,
+  privacy: json['privacy'] as String,
+  owner: json['owner'] as String,
+  actionPoints: (json['actionPoints'] as num?)?.toInt() ?? 1,
   modificationDate: json['modificationDate'] as String,
 );
 
@@ -22,7 +24,9 @@ Map<String, dynamic> _$GameDtoToJson(GameDto instance) => <String, dynamic>{
   'description': instance.description,
   'mode': instance.mode,
   'board': instance.board.toJson(),
-  'isVisible': instance.isVisible,
+  'privacy': instance.privacy,
+  'owner': instance.owner,
+  'actionPoints': instance.actionPoints,
   'modificationDate': instance.modificationDate,
 };
 

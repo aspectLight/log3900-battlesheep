@@ -18,12 +18,14 @@ sealed class CharacterCreationEntryAppEvent
     required int boardSize,
     required bool isCTF,
     @Default(0) int entryFee,
+    @Default(false) bool friendsOnly,
   }) = CharacterCreationHostEntered;
   const factory CharacterCreationEntryAppEvent.joinEntered({
     required String socketId,
     required String roomCode,
     required String hostId,
     required LobbyRoomModel initialRoom,
+    @Default(false) bool isDropIn,
   }) = CharacterCreationJoinEntered;
 }
 

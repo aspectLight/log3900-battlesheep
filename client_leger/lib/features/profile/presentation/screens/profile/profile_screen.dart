@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
-import '../../../../../core/presentation/widgets/app_background/app_background.dart';
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/constants/auth_avatar_assets.dart';
+import '../../../../../core/constants/ui_assets.dart';
 import '../../../../../core/enums/auth_avatar.dart';
-import '../../../core/localisation/profile_localizations.dart';
+import '../../../../../core/presentation/widgets/app_background/app_background.dart';
 import '../../../core/extensions/profile_failure_ext.dart';
+import '../../../core/localisation/profile_localizations.dart';
 import '../../../domain/commands/profile_commands.dart';
 import '../../../domain/models/profile_statistics_model.dart';
 import '../../../domain/state/profile_state.dart';
@@ -53,6 +55,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _usernameController.text = state.profile.username;
       _emailController.text = state.profile.email;
       _viewModel.setSelectedAvatarId(state.profile.avatarId);
+      _viewModel.syncPreferencesFromProfile(state.profile);
     }
   }
 
@@ -104,6 +107,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     final isSaving = _viewModel.isSaving.value;
                     final isDeleting = _viewModel.isDeleting.value;
                     final selectedAvatarId = _viewModel.selectedAvatarId.value;
+                    _viewModel.selectedThemeId.value;
+                    _viewModel.selectedLanguage.value;
                     if (state is ProfileStateLoading) {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,15 +169,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               isSaving,
                               isDeleting,
                               selectedAvatarId,
+                              _viewModel.selectedThemeId.value,
+                              _viewModel.selectedLanguage.value,
                             ),
                           ],
                         ),
                       _ => Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildHeader(l10n),
-                          ],
-                        ),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [_buildHeader(l10n)],
+                      ),
                     };
                   }),
                 ),
@@ -196,7 +201,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const Icon(Icons.chevron_left, color: Colors.white, size: 22),
               const SizedBox(width: 4),
               Text(
-              l10n.profileBack,
+                l10n.profileBack,
                 style: const TextStyle(
                   color: Colors.white,
                   fontFamily: 'CustomFont',
@@ -248,6 +253,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     bool isSaving,
     bool isDeleting,
     String selectedAvatarId,
+    String selectedThemeId,
+    String selectedLanguage,
   ) {
     return IntrinsicHeight(
       child: Row(
@@ -263,7 +270,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(width: 32),
           Expanded(
-            child: _buildStatsColumn(l10n, statistics),
+            child: _buildStatsColumn(
+              l10n,
+              statistics,
+              selectedThemeId,
+              selectedLanguage,
+            ),
           ),
         ],
       ),
@@ -302,6 +314,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: 8),
         _buildAvatarGrid(selectedAvatarId),
+        const SizedBox(height: 20),
         const SizedBox(height: 24),
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -309,15 +322,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ElevatedButton(
               onPressed: (isSaving || isDeleting) ? null : _handleSave,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF550000),
-                foregroundColor: const Color(0xFFF5E6E6),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(
                   vertical: 12,
                   horizontal: 24,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5),
-                  side: const BorderSide(color: Color(0xFF7F1F1F), width: 2),
+                  side: BorderSide(
+                    color: context.interactionColors.outline,
+                    width: 2,
+                  ),
                 ),
               ),
               child: Text(
@@ -332,15 +348,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ElevatedButton(
               onPressed: (isSaving || isDeleting) ? null : _handleDelete,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF8B0000),
-                foregroundColor: const Color(0xFFF5E6E6),
+                backgroundColor: context.interactionColors.danger,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(
                   vertical: 12,
                   horizontal: 24,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5),
-                  side: const BorderSide(color: Color(0xFFDC3545), width: 2),
+                  side: BorderSide(
+                    color: context.interactionColors.dangerBorder,
+                    width: 2,
+                  ),
                 ),
               ),
               child: Text(
@@ -357,13 +376,168 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _buildThemeSelector(
+    String selectedThemeId,
+    ProfileLocalizations l10n,
+  ) {
+    final themes = [
+      ('default', l10n.themeNameDefault, UiAssets.background),
+      ('frost', l10n.themeNameFrost, UiAssets.backgroundFrost),
+      ('village', l10n.themeNameVillage, UiAssets.backgroundVillage),
+    ];
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildThemeCard(themes[0], selectedThemeId),
+            const SizedBox(width: 10),
+            _buildThemeCard(themes[1], selectedThemeId),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [_buildThemeCard(themes[2], selectedThemeId)],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildThemeCard((String, String, String) t, String selectedThemeId) {
+    final isSelected = selectedThemeId == t.$1;
+    return GestureDetector(
+      onTap: () {
+        _viewModel.setSelectedThemeId(t.$1);
+        unawaited(_savePreferences(themeId: t.$1));
+      },
+      child: Container(
+        width: 100,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected
+                ? context.interactionColors.outline
+                : const Color(0xFF444444),
+            width: isSelected ? 2 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.5),
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                  ),
+                ]
+              : null,
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(7),
+          child: Stack(
+            children: [
+              Image.asset(t.$3, width: 100, height: 70, fit: BoxFit.cover),
+              if (isSelected)
+                Positioned(
+                  top: 4,
+                  right: 4,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: context.interactionColors.outline,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.check,
+                      color: Colors.white,
+                      size: 12,
+                    ),
+                  ),
+                ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  color: const Color(0xAA000000),
+                  child: Text(
+                    t.$2,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontFamily: 'CustomFont',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageSelector(String selectedLanguage) {
+    final languages = [('fr', 'French'), ('en', 'English')];
+    return Row(
+      children: languages.map((l) {
+        final isSelected = selectedLanguage == l.$1;
+        return Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: GestureDetector(
+              onTap: () {
+                _viewModel.setSelectedLanguage(l.$1);
+                unawaited(_savePreferences(language: l.$1));
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? context.interactionColors.primary
+                      : const Color(0xFF2B2B2B),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: isSelected
+                        ? context.interactionColors.outline
+                        : const Color(0xFF444444),
+                    width: isSelected ? 2 : 1,
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    l.$2,
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : Colors.grey,
+                      fontFamily: 'CustomFont',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
   Widget _buildAvatarGrid(String selectedAvatarId) {
+    final scheme = Theme.of(context).colorScheme;
+    final outline = context.interactionColors.outline;
     const avatars = AuthAvatar.values;
     const crossAxisCount = 4;
     final rows = <Widget>[];
     for (var i = 0; i < avatars.length; i += crossAxisCount) {
-      final rowAvatars =
-          avatars.skip(i).take(crossAxisCount).toList();
+      final rowAvatars = avatars.skip(i).take(crossAxisCount).toList();
       rows.add(
         Row(
           children: rowAvatars.map((AuthAvatar avatar) {
@@ -379,18 +553,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2B2B2B),
+                        color: scheme.surface,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: isSelected
-                              ? const Color(0xFF7F1F1F)
-                              : const Color(0xFF444444),
+                          color: isSelected ? outline : const Color(0xFF444444),
                           width: 2,
                         ),
                         boxShadow: isSelected
-                            ? const [
+                            ? [
                                 BoxShadow(
-                                  color: Color.fromRGBO(227, 75, 75, 0.7),
+                                  color: scheme.primary.withValues(alpha: 0.65),
                                   blurRadius: 8,
                                   spreadRadius: 2,
                                 ),
@@ -419,15 +591,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildStatsColumn(
     ProfileLocalizations l10n,
     ProfileStatisticsModel stats,
+    String selectedThemeId,
+    String selectedLanguage,
   ) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: const Color.fromRGBO(255, 255, 255, 0.1),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: const Color.fromRGBO(255, 255, 255, 0.2),
-        ),
+        border: Border.all(color: const Color.fromRGBO(255, 255, 255, 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -462,23 +634,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
             label: l10n.profileAverageTime,
             value: '${stats.averagePlaytimePerGame}s',
           ),
+          const SizedBox(height: 8),
+          Text(
+            l10n.profileThemeLabel,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'CustomFont',
+            ),
+          ),
+          _buildThemeSelector(selectedThemeId, l10n),
+          const SizedBox(height: 16),
+          Text(
+            l10n.profileLanguageLabel,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'CustomFont',
+            ),
+          ),
+          const SizedBox(height: 8),
+          _buildLanguageSelector(selectedLanguage),
         ],
       ),
     );
   }
 
-  Widget _buildStatCard({
-    required String label,
-    required String value,
-  }) {
+  Widget _buildStatCard({required String label, required String value}) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: const Color.fromRGBO(255, 255, 255, 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: const Color.fromRGBO(255, 255, 255, 0.2),
-        ),
+        border: Border.all(color: const Color.fromRGBO(255, 255, 255, 0.2)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -615,6 +805,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
       (_) {},
     );
   }
+
+  Future<void> _savePreferences({String? themeId, String? language}) async {
+    final state = _viewModel.state.value;
+    if (state is! ProfileStateLoaded) return;
+    await _viewModel.submitUpdate(
+      UpdateProfileCommand(
+        theme: themeId ?? _viewModel.selectedThemeId.value,
+        language: language ?? _viewModel.selectedLanguage.value,
+      ),
+    );
+  }
 }
 
 class _ProfileTextField extends StatefulWidget {
@@ -656,6 +857,8 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
   @override
   Widget build(BuildContext context) {
     final bool isFocused = _focusNode.hasFocus;
+    final scheme = Theme.of(context).colorScheme;
+    final interaction = context.interactionColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -663,7 +866,7 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
           Text(
             widget.label,
             style: const TextStyle(
-              color: Color(0xFFF5E6E6),
+              color: Colors.white,
               fontSize: 20,
               fontFamily: 'CustomFont',
               fontWeight: FontWeight.bold,
@@ -676,12 +879,12 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
             Container(
               height: 44,
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A),
+                color: scheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(
                   color: isFocused
-                      ? const Color(0xFFC60D0D)
-                      : const Color(0xFF333333),
+                      ? interaction.focus
+                      : interaction.outline.withValues(alpha: 0.45),
                   width: 1.5,
                 ),
               ),
@@ -696,7 +899,7 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          const Color(0xFFDC3545).withValues(alpha: 0.3),
+                          interaction.dangerBorder.withValues(alpha: 0.28),
                           Colors.transparent,
                         ],
                         stops: const [0.0, 0.5],
@@ -709,12 +912,12 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
               controller: widget.controller,
               focusNode: _focusNode,
               keyboardType: widget.keyboardType,
-              style: const TextStyle(
-                color: Color(0xFFF5E6E6),
+              style: TextStyle(
+                color: scheme.onSurface,
                 fontFamily: 'CustomFont',
                 fontSize: 18,
               ),
-              cursorColor: const Color(0xFFF5E6E6),
+              cursorColor: scheme.primary,
               decoration: const InputDecoration(
                 filled: true,
                 fillColor: Colors.transparent,
@@ -730,4 +933,3 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
     );
   }
 }
-

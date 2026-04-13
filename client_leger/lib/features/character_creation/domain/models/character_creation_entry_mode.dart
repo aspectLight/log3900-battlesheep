@@ -12,6 +12,7 @@ class CharacterCreationHostEntryMode extends CharacterCreationEntryMode {
     required this.boardSize,
     required this.isCTF,
     this.entryFee = 0,
+    this.friendsOnly = false,
   });
 
   final String gameId;
@@ -20,14 +21,17 @@ class CharacterCreationHostEntryMode extends CharacterCreationEntryMode {
   final int boardSize;
   final bool isCTF;
   final int entryFee;
+  final bool friendsOnly;
 }
 
 class CharacterCreationJoinEntryMode extends CharacterCreationEntryMode {
   const CharacterCreationJoinEntryMode({
     required this.hostId,
     required this.initialRoom,
+    this.isDropIn = false,
   });
 
   final String hostId;
   final LobbyRoomModel initialRoom;
+  final bool isDropIn;
 }

@@ -9,11 +9,13 @@ class CreateWaitingRoomPayloadDto {
   final String roomId;
   final String gameId;
   final WaitingRoomPlayerDto host;
+  final bool friendsOnly;
 
   const CreateWaitingRoomPayloadDto({
     required this.roomId,
     required this.gameId,
     required this.host,
+    this.friendsOnly = false,
   });
 
   factory CreateWaitingRoomPayloadDto.fromJson(Map<String, dynamic> json) =>

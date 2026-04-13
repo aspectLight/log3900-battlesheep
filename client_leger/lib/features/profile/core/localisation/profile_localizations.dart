@@ -286,6 +286,20 @@ abstract class ProfileLocalizations {
   /// In en, this message translates to:
   /// **'Deleting...'**
   String get profileDeleting;
+
+  String get profileThemeLabel;
+
+  String get profileLanguageLabel;
+
+  String get themeNameDefault;
+
+  String get themeNameFrost;
+
+  String get themeNameVillage;
+
+  String get languageNameFr;
+
+  String get languageNameEn;
 }
 
 class _ProfileLocalizationsDelegate

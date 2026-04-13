@@ -36,6 +36,9 @@ SpawnedPlayerDto _$SpawnedPlayerDtoFromJson(
   spawnPoint: GameBoardPositionDto.fromJson(
     json['spawnPoint'] as Map<String, dynamic>,
   ),
+  boardPosition: json['position'] == null
+      ? null
+      : GameBoardPositionDto.fromJson(json['position'] as Map<String, dynamic>),
   inventory: (json['inventory'] as List<dynamic>)
       .map((e) => GameItemDto.fromJson(e as Map<String, dynamic>))
       .toList(),
@@ -59,6 +62,7 @@ Map<String, dynamic> _$SpawnedPlayerDtoToJson(SpawnedPlayerDto instance) =>
       'movementPoints': instance.movementPoints,
       'actionPoints': instance.actionPoints,
       'spawnPoint': instance.spawnPoint.toJson(),
+      'position': instance.boardPosition?.toJson(),
       'inventory': instance.inventory.map((e) => e.toJson()).toList(),
       'stats': const StatTypeMapConverter().toJson(instance.stats),
       'd6Choice': const StatTypeConverter().toJson(instance.diceChoice),

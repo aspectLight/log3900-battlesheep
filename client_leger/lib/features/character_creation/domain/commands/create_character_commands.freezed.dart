@@ -552,6 +552,7 @@ mixin _$CreateWaitingRoomCommand {
   String get gameId => throw _privateConstructorUsedError;
   CreateCharacterPlayerData get host => throw _privateConstructorUsedError;
   int get entryFee => throw _privateConstructorUsedError;
+  bool get friendsOnly => throw _privateConstructorUsedError;
 
   /// Create a copy of CreateWaitingRoomCommand
   /// with the given fields replaced by the non-null parameter values.
@@ -572,6 +573,7 @@ abstract class $CreateWaitingRoomCommandCopyWith<$Res> {
     String gameId,
     CreateCharacterPlayerData host,
     int entryFee,
+    bool friendsOnly,
   });
 
   $CreateCharacterPlayerDataCopyWith<$Res> get host;
@@ -599,6 +601,7 @@ class _$CreateWaitingRoomCommandCopyWithImpl<
     Object? gameId = null,
     Object? host = null,
     Object? entryFee = null,
+    Object? friendsOnly = null,
   }) {
     return _then(
       _value.copyWith(
@@ -618,6 +621,10 @@ class _$CreateWaitingRoomCommandCopyWithImpl<
                 ? _value.entryFee
                 : entryFee // ignore: cast_nullable_to_non_nullable
                       as int,
+            friendsOnly: null == friendsOnly
+                ? _value.friendsOnly
+                : friendsOnly // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -648,6 +655,7 @@ abstract class _$$CreateWaitingRoomCommandImplCopyWith<$Res>
     String gameId,
     CreateCharacterPlayerData host,
     int entryFee,
+    bool friendsOnly,
   });
 
   @override
@@ -676,6 +684,7 @@ class __$$CreateWaitingRoomCommandImplCopyWithImpl<$Res>
     Object? gameId = null,
     Object? host = null,
     Object? entryFee = null,
+    Object? friendsOnly = null,
   }) {
     return _then(
       _$CreateWaitingRoomCommandImpl(
@@ -695,6 +704,10 @@ class __$$CreateWaitingRoomCommandImplCopyWithImpl<$Res>
             ? _value.entryFee
             : entryFee // ignore: cast_nullable_to_non_nullable
                   as int,
+        friendsOnly: null == friendsOnly
+            ? _value.friendsOnly
+            : friendsOnly // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -708,6 +721,7 @@ class _$CreateWaitingRoomCommandImpl implements _CreateWaitingRoomCommand {
     required this.gameId,
     required this.host,
     this.entryFee = 0,
+    this.friendsOnly = false,
   });
 
   @override
@@ -719,10 +733,13 @@ class _$CreateWaitingRoomCommandImpl implements _CreateWaitingRoomCommand {
   @override
   @JsonKey()
   final int entryFee;
+  @override
+  @JsonKey()
+  final bool friendsOnly;
 
   @override
   String toString() {
-    return 'CreateWaitingRoomCommand(roomCode: $roomCode, gameId: $gameId, host: $host, entryFee: $entryFee)';
+    return 'CreateWaitingRoomCommand(roomCode: $roomCode, gameId: $gameId, host: $host, entryFee: $entryFee, friendsOnly: $friendsOnly)';
   }
 
   @override
@@ -735,12 +752,14 @@ class _$CreateWaitingRoomCommandImpl implements _CreateWaitingRoomCommand {
             (identical(other.gameId, gameId) || other.gameId == gameId) &&
             (identical(other.host, host) || other.host == host) &&
             (identical(other.entryFee, entryFee) ||
-                other.entryFee == entryFee));
+                other.entryFee == entryFee) &&
+            (identical(other.friendsOnly, friendsOnly) ||
+                other.friendsOnly == friendsOnly));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, roomCode, gameId, host, entryFee);
+      Object.hash(runtimeType, roomCode, gameId, host, entryFee, friendsOnly);
 
   /// Create a copy of CreateWaitingRoomCommand
   /// with the given fields replaced by the non-null parameter values.
@@ -760,6 +779,7 @@ abstract class _CreateWaitingRoomCommand implements CreateWaitingRoomCommand {
     required final String gameId,
     required final CreateCharacterPlayerData host,
     final int entryFee,
+    final bool friendsOnly,
   }) = _$CreateWaitingRoomCommandImpl;
 
   @override
@@ -770,6 +790,8 @@ abstract class _CreateWaitingRoomCommand implements CreateWaitingRoomCommand {
   CreateCharacterPlayerData get host;
   @override
   int get entryFee;
+  @override
+  bool get friendsOnly;
 
   /// Create a copy of CreateWaitingRoomCommand
   /// with the given fields replaced by the non-null parameter values.

@@ -1,5 +1,162 @@
-.filter {
-    display: none;
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    background-color: var(--theme-bg-card-hover);
+    border: 1px solid var(--theme-border-tertiary);
+    border-bottom: 2px solid var(--theme-bg-card);
+    border-radius: 8px 8px 0 0;
+    padding: 14px 20px;
+}
+
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 200px;
+
+    .search-icon {
+        position: absolute;
+        left: 12px;
+        color: var(--theme-text-special);
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 9px 36px 9px 36px;
+        background-color: var(--theme-bg-overlay-medium, var(--theme-bg-card));
+        border: 1px solid var(--theme-border-tertiary);
+        border-radius: 8px;
+        color: var(--theme-text-primary);
+        font-family: inherit;
+        font-size: 14px;
+        outline: none;
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+        box-sizing: border-box;
+
+        &::placeholder {
+            color: var(--theme-text-placeholder, var(--theme-text-special));
+            opacity: 0.6;
+        }
+
+        &:focus {
+            border-color: var(--theme-border-button);
+            box-shadow: none;
+        }
+    }
+
+    .clear-search {
+        position: absolute;
+        right: 8px;
+        background: none;
+        border: none;
+        color: var(--theme-text-special);
+        font-size: 11px;
+        cursor: pointer;
+        opacity: 0.6;
+        padding: 4px;
+        border-radius: 4px;
+        line-height: 1;
+        transition: opacity 0.15s ease;
+
+        &:hover {
+            opacity: 1;
+            transform: none;
+        }
+    }
+}
+
+.filter-chips {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.chip-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--theme-bg-card);
+    border: 1px solid var(--theme-border-tertiary);
+    border-radius: 20px;
+    padding: 8px 14px;
+    transition: border-color 0.2s ease;
+    white-space: nowrap;
+
+    svg {
+        color: var(--theme-text-special);
+        opacity: 0.8;
+        flex-shrink: 0;
+    }
+
+    select {
+        appearance: none;
+        background: none;
+        border: none;
+        color: var(--theme-text-primary);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1;
+        cursor: pointer;
+        outline: none;
+        padding: 2px 0 0 0;
+        letter-spacing: 0.3px;
+        width: auto;
+        max-width: 130px;
+
+        &:focus {
+            border: none;
+            box-shadow: none;
+        }
+
+        option {
+            background-color: var(--theme-bg-card);
+            color: var(--theme-text-primary);
+        }
+    }
+
+    &:has(select:focus) {
+        border-color: var(--theme-border-button);
+    }
+}
+
+.reset-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    background-color: transparent;
+    color: var(--theme-text-special);
+    border: 1px solid var(--theme-border-button);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+
+    svg {
+        opacity: 0.8;
+    }
+
+    &:hover {
+        background-color: var(--theme-bg-button);
+        color: var(--theme-text-special-alt);
+        transform: none;
+    }
+
+    &:active {
+        transform: scale(0.97);
+    }
 }
 
 .game-list {
@@ -59,6 +216,11 @@ li.header {
     padding: 15px;
     text-transform: uppercase;
     border-radius: 8px 8px 0 0;
+}
+
+.game-list.has-toolbar li.header {
+    border-radius: 0;
+    border-top: none;
 }
 
 li.add-board {
@@ -182,6 +344,10 @@ app-board {
 
 .games {
     width: 100%;
+}
+
+.games li:first-child {
+    border-radius: 0;
 }
 
 .no-games-message {

@@ -52,7 +52,9 @@ class CharacterCreationCoordinator
   Future<CharacterCreationData?> onEntryImpl(
     CharacterCreationEntryAppEvent event,
   ) async {
-    appTransitionEventBus.fire(const CharacterCreationCompletedAppEvent.ready());
+    appTransitionEventBus.fire(
+      const CharacterCreationCompletedAppEvent.ready(),
+    );
     final (socketId, roomCode, entryMode) = switch (event) {
       CharacterCreationHostEntered(
         :final socketId,
@@ -63,6 +65,7 @@ class CharacterCreationCoordinator
         :final boardSize,
         :final isCTF,
         :final entryFee,
+        :final friendsOnly,
       ) => (
         socketId,
         roomCode,
@@ -73,6 +76,7 @@ class CharacterCreationCoordinator
           boardSize: boardSize,
           isCTF: isCTF,
           entryFee: entryFee,
+          friendsOnly: friendsOnly,
         ),
       ),
       CharacterCreationJoinEntered(
@@ -80,12 +84,14 @@ class CharacterCreationCoordinator
         :final roomCode,
         :final hostId,
         :final initialRoom,
+        :final isDropIn,
       ) => (
         socketId,
         roomCode,
         CharacterCreationJoinEntryMode(
           hostId: hostId,
           initialRoom: initialRoom,
+          isDropIn: isDropIn,
         ),
       ),
     };
@@ -137,7 +143,13 @@ class CharacterCreationCoordinator
 
   void _onExitToWaitingRoom(String roomCode, CharacterCreationData data) {
     switch (data.entryMode) {
-      case CharacterCreationHostEntryMode(:final boardSize, :final isCTF, :final gameName, :final gameDescription):
+      case CharacterCreationHostEntryMode(
+        :final boardSize,
+        :final isCTF,
+        :final gameName,
+        :final gameDescription,
+        :final friendsOnly,
+      ):
         appTransitionEventBus.fire(
           WaitingRoomEntryAppEvent.enteredAsHost(
             roomId: roomCode,
@@ -147,6 +159,7 @@ class CharacterCreationCoordinator
             gameDescription: gameDescription,
             boardSize: boardSize,
             isCTF: isCTF,
+            friendsOnly: friendsOnly,
           ),
         );
       case CharacterCreationJoinEntryMode(:final hostId, :final initialRoom):

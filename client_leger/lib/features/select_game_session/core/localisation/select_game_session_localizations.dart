@@ -196,6 +196,8 @@ abstract class SelectGameSessionLocalizations {
   /// In en, this message translates to:
   /// **'You do not have enough coins to set this entry fee. Lower the fee or earn coins in the shop.'**
   String get createGameInsufficientFundsMessage;
+
+  String get noGames;
 }
 
 class _SelectGameSessionLocalizationsDelegate

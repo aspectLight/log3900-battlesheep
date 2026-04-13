@@ -57,4 +57,7 @@ class SelectGameSessionLocalizationsEn extends SelectGameSessionLocalizations {
   @override
   String get createGameInsufficientFundsMessage =>
       'You do not have enough coins to set this entry fee. Lower the fee or earn coins in the shop.';
+
+  @override
+  String get noGames => 'No games available.';
 }

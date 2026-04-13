@@ -97,6 +97,7 @@ flutter:
         - assets/images/characters/yellow/
         - assets/images/ui/
         - assets/images/shop_avatars/
+        - assets/images/themes/
         - assets/images/stats/
 
     # An image asset can refer to one or more resolution-specific "variants", see

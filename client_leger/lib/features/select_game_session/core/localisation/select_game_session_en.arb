@@ -15,5 +15,6 @@
   "createGameEntryFeeHint": "0 = free",
   "createGameBalanceLabel": "Your balance",
   "createGameInsufficientFundsTitle": "Insufficient balance",
-  "createGameInsufficientFundsMessage": "You do not have enough coins to set this entry fee. Lower the fee or earn coins in the shop."
+  "createGameInsufficientFundsMessage": "You do not have enough coins to set this entry fee. Lower the fee or earn coins in the shop.",
+  "noGames": "No games available."
 }

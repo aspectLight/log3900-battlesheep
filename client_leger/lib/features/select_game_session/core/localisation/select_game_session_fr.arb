@@ -15,5 +15,6 @@
   "createGameEntryFeeHint": "0 = gratuit",
   "createGameBalanceLabel": "Votre solde",
   "createGameInsufficientFundsTitle": "Solde insuffisant",
-  "createGameInsufficientFundsMessage": "Vous n'avez pas assez de pièces pour ce montant. Réduisez les frais ou gagnez des pièces à la boutique."
+  "createGameInsufficientFundsMessage": "Vous n'avez pas assez de pièces pour ce montant. Réduisez les frais ou gagnez des pièces à la boutique.",
+  "noGames": "Aucun jeu disponible."
 }

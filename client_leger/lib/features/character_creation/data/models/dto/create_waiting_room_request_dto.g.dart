@@ -13,6 +13,7 @@ CreateWaitingRoomRequestDto _$CreateWaitingRoomRequestDtoFromJson(
   gameId: json['gameId'] as String,
   host: PlayerPayloadDto.fromJson(json['host'] as Map<String, dynamic>),
   entryFee: (json['entryFee'] as num?)?.toInt() ?? 0,
+  friendsOnly: json['friendsOnly'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$CreateWaitingRoomRequestDtoToJson(
@@ -22,4 +23,5 @@ Map<String, dynamic> _$CreateWaitingRoomRequestDtoToJson(
   'gameId': instance.gameId,
   'host': instance.host.toJson(),
   'entryFee': instance.entryFee,
+  'friendsOnly': instance.friendsOnly,
 };

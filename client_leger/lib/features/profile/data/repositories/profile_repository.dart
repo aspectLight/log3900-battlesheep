@@ -32,6 +32,8 @@ class ProfileRepository {
           username: profileDto.username,
           email: profileDto.email,
           avatarId: profileDto.avatarId,
+          theme: profileDto.theme,
+          language: profileDto.language,
         );
         final statistics = ProfileStatisticsModel(
           classicGamesPlayed: statsDto.classicGamesPlayed,
@@ -68,10 +70,21 @@ class ProfileRepository {
           email: command.email != current.email ? command.email : null,
           avatarId:
               command.avatarId != current.avatarId ? command.avatarId : null,
+          theme: command.theme != null && command.theme != current.theme
+              ? command.theme
+              : null,
+          language: command.language != null &&
+                  command.language != current.language
+              ? command.language
+              : null,
+          preferences: command.preferences,
         );
         final hasChange = dto.username != null ||
             dto.email != null ||
-            dto.avatarId != null;
+            dto.avatarId != null ||
+            dto.theme != null ||
+            dto.language != null ||
+            dto.preferences != null;
         if (!hasChange) {
           throw const NoChangesProfileFailure();
         }
@@ -82,6 +95,8 @@ class ProfileRepository {
           username: updatedDto.username,
           email: updatedDto.email,
           avatarId: updatedDto.avatarId,
+          theme: updatedDto.theme,
+          language: updatedDto.language,
         );
         final loaded = state.value;
         if (loaded is ProfileStateLoaded) {

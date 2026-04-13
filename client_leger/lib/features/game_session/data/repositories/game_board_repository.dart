@@ -59,6 +59,26 @@ class GameBoardRepository {
     state.value = _reducer.reduce(state.value, event);
   }
 
+  void replaceBoardAndItems({
+    required Board board,
+    required Map<GameBoardPosition, GameItem> items,
+  }) {
+    state.value = GameBoardState.scopedInitial(
+      board: board,
+      items: items,
+    );
+  }
+
+  void removePlayerFromBoard(String playerId) {
+    final current = state.value;
+    final positions = Map<String, GameBoardPosition>.from(
+      current.playerPositions,
+    );
+    if (!positions.containsKey(playerId)) return;
+    positions.remove(playerId);
+    state.value = current.copyWith(playerPositions: positions);
+  }
+
   void setReachableCells(Set<GameBoardPosition> cells) {
     state.value = state.value.copyWith(reachableCellCoords: cells);
   }

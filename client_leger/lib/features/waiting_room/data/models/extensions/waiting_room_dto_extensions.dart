@@ -8,5 +8,6 @@ extension WaitingRoomDtoToModel on WaitingRoomDto {
         hostId: hostId,
         players: players.map((p) => p.toModel()).toList(),
         isLocked: isLocked,
+        dropInDropOut: dropInDropOut,
       );
 }

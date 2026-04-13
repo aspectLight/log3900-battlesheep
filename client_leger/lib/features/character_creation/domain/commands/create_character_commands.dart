@@ -36,5 +36,6 @@ class CreateWaitingRoomCommand with _$CreateWaitingRoomCommand {
     required String gameId,
     required CreateCharacterPlayerData host,
     @Default(0) int entryFee,
+    @Default(false) bool friendsOnly,
   }) = _CreateWaitingRoomCommand;
 }

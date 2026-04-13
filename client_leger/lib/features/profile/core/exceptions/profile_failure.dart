@@ -47,6 +47,5 @@ class NoChangesProfileFailure extends ProfileFailure {
 }
 
 class UnknownProfileFailure extends ProfileFailure {
-  const UnknownProfileFailure([String devMessage = 'Unknown profile error'])
-      : super(devMessage);
+  const UnknownProfileFailure([super.devMessage = 'Unknown profile error']);
 }

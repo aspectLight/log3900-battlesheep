@@ -6,12 +6,13 @@ import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ShopItem } from '@common/shop.constants';
 import { VirtualCurrencyService } from '@app/services/currency/virtual-currency.service';
 import { ProfileService } from '@app/services/communication/profile.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-shop-page',
     templateUrl: './shop-page.component.html',
     styleUrl: './shop-page.component.scss',
-    imports: [CommonModule, RouterLink, ProfileMenuComponent, PopUpComponent],
+    imports: [CommonModule, RouterLink, ProfileMenuComponent, PopUpComponent, TranslateModule],
 })
 export class ShopPageComponent implements OnInit {
     purchaseSuccess: string = '';
@@ -21,6 +22,7 @@ export class ShopPageComponent implements OnInit {
     constructor(
         public currencyService: VirtualCurrencyService,
         private profileService: ProfileService,
+        private translate: TranslateService,
     ) {}
 
     async ngOnInit(): Promise<void> {
@@ -46,6 +48,12 @@ export class ShopPageComponent implements OnInit {
         return this.currencyService.catalogue.filter((i) => i.type === 'character');
     }
 
+    getItemDisplayName(item: ShopItem): string {
+        const key = `shop.items.${item.id}`;
+        const translated = this.translate.instant(key);
+        return translated !== key ? translated : item.name;
+    }
+
     requestPurchase(item: ShopItem): void {
         if (this.currencyService.hasPurchased(item.id)) return;
         if (this.currencyService.balance < item.price) {
@@ -53,7 +61,7 @@ export class ShopPageComponent implements OnInit {
             return;
         }
         this.currencyService.purchaseItem(item.id);
-        this.purchaseSuccess = 'Achat effectué !';
+        this.purchaseSuccess = this.translate.instant('shop.success.purchase');
         setTimeout(() => { this.purchaseSuccess = ''; }, 3000);
     }
 
@@ -76,7 +84,7 @@ export class ShopPageComponent implements OnInit {
             delete updated[key];
             this.activePreferences = updated;
         }
-        this.purchaseSuccess = newValue ? 'Cosmétique équipé !' : 'Cosmétique déséquipé.';
+        this.purchaseSuccess = newValue ? this.translate.instant('shop.success.equipped') : this.translate.instant('shop.success.unequipped');
         setTimeout(() => { this.purchaseSuccess = ''; }, 3000);
     }
 }

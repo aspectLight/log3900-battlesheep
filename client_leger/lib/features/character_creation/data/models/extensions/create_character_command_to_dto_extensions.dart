@@ -15,5 +15,6 @@ extension CreateWaitingRoomCommandToDto on CreateWaitingRoomCommand {
         gameId: gameId,
         host: host.toDto(),
         entryFee: entryFee,
+        friendsOnly: friendsOnly,
       );
 }

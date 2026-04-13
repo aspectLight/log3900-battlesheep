@@ -9,7 +9,6 @@ import { authGuard } from '@app/guards/auth.gard';
 import { AdminGamePageComponent } from '@app/pages/admin-game-page/admin-game-page.component';
 import { AppComponent } from '@app/pages/app/app.component';
 import { AuthLandingPageComponent } from '@app/pages/auth-landing/auth-landing.component';
-import { ChannelsPageComponent } from '@app/pages/channels-page/channels-page.component';
 import { ConfigureGamePageComponent } from '@app/pages/configure-game-page/configure-game-page.component';
 import { CreateGamePageComponent } from '@app/pages/create-game-page/create-game-page.component';
 import { CreatePlayerPageComponent } from '@app/pages/create-player-page/create-player-page.component';
@@ -56,7 +55,6 @@ const routes: Routes = [
     { path: 'logs-history', component: LogsHistoryComponent, canActivate: [authGuard] },
     { path: 'games-history', component: GamesHistoryComponent, canActivate: [authGuard] },
     { path: 'profile', component: ProfilePageComponent, canActivate: [authGuard] },
-    { path: 'channels', component: ChannelsPageComponent, canActivate: [authGuard] },
     { path: 'friends', component: FriendsPageComponent, canActivate: [authGuard] },
     { path: 'shop', component: ShopPageComponent, canActivate: [authGuard] },
     { path: '**', redirectTo: '/home' },

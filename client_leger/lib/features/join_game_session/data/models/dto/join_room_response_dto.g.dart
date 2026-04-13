@@ -71,6 +71,7 @@ JoinRoomDto _$JoinRoomDtoFromJson(Map<String, dynamic> json) => JoinRoomDto(
       .map((e) => JoinRoomPlayerDto.fromJson(e as Map<String, dynamic>))
       .toList(),
   isLocked: json['isLocked'] as bool,
+  dropInDropOut: json['dropInDropOut'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$JoinRoomDtoToJson(JoinRoomDto instance) =>
@@ -79,6 +80,7 @@ Map<String, dynamic> _$JoinRoomDtoToJson(JoinRoomDto instance) =>
       'hostId': instance.hostId,
       'players': instance.players.map((e) => e.toJson()).toList(),
       'isLocked': instance.isLocked,
+      'dropInDropOut': instance.dropInDropOut,
     };
 
 JoinRoomResponseDto _$JoinRoomResponseDtoFromJson(Map<String, dynamic> json) =>

@@ -40,6 +40,7 @@ class JoinGameSessionCoordinator
             roomCode: result.roomCode,
             hostId: result.hostId,
             initialRoom: result.initialRoom,
+            isDropIn: result.isDropIn,
           ),
         );
     }

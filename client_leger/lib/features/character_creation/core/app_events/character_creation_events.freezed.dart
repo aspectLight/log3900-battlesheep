@@ -30,6 +30,7 @@ mixin _$CharacterCreationEntryAppEvent {
       int boardSize,
       bool isCTF,
       int entryFee,
+      bool friendsOnly,
     )
     hostEntered,
     required TResult Function(
@@ -37,6 +38,7 @@ mixin _$CharacterCreationEntryAppEvent {
       String roomCode,
       String hostId,
       LobbyRoomModel initialRoom,
+      bool isDropIn,
     )
     joinEntered,
   }) => throw _privateConstructorUsedError;
@@ -51,6 +53,7 @@ mixin _$CharacterCreationEntryAppEvent {
       int boardSize,
       bool isCTF,
       int entryFee,
+      bool friendsOnly,
     )?
     hostEntered,
     TResult? Function(
@@ -58,6 +61,7 @@ mixin _$CharacterCreationEntryAppEvent {
       String roomCode,
       String hostId,
       LobbyRoomModel initialRoom,
+      bool isDropIn,
     )?
     joinEntered,
   }) => throw _privateConstructorUsedError;
@@ -72,6 +76,7 @@ mixin _$CharacterCreationEntryAppEvent {
       int boardSize,
       bool isCTF,
       int entryFee,
+      bool friendsOnly,
     )?
     hostEntered,
     TResult Function(
@@ -79,6 +84,7 @@ mixin _$CharacterCreationEntryAppEvent {
       String roomCode,
       String hostId,
       LobbyRoomModel initialRoom,
+      bool isDropIn,
     )?
     joinEntered,
     required TResult orElse(),
@@ -173,6 +179,7 @@ abstract class _$$CharacterCreationHostEnteredImplCopyWith<$Res>
     int boardSize,
     bool isCTF,
     int entryFee,
+    bool friendsOnly,
   });
 }
 
@@ -202,6 +209,7 @@ class __$$CharacterCreationHostEnteredImplCopyWithImpl<$Res>
     Object? boardSize = null,
     Object? isCTF = null,
     Object? entryFee = null,
+    Object? friendsOnly = null,
   }) {
     return _then(
       _$CharacterCreationHostEnteredImpl(
@@ -237,6 +245,10 @@ class __$$CharacterCreationHostEnteredImplCopyWithImpl<$Res>
             ? _value.entryFee
             : entryFee // ignore: cast_nullable_to_non_nullable
                   as int,
+        friendsOnly: null == friendsOnly
+            ? _value.friendsOnly
+            : friendsOnly // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -255,6 +267,7 @@ class _$CharacterCreationHostEnteredImpl
     required this.boardSize,
     required this.isCTF,
     this.entryFee = 0,
+    this.friendsOnly = false,
   });
 
   @override
@@ -274,10 +287,13 @@ class _$CharacterCreationHostEnteredImpl
   @override
   @JsonKey()
   final int entryFee;
+  @override
+  @JsonKey()
+  final bool friendsOnly;
 
   @override
   String toString() {
-    return 'CharacterCreationEntryAppEvent.hostEntered(socketId: $socketId, roomCode: $roomCode, gameId: $gameId, gameName: $gameName, gameDescription: $gameDescription, boardSize: $boardSize, isCTF: $isCTF, entryFee: $entryFee)';
+    return 'CharacterCreationEntryAppEvent.hostEntered(socketId: $socketId, roomCode: $roomCode, gameId: $gameId, gameName: $gameName, gameDescription: $gameDescription, boardSize: $boardSize, isCTF: $isCTF, entryFee: $entryFee, friendsOnly: $friendsOnly)';
   }
 
   @override
@@ -298,7 +314,9 @@ class _$CharacterCreationHostEnteredImpl
                 other.boardSize == boardSize) &&
             (identical(other.isCTF, isCTF) || other.isCTF == isCTF) &&
             (identical(other.entryFee, entryFee) ||
-                other.entryFee == entryFee));
+                other.entryFee == entryFee) &&
+            (identical(other.friendsOnly, friendsOnly) ||
+                other.friendsOnly == friendsOnly));
   }
 
   @override
@@ -312,6 +330,7 @@ class _$CharacterCreationHostEnteredImpl
     boardSize,
     isCTF,
     entryFee,
+    friendsOnly,
   );
 
   /// Create a copy of CharacterCreationEntryAppEvent
@@ -339,6 +358,7 @@ class _$CharacterCreationHostEnteredImpl
       int boardSize,
       bool isCTF,
       int entryFee,
+      bool friendsOnly,
     )
     hostEntered,
     required TResult Function(
@@ -346,6 +366,7 @@ class _$CharacterCreationHostEnteredImpl
       String roomCode,
       String hostId,
       LobbyRoomModel initialRoom,
+      bool isDropIn,
     )
     joinEntered,
   }) {
@@ -358,6 +379,7 @@ class _$CharacterCreationHostEnteredImpl
       boardSize,
       isCTF,
       entryFee,
+      friendsOnly,
     );
   }
 
@@ -373,6 +395,7 @@ class _$CharacterCreationHostEnteredImpl
       int boardSize,
       bool isCTF,
       int entryFee,
+      bool friendsOnly,
     )?
     hostEntered,
     TResult? Function(
@@ -380,6 +403,7 @@ class _$CharacterCreationHostEnteredImpl
       String roomCode,
       String hostId,
       LobbyRoomModel initialRoom,
+      bool isDropIn,
     )?
     joinEntered,
   }) {
@@ -392,6 +416,7 @@ class _$CharacterCreationHostEnteredImpl
       boardSize,
       isCTF,
       entryFee,
+      friendsOnly,
     );
   }
 
@@ -407,6 +432,7 @@ class _$CharacterCreationHostEnteredImpl
       int boardSize,
       bool isCTF,
       int entryFee,
+      bool friendsOnly,
     )?
     hostEntered,
     TResult Function(
@@ -414,6 +440,7 @@ class _$CharacterCreationHostEnteredImpl
       String roomCode,
       String hostId,
       LobbyRoomModel initialRoom,
+      bool isDropIn,
     )?
     joinEntered,
     required TResult orElse(),
@@ -428,6 +455,7 @@ class _$CharacterCreationHostEnteredImpl
         boardSize,
         isCTF,
         entryFee,
+        friendsOnly,
       );
     }
     return orElse();
@@ -476,6 +504,7 @@ abstract class CharacterCreationHostEntered
     required final int boardSize,
     required final bool isCTF,
     final int entryFee,
+    final bool friendsOnly,
   }) = _$CharacterCreationHostEnteredImpl;
 
   @override
@@ -488,6 +517,7 @@ abstract class CharacterCreationHostEntered
   int get boardSize;
   bool get isCTF;
   int get entryFee;
+  bool get friendsOnly;
 
   /// Create a copy of CharacterCreationEntryAppEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -513,6 +543,7 @@ abstract class _$$CharacterCreationJoinEnteredImplCopyWith<$Res>
     String roomCode,
     String hostId,
     LobbyRoomModel initialRoom,
+    bool isDropIn,
   });
 }
 
@@ -538,6 +569,7 @@ class __$$CharacterCreationJoinEnteredImplCopyWithImpl<$Res>
     Object? roomCode = null,
     Object? hostId = null,
     Object? initialRoom = null,
+    Object? isDropIn = null,
   }) {
     return _then(
       _$CharacterCreationJoinEnteredImpl(
@@ -557,6 +589,10 @@ class __$$CharacterCreationJoinEnteredImplCopyWithImpl<$Res>
             ? _value.initialRoom
             : initialRoom // ignore: cast_nullable_to_non_nullable
                   as LobbyRoomModel,
+        isDropIn: null == isDropIn
+            ? _value.isDropIn
+            : isDropIn // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -571,6 +607,7 @@ class _$CharacterCreationJoinEnteredImpl
     required this.roomCode,
     required this.hostId,
     required this.initialRoom,
+    this.isDropIn = false,
   });
 
   @override
@@ -581,10 +618,13 @@ class _$CharacterCreationJoinEnteredImpl
   final String hostId;
   @override
   final LobbyRoomModel initialRoom;
+  @override
+  @JsonKey()
+  final bool isDropIn;
 
   @override
   String toString() {
-    return 'CharacterCreationEntryAppEvent.joinEntered(socketId: $socketId, roomCode: $roomCode, hostId: $hostId, initialRoom: $initialRoom)';
+    return 'CharacterCreationEntryAppEvent.joinEntered(socketId: $socketId, roomCode: $roomCode, hostId: $hostId, initialRoom: $initialRoom, isDropIn: $isDropIn)';
   }
 
   @override
@@ -598,12 +638,20 @@ class _$CharacterCreationJoinEnteredImpl
                 other.roomCode == roomCode) &&
             (identical(other.hostId, hostId) || other.hostId == hostId) &&
             (identical(other.initialRoom, initialRoom) ||
-                other.initialRoom == initialRoom));
+                other.initialRoom == initialRoom) &&
+            (identical(other.isDropIn, isDropIn) ||
+                other.isDropIn == isDropIn));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, socketId, roomCode, hostId, initialRoom);
+  int get hashCode => Object.hash(
+    runtimeType,
+    socketId,
+    roomCode,
+    hostId,
+    initialRoom,
+    isDropIn,
+  );
 
   /// Create a copy of CharacterCreationEntryAppEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -630,6 +678,7 @@ class _$CharacterCreationJoinEnteredImpl
       int boardSize,
       bool isCTF,
       int entryFee,
+      bool friendsOnly,
     )
     hostEntered,
     required TResult Function(
@@ -637,10 +686,11 @@ class _$CharacterCreationJoinEnteredImpl
       String roomCode,
       String hostId,
       LobbyRoomModel initialRoom,
+      bool isDropIn,
     )
     joinEntered,
   }) {
-    return joinEntered(socketId, roomCode, hostId, initialRoom);
+    return joinEntered(socketId, roomCode, hostId, initialRoom, isDropIn);
   }
 
   @override
@@ -655,6 +705,7 @@ class _$CharacterCreationJoinEnteredImpl
       int boardSize,
       bool isCTF,
       int entryFee,
+      bool friendsOnly,
     )?
     hostEntered,
     TResult? Function(
@@ -662,10 +713,11 @@ class _$CharacterCreationJoinEnteredImpl
       String roomCode,
       String hostId,
       LobbyRoomModel initialRoom,
+      bool isDropIn,
     )?
     joinEntered,
   }) {
-    return joinEntered?.call(socketId, roomCode, hostId, initialRoom);
+    return joinEntered?.call(socketId, roomCode, hostId, initialRoom, isDropIn);
   }
 
   @override
@@ -680,6 +732,7 @@ class _$CharacterCreationJoinEnteredImpl
       int boardSize,
       bool isCTF,
       int entryFee,
+      bool friendsOnly,
     )?
     hostEntered,
     TResult Function(
@@ -687,12 +740,13 @@ class _$CharacterCreationJoinEnteredImpl
       String roomCode,
       String hostId,
       LobbyRoomModel initialRoom,
+      bool isDropIn,
     )?
     joinEntered,
     required TResult orElse(),
   }) {
     if (joinEntered != null) {
-      return joinEntered(socketId, roomCode, hostId, initialRoom);
+      return joinEntered(socketId, roomCode, hostId, initialRoom, isDropIn);
     }
     return orElse();
   }
@@ -736,6 +790,7 @@ abstract class CharacterCreationJoinEntered
     required final String roomCode,
     required final String hostId,
     required final LobbyRoomModel initialRoom,
+    final bool isDropIn,
   }) = _$CharacterCreationJoinEnteredImpl;
 
   @override
@@ -744,6 +799,7 @@ abstract class CharacterCreationJoinEntered
   String get roomCode;
   String get hostId;
   LobbyRoomModel get initialRoom;
+  bool get isDropIn;
 
   /// Create a copy of CharacterCreationEntryAppEvent
   /// with the given fields replaced by the non-null parameter values.

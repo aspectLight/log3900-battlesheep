@@ -29,6 +29,7 @@ extension JoinRoomDtoRoomExtensions on JoinRoomDto {
     hostId: hostId,
     players: players.map((p) => p.toLobbyPlayerModel()).toList(),
     isLocked: isLocked,
+    dropInDropOut: dropInDropOut,
   );
 }
 

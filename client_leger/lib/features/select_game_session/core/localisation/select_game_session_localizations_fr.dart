@@ -57,4 +57,7 @@ class SelectGameSessionLocalizationsFr extends SelectGameSessionLocalizations {
   @override
   String get createGameInsufficientFundsMessage =>
       'Vous n\'avez pas assez de pièces pour ce montant. Réduisez les frais ou gagnez des pièces à la boutique.';
+
+  @override
+  String get noGames => 'Aucun jeu disponible.';
 }

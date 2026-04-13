@@ -6,10 +6,12 @@ class LobbyRoomModel {
     required this.hostId,
     required this.players,
     required this.isLocked,
+    required this.dropInDropOut,
   });
 
   final String roomId;
   final String hostId;
   final List<LobbyPlayerModel> players;
   final bool isLocked;
+  final bool dropInDropOut;
 }

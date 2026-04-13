@@ -8,6 +8,10 @@ class ProfileDto {
   final String username;
   final String email;
   final String avatarId;
+  @JsonKey(defaultValue: 'default')
+  final String theme;
+  @JsonKey(defaultValue: 'fr')
+  final String language;
 
   final Map<String, dynamic> preferences;
 
@@ -16,6 +20,8 @@ class ProfileDto {
     required this.username,
     required this.email,
     required this.avatarId,
+    this.theme = 'default',
+    this.language = 'fr',
     this.preferences = const {},
   });
 
@@ -30,12 +36,16 @@ class ProfileUpdateRequestDto {
   final String? username;
   final String? email;
   final String? avatarId;
+  final String? theme;
+  final String? language;
   final Map<String, dynamic>? preferences;
 
   const ProfileUpdateRequestDto({
     this.username,
     this.email,
     this.avatarId,
+    this.theme,
+    this.language,
     this.preferences,
   });
 
@@ -44,5 +54,3 @@ class ProfileUpdateRequestDto {
 
   Map<String, dynamic> toJson() => _$ProfileUpdateRequestDtoToJson(this);
 }
-
-
