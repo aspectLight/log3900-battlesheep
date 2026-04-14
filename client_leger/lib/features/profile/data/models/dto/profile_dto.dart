@@ -8,6 +8,8 @@ class ProfileDto {
   final String username;
   final String email;
   final String avatarId;
+  @JsonKey(includeIfNull: false)
+  final String? avatarUrl;
   @JsonKey(defaultValue: 'default')
   final String theme;
   @JsonKey(defaultValue: 'fr')
@@ -20,6 +22,7 @@ class ProfileDto {
     required this.username,
     required this.email,
     required this.avatarId,
+    this.avatarUrl,
     this.theme = 'default',
     this.language = 'fr',
     this.preferences = const {},

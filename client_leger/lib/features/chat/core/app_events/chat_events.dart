@@ -8,9 +8,8 @@ part 'chat_events.freezed.dart';
 sealed class ChatEntryAppEvent
     with _$ChatEntryAppEvent
     implements AppTransitionEvent {
-  const factory ChatEntryAppEvent.authCompleted({
-    required String username,
-  }) = ChatEnterAfterAuth;
+  const factory ChatEntryAppEvent.authCompleted({required String username}) =
+      ChatEnterAfterAuth;
 }
 
 @freezed
@@ -21,6 +20,8 @@ class ChatCompletedAppEvent
 }
 
 @freezed
-sealed class ChatExitAppEvent with _$ChatExitAppEvent implements AppTransitionEvent {
+sealed class ChatExitAppEvent
+    with _$ChatExitAppEvent
+    implements AppTransitionEvent {
   const factory ChatExitAppEvent.closed() = ChatClosedEvent;
 }

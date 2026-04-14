@@ -8,10 +8,7 @@ import '../../../core/localisation/game_session_localizations.dart';
 import 'game_info_panel_view_model.dart';
 
 class GameInfoPanel extends StatelessWidget {
-  const GameInfoPanel({
-    super.key,
-    required this.onClose,
-  });
+  const GameInfoPanel({super.key, required this.onClose});
 
   final VoidCallback onClose;
 

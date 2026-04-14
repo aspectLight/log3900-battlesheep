@@ -86,11 +86,7 @@ class JoinRoomDto {
 
 @JsonSerializable(explicitToJson: true)
 class JoinRoomResponseDto {
-  const JoinRoomResponseDto({
-    required this.success,
-    this.error,
-    this.room,
-  });
+  const JoinRoomResponseDto({required this.success, this.error, this.room});
 
   final bool success;
   final String? error;

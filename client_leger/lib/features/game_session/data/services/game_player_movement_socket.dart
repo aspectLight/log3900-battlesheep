@@ -22,8 +22,7 @@ class GamePlayerMovementSocket {
       StreamController<VirtualPlayerMovedEvent>.broadcast();
   final _synchronizeMovementController =
       StreamController<SynchronizeMovementEvent>.broadcast();
-  final _trapPendingController =
-      StreamController<TrapPendingEvent>.broadcast();
+  final _trapPendingController = StreamController<TrapPendingEvent>.broadcast();
   final _trapResultController =
       StreamController<TrapResultSyncEvent>.broadcast();
   final _torchIlluminationController =
@@ -177,18 +176,14 @@ class GamePlayerMovementSocket {
             );
           }),
       _socketService
-          .on<Map<String, dynamic>>(
-            GamePlayerMovementSocketEvents.trapPending,
-          )
+          .on<Map<String, dynamic>>(GamePlayerMovementSocketEvents.trapPending)
           .listen((data) {
             _trapPendingController.add(
               TrapPendingDto.fromObject(data).toEntity(),
             );
           }),
       _socketService
-          .on<Map<String, dynamic>>(
-            GamePlayerMovementSocketEvents.trapResult,
-          )
+          .on<Map<String, dynamic>>(GamePlayerMovementSocketEvents.trapResult)
           .listen((data) {
             _trapResultController.add(
               TrapResultDto.fromObject(data).toEntity(),

@@ -23,16 +23,22 @@ class GameSessionEventSideEffect with DisposableSideEffect {
         if (scope == null || !scope.isRegistered<GameSessionData>()) return;
         final sessionData = scope.get<GameSessionData>();
         if (sessionData.socketId == event.playerId) return;
-        _notificationIntentSink.addIntent(const GameCanceledNotificationIntent());
+        _notificationIntentSink.addIntent(
+          const GameCanceledNotificationIntent(),
+        );
         _appTransitionEventBus.fire(
-          const GameSessionExitAppEvent.sessionTerminated(SessionEndReason.canceled),
+          const GameSessionExitAppEvent.sessionTerminated(
+            SessionEndReason.canceled,
+          ),
         );
       }),
     );
     trackSubscription(
       gameSessionEventBus.on<GameSessionAbandoned>().listen((_) {
         _appTransitionEventBus.fire(
-          const GameSessionExitAppEvent.sessionTerminated(SessionEndReason.abandoned),
+          const GameSessionExitAppEvent.sessionTerminated(
+            SessionEndReason.abandoned,
+          ),
         );
       }),
     );

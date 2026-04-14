@@ -34,11 +34,12 @@ import '../../domain/state/game_board_state.dart';
 
 class GameSessionCoordinator
     extends
-    AutoScopeCoordinator<
-        GameSessionData,
-        GameSessionEntryAppEvent,
-        GameSessionCompletedAppEvent,
-        GameSessionExitAppEvent> {
+        AutoScopeCoordinator<
+          GameSessionData,
+          GameSessionEntryAppEvent,
+          GameSessionCompletedAppEvent,
+          GameSessionExitAppEvent
+        > {
   GameSessionCoordinator({
     required this.getIt,
     required this.sessionScopeManager,
@@ -49,8 +50,8 @@ class GameSessionCoordinator
     required this.gameService,
     required GameMetadataStateReducer gameMetadataStateReducer,
     required GameHistoryRepository gameHistoryRepository,
-  })  : _gameMetadataStateReducer = gameMetadataStateReducer,
-        _gameHistoryRepository = gameHistoryRepository;
+  }) : _gameMetadataStateReducer = gameMetadataStateReducer,
+       _gameHistoryRepository = gameHistoryRepository;
 
   final GetIt getIt;
   @override

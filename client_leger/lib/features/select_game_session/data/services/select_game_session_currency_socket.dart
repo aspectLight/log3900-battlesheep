@@ -7,14 +7,18 @@ import '../models/extensions/select_game_session_socket_raw_ext.dart';
 class SelectGameSessionCurrencySocket {
   SelectGameSessionCurrencySocket({required SocketService socketService})
     : _socketService = socketService {
-    _connectionSubscription = _socketService.connectionStream.listen((connected) {
+    _connectionSubscription = _socketService.connectionStream.listen((
+      connected,
+    ) {
       if (!connected) {
         return;
       }
       _setupListeners();
+      fetchBalance();
     });
     if (_socketService.isConnected) {
       _setupListeners();
+      fetchBalance();
     }
   }
 
@@ -40,10 +44,14 @@ class SelectGameSessionCurrencySocket {
   void _setupListeners() {
     _cancelEventListeners();
     _eventSubscriptions.addAll([
-      _jsonObjectStream(SelectGameSessionCurrencySocketEvents.virtualCurrencyResponse)
+      _jsonObjectStream(
+            SelectGameSessionCurrencySocketEvents.virtualCurrencyResponse,
+          )
           .map(SelectGameSessionCurrencyResponse.fromJson)
           .listen(_currencyResponseController.add),
-      _jsonObjectStream(SelectGameSessionCurrencySocketEvents.virtualCurrencyUpdated)
+      _jsonObjectStream(
+            SelectGameSessionCurrencySocketEvents.virtualCurrencyUpdated,
+          )
           .map((json) => json.readBalance())
           .where((b) => b != null)
           .cast<int>()
@@ -65,7 +73,9 @@ class SelectGameSessionCurrencySocket {
       .cast<Map<String, dynamic>>();
 
   void fetchBalance() {
-    _socketService.emit(SelectGameSessionCurrencySocketEvents.getVirtualCurrency);
+    _socketService.emit(
+      SelectGameSessionCurrencySocketEvents.getVirtualCurrency,
+    );
   }
 
   Future<void> dispose() async {
@@ -89,7 +99,9 @@ class SelectGameSessionCurrencyResponse {
   final bool success;
   final int? balance;
 
-  factory SelectGameSessionCurrencyResponse.fromJson(Map<String, dynamic> json) {
+  factory SelectGameSessionCurrencyResponse.fromJson(
+    Map<String, dynamic> json,
+  ) {
     return SelectGameSessionCurrencyResponse(
       success: json['success'] as bool? ?? false,
       balance: (json['balance'] as num?)?.toInt(),

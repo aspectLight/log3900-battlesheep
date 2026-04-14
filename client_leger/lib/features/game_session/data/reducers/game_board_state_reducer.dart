@@ -33,9 +33,7 @@ class GameBoardStateReducer {
       return _reduceSpawnPointCleared(previous, event);
     }
     if (event is BoardIlluminationUpdatedEvent) {
-      return previous.copyWith(
-        illuminatedCellKeys: event.illuminatedCellKeys,
-      );
+      return previous.copyWith(illuminatedCellKeys: event.illuminatedCellKeys);
     }
     return previous;
   }
@@ -51,8 +49,9 @@ class GameBoardStateReducer {
       if (!board.isInBounds(pos.x, pos.y)) continue;
       nextPositions[player.id] = pos;
     }
-    final occupiedSpawnPositions =
-        Set<GameBoardPosition>.from(nextPositions.values);
+    final occupiedSpawnPositions = Set<GameBoardPosition>.from(
+      nextPositions.values,
+    );
     final nextItems = Map<GameBoardPosition, GameItem>.from(previous.items);
     for (final entry in previous.items.entries) {
       if (entry.value.type == ItemType.spawnPoint &&
@@ -60,10 +59,7 @@ class GameBoardStateReducer {
         nextItems.remove(entry.key);
       }
     }
-    return previous.copyWith(
-      playerPositions: nextPositions,
-      items: nextItems,
-    );
+    return previous.copyWith(playerPositions: nextPositions, items: nextItems);
   }
 
   GameBoardState _reduceDoorToggled(
@@ -124,11 +120,13 @@ class GameBoardStateReducer {
       ..remove(dest);
     return previous.copyWith(
       selectedPathCoords: const [],
-      pendingItemPickup: Option.of(PendingItemPickup(
-        playerId: event.playerId,
-        item: GameItem(type: cellItem.type),
-        cellCoords: dest,
-      )),
+      pendingItemPickup: Option.of(
+        PendingItemPickup(
+          playerId: event.playerId,
+          item: GameItem(type: cellItem.type),
+          cellCoords: dest,
+        ),
+      ),
       playerPositions: nextPositions,
       items: nextItems,
     );

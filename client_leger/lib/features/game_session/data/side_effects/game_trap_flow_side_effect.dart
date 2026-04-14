@@ -83,9 +83,7 @@ class GameTrapFlowSideEffect with DisposableSideEffect {
     if (event.playerId != _socketId) return;
     if (_turnRepository.state.value.currentPlayerId != _socketId) return;
     if (event.activated) {
-      _actionsRepository.forwardTurn(
-        ForwardTurnCommand(roomId: _roomId),
-      );
+      _actionsRepository.forwardTurn(ForwardTurnCommand(roomId: _roomId));
       return;
     }
     final inv =
@@ -103,9 +101,7 @@ class GameTrapFlowSideEffect with DisposableSideEffect {
       _boardRepository.state.value,
       _metadataRepository.state.value,
     )) {
-      _actionsRepository.forwardTurn(
-        ForwardTurnCommand(roomId: _roomId),
-      );
+      _actionsRepository.forwardTurn(ForwardTurnCommand(roomId: _roomId));
     }
   }
 }

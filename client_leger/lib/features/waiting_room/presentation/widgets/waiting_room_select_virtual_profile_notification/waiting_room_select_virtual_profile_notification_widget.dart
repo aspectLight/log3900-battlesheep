@@ -4,7 +4,8 @@ import '../../../../../core/notification/notification_intent.dart';
 import '../../../core/localisation/waiting_room_localizations.dart';
 import 'waiting_room_select_virtual_profile_notification_view_model.dart';
 
-class WaitingRoomSelectVirtualProfileNotificationWidget extends StatelessWidget {
+class WaitingRoomSelectVirtualProfileNotificationWidget
+    extends StatelessWidget {
   WaitingRoomSelectVirtualProfileNotificationWidget({
     super.key,
     required WaitingRoomSelectVirtualProfileNotificationIntent intent,
@@ -96,10 +97,7 @@ class _SelectionShell extends StatelessWidget {
 }
 
 class _ActionButton extends StatelessWidget {
-  const _ActionButton({
-    required this.label,
-    required this.onTap,
-  });
+  const _ActionButton({required this.label, required this.onTap});
 
   final String label;
   final VoidCallback onTap;

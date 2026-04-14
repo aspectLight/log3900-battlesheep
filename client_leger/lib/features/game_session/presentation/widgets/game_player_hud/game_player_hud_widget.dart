@@ -22,7 +22,8 @@ class _GamePlayerHudWidgetState extends State<GamePlayerHudWidget> {
   @override
   void initState() {
     super.initState();
-    _viewModel = GetIt.I<GameSessionScopeHolder>().scope!.get<GamePlayerHudWidgetViewModel>();
+    _viewModel = GetIt.I<GameSessionScopeHolder>().scope!
+        .get<GamePlayerHudWidgetViewModel>();
   }
 
   @override
@@ -293,11 +294,7 @@ class _StatsGrid extends StatelessWidget {
                     stat.value.clamp(0, 999),
                     (_) => Padding(
                       padding: const EdgeInsets.only(right: 2),
-                      child: Image.asset(
-                        stat.assetPath,
-                        width: 15,
-                        height: 15,
-                      ),
+                      child: Image.asset(stat.assetPath, width: 15, height: 15),
                     ),
                   ),
                 ),

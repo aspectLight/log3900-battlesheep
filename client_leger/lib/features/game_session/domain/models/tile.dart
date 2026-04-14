@@ -16,8 +16,9 @@ sealed class Tile {
     TileType.corner => const CornerTile(),
     TileType.intersection => const IntersectionTile(),
     TileType.trap => const TrapTile(),
-    TileType.teleportPad =>
-      TeleportPadTile(_normalizeTeleportState(stateString)),
+    TileType.teleportPad => TeleportPadTile(
+      _normalizeTeleportState(stateString),
+    ),
   };
 }
 

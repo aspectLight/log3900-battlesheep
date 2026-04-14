@@ -29,13 +29,13 @@ class GameBoardUiTile {
       TrapTile() => TileAssets.imagePathFor(sourceTile),
       TeleportPadTile() => TileAssets.imagePathFor(sourceTile),
       _ => TileAssets.tileImagePath(
-          displayType,
-          doorState.fold(() => null, (s) => s),
-          orientation.fold(() => null, (o) => o),
-          diagonalSuffix.fold(() => null, (s) => s),
-          cellX,
-          cellY,
-        ),
+        displayType,
+        doorState.fold(() => null, (s) => s),
+        orientation.fold(() => null, (o) => o),
+        diagonalSuffix.fold(() => null, (s) => s),
+        cellX,
+        cellY,
+      ),
     };
   }
 
@@ -44,10 +44,10 @@ class GameBoardUiTile {
       TrapTile() => TileAssets.imagePathFor(sourceTile),
       TeleportPadTile() => TileAssets.imagePathFor(sourceTile),
       _ => TileAssets.tileImagePath(
-          displayType,
-          doorState.fold(() => null, (s) => s),
-          orientation.fold(() => null, (o) => o),
-        ),
+        displayType,
+        doorState.fold(() => null, (s) => s),
+        orientation.fold(() => null, (o) => o),
+      ),
     };
   }
 }

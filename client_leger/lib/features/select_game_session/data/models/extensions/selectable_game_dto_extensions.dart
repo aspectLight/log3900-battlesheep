@@ -66,15 +66,15 @@ ItemType? itemTypeFromServerString(String? serverItemType) {
 
 extension GameSummaryDtoToModel on GameSummaryDto {
   GameModelInfo toModel() => GameModelInfo(
-        id: id,
-        name: name,
-        description: description,
-        mode: mode,
-        boardSize: board.size,
-        boardMatrix: previewMatrixFromGameSummaryBoard(board),
-        privacy: privacy,
-        owner: owner,
-        actionPoints: actionPoints,
-        lastModified: modificationDate,
-      );
+    id: id,
+    name: name,
+    description: description,
+    mode: mode,
+    boardSize: board.size,
+    boardMatrix: previewMatrixFromGameSummaryBoard(board),
+    privacy: privacy,
+    owner: owner,
+    actionPoints: actionPoints,
+    lastModified: modificationDate,
+  );
 }

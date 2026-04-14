@@ -10,34 +10,26 @@ import '../reducers/game_inventory_state_reducer.dart';
 class GameInventoryRepository {
   final GameInventoryStateReducer _reducer;
 
-
-  final Signal<GameInventoryState> state = signal(
-    GameInventoryState.initial(),
-  );
+  final Signal<GameInventoryState> state = signal(GameInventoryState.initial());
 
   GameInventoryRepository({required GameInventoryStateReducer reducer})
     : _reducer = reducer;
-
 
   void applyItemDropped(ItemDroppedEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
 
-
   void applyItemCollected(ItemCollectedEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
-
 
   void applyItemDroppedDisconnected(ItemDroppedDisconnectedEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
 
-
   void applyFlagCollected(FlagCollectedEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
-
 
   void applyPlayerInventorySet(PlayerInventorySetEvent event) {
     state.value = _reducer.reduce(state.value, event);

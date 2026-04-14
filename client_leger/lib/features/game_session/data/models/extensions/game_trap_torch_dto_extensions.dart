@@ -3,27 +3,21 @@ import '../../../domain/events/game_environment_events.dart';
 import '../dto/game_trap_torch_dto.dart';
 
 extension TrapPendingDtoToEntity on TrapPendingDto {
-  TrapPendingEvent toEntity() => TrapPendingEvent(
-        roomId: roomId,
-        playerId: playerId,
-        canAvoid: canAvoid,
-      );
+  TrapPendingEvent toEntity() =>
+      TrapPendingEvent(roomId: roomId, playerId: playerId, canAvoid: canAvoid);
 }
 
 extension TrapResultDtoToEntity on TrapResultDto {
   TrapResultSyncEvent toEntity() => TrapResultSyncEvent(
-        playerId: playerId,
-        remainingMovementPoints: remainingMovementPoints,
-        activated: activated,
-      );
+    playerId: playerId,
+    remainingMovementPoints: remainingMovementPoints,
+    activated: activated,
+  );
 }
 
 extension TrapChoiceCommandToDto on TrapChoiceCommand {
-  TrapChoiceCommandDto toDto() => TrapChoiceCommandDto(
-        roomId: roomId,
-        playerId: playerId,
-        choice: choice,
-      );
+  TrapChoiceCommandDto toDto() =>
+      TrapChoiceCommandDto(roomId: roomId, playerId: playerId, choice: choice);
 }
 
 extension TorchIlluminationUpdateDtoToDomain on TorchIlluminationUpdateDto {
@@ -41,11 +35,7 @@ extension TorchIlluminationUpdateDtoToDomain on TorchIlluminationUpdateDto {
       final dv = stats.defense?.value;
       if (av == null || dv == null) continue;
       patches.add(
-        TorchPlayerStatPatch(
-          playerId: p.id,
-          attack: av,
-          defense: dv,
-        ),
+        TorchPlayerStatPatch(playerId: p.id, attack: av, defense: dv),
       );
     }
     return PlayerTorchStatsSyncEvent(patches: patches);

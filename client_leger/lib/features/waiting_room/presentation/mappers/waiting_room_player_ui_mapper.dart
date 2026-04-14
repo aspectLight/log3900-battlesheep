@@ -10,6 +10,8 @@ WaitingRoomPlayerUi toWaitingRoomPlayerUi(WaitingRoomPlayerModel model) {
       :final character,
       :final stats,
       :final avatarDisplayPath,
+      :final profileAvatarId,
+      :final profileAvatarUrl,
       :final activeBanner,
     ) =>
       WaitingRoomPlayerUi(
@@ -18,6 +20,8 @@ WaitingRoomPlayerUi toWaitingRoomPlayerUi(WaitingRoomPlayerModel model) {
         avatarFullPath:
             avatarDisplayPath ??
             CharacterAssets.characterAvatarFullPath(character),
+        profileAvatarId: profileAvatarId,
+        profileAvatarUrl: profileAvatarUrl,
         isVirtual: false,
         health: stats.health.value,
         speed: stats.speed.value,
@@ -31,6 +35,8 @@ WaitingRoomPlayerUi toWaitingRoomPlayerUi(WaitingRoomPlayerModel model) {
       :final character,
       :final stats,
       :final avatarDisplayPath,
+      :final profileAvatarId,
+      :final profileAvatarUrl,
       :final activeBanner,
     ) =>
       WaitingRoomPlayerUi(
@@ -39,6 +45,8 @@ WaitingRoomPlayerUi toWaitingRoomPlayerUi(WaitingRoomPlayerModel model) {
         avatarFullPath:
             avatarDisplayPath ??
             CharacterAssets.characterAvatarFullPath(character),
+        profileAvatarId: profileAvatarId,
+        profileAvatarUrl: profileAvatarUrl,
         isVirtual: true,
         health: stats.health.value,
         speed: stats.speed.value,

@@ -13,7 +13,7 @@ class GamePlayerRepository {
   final Signal<GamePlayerState> state = signal(GamePlayerState.initial());
 
   GamePlayerRepository({required GamePlayerStateReducer reducer})
-      : _reducer = reducer;
+    : _reducer = reducer;
 
   void applyPlayersSpawned(PlayerSpawnedEvent event) {
     state.value = _reducer.reduce(state.value, event);
@@ -27,36 +27,29 @@ class GamePlayerRepository {
     state.value = _reducer.reduce(state.value, event);
   }
 
-
   void applyScoreUpdated(UpdateScoreEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
-
 
   void applyPlayerMoved(PlayerMovedEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
 
-
   void applyVirtualPlayerMoved(VirtualPlayerMovedEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
-
 
   void applyMovementStep(PlayerMovementStepEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
 
-
   void applyPlayerIdleReset(PlayerIdleResetEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
 
-
   void applyTurnStartingPlayerPoints(TurnStartingPlayerPointsEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
-
 
   void applyPlayerHealthUpdated(PlayerHealthUpdatedEvent event) {
     state.value = _reducer.reduce(state.value, event);

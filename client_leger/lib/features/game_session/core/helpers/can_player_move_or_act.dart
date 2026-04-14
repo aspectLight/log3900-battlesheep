@@ -55,8 +55,7 @@ bool canPlayerMoveOrAct(
     if (otherPlayerId != null && otherPlayerId != playerId) {
       final other = playerState.findById(otherPlayerId);
       if (other case Some(value: final o)) {
-        final isCTF =
-            metadataState is GameSessionActive && metadataState.isCTF;
+        final isCTF = metadataState is GameSessionActive && metadataState.isCTF;
         if (!isCTF || o.team != currentPlayer.team) return true;
       }
     }

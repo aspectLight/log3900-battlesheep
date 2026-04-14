@@ -50,5 +50,6 @@ extension TileTypeExtension on TileType {
 
 extension TileExtension on Tile {
   String getName(GameSessionLocalizations l10n) => type.getName(l10n);
-  String getDescription(GameSessionLocalizations l10n) => type.getDescription(l10n);
+  String getDescription(GameSessionLocalizations l10n) =>
+      type.getDescription(l10n);
 }

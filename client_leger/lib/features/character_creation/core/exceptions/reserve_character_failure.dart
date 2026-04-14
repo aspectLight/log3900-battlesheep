@@ -10,7 +10,7 @@ sealed class ReserveCharacterFailure implements Exception {
 class CharacterAlreadyReservedReserveCharacterFailure
     extends ReserveCharacterFailure {
   const CharacterAlreadyReservedReserveCharacterFailure()
-      : super('Character already reserved');
+    : super('Character already reserved');
 }
 
 class RoomLockedReserveCharacterFailure extends ReserveCharacterFailure {

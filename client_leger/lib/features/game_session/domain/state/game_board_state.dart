@@ -36,8 +36,9 @@ class BoardCell {
       x == player.spawnPoint.x && y == player.spawnPoint.y;
 
   bool isEmpty(GameBoardState state) {
-    final hasPlayer = state.playerPositions.values
-        .any((p) => p.x == position.x && p.y == position.y);
+    final hasPlayer = state.playerPositions.values.any(
+      (p) => p.x == position.x && p.y == position.y,
+    );
     return !hasPlayer &&
         !state.items.containsKey(position) &&
         tile.isReachableForMovement;
@@ -91,8 +92,7 @@ class Board {
     return Board(matrix: matrix ?? this.matrix, size: size ?? this.size);
   }
 
-  bool isInBounds(int x, int y) =>
-      x >= 0 && y >= 0 && x < size && y < size;
+  bool isInBounds(int x, int y) => x >= 0 && y >= 0 && x < size && y < size;
 
   Option<BoardCell> cellForPlayer(
     Map<String, GameBoardPosition> positions,
@@ -112,7 +112,7 @@ class GameBoardState with _$GameBoardState {
     required Map<String, GameBoardPosition> playerPositions,
     required Set<GameBoardPosition> reachableCellCoords,
     required Map<GameBoardPosition, List<GameBoardPosition>>
-        reachablePathsByDestination,
+    reachablePathsByDestination,
     required List<GameBoardPosition> selectedPathCoords,
     @Default(Option.none()) Option<PendingItemPickup> pendingItemPickup,
     @Default({}) Set<String> illuminatedCellKeys,
@@ -128,13 +128,12 @@ class GameBoardState with _$GameBoardState {
   factory GameBoardState.scopedInitial({
     required Board board,
     Map<GameBoardPosition, GameItem>? items,
-  }) =>
-      GameBoardState(
-        board: board,
-        items: items ?? const {},
-        playerPositions: const {},
-        reachableCellCoords: const {},
-        reachablePathsByDestination: const {},
-        selectedPathCoords: const [],
-      );
+  }) => GameBoardState(
+    board: board,
+    items: items ?? const {},
+    playerPositions: const {},
+    reachableCellCoords: const {},
+    reachablePathsByDestination: const {},
+    selectedPathCoords: const [],
+  );
 }

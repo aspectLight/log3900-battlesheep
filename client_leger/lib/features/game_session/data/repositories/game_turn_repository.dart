@@ -10,7 +10,7 @@ class GameTurnRepository {
   final Signal<GameTurnState> state = signal(GameTurnState.initial());
 
   GameTurnRepository({required GameTurnStateReducer reducer})
-      : _reducer = reducer;
+    : _reducer = reducer;
 
   void applyTurnStarting(TurnStartingEvent event) {
     state.value = _reducer.reduce(state.value, event);

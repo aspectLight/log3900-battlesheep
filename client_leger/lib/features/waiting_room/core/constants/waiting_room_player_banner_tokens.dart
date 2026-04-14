@@ -29,26 +29,15 @@ abstract final class WaitingRoomPlayerBannerTokens {
   static const goldDiv1 = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [
-      Color(0x14B8860B),
-      Color(0x1EFFD700),
-    ],
+    colors: [Color(0x14B8860B), Color(0x1EFFD700)],
   );
 
   static const goldDiv2 = LinearGradient(
-    colors: [
-      Color(0x66B8860B),
-      blackCenter,
-      Color(0x66B8860B),
-    ],
+    colors: [Color(0x66B8860B), blackCenter, Color(0x66B8860B)],
   );
 
   static const goldStats = LinearGradient(
-    colors: [
-      Color(0x4DB8860B),
-      blackCenter,
-      Color(0x4DB8860B),
-    ],
+    colors: [Color(0x4DB8860B), blackCenter, Color(0x4DB8860B)],
   );
 
   static const goldNameShadows = [
@@ -80,26 +69,15 @@ abstract final class WaitingRoomPlayerBannerTokens {
   static const shadowDiv1 = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [
-      Color(0x4D0D0015),
-      Color(0x262D1B69),
-    ],
+    colors: [Color(0x4D0D0015), Color(0x262D1B69)],
   );
 
   static const shadowDiv2 = LinearGradient(
-    colors: [
-      Color(0xCC0D0015),
-      Color(0x802D1B69),
-      Color(0xCC0D0015),
-    ],
+    colors: [Color(0xCC0D0015), Color(0x802D1B69), Color(0xCC0D0015)],
   );
 
   static const shadowStats = LinearGradient(
-    colors: [
-      Color(0xCC0D0015),
-      Color(0x662D1B69),
-      Color(0xCC0D0015),
-    ],
+    colors: [Color(0xCC0D0015), Color(0x662D1B69), Color(0xCC0D0015)],
   );
 
   static const shadowName = Color(0xFFC9B3FF);
@@ -136,26 +114,15 @@ abstract final class WaitingRoomPlayerBannerTokens {
   static const flameDiv1 = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [
-      Color(0x0DFF4500),
-      Color(0x33FF4500),
-    ],
+    colors: [Color(0x0DFF4500), Color(0x33FF4500)],
   );
 
   static const flameDiv2 = LinearGradient(
-    colors: [
-      Color(0x998B0000),
-      blackCenter,
-      Color(0x998B0000),
-    ],
+    colors: [Color(0x998B0000), blackCenter, Color(0x998B0000)],
   );
 
   static const flameStats = LinearGradient(
-    colors: [
-      Color(0x808B0000),
-      blackCenter,
-      Color(0x808B0000),
-    ],
+    colors: [Color(0x808B0000), blackCenter, Color(0x808B0000)],
   );
 
   static const flameNameShadows = [
@@ -187,26 +154,15 @@ abstract final class WaitingRoomPlayerBannerTokens {
   static const iceDiv1 = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [
-      Color(0x1A87CEEB),
-      Color(0x264FC3F7),
-    ],
+    colors: [Color(0x1A87CEEB), Color(0x264FC3F7)],
   );
 
   static const iceDiv2 = LinearGradient(
-    colors: [
-      Color(0x6664B5F6),
-      blackCenter,
-      Color(0x6664B5F6),
-    ],
+    colors: [Color(0x6664B5F6), blackCenter, Color(0x6664B5F6)],
   );
 
   static const iceStats = LinearGradient(
-    colors: [
-      Color(0x4D64B5F6),
-      blackCenter,
-      Color(0x4D64B5F6),
-    ],
+    colors: [Color(0x4D64B5F6), blackCenter, Color(0x4D64B5F6)],
   );
 
   static const iceName = Color(0xFFE0F7FA);
@@ -241,26 +197,15 @@ abstract final class WaitingRoomPlayerBannerTokens {
   static const neonDiv1 = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [
-      Color(0x0DFF00FF),
-      Color(0x1A00FFFF),
-    ],
+    colors: [Color(0x0DFF00FF), Color(0x1A00FFFF)],
   );
 
   static const neonDiv2 = LinearGradient(
-    colors: [
-      Color(0x4DFF00FF),
-      blackCenterDeep,
-      Color(0x4D00FFFF),
-    ],
+    colors: [Color(0x4DFF00FF), blackCenterDeep, Color(0x4D00FFFF)],
   );
 
   static const neonStats = LinearGradient(
-    colors: [
-      Color(0x40FF00FF),
-      blackCenterDeep,
-      Color(0x4000FFFF),
-    ],
+    colors: [Color(0x40FF00FF), blackCenterDeep, Color(0x4000FFFF)],
   );
 
   static const neonName = Color(0xFFE0FFFF);

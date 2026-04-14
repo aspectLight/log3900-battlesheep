@@ -43,6 +43,15 @@ class SelectGameSessionLocalizationsFr extends SelectGameSessionLocalizations {
   String get createGameModeCtf => 'Capture du drapeau';
 
   @override
+  String get createGameAccessibilityLabel => 'Accessibilité';
+
+  @override
+  String get createGameFriendsOnlyLabel => 'Amis seulement';
+
+  @override
+  String get createGameEntryFeeSectionLabel => 'Prix d\'entrée';
+
+  @override
   String get createGameEntryFeeLabel => 'Frais d\'entrée';
 
   @override

@@ -8,7 +8,8 @@ class ShopCoordinator
         FeatureCoordinator<
           ShopEntryAppEvent,
           ShopCompletedAppEvent,
-          ShopExitAppEvent> {
+          ShopExitAppEvent
+        > {
   ShopCoordinator({required this.appNavigator});
 
   final AppNavigator appNavigator;

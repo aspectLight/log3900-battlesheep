@@ -53,10 +53,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                    ),
+                    const Icon(Icons.arrow_back, color: Colors.white),
                     const SizedBox(width: 15),
                     Text(
                       l10n.statisticsReturnHome,

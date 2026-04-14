@@ -66,34 +66,36 @@ class CharacterCreationCoordinator
         :final isCTF,
         :final entryFee,
         :final friendsOnly,
-      ) => (
-        socketId,
-        roomCode,
-        CharacterCreationHostEntryMode(
-          gameId: gameId,
-          gameName: gameName,
-          gameDescription: gameDescription,
-          boardSize: boardSize,
-          isCTF: isCTF,
-          entryFee: entryFee,
-          friendsOnly: friendsOnly,
+      ) =>
+        (
+          socketId,
+          roomCode,
+          CharacterCreationHostEntryMode(
+            gameId: gameId,
+            gameName: gameName,
+            gameDescription: gameDescription,
+            boardSize: boardSize,
+            isCTF: isCTF,
+            entryFee: entryFee,
+            friendsOnly: friendsOnly,
+          ),
         ),
-      ),
       CharacterCreationJoinEntered(
         :final socketId,
         :final roomCode,
         :final hostId,
         :final initialRoom,
         :final isDropIn,
-      ) => (
-        socketId,
-        roomCode,
-        CharacterCreationJoinEntryMode(
-          hostId: hostId,
-          initialRoom: initialRoom,
-          isDropIn: isDropIn,
+      ) =>
+        (
+          socketId,
+          roomCode,
+          CharacterCreationJoinEntryMode(
+            hostId: hostId,
+            initialRoom: initialRoom,
+            isDropIn: isDropIn,
+          ),
         ),
-      ),
     };
     return CharacterCreationData(
       roomCode: roomCode,
@@ -149,6 +151,7 @@ class CharacterCreationCoordinator
         :final gameName,
         :final gameDescription,
         :final friendsOnly,
+        :final entryFee,
       ):
         appTransitionEventBus.fire(
           WaitingRoomEntryAppEvent.enteredAsHost(
@@ -160,6 +163,7 @@ class CharacterCreationCoordinator
             boardSize: boardSize,
             isCTF: isCTF,
             friendsOnly: friendsOnly,
+            entryFee: entryFee,
           ),
         );
       case CharacterCreationJoinEntryMode(:final hostId, :final initialRoom):

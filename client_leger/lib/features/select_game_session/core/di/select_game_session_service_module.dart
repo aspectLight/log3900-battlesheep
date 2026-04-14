@@ -14,8 +14,7 @@ void registerSelectGameSessionServices(GetIt getIt) {
     ),
   );
   getIt.registerLazySingleton<SelectGameSessionCurrencySocket>(
-    () => SelectGameSessionCurrencySocket(
-      socketService: getIt<SocketService>(),
-    ),
+    () =>
+        SelectGameSessionCurrencySocket(socketService: getIt<SocketService>()),
   );
 }

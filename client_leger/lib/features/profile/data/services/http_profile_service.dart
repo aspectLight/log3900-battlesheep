@@ -15,18 +15,13 @@ class HttpProfileService {
   final AuthRepository _authRepository;
   final Dio _dio;
 
-  HttpProfileService({
-    required AuthRepository authRepository,
-    Dio? dio,
-  })  : _authRepository = authRepository,
-        _dio = dio ?? Dio(BaseOptions(baseUrl: EnvConfig.baseUrl));
+  HttpProfileService({required AuthRepository authRepository, Dio? dio})
+    : _authRepository = authRepository,
+      _dio = dio ?? Dio(BaseOptions(baseUrl: EnvConfig.baseUrl));
 
   Options _authOptions(String token, String sessionId) {
     return Options(
-      headers: {
-        'Authorization': 'Bearer $token',
-        'x-session-id': sessionId,
-      },
+      headers: {'Authorization': 'Bearer $token', 'x-session-id': sessionId},
     );
   }
 
@@ -110,6 +105,39 @@ class HttpProfileService {
     );
   }
 
+  Future<ProfileDto> uploadAvatar(String filePath) {
+    final creds = _authRepository.getSocketAuthCredentials();
+    return creds.when(
+      none: () => Future.error(const UnauthorizedProfileFailure()),
+      some: (SocketAuthCredentialsModel c) async {
+        try {
+          final formData = FormData.fromMap({
+            'file': await MultipartFile.fromFile(filePath),
+          });
+          final response = await _dio.post<Map<String, dynamic>>(
+            ProfileApiEndpoints.uploadAvatar,
+            data: formData,
+            options: _authOptions(c.token, c.sessionId),
+          );
+          final data = response.data;
+          if (data == null) {
+            throw ServerProfileFailure(
+              statusCode: response.statusCode,
+              devMessage: 'Empty upload avatar response',
+            );
+          }
+          final user = data['user'];
+          if (user is Map<String, dynamic>) {
+            return ProfileDto.fromJson(user);
+          }
+          return ProfileDto.fromJson(data);
+        } on DioException catch (e) {
+          throw _mapDioToFailure(e);
+        }
+      },
+    );
+  }
+
   Future<void> deleteAccount() {
     final creds = _authRepository.getSocketAuthCredentials();
     return creds.when(
@@ -150,20 +178,32 @@ class HttpProfileService {
     }
 
     final code = response.statusCode;
+    if (code == HttpStatus.badRequest) {
+      final message = (errorDto?.errorMessage ?? '').toLowerCase();
+      if (message.contains('jpg') ||
+          message.contains('jpeg') ||
+          message.contains('png')) {
+        return const AvatarInvalidFileTypeProfileFailure();
+      }
+      return const BadRequestProfileFailure();
+    }
+
     return switch (code) {
-      HttpStatus.badRequest => const BadRequestProfileFailure(),
       HttpStatus.unauthorized => const UnauthorizedProfileFailure(),
       HttpStatus.forbidden => const ForbiddenProfileFailure(),
       HttpStatus.notFound => const NotFoundProfileFailure(),
       HttpStatus.conflict when errorDto?.isUsernameConflict ?? false =>
         const UsernameAlreadyInUseProfileFailure(),
       HttpStatus.conflict => const EmailAlreadyInUseProfileFailure(),
-      final int? c when c != null && c >= 500 =>
-        ServerProfileFailure(statusCode: c, devMessage: 'Server error: $c'),
+      HttpStatus.payloadTooLarge => const AvatarFileTooLargeProfileFailure(),
+      final int? c when c != null && c >= 500 => ServerProfileFailure(
+        statusCode: c,
+        devMessage: 'Server error: $c',
+      ),
       final int? c => ServerProfileFailure(
-          statusCode: c,
-          devMessage: c != null ? 'HTTP error: $c' : 'HTTP error',
-        ),
+        statusCode: c,
+        devMessage: c != null ? 'HTTP error: $c' : 'HTTP error',
+      ),
     };
   }
 }

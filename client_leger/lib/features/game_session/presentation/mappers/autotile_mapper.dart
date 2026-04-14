@@ -20,8 +20,9 @@ Option<AutotileResult> autotileResultForCell(
     final orientation = map[mask];
     if (orientation == null) return const Option.none();
     final diag = _diagonalSuffix(x, y, board, type);
-    final diagonalSuffix =
-        diag.isEmpty ? const Option<String>.none() : Option.of(diag);
+    final diagonalSuffix = diag.isEmpty
+        ? const Option<String>.none()
+        : Option.of(diag);
     return Option.of((
       displayType: const Option<TileType>.none(),
       orientation: orientation,
@@ -75,25 +76,29 @@ int _cardinalBitmask(int x, int y, Board board, TileType type) {
 String _diagonalSuffix(int x, int y, Board board, TileType type) {
   final size = board.size;
   var suffix = '';
-  if (x > 0 && y > 0 &&
+  if (x > 0 &&
+      y > 0 &&
       _isSameCategoryForBitmask(type, board.matrix[x - 1][y - 1].tile.type) &&
       _isSameCategoryForBitmask(type, board.matrix[x - 1][y].tile.type) &&
       _isSameCategoryForBitmask(type, board.matrix[x][y - 1].tile.type)) {
     suffix += '_TL';
   }
-  if (x > 0 && y < size - 1 &&
+  if (x > 0 &&
+      y < size - 1 &&
       _isSameCategoryForBitmask(type, board.matrix[x - 1][y + 1].tile.type) &&
       _isSameCategoryForBitmask(type, board.matrix[x - 1][y].tile.type) &&
       _isSameCategoryForBitmask(type, board.matrix[x][y + 1].tile.type)) {
     suffix += '_TR';
   }
-  if (x < size - 1 && y < size - 1 &&
+  if (x < size - 1 &&
+      y < size - 1 &&
       _isSameCategoryForBitmask(type, board.matrix[x + 1][y + 1].tile.type) &&
       _isSameCategoryForBitmask(type, board.matrix[x + 1][y].tile.type) &&
       _isSameCategoryForBitmask(type, board.matrix[x][y + 1].tile.type)) {
     suffix += '_BR';
   }
-  if (x < size - 1 && y > 0 &&
+  if (x < size - 1 &&
+      y > 0 &&
       _isSameCategoryForBitmask(type, board.matrix[x + 1][y - 1].tile.type) &&
       _isSameCategoryForBitmask(type, board.matrix[x + 1][y].tile.type) &&
       _isSameCategoryForBitmask(type, board.matrix[x][y - 1].tile.type)) {

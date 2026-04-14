@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/presentation/shell/shell_chrome_back_handler.dart';
 import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/constants/character_assets.dart';
 import '../../../../../core/constants/stat_assets.dart';
@@ -34,10 +35,14 @@ class _CharacterCreationScreenState extends State<CharacterCreationScreen> {
     _viewModel = GetIt.I<CharacterCreationScopeHolder>().scope!
         .get<CharacterCreationViewModel>();
     _viewModel.init();
+    GetIt.I<ShellChromeBackHandler>().register(
+      _viewModel.requestExitToCreateGame,
+    );
   }
 
   @override
   void dispose() {
+    GetIt.I<ShellChromeBackHandler>().clear();
     _viewModel.dispose();
     _gridScrollController.dispose();
     super.dispose();
@@ -45,149 +50,62 @@ class _CharacterCreationScreenState extends State<CharacterCreationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = CharacterCreationLocalizations.of(context)!;
     return AppBackground(
-      child: Stack(
-        children: [
-          Column(
-            children: [
-              _CharacterCreationHeader(
-                title: l10n.createPlayerTitle,
-                onBackTap: _viewModel.requestExitToCreateGame,
-              ),
-              Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    if (constraints.maxWidth < 900) {
-                      return SingleChildScrollView(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          children: [
-                            _CharacterGrid(
-                              viewModel: _viewModel,
-                              scrollController: _gridScrollController,
-                              maxHeight: 420,
-                            ),
-                            const SizedBox(height: 24),
-                            _CenterColumn(viewModel: _viewModel),
-                            const SizedBox(height: 24),
-                            _BonusSection(
-                              viewModel: _viewModel,
-                              maxHeight: 420,
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                    return SingleChildScrollView(
-                      padding: const EdgeInsets.all(16),
-                      child: SizedBox(
-                        height: 560,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: _CharacterGrid(
-                                viewModel: _viewModel,
-                                scrollController: _gridScrollController,
-                                maxHeight: 560,
-                              ),
-                            ),
-                            const SizedBox(width: 32),
-                            Expanded(
-                              child: Center(
-                                child: _CenterColumn(viewModel: _viewModel),
-                              ),
-                            ),
-                            const SizedBox(width: 32),
-                            Expanded(
-                              child: _BonusSection(
-                                viewModel: _viewModel,
-                                maxHeight: 560,
-                              ),
-                            ),
-                          ],
-                        ),
+      child: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 900) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    _CharacterGrid(
+                      viewModel: _viewModel,
+                      scrollController: _gridScrollController,
+                      maxHeight: 420,
+                    ),
+                    const SizedBox(height: 24),
+                    _CenterColumn(viewModel: _viewModel),
+                    const SizedBox(height: 24),
+                    _BonusSection(viewModel: _viewModel, maxHeight: 420),
+                  ],
+                ),
+              );
+            }
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: SizedBox(
+                height: 560,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: _CharacterGrid(
+                        viewModel: _viewModel,
+                        scrollController: _gridScrollController,
+                        maxHeight: 560,
                       ),
-                    );
-                  },
+                    ),
+                    const SizedBox(width: 32),
+                    Expanded(
+                      child: Center(
+                        child: _CenterColumn(viewModel: _viewModel),
+                      ),
+                    ),
+                    const SizedBox(width: 32),
+                    Expanded(
+                      child: _BonusSection(
+                        viewModel: _viewModel,
+                        maxHeight: 560,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CharacterCreationHeader extends StatelessWidget {
-  const _CharacterCreationHeader({
-    required this.title,
-    required this.onBackTap,
-  });
-
-  final String title;
-  final VoidCallback onBackTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = CharacterCreationLocalizations.of(context)!;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: onBackTap,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 6,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Image.asset(
-                          UiAssets.characterCreationBackArrowIcon,
-                          width: 15,
-                          fit: BoxFit.contain,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          l10n.backToCreateGame,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'CustomFont',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontFamily: 'CustomFont',
-              fontSize: 24,
-            ),
-          ),
-        ],
+            );
+          },
+        ),
       ),
     );
   }

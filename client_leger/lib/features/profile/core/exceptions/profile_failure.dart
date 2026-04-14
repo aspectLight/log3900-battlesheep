@@ -38,12 +38,23 @@ class EmailAlreadyInUseProfileFailure extends ProfileFailure {
 class ServerProfileFailure extends ProfileFailure {
   final int? statusCode;
 
-  const ServerProfileFailure({this.statusCode, String devMessage = 'Server error'})
-      : super(devMessage);
+  const ServerProfileFailure({
+    this.statusCode,
+    String devMessage = 'Server error',
+  }) : super(devMessage);
 }
 
 class NoChangesProfileFailure extends ProfileFailure {
   const NoChangesProfileFailure() : super('No profile changes');
+}
+
+class AvatarFileTooLargeProfileFailure extends ProfileFailure {
+  const AvatarFileTooLargeProfileFailure() : super('Avatar file too large');
+}
+
+class AvatarInvalidFileTypeProfileFailure extends ProfileFailure {
+  const AvatarInvalidFileTypeProfileFailure()
+    : super('Invalid avatar file type');
 }
 
 class UnknownProfileFailure extends ProfileFailure {

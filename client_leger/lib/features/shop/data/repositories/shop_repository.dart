@@ -39,6 +39,11 @@ class ShopRepository {
     _socket.fetchBalance();
   }
 
+  void refreshCatalogueAndBalance() {
+    _socket.fetchBalance();
+    _socket.fetchCatalogue();
+  }
+
   void requestPurchase(ShopCatalogItemId itemId) =>
       _socket.purchaseItem(itemId.wireValue);
 
@@ -52,7 +57,9 @@ class ShopRepository {
     };
     state.value = ShopState.loaded(
       catalogue: List<ShopItemModel>.unmodifiable(model.catalogue),
-      purchasedItems: List<ShopCatalogItemId>.unmodifiable(model.purchasedItems),
+      purchasedItems: List<ShopCatalogItemId>.unmodifiable(
+        model.purchasedItems,
+      ),
       balance: balance,
     );
   }
@@ -97,8 +104,9 @@ class ShopRepository {
     }
     state.value = current.copyWith(
       balance: model.newBalance!,
-      purchasedItems:
-          List<ShopCatalogItemId>.unmodifiable(model.purchasedItems),
+      purchasedItems: List<ShopCatalogItemId>.unmodifiable(
+        model.purchasedItems,
+      ),
     );
   }
 

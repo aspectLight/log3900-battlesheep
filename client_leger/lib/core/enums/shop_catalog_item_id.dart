@@ -10,8 +10,7 @@ enum ShopCatalogItemId {
   sergei('sergei'),
   sokolov('sokolov'),
   viktor('viktor'),
-  volkov('volkov'),
-  ;
+  volkov('volkov');
 
   const ShopCatalogItemId(this.wireValue);
   final String wireValue;
@@ -19,11 +18,8 @@ enum ShopCatalogItemId {
   static ShopCatalogItemId parse(String raw) {
     return ShopCatalogItemId.values.firstWhere(
       (e) => e.wireValue == raw,
-      orElse: () => throw ArgumentError.value(
-        raw,
-        'id',
-        'Unknown shop catalog item id',
-      ),
+      orElse: () =>
+          throw ArgumentError.value(raw, 'id', 'Unknown shop catalog item id'),
     );
   }
 }

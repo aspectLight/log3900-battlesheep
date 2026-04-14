@@ -13,4 +13,3 @@ class GetEmailByUsernameResponseDto {
 
   Map<String, dynamic> toJson() => _$GetEmailByUsernameResponseDtoToJson(this);
 }
-

@@ -10,18 +10,13 @@ class HttpLogsHistoryService {
   final AuthRepository _authRepository;
   final Dio _dio;
 
-  HttpLogsHistoryService({
-    required AuthRepository authRepository,
-    Dio? dio,
-  })  : _authRepository = authRepository,
-        _dio = dio ?? Dio(BaseOptions(baseUrl: EnvConfig.baseUrl));
+  HttpLogsHistoryService({required AuthRepository authRepository, Dio? dio})
+    : _authRepository = authRepository,
+      _dio = dio ?? Dio(BaseOptions(baseUrl: EnvConfig.baseUrl));
 
   Options _authOptions(String token, String sessionId) {
     return Options(
-      headers: {
-        'Authorization': 'Bearer $token',
-        'x-session-id': sessionId,
-      },
+      headers: {'Authorization': 'Bearer $token', 'x-session-id': sessionId},
     );
   }
 
@@ -39,8 +34,7 @@ class HttpLogsHistoryService {
           if (data == null) return <LogsHistoryItemDto>[];
           return data
               .map(
-                (e) =>
-                    LogsHistoryItemDto.fromJson(e as Map<String, dynamic>),
+                (e) => LogsHistoryItemDto.fromJson(e as Map<String, dynamic>),
               )
               .toList();
         } on Object catch (_) {

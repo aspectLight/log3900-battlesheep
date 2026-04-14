@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 
 import '../typedefs/waiting_room_start_validation_params.dart';
+import '../../../shop/data/repositories/shop_repository.dart';
 import '../../data/repositories/waiting_room_room_repository.dart';
 import '../../domain/use_cases/add_virtual_player_use_case.dart';
 import '../../domain/use_cases/kick_player_use_case.dart';
@@ -10,10 +11,7 @@ import '../../domain/use_cases/toggle_drop_in_drop_out_use_case.dart';
 import '../../domain/use_cases/toggle_lock_waiting_room_use_case.dart';
 import '../../presentation/screens/waiting_room/waiting_room_view_model.dart';
 
-void registerWaitingRoomScopeViewModels(
-  GetIt scope,
-  GetIt rootGetIt,
-) {
+void registerWaitingRoomScopeViewModels(GetIt scope, GetIt rootGetIt) {
   scope.registerFactory<WaitingRoomViewModel>(
     () => WaitingRoomViewModel(
       roomRepository: scope.get<WaitingRoomRoomRepository>(),
@@ -24,6 +22,7 @@ void registerWaitingRoomScopeViewModels(
       toggleDropInDropOutUseCase: scope.get<ToggleDropInDropOutUseCase>(),
       kickPlayerUseCase: scope.get<KickPlayerUseCase>(),
       startWaitingRoomGameUseCase: scope.get<StartWaitingRoomGameUseCase>(),
+      shopRepository: rootGetIt.get<ShopRepository>(),
     ),
   );
 }

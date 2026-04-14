@@ -3,7 +3,8 @@ import 'package:json_annotation/json_annotation.dart';
 import '../../features/game_session/core/enums/tile_orientation.dart';
 import '../../features/game_session/core/enums/tile_type.dart';
 
-class TileOrientationConverter implements JsonConverter<TileOrientation?, String?> {
+class TileOrientationConverter
+    implements JsonConverter<TileOrientation?, String?> {
   const TileOrientationConverter();
 
   @override

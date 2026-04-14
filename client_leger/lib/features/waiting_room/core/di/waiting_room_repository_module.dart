@@ -16,10 +16,14 @@ void registerWaitingRoomRepositories(
   required String socketId,
   required WaitingRoomEntryData entryData,
   WaitingRoomModel? initialRoom,
+  int entryFee = 0,
 }) {
   final socket = scope.get<WaitingRoomSocket>();
-  final initialRoomState = initialRoom ??
-      WaitingRoomModel.initial(roomId: roomId, hostId: hostId);
+  final baseRoom =
+      initialRoom ?? WaitingRoomModel.initial(roomId: roomId, hostId: hostId);
+  final initialRoomState = entryFee > 0
+      ? baseRoom.copyWith(entryFee: entryFee)
+      : baseRoom;
   final clientStartedWaitingRoom = switch (entryData) {
     WaitingRoomHostEntryData() => true,
     WaitingRoomJoinEntryData() => false,

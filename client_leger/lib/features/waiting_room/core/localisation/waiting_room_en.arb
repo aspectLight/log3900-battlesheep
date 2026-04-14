@@ -39,6 +39,8 @@
   "waitingRoomStatSpeed": "Speed",
   "waitingRoomStatAttack": "Attack",
   "waitingRoomStatDefense": "Defense",
+  "waitingRoomBalanceLabel": "Balance:",
+  "waitingRoomEntryFeeLabel": "Entry fee:",
   "gameNotFound": "Game not found",
   "unknownError": "An unknown error occurred",
   "waitingRoomWelcomeMessage": "Bienvenue dans la salle d'attente, partagez le code de la partie avec vos amis !"

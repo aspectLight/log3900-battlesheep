@@ -11,9 +11,9 @@ class CharacterAlreadyUsedNotificationWidget extends StatelessWidget {
     required WaitingRoomReserveFailedNotificationIntent intent,
     required VoidCallback onDismiss,
   }) : _viewModel = CharacterAlreadyUsedNotificationViewModel(
-          intent: intent,
-          onDismiss: onDismiss,
-        );
+         intent: intent,
+         onDismiss: onDismiss,
+       );
 
   final CharacterAlreadyUsedNotificationViewModel _viewModel;
 
@@ -76,10 +76,7 @@ class _GameButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _GameButton({
-    required this.label,
-    required this.onTap,
-  });
+  const _GameButton({required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

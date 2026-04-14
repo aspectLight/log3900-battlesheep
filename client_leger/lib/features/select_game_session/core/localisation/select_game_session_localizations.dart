@@ -167,6 +167,24 @@ abstract class SelectGameSessionLocalizations {
   /// **'Capture the flag'**
   String get createGameModeCtf;
 
+  /// No description provided for @createGameAccessibilityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Accessibility'**
+  String get createGameAccessibilityLabel;
+
+  /// No description provided for @createGameFriendsOnlyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends only'**
+  String get createGameFriendsOnlyLabel;
+
+  /// No description provided for @createGameEntryFeeSectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry price'**
+  String get createGameEntryFeeSectionLabel;
+
   /// No description provided for @createGameEntryFeeLabel.
   ///
   /// In en, this message translates to:
@@ -197,6 +215,10 @@ abstract class SelectGameSessionLocalizations {
   /// **'You do not have enough coins to set this entry fee. Lower the fee or earn coins in the shop.'**
   String get createGameInsufficientFundsMessage;
 
+  /// No description provided for @noGames.
+  ///
+  /// In en, this message translates to:
+  /// **'No games available.'**
   String get noGames;
 }
 

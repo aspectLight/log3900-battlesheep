@@ -1,11 +1,8 @@
-enum CharacterCreationBonusChoice {
-  health,
-  speed,
-}
+enum CharacterCreationBonusChoice { health, speed }
 
 extension CharacterCreationBonusChoiceExt on CharacterCreationBonusChoice {
   String get toServerValue => switch (this) {
-        CharacterCreationBonusChoice.health => 'health',
-        CharacterCreationBonusChoice.speed => 'speed',
-      };
+    CharacterCreationBonusChoice.health => 'health',
+    CharacterCreationBonusChoice.speed => 'speed',
+  };
 }

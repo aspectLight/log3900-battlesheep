@@ -24,10 +24,39 @@ class ProfileLocalizationsFr extends ProfileLocalizations {
   String get profileAvatarLabel => 'Avatar';
 
   @override
+  String get profileAvatarUploadLabel => 'Importer une photo';
+
+  @override
+  String get profileAvatarCameraLabel => 'Prendre une photo';
+
+  @override
+  String get profileAvatarOrUpload => 'Ou importer une photo personnalisée';
+
+  @override
+  String get profileAvatarFileTooLarge => 'L\'image doit faire moins de 2 Mo.';
+
+  @override
+  String get profileAvatarInvalidFileType =>
+      'Seuls les formats JPG et PNG sont acceptés.';
+
+  @override
+  String get profileAvatarUploadFailed =>
+      'Échec du téléversement de l\'avatar. L\'avatar précédent a été conservé.';
+
+  @override
+  String get profileAvatarUploading => 'Téléversement...';
+
+  @override
   String get profileSave => 'Enregistrer les modifications';
 
   @override
   String get profileSaveInProgress => 'Enregistrement...';
+
+  @override
+  String get profileSuccessTitle => 'Succès';
+
+  @override
+  String get profileErrorTitle => 'Erreur';
 
   @override
   String get profileSaveSuccess => 'Profil mis à jour avec succès.';
@@ -91,6 +120,21 @@ class ProfileLocalizationsFr extends ProfileLocalizations {
   String get profileAverageTime => 'Temps moyen par partie';
 
   @override
+  String get profileThemeLabel => 'Thème';
+
+  @override
+  String get profileLanguageLabel => 'Langue';
+
+  @override
+  String get themeNameDefault => 'Par défaut';
+
+  @override
+  String get themeNameFrost => 'Givre';
+
+  @override
+  String get themeNameVillage => 'Village';
+
+  @override
   String get profileDeleteAccount => 'Supprimer le compte';
 
   @override
@@ -108,25 +152,4 @@ class ProfileLocalizationsFr extends ProfileLocalizations {
 
   @override
   String get profileDeleting => 'Suppression...';
-
-  @override
-  String get profileThemeLabel => 'Thème visuel';
-
-  @override
-  String get profileLanguageLabel => 'Langue';
-
-  @override
-  String get themeNameDefault => 'Principal';
-
-  @override
-  String get themeNameFrost => 'Froid sibérien';
-
-  @override
-  String get themeNameVillage => 'Village abandonné';
-
-  @override
-  String get languageNameFr => 'Français';
-
-  @override
-  String get languageNameEn => 'Anglais';
 }

@@ -8,7 +8,8 @@ sealed class LogsHistoryFailure implements Exception {
 }
 
 class LoadFailedLogsHistoryFailure extends LogsHistoryFailure {
-  const LoadFailedLogsHistoryFailure() : super('Failed to load connection history');
+  const LoadFailedLogsHistoryFailure()
+    : super('Failed to load connection history');
 }
 
 class UnknownLogsHistoryFailure extends LogsHistoryFailure {

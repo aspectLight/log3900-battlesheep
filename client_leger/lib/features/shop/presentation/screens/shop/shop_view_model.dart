@@ -7,10 +7,9 @@ import '../../../domain/models/shop_item_model.dart';
 import '../../../domain/state/shop_state.dart';
 
 class ShopViewModel {
-  ShopViewModel({
-    required ShopRepository repository,
-  })  : _repository = repository,
-        state = computed(() => repository.state.value);
+  ShopViewModel({required ShopRepository repository})
+    : _repository = repository,
+      state = computed(() => repository.state.value);
 
   final ShopRepository _repository;
 

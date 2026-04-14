@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../core/localisation/core_localizations.dart';
+import '../../../../core/presentation/widgets/profile_avatar_thumb/profile_avatar_thumb.dart';
 
 class UserCard extends StatelessWidget {
   const UserCard({
@@ -10,11 +11,13 @@ class UserCard extends StatelessWidget {
     required this.actions,
     this.isOnline,
     this.avatarId,
+    this.avatarUrl,
   });
 
   final String username;
   final bool? isOnline;
   final String? avatarId;
+  final String? avatarUrl;
   final List<Widget> actions;
 
   @override
@@ -33,17 +36,12 @@ class UserCard extends StatelessWidget {
           Expanded(
             child: Row(
               children: [
-                if (avatarId != null) ...[
-                  CircleAvatar(
-                    radius: 18,
-                    backgroundColor: const Color(0xFF4a3010),
-                    child: Text(
-                      username.isNotEmpty ? username[0].toUpperCase() : '?',
-                      style: const TextStyle(
-                        color: Color(0xFFffd39a),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                if (avatarId != null || avatarUrl != null) ...[
+                  ProfileAvatarThumb(
+                    displayName: username,
+                    avatarId: avatarId,
+                    avatarUrl: avatarUrl,
+                    size: 36,
                   ),
                   const SizedBox(width: 12),
                 ],

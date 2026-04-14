@@ -31,23 +31,17 @@ class ShopItemCard extends StatelessWidget {
       width: 180,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: owned
-            ? const Color(0xD9071607)
-            : const Color(0xD9160707),
+        color: owned ? const Color(0xD9071607) : const Color(0xD9160707),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
           color: equipped
               ? const Color(0xFF2E7D32)
               : owned
-                  ? const Color(0xFF2E7D32)
-                  : const Color(0xFF3A3A3A),
+              ? const Color(0xFF2E7D32)
+              : const Color(0xFF3A3A3A),
         ),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black38,
-            blurRadius: 8,
-            offset: Offset(0, 4),
-          ),
+          BoxShadow(color: Colors.black38, blurRadius: 8, offset: Offset(0, 4)),
         ],
       ),
       child: Column(
@@ -63,10 +57,7 @@ class ShopItemCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(4),
                 child: ColoredBox(
                   color: Colors.black26,
-                  child: Image.asset(
-                    asset,
-                    fit: BoxFit.contain,
-                  ),
+                  child: Image.asset(asset, fit: BoxFit.contain),
                 ),
               ),
             ),
@@ -83,7 +74,9 @@ class ShopItemCard extends StatelessWidget {
           const SizedBox(height: 4),
           ShopCoinPrice(price: item.price),
           const SizedBox(height: 8),
-          if (owned && item.type == ShopItemType.banner && onEquipToggle != null)
+          if (owned &&
+              item.type == ShopItemType.banner &&
+              onEquipToggle != null)
             ElevatedButton(
               onPressed: onEquipToggle,
               style: ElevatedButton.styleFrom(
@@ -98,9 +91,7 @@ class ShopItemCard extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              child: Text(
-                equipped ? l10n.shopUnequip : l10n.shopEquip,
-              ),
+              child: Text(equipped ? l10n.shopUnequip : l10n.shopEquip),
             )
           else if (owned)
             Text(

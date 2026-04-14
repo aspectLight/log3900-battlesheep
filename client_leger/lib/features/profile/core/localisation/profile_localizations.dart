@@ -131,6 +131,48 @@ abstract class ProfileLocalizations {
   /// **'Avatar'**
   String get profileAvatarLabel;
 
+  /// No description provided for @profileAvatarUploadLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload photo'**
+  String get profileAvatarUploadLabel;
+
+  /// No description provided for @profileAvatarCameraLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get profileAvatarCameraLabel;
+
+  /// No description provided for @profileAvatarOrUpload.
+  ///
+  /// In en, this message translates to:
+  /// **'Or upload a custom photo'**
+  String get profileAvatarOrUpload;
+
+  /// No description provided for @profileAvatarFileTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Image must be under 2 MB.'**
+  String get profileAvatarFileTooLarge;
+
+  /// No description provided for @profileAvatarInvalidFileType.
+  ///
+  /// In en, this message translates to:
+  /// **'Only JPG and PNG images are accepted.'**
+  String get profileAvatarInvalidFileType;
+
+  /// No description provided for @profileAvatarUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar upload failed. Your previous avatar was kept.'**
+  String get profileAvatarUploadFailed;
+
+  /// No description provided for @profileAvatarUploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading...'**
+  String get profileAvatarUploading;
+
   /// No description provided for @profileSave.
   ///
   /// In en, this message translates to:
@@ -142,6 +184,18 @@ abstract class ProfileLocalizations {
   /// In en, this message translates to:
   /// **'Saving...'**
   String get profileSaveInProgress;
+
+  /// No description provided for @profileSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get profileSuccessTitle;
+
+  /// No description provided for @profileErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get profileErrorTitle;
 
   /// No description provided for @profileSaveSuccess.
   ///
@@ -251,6 +305,36 @@ abstract class ProfileLocalizations {
   /// **'Average time per game'**
   String get profileAverageTime;
 
+  /// No description provided for @profileThemeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get profileThemeLabel;
+
+  /// No description provided for @profileLanguageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get profileLanguageLabel;
+
+  /// No description provided for @themeNameDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get themeNameDefault;
+
+  /// No description provided for @themeNameFrost.
+  ///
+  /// In en, this message translates to:
+  /// **'Frost'**
+  String get themeNameFrost;
+
+  /// No description provided for @themeNameVillage.
+  ///
+  /// In en, this message translates to:
+  /// **'Village'**
+  String get themeNameVillage;
+
   /// No description provided for @profileDeleteAccount.
   ///
   /// In en, this message translates to:
@@ -286,20 +370,6 @@ abstract class ProfileLocalizations {
   /// In en, this message translates to:
   /// **'Deleting...'**
   String get profileDeleting;
-
-  String get profileThemeLabel;
-
-  String get profileLanguageLabel;
-
-  String get themeNameDefault;
-
-  String get themeNameFrost;
-
-  String get themeNameVillage;
-
-  String get languageNameFr;
-
-  String get languageNameEn;
 }
 
 class _ProfileLocalizationsDelegate

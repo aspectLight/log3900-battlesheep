@@ -63,10 +63,7 @@ class GameBoardRepository {
     required Board board,
     required Map<GameBoardPosition, GameItem> items,
   }) {
-    state.value = GameBoardState.scopedInitial(
-      board: board,
-      items: items,
-    );
+    state.value = GameBoardState.scopedInitial(board: board, items: items);
   }
 
   void removePlayerFromBoard(String playerId) {

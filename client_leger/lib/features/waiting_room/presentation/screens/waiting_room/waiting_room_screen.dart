@@ -8,7 +8,9 @@ import 'package:signals_flutter/signals_flutter.dart';
 import '../../../../../core/constants/ui_assets.dart';
 import '../../../../../core/enums/virtual_player_type.dart';
 import '../../../../../core/helpers/functional_programming.dart';
+import '../../../../../core/presentation/shell/shell_chrome_back_handler.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
+import '../../../../../core/presentation/widgets/profile_avatar_thumb/profile_avatar_thumb.dart';
 import '../../../core/context/waiting_room_scope_holder.dart';
 import '../../../core/event_bus/waiting_room_event_bus.dart';
 import '../../../core/exceptions/waiting_room_failure.dart';
@@ -44,10 +46,12 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
     _viewModel = scope!.get<WaitingRoomViewModel>();
     _eventBus = GetIt.I<WaitingRoomEventBus>();
     _eventBus.fire(const WaitingRoomWelcomeRequestedEvent());
+    GetIt.I<ShellChromeBackHandler>().register(_requestLeaveConfirmation);
   }
 
   @override
   void dispose() {
+    GetIt.I<ShellChromeBackHandler>().clear();
     _playersScrollController.dispose();
     super.dispose();
   }
@@ -156,62 +160,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = WaitingRoomLocalizations.of(context)!;
-    return AppBackground(
-      child: Column(
-        children: [
-          _buildHeader(context, l10n),
-          Expanded(child: _buildBody(context, l10n)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context, WaitingRoomLocalizations l10n) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: GestureDetector(
-                onTap: _requestLeaveConfirmation,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset(
-                      UiAssets.characterCreationBackArrowIcon,
-                      width: 15,
-                      height: 15,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      l10n.back,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontFamily: 'CustomFont',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Text(
-              l10n.waitingRoomTitle,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 3,
-                fontFamily: 'CustomFont',
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    return AppBackground(child: SafeArea(child: _buildBody(context, l10n)));
   }
 
   Widget _buildBody(BuildContext context, WaitingRoomLocalizations l10n) {
@@ -219,6 +168,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
       final room = _viewModel.room.value;
       final isHost = _viewModel.isHost.value;
       final isLocked = room.isLocked;
+      final balance = _viewModel.balance.value;
       return Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -233,6 +183,12 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
             ),
             const SizedBox(height: 20),
             _buildGameCode(room.roomId, l10n),
+            const SizedBox(height: 20),
+            _buildCurrencyPanel(
+              l10n,
+              balance: balance,
+              entryFee: room.entryFee,
+            ),
             const SizedBox(height: 20),
             if (isHost)
               _buildHostActions(
@@ -279,7 +235,9 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
         final viewportWidth = constraints.maxWidth;
         final viewportHeight = constraints.maxHeight;
         final availableWidth =
-            viewportWidth - (horizontalPadding * 2) - (cardSpacing * (players.length - 1));
+            viewportWidth -
+            (horizontalPadding * 2) -
+            (cardSpacing * (players.length - 1));
         final computedCardWidth = availableWidth / players.length;
         final cardWidth = computedCardWidth > 320 ? 320.0 : computedCardWidth;
         final shouldScroll = cardWidth < 170;
@@ -371,6 +329,69 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
     );
   }
 
+  Widget _buildCurrencyPanel(
+    WaitingRoomLocalizations l10n, {
+    required int balance,
+    required int entryFee,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xBF1E0A0A),
+        border: Border.all(color: const Color(0xFF7F1F1F)),
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x4D550000),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildCurrencyRow(
+            label: l10n.waitingRoomBalanceLabel,
+            value: '$balance',
+          ),
+          if (entryFee > 0) ...[
+            const SizedBox(height: 6),
+            _buildCurrencyRow(
+              label: l10n.waitingRoomEntryFeeLabel,
+              value: '$entryFee',
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCurrencyRow({required String label, required String value}) {
+    const labelStyle = TextStyle(
+      color: Color(0xFFE0D8C0),
+      fontSize: 16,
+      fontFamily: 'CustomFont',
+    );
+    const valueStyle = TextStyle(
+      color: Color(0xFFF5C842),
+      fontSize: 16,
+      fontWeight: FontWeight.w600,
+      fontFamily: 'CustomFont',
+    );
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(label, style: labelStyle),
+        const SizedBox(width: 6),
+        Text(value, style: valueStyle),
+        const SizedBox(width: 5),
+        Image.asset(UiAssets.goldCoin, width: 20, height: 20),
+      ],
+    );
+  }
+
   Widget _buildHostActions(
     BuildContext context,
     WaitingRoomLocalizations l10n,
@@ -390,7 +411,9 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
           label: isLocked
               ? l10n.waitingRoomUnlockRoom
               : l10n.waitingRoomLockRoom,
-          onPressed: canToggleLock ? _requestToggleLockConfirmationIfNeeded : null,
+          onPressed: canToggleLock
+              ? _requestToggleLockConfirmationIfNeeded
+              : null,
         ),
         _buildDropInToggle(
           enabled: isDropInDropOutEnabled,
@@ -589,8 +612,7 @@ class _WaitingRoomPlayerCardInnerStack extends StatelessWidget {
     final nameColor = playerUi.isVirtual
         ? const Color(0xFF00BFFF)
         : (bannerTheme?.nameColor ?? Colors.white);
-    final nameShadows =
-        playerUi.isVirtual ? null : bannerTheme?.nameShadows;
+    final nameShadows = playerUi.isVirtual ? null : bannerTheme?.nameShadows;
     final statLabel = bannerTheme?.statLabelColor ?? Colors.white70;
     final statValue = bannerTheme?.statValueColor ?? Colors.white;
 
@@ -633,16 +655,32 @@ class _WaitingRoomPlayerCardInnerStack extends StatelessWidget {
                     ? const Color.fromRGBO(0, 0, 0, 0.7)
                     : null,
               ),
-              child: Text(
-                playerUi.name,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: nameColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  fontFamily: 'CustomFont',
-                  shadows: nameShadows,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ProfileAvatarThumb(
+                    displayName: playerUi.name,
+                    avatarId: playerUi.profileAvatarId,
+                    avatarUrl: playerUi.profileAvatarUrl,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      playerUi.name,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: nameColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        fontFamily: 'CustomFont',
+                        shadows: nameShadows,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             Container(
@@ -686,11 +724,7 @@ class _WaitingRoomPlayerCardInnerStack extends StatelessWidget {
           ],
         ),
         if (bannerTheme != null)
-          waitingRoomBannerOverlayLayer(
-            bannerTheme,
-            borderPhase,
-            overlayPhase,
-          ),
+          waitingRoomBannerOverlayLayer(bannerTheme, borderPhase, overlayPhase),
         if (isHost)
           Positioned(
             left: 8,
@@ -699,8 +733,7 @@ class _WaitingRoomPlayerCardInnerStack extends StatelessWidget {
               UiAssets.crownBadge,
               width: 42,
               height: 42,
-              errorBuilder: (_, _, _) =>
-                  const SizedBox(width: 42, height: 42),
+              errorBuilder: (_, _, _) => const SizedBox(width: 42, height: 42),
             ),
           ),
         if (playerUi.isVirtual)
@@ -711,8 +744,7 @@ class _WaitingRoomPlayerCardInnerStack extends StatelessWidget {
               UiAssets.robotBadge,
               width: 42,
               height: 42,
-              errorBuilder: (_, _, _) =>
-                  const SizedBox(width: 42, height: 42),
+              errorBuilder: (_, _, _) => const SizedBox(width: 42, height: 42),
             ),
           ),
         if (showKickButton)

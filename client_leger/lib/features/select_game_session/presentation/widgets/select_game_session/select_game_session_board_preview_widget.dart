@@ -98,17 +98,10 @@ class _SelectGameSessionBoardPreviewWidgetState
     }
 
     final board = Board(matrix: matrix, size: widget.boardSize);
-    final boardState = GameBoardState.scopedInitial(
-      board: board,
-      items: items,
-    );
+    final boardState = GameBoardState.scopedInitial(board: board, items: items);
     final playerState = GamePlayerState.initial();
 
-    return toGameBoardUi(
-      board,
-      playerState,
-      boardState,
-    );
+    return toGameBoardUi(board, playerState, boardState);
   }
 
   @override
@@ -131,18 +124,12 @@ class _SelectGameSessionBoardPreviewWidgetState
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: _boardUi.size,
-              children: List.generate(
-                _boardUi.size * _boardUi.size,
-                (index) {
-                  final x = index ~/ _boardUi.size;
-                  final y = index % _boardUi.size;
-                  final cell = _boardUi.matrix[x][y];
-                  return _CellUiRenderer(
-                    cell: cell,
-                    cellSize: cellSize,
-                  );
-                },
-              ),
+              children: List.generate(_boardUi.size * _boardUi.size, (index) {
+                final x = index ~/ _boardUi.size;
+                final y = index % _boardUi.size;
+                final cell = _boardUi.matrix[x][y];
+                return _CellUiRenderer(cell: cell, cellSize: cellSize);
+              }),
             ),
           ),
         );
@@ -152,10 +139,7 @@ class _SelectGameSessionBoardPreviewWidgetState
 }
 
 class _CellUiRenderer extends StatelessWidget {
-  const _CellUiRenderer({
-    required this.cell,
-    required this.cellSize,
-  });
+  const _CellUiRenderer({required this.cell, required this.cellSize});
 
   final GameBoardCellUi cell;
   final double cellSize;
@@ -172,8 +156,10 @@ class _CellUiRenderer extends StatelessWidget {
             Image.asset(
               GameBoardUiTile(
                 sourceTile: cell.tile,
-                displayType: cell.displayTileType
-                    .fold(() => cell.tile.type, (t) => t),
+                displayType: cell.displayTileType.fold(
+                  () => cell.tile.type,
+                  (t) => t,
+                ),
                 orientation: cell.tileOrientation,
                 doorState: switch (cell.tile) {
                   DoorTile(:final state) => fp.Option.of(state),
@@ -187,8 +173,10 @@ class _CellUiRenderer extends StatelessWidget {
               errorBuilder: (context, error, stackTrace) => Image.asset(
                 GameBoardUiTile(
                   sourceTile: cell.tile,
-                  displayType: cell.displayTileType
-                      .fold(() => cell.tile.type, (t) => t),
+                  displayType: cell.displayTileType.fold(
+                    () => cell.tile.type,
+                    (t) => t,
+                  ),
                   orientation: cell.tileOrientation,
                   doorState: switch (cell.tile) {
                     DoorTile(:final state) => fp.Option.of(state),
@@ -217,4 +205,3 @@ class _CellUiRenderer extends StatelessWidget {
     );
   }
 }
-

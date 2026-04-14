@@ -55,6 +55,9 @@ class JoinGameSessionLocalizationsFr extends JoinGameSessionLocalizations {
   String get joinGameRoomListCode => 'Code';
 
   @override
+  String get joinGameRoomListPrice => 'Prix';
+
+  @override
   String get joinGameStatusWaiting => 'En attente';
 
   @override
@@ -68,6 +71,9 @@ class JoinGameSessionLocalizationsFr extends JoinGameSessionLocalizations {
 
   @override
   String get joinGameAccessibilityFull => 'Complète';
+
+  @override
+  String get joinGamePriceFree => 'Gratuit';
 
   @override
   String get waitingRoomRoomNotFound => 'Partie introuvable';

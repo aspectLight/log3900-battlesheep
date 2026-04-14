@@ -32,10 +32,7 @@ class SelectGameSessionPanelViewModel {
   final SelectGameSessionCurrencyRepository _currencyRepository;
 
   final _state = signal<SelectGameSessionState>(
-    const SelectGameSessionState.loaded(
-      games: [],
-      isLoadingGames: true,
-    ),
+    const SelectGameSessionState.loaded(games: [], isLoadingGames: true),
   );
 
   final entryFee = signal<int>(0);

@@ -24,10 +24,39 @@ class ProfileLocalizationsEn extends ProfileLocalizations {
   String get profileAvatarLabel => 'Avatar';
 
   @override
+  String get profileAvatarUploadLabel => 'Upload photo';
+
+  @override
+  String get profileAvatarCameraLabel => 'Take photo';
+
+  @override
+  String get profileAvatarOrUpload => 'Or upload a custom photo';
+
+  @override
+  String get profileAvatarFileTooLarge => 'Image must be under 2 MB.';
+
+  @override
+  String get profileAvatarInvalidFileType =>
+      'Only JPG and PNG images are accepted.';
+
+  @override
+  String get profileAvatarUploadFailed =>
+      'Avatar upload failed. Your previous avatar was kept.';
+
+  @override
+  String get profileAvatarUploading => 'Uploading...';
+
+  @override
   String get profileSave => 'Save changes';
 
   @override
   String get profileSaveInProgress => 'Saving...';
+
+  @override
+  String get profileSuccessTitle => 'Success';
+
+  @override
+  String get profileErrorTitle => 'Error';
 
   @override
   String get profileSaveSuccess => 'Profile updated successfully.';
@@ -90,6 +119,21 @@ class ProfileLocalizationsEn extends ProfileLocalizations {
   String get profileAverageTime => 'Average time per game';
 
   @override
+  String get profileThemeLabel => 'Theme';
+
+  @override
+  String get profileLanguageLabel => 'Language';
+
+  @override
+  String get themeNameDefault => 'Default';
+
+  @override
+  String get themeNameFrost => 'Frost';
+
+  @override
+  String get themeNameVillage => 'Village';
+
+  @override
   String get profileDeleteAccount => 'Delete account';
 
   @override
@@ -107,25 +151,4 @@ class ProfileLocalizationsEn extends ProfileLocalizations {
 
   @override
   String get profileDeleting => 'Deleting...';
-
-  @override
-  String get profileThemeLabel => 'Visual theme';
-
-  @override
-  String get profileLanguageLabel => 'Language';
-
-  @override
-  String get themeNameDefault => 'Main';
-
-  @override
-  String get themeNameFrost => 'Siberian frost';
-
-  @override
-  String get themeNameVillage => 'Abandoned village';
-
-  @override
-  String get languageNameFr => 'French';
-
-  @override
-  String get languageNameEn => 'English';
 }

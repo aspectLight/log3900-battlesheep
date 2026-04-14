@@ -5,8 +5,6 @@ import '../../presentation/screens/shop/shop_view_model.dart';
 
 void registerShopViewModels(GetIt getIt) {
   getIt.registerFactory<ShopViewModel>(
-    () => ShopViewModel(
-      repository: getIt<ShopRepository>(),
-    ),
+    () => ShopViewModel(repository: getIt<ShopRepository>()),
   );
 }

@@ -335,6 +335,18 @@ abstract class WaitingRoomLocalizations {
   /// **'Defense'**
   String get waitingRoomStatDefense;
 
+  /// No description provided for @waitingRoomBalanceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance:'**
+  String get waitingRoomBalanceLabel;
+
+  /// No description provided for @waitingRoomEntryFeeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry fee:'**
+  String get waitingRoomEntryFeeLabel;
+
   /// No description provided for @gameNotFound.
   ///
   /// In en, this message translates to:

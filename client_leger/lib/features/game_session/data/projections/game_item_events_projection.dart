@@ -93,39 +93,36 @@ class GameItemEventsProjection implements EventProjection {
     _notificationCoordinator.addIntent(
       InventoryFullDiscardIntent(
         candidateItems: [...inv.map((e) => e.type), event.item.type],
-        onComplete: (discarded) => discarded.fold(
-          () {},
-          (ItemType itemType) {
-            if (itemType == event.item.type) {
-              _itemRepository.dropItem(
-                ItemDroppedCommand(
-                  roomId: _roomId,
-                  source: PlayerItemDropSource(playerId: event.playerId),
-                  item: GameItem(type: itemType),
-                  coords: pos,
-                ),
-              );
-            } else {
-              final item = GameItem(type: itemType);
-              final dropEv = ItemDroppedEvent(
+        onComplete: (discarded) => discarded.fold(() {}, (ItemType itemType) {
+          if (itemType == event.item.type) {
+            _itemRepository.dropItem(
+              ItemDroppedCommand(
                 roomId: _roomId,
-                playerId: event.playerId,
+                source: PlayerItemDropSource(playerId: event.playerId),
+                item: GameItem(type: itemType),
+                coords: pos,
+              ),
+            );
+          } else {
+            final item = GameItem(type: itemType);
+            final dropEv = ItemDroppedEvent(
+              roomId: _roomId,
+              playerId: event.playerId,
+              item: item,
+              coords: pos,
+            );
+            _inventoryRepository.applyItemDropped(dropEv);
+            _playerRepository.applyItemDropped(dropEv);
+            _itemRepository.dropItem(
+              ItemDroppedCommand(
+                roomId: _roomId,
+                source: PlayerItemDropSource(playerId: event.playerId),
                 item: item,
                 coords: pos,
-              );
-              _inventoryRepository.applyItemDropped(dropEv);
-              _playerRepository.applyItemDropped(dropEv);
-              _itemRepository.dropItem(
-                ItemDroppedCommand(
-                  roomId: _roomId,
-                  source: PlayerItemDropSource(playerId: event.playerId),
-                  item: item,
-                  coords: pos,
-                ),
-              );
-            }
-          },
-        ),
+              ),
+            );
+          }
+        }),
       ),
     );
   }

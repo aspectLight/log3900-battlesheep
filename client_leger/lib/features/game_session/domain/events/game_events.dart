@@ -28,8 +28,9 @@ class SpawnedPlayerEvent with _$SpawnedPlayerEvent {
 
 @freezed
 class PlayerSpawnedEvent with _$PlayerSpawnedEvent {
-  const factory PlayerSpawnedEvent({required List<SpawnedPlayerEvent> players}) =
-      _PlayerSpawnedEvent;
+  const factory PlayerSpawnedEvent({
+    required List<SpawnedPlayerEvent> players,
+  }) = _PlayerSpawnedEvent;
 }
 
 @freezed
@@ -82,7 +83,8 @@ class CurrentPlayerChangedEvent with _$CurrentPlayerChangedEvent {
 
 @freezed
 class UpdateScoreEvent with _$UpdateScoreEvent {
-  const factory UpdateScoreEvent({required String winnerId}) = _UpdateScoreEvent;
+  const factory UpdateScoreEvent({required String winnerId}) =
+      _UpdateScoreEvent;
 }
 
 @freezed

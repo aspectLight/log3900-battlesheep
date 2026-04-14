@@ -48,7 +48,9 @@ class GameInventoryStateReducer {
     final clearFlag = event.item.type == ItemType.flag;
     return previous.copyWith(
       itemsByPlayerId: next,
-      playerWithFlagId: clearFlag ? const Option.none() : previous.playerWithFlagId,
+      playerWithFlagId: clearFlag
+          ? const Option.none()
+          : previous.playerWithFlagId,
     );
   }
 
@@ -58,7 +60,8 @@ class GameInventoryStateReducer {
   ) {
     if (event.inventoryFull) return previous;
     final current = previous.itemsByPlayerId[event.playerId] ?? [];
-    if (current.length >= GameRulesConstants.inventorySlotCount) return previous;
+    if (current.length >= GameRulesConstants.inventorySlotCount)
+      return previous;
     final next = Map<String, List<GameItem>>.from(previous.itemsByPlayerId);
     next[event.playerId] = [...current, event.item];
     return previous.copyWith(itemsByPlayerId: next);
@@ -88,7 +91,9 @@ class GameInventoryStateReducer {
     final hasFlag = droppedItems.any((item) => item.type == ItemType.flag);
     return previous.copyWith(
       itemsByPlayerId: next,
-      playerWithFlagId: hasFlag ? const Option.none() : previous.playerWithFlagId,
+      playerWithFlagId: hasFlag
+          ? const Option.none()
+          : previous.playerWithFlagId,
     );
   }
 

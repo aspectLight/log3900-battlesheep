@@ -50,10 +50,8 @@ void registerNotificationModule(GetIt getIt) {
         GameCanceledNotificationWidget(intent: intent, onDismiss: onDismiss),
   );
   registry.register<CombatStartedNotificationIntent>(
-    (c, intent, onDismiss) => CombatStartedNotificationWidget(
-      intent: intent,
-      onDismiss: onDismiss,
-    ),
+    (c, intent, onDismiss) =>
+        CombatStartedNotificationWidget(intent: intent, onDismiss: onDismiss),
   );
   registry.register<EndCombatNotificationIntent>(
     (c, intent, onDismiss) =>
@@ -66,10 +64,8 @@ void registerNotificationModule(GetIt getIt) {
     ),
   );
   registry.register<TrapChoiceIntent>(
-    (c, intent, onDismiss) => GameTrapChoiceNotificationWidget(
-      intent: intent,
-      onDismiss: onDismiss,
-    ),
+    (c, intent, onDismiss) =>
+        GameTrapChoiceNotificationWidget(intent: intent, onDismiss: onDismiss),
   );
   registry.register<JoinGameSessionFailureNotificationIntent>(
     (c, intent, onDismiss) => JoinGameSessionFailureNotificationWidget(
@@ -116,18 +112,16 @@ void registerNotificationModule(GetIt getIt) {
         PlayerKickedNotificationWidget(intent: intent, onDismiss: onDismiss),
   );
   registry.register<WaitingRoomRoomLockedNotificationIntent>(
-    (c, intent, onDismiss) =>
-        WaitingRoomRoomLockedNotificationWidget(
-          intent: intent,
-          onDismiss: onDismiss,
-        ),
+    (c, intent, onDismiss) => WaitingRoomRoomLockedNotificationWidget(
+      intent: intent,
+      onDismiss: onDismiss,
+    ),
   );
   registry.register<WaitingRoomFailureNotificationIntent>(
-    (c, intent, onDismiss) =>
-        WaitingRoomFailureNotificationWidget(
-          intent: intent,
-          onDismiss: onDismiss,
-        ),
+    (c, intent, onDismiss) => WaitingRoomFailureNotificationWidget(
+      intent: intent,
+      onDismiss: onDismiss,
+    ),
   );
   registry.register<WaitingRoomWelcomeNotificationIntent>(
     (c, intent, onDismiss) => WaitingRoomWelcomeNotificationWidget(

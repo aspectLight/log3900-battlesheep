@@ -43,7 +43,7 @@ class TrapResultDto {
   final String? choice;
   @JsonKey(fromJson: _readInt)
   final int remainingMovementPoints;
-   @JsonKey(fromJson: _readBool)
+  @JsonKey(fromJson: _readBool)
   final bool activated;
 
   const TrapResultDto({

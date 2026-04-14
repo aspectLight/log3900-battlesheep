@@ -13,6 +13,9 @@ extension ProfileFailureExt on ProfileFailure {
       UsernameAlreadyInUseProfileFailure() => l10n.profileUsernameTaken,
       EmailAlreadyInUseProfileFailure() => l10n.profileEmailTaken,
       NoChangesProfileFailure() => l10n.profileNoChanges,
+      AvatarFileTooLargeProfileFailure() => l10n.profileAvatarFileTooLarge,
+      AvatarInvalidFileTypeProfileFailure() =>
+        l10n.profileAvatarInvalidFileType,
       ServerProfileFailure() => l10n.profileServerError,
       UnknownProfileFailure() => l10n.profileUnexpectedError,
     };

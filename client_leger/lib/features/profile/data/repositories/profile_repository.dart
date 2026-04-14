@@ -11,10 +11,9 @@ import '../models/dto/profile_statistics_dto.dart';
 import '../services/http_profile_service.dart';
 
 class ProfileRepository {
-  ProfileRepository({
-    required HttpProfileService httpProfileService,
-  })  : _httpProfileService = httpProfileService,
-        state = signal<ProfileState>(const ProfileState.idle());
+  ProfileRepository({required HttpProfileService httpProfileService})
+    : _httpProfileService = httpProfileService,
+      state = signal<ProfileState>(const ProfileState.idle());
 
   final HttpProfileService _httpProfileService;
 
@@ -22,30 +21,38 @@ class ProfileRepository {
 
   Future<void> loadProfileAndStatistics() async {
     state.value = const ProfileState.loading();
-    final result = await TaskEither<ProfileFailure, (ProfileModel, ProfileStatisticsModel)>.tryCatch(
-      () async {
-        final ProfileDto profileDto = await _httpProfileService.fetchProfile();
-        final ProfileStatisticsDto statsDto =
-            await _httpProfileService.fetchProfileStatistics();
-        final profile = ProfileModel(
-          id: profileDto.id,
-          username: profileDto.username,
-          email: profileDto.email,
-          avatarId: profileDto.avatarId,
-          theme: profileDto.theme,
-          language: profileDto.language,
-        );
-        final statistics = ProfileStatisticsModel(
-          classicGamesPlayed: statsDto.classicGamesPlayed,
-          ctfGamesPlayed: statsDto.ctfGamesPlayed,
-          totalGamesWon: statsDto.totalGamesWon,
-          averagePlaytimePerGame: statsDto.averagePlaytimePerGame,
-        );
-        return (profile, statistics);
-      },
-      (error, _) =>
-          error is ProfileFailure ? error : const UnknownProfileFailure(),
-    ).run();
+    final result =
+        await TaskEither<
+              ProfileFailure,
+              (ProfileModel, ProfileStatisticsModel)
+            >.tryCatch(
+              () async {
+                final ProfileDto profileDto = await _httpProfileService
+                    .fetchProfile();
+                final ProfileStatisticsDto statsDto = await _httpProfileService
+                    .fetchProfileStatistics();
+                final profile = ProfileModel(
+                  id: profileDto.id,
+                  username: profileDto.username,
+                  email: profileDto.email,
+                  avatarId: profileDto.avatarId,
+                  avatarUrl: profileDto.avatarUrl,
+                  theme: profileDto.theme,
+                  language: profileDto.language,
+                );
+                final statistics = ProfileStatisticsModel(
+                  classicGamesPlayed: statsDto.classicGamesPlayed,
+                  ctfGamesPlayed: statsDto.ctfGamesPlayed,
+                  totalGamesWon: statsDto.totalGamesWon,
+                  averagePlaytimePerGame: statsDto.averagePlaytimePerGame,
+                );
+                return (profile, statistics);
+              },
+              (error, _) => error is ProfileFailure
+                  ? error
+                  : const UnknownProfileFailure(),
+            )
+            .run();
     result.match(
       (failure) => state.value = ProfileState.error(failure),
       (tuple) => state.value = ProfileState.loaded(
@@ -66,20 +73,24 @@ class ProfileRepository {
         }
         final current = s.profile;
         final dto = ProfileUpdateRequestDto(
-          username: command.username != current.username ? command.username : null,
+          username: command.username != current.username
+              ? command.username
+              : null,
           email: command.email != current.email ? command.email : null,
-          avatarId:
-              command.avatarId != current.avatarId ? command.avatarId : null,
+          avatarId: command.avatarId != current.avatarId
+              ? command.avatarId
+              : null,
           theme: command.theme != null && command.theme != current.theme
               ? command.theme
               : null,
-          language: command.language != null &&
-                  command.language != current.language
+          language:
+              command.language != null && command.language != current.language
               ? command.language
               : null,
           preferences: command.preferences,
         );
-        final hasChange = dto.username != null ||
+        final hasChange =
+            dto.username != null ||
             dto.email != null ||
             dto.avatarId != null ||
             dto.theme != null ||
@@ -88,13 +99,15 @@ class ProfileRepository {
         if (!hasChange) {
           throw const NoChangesProfileFailure();
         }
-        final ProfileDto updatedDto =
-            await _httpProfileService.updateProfile(dto);
+        final ProfileDto updatedDto = await _httpProfileService.updateProfile(
+          dto,
+        );
         final model = ProfileModel(
           id: updatedDto.id,
           username: updatedDto.username,
           email: updatedDto.email,
           avatarId: updatedDto.avatarId,
+          avatarUrl: updatedDto.avatarUrl,
           theme: updatedDto.theme,
           language: updatedDto.language,
         );
@@ -118,6 +131,34 @@ class ProfileRepository {
       () async {
         await _httpProfileService.deleteAccount();
         return unit;
+      },
+      (error, _) =>
+          error is ProfileFailure ? error : const UnknownProfileFailure(),
+    );
+    return task.run();
+  }
+
+  Future<Either<ProfileFailure, ProfileModel>> uploadAvatar(String filePath) {
+    final task = TaskEither<ProfileFailure, ProfileModel>.tryCatch(
+      () async {
+        final dto = await _httpProfileService.uploadAvatar(filePath);
+        final model = ProfileModel(
+          id: dto.id,
+          username: dto.username,
+          email: dto.email,
+          avatarId: dto.avatarId,
+          avatarUrl: dto.avatarUrl,
+          theme: dto.theme,
+          language: dto.language,
+        );
+        final loaded = state.value;
+        if (loaded is ProfileStateLoaded) {
+          state.value = ProfileState.loaded(
+            profile: model,
+            statistics: loaded.statistics,
+          );
+        }
+        return model;
       },
       (error, _) =>
           error is ProfileFailure ? error : const UnknownProfileFailure(),

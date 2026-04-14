@@ -6,7 +6,8 @@ import '../../core/constants/waiting_room_player_banner_tokens.dart';
 WaitingRoomBannerTheme? waitingRoomBannerTheme(String? activeBanner) {
   return switch (activeBanner) {
     WaitingRoomPlayerBannerTokens.bannerIdGold => WaitingRoomBannerTheme.gold,
-    WaitingRoomPlayerBannerTokens.bannerIdShadow => WaitingRoomBannerTheme.shadow,
+    WaitingRoomPlayerBannerTokens.bannerIdShadow =>
+      WaitingRoomBannerTheme.shadow,
     WaitingRoomPlayerBannerTokens.bannerIdFlame => WaitingRoomBannerTheme.flame,
     WaitingRoomPlayerBannerTokens.bannerIdIce => WaitingRoomBannerTheme.ice,
     WaitingRoomPlayerBannerTokens.bannerIdNeon => WaitingRoomBannerTheme.neon,

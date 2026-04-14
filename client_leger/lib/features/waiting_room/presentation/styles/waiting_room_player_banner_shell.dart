@@ -19,20 +19,23 @@ class WaitingRoomPlayerBannerShell extends StatefulWidget {
     double borderPhase,
     double pulsePhase,
     double overlayPhase,
-  ) builder;
+  )
+  builder;
 
   @override
   State<WaitingRoomPlayerBannerShell> createState() =>
       _WaitingRoomPlayerBannerShellState();
 }
 
-class _WaitingRoomPlayerBannerShellState extends State<WaitingRoomPlayerBannerShell>
+class _WaitingRoomPlayerBannerShellState
+    extends State<WaitingRoomPlayerBannerShell>
     with TickerProviderStateMixin {
   AnimationController? _border;
   AnimationController? _pulse;
   AnimationController? _overlay;
 
-  WaitingRoomBannerTheme? get _theme => waitingRoomBannerTheme(widget.activeBanner);
+  WaitingRoomBannerTheme? get _theme =>
+      waitingRoomBannerTheme(widget.activeBanner);
 
   @override
   void initState() {
@@ -118,7 +121,8 @@ class _WaitingRoomPlayerBannerShellState extends State<WaitingRoomPlayerBannerSh
             : borderRaw;
         final pulseP = WaitingRoomBannerTheme.pulsePhase(_pulse!.value);
         final overlayCtrl = _overlay?.value ?? 0.0;
-        final overlayP = theme.overlay?.type == WaitingRoomBannerOverlayType.neonWash
+        final overlayP =
+            theme.overlay?.type == WaitingRoomBannerOverlayType.neonWash
             ? _neonFlicker(overlayCtrl)
             : WaitingRoomBannerTheme.pulsePhase(overlayCtrl);
 
@@ -140,10 +144,7 @@ class _WaitingRoomPlayerBannerShellState extends State<WaitingRoomPlayerBannerSh
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(11)),
                 border: theme.innerEdgeBorderColor != null
-                    ? Border.all(
-                        color: theme.innerEdgeBorderColor!,
-                        width: 2,
-                      )
+                    ? Border.all(color: theme.innerEdgeBorderColor!, width: 2)
                     : null,
               ),
               child: widget.builder(context, theme, borderP, pulseP, overlayP),
@@ -212,12 +213,15 @@ Widget waitingRoomBannerOverlayLayer(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  const Color(0x0DFF00FF)
-                      .withValues(alpha: 0.4 + 0.35 * overlayPhase),
-                  const Color(0x1400FFFF)
-                      .withValues(alpha: 0.45 + 0.25 * overlayPhase),
-                  const Color(0x0DFF00FF)
-                      .withValues(alpha: 0.4 + 0.35 * overlayPhase),
+                  const Color(
+                    0x0DFF00FF,
+                  ).withValues(alpha: 0.4 + 0.35 * overlayPhase),
+                  const Color(
+                    0x1400FFFF,
+                  ).withValues(alpha: 0.45 + 0.25 * overlayPhase),
+                  const Color(
+                    0x0DFF00FF,
+                  ).withValues(alpha: 0.4 + 0.35 * overlayPhase),
                 ],
               ),
             ),
@@ -276,17 +280,29 @@ class _FlameGlowPainter extends CustomPainter {
       final a = (color.a * o).clamp(0.0, 1.0);
       final p = Paint()
         ..shader = RadialGradient(
-          colors: [color.withValues(alpha: a), Colors.transparent],
+          colors: [
+            color.withValues(alpha: a),
+            Colors.transparent,
+          ],
         ).createShader(Rect.fromCircle(center: c, radius: r));
       canvas.drawCircle(c, r, p);
     }
 
-    drawGlow(Offset(size.width / 2, size.height), size.height * 0.55,
-        const Color(0x4DFF4500));
-    drawGlow(Offset(size.width * 0.28, size.height * 0.92), size.height * 0.35,
-        const Color(0x33FFA500));
-    drawGlow(Offset(size.width * 0.72, size.height * 0.92), size.height * 0.35,
-        const Color(0x33FF0000));
+    drawGlow(
+      Offset(size.width / 2, size.height),
+      size.height * 0.55,
+      const Color(0x4DFF4500),
+    );
+    drawGlow(
+      Offset(size.width * 0.28, size.height * 0.92),
+      size.height * 0.35,
+      const Color(0x33FFA500),
+    );
+    drawGlow(
+      Offset(size.width * 0.72, size.height * 0.92),
+      size.height * 0.35,
+      const Color(0x33FF0000),
+    );
 
     canvas.restore();
   }
@@ -316,10 +332,26 @@ class _IceSparklePainter extends CustomPainter {
       canvas.drawCircle(c, r, p);
     }
 
-    sparkle(Offset(size.width * 0.2, size.height * 0.2), size.width * 0.12, 0.3);
-    sparkle(Offset(size.width * 0.82, size.height * 0.28), size.width * 0.09, 0.2);
-    sparkle(Offset(size.width * 0.5, size.height * 0.72), size.width * 0.11, 0.25);
-    sparkle(Offset(size.width * 0.72, size.height * 0.82), size.width * 0.07, 0.15);
+    sparkle(
+      Offset(size.width * 0.2, size.height * 0.2),
+      size.width * 0.12,
+      0.3,
+    );
+    sparkle(
+      Offset(size.width * 0.82, size.height * 0.28),
+      size.width * 0.09,
+      0.2,
+    );
+    sparkle(
+      Offset(size.width * 0.5, size.height * 0.72),
+      size.width * 0.11,
+      0.25,
+    );
+    sparkle(
+      Offset(size.width * 0.72, size.height * 0.82),
+      size.width * 0.07,
+      0.15,
+    );
   }
 
   @override

@@ -47,16 +47,12 @@ BoxDecoration _bannerDecoration(ShopCatalogItemId bannerId) {
     ShopCatalogItemId.sergei ||
     ShopCatalogItemId.sokolov ||
     ShopCatalogItemId.viktor ||
-    ShopCatalogItemId.volkov =>
-      const BoxDecoration(color: Color(0xFF3A1212)),
+    ShopCatalogItemId.volkov => const BoxDecoration(color: Color(0xFF3A1212)),
   };
 }
 
 class ShopBannerCard extends StatelessWidget {
-  const ShopBannerCard({
-    super.key,
-    required this.bannerId,
-  });
+  const ShopBannerCard({super.key, required this.bannerId});
 
   final ShopCatalogItemId bannerId;
 
@@ -64,7 +60,7 @@ class ShopBannerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = ShopLocalizations.of(context)!;
     return AspectRatio(
-      aspectRatio: 16 / 10,
+      aspectRatio: 3 / 4,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(6),
@@ -103,9 +99,7 @@ class ShopBannerCard extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.black26,
                             shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white24,
-                            ),
+                            border: Border.all(color: Colors.white24),
                           ),
                         ),
                       );
@@ -114,8 +108,10 @@ class ShopBannerCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black38,
                     borderRadius: BorderRadius.circular(4),
@@ -150,8 +146,10 @@ class ShopBannerCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black45,
                     borderRadius: BorderRadius.circular(4),
@@ -191,10 +189,7 @@ class ShopBannerCard extends StatelessWidget {
 }
 
 class ShopCoinPrice extends StatelessWidget {
-  const ShopCoinPrice({
-    super.key,
-    required this.price,
-  });
+  const ShopCoinPrice({super.key, required this.price});
 
   final int price;
 

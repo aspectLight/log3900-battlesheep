@@ -191,6 +191,12 @@ abstract class JoinGameSessionLocalizations {
   /// **'Code'**
   String get joinGameRoomListCode;
 
+  /// No description provided for @joinGameRoomListPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get joinGameRoomListPrice;
+
   /// No description provided for @joinGameStatusWaiting.
   ///
   /// In en, this message translates to:
@@ -220,6 +226,12 @@ abstract class JoinGameSessionLocalizations {
   /// In en, this message translates to:
   /// **'Full'**
   String get joinGameAccessibilityFull;
+
+  /// No description provided for @joinGamePriceFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get joinGamePriceFree;
 
   /// No description provided for @waitingRoomRoomNotFound.
   ///

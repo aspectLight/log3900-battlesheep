@@ -8,12 +8,8 @@ class SelectGameSessionCurrencyRepository {
   SelectGameSessionCurrencyRepository({
     required SelectGameSessionCurrencySocket socket,
   }) : _socket = socket {
-    _subs.add(
-      _socket.currencyResponseStream.listen(_onCurrencyResponse),
-    );
-    _subs.add(
-      _socket.balanceUpdatedStream.listen(_onBalanceUpdated),
-    );
+    _subs.add(_socket.currencyResponseStream.listen(_onCurrencyResponse));
+    _subs.add(_socket.balanceUpdatedStream.listen(_onBalanceUpdated));
   }
 
   final SelectGameSessionCurrencySocket _socket;

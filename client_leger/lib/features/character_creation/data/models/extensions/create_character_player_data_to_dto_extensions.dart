@@ -8,24 +8,24 @@ import '../dto/player_stat_value_dto.dart';
 
 extension CreateCharacterPlayerDataToDto on CreateCharacterPlayerData {
   PlayerPayloadDto toDto() => PlayerPayloadDto(
-        name: name,
-        avatar: AvatarNameDto(name: characterId),
-        bonusChoice: bonusChoice.toServerValue,
-        d6Choice: d6Choice.toServerValue,
-        d4Choice: d4Choice.toServerValue,
-        inventory: _createServerCompatibleEmptyInventory(),
-        stats: {
-          CharacterCreationStatKey.health.toServerValue:
-              _createServerCompatibleFixedStat(health),
-          CharacterCreationStatKey.speed.toServerValue:
-              _createServerCompatibleFixedStat(speed),
-          CharacterCreationStatKey.attack.toServerValue:
-              _createServerCompatibleFixedStat(attackDice),
-          CharacterCreationStatKey.defense.toServerValue:
-              _createServerCompatibleFixedStat(defenseDice),
-        },
-        activeBanner: activeBanner,
-      );
+    name: name,
+    avatar: AvatarNameDto(name: characterId),
+    bonusChoice: bonusChoice.toServerValue,
+    d6Choice: d6Choice.toServerValue,
+    d4Choice: d4Choice.toServerValue,
+    inventory: _createServerCompatibleEmptyInventory(),
+    stats: {
+      CharacterCreationStatKey.health.toServerValue:
+          _createServerCompatibleFixedStat(health),
+      CharacterCreationStatKey.speed.toServerValue:
+          _createServerCompatibleFixedStat(speed),
+      CharacterCreationStatKey.attack.toServerValue:
+          _createServerCompatibleFixedStat(attackDice),
+      CharacterCreationStatKey.defense.toServerValue:
+          _createServerCompatibleFixedStat(defenseDice),
+    },
+    activeBanner: activeBanner,
+  );
 }
 
 List<PlayerInventoryItemDto> _createServerCompatibleEmptyInventory() {
@@ -33,9 +33,5 @@ List<PlayerInventoryItemDto> _createServerCompatibleEmptyInventory() {
 }
 
 PlayerStatValueDto _createServerCompatibleFixedStat(int value) {
-  return PlayerStatValueDto(
-    value: value,
-    maxValue: value,
-    description: '',
-  );
+  return PlayerStatValueDto(value: value, maxValue: value, description: '');
 }

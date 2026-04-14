@@ -12,8 +12,8 @@ ShopPurchaseException _failureFromPurchaseResponse(PurchaseResponseDto dto) {
       const ItemNotFoundShopPurchaseException(),
     'Non authentifié' => const NotAuthenticatedShopPurchaseException(),
     _ => UnknownShopPurchaseException(
-        e.isEmpty ? 'Unknown shop purchase error' : e,
-      ),
+      e.isEmpty ? 'Unknown shop purchase error' : e,
+    ),
   };
 }
 

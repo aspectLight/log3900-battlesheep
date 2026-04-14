@@ -14,4 +14,3 @@ extension GameModeLocalizedExtension on GameMode {
     }
   }
 }
-

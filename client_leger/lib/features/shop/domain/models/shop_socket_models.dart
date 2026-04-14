@@ -21,11 +21,7 @@ class ShopCurrencyModel {
   final int? balance;
   final String? error;
 
-  const ShopCurrencyModel({
-    required this.success,
-    this.balance,
-    this.error,
-  });
+  const ShopCurrencyModel({required this.success, this.balance, this.error});
 }
 
 class ShopPurchaseModel {

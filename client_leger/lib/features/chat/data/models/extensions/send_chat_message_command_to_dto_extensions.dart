@@ -5,4 +5,3 @@ extension SendChatMessageCommandToDto on SendChatMessageCommand {
   SendMessagePayloadDto toSendMessagePayloadDto() =>
       SendMessagePayloadDto(username: username, message: content);
 }
-

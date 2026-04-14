@@ -15,8 +15,7 @@ class ShopAssetPaths {
       ShopCatalogItemId.streetFighter => '$_shopAvatars/street-fighter.png',
       ShopCatalogItemId.tacticalOperator =>
         '$_shopAvatars/tactical-operator.png',
-      ShopCatalogItemId.screamGhostface =>
-        '$_shopAvatars/scream-ghostface.png',
+      ShopCatalogItemId.screamGhostface => '$_shopAvatars/scream-ghostface.png',
       ShopCatalogItemId.sergei => '$_avatars/sergeiAvatar.png',
       ShopCatalogItemId.sokolov => '$_avatars/sokolovAvatar.png',
       ShopCatalogItemId.viktor => '$_avatars/viktorAvatar.png',
@@ -25,8 +24,7 @@ class ShopAssetPaths {
       ShopCatalogItemId.bannerShadow ||
       ShopCatalogItemId.bannerFlame ||
       ShopCatalogItemId.bannerIce ||
-      ShopCatalogItemId.bannerNeon =>
-        null,
+      ShopCatalogItemId.bannerNeon => null,
     };
   }
 }

@@ -7,9 +7,16 @@ import 'shop_side_effect_module.dart';
 import 'shop_view_model_module.dart';
 
 void registerShopRoot(GetIt getIt) {
-  registerShopServices(getIt);
-  registerShopRepositories(getIt);
   registerShopViewModels(getIt);
   registerShopCoordinator(getIt);
-  registerShopSideEffects(getIt);
+}
+
+void registerShopConnectedScope(GetIt scope, GetIt _) {
+  registerShopServices(scope);
+  registerShopRepositories(scope);
+  registerShopSideEffects(scope);
+}
+
+void bootstrapShopConnectedScope(GetIt scope) {
+  bootstrapShopSideEffects(scope);
 }

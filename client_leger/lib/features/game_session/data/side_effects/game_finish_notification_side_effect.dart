@@ -23,14 +23,16 @@ class GameFinishNotificationSideEffect with DisposableSideEffect {
     required AppTransitionEventBus appTransitionEventBus,
     required GameSessionScopeHolder gameSessionScopeHolder,
     required GamePlayerRepository gamePlayerRepository,
-  })  : _socketId = socketId,
-        _gameSessionEventBus = gameSessionEventBus,
-        _notificationIntentSink = notificationIntentSink,
-        _appTransitionEventBus = appTransitionEventBus,
-        _gameSessionScopeHolder = gameSessionScopeHolder,
-        _gamePlayerRepository = gamePlayerRepository {
+  }) : _socketId = socketId,
+       _gameSessionEventBus = gameSessionEventBus,
+       _notificationIntentSink = notificationIntentSink,
+       _appTransitionEventBus = appTransitionEventBus,
+       _gameSessionScopeHolder = gameSessionScopeHolder,
+       _gamePlayerRepository = gamePlayerRepository {
     trackSubscription(
-      _gameSessionEventBus.on<GameSessionFinishedEvent>().listen(_onGameSessionFinished),
+      _gameSessionEventBus.on<GameSessionFinishedEvent>().listen(
+        _onGameSessionFinished,
+      ),
     );
   }
 

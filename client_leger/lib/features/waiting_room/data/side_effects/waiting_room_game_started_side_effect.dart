@@ -12,10 +12,10 @@ class WaitingRoomGameStartedSideEffect with DisposableSideEffect {
     required AppTransitionEventBus appTransitionEventBus,
     required SessionScopeManager sessionScopeManager,
     required WaitingRoomEntryData entryData,
-  })  : _waitingRoomSocket = waitingRoomSocket,
-        _appTransitionEventBus = appTransitionEventBus,
-        _sessionScopeManager = sessionScopeManager,
-        _entryData = entryData {
+  }) : _waitingRoomSocket = waitingRoomSocket,
+       _appTransitionEventBus = appTransitionEventBus,
+       _sessionScopeManager = sessionScopeManager,
+       _entryData = entryData {
     trackSubscription(
       _waitingRoomSocket.gameRoomCreatedStream.listen(_onGameRoomCreated),
     );

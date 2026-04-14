@@ -17,7 +17,7 @@ import '../models/events/join_game_session_socket_events.dart';
 
 class JoinGameSessionSocket {
   JoinGameSessionSocket({required SocketService socketService})
-      : _socketService = socketService;
+    : _socketService = socketService;
 
   final SocketService _socketService;
 
@@ -73,16 +73,20 @@ class JoinGameSessionSocket {
     if (!dto.success) return left(dto.toFailure());
     final room = dto.room;
     if (room == null) {
-      return left(const UnknownJoinGameSessionFailure(
-        'Invalid join response: room missing',
-      ));
+      return left(
+        const UnknownJoinGameSessionFailure(
+          'Invalid join response: room missing',
+        ),
+      );
     }
-    return right(JoinRoomResult(
-      roomCode: roomCode,
-      socketId: socketId,
-      hostId: room.hostId,
-      initialRoom: room.toLobbyRoomModel(),
-    ));
+    return right(
+      JoinRoomResult(
+        roomCode: roomCode,
+        socketId: socketId,
+        hostId: room.hostId,
+        initialRoom: room.toLobbyRoomModel(),
+      ),
+    );
   }
 
   Future<Either<JoinGameSessionFailure, JoinRoomResult>> joinOrDropIn(
@@ -130,6 +134,7 @@ class JoinGameSessionSocket {
           players: const [],
           isLocked: false,
           dropInDropOut: true,
+          entryFee: room.entryFee,
         ),
         isDropIn: true,
       ),
@@ -157,9 +162,7 @@ class JoinGameSessionSocket {
   Future<List<AvailableRoomModel>> _fetchAvailableRooms() async {
     try {
       final responseFuture = _socketService
-          .on<List<dynamic>>(
-            JoinGameSessionSocketEvents.availableRoomsResponse,
-          )
+          .on<List<dynamic>>(JoinGameSessionSocketEvents.availableRoomsResponse)
           .first
           .timeout(_availableRoomsTimeout);
       _socketService.emit(JoinGameSessionSocketEvents.getAvailableRooms);
@@ -207,6 +210,7 @@ class _RoomInfoDto {
     required this.dropInDropOut,
     required this.playerCount,
     required this.maxPlayers,
+    required this.entryFee,
   });
 
   final String roomId;
@@ -217,6 +221,7 @@ class _RoomInfoDto {
   final bool dropInDropOut;
   final int playerCount;
   final int maxPlayers;
+  final int entryFee;
 
   factory _RoomInfoDto.fromJson(Map<String, dynamic> json) {
     final boardSize = json['boardSize'] as int? ?? 0;
@@ -241,17 +246,19 @@ class _RoomInfoDto {
       dropInDropOut: json['dropInDropOut'] as bool? ?? false,
       playerCount: json['playerCount'] as int? ?? 0,
       maxPlayers: json['maxPlayers'] as int? ?? 0,
+      entryFee: json['entryFee'] as int? ?? 0,
     );
   }
 
   AvailableRoomModel toModel() => AvailableRoomModel(
-        roomId: roomId,
-        playerCount: playerCount,
-        maxPlayers: maxPlayers,
-        boardSize: boardSize,
-        boardMatrix: boardMatrix,
-        status: status,
-        isLocked: isLocked,
-        dropInDropOut: dropInDropOut,
-      );
+    roomId: roomId,
+    playerCount: playerCount,
+    maxPlayers: maxPlayers,
+    boardSize: boardSize,
+    boardMatrix: boardMatrix,
+    status: status,
+    isLocked: isLocked,
+    dropInDropOut: dropInDropOut,
+    entryFee: entryFee,
+  );
 }

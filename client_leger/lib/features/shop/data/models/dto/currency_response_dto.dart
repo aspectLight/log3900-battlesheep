@@ -8,11 +8,7 @@ class CurrencyResponseDto {
   final int? balance;
   final String? error;
 
-  const CurrencyResponseDto({
-    required this.success,
-    this.balance,
-    this.error,
-  });
+  const CurrencyResponseDto({required this.success, this.balance, this.error});
 
   factory CurrencyResponseDto.fromJson(Map<String, dynamic> json) =>
       _$CurrencyResponseDtoFromJson(json);

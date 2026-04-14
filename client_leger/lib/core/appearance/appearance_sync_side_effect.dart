@@ -13,9 +13,9 @@ class AppearanceSyncSideEffect {
     required AuthRepository authRepository,
     required HttpProfileService httpProfileService,
     required AppAppearanceService appearance,
-  })  : _authRepository = authRepository,
-        _httpProfileService = httpProfileService,
-        _appearance = appearance {
+  }) : _authRepository = authRepository,
+       _httpProfileService = httpProfileService,
+       _appearance = appearance {
     _subscription = _authRepository.authStateChanges.listen(_onAuthChanged);
     unawaited(_syncInitial());
   }
@@ -49,10 +49,7 @@ class AppearanceSyncSideEffect {
   Future<void> _pullProfileAndApply() async {
     try {
       final dto = await _httpProfileService.fetchProfile();
-      _appearance.applyFromServer(
-        theme: dto.theme,
-        language: dto.language,
-      );
+      _appearance.applyFromServer(theme: dto.theme, language: dto.language);
     } on Object {
       // Keep current appearance if profile cannot be loaded.
     }

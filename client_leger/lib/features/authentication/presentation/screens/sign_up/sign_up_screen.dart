@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/constants/ui_assets.dart';
@@ -31,9 +33,16 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  static const int _maxAvatarBytes = 2 * 1024 * 1024;
+  static const Set<String> _allowedAvatarExtensions = {'jpg', 'jpeg', 'png'};
+
   late final SignUpViewModel _viewModel;
   late final AvatarPickerViewModel _avatarPickerViewModel;
   late final AppNavigator _appNavigator;
+  final _imagePicker = ImagePicker();
+  String? _customAvatarError;
+
+  bool get _supportsCameraCapture => Platform.isAndroid || Platform.isIOS;
 
   @override
   void initState() {
@@ -132,7 +141,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: Watch(
               (context) => AvatarPicker(
                 viewModel: _avatarPickerViewModel,
-                onSelectionChange: _viewModel.selectAvatar,
+                onSelectionChange: (avatar) {
+                  setState(() {
+                    _customAvatarError = null;
+                  });
+                  _viewModel.selectAvatar(avatar);
+                },
+                onPickFromGallery: () =>
+                    unawaited(_pickCustomAvatar(ImageSource.gallery)),
+                onPickFromCamera: () =>
+                    unawaited(_pickCustomAvatar(ImageSource.camera)),
+                customAvatarPath: _viewModel.formState.value.customAvatarPath,
+                customAvatarError: _customAvatarError,
                 error: _viewModel.avatarError.value.when(
                   none: () => null,
                   some: (e) => e.localize(AuthLocalizations.of(context)!),
@@ -147,6 +167,53 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void _handleFormSubmit() {
     unawaited(_viewModel.signUpSubmit());
+  }
+
+  Future<void> _pickCustomAvatar(ImageSource source) async {
+    final l10n = AuthLocalizations.of(context)!;
+    if (source == ImageSource.camera && !_supportsCameraCapture) {
+      setState(() {
+        _customAvatarError = l10n.avatarUploadFallbackWarning;
+      });
+      return;
+    }
+    try {
+      final picked = await _imagePicker.pickImage(source: source);
+      if (picked == null) return;
+      final error = await _validateCustomAvatar(picked, l10n);
+      if (error != null) {
+        setState(() {
+          _customAvatarError = error;
+        });
+        return;
+      }
+      setState(() {
+        _customAvatarError = null;
+      });
+      _avatarPickerViewModel.reset();
+      _viewModel.setCustomAvatarPath(picked.path);
+    } on Object {
+      setState(() {
+        _customAvatarError = l10n.avatarUploadFallbackWarning;
+      });
+    }
+  }
+
+  Future<String?> _validateCustomAvatar(
+    XFile file,
+    AuthLocalizations l10n,
+  ) async {
+    final extension = file.name.contains('.')
+        ? file.name.split('.').last.toLowerCase()
+        : '';
+    if (!_allowedAvatarExtensions.contains(extension)) {
+      return l10n.avatarInvalidFileType;
+    }
+    final size = await file.length();
+    if (size > _maxAvatarBytes) {
+      return l10n.avatarFileTooLarge;
+    }
+    return null;
   }
 
   Widget _buildSubmitSection() {
@@ -164,6 +231,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
               SizedBox(
                 width: 450,
                 child: _AuthErrorBox(errorMessage: errorMessage),
+              ),
+              const SizedBox(height: 12),
+            ],
+          );
+        }),
+        Watch((context) {
+          if (!_viewModel.customAvatarUploadFailed.value) {
+            return const SizedBox.shrink();
+          }
+          return Column(
+            children: [
+              SizedBox(
+                width: 450,
+                child: _AuthErrorBox(
+                  errorMessage: l10n.avatarUploadFallbackWarning,
+                ),
               ),
               const SizedBox(height: 12),
             ],

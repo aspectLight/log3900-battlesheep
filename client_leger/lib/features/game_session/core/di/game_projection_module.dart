@@ -27,7 +27,12 @@ import '../../data/services/game_player_movement_socket.dart';
 import '../event_bus/game_session_event_bus.dart';
 import '../../../../core/notification/notification_coordinator.dart';
 
-void registerGameProjections(GetIt scope, GetIt rootGetIt, {required String socketId, required String roomId}) {
+void registerGameProjections(
+  GetIt scope,
+  GetIt rootGetIt, {
+  required String socketId,
+  required String roomId,
+}) {
   scope.registerLazySingleton<GameTurnEventsProjection>(
     () => GameTurnEventsProjection(
       eventsSocket: scope.get<GameEventsSocket>(),

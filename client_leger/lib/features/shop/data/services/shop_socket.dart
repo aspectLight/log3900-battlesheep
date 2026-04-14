@@ -13,15 +13,20 @@ import '../models/extensions/shop_catalog_response_dto_ext.dart';
 import '../models/extensions/socket_raw_ext.dart';
 
 class ShopSocket {
-  ShopSocket({required SocketService socketService}) : _socketService = socketService {
-    _connectionSubscription = _socketService.connectionStream.listen((connected) {
+  ShopSocket({required SocketService socketService})
+    : _socketService = socketService {
+    _connectionSubscription = _socketService.connectionStream.listen((
+      connected,
+    ) {
       if (!connected) {
         return;
       }
       _setupListeners();
+      _syncOnConnected();
     });
     if (_socketService.isConnected) {
       _setupListeners();
+      _syncOnConnected();
     }
   }
 
@@ -43,7 +48,8 @@ class ShopSocket {
   StreamSubscription<bool>? _connectionSubscription;
   final List<StreamSubscription<dynamic>> _eventSubscriptions = [];
 
-  Stream<ShopCatalogModel> get shopCatalogStream => _shopCatalogController.stream;
+  Stream<ShopCatalogModel> get shopCatalogStream =>
+      _shopCatalogController.stream;
 
   Stream<ShopCurrencyModel> get virtualCurrencyStream =>
       _virtualCurrencyController.stream;
@@ -77,6 +83,11 @@ class ShopSocket {
       unawaited(sub.cancel());
     }
     _eventSubscriptions.clear();
+  }
+
+  void _syncOnConnected() {
+    fetchBalance();
+    fetchCatalogue();
   }
 
   Stream<Map<String, dynamic>> _jsonObjectStream(String event) => _socketService

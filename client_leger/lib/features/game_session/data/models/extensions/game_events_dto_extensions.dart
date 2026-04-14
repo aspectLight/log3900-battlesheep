@@ -16,21 +16,20 @@ extension DoorToggledDtoToEntity on DoorToggledDto {
 
 extension SpawnedPlayerDtoToEntity on SpawnedPlayerDto {
   SpawnedPlayerEvent toEntity() => SpawnedPlayerEvent(
-        id: id,
-        name: name,
-        characterType: characterType,
-        color: color,
-        movementPoints: movementPoints,
-        actionPoints: actionPoints,
-        spawnPoint: spawnPoint.toEntity(),
-        currentBoardPosition:
-            (boardPosition ?? spawnPoint).toEntity(),
-        inventory: inventory.map((d) => d.toEntity()).toList(),
-        stats: stats,
-        diceChoice: diceChoice,
-        isVirtual: isVirtual,
-        team: team,
-      );
+    id: id,
+    name: name,
+    characterType: characterType,
+    color: color,
+    movementPoints: movementPoints,
+    actionPoints: actionPoints,
+    spawnPoint: spawnPoint.toEntity(),
+    currentBoardPosition: (boardPosition ?? spawnPoint).toEntity(),
+    inventory: inventory.map((d) => d.toEntity()).toList(),
+    stats: stats,
+    diceChoice: diceChoice,
+    isVirtual: isVirtual,
+    team: team,
+  );
 }
 
 extension PlayerSpawnedPayloadOnMap on Map<String, dynamic> {
@@ -40,8 +39,10 @@ extension PlayerSpawnedPayloadOnMap on Map<String, dynamic> {
 
 extension PlayerSpawnedPayloadOnList on List<dynamic> {
   PlayerSpawnedDto toPlayerSpawnedDto() => PlayerSpawnedDto(
-        players: whereType<Map<String, dynamic>>().map((e) => e.toSpawnedPlayerDto()).toList(),
-      );
+    players: whereType<Map<String, dynamic>>()
+        .map((e) => e.toSpawnedPlayerDto())
+        .toList(),
+  );
 }
 
 extension PlayerSpawnedDtoToEntity on PlayerSpawnedDto {
@@ -51,13 +52,13 @@ extension PlayerSpawnedDtoToEntity on PlayerSpawnedDto {
 
 extension TurnStartingDtoToEntity on TurnStartingDto {
   TurnStartingEvent toEntity() => TurnStartingEvent(
-        nextPlayerId: nextPlayerId,
-        startTime: startTime,
-        nextPlayerMovementPoints: nextPlayerMovementPoints,
-        nextPlayerActionPoints:
-            nextPlayerActionPoints ?? GameRulesConstants.actionPointsPerTurn,
-        isNextPlayerVirtual: isNextPlayerVirtual,
-      );
+    nextPlayerId: nextPlayerId,
+    startTime: startTime,
+    nextPlayerMovementPoints: nextPlayerMovementPoints,
+    nextPlayerActionPoints:
+        nextPlayerActionPoints ?? GameRulesConstants.actionPointsPerTurn,
+    isNextPlayerVirtual: isNextPlayerVirtual,
+  );
 }
 
 extension UpdateCountdownDtoToEntity on UpdateCountdownDto {
@@ -86,8 +87,7 @@ extension GameAbandonedDtoToEntity on GameAbandonedDto {
 }
 
 extension PlayerAbandonedDtoToEntity on PlayerAbandonedDto {
-  PlayerAbandonedEvent toEntity() =>
-      PlayerAbandonedEvent(playerId: playerId);
+  PlayerAbandonedEvent toEntity() => PlayerAbandonedEvent(playerId: playerId);
 }
 
 extension OrganizatorChangedDtoToEntity on OrganizatorChangedDto {

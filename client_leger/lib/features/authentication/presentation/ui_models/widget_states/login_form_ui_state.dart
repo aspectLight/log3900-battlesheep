@@ -13,11 +13,10 @@ class LoginFormUiState with _$LoginFormUiState {
   }) = _LoginFormUiState;
 
   factory LoginFormUiState.initial() => const LoginFormUiState(
-        username: '',
-        password: '',
-        usernameTouched: false,
-        passwordTouched: false,
-        hasAttemptedSubmit: false,
-      );
+    username: '',
+    password: '',
+    usernameTouched: false,
+    passwordTouched: false,
+    hasAttemptedSubmit: false,
+  );
 }
-

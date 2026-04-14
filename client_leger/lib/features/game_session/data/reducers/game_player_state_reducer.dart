@@ -66,8 +66,9 @@ class GamePlayerStateReducer {
   ) {
     final players = event.players.map(GamePlayer.fromSpawned).toList();
     final playerIds = players.map((p) => p.id).toSet();
-    final prunedDisconnected =
-        previous.disconnectedPlayerIds.where(playerIds.contains).toList();
+    final prunedDisconnected = previous.disconnectedPlayerIds
+        .where(playerIds.contains)
+        .toList();
     return previous.copyWith(
       players: players,
       disconnectedPlayerIds: prunedDisconnected,
@@ -247,10 +248,7 @@ class GamePlayerStateReducer {
     final droppedTypes = event.items.map((i) => i.type).toList()..sort();
     for (var i = 0; i < previous.players.length; i++) {
       final inv = previous.players[i].inventory;
-      final invTypes = inv
-          .whereType<GameItem>()
-          .map((e) => e.type)
-          .toList()
+      final invTypes = inv.whereType<GameItem>().map((e) => e.type).toList()
         ..sort();
       if (invTypes.length != droppedTypes.length) continue;
       var match = true;
@@ -268,7 +266,6 @@ class GamePlayerStateReducer {
     }
     return previous;
   }
-
 
   GamePlayerState _reducePlayerMovementStep(
     GamePlayerState previous,

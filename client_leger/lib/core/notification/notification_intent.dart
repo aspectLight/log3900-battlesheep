@@ -103,10 +103,7 @@ class TrapChoiceIntent extends NotificationIntent {
   final bool canAvoid;
   final void Function(String choice) onChoice;
 
-  TrapChoiceIntent({
-    required this.canAvoid,
-    required this.onChoice,
-  });
+  TrapChoiceIntent({required this.canAvoid, required this.onChoice});
 }
 
 class JoinGameSessionFailureNotificationIntent extends NotificationIntent {
@@ -211,9 +208,7 @@ class WaitingRoomRoomLockedNotificationIntent extends NotificationIntent {
 }
 
 class WaitingRoomFailureNotificationIntent extends NotificationIntent {
-  const WaitingRoomFailureNotificationIntent({
-    required this.failure,
-  });
+  const WaitingRoomFailureNotificationIntent({required this.failure});
 
   final WaitingRoomFailure failure;
 }

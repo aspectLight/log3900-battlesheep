@@ -16,6 +16,9 @@ class FakeAuthRepository extends AuthRepository {
   Stream<Option<UserModel>> get authStateChanges => Stream.value(some(_user));
 
   @override
+  void syncCurrentUser(UserModel user) {}
+
+  @override
   Option<SocketAuthCredentialsModel> getSocketAuthCredentials() =>
       const Option.none();
 
@@ -38,8 +41,7 @@ class FakeAuthRepository extends AuthRepository {
   @override
   TaskEither<AuthException, UserModel> updateProfile(
     UpdateProfileCommand command,
-  ) =>
-      TaskEither.of(_user);
+  ) => TaskEither.of(_user);
 
   @override
   TaskEither<AuthException, Unit> deleteAccount(DeleteAccountCommand command) =>

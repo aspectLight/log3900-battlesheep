@@ -22,11 +22,13 @@ GameBoardCellUi toGameBoardCellUi(
   required Option<TileType> displayTileType,
   required Option<String> diagonalSuffix,
 }) {
-  final character = Option.fromNullable(positionToPlayerId[cell.position])
-      .flatMap((id) => playerState.findById(id))
-      .map(_toGameBoardUiCharacter);
+  final character = Option.fromNullable(
+    positionToPlayerId[cell.position],
+  ).flatMap((id) => playerState.findById(id)).map(_toGameBoardUiCharacter);
   final cellItem = boardState.items[cell.position];
-  final item = Option.fromNullable(cellItem).map((i) => GameBoardUiItem(type: i.type));
+  final item = Option.fromNullable(
+    cellItem,
+  ).map((i) => GameBoardUiItem(type: i.type));
   final illumKey = '${cell.x},${cell.y}';
   final isIlluminated = boardState.illuminatedCellKeys.contains(illumKey);
   return GameBoardCellUi(

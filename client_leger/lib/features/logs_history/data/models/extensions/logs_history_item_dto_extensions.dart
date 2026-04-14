@@ -4,7 +4,7 @@ import '../dto/logs_history_item_dto.dart';
 
 extension LogsHistoryItemDtoToEntity on LogsHistoryItemDto {
   LogsHistoryItem toEntity() => LogsHistoryItem(
-        type: type == 'login' ? LogType.login : LogType.logout,
-        date: DateTime.parse(date).toLocal(),
-      );
+    type: type == 'login' ? LogType.login : LogType.logout,
+    date: DateTime.parse(date).toLocal(),
+  );
 }
