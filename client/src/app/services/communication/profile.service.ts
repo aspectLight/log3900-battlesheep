@@ -16,9 +16,9 @@ export class ProfileService {
     private cachedProfile: UserProfile | null = null;
 
     private readonly profileErrorKeyMap: Record<string, string> = {
-        'Erreur lors de la mise à jour du profil': 'profile.errors.update_profile',
+        'Erreur lors de la mise ï¿½ jour du profil': 'profile.errors.update_profile',
         'Erreur lors du chargement du profil': 'profile.errors.load_profile',
-        'Utilisateur non authentifié': 'profile.errors.unauthenticated',
+        'Utilisateur non authentifiï¿½': 'profile.errors.unauthenticated',
     };
 
     constructor(
@@ -143,6 +143,7 @@ export class ProfileService {
         const headers = await this.getAuthHeaders();
         try {
             await firstValueFrom(this.http.delete(`${this.apiUrl}/account`, { headers }));
+            this.invalidateCache();
             return { success: true };
         } catch (error: unknown) {
             return { success: false, error: this.extractErrorMessage(error) };
