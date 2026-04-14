@@ -149,10 +149,9 @@ export class EndGameComponent {
         window.open(url, '_blank', 'noopener,noreferrer');
     }
 
-    shareOnInstagram(): void {
-        navigator.clipboard.writeText(this.buildShareText()).then(() => {
-            window.open('https://www.instagram.com/create/story', '_blank', 'noopener,noreferrer');
-        });
+    shareOnWhatsApp(): void {
+        const url = `https://wa.me/?text=${encodeURIComponent(this.buildShareText())}`;
+        window.open(url, '_blank', 'noopener,noreferrer');
     }
 
     private buildShareText(): string {
