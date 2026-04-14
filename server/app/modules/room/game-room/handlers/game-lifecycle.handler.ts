@@ -2,6 +2,7 @@ import { AuthService } from '@app/modules/auth/services/auth.service';
 import { GameService } from '@app/modules/game/services/game.service';
 import { CustomChannelService } from '@app/modules/general-chat/services/custom-channel.service';
 import { GameMovementService } from '@app/modules/movement/services/game-movement.service';
+import { TorchService } from '@app/modules/movement/services/torch.service';
 import { MS_IN_SECOND, SECONDS_IN_MINUTE } from '@app/modules/shared-room/constants/game-room.constants';
 import { GameRoom } from '@app/modules/shared-room/interfaces/game-room';
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
@@ -22,6 +23,7 @@ export class GameLifecycleHandler {
         private readonly gameService: GameService,
         private readonly authService: AuthService,
         private readonly customChannelService: CustomChannelService,
+        private readonly torchService: TorchService,
     ) {}
 
     /**
@@ -32,6 +34,8 @@ export class GameLifecycleHandler {
             const room = this.gameRoomService.findRoomById(roomId);
             room.players = await this.gameMovementService.addPlayersToBoard(roomId, room.gameId, room.players);
             server.to(roomId).emit(GameRoomEvents.PlayerSpawned, room.players);
+            const illuminatedCells = this.torchService.recalculateIllumination(roomId, room.players);
+            server.to(roomId).emit(GameRoomEvents.TorchIlluminationUpdate, { roomId, illuminatedCells, players: room.players });
             this.gameRoomService.setServer(server);
             this.gameRoomService.prepareNextTurn(roomId);
         } catch (error) {

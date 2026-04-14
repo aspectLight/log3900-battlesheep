@@ -19,10 +19,12 @@ export enum ItemType {
 export enum AggressiveItemType {
     Vodka = 'vodka',
     Propaganda = 'propaganda',
+    Torch = 'torch',
 }
 
 export enum DefensiveItemType {
     Adrenaline = 'adrenaline',
     WaterProofBoots = 'waterproofBoots',
     Propaganda = 'propaganda',
+    Torch = 'torch',
 }
