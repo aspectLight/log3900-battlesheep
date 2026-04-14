@@ -92,7 +92,7 @@ export class GameLifecycleHandler {
             socket.leave(`custom-channel-${channelId}`);
             socket.emit(CustomChannelEvents.CustomChannelLeft, { channelId });
 
-            if (!room || room.players.length === 0) {
+            if (!room || room.players.length === 0 || room.players.every((p) => p.isVirtual)) {
                 if (room) this.gameMovementService.removeBoard(roomId);
                 this.gameRoomService.deleteRoomById(roomId);
                 server.emit(WaitingRoomEvents.AvailableRoomsChanged);
