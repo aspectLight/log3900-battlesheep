@@ -149,8 +149,8 @@ export class EndGameComponent {
         window.open(url, '_blank', 'noopener,noreferrer');
     }
 
-    shareOnWhatsApp(): void {
-        const url = `https://wa.me/?text=${encodeURIComponent(this.buildShareText())}`;
+    shareOnBluesky(): void {
+        const url = `https://bsky.app/intent/compose?text=${encodeURIComponent(this.buildShareText())}`;
         window.open(url, '_blank', 'noopener,noreferrer');
     }
 
