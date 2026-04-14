@@ -106,6 +106,7 @@ export class BoardComponent implements OnInit, OnDestroy {
                     return;
                 } else {
                     if (!this.isSelectionActive) return;
+                    if (!this.gameManagerService.isPlayerTurn) return;
                     this.gameManagerService.setPathFromCoord({ x: cell.x, y: cell.y });
                     this.movePlayerFromPath();
                 }

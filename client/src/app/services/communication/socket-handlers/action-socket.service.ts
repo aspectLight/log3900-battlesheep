@@ -132,7 +132,9 @@ export class ActionSocketService implements ISocketService {
         this.socket.on(GameRoomEvents.DebugModeDisabled, () => {
             this.gameRoomService.setDebugMode(false);
 
-            this.movementSocketService.getPlayerMovements();
+            if (this.gameManagerService.isPlayerTurn) {
+                this.movementSocketService.getPlayerMovements();
+            }
         });
 
         this.socket.on(GameRoomEvents.DoorToggled, (coords) => {
@@ -140,7 +142,9 @@ export class ActionSocketService implements ISocketService {
             if (door?.tile.type === 'door') {
                 door.tile.toggleState();
             }
-            this.movementSocketService.getPlayerMovements();
+            if (this.gameManagerService.isPlayerTurn) {
+                this.movementSocketService.getPlayerMovements();
+            }
             if (this.gameManagerService.isDebugMode) this.gameManagerService.clearPaths();
 
             if (this.socket.id === this.gameManagerService.currentPlayerId) {
