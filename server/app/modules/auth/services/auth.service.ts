@@ -383,14 +383,6 @@ export class AuthService {
 
         user.statistics.totalPlaytime += playtimeSeconds;
 
-        user.gameHistory.push({
-            startDate: new Date(Date.now() - playtimeSeconds * 1000),
-            endDate: new Date(),
-            mode: gameMode,
-            hasWon,
-            hasAbandoned,
-        });
-
         await user.save();
         this.logger.log(`Statistics updated for user ${firebaseUid}: ${gameMode} game, won: ${hasWon}, playtime: ${playtimeSeconds}s`);
     }
