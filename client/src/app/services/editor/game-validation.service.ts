@@ -85,11 +85,11 @@ export class GameValidationService {
 
         const requiredPoints = REQUIRED_OBJECTS.spawnPoints[board.size];
 
-        if (spawnPoints < requiredPoints.min || spawnPoints > requiredPoints.max) {
+        if (spawnPoints !== requiredPoints.min) {
             return {
                 isValid: false,
                 message: 'save.error_spawn_points',
-                messageParams: { min: requiredPoints.min, max: requiredPoints.max },
+                messageParams: { count: requiredPoints.min },
             };
         }
 
