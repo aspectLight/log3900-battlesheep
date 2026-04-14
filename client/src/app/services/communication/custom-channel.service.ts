@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { AuthService } from '@app/services/communication/auth.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { SocialService } from '@app/services/communication/social.service';
@@ -54,18 +54,24 @@ export class CustomChannelService {
         return this.authService.currentUser?.displayName as string;
     }
 
+    resetState(): void {
+        this.channels = [];
+        this.channelError = null;
+        this.avatarId = null;
+        this.avatarUrl = null;
+        this.joinedChannelIds.clear();
+        this.joinedChannelNames.clear();
+        this.gameChannelIds.clear();
+        this.messagesByChannel = {};
+
+        this.channelsUpdated$.next([]);
+        this.joinedChannels$.next([]);
+    }
+
     setupListeners(): void {
         const socket = this.socketService.socket;
         if (!socket) return;
-
-        // Vider les canaux de partie éphémères à chaque reconnexion (ils ne sont pas restaurés)
-        for (const id of this.gameChannelIds) {
-            this.joinedChannelIds.delete(id);
-            this.joinedChannelNames.delete(id);
-            delete this.messagesByChannel[id];
-        }
-        this.gameChannelIds.clear();
-        this.joinedChannels$.next([...this.joinedChannelIds]);
+        this.resetState();
 
         socket.on(CustomChannelEvents.CustomChannelsListResponse, (channels: ChannelInfo[]) => {
             const incomingIds = new Set(channels.map((c) => c.id));
@@ -274,3 +280,5 @@ export class CustomChannelService {
         return null;
     }
 }
+
+

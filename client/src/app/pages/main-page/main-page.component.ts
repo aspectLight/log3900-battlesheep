@@ -62,6 +62,8 @@ export class MainPageComponent implements OnInit, OnDestroy {
     }
 
     async ngOnInit(): Promise<void> {
+        this.customChannelService.resetState();
+
         this.pendingRequestsSub = this.socialService.pendingRequests$.subscribe((requests) => {
             this.pendingRequestCount = requests.length;
         });
