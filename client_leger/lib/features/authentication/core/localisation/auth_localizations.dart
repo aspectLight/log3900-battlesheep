@@ -290,6 +290,42 @@ abstract class AuthLocalizations {
   /// **'Select an avatar'**
   String get avatarRequired;
 
+  /// No description provided for @avatarUploadLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload photo'**
+  String get avatarUploadLabel;
+
+  /// No description provided for @avatarCameraLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get avatarCameraLabel;
+
+  /// No description provided for @avatarCustomHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Or choose a custom avatar'**
+  String get avatarCustomHint;
+
+  /// No description provided for @avatarFileTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Image must be under 2 MB.'**
+  String get avatarFileTooLarge;
+
+  /// No description provided for @avatarInvalidFileType.
+  ///
+  /// In en, this message translates to:
+  /// **'Only JPG and PNG images are accepted.'**
+  String get avatarInvalidFileType;
+
+  /// No description provided for @avatarUploadFallbackWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar upload failed. The default avatar was kept.'**
+  String get avatarUploadFallbackWarning;
+
   /// No description provided for @invalidCredentials.
   ///
   /// In en, this message translates to:

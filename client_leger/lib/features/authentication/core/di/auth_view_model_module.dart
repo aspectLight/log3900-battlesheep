@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 
 import '../../../../core/app_transition/app_transition_bus.dart';
 import '../../../../routing/app_navigator.dart';
+import '../../../profile/data/services/http_profile_service.dart';
 import '../../presentation/screens/auth_landing/auth_landing_view_model.dart';
 import '../../presentation/screens/login/login_view_model.dart';
 import '../../presentation/screens/sign_up/sign_up_view_model.dart';
@@ -24,6 +25,7 @@ void registerAuthViewModels(GetIt getIt) {
     () => SignUpViewModel(
       signUpUseCase: getIt<SignUpUseCase>(),
       appTransitionEventBus: getIt<AppTransitionEventBus>(),
+      profileService: getIt<HttpProfileService>(),
     ),
   );
 }

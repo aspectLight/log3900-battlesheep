@@ -27,13 +27,19 @@ class CreateCharacterUseCase {
   Future<void> execute(CreateCharacterCommand command) async {
     String roomCode = _roomCode;
     switch (_entryMode) {
-      case CharacterCreationHostEntryMode(:final gameId):
+      case CharacterCreationHostEntryMode(
+        :final gameId,
+        :final entryFee,
+        :final friendsOnly,
+      ):
         roomCode = await _repository.generateRoomCode();
         _repository.createWaitingRoom(
           command: CreateWaitingRoomCommand(
             roomCode: roomCode,
             gameId: gameId,
             host: command.player,
+            entryFee: entryFee,
+            friendsOnly: friendsOnly,
           ),
         );
       case CharacterCreationJoinEntryMode():

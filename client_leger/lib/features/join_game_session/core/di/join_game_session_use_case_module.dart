@@ -6,9 +6,7 @@ import '../../domain/use_cases/join_by_code_use_case.dart';
 
 void registerJoinGameSessionUseCases(GetIt getIt) {
   getIt.registerFactory<JoinByCodeUseCase>(
-    () => JoinByCodeUseCase(
-      repository: getIt<JoinGameSessionRepository>(),
-    ),
+    () => JoinByCodeUseCase(repository: getIt<JoinGameSessionRepository>()),
   );
   getIt.registerFactory<GetAvailableRoomsUseCase>(
     () => GetAvailableRoomsUseCase(

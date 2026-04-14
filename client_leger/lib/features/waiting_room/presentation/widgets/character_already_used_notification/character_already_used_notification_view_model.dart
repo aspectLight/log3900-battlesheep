@@ -4,8 +4,8 @@ class CharacterAlreadyUsedNotificationViewModel {
   CharacterAlreadyUsedNotificationViewModel({
     required WaitingRoomReserveFailedNotificationIntent intent,
     required void Function() onDismiss,
-  })  : _intent = intent,
-        _onDismiss = onDismiss;
+  }) : _intent = intent,
+       _onDismiss = onDismiss;
 
   final WaitingRoomReserveFailedNotificationIntent _intent;
   final void Function() _onDismiss;

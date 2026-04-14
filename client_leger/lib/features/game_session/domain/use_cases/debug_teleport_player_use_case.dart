@@ -43,7 +43,9 @@ class DebugTeleportPlayerUseCase {
   bool _canTeleport(int x, int y, String socketId) {
     final isDebug = _debugRepository.state.value.isDebugMode;
     if (!isDebug) return false;
-    final isMyTurn = _turnRepository.state.value.isCurrentSessionPlayerTurn(socketId);
+    final isMyTurn = _turnRepository.state.value.isCurrentSessionPlayerTurn(
+      socketId,
+    );
     if (!isMyTurn) return false;
     final boardState = _boardRepository.state.value;
     final board = boardState.board;

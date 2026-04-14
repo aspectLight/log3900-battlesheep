@@ -14,9 +14,9 @@ class WaitingRoomReservationsRepository {
     required String roomId,
     required WaitingRoomSocket socket,
     required WaitingRoomReservationsStateReducer reducer,
-  })  : _socket = socket,
-        _reducer = reducer,
-        state = signal(WaitingRoomReservationsState(roomId: roomId));
+  }) : _socket = socket,
+       _reducer = reducer,
+       state = signal(WaitingRoomReservationsState(roomId: roomId));
 
   final WaitingRoomSocket _socket;
   final WaitingRoomReservationsStateReducer _reducer;
@@ -35,7 +35,5 @@ class WaitingRoomReservationsRepository {
 
   Future<Either<WaitingRoomFailure, void>> reserveCharacter(
     ReserveCharacterCommand command,
-  ) =>
-      _socket.reserveCharacter(command);
+  ) => _socket.reserveCharacter(command);
 }
-

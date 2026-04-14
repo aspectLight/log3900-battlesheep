@@ -10,8 +10,8 @@ class SelectGameSessionErrorNotificationSideEffect with DisposableSideEffect {
   SelectGameSessionErrorNotificationSideEffect({
     required SelectGameSessionEventBus eventBus,
     required NotificationIntentSink notificationIntentSink,
-  })  : _eventBus = eventBus,
-        _notificationIntentSink = notificationIntentSink {
+  }) : _eventBus = eventBus,
+       _notificationIntentSink = notificationIntentSink {
     trackSubscription(
       _eventBus.on<ConfirmSelectionFailed>().listen(_onConfirmSelectionFailed),
     );

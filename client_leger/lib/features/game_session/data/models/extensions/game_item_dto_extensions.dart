@@ -29,34 +29,37 @@ extension ItemDroppedCommandToDto on ItemDroppedCommand {
 
 extension ItemCollectedCommandToDto on ItemCollectedCommand {
   ItemCollectedCommandDto toDto() => ItemCollectedCommandDto(
-        roomId: roomId,
-        playerId: playerId,
-        item: item.toDto(),
-        position: position.toDto(),
-      );
+    roomId: roomId,
+    playerId: playerId,
+    item: item.toDto(),
+    position: position.toDto(),
+  );
 }
 
 extension ItemCollectedDtoToEntity on ItemCollectedDto {
-  ItemCollectedEvent toEntity() =>
-      ItemCollectedEvent(playerId: playerId, item: item.toEntity());
+  ItemCollectedEvent toEntity() => ItemCollectedEvent(
+    playerId: playerId,
+    item: item.toEntity(),
+    position: position?.toEntity(),
+    inventoryFull: inventoryFull,
+  );
 }
 
 extension ItemDroppedDtoToEntity on ItemDroppedDto {
   ItemDroppedEvent toEntity() => ItemDroppedEvent(
-        roomId: roomId,
-        playerId: playerId,
-        item: item.toEntity(),
-        coords: coords.toEntity(),
-      );
+    roomId: roomId,
+    playerId: playerId,
+    item: item.toEntity(),
+    coords: coords.toEntity(),
+  );
 }
 
 extension ItemDroppedDisconnectedDtoToEntity on ItemDroppedDisconnectedDto {
-  ItemDroppedDisconnectedEvent toEntity() =>
-      ItemDroppedDisconnectedEvent(
-        items: items.map((d) => d.toEntity()).toList(),
-        coords: coords.toEntity(),
-        roomId: roomId,
-      );
+  ItemDroppedDisconnectedEvent toEntity() => ItemDroppedDisconnectedEvent(
+    items: items.map((d) => d.toEntity()).toList(),
+    coords: coords.toEntity(),
+    roomId: roomId,
+  );
 }
 
 extension FlagCollectedDtoToEntity on FlagCollectedDto {

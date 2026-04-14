@@ -4,6 +4,7 @@ class UpdateProfileCommand {
   final String? avatarId;
   final String? theme;
   final String? language;
+  final Map<String, dynamic>? preferences;
 
   const UpdateProfileCommand({
     this.username,
@@ -11,6 +12,6 @@ class UpdateProfileCommand {
     this.avatarId,
     this.theme,
     this.language,
+    this.preferences,
   });
 }
-

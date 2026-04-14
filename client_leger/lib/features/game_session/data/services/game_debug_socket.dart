@@ -36,7 +36,6 @@ class GameDebugSocket {
     GameDebugSocketEvents.debugModeDisabled,
   ];
 
-
   void toggleDebugMode(ToggleDebugModeCommand command) {
     _socketService.emit(
       GameDebugSocketEvents.toggleDebugMode,
@@ -44,10 +43,8 @@ class GameDebugSocket {
     );
   }
 
-
   Stream<DebugModeEnabledEvent> get debugModeEnabledStream =>
       _debugModeEnabledController.stream;
-
 
   Stream<DebugModeDisabledEvent> get debugModeDisabledStream =>
       _debugModeDisabledController.stream;
@@ -79,7 +76,6 @@ class GameDebugSocket {
     }
     _eventSubscriptions.clear();
   }
-
 
   Future<void> dispose() async {
     await _connectionSubscription?.cancel();

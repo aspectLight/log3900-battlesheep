@@ -6,8 +6,7 @@ class DiceStatChoiceConverter implements JsonConverter<DiceStatChoice, String> {
   const DiceStatChoiceConverter();
 
   @override
-  DiceStatChoice fromJson(String json) =>
-      DiceStatChoice.values.byName(json);
+  DiceStatChoice fromJson(String json) => DiceStatChoice.values.byName(json);
 
   @override
   String toJson(DiceStatChoice object) => object.name;

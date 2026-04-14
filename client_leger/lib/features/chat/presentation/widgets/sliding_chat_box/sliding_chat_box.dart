@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/appearance/app_interaction_colors.dart';
+import '../../../../../core/presentation/widgets/profile_avatar_thumb/profile_avatar_thumb.dart';
 import '../../../core/constants/chat_constants.dart';
 import '../../../core/event_bus/chat_event_bus.dart';
 import '../../../core/localisation/chat_localizations.dart';
@@ -887,6 +888,7 @@ class _ChannelChatPanelState extends State<_ChannelChatPanel> {
                 itemCount: messages.length,
                 itemBuilder: (_, i) {
                   final msg = messages[i];
+                  final showAvatar = msg.senderName.trim().isNotEmpty;
                   return Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -919,11 +921,28 @@ class _ChannelChatPanelState extends State<_ChannelChatPanel> {
                           ),
                           if (msg.senderName.isNotEmpty)
                             TextSpan(
-                              text: '${msg.senderName}: ',
+                              text: msg.senderName,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
+                          if (showAvatar)
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                ),
+                                child: ProfileAvatarThumb(
+                                  displayName: msg.senderName,
+                                  avatarId: msg.avatarId,
+                                  avatarUrl: msg.avatarUrl,
+                                  size: 18,
+                                ),
+                              ),
+                            ),
+                          if (msg.senderName.isNotEmpty)
+                            const TextSpan(text: ': '),
                           TextSpan(text: msg.content),
                         ],
                       ),

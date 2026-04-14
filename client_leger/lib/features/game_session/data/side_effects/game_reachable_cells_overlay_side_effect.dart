@@ -30,35 +30,50 @@ class GameReachableCellsOverlaySideEffect with DisposableSideEffect {
     required GamePlayerMovementRepository movementRepository,
     required GameInventoryRepository inventoryRepository,
     required GameTurnRepository turnRepository,
-  })  : _roomId = roomId,
-        _socketId = socketId,
-        _gameSessionEventBus = gameSessionEventBus,
-        _boardRepository = boardRepository,
-        _debugRepository = debugRepository,
-        _movementRepository = movementRepository,
-        _inventoryRepository = inventoryRepository,
-        _turnRepository = turnRepository {
+  }) : _roomId = roomId,
+       _socketId = socketId,
+       _gameSessionEventBus = gameSessionEventBus,
+       _boardRepository = boardRepository,
+       _debugRepository = debugRepository,
+       _movementRepository = movementRepository,
+       _inventoryRepository = inventoryRepository,
+       _turnRepository = turnRepository {
     trackSubscription(
-        _gameSessionEventBus.on<TurnStartingEvent>().listen(_onTurnStarting));
-    trackSubscription(_gameSessionEventBus
-        .on<DebugModeEnabledEvent>()
-        .listen(_onDebugModeEnabled));
-    trackSubscription(_gameSessionEventBus
-        .on<DebugModeDisabledEvent>()
-        .listen(_onDebugModeDisabled));
+      _gameSessionEventBus.on<TurnStartingEvent>().listen(_onTurnStarting),
+    );
     trackSubscription(
-        _gameSessionEventBus.on<PlayerMoveCompleted>().listen(_onPlayerMoveCompleted));
-    trackSubscription(_gameSessionEventBus
-        .on<PlayerTeleportedEvent>()
-        .listen(_onPlayerTeleported));
-    trackSubscription(_gameSessionEventBus
-        .on<PlayerAbandonedWithSpawnPoint>()
-        .listen(_onPlayerAbandoned));
+      _gameSessionEventBus.on<DebugModeEnabledEvent>().listen(
+        _onDebugModeEnabled,
+      ),
+    );
     trackSubscription(
-        _gameSessionEventBus.on<DoorToggledEvent>().listen(_onDoorToggled));
-    trackSubscription(_gameSessionEventBus
-        .on<ReachablePathsResponseEvent>()
-        .listen(_onReachablePathsResponse));
+      _gameSessionEventBus.on<DebugModeDisabledEvent>().listen(
+        _onDebugModeDisabled,
+      ),
+    );
+    trackSubscription(
+      _gameSessionEventBus.on<PlayerMoveCompleted>().listen(
+        _onPlayerMoveCompleted,
+      ),
+    );
+    trackSubscription(
+      _gameSessionEventBus.on<PlayerTeleportedEvent>().listen(
+        _onPlayerTeleported,
+      ),
+    );
+    trackSubscription(
+      _gameSessionEventBus.on<PlayerAbandonedWithSpawnPoint>().listen(
+        _onPlayerAbandoned,
+      ),
+    );
+    trackSubscription(
+      _gameSessionEventBus.on<DoorToggledEvent>().listen(_onDoorToggled),
+    );
+    trackSubscription(
+      _gameSessionEventBus.on<ReachablePathsResponseEvent>().listen(
+        _onReachablePathsResponse,
+      ),
+    );
   }
 
   void _onReachablePathsResponse(ReachablePathsResponseEvent event) {
@@ -110,8 +125,9 @@ class GameReachableCellsOverlaySideEffect with DisposableSideEffect {
     if (_turnRepository.state.value.currentPlayerId != _socketId) return;
     final inventory =
         _inventoryRepository.state.value.itemsByPlayerId[_socketId] ?? [];
-    final hasBoots =
-        inventory.any((item) => item.type == ItemType.waterproofBoots);
+    final hasBoots = inventory.any(
+      (item) => item.type == ItemType.waterproofBoots,
+    );
     _movementRepository.getMovements(
       PlayerGetMovementsCommand(roomId: _roomId, hasBoots: hasBoots),
     );

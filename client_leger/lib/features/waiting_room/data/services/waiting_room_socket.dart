@@ -154,16 +154,15 @@ class WaitingRoomSocket {
       ),
       _socketService
           .on<Map<String, dynamic>>(
-        WaitingRoomSocketEvents.inbound.updateAvatarReserved,
-      )
+            WaitingRoomSocketEvents.inbound.updateAvatarReserved,
+          )
           .listen((data) {
-        _updateCharacterReservedController.add(
-          UpdateCharacterReservedPayloadDto.fromJson(data)
-              .reservedCharacters
-              .map((d) => d.toModel())
-              .toList(),
-        );
-      }),
+            _updateCharacterReservedController.add(
+              UpdateCharacterReservedPayloadDto.fromJson(
+                data,
+              ).reservedCharacters.map((d) => d.toModel()).toList(),
+            );
+          }),
       subscribeSocketEvent<Object?>(
         _socketService,
         WaitingRoomSocketEvents.inbound.waitingRoomError,

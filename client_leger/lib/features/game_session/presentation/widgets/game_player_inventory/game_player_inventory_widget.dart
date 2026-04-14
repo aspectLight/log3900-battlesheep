@@ -69,7 +69,8 @@ class _InventorySlotState extends State<_InventorySlot> {
       some: (item) => ItemCardWidget(item: item),
     );
     final hasItem = widget.slot.item.isSome();
-    final isDesktop = kIsWeb ||
+    final isDesktop =
+        kIsWeb ||
         {
           TargetPlatform.windows,
           TargetPlatform.linux,
@@ -96,9 +97,7 @@ class _InventorySlotState extends State<_InventorySlot> {
       );
     } else {
       content = GestureDetector(
-        onTap: hasItem
-            ? () => setState(() => _isHovered = !_isHovered)
-            : null,
+        onTap: hasItem ? () => setState(() => _isHovered = !_isHovered) : null,
         child: content,
       );
     }

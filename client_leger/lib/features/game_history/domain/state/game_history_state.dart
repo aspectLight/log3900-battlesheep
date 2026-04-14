@@ -15,7 +15,6 @@ sealed class GameHistoryState with _$GameHistoryState {
     required List<GameHistoryItem> items,
   }) = GameHistoryStateLoaded;
 
-  const factory GameHistoryState.error(
-    GameHistoryFailure failure,
-  ) = GameHistoryStateError;
+  const factory GameHistoryState.error(GameHistoryFailure failure) =
+      GameHistoryStateError;
 }

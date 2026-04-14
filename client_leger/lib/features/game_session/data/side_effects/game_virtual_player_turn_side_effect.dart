@@ -28,9 +28,7 @@ class GameVirtualPlayerTurnSideEffect with DisposableSideEffect {
        _metadataRepository = metadataRepository,
        _actionsRepository = actionsRepository,
        _eventsSocket = eventsSocket {
-    trackSubscription(
-      _eventsSocket.turnStartingStream.listen(_onTurnStarting),
-    );
+    trackSubscription(_eventsSocket.turnStartingStream.listen(_onTurnStarting));
   }
 
   void _onTurnStarting(TurnStartingEvent event) {

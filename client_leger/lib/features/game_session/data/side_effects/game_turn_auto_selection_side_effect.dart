@@ -16,9 +16,7 @@ class GameTurnAutoSelectionSideEffect with DisposableSideEffect {
   }) : _socketId = socketId,
        _interactionRepository = interactionRepository,
        _eventsSocket = eventsSocket {
-    trackSubscription(
-      _eventsSocket.turnStartingStream.listen(_onTurnStarting),
-    );
+    trackSubscription(_eventsSocket.turnStartingStream.listen(_onTurnStarting));
   }
 
   void _onTurnStarting(TurnStartingEvent event) {

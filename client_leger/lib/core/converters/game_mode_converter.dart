@@ -26,4 +26,3 @@ class GameModeConverter implements JsonConverter<GameMode, String> {
     }
   }
 }
-

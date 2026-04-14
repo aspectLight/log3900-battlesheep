@@ -10,13 +10,13 @@ class GamePlayerAbandonedBoardSideEffect with DisposableSideEffect {
     required GameSessionEventBus gameSessionEventBus,
     required GameBoardRepository boardRepository,
     required GameInventoryRepository inventoryRepository,
-  })  : _gameSessionEventBus = gameSessionEventBus,
-        _boardRepository = boardRepository,
-        _inventoryRepository = inventoryRepository {
+  }) : _gameSessionEventBus = gameSessionEventBus,
+       _boardRepository = boardRepository,
+       _inventoryRepository = inventoryRepository {
     trackSubscription(
-      _gameSessionEventBus
-          .on<PlayerAbandonedWithSpawnPoint>()
-          .listen(_onPlayerAbandonedWithSpawnPoint),
+      _gameSessionEventBus.on<PlayerAbandonedWithSpawnPoint>().listen(
+        _onPlayerAbandonedWithSpawnPoint,
+      ),
     );
   }
 

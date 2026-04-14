@@ -10,22 +10,16 @@ import '../modal/waiting_room_modal_intents.dart';
 void registerWaitingRoomModals(GetIt getIt) {
   final registry = getIt<ModalWidgetRegistry>();
   registry.register<WaitingRoomConfirmLeaveModalIntent>(
-    (context, intent, onClose) => WaitingRoomConfirmLeaveModalContent(
-      intent: intent,
-      onClose: onClose,
-    ),
+    (context, intent, onClose) =>
+        WaitingRoomConfirmLeaveModalContent(intent: intent, onClose: onClose),
   );
   registry.register<WaitingRoomConfirmKickModalIntent>(
-    (context, intent, onClose) => WaitingRoomConfirmKickModalContent(
-      intent: intent,
-      onClose: onClose,
-    ),
+    (context, intent, onClose) =>
+        WaitingRoomConfirmKickModalContent(intent: intent, onClose: onClose),
   );
   registry.register<WaitingRoomConfirmUnlockModalIntent>(
-    (context, intent, onClose) => WaitingRoomConfirmUnlockModalContent(
-      intent: intent,
-      onClose: onClose,
-    ),
+    (context, intent, onClose) =>
+        WaitingRoomConfirmUnlockModalContent(intent: intent, onClose: onClose),
   );
   registry.register<WaitingRoomSelectVirtualProfileModalIntent>(
     (context, intent, onClose) => WaitingRoomSelectVirtualProfileModalContent(

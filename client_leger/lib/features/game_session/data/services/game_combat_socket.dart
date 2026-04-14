@@ -45,14 +45,12 @@ class GameCombatSocket {
     GameCombatSocketEvents.endCombat,
   ];
 
-
   void startCombat(StartCombatCommand command) {
     _socketService.emit(
       GameCombatSocketEvents.startCombat,
       command.toDto().toJson(),
     );
   }
-
 
   void startVirtualCombat(StartVirtualCombatCommand command) {
     _socketService.emit(
@@ -61,7 +59,6 @@ class GameCombatSocket {
     );
   }
 
-
   void attack(AttackCommand command) {
     _socketService.emit(
       GameCombatSocketEvents.attack,
@@ -69,27 +66,21 @@ class GameCombatSocket {
     );
   }
 
-
   void flightAttempt(FlightAttemptCommand command) {
     _socketService.emit(GameCombatSocketEvents.flightAttempt, command.roomId);
   }
 
-
   Stream<AttackResultEvent> get attackResultStream =>
       _attackResultController.stream;
-
 
   Stream<FlightAttemptResultEvent> get flightAttemptResultStream =>
       _flightAttemptResultController.stream;
 
-
   Stream<CombatTurnStartedEvent> get combatTurnStartedStream =>
       _combatTurnStartedController.stream;
 
-
   Stream<EndCombatResultEvent> get endCombatStream =>
       _endCombatController.stream;
-
 
   Stream<int> get combatCountdownStream => _combatCountdownController.stream;
 
@@ -121,7 +112,9 @@ class GameCombatSocket {
       _socketService.on<Object?>(GameCombatSocketEvents.endCombat).listen((
         data,
       ) {
-        _endCombatController.add(EndCombatResultDto.fromObject(data).toEntity());
+        _endCombatController.add(
+          EndCombatResultDto.fromObject(data).toEntity(),
+        );
       }),
       _socketService
           .on<Object?>(GameCombatSocketEvents.updateCombatCountDown)
@@ -138,7 +131,6 @@ class GameCombatSocket {
     }
     _eventSubscriptions.clear();
   }
-
 
   Future<void> dispose() async {
     await _connectionSubscription?.cancel();

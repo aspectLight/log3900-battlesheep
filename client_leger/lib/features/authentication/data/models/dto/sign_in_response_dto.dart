@@ -9,10 +9,7 @@ class SignInResponseDto {
   final String sessionId;
   final UserDto user;
 
-  const SignInResponseDto({
-    required this.sessionId,
-    required this.user,
-  });
+  const SignInResponseDto({required this.sessionId, required this.user});
 
   factory SignInResponseDto.fromJson(Map<String, dynamic> json) =>
       _$SignInResponseDtoFromJson(json);

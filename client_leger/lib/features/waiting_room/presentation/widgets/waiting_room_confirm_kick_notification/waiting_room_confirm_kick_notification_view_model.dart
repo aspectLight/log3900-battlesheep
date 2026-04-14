@@ -4,8 +4,8 @@ class WaitingRoomConfirmKickNotificationViewModel {
   WaitingRoomConfirmKickNotificationViewModel({
     required WaitingRoomConfirmKickNotificationIntent intent,
     required void Function() onDismiss,
-  })  : _intent = intent,
-        _onDismiss = onDismiss;
+  }) : _intent = intent,
+       _onDismiss = onDismiss;
 
   final WaitingRoomConfirmKickNotificationIntent _intent;
   final void Function() _onDismiss;

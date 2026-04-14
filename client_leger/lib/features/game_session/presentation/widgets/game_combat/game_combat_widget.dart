@@ -749,7 +749,9 @@ class _ActionButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
           decoration: BoxDecoration(
-            color: isDisabled ? const Color(0xFF1A1A1A) : const Color(0xFF222222),
+            color: isDisabled
+                ? const Color(0xFF1A1A1A)
+                : const Color(0xFF222222),
             border: showRightDivider
                 ? const Border(right: BorderSide(color: Color(0xFF444444)))
                 : null,

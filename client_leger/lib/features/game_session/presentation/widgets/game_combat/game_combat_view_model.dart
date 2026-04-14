@@ -30,12 +30,7 @@ class GameCombatViewModel {
   late final combatUiModel = computed<GameCombatUiState>(() {
     final playerState = _playerRepository.state.value;
     final turnState = _turnRepository.state.value;
-    return toGameCombatUiModel(
-      _combatState,
-      playerState,
-      turnState,
-      _socketId,
-    );
+    return toGameCombatUiModel(_combatState, playerState, turnState, _socketId);
   });
 
   late final isCombatMode = computed<bool>(
@@ -82,9 +77,8 @@ class GameCombatViewModel {
   void flightAttempt() {
     if (!canFlee.value) return;
     _combatState.combatRoomId.whenPresent(
-      (roomId) => _combatRepository.flightAttempt(
-        FlightAttemptCommand(roomId: roomId),
-      ),
+      (roomId) =>
+          _combatRepository.flightAttempt(FlightAttemptCommand(roomId: roomId)),
     );
   }
 

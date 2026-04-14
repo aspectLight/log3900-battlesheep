@@ -9,8 +9,8 @@ class LeaveWaitingRoomUseCase {
   LeaveWaitingRoomUseCase({
     required WaitingRoomRoomRepository roomRepository,
     required AppTransitionEventBus appTransitionEventBus,
-  })  : _roomRepository = roomRepository,
-        _appTransitionEventBus = appTransitionEventBus;
+  }) : _roomRepository = roomRepository,
+       _appTransitionEventBus = appTransitionEventBus;
 
   final WaitingRoomRoomRepository _roomRepository;
   final AppTransitionEventBus _appTransitionEventBus;
@@ -21,7 +21,9 @@ class LeaveWaitingRoomUseCase {
       LeaveWaitingRoomCommand(roomId: roomId),
     );
     return result.map((_) {
-      _appTransitionEventBus.fire(const WaitingRoomExitAppEvent.leaveRequested());
+      _appTransitionEventBus.fire(
+        const WaitingRoomExitAppEvent.leaveRequested(),
+      );
     });
   }
 }

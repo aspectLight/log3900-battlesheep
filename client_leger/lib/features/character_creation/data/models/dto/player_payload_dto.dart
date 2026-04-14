@@ -14,6 +14,8 @@ class PlayerPayloadDto {
   final String d4Choice;
   final List<PlayerInventoryItemDto> inventory;
   final Map<String, PlayerStatValueDto> stats;
+  @JsonKey(includeIfNull: false)
+  final String? activeBanner;
 
   const PlayerPayloadDto({
     required this.name,
@@ -23,6 +25,7 @@ class PlayerPayloadDto {
     required this.d4Choice,
     required this.inventory,
     required this.stats,
+    this.activeBanner,
   });
 
   factory PlayerPayloadDto.fromJson(Map<String, dynamic> json) =>

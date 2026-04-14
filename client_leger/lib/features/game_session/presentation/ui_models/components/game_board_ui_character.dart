@@ -22,8 +22,7 @@ class GameBoardUiCharacter {
   String get imagePath =>
       CharacterAssets.gameBoardCharacter(color, state, orientation);
 
-  String get avatarFullPath =>
-      CharacterAssets.characterAvatarFullPath(
-        Character.values.byName(characterType.name),
-      );
+  String get avatarFullPath => CharacterAssets.characterAvatarFullPath(
+    Character.values.byName(characterType.name),
+  );
 }

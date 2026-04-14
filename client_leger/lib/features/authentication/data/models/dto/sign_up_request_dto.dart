@@ -21,4 +21,3 @@ class SignUpRequestDto {
 
   Map<String, dynamic> toJson() => _$SignUpRequestDtoToJson(this);
 }
-

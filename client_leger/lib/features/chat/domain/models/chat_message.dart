@@ -11,5 +11,7 @@ class ChatMessage with _$ChatMessage {
     required String name,
     required String content,
     required String time,
+    String? avatarId,
+    String? avatarUrl,
   }) = _ChatMessage;
 }

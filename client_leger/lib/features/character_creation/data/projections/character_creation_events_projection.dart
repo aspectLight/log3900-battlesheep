@@ -26,7 +26,9 @@ class CharacterCreationEventsProjection implements EventProjection {
       _eventBus.fire(const CharacterCreationRoomLockedEvent());
     }),
     _socket.reservedCharactersPayloadStream.listen((payload) {
-      _repository.applyReservedCharacters(payload.toReservedCharacterEventList());
+      _repository.applyReservedCharacters(
+        payload.toReservedCharacterEventList(),
+      );
     }),
   ];
 }

@@ -8,12 +8,14 @@ class UserDto {
   final String email;
   final String username;
   final String avatarId;
+  final String? avatarUrl;
 
   UserDto({
     required this.id,
     required this.email,
     required this.username,
     required this.avatarId,
+    this.avatarUrl,
   });
 
   factory UserDto.fromJson(Map<String, dynamic> json) =>

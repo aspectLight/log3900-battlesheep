@@ -8,6 +8,8 @@ import '../exceptions/auth_exception.dart';
 abstract class AuthRepository {
   Stream<Option<UserModel>> get authStateChanges;
 
+  void syncCurrentUser(UserModel user);
+
   Option<SocketAuthCredentialsModel> getSocketAuthCredentials();
 
   TaskEither<AuthException, Option<UserModel>> getCurrentUser();
@@ -18,7 +20,9 @@ abstract class AuthRepository {
 
   TaskEither<AuthException, Unit> signOut(SignOutCommand command);
 
-  TaskEither<AuthException, UserModel> updateProfile(UpdateProfileCommand command);
+  TaskEither<AuthException, UserModel> updateProfile(
+    UpdateProfileCommand command,
+  );
 
   TaskEither<AuthException, Unit> deleteAccount(DeleteAccountCommand command);
 }

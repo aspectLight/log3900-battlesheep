@@ -86,6 +86,12 @@ void main() async {
       outputFile: 'profile_localizations.dart',
       outputClass: 'ProfileLocalizations',
     ),
+    (
+      arbDir: 'lib/features/shop/core/localisation',
+      template: 'shop_en.arb',
+      outputFile: 'shop_localizations.dart',
+      outputClass: 'ShopLocalizations',
+    ),
   ];
 
   try {

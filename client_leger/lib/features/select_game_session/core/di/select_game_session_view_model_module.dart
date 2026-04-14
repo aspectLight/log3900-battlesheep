@@ -1,7 +1,8 @@
 import 'package:get_it/get_it.dart';
 
-import '../../../../../core/app_transition/app_transition_bus.dart';
+import '../../../../core/app_transition/app_transition_bus.dart';
 import '../../core/event_bus/select_game_session_event_bus.dart';
+import '../../data/repositories/select_game_session_currency_repository.dart';
 import '../../core/modal/select_game_session_modal_intents.dart';
 import '../../data/repositories/select_game_session_repository.dart';
 import '../../domain/use_cases/confirm_selection_use_case.dart';
@@ -22,6 +23,7 @@ void registerSelectGameSessionViewModels(GetIt getIt) {
       repository: getIt<SelectGameSessionRepository>(),
       eventBus: getIt<SelectGameSessionEventBus>(),
       appTransitionEventBus: getIt<AppTransitionEventBus>(),
+      currencyRepository: getIt<SelectGameSessionCurrencyRepository>(),
     ),
   );
 

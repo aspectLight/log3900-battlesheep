@@ -22,10 +22,7 @@ class GameSessionScopeReady {
   final String roomId;
   final bool isHost;
 
-  const GameSessionScopeReady({
-    required this.roomId,
-    required this.isHost,
-  });
+  const GameSessionScopeReady({required this.roomId, required this.isHost});
 }
 
 class GameSessionCanceled {
@@ -64,10 +61,7 @@ class CombatStarted {
   final String attackerId;
   final String defenderId;
 
-  const CombatStarted({
-    required this.attackerId,
-    required this.defenderId,
-  });
+  const CombatStarted({required this.attackerId, required this.defenderId});
 }
 
 class GameCombatEnded {

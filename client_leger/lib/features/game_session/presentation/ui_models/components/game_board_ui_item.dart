@@ -9,7 +9,8 @@ class GameBoardUiItem {
   const GameBoardUiItem({required this.type});
 
   String name(GameSessionLocalizations l10n) => type.getName(l10n);
-  String description(GameSessionLocalizations l10n) => type.getDescription(l10n);
+  String description(GameSessionLocalizations l10n) =>
+      type.getDescription(l10n);
 
   String get imagePath => ItemAssets.gameBoardItem(type);
 }

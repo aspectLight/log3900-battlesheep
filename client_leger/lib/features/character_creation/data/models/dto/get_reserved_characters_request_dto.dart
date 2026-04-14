@@ -11,5 +11,6 @@ class GetReservedCharactersRequestDto {
   factory GetReservedCharactersRequestDto.fromJson(Map<String, dynamic> json) =>
       _$GetReservedCharactersRequestDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$GetReservedCharactersRequestDtoToJson(this);
+  Map<String, dynamic> toJson() =>
+      _$GetReservedCharactersRequestDtoToJson(this);
 }

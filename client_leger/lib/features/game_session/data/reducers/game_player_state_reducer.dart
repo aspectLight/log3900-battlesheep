@@ -6,6 +6,7 @@ import '../../presentation/mappers/path_display_mapper.dart';
 import '../../domain/events/game_movement_events.dart';
 import '../../domain/events/game_events.dart';
 import '../../domain/events/game_item_events.dart';
+import '../../domain/events/game_environment_events.dart';
 import '../../domain/models/game_item.dart';
 import '../../domain/state/game_player_state.dart';
 
@@ -50,6 +51,12 @@ class GamePlayerStateReducer {
     if (event is ItemDroppedDisconnectedEvent) {
       return _reduceItemDroppedDisconnected(previous, event);
     }
+    if (event is TrapResultSyncEvent) {
+      return _reduceTrapResult(previous, event);
+    }
+    if (event is PlayerTorchStatsSyncEvent) {
+      return _reducePlayerTorchStatsSync(previous, event);
+    }
     return previous;
   }
 
@@ -59,8 +66,9 @@ class GamePlayerStateReducer {
   ) {
     final players = event.players.map(GamePlayer.fromSpawned).toList();
     final playerIds = players.map((p) => p.id).toSet();
-    final prunedDisconnected =
-        previous.disconnectedPlayerIds.where(playerIds.contains).toList();
+    final prunedDisconnected = previous.disconnectedPlayerIds
+        .where(playerIds.contains)
+        .toList();
     return previous.copyWith(
       players: players,
       disconnectedPlayerIds: prunedDisconnected,
@@ -172,11 +180,50 @@ class GamePlayerStateReducer {
     GamePlayerState previous,
     ItemCollectedEvent event,
   ) {
+    if (event.inventoryFull) return previous;
     final idx = previous.indexOf(event.playerId);
     if (idx < 0) return previous;
     final player = previous.players[idx];
     final updated = player.withItemCollected(event.item);
     final players = List.of(previous.players)..[idx] = updated;
+    return previous.copyWith(players: players);
+  }
+
+  GamePlayerState _reduceTrapResult(
+    GamePlayerState previous,
+    TrapResultSyncEvent event,
+  ) {
+    final idx = previous.indexOf(event.playerId);
+    if (idx < 0) return previous;
+    final player = previous.players[idx];
+    final updated = event.activated
+        ? player.copyWith(
+            movementPoints: 0,
+            actionPoints: 0,
+            state: BoardCharacterState.idle,
+          )
+        : player.copyWith(
+            movementPoints: event.remainingMovementPoints,
+            state: BoardCharacterState.idle,
+          );
+    final players = List.of(previous.players)..[idx] = updated;
+    return previous.copyWith(players: players);
+  }
+
+  GamePlayerState _reducePlayerTorchStatsSync(
+    GamePlayerState previous,
+    PlayerTorchStatsSyncEvent event,
+  ) {
+    final players = List<GamePlayer>.of(previous.players);
+    for (final patch in event.patches) {
+      final idx = previous.indexOf(patch.playerId);
+      if (idx < 0) continue;
+      final p = players[idx];
+      final newStats = Map<StatType, int>.from(p.stats)
+        ..[StatType.attack] = patch.attack
+        ..[StatType.defense] = patch.defense;
+      players[idx] = p.copyWith(stats: newStats).withReevaluatedPropaganda();
+    }
     return previous.copyWith(players: players);
   }
 
@@ -201,10 +248,7 @@ class GamePlayerStateReducer {
     final droppedTypes = event.items.map((i) => i.type).toList()..sort();
     for (var i = 0; i < previous.players.length; i++) {
       final inv = previous.players[i].inventory;
-      final invTypes = inv
-          .whereType<GameItem>()
-          .map((e) => e.type)
-          .toList()
+      final invTypes = inv.whereType<GameItem>().map((e) => e.type).toList()
         ..sort();
       if (invTypes.length != droppedTypes.length) continue;
       var match = true;
@@ -222,7 +266,6 @@ class GamePlayerStateReducer {
     }
     return previous;
   }
-
 
   GamePlayerState _reducePlayerMovementStep(
     GamePlayerState previous,

@@ -9,9 +9,9 @@ class GameHistoryViewModel {
   GameHistoryViewModel({
     required GameHistoryRepository repository,
     required AppTransitionEventBus appTransitionEventBus,
-  })  : _repository = repository,
-        _appTransitionEventBus = appTransitionEventBus,
-        state = computed(() => repository.state.value);
+  }) : _repository = repository,
+       _appTransitionEventBus = appTransitionEventBus,
+       state = computed(() => repository.state.value);
 
   final GameHistoryRepository _repository;
   final AppTransitionEventBus _appTransitionEventBus;

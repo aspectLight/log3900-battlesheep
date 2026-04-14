@@ -27,7 +27,8 @@ class _GameCellDetailWidgetState extends State<GameCellDetailWidget> {
   @override
   void initState() {
     super.initState();
-    _viewModel = GetIt.I<GameSessionScopeHolder>().scope!.get<GameCellDetailWidgetViewModel>();
+    _viewModel = GetIt.I<GameSessionScopeHolder>().scope!
+        .get<GameCellDetailWidgetViewModel>();
   }
 
   @override
@@ -74,27 +75,27 @@ class _DetailLayout extends StatelessWidget {
       width: double.infinity,
       height: double.infinity,
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          image: DecorationImage(
-            image: AssetImage(placeholderPath),
-            fit: BoxFit.cover,
-            alignment: Alignment.bottomCenter,
-            colorFilter: ColorFilter.mode(
-              Colors.black.withValues(alpha: 0.2),
-              BlendMode.darken,
-            ),
+        borderRadius: BorderRadius.circular(12),
+        image: DecorationImage(
+          image: AssetImage(placeholderPath),
+          fit: BoxFit.cover,
+          alignment: Alignment.bottomCenter,
+          colorFilter: ColorFilter.mode(
+            Colors.black.withValues(alpha: 0.2),
+            BlendMode.darken,
           ),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black54,
-              spreadRadius: 2,
-              blurRadius: 15,
-              offset: Offset(0, 4),
-            ),
-          ],
         ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black54,
+            spreadRadius: 2,
+            blurRadius: 15,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
         children: [
           Padding(
             padding: const EdgeInsets.all(16),

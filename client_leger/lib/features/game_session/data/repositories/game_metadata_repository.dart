@@ -14,14 +14,10 @@ class GameMetadataRepository {
     required String roomId,
     bool isCTF = false,
     String initialHostId = '',
-  })  : _reducer = reducer,
-        state = signal(
-          GameSessionActive(
-            roomId: roomId,
-            hostId: initialHostId,
-            isCTF: isCTF,
-          ),
-        );
+  }) : _reducer = reducer,
+       state = signal(
+         GameSessionActive(roomId: roomId, hostId: initialHostId, isCTF: isCTF),
+       );
 
   void applyFinishGame(FinishGameEvent event) {
     state.value = _reducer.reduce(state.value, event);

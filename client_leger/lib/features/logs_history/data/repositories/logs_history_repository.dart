@@ -9,7 +9,7 @@ import '../services/http_logs_history_service.dart';
 
 class LogsHistoryRepository {
   LogsHistoryRepository(this._service)
-      : state = signal<LogsHistoryState>(const LogsHistoryState.idle());
+    : state = signal<LogsHistoryState>(const LogsHistoryState.idle());
 
   final HttpLogsHistoryService _service;
   final Signal<LogsHistoryState> state;

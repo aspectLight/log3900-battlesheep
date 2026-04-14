@@ -42,11 +42,13 @@ class GameSessionEventsProjection implements EventProjection {
     final current = _sessionRepository.state.value;
     _sessionRepository.applyFinishGame(event);
     if (current is GameSessionActive) {
-      _gameSessionEventBus.fire(GameSessionFinishedEvent(
-        winnerId: event.winnerId,
-        roomId: current.roomId,
-        isCTF: current.isCTF,
-      ));
+      _gameSessionEventBus.fire(
+        GameSessionFinishedEvent(
+          winnerId: event.winnerId,
+          roomId: current.roomId,
+          isCTF: current.isCTF,
+        ),
+      );
     }
   }
 }

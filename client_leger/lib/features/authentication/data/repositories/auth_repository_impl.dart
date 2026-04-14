@@ -23,12 +23,16 @@ class AuthRepositoryImpl extends AuthRepository {
   AuthRepositoryImpl({
     required HttpAuthService authService,
     required FirebaseAuthService firebaseAuthService,
-  })  : _authService = authService,
-        _firebaseAuthService = firebaseAuthService;
+  }) : _authService = authService,
+       _firebaseAuthService = firebaseAuthService;
 
   @override
-  Stream<Option<UserModel>> get authStateChanges =>
-      _authStateController.stream;
+  Stream<Option<UserModel>> get authStateChanges => _authStateController.stream;
+
+  @override
+  void syncCurrentUser(UserModel user) {
+    _updateState(Option.of(user));
+  }
 
   bool get _hasCredentials => _credentials.isSome();
 

@@ -5,11 +5,11 @@ class StatAssets {
   static const String uiPath = 'assets/images/ui';
 
   static String statIconPath(StatType type) => switch (type) {
-        StatType.health => '$path/stat_health.png',
-        StatType.attack => '$path/stat_attack.png',
-        StatType.defense => '$path/stat_defense.png',
-        StatType.speed => '$path/stat_speed.png',
-      };
+    StatType.health => '$path/stat_health.png',
+    StatType.attack => '$path/stat_attack.png',
+    StatType.defense => '$path/stat_defense.png',
+    StatType.speed => '$path/stat_speed.png',
+  };
 
   static const String diceD4 = '$uiPath/dice_d4.png';
   static const String diceD6 = '$uiPath/dice_d6.png';

@@ -4,10 +4,11 @@ import 'waiting_room_player_dto_extensions.dart';
 
 extension WaitingRoomDtoToModel on WaitingRoomDto {
   WaitingRoomModel toModel() => WaitingRoomModel(
-        roomId: roomId,
-        hostId: hostId,
-        players: players.map((p) => p.toModel()).toList(),
-        isLocked: isLocked,
-        dropInDropOut: dropInDropOut,
-      );
+    roomId: roomId,
+    hostId: hostId,
+    players: players.map((p) => p.toModel()).toList(),
+    isLocked: isLocked,
+    dropInDropOut: dropInDropOut,
+    entryFee: entryFee,
+  );
 }

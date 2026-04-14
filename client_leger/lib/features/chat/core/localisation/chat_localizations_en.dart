@@ -1,6 +1,5 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'chat_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -22,44 +21,44 @@ class ChatLocalizationsEn extends ChatLocalizations {
   String get discussionCanals => 'Discussion Channels';
 
   @override
-  String get createChannel => "CREATE A NEW CHANNEL";
+  String get createChannel => 'CREATE A NEW CHANNEL';
 
   @override
-  String get channelNameHint => "Channel name (ex: ABC)";
+  String get channelNameHint => 'Channel name (ex: ABC)';
 
   @override
-  String get create => "Create";
+  String get create => 'Create';
 
   @override
-  String get availableChannels => "AVAILABLE CHANNELS";
+  String get availableChannels => 'AVAILABLE CHANNELS';
 
   @override
-  String get searchChannelsHint => "Search for a channel by name...";
+  String get searchChannelsHint => 'Search for a channel by name...';
 
   @override
-  String get loadingChannels => "Loading channels...";
+  String get loadingChannels => 'Loading channels...';
 
   @override
-  String get noChannelsFound => "No channels match your search.";
+  String get noChannelsFound => 'No channels match your search.';
 
   @override
-  String get channelName => "NAME";
+  String get channelName => 'NAME';
 
   @override
-  String get channelCreator => "CREATOR";
+  String get channelCreator => 'CREATOR';
 
   @override
-  String get channelActions => "ACTIONS";
+  String get channelActions => 'ACTIONS';
 
   @override
-  String get creatorBadge => "You";
+  String get creatorBadge => 'You';
 
   @override
-  String get leaveChannel => "Leave";
+  String get leaveChannel => 'Leave';
 
   @override
-  String get joinChannel => "Join";
+  String get joinChannel => 'Join';
 
   @override
-  String get deleteChannel => "Delete";
+  String get deleteChannel => 'Delete';
 }

@@ -8,7 +8,8 @@ class ProfileCoordinator
         FeatureCoordinator<
           ProfileEntryAppEvent,
           ProfileCompletedAppEvent,
-          ProfileExitAppEvent> {
+          ProfileExitAppEvent
+        > {
   ProfileCoordinator({required this.appNavigator});
 
   final AppNavigator appNavigator;
@@ -26,4 +27,3 @@ class ProfileCoordinator
     appNavigator.request(ExitToMainMenu());
   }
 }
-

@@ -10,8 +10,12 @@ import '../di/chat_module.dart';
 
 class ChatCoordinator
     extends
-    AutoScopeCoordinator<ChatData, ChatEntryAppEvent, ChatCompletedAppEvent,
-        ChatExitAppEvent> {
+        AutoScopeCoordinator<
+          ChatData,
+          ChatEntryAppEvent,
+          ChatCompletedAppEvent,
+          ChatExitAppEvent
+        > {
   ChatCoordinator({
     required this.getIt,
     required this.sessionScopeManager,

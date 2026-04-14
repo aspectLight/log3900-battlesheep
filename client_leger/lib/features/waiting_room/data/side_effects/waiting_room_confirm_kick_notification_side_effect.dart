@@ -9,9 +9,9 @@ class WaitingRoomConfirmKickNotificationSideEffect with DisposableSideEffect {
     required ModalIntentSink modalIntentSink,
   }) : _modalIntentSink = modalIntentSink {
     trackSubscription(
-      waitingRoomEventBus
-          .on<WaitingRoomConfirmKickRequestedEvent>()
-          .listen(_onConfirmKickRequested),
+      waitingRoomEventBus.on<WaitingRoomConfirmKickRequestedEvent>().listen(
+        _onConfirmKickRequested,
+      ),
     );
   }
 

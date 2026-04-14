@@ -90,18 +90,19 @@ class GameCombatStateReducer {
   ) {
     final nextAttempts = event.isSuccess
         ? previous.flightAttemptsLeft
-        : (previous.flightAttemptsLeft > 0 ? previous.flightAttemptsLeft - 1 : 0);
+        : (previous.flightAttemptsLeft > 0
+              ? previous.flightAttemptsLeft - 1
+              : 0);
     return previous.when(
       idle: (s) => s,
       active: (active) => active.copyWith(
         flightAttemptsLeft: nextAttempts,
         lastFlightAttemptSuccess: Option.of(event.isSuccess),
       ),
-      withResult: (withResult) =>
-          withResult.copyWith(
-            flightAttemptsLeft: nextAttempts,
-            lastFlightAttemptSuccess: Option.of(event.isSuccess),
-          ),
+      withResult: (withResult) => withResult.copyWith(
+        flightAttemptsLeft: nextAttempts,
+        lastFlightAttemptSuccess: Option.of(event.isSuccess),
+      ),
     );
   }
 

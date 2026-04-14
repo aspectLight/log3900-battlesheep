@@ -8,6 +8,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/localisation/core_localizations.dart';
+import '../../../../../core/presentation/shell/shell_chrome_back_handler.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
 import '../../../core/enums/log_type.dart';
 import '../../../core/extensions/logs_history_failure_ext.dart';
@@ -33,7 +34,14 @@ class _LogsHistoryScreenState extends State<LogsHistoryScreen> {
   void initState() {
     super.initState();
     _viewModel = GetIt.I<LogsHistoryViewModel>();
+    GetIt.I<ShellChromeBackHandler>().register(_viewModel.requestLeave);
     unawaited(_viewModel.loadHistory());
+  }
+
+  @override
+  void dispose() {
+    GetIt.I<ShellChromeBackHandler>().clear();
+    super.dispose();
   }
 
   @override
@@ -43,70 +51,7 @@ class _LogsHistoryScreenState extends State<LogsHistoryScreen> {
     return AppBackground(
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildTopBar(l10n),
-            const SizedBox(height: 10),
-            Expanded(child: _buildBody(l10n)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTopBar(CoreLocalizations l10n) {
-    return SizedBox(
-      width: double.infinity,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: GestureDetector(
-              onTap: _viewModel.requestLeave,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.chevron_left,
-                      color: Colors.white,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 15),
-                    Text(
-                      l10n.homePage,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'CustomFont',
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Text(
-            l10n.connectionHistory,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 44,
-              fontFamily: 'CustomFont',
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
-              shadows: [
-                Shadow(
-                  color: Color(0x99000000),
-                  offset: Offset(0, 3),
-                  blurRadius: 12,
-                ),
-              ],
-            ),
-          ),
-        ],
+        child: Column(children: [Expanded(child: _buildBody(l10n))]),
       ),
     );
   }

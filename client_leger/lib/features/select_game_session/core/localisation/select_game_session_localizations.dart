@@ -167,6 +167,58 @@ abstract class SelectGameSessionLocalizations {
   /// **'Capture the flag'**
   String get createGameModeCtf;
 
+  /// No description provided for @createGameAccessibilityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Accessibility'**
+  String get createGameAccessibilityLabel;
+
+  /// No description provided for @createGameFriendsOnlyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends only'**
+  String get createGameFriendsOnlyLabel;
+
+  /// No description provided for @createGameEntryFeeSectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry price'**
+  String get createGameEntryFeeSectionLabel;
+
+  /// No description provided for @createGameEntryFeeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry fee'**
+  String get createGameEntryFeeLabel;
+
+  /// No description provided for @createGameEntryFeeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'0 = free'**
+  String get createGameEntryFeeHint;
+
+  /// No description provided for @createGameBalanceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your balance'**
+  String get createGameBalanceLabel;
+
+  /// No description provided for @createGameInsufficientFundsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient balance'**
+  String get createGameInsufficientFundsTitle;
+
+  /// No description provided for @createGameInsufficientFundsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have enough coins to set this entry fee. Lower the fee or earn coins in the shop.'**
+  String get createGameInsufficientFundsMessage;
+
+  /// No description provided for @noGames.
+  ///
+  /// In en, this message translates to:
+  /// **'No games available.'**
   String get noGames;
 }
 

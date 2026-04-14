@@ -7,10 +7,7 @@ class SendEmojiPayloadDto {
   final String username;
   final String emoji;
 
-  const SendEmojiPayloadDto({
-    required this.username,
-    required this.emoji,
-  });
+  const SendEmojiPayloadDto({required this.username, required this.emoji});
 
   factory SendEmojiPayloadDto.fromJson(Map<String, dynamic> json) =>
       _$SendEmojiPayloadDtoFromJson(json);

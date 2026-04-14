@@ -11,8 +11,8 @@ extension GameHistoryItemDtoToEntity on GameHistoryItemDto {
     final resultEnum = hasAbandoned
         ? GameResult.abandoned
         : hasWon
-            ? GameResult.won
-            : GameResult.lost;
+        ? GameResult.won
+        : GameResult.lost;
     return GameHistoryItem(
       startDate: DateTime.parse(startDate).toLocal(),
       mode: modeEnum,

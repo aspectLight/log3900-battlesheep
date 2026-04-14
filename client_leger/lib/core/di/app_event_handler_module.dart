@@ -20,6 +20,8 @@ import '../../features/profile/core/app_events/profile_events.dart';
 import '../../features/profile/core/coordinators/profile_coordinator.dart';
 import '../../features/select_game_session/core/app_events/select_game_session_events.dart';
 import '../../features/select_game_session/core/coordinators/select_game_session_coordinator.dart';
+import '../../features/shop/core/app_events/shop_events.dart';
+import '../../features/shop/core/coordinators/shop_coordinator.dart';
 import '../../features/statistics/core/app_events/statistics_events.dart';
 import '../../features/statistics/core/coordinators/statistics_coordinator.dart';
 import '../../features/waiting_room/core/app_events/waiting_room_events.dart';
@@ -43,6 +45,7 @@ void registerAppEventHandler(GetIt getIt) {
       characterCreation: getIt<CharacterCreationCoordinator>(),
       waitingRoom: getIt<WaitingRoomCoordinator>(),
       profile: getIt<ProfileCoordinator>(),
+      shop: getIt<ShopCoordinator>(),
       friends: getIt<FriendsCoordinator>(),
     ),
   );
@@ -71,6 +74,7 @@ AppEventHandler _buildHandler({
   required CharacterCreationCoordinator characterCreation,
   required WaitingRoomCoordinator waitingRoom,
   required ProfileCoordinator profile,
+  required ShopCoordinator shop,
   required FriendsCoordinator friends,
 }) {
   return AppEventHandler(
@@ -213,6 +217,18 @@ AppEventHandler _buildHandler({
       GenericHandlerDelegate<ProfileExitAppEvent>.simple(
         ProfileExitAppEvent,
         profile.onExit,
+      ),
+      GenericHandlerDelegate<ShopEntryAppEvent>.simple(
+        ShopEntryAppEvent,
+        shop.onEntry,
+      ),
+      GenericHandlerDelegate<ShopCompletedAppEvent>.simple(
+        ShopCompletedAppEvent,
+        shop.onCompleted,
+      ),
+      GenericHandlerDelegate<ShopExitAppEvent>.simple(
+        ShopExitAppEvent,
+        shop.onExit,
       ),
       // --- Friends ---
       GenericHandlerDelegate<FriendsEntryAppEvent>.simple(

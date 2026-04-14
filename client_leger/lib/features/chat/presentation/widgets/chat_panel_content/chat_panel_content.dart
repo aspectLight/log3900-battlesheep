@@ -8,6 +8,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/appearance/app_interaction_colors.dart';
+import '../../../../../core/presentation/widgets/profile_avatar_thumb/profile_avatar_thumb.dart';
 import '../../../core/constants/chat_constants.dart';
 import '../../../core/event_bus/chat_event_bus.dart';
 import '../../../core/localisation/chat_localizations.dart';
@@ -370,6 +371,7 @@ class _ChatLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final showAvatar = message.name.trim().isNotEmpty;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -398,12 +400,26 @@ class _ChatLine extends StatelessWidget {
             ),
             if (message.name.isNotEmpty)
               TextSpan(
-                text: '${message.name}: ',
+                text: message.name,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontFamily: 'CustomFont',
                 ),
               ),
+            if (showAvatar)
+              WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: ProfileAvatarThumb(
+                    displayName: message.name,
+                    avatarId: message.avatarId,
+                    avatarUrl: message.avatarUrl,
+                    size: 18,
+                  ),
+                ),
+              ),
+            if (message.name.isNotEmpty) const TextSpan(text: ': '),
             TextSpan(
               text: message.content,
               style: const TextStyle(fontFamily: 'CustomFont'),

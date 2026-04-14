@@ -30,6 +30,7 @@ import '../../data/side_effects/game_session_event_side_effect.dart';
 import '../../data/side_effects/game_session_play_game_side_effect.dart';
 import '../../data/side_effects/game_turn_auto_forward_side_effect.dart';
 import '../../data/side_effects/game_turn_auto_selection_side_effect.dart';
+import '../../data/side_effects/game_trap_flow_side_effect.dart';
 import '../../data/side_effects/game_turn_end_item_cleanup_side_effect.dart';
 import '../../data/side_effects/game_turn_side_effect.dart';
 import '../../data/side_effects/game_turn_start_notification_side_effect.dart';
@@ -255,6 +256,21 @@ void registerGameSideEffects(
       socketId: socketId,
       metadataRepository: scope.get<GameMetadataRepository>(),
       debugRepository: scope.get<GameDebugRepository>(),
+    ),
+    dispose: (se) => se.dispose(),
+  );
+  scope.registerSingleton<GameTrapFlowSideEffect>(
+    GameTrapFlowSideEffect(
+      roomId: roomId,
+      socketId: socketId,
+      notificationCoordinator: scope.get<NotificationCoordinator>(),
+      actionsRepository: scope.get<GameActionsRepository>(),
+      movementRepository: scope.get<GamePlayerMovementRepository>(),
+      boardRepository: scope.get<GameBoardRepository>(),
+      playerRepository: scope.get<GamePlayerRepository>(),
+      metadataRepository: scope.get<GameMetadataRepository>(),
+      turnRepository: scope.get<GameTurnRepository>(),
+      inventoryRepository: scope.get<GameInventoryRepository>(),
     ),
     dispose: (se) => se.dispose(),
   );

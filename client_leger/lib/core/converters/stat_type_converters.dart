@@ -31,6 +31,7 @@ class StatTypeMapConverter
   }
 
   @override
-  Map<String, dynamic> toJson(Map<StatType, int> object) =>
-      {for (final e in object.entries) e.key.name: {'value': e.value}};
+  Map<String, dynamic> toJson(Map<StatType, int> object) => {
+    for (final e in object.entries) e.key.name: {'value': e.value},
+  };
 }

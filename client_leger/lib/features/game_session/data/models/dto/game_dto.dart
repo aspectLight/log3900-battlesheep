@@ -68,7 +68,7 @@ class CellDto {
   Map<String, dynamic> toJson() => _$CellDtoToJson(this);
 
   TileType get tileType => tileData.type;
-  TileState? get tileState => tileData.state;
+  String? get tileState => tileData.state;
   ItemType? get itemType => itemData?.type;
 }
 
@@ -76,8 +76,7 @@ class CellDto {
 class TileDataDto {
   @TileTypeConverter()
   final TileType type;
-  @TileStateConverter()
-  final TileState? state;
+  final String? state;
   @TileOrientationConverter()
   final TileOrientation? orientation;
 

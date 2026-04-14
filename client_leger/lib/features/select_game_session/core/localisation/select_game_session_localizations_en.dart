@@ -43,5 +43,30 @@ class SelectGameSessionLocalizationsEn extends SelectGameSessionLocalizations {
   String get createGameModeCtf => 'Capture the flag';
 
   @override
+  String get createGameAccessibilityLabel => 'Accessibility';
+
+  @override
+  String get createGameFriendsOnlyLabel => 'Friends only';
+
+  @override
+  String get createGameEntryFeeSectionLabel => 'Entry price';
+
+  @override
+  String get createGameEntryFeeLabel => 'Entry fee';
+
+  @override
+  String get createGameEntryFeeHint => '0 = free';
+
+  @override
+  String get createGameBalanceLabel => 'Your balance';
+
+  @override
+  String get createGameInsufficientFundsTitle => 'Insufficient balance';
+
+  @override
+  String get createGameInsufficientFundsMessage =>
+      'You do not have enough coins to set this entry fee. Lower the fee or earn coins in the shop.';
+
+  @override
   String get noGames => 'No games available.';
 }

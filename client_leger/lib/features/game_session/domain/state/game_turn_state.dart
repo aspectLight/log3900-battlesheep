@@ -14,11 +14,11 @@ class GameTurnState with _$GameTurnState {
   const GameTurnState._();
 
   factory GameTurnState.initial() => const GameTurnState(
-        currentPlayerId: '',
-        turnCountdown: 0,
-        startCountdown: 0,
-        canForwardTurn: false,
-      );
+    currentPlayerId: '',
+    turnCountdown: 0,
+    startCountdown: 0,
+    canForwardTurn: false,
+  );
 
   bool isCurrentSessionPlayerTurn(String sessionPlayerId) =>
       currentPlayerId == sessionPlayerId;

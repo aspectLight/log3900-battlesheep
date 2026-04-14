@@ -18,6 +18,7 @@ import '../../features/join_game_session/core/di/join_game_session_module.dart';
 import '../../features/join_game_session/core/di/join_game_session_side_effect_module.dart';
 import '../../features/logs_history/core/di/logs_history_module.dart';
 import '../../features/profile/core/di/profile_module.dart';
+import '../../features/shop/core/di/shop_module.dart';
 import '../../features/select_game_session/core/di/select_game_session_module.dart';
 import '../../features/select_game_session/core/di/select_game_session_side_effect_module.dart';
 import '../../features/statistics/core/di/statistics_module.dart';
@@ -33,6 +34,7 @@ import '../app_transition/app_initialization.dart';
 import '../app_transition/app_transition_bus.dart';
 import '../config/env_config.dart';
 import '../connected_scope/session_scope_manager.dart';
+import '../presentation/shell/shell_chrome_back_handler.dart';
 import '../modal/modal_module.dart';
 import '../notification/notification_module.dart';
 import 'appearance_sync_module.dart';
@@ -73,6 +75,9 @@ Future<void> setupDependencies() async {
       mapper: getIt<RouteToNavigationStateMapper>(),
     ),
   );
+  getIt.registerLazySingleton<ShellChromeBackHandler>(
+    ShellChromeBackHandler.new,
+  );
   registerAuthCoordinator(getIt);
   registerAuthViewModels(getIt);
   registerAuthSideEffects(getIt);
@@ -86,6 +91,7 @@ Future<void> setupDependencies() async {
   registerLogsHistoryRoot(getIt);
   registerGameHistoryRoot(getIt);
   registerProfileRoot(getIt);
+  registerShopRoot(getIt);
   registerAppearanceSync(getIt);
   registerFriendsRoot(getIt);
   registerCharacterCreationRoot(getIt);
