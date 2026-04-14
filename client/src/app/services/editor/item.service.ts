@@ -45,7 +45,7 @@ export class ItemService {
     }
 
     getItemCount(type: string): number {
-        if (this.inventory['random'] === 0 && type !== 'spawnPoint') {
+        if (this.inventory['random'] === 0 && type !== 'spawnPoint' && type !== 'flag') {
             return 0;
         }
 

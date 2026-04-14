@@ -43,7 +43,7 @@
             <div class="controls" [@fadeInOut]>
                 <div class="item-count">
                     <br />
-                    <span>{{ 'toolbox.items_to_place' | translate }}: {{ getItemCount('random') }} &nbsp;|&nbsp; {{ 'toolbox.spawns_to_place' | translate }}: {{ getSpawnPointCount() }}</span>
+                    <span>{{ 'toolbox.items_to_place' | translate }}: {{ getItemCount('random') }} &nbsp;|&nbsp; {{ 'toolbox.spawns_to_place' | translate }}: {{ getSpawnPointCount() }}@if (gameMode === 'ctf') { &nbsp;|&nbsp; {{ 'toolbox.flag_to_place' | translate }}: {{ getItemCount('flag') }}}</span>
                 </div>
             </div>
             }
