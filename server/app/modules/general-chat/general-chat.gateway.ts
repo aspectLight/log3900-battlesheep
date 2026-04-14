@@ -391,6 +391,13 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
 
                 try {
                     const user = await this.authService.getUserByUsername(username);
+                    if (!user.isOnline) {
+                        // The user already went through the explicit HTTP logout (isOnline=false),
+                        // so a logout history entry was already recorded. Skip to avoid a duplicate.
+                        this.disconnectionTimeouts.delete(username);
+                        this.logger.log(`Déconnexion automatique annulée pour ${username} (déjà déconnecté explicitement).`);
+                        return;
+                    }
                     await this.authService.logout(user.firebaseUid);
                     this.socketIdToUsername.delete(socket.id);
                     this.disconnectionTimeouts.delete(username);
