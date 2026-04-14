@@ -13,10 +13,10 @@ class JoinByCodePanelViewModel {
     required String socketId,
     required AppTransitionEventBus appTransitionEventBus,
     required JoinGameSessionEventBus joinGameSessionEventBus,
-  })  : _joinByCodeUseCase = joinByCodeUseCase,
-        _socketId = socketId,
-        _appTransitionEventBus = appTransitionEventBus,
-        _joinGameSessionEventBus = joinGameSessionEventBus;
+  }) : _joinByCodeUseCase = joinByCodeUseCase,
+       _socketId = socketId,
+       _appTransitionEventBus = appTransitionEventBus,
+       _joinGameSessionEventBus = joinGameSessionEventBus;
 
   final JoinByCodeUseCase _joinByCodeUseCase;
   final String _socketId;
@@ -39,10 +39,7 @@ class JoinByCodePanelViewModel {
     final normalizedCode = code.value.trim();
     joinState.value = const JoinGameSessionState.loading();
     final result = await _joinByCodeUseCase.execute(
-      JoinGameSessionCommand(
-        roomCode: normalizedCode,
-        socketId: _socketId,
-      ),
+      JoinGameSessionCommand(roomCode: normalizedCode, socketId: _socketId),
     );
     result.match(
       (failure) {

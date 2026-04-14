@@ -7,6 +7,7 @@ import '../../../../routing/app_navigator.dart';
 import '../../data/projections/session_connection_projection.dart';
 import '../interfaces/auth_repository.dart';
 import '../coordinators/authentication_coordinator.dart';
+import '../../../shop/core/di/shop_module.dart';
 import 'auth_projection_module.dart';
 import 'auth_repository_module.dart';
 import 'auth_service_module.dart';
@@ -37,6 +38,7 @@ void registerAuthCoordinator(GetIt getIt) {
 void registerConnectedScope(GetIt scope, GetIt rootGetIt) {
   registerSessionRepository(scope);
   registerSessionConnectionProjection(scope, rootGetIt);
+  registerShopConnectedScope(scope, rootGetIt);
 }
 
 void bootstrapConnectedScope(GetIt scope) {
@@ -44,4 +46,5 @@ void bootstrapConnectedScope(GetIt scope) {
     scope,
     scope.get<SessionConnectionProjection>().subscribe(),
   );
+  bootstrapShopConnectedScope(scope);
 }

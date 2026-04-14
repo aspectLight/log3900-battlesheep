@@ -7,10 +7,7 @@ class SendMessagePayloadDto {
   final String username;
   final String message;
 
-  const SendMessagePayloadDto({
-    required this.username,
-    required this.message,
-  });
+  const SendMessagePayloadDto({required this.username, required this.message});
 
   factory SendMessagePayloadDto.fromJson(Map<String, dynamic> json) =>
       _$SendMessagePayloadDtoFromJson(json);

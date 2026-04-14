@@ -6,20 +6,23 @@ import '../../../../core/connected_scope/session_scope_manager.dart';
 import '../../../../core/services/socket_service.dart';
 import '../../../../routing/app_navigator.dart';
 import '../../../../routing/navigation_command.dart';
+import '../../data/models/extensions/game_rewards_info_dto_extensions.dart';
 import '../../data/models/extensions/statistics_dto_extensions.dart';
 import '../../data/services/statistics_socket.dart';
 import '../app_events/statistics_events.dart';
 import '../context/statistics_data.dart';
 import '../context/statistics_scope_holder.dart';
 import '../di/statistics_module.dart';
+import '../../domain/models/game_rewards_info.dart';
 
 class StatisticsCoordinator
     extends
-    AutoScopeCoordinator<
-        StatisticsData,
-        StatisticsEntryAppEvent,
-        StatisticsCompletedAppEvent,
-        StatisticsExitAppEvent> {
+        AutoScopeCoordinator<
+          StatisticsData,
+          StatisticsEntryAppEvent,
+          StatisticsCompletedAppEvent,
+          StatisticsExitAppEvent
+        > {
   StatisticsCoordinator({
     required this.getIt,
     required this.sessionScopeManager,
@@ -34,6 +37,7 @@ class StatisticsCoordinator
   final StatisticsScopeHolder statisticsScopeHolder;
   final AppNavigator appNavigator;
   final AppTransitionEventBus appTransitionEventBus;
+  GameRewardsInfo _initialRewards = GameRewardsInfo.empty;
 
   @override
   final String scopeName = 'statistics';
@@ -45,6 +49,7 @@ class StatisticsCoordinator
       scope,
       getIt,
       initialData: entryData.initialData,
+      initialRewards: _initialRewards,
       isCTF: entryData.isCTF,
     );
     bootstrapStatisticsScope(scope);
@@ -53,9 +58,15 @@ class StatisticsCoordinator
   @override
   Future<StatisticsData?> onEntryImpl(StatisticsEntryAppEvent event) async {
     if (event is! StatisticsRequested) return null;
+    _initialRewards = GameRewardsInfo.empty;
     final statisticsSocket = StatisticsSocket(
       socketService: getIt<SocketService>(),
     );
+    final rewardsSubscription = statisticsSocket.rewardsInfoStream.listen((
+      dto,
+    ) {
+      _initialRewards = dto.toEntity();
+    });
     statisticsSocket.getStatistics(event.roomId);
     try {
       final dto = await statisticsSocket.statisticsResponseStream.first;
@@ -67,6 +78,7 @@ class StatisticsCoordinator
         isCTF: event.isCTF,
       );
     } finally {
+      await rewardsSubscription.cancel();
       await statisticsSocket.dispose();
     }
   }
@@ -82,6 +94,7 @@ class StatisticsCoordinator
     StatisticsExitAppEvent event,
     StatisticsData data,
   ) async {
+    _initialRewards = GameRewardsInfo.empty;
     statisticsScopeHolder.clearScope();
     appNavigator.request(ExitToMainMenu());
   }

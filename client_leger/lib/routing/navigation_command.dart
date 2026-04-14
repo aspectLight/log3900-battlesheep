@@ -32,4 +32,6 @@ class GoToGameHistory extends NavigationCommand {}
 
 class GoToProfile extends NavigationCommand {}
 
+class GoToShop extends NavigationCommand {}
+
 class GoToFriends extends NavigationCommand {}

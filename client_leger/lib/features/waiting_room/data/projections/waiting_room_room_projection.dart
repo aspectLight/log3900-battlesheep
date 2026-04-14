@@ -7,6 +7,7 @@ import '../../domain/events/player_left_event.dart';
 import '../../domain/events/room_created_event.dart';
 import '../../domain/events/room_locked_event.dart';
 import '../../domain/events/room_unlocked_event.dart';
+import '../../domain/events/room_updated_event.dart';
 import '../../domain/models/waiting_room_model.dart';
 import '../../domain/models/waiting_room_player_model.dart';
 import '../repositories/waiting_room_reservations_repository.dart';
@@ -45,14 +46,13 @@ class WaitingRoomRoomProjection implements EventProjection {
       _socket.roomUnlockedStream.listen(
         (_) => _repository.applyRoomUnlocked(const RoomUnlockedEvent()),
       ),
+      _socket.dropInDropOutToggledStream.listen(_onDropInDropOutToggled),
       _socket.playerLeftStream.listen(_onPlayerLeft),
       _socket.playerCreatedStream.listen(_onPlayerCreated),
-      _socket.playerKickedStream.listen(
-        (_) {
-          _reservationsRepository.requestReservedCharacters();
-          _eventBus.fire(const WaitingRoomPlayerKickedEvent());
-        },
-      ),
+      _socket.playerKickedStream.listen((_) {
+        _reservationsRepository.requestReservedCharacters();
+        _eventBus.fire(const WaitingRoomPlayerKickedEvent());
+      }),
       _socket.waitingRoomErrorStream.listen(
         (failure) => _eventBus.fire(
           WaitingRoomFailureNotificationRequestedEvent(failure),
@@ -72,5 +72,12 @@ class WaitingRoomRoomProjection implements EventProjection {
 
   void _onPlayerCreated(List<WaitingRoomPlayerModel> players) {
     _repository.applyPlayerCreated(PlayerCreatedEvent(players: players));
+  }
+
+  void _onDropInDropOutToggled(bool isEnabled) {
+    final current = _repository.state.value.room;
+    _repository.applyRoomUpdated(
+      RoomUpdatedEvent(room: current.copyWith(dropInDropOut: isEnabled)),
+    );
   }
 }

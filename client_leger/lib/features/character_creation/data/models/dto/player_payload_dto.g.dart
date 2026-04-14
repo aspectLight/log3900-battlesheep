@@ -22,6 +22,7 @@ PlayerPayloadDto _$PlayerPayloadDtoFromJson(Map<String, dynamic> json) =>
         (k, e) =>
             MapEntry(k, PlayerStatValueDto.fromJson(e as Map<String, dynamic>)),
       ),
+      activeBanner: json['activeBanner'] as String?,
     );
 
 Map<String, dynamic> _$PlayerPayloadDtoToJson(PlayerPayloadDto instance) =>
@@ -33,6 +34,7 @@ Map<String, dynamic> _$PlayerPayloadDtoToJson(PlayerPayloadDto instance) =>
       'd4Choice': instance.d4Choice,
       'inventory': instance.inventory.map((e) => e.toJson()).toList(),
       'stats': instance.stats.map((k, e) => MapEntry(k, e.toJson())),
+      if (instance.activeBanner case final value?) 'activeBanner': value,
     };
 
 PlayerInventoryItemDto _$PlayerInventoryItemDtoFromJson(

@@ -14,10 +14,8 @@ class GameInventoryState with _$GameInventoryState {
 
   const GameInventoryState._();
 
-  factory GameInventoryState.initial() => const GameInventoryState(
-        playerWithFlagId: Option.none(),
-      );
+  factory GameInventoryState.initial() =>
+      const GameInventoryState(playerWithFlagId: Option.none());
 
-  List<GameItem> getItems(String playerId) =>
-      itemsByPlayerId[playerId] ?? [];
+  List<GameItem> getItems(String playerId) => itemsByPlayerId[playerId] ?? [];
 }

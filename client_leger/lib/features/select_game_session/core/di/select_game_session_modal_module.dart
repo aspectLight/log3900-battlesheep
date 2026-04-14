@@ -7,8 +7,7 @@ import '../modal/select_game_session_modal_intents.dart';
 void registerSelectGameSessionModals(GetIt getIt) {
   final registry = getIt<ModalWidgetRegistry>();
   registry.register<SelectGameSessionGamePreviewModalIntent>(
-    (context, intent, onClose) =>
-        SelectGameSessionGamePreviewModalContent(
+    (context, intent, onClose) => SelectGameSessionGamePreviewModalContent(
       intent: intent,
       onClose: onClose,
     ),

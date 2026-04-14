@@ -81,6 +81,10 @@ class WaitingRoomRoomRepository {
     _socket.toggleLockWaitingRoom(command);
   }
 
+  void toggleDropInDropOut(String roomId) {
+    _socket.toggleDropInDropOut(roomId);
+  }
+
   void kickPlayer(KickPlayerCommand command) {
     _socket.kickPlayer(command);
   }

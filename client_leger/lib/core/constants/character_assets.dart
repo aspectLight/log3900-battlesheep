@@ -8,19 +8,19 @@ class CharacterAssets {
   static const String characterShadow = '$charactersPath/shadow.png';
 
   static String characterAvatarPath(Character character) => switch (character) {
-        Character.dmitry => '$avatarsPath/dmitryAvatar.png',
-        Character.georgie => '$avatarsPath/georgieAvatar.png',
-        Character.gorkina => '$avatarsPath/gorkinaAvatar.png',
-        Character.irina => '$avatarsPath/irinaAvatar.png',
-        Character.ivanov => '$avatarsPath/ivanovAvatar.png',
-        Character.ladeve => '$avatarsPath/ladeveAvatar.png',
-        Character.misha => '$avatarsPath/mishaAvatar.png',
-        Character.petrov => '$avatarsPath/petrovAvatar.png',
-        Character.sergei => '$avatarsPath/sergeiAvatar.png',
-        Character.sokolov => '$avatarsPath/sokolovAvatar.png',
-        Character.viktor => '$avatarsPath/viktorAvatar.png',
-        Character.volkov => '$avatarsPath/volkovAvatar.png',
-      };
+    Character.dmitry => '$avatarsPath/dmitryAvatar.png',
+    Character.georgie => '$avatarsPath/georgieAvatar.png',
+    Character.gorkina => '$avatarsPath/gorkinaAvatar.png',
+    Character.irina => '$avatarsPath/irinaAvatar.png',
+    Character.ivanov => '$avatarsPath/ivanovAvatar.png',
+    Character.ladeve => '$avatarsPath/ladeveAvatar.png',
+    Character.misha => '$avatarsPath/mishaAvatar.png',
+    Character.petrov => '$avatarsPath/petrovAvatar.png',
+    Character.sergei => '$avatarsPath/sergeiAvatar.png',
+    Character.sokolov => '$avatarsPath/sokolovAvatar.png',
+    Character.viktor => '$avatarsPath/viktorAvatar.png',
+    Character.volkov => '$avatarsPath/volkovAvatar.png',
+  };
 
   static String characterAvatarFullPath(Character character) =>
       switch (character) {

@@ -5,10 +5,7 @@ import '../event_bus/chat_event_bus.dart';
 import '../../data/repositories/chat_panel_state_repository.dart';
 import '../../data/repositories/chat_repository.dart';
 
-void registerChatSideEffects(
-  GetIt scope, {
-  required String username,
-}) {
+void registerChatSideEffects(GetIt scope, {required String username}) {
   scope.registerSingleton<ChatShakeSideEffect>(
     ChatShakeSideEffect(
       username: username,

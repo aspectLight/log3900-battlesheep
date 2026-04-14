@@ -17,4 +17,15 @@ class EnvConfig {
     return dotenv.env['FIREBASE_AUTH_BASE_URL'] ??
         'https://identitytoolkit.googleapis.com/v1/accounts';
   }
+
+  static String resolveAvatarUrl(String rawAvatarUrl, {int? cacheBust}) {
+    final trimmed = rawAvatarUrl.trim();
+    if (trimmed.isEmpty) return '';
+    final absolute =
+        trimmed.startsWith('http://') || trimmed.startsWith('https://');
+    final base = absolute ? trimmed : '$baseUrl$trimmed';
+    if (cacheBust == null) return base;
+    final separator = base.contains('?') ? '&' : '?';
+    return '$base${separator}t=$cacheBust';
+  }
 }

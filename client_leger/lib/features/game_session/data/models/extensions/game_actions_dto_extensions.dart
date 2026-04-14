@@ -15,11 +15,11 @@ extension QuitEndGameCommandToDto on QuitEndGameCommand {
 
 extension VirtualPlayerTurnCommandToDto on VirtualPlayerTurnCommand {
   VirtualPlayerTurnCommandDto toDto() => VirtualPlayerTurnCommandDto(
-        roomId: roomId,
-        playerId: playerId,
-        isCTF: isCTF,
-        skipTimeout: skipTimeout,
-      );
+    roomId: roomId,
+    playerId: playerId,
+    isCTF: isCTF,
+    skipTimeout: skipTimeout,
+  );
 }
 
 extension FinishGameCommandToDto on FinishGameCommand {

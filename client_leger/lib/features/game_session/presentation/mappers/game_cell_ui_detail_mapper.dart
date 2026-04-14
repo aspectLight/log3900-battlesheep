@@ -76,31 +76,26 @@ GameCellDetailUiState toGameCellDetailUiState(
   GameBoardCellUi cell,
   String currentPlayerId,
 ) {
-  final byCharacter = cell.character.fold<GameCellDetailUiState?>(
-    () => null,
-    (c) {
-      final isCurrentPlayer = c.id == currentPlayerId;
-      return GameCellDetailPlayer(
-        GameCellDetailPlayerInfo(
-          name: c.name,
-          avatarPath: Option.of(c.imagePath),
-          avatarFullPath: Option.of(c.avatarFullPath),
-          isCurrentPlayer: isCurrentPlayer,
-        ),
-      );
-    },
-  );
+  final byCharacter = cell.character.fold<GameCellDetailUiState?>(() => null, (
+    c,
+  ) {
+    final isCurrentPlayer = c.id == currentPlayerId;
+    return GameCellDetailPlayer(
+      GameCellDetailPlayerInfo(
+        name: c.name,
+        avatarPath: Option.of(c.imagePath),
+        avatarFullPath: Option.of(c.avatarFullPath),
+        isCurrentPlayer: isCurrentPlayer,
+      ),
+    );
+  });
   if (byCharacter != null) return byCharacter;
-  final byItem = cell.item.fold<GameCellDetailUiState?>(
-    () => null,
-    (itemUi) {
-      final def = ItemDefinition.fromType(itemUi.type);
-      return Option.fromNullable(def).fold(
-        () => const GameCellDetailEmpty(),
-        GameCellDetailItem.new,
-      );
-    },
-  );
+  final byItem = cell.item.fold<GameCellDetailUiState?>(() => null, (itemUi) {
+    final def = ItemDefinition.fromType(itemUi.type);
+    return Option.fromNullable(
+      def,
+    ).fold(() => const GameCellDetailEmpty(), GameCellDetailItem.new);
+  });
   if (byItem != null) return byItem;
   final tileDef = TileDefinition.fromTile(cell.tile);
   return GameCellDetailTile(tileDef);

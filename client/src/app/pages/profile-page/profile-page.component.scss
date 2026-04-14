@@ -16,7 +16,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    overflow: auto;
+    overflow: hidden;
 }
 
 .container::before {
@@ -41,42 +41,36 @@
     font-size: 1.2em;
 }
 
+.header {
+    position: relative;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+}
+
 .return-button {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    left: 10px;
     display: flex;
     align-items: center;
     gap: 15px;
     cursor: pointer;
-    background: none;
-    border: none;
-    font-size: 16px;
-    color: var(--theme-text-muted);
-    z-index: 10;
-
-    &:active {
-        color: var(--theme-text-hover-active);
-    }
-
-    &:hover {
-        color: var(--theme-text-hover);
-    }
 
     img {
         width: 15px;
         max-width: 15px;
         filter: brightness(0) invert(1);
     }
-}
 
-.page-title {
-    color: var(--theme-text-primary);
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 2rem;
-    text-align: center;
-    text-shadow: 2px 2px 4px var(--theme-shadow-strong);
+    &:hover {
+        color: var(--theme-text-hover);
+    }
+
+    &:active {
+        color: var(--theme-text-hover-active);
+    }
 }
 
 .content-wrapper {
@@ -84,8 +78,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 20px;
+    justify-content: flex-start;
+    padding: 10px 30px 10px;
+    min-height: 0;
 }
 
 .main-content {
@@ -105,15 +100,17 @@
 
 .form-column-left {
     flex: 1;
+    max-width: 450px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
 }
 
 .form-column-right {
     flex: 1;
     display: flex;
     flex-direction: column;
+    gap: 20px;
 }
 
 .form-column-right .field {
@@ -126,8 +123,8 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
-    margin-top: 16px;
+    gap: 8px;
+    margin-top: 8px;
     width: 100%;
 }
 
@@ -135,27 +132,27 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 750px;
-    gap: 20px;
+    max-width: 1000px;
+    gap: 10px;
 }
 
 .profile-form .field {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
 }
 
 .profile-form label,
 .profile-form .label {
     font-weight: 600;
     color: var(--theme-text-primary);
-    margin-bottom: 0;
+    margin: 12px 0 0 0;
 }
 
 .profile-form input {
-    padding: 0.5rem;
+    padding: 0.35rem 0.5rem;
     font-family: inherit;
-    font-size: 1rem;
+    font-size: 0.95rem;
     background-color: var(--theme-bg-input);
     color: var(--theme-text-tertiary);
     border: 2px solid var(--theme-border-secondary);
@@ -190,9 +187,8 @@
 
 .avatar-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    flex: 1;
+    grid-template-columns: repeat(4, 0.24fr);
+    gap: 8px;
 }
 
 .avatar-btn {
@@ -345,7 +341,7 @@
 }
 
 .btn-primary {
-    padding: 0.5rem 2rem;
+    padding: 0.4rem 2rem;
     background-color: var(--theme-bg-button);
     color: var(--theme-text-tertiary);
     border: 2px solid var(--theme-border-button);
@@ -357,7 +353,7 @@
         box-shadow 0.3s,
         color 0.3s;
     width: 100%;
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 600;
 
     &:hover:not(:disabled) {
@@ -373,7 +369,7 @@
 }
 
 .btn-danger {
-    padding: 0.5rem 2rem;
+    padding: 0.4rem 2rem;
     background-color: var(--theme-bg-button-danger);
     color: var(--theme-text-tertiary);
     border: 2px solid var(--theme-border-button-danger);
@@ -385,7 +381,7 @@
         box-shadow 0.3s,
         color 0.3s;
     width: 100%;
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 600;
 
     &:hover:not(:disabled) {
@@ -403,47 +399,53 @@
 .statistics-section {
     background: var(--theme-bg-card-light);
     backdrop-filter: blur(10px);
-    padding: 20px;
+    padding: 12px 16px;
     border-radius: 10px;
     border: 1px solid var(--theme-scrollbar-thumb-soft);
     box-sizing: border-box;
-    height: 100%;
     display: flex;
     flex-direction: column;
+    flex: 1;
 }
 
 .section-title {
     color: var(--theme-text-primary);
-    font-size: 1.2em;
+    font-size: 1.05em;
     font-weight: 600;
-    margin: 0 0 20px 0;
+    margin: 0 0 8px 0;
     text-align: center;
 }
 
 .statistics-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 25px;
+    grid-auto-rows: 1fr;
+    gap: 8px;
+    flex: 1;
 }
 
 .stat-card {
     background: var(--theme-bg-card-light);
-    padding: 12px;
+    padding: 8px 10px;
     border-radius: 8px;
     text-align: center;
     border: 1px solid var(--theme-scrollbar-thumb-soft);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .stat-label {
     color: var(--theme-text-muted-dark);
-    font-size: 1em;
+    font-size: 0.85em;
     font-weight: 500;
-    margin: 0 0 6px 0;
+    margin: 0 0 3px 0;
 }
 
 .stat-value {
     color: var(--theme-text-primary);
-    font-size: 1.4em;
+    font-size: 1.15em;
     font-weight: 600;
     margin: 0;
 }
@@ -461,10 +463,10 @@
 // ── Thème visuel ─────────────────────────────────────────────────
 
 .theme-section {
-    margin-top: 16px;
+    margin-top: 0;
     background: var(--theme-bg-card-light);
     backdrop-filter: blur(10px);
-    padding: 20px;
+    padding: 12px 16px;
     border-radius: 10px;
     border: 1px solid var(--theme-scrollbar-thumb-soft);
     box-sizing: border-box;
@@ -472,10 +474,10 @@
 
 .theme-picker {
     display: flex;
-    gap: 16px;
+    gap: 10px;
     flex-wrap: wrap;
     justify-content: center;
-    padding-top: 10px;
+    padding-top: 6px;
 }
 
 .theme-btn {
@@ -492,7 +494,7 @@
         border-color 0.25s,
         box-shadow 0.25s,
         transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
-    width: 130px;
+    width: 110px;
     position: relative;
 
     &:hover {
@@ -512,7 +514,7 @@
 .theme-thumbnail-wrapper {
     position: relative;
     width: 100%;
-    height: 82px;
+    height: 64px;
     overflow: hidden;
     border-radius: 10px 10px 0 0;
 
@@ -557,7 +559,9 @@
         border-radius: 50%;
         flex-shrink: 0;
         background: var(--theme-border-secondary);
-        transition: background 0.25s, box-shadow 0.25s;
+        transition:
+            background 0.25s,
+            box-shadow 0.25s;
     }
 }
 
@@ -605,7 +609,7 @@
     object-fit: cover;
     border-radius: 12px;
     border: 2px solid var(--theme-border-focus);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.80);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
     opacity: 0;
     pointer-events: none;
     transition:
@@ -631,32 +635,36 @@
 @media screen and (max-width: 700px) {
     .form-columns {
         flex-direction: column;
-        gap: 20px;
+        gap: 16px;
     }
 
     .profile-form {
-        max-width: 350px;
+        max-width: 100%;
     }
 
     .avatar-grid {
         grid-template-columns: repeat(4, 1fr);
     }
+
+    .statistics-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
 @media screen and (max-height: 600px) {
     .page-title {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
+        font-size: 1.4em;
+        margin-bottom: 8px;
     }
 }
 
 // ── Langue ───────────────────────────────────────────────────────
 
 .language-section {
-    margin-top: 16px;
+    margin-top: 0;
     background: var(--theme-bg-card-light);
     backdrop-filter: blur(10px);
-    padding: 20px;
+    padding: 12px 16px;
     border-radius: 10px;
     border: 1px solid var(--theme-scrollbar-thumb-soft);
     box-sizing: border-box;
@@ -664,9 +672,10 @@
 
 .language-picker {
     display: flex;
-    gap: 12px;
-    margin-top: 12px;
+    gap: 10px;
+    margin-top: 8px;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .lang-btn {
@@ -674,16 +683,16 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 28px;
+    padding: 7px 20px;
     background: var(--theme-bg-card);
     border: 2px solid var(--theme-border-primary);
     border-radius: 10px;
     color: var(--theme-text-secondary);
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    min-width: 120px;
+    min-width: 100px;
     justify-content: center;
 
     &:hover {

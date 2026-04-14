@@ -15,6 +15,23 @@ class GameSessionLocalizationsEn extends GameSessionLocalizations {
   String get gameInventoryFullDiscardTitle => 'Inventory full';
 
   @override
+  String get gameTrapTitle => 'Trap';
+
+  @override
+  String get gameTrapDescriptionCanAvoid =>
+      'You can avoid the trap or try to cross it.';
+
+  @override
+  String get gameTrapDescriptionMustTraverse =>
+      'You don\'t have enough movement points to avoid the trap. You must cross it.';
+
+  @override
+  String get gameTrapAvoid => 'Avoid';
+
+  @override
+  String get gameTrapTraverse => 'Cross';
+
+  @override
   String get gamePlayersListPlaying => 'Playing...';
 
   @override
@@ -270,6 +287,13 @@ class GameSessionLocalizationsEn extends GameSessionLocalizations {
   String get itemAirStrikeDesc => 'Allows attacking at range';
 
   @override
+  String get itemTorchName => 'Torch';
+
+  @override
+  String get itemTorchDesc =>
+      'A lit torch that improves your abilities in the light';
+
+  @override
   String get itemRandomName => 'Random';
 
   @override
@@ -315,6 +339,12 @@ class GameSessionLocalizationsEn extends GameSessionLocalizations {
   String get tileIntersectionName => 'Intersection';
 
   @override
+  String get tileTrapName => 'Trap';
+
+  @override
+  String get tileTeleportPadName => 'Teleport pad';
+
+  @override
   String get tileSnowDesc => 'A basic snow tile';
 
   @override
@@ -340,6 +370,12 @@ class GameSessionLocalizationsEn extends GameSessionLocalizations {
 
   @override
   String get tileIntersectionDesc => 'An impassable wall';
+
+  @override
+  String get tileTrapDesc => 'A trap that slows movement';
+
+  @override
+  String get tileTeleportPadDesc => 'Teleports you to the paired pad';
 
   @override
   String get unknownError => 'An unknown error occurred';

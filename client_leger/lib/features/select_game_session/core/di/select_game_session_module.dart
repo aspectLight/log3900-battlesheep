@@ -19,4 +19,3 @@ void registerSelectGameSessionRoot(GetIt getIt) {
   registerSelectGameSessionViewModels(getIt);
   registerSelectGameSessionModals(getIt);
 }
-

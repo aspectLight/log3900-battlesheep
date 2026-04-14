@@ -16,6 +16,7 @@
   "lockRoom": "Verrouiller la salle",
   "startGame": "Commencer la partie",
   "waitingRoomAddVirtualPlayer": "Ajouter un joueur virtuel",
+  "waitingRoomDropInDropOut": "Drop-in/Drop-out",
   "addVirtualPlayer": "Ajouter un joueur virtuel",
   "selectVirtualProfile": "Sélectionnez le profil du joueur virtuel :",
   "waitingRoomVirtualPlayerName": "Nom du joueur virtuel",
@@ -38,6 +39,8 @@
   "waitingRoomStatSpeed": "Rapidité",
   "waitingRoomStatAttack": "Attaque",
   "waitingRoomStatDefense": "Défense",
+  "waitingRoomBalanceLabel": "Solde :",
+  "waitingRoomEntryFeeLabel": "Prix d'entrée :",
   "gameNotFound": "Partie introuvable",
   "unknownError": "Une erreur inconnue est survenue",
   "waitingRoomWelcomeMessage": "Bienvenue dans la salle d'attente, partagez le code de la partie avec vos amis !"

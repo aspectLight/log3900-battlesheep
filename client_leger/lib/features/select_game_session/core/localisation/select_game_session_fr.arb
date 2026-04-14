@@ -10,5 +10,14 @@
   "createGameModeHeader": "Mode",
   "createGameLastModifiedHeader": "Dernière modification",
   "createGameModeClassic": "Classique",
-  "createGameModeCtf": "Capture du drapeau"
+  "createGameModeCtf": "Capture du drapeau",
+  "createGameAccessibilityLabel": "Accessibilité",
+  "createGameFriendsOnlyLabel": "Amis seulement",
+  "createGameEntryFeeSectionLabel": "Prix d'entrée",
+  "createGameEntryFeeLabel": "Frais d'entrée",
+  "createGameEntryFeeHint": "0 = gratuit",
+  "createGameBalanceLabel": "Votre solde",
+  "createGameInsufficientFundsTitle": "Solde insuffisant",
+  "createGameInsufficientFundsMessage": "Vous n'avez pas assez de pièces pour ce montant. Réduisez les frais ou gagnez des pièces à la boutique.",
+  "noGames": "Aucun jeu disponible."
 }

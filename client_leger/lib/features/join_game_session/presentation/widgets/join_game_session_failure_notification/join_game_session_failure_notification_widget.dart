@@ -75,10 +75,7 @@ class _JoinGameSessionFailureNotificationWidgetState
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _GameButton(
-                      label: l10n.ok,
-                      onTap: _viewModel.dismiss,
-                    ),
+                    _GameButton(label: l10n.ok, onTap: _viewModel.dismiss),
                   ],
                 ),
               ],

@@ -55,6 +55,7 @@
     "channels": "Canaux de discussion",
     "profile": "Profil",
     "friends": "Amis",
+    "shop": "Boutique",
     "games_history": "Historique des parties",
     "login_history": "Historique de connexion",
     "logout": "Se déconnecter",
@@ -102,7 +103,12 @@
     "use_photo": "Utiliser cette photo",
     "error_file_type": "Fichier de type \"{{ ext }}\" non autorisé. Formats permis : JPG, JPEG, PNG (taille maximale 2 MB).",
     "error_file_size": "Fichier trop volumineux ({{ size }} MB). Taille maximale autorisée : 2 MB.",
-    "no_changes": "Aucune modification détectée"
+    "no_changes": "Aucune modification détectée",
+    "errors": {
+      "load_profile": "Erreur lors du chargement du profil",
+      "update_profile": "Erreur lors de la sauvegarde des changements du profil",
+      "unauthenticated": "Utilisateur non authentifié"
+    }
   },
   "friends": {
     "title": "Amis",
@@ -134,6 +140,49 @@
     "error_remove": "Erreur lors de la suppression de l'ami",
     "error_block": "Erreur lors du blocage de l'utilisateur",
     "error_unblock": "Erreur lors du déblocage de l'utilisateur"
+  },
+  "shop": {
+    "title": "Boutique",
+    "insufficient_funds_title": "Solde insuffisant",
+    "insufficient_funds_desc": "Vous n'avez pas assez de pièces pour acheter cet article.",
+    "sections": {
+      "banners": "Bannières",
+      "characters": "Personnages exclusifs",
+      "avatars": "Avatars exclusifs"
+    },
+    "preview": {
+      "player": "Joueur",
+      "health": "Vie",
+      "speed": "Rapidité",
+      "attack": "Attaque",
+      "defense": "Défense"
+    },
+    "actions": {
+      "buy": "Acheter",
+      "equip": "Équiper",
+      "unequip": "Déséquiper"
+    },
+    "items": {
+      "banner_gold": "Bannière dorée",
+      "banner_shadow": "Bannière sombre",
+      "banner_flame": "Bannière flamme",
+      "banner_ice": "Bannière glaciale",
+      "banner_neon": "Bannière néon",
+      "streetFighter": "Street Fighter",
+      "tacticalOperator": "Tactical Operator",
+      "screamGhostface": "Ghostface",
+      "sergei": "Sergei",
+      "sokolov": "Sokolov",
+      "viktor": "Viktor",
+      "volkov": "Volkov"
+    },
+    "owned": "Possédé",
+    "coins_alt": "pièces",
+    "success": {
+      "purchase": "Achat effectué !",
+      "equipped": "Cosmétique équipé !",
+      "unequipped": "Cosmétique déséquipé."
+    }
   },
   "admin": {
     "title": "Administration"
@@ -208,7 +257,21 @@
     "write_msg": "Écrire un message dans #{{ name }}...",
     "member_singular": "membre",
     "member_plural": "membres",
-    "quit_confirm": "Voulez-vous vraiment supprimer ce canal ?"
+    "quit_confirm": "Voulez-vous vraiment supprimer ce canal ?",
+    "success_created": "Canal \"{{name}}\" créé avec succès !",
+    "success_deleted": "Canal supprimé.",
+    "errors": {
+      "empty_name": "Le nom du canal ne peut pas être vide.",
+      "name_too_long": "Le nom du canal ne peut pas dépasser 50 caractères.",
+      "reserved_general": "Le nom du canal est réservé pour le chat général.",
+      "reserved_game": "Le nom du canal est réservé pour les canaux de partie.",
+      "forbidden_words": "Le nom du canal contient des mots interdits.",
+      "name_taken": "Le nom du canal est déjà pris, veuillez en choisir un autre.",
+      "not_found": "Ce canal n'existe plus ou a été supprimé.",
+      "only_creator_delete": "Seul le créateur du canal peut le supprimer.",
+      "must_be_member_to_send": "Vous devez être membre du canal pour envoyer des messages.",
+      "generic": "Une erreur est survenue. Veuillez réessayer."
+    }
   },
   "history": {
     "games": {
@@ -264,7 +327,18 @@
     "hidden_deleted": "Le jeu sélectionné est caché ou supprimé.",
     "mode_classique": "Classique",
     "mode_ctf": "CTF",
-    "delete_warning": "Vous allez supprimer ce jeu, voulez-vous continuer ?"
+    "delete_warning": "Vous allez supprimer ce jeu, voulez-vous continuer ?",
+    "filter_title": "Filtres",
+    "filter_size": "Taille",
+    "filter_size_all": "Toutes tailles",
+    "filter_mode": "Mode de jeu",
+    "filter_mode_all": "Tous les modes",
+    "filter_sort": "Tri par date",
+    "filter_sort_none": "Sans tri",
+    "filter_sort_newest": "Plus récent",
+    "filter_sort_oldest": "Plus ancien",
+    "filter_reset": "Effacer",
+    "search_placeholder": "Rechercher un jeu..."
   },
   "game_creator": {
     "title": "Créer une partie",
@@ -373,7 +447,7 @@
   },
   "chatbox": {
     "general": "Général",
-    "game_channel": "Canal de ",
+    "game_channel": "Canal de partie {{id}}",
     "send": "Envoyer",
     "placeholder_general": "Écrire un message...",
     "placeholder_channel": "Écrire dans {{ name }}..."

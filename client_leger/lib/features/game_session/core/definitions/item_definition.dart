@@ -10,7 +10,8 @@ class ItemDefinition {
 
   String get imagePath => ItemAssets.gameBoardItem(type);
   String name(GameSessionLocalizations l10n) => type.getName(l10n);
-  String description(GameSessionLocalizations l10n) => type.getDescription(l10n);
+  String description(GameSessionLocalizations l10n) =>
+      type.getDescription(l10n);
 
   static const _all = {
     ItemType.adrenaline: ItemDefinition._(type: ItemType.adrenaline),
@@ -20,6 +21,7 @@ class ItemDefinition {
     ItemType.camouflage: ItemDefinition._(type: ItemType.camouflage),
     ItemType.waterproofBoots: ItemDefinition._(type: ItemType.waterproofBoots),
     ItemType.airStrike: ItemDefinition._(type: ItemType.airStrike),
+    ItemType.torch: ItemDefinition._(type: ItemType.torch),
     ItemType.random: ItemDefinition._(type: ItemType.random),
     ItemType.flag: ItemDefinition._(type: ItemType.flag),
     ItemType.spawnPoint: ItemDefinition._(type: ItemType.spawnPoint),

@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/localisation/core_localizations.dart';
+import '../../../../../core/presentation/shell/shell_chrome_back_handler.dart';
+import '../../../../../core/presentation/shell/shell_chrome_metrics.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
 import '../widgets/friends_tab_bar.dart';
 import '../widgets/user_card.dart';
@@ -15,8 +18,6 @@ const _kBorder = Color(0xFF3a3a3a);
 const _kHeaderText = Color(0xFFe0d8c0);
 const _kStateBg = Color(0x40000000);
 const _kAccept = Color(0xFF145214);
-const _kDanger = Color(0xFFff6b6b);
-const _kDangerBorder = Color(0xFF7f1f1f);
 const _kBlock = Color(0xFFffb347);
 const _kBlockBorder = Color(0xFF8b5a00);
 
@@ -37,11 +38,13 @@ class _FriendsScreenState extends State<FriendsScreen> {
   void initState() {
     super.initState();
     _viewModel = GetIt.I<FriendsViewModel>();
-    _viewModel.loadAll();
+    GetIt.I<ShellChromeBackHandler>().register(_viewModel.requestLeave);
+    unawaited(_viewModel.loadAll());
   }
 
   @override
   void dispose() {
+    GetIt.I<ShellChromeBackHandler>().clear();
     _searchController.dispose();
     _debounce?.cancel();
     super.dispose();
@@ -58,13 +61,12 @@ class _FriendsScreenState extends State<FriendsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = CoreLocalizations.of(context)!;
+    final topInset = shellChromeBodyTopInset(context);
     return AppBackground(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.fromLTRB(20, topInset + 20, 20, 20),
         child: Column(
           children: [
-            _buildHeader(l10n),
-            const SizedBox(height: 12),
             Watch((context) {
               final err = _viewModel.errorMessage.value;
               if (err == null) return const SizedBox.shrink();
@@ -79,66 +81,9 @@ class _FriendsScreenState extends State<FriendsScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            Expanded(child: Watch((context) => _buildTabContent())),
+            Expanded(child: Watch((context) => _buildTabContent(l10n))),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(CoreLocalizations l10n) {
-    return SizedBox(
-      width: double.infinity,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: GestureDetector(
-              onTap: _viewModel.requestLeave,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.chevron_left,
-                      color: Colors.white,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 18),
-                    Text(
-                      l10n.homePage,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'CustomFont',
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Text(
-            l10n.friends,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 44,
-              fontFamily: 'CustomFont',
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
-              shadows: [
-                Shadow(
-                  color: Color(0x99000000),
-                  offset: Offset(0, 3),
-                  blurRadius: 12,
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -163,22 +108,19 @@ class _FriendsScreenState extends State<FriendsScreen> {
     );
   }
 
-  Widget _buildTabContent() {
-    if (_viewModel.isLoading.value) return _buildState('Chargement...');
+  Widget _buildTabContent(CoreLocalizations l10n) {
+    if (_viewModel.isLoading.value) return _buildState(l10n.loading);
     return switch (_viewModel.activeTab.value) {
-      FriendsTab.friends => _buildFriendsList(),
-      FriendsTab.requests => _buildRequestsList(),
-      FriendsTab.search => _buildSearchTab(),
-      FriendsTab.blocked => _buildBlockedList(),
+      FriendsTab.friends => _buildFriendsList(l10n),
+      FriendsTab.requests => _buildRequestsList(l10n),
+      FriendsTab.search => _buildSearchTab(l10n),
+      FriendsTab.blocked => _buildBlockedList(l10n),
     };
   }
 
-  Widget _buildFriendsList() {
+  Widget _buildFriendsList(CoreLocalizations l10n) {
     final list = _viewModel.friends.value;
-    if (list.isEmpty)
-      return _buildState(
-        'Aucun ami pour le moment. Recherchez des utilisateurs pour en ajouter !',
-      );
+    if (list.isEmpty) return _buildState(l10n.noFriends);
     return ListView.builder(
       itemCount: list.length,
       itemBuilder: (_, i) {
@@ -186,16 +128,15 @@ class _FriendsScreenState extends State<FriendsScreen> {
         return UserCard(
           username: f.username,
           avatarId: f.avatarId,
+          avatarUrl: f.avatarUrl,
           isOnline: f.isOnline,
           actions: [
             FriendActionButton(
-              label: 'Retirer',
+              label: l10n.removeFriend,
               onPressed: () => _viewModel.removeFriend(f.username),
-              color: _kDanger,
-              borderColor: _kDangerBorder,
             ),
             FriendActionButton(
-              label: 'Bloquer',
+              label: l10n.blockUser,
               onPressed: () => _viewModel.blockUser(f.username),
               color: _kBlock,
               borderColor: _kBlockBorder,
@@ -206,47 +147,42 @@ class _FriendsScreenState extends State<FriendsScreen> {
     );
   }
 
-  Widget _buildRequestsList() {
+  Widget _buildRequestsList(CoreLocalizations l10n) {
     final pending = _viewModel.pendingRequests.value;
     final sent = _viewModel.sentRequests.value;
-    if (pending.isEmpty && sent.isEmpty)
-      return _buildState('Aucune demande en cours');
+    if (pending.isEmpty && sent.isEmpty) return _buildState(l10n.noRequests);
     return ListView(
       children: [
         if (pending.isNotEmpty) ...[
-          _buildSectionTitle('Demandes reçues'),
+          _buildSectionTitle(l10n.receivedRequests),
           ...pending.map(
             (r) => UserCard(
               username: r.senderId,
               actions: [
                 FriendActionButton(
-                  label: 'Accepter',
+                  label: l10n.accept,
                   onPressed: () => _viewModel.acceptRequest(r.id),
                   color: Colors.white,
                   bg: _kAccept,
                   borderColor: _kAccept,
                 ),
                 FriendActionButton(
-                  label: 'Refuser',
+                  label: l10n.refuse,
                   onPressed: () => _viewModel.refuseRequest(r.id),
-                  color: _kDanger,
-                  borderColor: _kDangerBorder,
                 ),
               ],
             ),
           ),
         ],
         if (sent.isNotEmpty) ...[
-          _buildSectionTitle('Demandes envoyées'),
+          _buildSectionTitle(l10n.sentRequests),
           ...sent.map(
             (r) => UserCard(
               username: r.receiverId,
               actions: [
                 FriendActionButton(
-                  label: 'Annuler',
+                  label: l10n.cancel,
                   onPressed: () => _viewModel.cancelRequest(r.id),
-                  color: _kDanger,
-                  borderColor: _kDangerBorder,
                 ),
               ],
             ),
@@ -256,7 +192,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
     );
   }
 
-  Widget _buildSearchTab() {
+  Widget _buildSearchTab(CoreLocalizations l10n) {
     final results = _viewModel.searchResults.value;
     return Column(
       children: [
@@ -265,21 +201,21 @@ class _FriendsScreenState extends State<FriendsScreen> {
           onChanged: _onSearchChanged,
           style: const TextStyle(color: Color(0xFFF0F0F0)),
           decoration: InputDecoration(
-            hintText: 'Rechercher un utilisateur...',
+            hintText: l10n.searchUser,
             hintStyle: const TextStyle(color: Color(0xFF666666)),
             filled: true,
             fillColor: const Color(0x66000000),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
-              borderSide: const BorderSide(color: Color(0xFF3a1212)),
+              borderSide: BorderSide(color: context.interactionColors.outline),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
-              borderSide: const BorderSide(color: Color(0xFF3a1212)),
+              borderSide: BorderSide(color: context.interactionColors.outline),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
-              borderSide: const BorderSide(color: Color(0xFF8b0000)),
+              borderSide: BorderSide(color: context.interactionColors.outline),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
@@ -289,7 +225,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
         ),
         const SizedBox(height: 8),
         if (_searchController.text.isNotEmpty && results.isEmpty)
-          _buildState('Aucun résultat')
+          _buildState(l10n.noResults)
         else
           Expanded(
             child: ListView.builder(
@@ -301,11 +237,12 @@ class _FriendsScreenState extends State<FriendsScreen> {
                 return UserCard(
                   username: u.username,
                   avatarId: u.avatarId,
+                  avatarUrl: u.avatarUrl,
                   isOnline: u.isOnline,
                   actions: isBlocked
                       ? [
                           FriendActionButton(
-                            label: 'Débloquer',
+                            label: l10n.unblockUser,
                             onPressed: () => _viewModel.unblockUser(u.username),
                             color: Colors.white,
                             bg: _kAccept,
@@ -315,15 +252,13 @@ class _FriendsScreenState extends State<FriendsScreen> {
                       : [
                           if (hasPending)
                             FriendActionButton(
-                              label: 'Annuler',
+                              label: l10n.cancel,
                               onPressed: () => _viewModel
                                   .cancelRequestByUsername(u.username),
-                              color: _kDanger,
-                              borderColor: _kDangerBorder,
                             )
                           else
                             FriendActionButton(
-                              label: 'Ajouter',
+                              label: l10n.addFriend,
                               onPressed: () =>
                                   _viewModel.sendRequest(u.username),
                               color: Colors.white,
@@ -331,7 +266,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                               borderColor: _kAccept,
                             ),
                           FriendActionButton(
-                            label: 'Bloquer',
+                            label: l10n.blockUser,
                             onPressed: () =>
                                 _viewModel.blockUserFromSearch(u.username),
                             color: _kBlock,
@@ -346,16 +281,16 @@ class _FriendsScreenState extends State<FriendsScreen> {
     );
   }
 
-  Widget _buildBlockedList() {
+  Widget _buildBlockedList(CoreLocalizations l10n) {
     final list = _viewModel.blockedUsers.value;
-    if (list.isEmpty) return _buildState('Aucun utilisateur bloqué');
+    if (list.isEmpty) return _buildState(l10n.noBlockedUsers);
     return ListView.builder(
       itemCount: list.length,
       itemBuilder: (_, i) => UserCard(
         username: list[i],
         actions: [
           FriendActionButton(
-            label: 'Débloquer',
+            label: l10n.unblockUser,
             onPressed: () => _viewModel.unblockUser(list[i]),
             color: Colors.white,
             bg: _kAccept,

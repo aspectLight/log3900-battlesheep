@@ -3,11 +3,8 @@ import 'package:flutter/material.dart';
 import 'modal_entry.dart';
 import 'modal_intent.dart';
 
-typedef ModalWidgetBuilder<T extends ModalIntent> = Widget Function(
-  BuildContext context,
-  T intent,
-  VoidCallback onClose,
-);
+typedef ModalWidgetBuilder<T extends ModalIntent> =
+    Widget Function(BuildContext context, T intent, VoidCallback onClose);
 
 class ModalWidgetRegistry {
   final _builders =
@@ -18,11 +15,7 @@ class ModalWidgetRegistry {
         builder(context, entry.intent as T, onClose);
   }
 
-  Widget build(
-    BuildContext context,
-    ModalEntry entry,
-    VoidCallback onClose,
-  ) {
+  Widget build(BuildContext context, ModalEntry entry, VoidCallback onClose) {
     final builder = _builders[entry.intent.runtimeType];
     return builder?.call(context, entry, onClose) ?? const SizedBox.shrink();
   }

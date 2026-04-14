@@ -12,4 +12,3 @@ void registerAuthUseCases(GetIt getIt) {
     () => SignUpUseCase(authRepository: getIt<AuthRepository>()),
   );
 }
-

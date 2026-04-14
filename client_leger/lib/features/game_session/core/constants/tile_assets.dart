@@ -30,7 +30,14 @@ class TileAssets {
     TileType.stone => '$path/stone.png',
     TileType.ice => '$path/ice.png',
     TileType.water => '$path/water.png',
+    TileType.trap => '$path/trap.png',
+    TileType.teleportPad => '$path/teleport.png',
   };
+
+  static String teleportPadImagePath(String state) {
+    if (state == 'default') return '$path/teleport.png';
+    return '$path/teleport_$state.png';
+  }
 
   static String _doorImagePath(TileOrientation? orientation, TileState? state) {
     final orient = orientation ?? defaultDoorOrientation;
@@ -108,7 +115,11 @@ class TileAssets {
   }
 
   static String imagePathFor(Tile tile, [TileOrientation? orientation]) {
-    final state = tile is DoorTile ? tile.state : null;
-    return tileImagePath(tile.type, state, orientation);
+    return switch (tile) {
+      TrapTile() => '$path/trap.png',
+      TeleportPadTile(:final state) => teleportPadImagePath(state),
+      DoorTile(:final state) => tileImagePath(tile.type, state, orientation),
+      _ => tileImagePath(tile.type, null, orientation),
+    };
   }
 }

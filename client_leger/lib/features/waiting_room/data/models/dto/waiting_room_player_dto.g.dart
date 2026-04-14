@@ -27,6 +27,9 @@ WaitingRoomPlayerDto _$WaitingRoomPlayerDtoFromJson(
     json['d4Choice'],
     const DiceStatChoiceConverter().fromJson,
   ),
+  profileAvatarId: json['profileAvatarId'] as String?,
+  profileAvatarUrl: json['profileAvatarUrl'] as String?,
+  activeBanner: json['activeBanner'] as String?,
 );
 
 Map<String, dynamic> _$WaitingRoomPlayerDtoToJson(
@@ -46,6 +49,9 @@ Map<String, dynamic> _$WaitingRoomPlayerDtoToJson(
     instance.d4Choice,
     const DiceStatChoiceConverter().toJson,
   ),
+  'profileAvatarId': instance.profileAvatarId,
+  'profileAvatarUrl': instance.profileAvatarUrl,
+  'activeBanner': instance.activeBanner,
 };
 
 Value? _$JsonConverterFromJson<Json, Value>(

@@ -30,6 +30,7 @@ mixin _$GameBoardState {
       throw _privateConstructorUsedError;
   Option<PendingItemPickup> get pendingItemPickup =>
       throw _privateConstructorUsedError;
+  Set<String> get illuminatedCellKeys => throw _privateConstructorUsedError;
 
   /// Create a copy of GameBoardState
   /// with the given fields replaced by the non-null parameter values.
@@ -53,6 +54,7 @@ abstract class $GameBoardStateCopyWith<$Res> {
     Map<GameBoardPosition, List<GameBoardPosition>> reachablePathsByDestination,
     List<GameBoardPosition> selectedPathCoords,
     Option<PendingItemPickup> pendingItemPickup,
+    Set<String> illuminatedCellKeys,
   });
 }
 
@@ -78,6 +80,7 @@ class _$GameBoardStateCopyWithImpl<$Res, $Val extends GameBoardState>
     Object? reachablePathsByDestination = null,
     Object? selectedPathCoords = null,
     Object? pendingItemPickup = null,
+    Object? illuminatedCellKeys = null,
   }) {
     return _then(
       _value.copyWith(
@@ -109,6 +112,10 @@ class _$GameBoardStateCopyWithImpl<$Res, $Val extends GameBoardState>
                 ? _value.pendingItemPickup
                 : pendingItemPickup // ignore: cast_nullable_to_non_nullable
                       as Option<PendingItemPickup>,
+            illuminatedCellKeys: null == illuminatedCellKeys
+                ? _value.illuminatedCellKeys
+                : illuminatedCellKeys // ignore: cast_nullable_to_non_nullable
+                      as Set<String>,
           )
           as $Val,
     );
@@ -132,6 +139,7 @@ abstract class _$$GameBoardStateImplCopyWith<$Res>
     Map<GameBoardPosition, List<GameBoardPosition>> reachablePathsByDestination,
     List<GameBoardPosition> selectedPathCoords,
     Option<PendingItemPickup> pendingItemPickup,
+    Set<String> illuminatedCellKeys,
   });
 }
 
@@ -156,6 +164,7 @@ class __$$GameBoardStateImplCopyWithImpl<$Res>
     Object? reachablePathsByDestination = null,
     Object? selectedPathCoords = null,
     Object? pendingItemPickup = null,
+    Object? illuminatedCellKeys = null,
   }) {
     return _then(
       _$GameBoardStateImpl(
@@ -187,6 +196,10 @@ class __$$GameBoardStateImplCopyWithImpl<$Res>
             ? _value.pendingItemPickup
             : pendingItemPickup // ignore: cast_nullable_to_non_nullable
                   as Option<PendingItemPickup>,
+        illuminatedCellKeys: null == illuminatedCellKeys
+            ? _value._illuminatedCellKeys
+            : illuminatedCellKeys // ignore: cast_nullable_to_non_nullable
+                  as Set<String>,
       ),
     );
   }
@@ -204,11 +217,13 @@ class _$GameBoardStateImpl extends _GameBoardState {
     reachablePathsByDestination,
     required final List<GameBoardPosition> selectedPathCoords,
     this.pendingItemPickup = const Option.none(),
+    final Set<String> illuminatedCellKeys = const {},
   }) : _items = items,
        _playerPositions = playerPositions,
        _reachableCellCoords = reachableCellCoords,
        _reachablePathsByDestination = reachablePathsByDestination,
        _selectedPathCoords = selectedPathCoords,
+       _illuminatedCellKeys = illuminatedCellKeys,
        super._();
 
   @override
@@ -261,10 +276,19 @@ class _$GameBoardStateImpl extends _GameBoardState {
   @override
   @JsonKey()
   final Option<PendingItemPickup> pendingItemPickup;
+  final Set<String> _illuminatedCellKeys;
+  @override
+  @JsonKey()
+  Set<String> get illuminatedCellKeys {
+    if (_illuminatedCellKeys is EqualUnmodifiableSetView)
+      return _illuminatedCellKeys;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_illuminatedCellKeys);
+  }
 
   @override
   String toString() {
-    return 'GameBoardState(board: $board, items: $items, playerPositions: $playerPositions, reachableCellCoords: $reachableCellCoords, reachablePathsByDestination: $reachablePathsByDestination, selectedPathCoords: $selectedPathCoords, pendingItemPickup: $pendingItemPickup)';
+    return 'GameBoardState(board: $board, items: $items, playerPositions: $playerPositions, reachableCellCoords: $reachableCellCoords, reachablePathsByDestination: $reachablePathsByDestination, selectedPathCoords: $selectedPathCoords, pendingItemPickup: $pendingItemPickup, illuminatedCellKeys: $illuminatedCellKeys)';
   }
 
   @override
@@ -291,7 +315,11 @@ class _$GameBoardStateImpl extends _GameBoardState {
               _selectedPathCoords,
             ) &&
             (identical(other.pendingItemPickup, pendingItemPickup) ||
-                other.pendingItemPickup == pendingItemPickup));
+                other.pendingItemPickup == pendingItemPickup) &&
+            const DeepCollectionEquality().equals(
+              other._illuminatedCellKeys,
+              _illuminatedCellKeys,
+            ));
   }
 
   @override
@@ -304,6 +332,7 @@ class _$GameBoardStateImpl extends _GameBoardState {
     const DeepCollectionEquality().hash(_reachablePathsByDestination),
     const DeepCollectionEquality().hash(_selectedPathCoords),
     pendingItemPickup,
+    const DeepCollectionEquality().hash(_illuminatedCellKeys),
   );
 
   /// Create a copy of GameBoardState
@@ -328,6 +357,7 @@ abstract class _GameBoardState extends GameBoardState {
     reachablePathsByDestination,
     required final List<GameBoardPosition> selectedPathCoords,
     final Option<PendingItemPickup> pendingItemPickup,
+    final Set<String> illuminatedCellKeys,
   }) = _$GameBoardStateImpl;
   const _GameBoardState._() : super._();
 
@@ -346,6 +376,8 @@ abstract class _GameBoardState extends GameBoardState {
   List<GameBoardPosition> get selectedPathCoords;
   @override
   Option<PendingItemPickup> get pendingItemPickup;
+  @override
+  Set<String> get illuminatedCellKeys;
 
   /// Create a copy of GameBoardState
   /// with the given fields replaced by the non-null parameter values.

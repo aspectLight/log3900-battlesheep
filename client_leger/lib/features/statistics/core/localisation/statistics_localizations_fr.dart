@@ -49,6 +49,9 @@ class StatisticsLocalizationsFr extends StatisticsLocalizations {
   String get statisticsGlobalTitle => 'Global';
 
   @override
+  String get statisticsRewardsTitle => 'Récompenses';
+
+  @override
   String get statisticsDuration => 'Durée de la partie';
 
   @override

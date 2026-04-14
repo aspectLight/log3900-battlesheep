@@ -123,7 +123,8 @@ class GameBoardViewModel {
       final path = reachablePathsByDestination.value[pos];
       if (path == null || path.isEmpty) return;
       final currentPath = _boardRepository.state.value.selectedPathCoords;
-      final isSecondTapOnSameTile = currentPath.isNotEmpty &&
+      final isSecondTapOnSameTile =
+          currentPath.isNotEmpty &&
           currentPath.last.x == pos.x &&
           currentPath.last.y == pos.y;
       if (isSecondTapOnSameTile) {

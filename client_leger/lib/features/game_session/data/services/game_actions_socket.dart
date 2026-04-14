@@ -6,7 +6,7 @@ import '../../../../core/services/socket_service.dart';
 class GameActionsSocket {
   final SocketService _socketService;
 
-  GameActionsSocket({required SocketService socketService  })
+  GameActionsSocket({required SocketService socketService})
     : _socketService = socketService;
 
   void abandonGame(AbandonGameCommand command) {

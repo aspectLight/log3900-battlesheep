@@ -32,6 +32,11 @@ export class GameListComponent implements OnInit {
     errorMessage: string = '';
     onConfirm: () => void;
 
+    filterSize: string = '';
+    filterMode: string = '';
+    sortByDate: string = '';
+    searchQuery: string = '';
+
     private pendingGame: Game | null = null;
 
     constructor(
@@ -40,6 +45,38 @@ export class GameListComponent implements OnInit {
         private profileService: ProfileService,
         private translate: TranslateService,
     ) {}
+
+    get filteredGames(): Game[] {
+        let result = this.games;
+
+        if (this.searchQuery.trim()) {
+            const query = this.searchQuery.trim().toLowerCase();
+            result = result.filter((g) => g.name.toLowerCase().includes(query));
+        }
+
+        if (this.filterSize) {
+            result = result.filter((g) => String(g.board.size) === this.filterSize);
+        }
+
+        if (this.filterMode) {
+            result = result.filter((g) => g.mode === this.filterMode);
+        }
+
+        if (this.sortByDate === 'newest') {
+            result = [...result].sort((a, b) => new Date(b.modificationDate).getTime() - new Date(a.modificationDate).getTime());
+        } else if (this.sortByDate === 'oldest') {
+            result = [...result].sort((a, b) => new Date(a.modificationDate).getTime() - new Date(b.modificationDate).getTime());
+        }
+
+        return result;
+    }
+
+    resetFilters(): void {
+        this.filterSize = '';
+        this.filterMode = '';
+        this.sortByDate = '';
+        this.searchQuery = '';
+    }
 
     ngOnInit(): void {
         this.profileService.getProfile().then((profile) => {

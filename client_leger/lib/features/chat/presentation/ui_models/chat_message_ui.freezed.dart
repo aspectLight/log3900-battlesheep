@@ -22,6 +22,8 @@ mixin _$ChatMessageUi {
   String get content => throw _privateConstructorUsedError;
   String get time => throw _privateConstructorUsedError;
   bool get isMe => throw _privateConstructorUsedError;
+  String? get avatarId => throw _privateConstructorUsedError;
+  String? get avatarUrl => throw _privateConstructorUsedError;
 
   /// Create a copy of ChatMessageUi
   /// with the given fields replaced by the non-null parameter values.
@@ -43,6 +45,8 @@ abstract class $ChatMessageUiCopyWith<$Res> {
     String content,
     String time,
     bool isMe,
+    String? avatarId,
+    String? avatarUrl,
   });
 }
 
@@ -66,6 +70,8 @@ class _$ChatMessageUiCopyWithImpl<$Res, $Val extends ChatMessageUi>
     Object? content = null,
     Object? time = null,
     Object? isMe = null,
+    Object? avatarId = freezed,
+    Object? avatarUrl = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -89,6 +95,14 @@ class _$ChatMessageUiCopyWithImpl<$Res, $Val extends ChatMessageUi>
                 ? _value.isMe
                 : isMe // ignore: cast_nullable_to_non_nullable
                       as bool,
+            avatarId: freezed == avatarId
+                ? _value.avatarId
+                : avatarId // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            avatarUrl: freezed == avatarUrl
+                ? _value.avatarUrl
+                : avatarUrl // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -110,6 +124,8 @@ abstract class _$$ChatMessageUiImplCopyWith<$Res>
     String content,
     String time,
     bool isMe,
+    String? avatarId,
+    String? avatarUrl,
   });
 }
 
@@ -132,6 +148,8 @@ class __$$ChatMessageUiImplCopyWithImpl<$Res>
     Object? content = null,
     Object? time = null,
     Object? isMe = null,
+    Object? avatarId = freezed,
+    Object? avatarUrl = freezed,
   }) {
     return _then(
       _$ChatMessageUiImpl(
@@ -155,6 +173,14 @@ class __$$ChatMessageUiImplCopyWithImpl<$Res>
             ? _value.isMe
             : isMe // ignore: cast_nullable_to_non_nullable
                   as bool,
+        avatarId: freezed == avatarId
+            ? _value.avatarId
+            : avatarId // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        avatarUrl: freezed == avatarUrl
+            ? _value.avatarUrl
+            : avatarUrl // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -169,6 +195,8 @@ class _$ChatMessageUiImpl implements _ChatMessageUi {
     required this.content,
     required this.time,
     required this.isMe,
+    this.avatarId,
+    this.avatarUrl,
   });
 
   @override
@@ -181,10 +209,14 @@ class _$ChatMessageUiImpl implements _ChatMessageUi {
   final String time;
   @override
   final bool isMe;
+  @override
+  final String? avatarId;
+  @override
+  final String? avatarUrl;
 
   @override
   String toString() {
-    return 'ChatMessageUi(type: $type, name: $name, content: $content, time: $time, isMe: $isMe)';
+    return 'ChatMessageUi(type: $type, name: $name, content: $content, time: $time, isMe: $isMe, avatarId: $avatarId, avatarUrl: $avatarUrl)';
   }
 
   @override
@@ -196,11 +228,24 @@ class _$ChatMessageUiImpl implements _ChatMessageUi {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.content, content) || other.content == content) &&
             (identical(other.time, time) || other.time == time) &&
-            (identical(other.isMe, isMe) || other.isMe == isMe));
+            (identical(other.isMe, isMe) || other.isMe == isMe) &&
+            (identical(other.avatarId, avatarId) ||
+                other.avatarId == avatarId) &&
+            (identical(other.avatarUrl, avatarUrl) ||
+                other.avatarUrl == avatarUrl));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, type, name, content, time, isMe);
+  int get hashCode => Object.hash(
+    runtimeType,
+    type,
+    name,
+    content,
+    time,
+    isMe,
+    avatarId,
+    avatarUrl,
+  );
 
   /// Create a copy of ChatMessageUi
   /// with the given fields replaced by the non-null parameter values.
@@ -218,6 +263,8 @@ abstract class _ChatMessageUi implements ChatMessageUi {
     required final String content,
     required final String time,
     required final bool isMe,
+    final String? avatarId,
+    final String? avatarUrl,
   }) = _$ChatMessageUiImpl;
 
   @override
@@ -230,6 +277,10 @@ abstract class _ChatMessageUi implements ChatMessageUi {
   String get time;
   @override
   bool get isMe;
+  @override
+  String? get avatarId;
+  @override
+  String? get avatarUrl;
 
   /// Create a copy of ChatMessageUi
   /// with the given fields replaced by the non-null parameter values.

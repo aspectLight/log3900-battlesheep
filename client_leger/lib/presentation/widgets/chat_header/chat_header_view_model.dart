@@ -1,3 +1,0 @@
-class ChatHeaderViewModel {
-  void dispose() {}
-}

@@ -13,6 +13,45 @@ import '../../../../game_session/presentation/ui_models/components/game_board_ce
 import '../../../../game_session/presentation/ui_models/components/game_board_ui_tile.dart';
 import '../../../../game_session/presentation/ui_models/components/game_board_ui.dart';
 
+class DeferredSelectGameSessionBoardPreview extends StatefulWidget {
+  const DeferredSelectGameSessionBoardPreview({
+    super.key,
+    required this.boardSize,
+    required this.boardMatrix,
+  });
+
+  final int boardSize;
+  final List<List<GameBoardPreviewCell>> boardMatrix;
+
+  @override
+  State<DeferredSelectGameSessionBoardPreview> createState() =>
+      _DeferredSelectGameSessionBoardPreviewState();
+}
+
+class _DeferredSelectGameSessionBoardPreviewState
+    extends State<DeferredSelectGameSessionBoardPreview> {
+  bool _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _ready = true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_ready) {
+      return const ColoredBox(color: Color(0xFF2A2A2A));
+    }
+    return SelectGameSessionBoardPreviewWidget(
+      boardSize: widget.boardSize,
+      boardMatrix: widget.boardMatrix,
+    );
+  }
+}
+
 class SelectGameSessionBoardPreviewWidget extends StatefulWidget {
   const SelectGameSessionBoardPreviewWidget({
     super.key,
@@ -59,17 +98,10 @@ class _SelectGameSessionBoardPreviewWidgetState
     }
 
     final board = Board(matrix: matrix, size: widget.boardSize);
-    final boardState = GameBoardState.scopedInitial(
-      board: board,
-      items: items,
-    );
+    final boardState = GameBoardState.scopedInitial(board: board, items: items);
     final playerState = GamePlayerState.initial();
 
-    return toGameBoardUi(
-      board,
-      playerState,
-      boardState,
-    );
+    return toGameBoardUi(board, playerState, boardState);
   }
 
   @override
@@ -92,18 +124,12 @@ class _SelectGameSessionBoardPreviewWidgetState
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: _boardUi.size,
-              children: List.generate(
-                _boardUi.size * _boardUi.size,
-                (index) {
-                  final x = index ~/ _boardUi.size;
-                  final y = index % _boardUi.size;
-                  final cell = _boardUi.matrix[x][y];
-                  return _CellUiRenderer(
-                    cell: cell,
-                    cellSize: cellSize,
-                  );
-                },
-              ),
+              children: List.generate(_boardUi.size * _boardUi.size, (index) {
+                final x = index ~/ _boardUi.size;
+                final y = index % _boardUi.size;
+                final cell = _boardUi.matrix[x][y];
+                return _CellUiRenderer(cell: cell, cellSize: cellSize);
+              }),
             ),
           ),
         );
@@ -113,10 +139,7 @@ class _SelectGameSessionBoardPreviewWidgetState
 }
 
 class _CellUiRenderer extends StatelessWidget {
-  const _CellUiRenderer({
-    required this.cell,
-    required this.cellSize,
-  });
+  const _CellUiRenderer({required this.cell, required this.cellSize});
 
   final GameBoardCellUi cell;
   final double cellSize;
@@ -132,8 +155,11 @@ class _CellUiRenderer extends StatelessWidget {
           children: [
             Image.asset(
               GameBoardUiTile(
-                displayType: cell.displayTileType
-                    .fold(() => cell.tile.type, (t) => t),
+                sourceTile: cell.tile,
+                displayType: cell.displayTileType.fold(
+                  () => cell.tile.type,
+                  (t) => t,
+                ),
                 orientation: cell.tileOrientation,
                 doorState: switch (cell.tile) {
                   DoorTile(:final state) => fp.Option.of(state),
@@ -146,8 +172,11 @@ class _CellUiRenderer extends StatelessWidget {
               fit: BoxFit.fill,
               errorBuilder: (context, error, stackTrace) => Image.asset(
                 GameBoardUiTile(
-                  displayType: cell.displayTileType
-                      .fold(() => cell.tile.type, (t) => t),
+                  sourceTile: cell.tile,
+                  displayType: cell.displayTileType.fold(
+                    () => cell.tile.type,
+                    (t) => t,
+                  ),
                   orientation: cell.tileOrientation,
                   doorState: switch (cell.tile) {
                     DoorTile(:final state) => fp.Option.of(state),
@@ -176,4 +205,3 @@ class _CellUiRenderer extends StatelessWidget {
     );
   }
 }
-

@@ -25,10 +25,11 @@ class GameSpawnEventsProjection implements EventProjection {
 
   @override
   List<StreamSubscription> subscribe() => [
-    _eventsSocket.playerSpawnedStream.listen(_onPlayerSpawned),
+    _eventsSocket.playerSpawnedStream.listen(_onPlayersRosterSynced),
+    _eventsSocket.playerJoinedGameStream.listen(_onPlayersRosterSynced),
   ];
 
-  void _onPlayerSpawned(PlayerSpawnedEvent event) {
+  void _onPlayersRosterSynced(PlayerSpawnedEvent event) {
     _playerRepository.applyPlayersSpawned(event);
     _boardRepository.applyPlayersSpawned(event);
     _inventoryRepository.applyPlayersSpawned(event);

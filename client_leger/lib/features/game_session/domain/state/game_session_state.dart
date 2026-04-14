@@ -21,13 +21,13 @@ sealed class GameSessionState with _$GameSessionState {
 
   @override
   String get hostId => switch (this) {
-        GameSessionActive(:final hostId) => hostId,
-        GameSessionFinished(:final hostId) => hostId,
-      };
+    GameSessionActive(:final hostId) => hostId,
+    GameSessionFinished(:final hostId) => hostId,
+  };
 
   @override
   bool get isCTF => switch (this) {
-        GameSessionActive(:final isCTF) => isCTF,
-        GameSessionFinished(:final isCTF) => isCTF,
-      };
+    GameSessionActive(:final isCTF) => isCTF,
+    GameSessionFinished(:final isCTF) => isCTF,
+  };
 }

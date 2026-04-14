@@ -9,10 +9,7 @@ class CreatePlayerRequestDto {
   final String roomId;
   final PlayerPayloadDto player;
 
-  const CreatePlayerRequestDto({
-    required this.roomId,
-    required this.player,
-  });
+  const CreatePlayerRequestDto({required this.roomId, required this.player});
 
   factory CreatePlayerRequestDto.fromJson(Map<String, dynamic> json) =>
       _$CreatePlayerRequestDtoFromJson(json);

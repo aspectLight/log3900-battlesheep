@@ -54,10 +54,10 @@ class CoreLocalizationsEn extends CoreLocalizations {
   String get signOut => 'Sign Out';
 
   @override
-  String get connectionHistory => 'Connection History';
+  String get connectionHistory => 'Login History';
 
   @override
-  String get gameHistory => 'Games History';
+  String get gameHistory => 'Game History';
 
   @override
   String get filter => 'Filter';
@@ -135,4 +135,67 @@ class CoreLocalizationsEn extends CoreLocalizations {
 
   @override
   String get loading => 'Loading...';
+
+  @override
+  String get shop => 'Shop';
+
+  @override
+  String get discussionCanals => 'Discussion Channels';
+
+  @override
+  String get noFriends => 'No friends yet. Search for users to add!';
+
+  @override
+  String get noRequests => 'No friend requests at the moment.';
+
+  @override
+  String get removeFriend => 'Remove';
+
+  @override
+  String get blockUser => 'Block';
+
+  @override
+  String get searchUser => 'Search for a user...';
+
+  @override
+  String get unblockUser => 'Unblock';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get addFriend => 'Add';
+
+  @override
+  String get noBlockedUsers => 'No blocked users';
+
+  @override
+  String get receivedRequests => 'Requests received';
+
+  @override
+  String get accept => 'Accept';
+
+  @override
+  String get refuse => 'Refuse';
+
+  @override
+  String get sentRequests => 'Sent Requests';
+
+  @override
+  String get noResults => 'No results';
+
+  @override
+  String get demands => 'Requests';
+
+  @override
+  String get search => 'Search';
+
+  @override
+  String get blocked => 'Blocked';
+
+  @override
+  String get online => 'Online';
+
+  @override
+  String get offline => 'Offline';
 }

@@ -19,9 +19,7 @@ class WaitingRoomFailureNotificationSideEffect with DisposableSideEffect {
 
   void _onFailureRequested(WaitingRoomFailureNotificationRequestedEvent event) {
     _notificationIntentSink.addIntent(
-      WaitingRoomFailureNotificationIntent(
-        failure: event.failure,
-      ),
+      WaitingRoomFailureNotificationIntent(failure: event.failure),
     );
   }
 }

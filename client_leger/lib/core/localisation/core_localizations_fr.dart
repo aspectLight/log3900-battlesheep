@@ -136,4 +136,68 @@ class CoreLocalizationsFr extends CoreLocalizations {
 
   @override
   String get loading => 'Chargement...';
+
+  @override
+  String get shop => 'Boutique';
+
+  @override
+  String get discussionCanals => 'Canaux de discussion';
+
+  @override
+  String get noFriends =>
+      'Aucun ami pour le moment. Recherchez des utilisateurs pour en ajouter !';
+
+  @override
+  String get noRequests => 'Aucune demande d\'ami pour le moment.';
+
+  @override
+  String get removeFriend => 'Retirer';
+
+  @override
+  String get blockUser => 'Bloquer';
+
+  @override
+  String get searchUser => 'Rechercher un utilisateur...';
+
+  @override
+  String get unblockUser => 'Débloquer';
+
+  @override
+  String get cancel => 'Annuler';
+
+  @override
+  String get addFriend => 'Ajouter';
+
+  @override
+  String get noBlockedUsers => 'Aucun utilisateur bloqué';
+
+  @override
+  String get receivedRequests => 'Demandes reçues';
+
+  @override
+  String get accept => 'Accepter';
+
+  @override
+  String get refuse => 'Refuser';
+
+  @override
+  String get sentRequests => 'Demandes envoyées';
+
+  @override
+  String get noResults => 'Aucun résultats';
+
+  @override
+  String get demands => 'Demandes';
+
+  @override
+  String get search => 'Rechercher';
+
+  @override
+  String get blocked => 'Bloqués';
+
+  @override
+  String get online => 'En ligne';
+
+  @override
+  String get offline => 'Hors ligne';
 }

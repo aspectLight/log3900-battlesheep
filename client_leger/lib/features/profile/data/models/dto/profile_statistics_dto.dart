@@ -21,4 +21,3 @@ class ProfileStatisticsDto {
 
   Map<String, dynamic> toJson() => _$ProfileStatisticsDtoToJson(this);
 }
-

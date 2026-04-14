@@ -17,11 +17,9 @@ class HttpGameHistoryService {
   final AuthRepository _authRepository;
   final Dio _dio;
 
-  HttpGameHistoryService({
-    required AuthRepository authRepository,
-    Dio? dio,
-  })  : _authRepository = authRepository,
-        _dio = dio ?? Dio(BaseOptions(baseUrl: EnvConfig.baseUrl));
+  HttpGameHistoryService({required AuthRepository authRepository, Dio? dio})
+    : _authRepository = authRepository,
+      _dio = dio ?? Dio(BaseOptions(baseUrl: EnvConfig.baseUrl));
 
   Options _authOptions(SocketAuthCredentialsModel creds) {
     return Options(
@@ -46,8 +44,7 @@ class HttpGameHistoryService {
           if (data == null) return <GameHistoryItemDto>[];
           return data
               .map(
-                (e) =>
-                    GameHistoryItemDto.fromJson(e as Map<String, dynamic>),
+                (e) => GameHistoryItemDto.fromJson(e as Map<String, dynamic>),
               )
               .toList();
         } on Object catch (_) {

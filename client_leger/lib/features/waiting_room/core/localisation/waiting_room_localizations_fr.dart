@@ -58,6 +58,9 @@ class WaitingRoomLocalizationsFr extends WaitingRoomLocalizations {
   String get waitingRoomAddVirtualPlayer => 'Ajouter un joueur virtuel';
 
   @override
+  String get waitingRoomDropInDropOut => 'Drop-in/Drop-out';
+
+  @override
   String get addVirtualPlayer => 'Ajouter un joueur virtuel';
 
   @override
@@ -125,6 +128,12 @@ class WaitingRoomLocalizationsFr extends WaitingRoomLocalizations {
 
   @override
   String get waitingRoomStatDefense => 'Défense';
+
+  @override
+  String get waitingRoomBalanceLabel => 'Solde :';
+
+  @override
+  String get waitingRoomEntryFeeLabel => 'Prix d\'entrée :';
 
   @override
   String get gameNotFound => 'Partie introuvable';

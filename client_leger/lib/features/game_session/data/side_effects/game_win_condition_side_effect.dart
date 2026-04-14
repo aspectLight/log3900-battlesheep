@@ -32,13 +32,13 @@ class GameWinConditionSideEffect with DisposableSideEffect {
     required GameBoardRepository boardRepository,
     required GameActionsRepository actionsRepository,
     required GameMetadataRepository metadataRepository,
-  })  : _roomId = roomId,
-        _socketId = socketId,
-        _playerRepository = playerRepository,
-        _metadataRepository = metadataRepository,
-        _inventoryRepository = inventoryRepository,
-        _boardRepository = boardRepository,
-        _actionsRepository = actionsRepository {
+  }) : _roomId = roomId,
+       _socketId = socketId,
+       _playerRepository = playerRepository,
+       _metadataRepository = metadataRepository,
+       _inventoryRepository = inventoryRepository,
+       _boardRepository = boardRepository,
+       _actionsRepository = actionsRepository {
     trackEffect(_finishGameIfWon);
   }
 
@@ -64,7 +64,7 @@ class GameWinConditionSideEffect with DisposableSideEffect {
         None() => false,
         Some(value: final winner) =>
           _socketId == winner.id ||
-          (winner.isVirtual && _socketId == session.hostId),
+              (winner.isVirtual && _socketId == session.hostId),
       };
       if (shouldFinish) return Option.of(key);
     }
@@ -91,18 +91,13 @@ class GameWinConditionSideEffect with DisposableSideEffect {
   }
 
   Option<String> _resolveFlagHolderId(GameInventoryState inventoryState) {
-    return inventoryState.playerWithFlagId.match(
-      () {
-        for (final entry in inventoryState.itemsByPlayerId.entries) {
-          final hasFlag = entry.value.any(
-            (item) => item.type == ItemType.flag,
-          );
-          if (hasFlag) return Option.of(entry.key);
-        }
-        return const Option.none();
-      },
-      Option.of,
-    );
+    return inventoryState.playerWithFlagId.match(() {
+      for (final entry in inventoryState.itemsByPlayerId.entries) {
+        final hasFlag = entry.value.any((item) => item.type == ItemType.flag);
+        if (hasFlag) return Option.of(entry.key);
+      }
+      return const Option.none();
+    }, Option.of);
   }
 
   void _finishGameIfWon() {

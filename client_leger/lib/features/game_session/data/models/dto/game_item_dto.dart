@@ -76,8 +76,16 @@ class ItemCollectedCommandDto {
 class ItemCollectedDto {
   final String playerId;
   final GameItemDto item;
+  final GameBoardPositionDto? position;
+  @JsonKey(defaultValue: false)
+  final bool inventoryFull;
 
-  const ItemCollectedDto({required this.playerId, required this.item});
+  const ItemCollectedDto({
+    required this.playerId,
+    required this.item,
+    this.position,
+    this.inventoryFull = false,
+  });
 
   factory ItemCollectedDto.fromJson(Map<String, dynamic> json) =>
       _$ItemCollectedDtoFromJson(json);

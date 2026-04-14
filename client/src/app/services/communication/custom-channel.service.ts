@@ -3,6 +3,7 @@ import { AuthService } from '@app/services/communication/auth.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { SocialService } from '@app/services/communication/social.service';
 import { CustomChannelEvents } from '@common/socket.constants';
+import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 
 export interface ChannelInfo {
@@ -46,6 +47,7 @@ export class CustomChannelService {
         private socketService: SocketService,
         private authService: AuthService,
         private socialService: SocialService,
+        private translate: TranslateService,
     ) {}
 
     get username(): string {
@@ -106,8 +108,9 @@ export class CustomChannelService {
         });
 
         socket.on(CustomChannelEvents.CustomChannelError, (data: { message: string }) => {
-            this.channelError = data.message;
-            this.channelError$.next(data.message);
+            const translatedMessage = this.translateChannelError(data.message);
+            this.channelError = translatedMessage;
+            this.channelError$.next(translatedMessage);
         });
 
         socket.on(CustomChannelEvents.CustomChannelJoined, (data: { channelId: string; channelName: string; isGameChannel?: boolean }) => {
@@ -134,13 +137,11 @@ export class CustomChannelService {
         });
 
         socket.on(CustomChannelEvents.CustomChannelMessage, (payload: { channelId: string; message: ChannelMessage }) => {
-            if (payload.message.name && this.socialService.isInBlockRelationship(payload.message.name)) return;
-            const current = this.messagesByChannel[payload.channelId] ?? [];
-            this.messagesByChannel[payload.channelId] = [...current, payload.message];
-            this.messagesUpdated$.next({
-                channelId: payload.channelId,
-                messages: this.messagesByChannel[payload.channelId],
-            });
+            this.appendIncomingMessage(payload.channelId, payload.message);
+        });
+
+        socket.on(CustomChannelEvents.CustomChannelEmoji, (payload: { channelId: string; emoji: ChannelMessage }) => {
+            this.appendIncomingMessage(payload.channelId, payload.emoji);
         });
 
         // Restauration des canaux à la (re)connexion : le serveur envoie automatiquement
@@ -198,6 +199,14 @@ export class CustomChannelService {
         });
     }
 
+    sendEmoji(channelId: string, emoji: string): void {
+        this.socketService.send(CustomChannelEvents.SendEmojiToCustomChannel, {
+            channelId,
+            username: this.username,
+            emoji,
+        });
+    }
+
     getMessages(channelId: string): ChannelMessage[] {
         return this.messagesByChannel[channelId] ?? [];
     }
@@ -223,5 +232,45 @@ export class CustomChannelService {
     /** Retourne les IDs des canaux rejoints (snapshot synchrone). */
     getJoinedChannelIds(): string[] {
         return [...this.joinedChannelIds];
+    }
+
+    private appendIncomingMessage(channelId: string, message: ChannelMessage): void {
+        if (message.name && this.socialService.isInBlockRelationship(message.name)) return;
+        const current = this.messagesByChannel[channelId] ?? [];
+        this.messagesByChannel[channelId] = [...current, message];
+        this.messagesUpdated$.next({
+            channelId,
+            messages: this.messagesByChannel[channelId],
+        });
+    }
+
+    private translateChannelError(serverMessage: string): string {
+        const key = this.mapChannelErrorKey(serverMessage);
+        return this.translate.instant(key ?? 'channels.errors.generic');
+    }
+
+    private mapChannelErrorKey(serverMessage: string): string | null {
+        const normalized = serverMessage
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/['\u2019]/g, ' ')
+            .replace(/[^a-z0-9\s]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        if (normalized.includes('ne peut pas etre vide')) return 'channels.errors.empty_name';
+        if (normalized.includes('depasser 50 caracteres')) return 'channels.errors.name_too_long';
+        if (normalized.includes('reserve pour le chat general')) return 'channels.errors.reserved_general';
+        if (normalized.includes('reserve pour les canaux de partie')) return 'channels.errors.reserved_game';
+        if (normalized.includes('mots interdits')) return 'channels.errors.forbidden_words';
+        if (normalized.includes('deja pris') || normalized.includes('existe deja')) return 'channels.errors.name_taken';
+        if (normalized.includes('n existe plus') || normalized.includes('introuvable') || normalized.includes('a ete supprime'))
+            return 'channels.errors.not_found';
+        if (normalized.includes('seul le createur')) return 'channels.errors.only_creator_delete';
+        if (normalized.includes('etre membre')) return 'channels.errors.must_be_member_to_send';
+        if (normalized.includes('une erreur est survenue')) return 'channels.errors.generic';
+
+        return null;
     }
 }

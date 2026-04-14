@@ -6,7 +6,9 @@ import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/localisation/core_localizations.dart';
+import '../../../../../core/presentation/shell/shell_chrome_back_handler.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
 import '../../../core/enums/game_result.dart';
 import '../../../core/extensions/game_history_failure_ext.dart';
@@ -14,10 +16,6 @@ import '../../../domain/models/game_history_item.dart';
 import '../../../domain/state/game_history_state.dart';
 import 'game_history_view_model.dart';
 
-const Color _kRowBg = Color(0xFF2b2b2b);
-const Color _kHeaderBg = Color(0xFF3c3c3c);
-const Color _kBorder = Color(0xFF3a3a3a);
-const Color _kHeaderText = Color(0xFFe0d8c0);
 const Color _kBadgeYes = Color(0xFFc9ffe4);
 const Color _kBadgeNo = Color(0xFFfb8585);
 const Color _kBadgeAbandonedYes = Color(0xFFFFd39a);
@@ -38,7 +36,14 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
   void initState() {
     super.initState();
     _viewModel = GetIt.I<GameHistoryViewModel>();
+    GetIt.I<ShellChromeBackHandler>().register(_viewModel.requestLeave);
     unawaited(_viewModel.loadHistory());
+  }
+
+  @override
+  void dispose() {
+    GetIt.I<ShellChromeBackHandler>().clear();
+    super.dispose();
   }
 
   @override
@@ -48,70 +53,7 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
     return AppBackground(
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildTopBar(l10n),
-            const SizedBox(height: 10),
-            Expanded(child: _buildBody(l10n)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTopBar(CoreLocalizations l10n) {
-    return SizedBox(
-      width: double.infinity,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: GestureDetector(
-              onTap: _viewModel.requestLeave,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.chevron_left,
-                      color: Colors.white,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 18),
-                    Text(
-                      l10n.homePage,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'CustomFont',
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Text(
-            l10n.gameHistory,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 44,
-              fontFamily: 'CustomFont',
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
-              shadows: [
-                Shadow(
-                  color: Color(0x99000000),
-                  offset: Offset(0, 3),
-                  blurRadius: 12,
-                ),
-              ],
-            ),
-          ),
-        ],
+        child: Column(children: [Expanded(child: _buildBody(l10n))]),
       ),
     );
   }
@@ -152,14 +94,14 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: _kStateBg,
-        border: Border.all(color: _kBorder),
+        border: Border.all(color: context.interactionColors.outline),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
         text,
         textAlign: TextAlign.center,
         style: const TextStyle(
-          color: _kHeaderText,
+          color: Colors.white,
           fontFamily: 'CustomFont',
           fontSize: 18,
         ),
@@ -167,7 +109,10 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
     );
   }
 
-  Widget _buildHistoryList(CoreLocalizations l10n, List<GameHistoryItem> items) {
+  Widget _buildHistoryList(
+    CoreLocalizations l10n,
+    List<GameHistoryItem> items,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -192,13 +137,13 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
     return Container(
       height: 56,
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-      decoration: const BoxDecoration(
-        color: _kHeaderBg,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+      decoration: BoxDecoration(
+        color: context.interactionColors.primary,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
         border: Border(
-          left: BorderSide(color: _kBorder),
-          right: BorderSide(color: _kBorder),
-          top: BorderSide(color: _kBorder),
+          left: BorderSide(color: context.interactionColors.outline),
+          right: BorderSide(color: context.interactionColors.outline),
+          top: BorderSide(color: context.interactionColors.outline),
         ),
       ),
       child: Row(
@@ -208,7 +153,7 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
               l10n.date.toUpperCase(),
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: _kHeaderText,
+                color: Colors.white,
                 fontFamily: 'CustomFont',
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1,
@@ -221,7 +166,7 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
               l10n.time.toUpperCase(),
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: _kHeaderText,
+                color: Colors.white,
                 fontFamily: 'CustomFont',
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1,
@@ -234,7 +179,7 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
               l10n.result.toUpperCase(),
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: _kHeaderText,
+                color: Colors.white,
                 fontFamily: 'CustomFont',
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1,
@@ -247,7 +192,7 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
               l10n.abandoned.toUpperCase(),
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: _kHeaderText,
+                color: Colors.white,
                 fontFamily: 'CustomFont',
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1,
@@ -265,7 +210,9 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
   }
 
   Color _abandonedBadgeColor(GameHistoryItem item) {
-    return (item.result == GameResult.abandoned) ? _kBadgeAbandonedYes : _kBadgeYes;
+    return (item.result == GameResult.abandoned)
+        ? _kBadgeAbandonedYes
+        : _kBadgeYes;
   }
 
   Widget _buildRow(CoreLocalizations l10n, GameHistoryItem item, bool isLast) {
@@ -290,13 +237,15 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
         height: 100,
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         decoration: BoxDecoration(
-          color: _kRowBg,
-          border: const Border(
-            left: BorderSide(color: _kBorder),
-            right: BorderSide(color: _kBorder),
-            bottom: BorderSide(color: _kBorder),
+          color: context.interactionColors.primaryStrong,
+          border: Border(
+            left: BorderSide(color: context.interactionColors.outline),
+            right: BorderSide(color: context.interactionColors.outline),
+            bottom: BorderSide(color: context.interactionColors.outline),
           ),
-          borderRadius: isLast ? const BorderRadius.vertical(bottom: Radius.circular(8)) : null,
+          borderRadius: isLast
+              ? const BorderRadius.vertical(bottom: Radius.circular(8))
+              : null,
           boxShadow: const [
             BoxShadow(
               color: Color(0x1A000000),

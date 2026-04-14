@@ -12,6 +12,9 @@ extension JoinGameSessionFailureExt on JoinGameSessionFailure {
     if (this is MaxPlayerLimitReachedJoinGameSessionFailure) {
       return l10n.joinGameMaxPlayerLimitReached;
     }
+    if (this is InsufficientBalanceJoinGameSessionFailure) {
+      return l10n.joinGameInsufficientBalance;
+    }
     return l10n.joinGameFailed;
   }
 }

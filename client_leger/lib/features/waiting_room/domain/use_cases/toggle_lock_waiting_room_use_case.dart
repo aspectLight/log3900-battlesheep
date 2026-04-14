@@ -10,8 +10,6 @@ class ToggleLockWaitingRoomUseCase {
 
   void execute() {
     final roomId = _roomRepository.state.value.room.roomId;
-    _roomRepository.toggleLock(
-      ToggleLockWaitingRoomCommand(roomId: roomId),
-    );
+    _roomRepository.toggleLock(ToggleLockWaitingRoomCommand(roomId: roomId));
   }
 }

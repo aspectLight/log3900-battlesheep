@@ -179,6 +179,12 @@ abstract class StatisticsLocalizations {
   /// **'Global'**
   String get statisticsGlobalTitle;
 
+  /// No description provided for @statisticsRewardsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewards'**
+  String get statisticsRewardsTitle;
+
   /// No description provided for @statisticsDuration.
   ///
   /// In en, this message translates to:

@@ -12,7 +12,9 @@ GameDto _$GameDtoFromJson(Map<String, dynamic> json) => GameDto(
   description: json['description'] as String,
   mode: json['mode'] as String,
   board: BoardDto.fromJson(json['board'] as Map<String, dynamic>),
-  isVisible: json['isVisible'] as bool,
+  privacy: json['privacy'] as String,
+  owner: json['owner'] as String,
+  actionPoints: (json['actionPoints'] as num?)?.toInt() ?? 1,
   modificationDate: json['modificationDate'] as String,
 );
 
@@ -22,7 +24,9 @@ Map<String, dynamic> _$GameDtoToJson(GameDto instance) => <String, dynamic>{
   'description': instance.description,
   'mode': instance.mode,
   'board': instance.board.toJson(),
-  'isVisible': instance.isVisible,
+  'privacy': instance.privacy,
+  'owner': instance.owner,
+  'actionPoints': instance.actionPoints,
   'modificationDate': instance.modificationDate,
 };
 
@@ -58,7 +62,7 @@ Map<String, dynamic> _$CellDtoToJson(CellDto instance) => <String, dynamic>{
 
 TileDataDto _$TileDataDtoFromJson(Map<String, dynamic> json) => TileDataDto(
   type: const TileTypeConverter().fromJson(json['type'] as String),
-  state: const TileStateConverter().fromJson(json['state'] as String?),
+  state: json['state'] as String?,
   orientation: const TileOrientationConverter().fromJson(
     json['orientation'] as String?,
   ),
@@ -68,7 +72,7 @@ Map<String, dynamic> _$TileDataDtoToJson(
   TileDataDto instance,
 ) => <String, dynamic>{
   'type': const TileTypeConverter().toJson(instance.type),
-  'state': const TileStateConverter().toJson(instance.state),
+  'state': instance.state,
   'orientation': const TileOrientationConverter().toJson(instance.orientation),
 };
 
@@ -86,6 +90,7 @@ const _$ItemTypeEnumMap = {
   ItemType.camouflage: 'camouflage',
   ItemType.waterproofBoots: 'waterproofBoots',
   ItemType.airStrike: 'airStrike',
+  ItemType.torch: 'torch',
   ItemType.random: 'random',
   ItemType.flag: 'flag',
   ItemType.spawnPoint: 'spawnPoint',

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/constants/character_assets.dart';
+import '../../../../../core/constants/ui_assets.dart';
+import '../../../../../core/enums/character.dart';
 import '../../../core/localisation/statistics_localizations.dart';
 import '../../../../../core/enums/item_type.dart';
+import '../../../domain/models/game_rewards_info.dart';
 import '../../../core/enums/player_stats_sort_field.dart';
 import '../../../domain/models/game_statistics.dart';
 import 'statistics_content_view_model.dart';
@@ -25,13 +29,18 @@ class StatisticsContentWidget extends StatelessWidget {
 
     return Watch((context) {
       final statistics = viewModel.statistics.value.data;
+      final rewards = viewModel.rewardsRows.value;
       return LayoutBuilder(
         builder: (context, constraints) {
           const horizontalPadding = 80.0;
-          final rawWidth = constraints.maxWidth.isFinite && constraints.maxWidth > 0
+          final rawWidth =
+              constraints.maxWidth.isFinite && constraints.maxWidth > 0
               ? constraints.maxWidth
               : MediaQuery.sizeOf(context).width;
-          final contentWidth = (rawWidth - horizontalPadding).clamp(200.0, double.infinity);
+          final contentWidth = (rawWidth - horizontalPadding).clamp(
+            200.0,
+            double.infinity,
+          );
           return SingleChildScrollView(
             padding: const EdgeInsets.all(40),
             child: Column(
@@ -40,6 +49,10 @@ class StatisticsContentWidget extends StatelessWidget {
                 _buildPlayerStatsTable(context, l10n, statistics, contentWidth),
                 const SizedBox(height: 24),
                 _buildGlobalStatsTable(context, l10n, statistics),
+                if (rewards.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  _buildRewardsSection(context, l10n, rewards),
+                ],
               ],
             ),
           );
@@ -78,11 +91,11 @@ class StatisticsContentWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             DataTable(
-                  headingRowColor: WidgetStateProperty.all(const Color(0xFF3c3c3c)),
-                  dataRowColor: WidgetStateProperty.resolveWith(
-                    (states) => const Color(0xFF2b2b2b),
-                  ),
-                  columns: [
+              headingRowColor: WidgetStateProperty.all(const Color(0xFF3c3c3c)),
+              dataRowColor: WidgetStateProperty.resolveWith(
+                (states) => const Color(0xFF2b2b2b),
+              ),
+              columns: [
                 _buildSortableColumn(
                   l10n.statisticsPlayerName,
                   PlayerStatsSortField.name,
@@ -152,15 +165,48 @@ class StatisticsContentWidget extends StatelessWidget {
                 );
                 return DataRow(
                   cells: [
-                    DataCell(_wrapCell(Text(player.name, style: cellTextStyle))),
-                    DataCell(_wrapCell(Text('${player.combats}', style: cellTextStyle))),
-                    DataCell(_wrapCell(Text('${player.evasions}', style: cellTextStyle))),
-                    DataCell(_wrapCell(Text('${player.victories}', style: cellTextStyle))),
-                    DataCell(_wrapCell(Text('${player.defeats}', style: cellTextStyle))),
-                    DataCell(_wrapCell(Text('${player.healthLost}', style: cellTextStyle))),
-                    DataCell(_wrapCell(Text('${player.damage}', style: cellTextStyle))),
-                    DataCell(_wrapCell(Text('${player.itemsCollected.length}', style: cellTextStyle))),
-                    DataCell(_wrapCell(Text('$tilePercentage%', style: cellTextStyle))),
+                    DataCell(
+                      _wrapCell(Text(player.name, style: cellTextStyle)),
+                    ),
+                    DataCell(
+                      _wrapCell(
+                        Text('${player.combats}', style: cellTextStyle),
+                      ),
+                    ),
+                    DataCell(
+                      _wrapCell(
+                        Text('${player.evasions}', style: cellTextStyle),
+                      ),
+                    ),
+                    DataCell(
+                      _wrapCell(
+                        Text('${player.victories}', style: cellTextStyle),
+                      ),
+                    ),
+                    DataCell(
+                      _wrapCell(
+                        Text('${player.defeats}', style: cellTextStyle),
+                      ),
+                    ),
+                    DataCell(
+                      _wrapCell(
+                        Text('${player.healthLost}', style: cellTextStyle),
+                      ),
+                    ),
+                    DataCell(
+                      _wrapCell(Text('${player.damage}', style: cellTextStyle)),
+                    ),
+                    DataCell(
+                      _wrapCell(
+                        Text(
+                          '${player.itemsCollected.length}',
+                          style: cellTextStyle,
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      _wrapCell(Text('$tilePercentage%', style: cellTextStyle)),
+                    ),
                   ],
                 );
               }).toList(),
@@ -262,9 +308,7 @@ class StatisticsContentWidget extends StatelessWidget {
           DecoratedBox(
             decoration: const BoxDecoration(
               color: Color(0xFF2b2b2b),
-              border: Border(
-                top: BorderSide(color: Color(0xFF3a3a3a)),
-              ),
+              border: Border(top: BorderSide(color: Color(0xFF3a3a3a))),
             ),
             child: Padding(
               padding: const EdgeInsets.all(15),
@@ -333,5 +377,118 @@ class StatisticsContentWidget extends StatelessWidget {
         viewModel.sortBy(field);
       },
     );
+  }
+
+  Widget _buildRewardsSection(
+    BuildContext context,
+    StatisticsLocalizations l10n,
+    List<PlayerRewardInfo> rewards,
+  ) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 440),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: const Color(0xFF2b2b2b),
+            border: Border.all(color: const Color(0xFF3a3a3a)),
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x1A000000),
+                offset: Offset(0, 4),
+                blurRadius: 6,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+                child: Text(
+                  l10n.statisticsRewardsTitle,
+                  style: const TextStyle(
+                    color: Color(0xFFe0d8c0),
+                    fontFamily: 'CustomFont',
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+              ...List.generate(rewards.length, (index) {
+                final reward = rewards[index];
+                final avatarPath = _avatarPathFor(reward.avatarName);
+                return Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(
+                        color: index == 0
+                            ? const Color(0xFF3a3a3a)
+                            : const Color(0xFF2b2b2b),
+                      ),
+                    ),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  child: Row(
+                    children: [
+                      if (avatarPath != null) ...[
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(999),
+                          child: Image.asset(
+                            avatarPath,
+                            width: 30,
+                            height: 30,
+                            fit: BoxFit.cover,
+                            filterQuality: FilterQuality.none,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                      ],
+                      Expanded(
+                        child: Text(
+                          reward.playerName,
+                          style: const TextStyle(
+                            color: Color(0xFFFFFFFF),
+                            fontFamily: 'CustomFont',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '+${reward.coinsEarned}',
+                        style: const TextStyle(
+                          color: Color(0xFFF6D365),
+                          fontFamily: 'CustomFont',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Image.asset(
+                        UiAssets.goldCoin,
+                        width: 14,
+                        height: 14,
+                        filterQuality: FilterQuality.none,
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String? _avatarPathFor(String avatarName) {
+    if (avatarName.isEmpty) return null;
+    final character = Character.fromAvatarName(avatarName);
+    return CharacterAssets.characterAvatarPath(character);
   }
 }

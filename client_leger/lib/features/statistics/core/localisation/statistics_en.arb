@@ -13,6 +13,7 @@
   "statisticsItemsCollected": "Number of different items collected",
   "statisticsTilesVisited": "Percentage of terrain tiles visited",
   "statisticsGlobalTitle": "Global",
+  "statisticsRewardsTitle": "Rewards",
   "statisticsDuration": "Game duration",
   "statisticsTurns": "Number of game turns",
   "statisticsTilesExplored": "Percentage of terrain tiles visited by at least one player",

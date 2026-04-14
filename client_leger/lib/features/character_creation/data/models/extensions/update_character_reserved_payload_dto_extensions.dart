@@ -7,4 +7,3 @@ extension UpdateCharacterReservedPayloadDtoExtensions
   List<ReservedCharacterEvent> toReservedCharacterEventList() =>
       reservedAvatars.map((d) => d.toReservedCharacterEvent()).toList();
 }
-

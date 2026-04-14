@@ -28,6 +28,11 @@ class WaitingRoomPlayerDto {
   @JsonKey(name: 'd4Choice')
   @DiceStatChoiceConverter()
   final DiceStatChoice? d4Choice;
+  @JsonKey(name: 'profileAvatarId')
+  final String? profileAvatarId;
+  @JsonKey(name: 'profileAvatarUrl')
+  final String? profileAvatarUrl;
+  final String? activeBanner;
 
   const WaitingRoomPlayerDto({
     required this.id,
@@ -38,6 +43,9 @@ class WaitingRoomPlayerDto {
     this.virtualType = VirtualPlayerType.aggressive,
     this.d6Choice,
     this.d4Choice,
+    this.profileAvatarId,
+    this.profileAvatarUrl,
+    this.activeBanner,
   });
 
   factory WaitingRoomPlayerDto.fromJson(Map<String, dynamic> json) =>

@@ -9,5 +9,6 @@ class UserModel with _$UserModel {
     required String email,
     required String username,
     required String avatarId,
+    String? avatarUrl,
   }) = _UserModel;
 }

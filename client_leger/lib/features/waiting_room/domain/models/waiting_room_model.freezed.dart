@@ -22,6 +22,8 @@ mixin _$WaitingRoomModel {
   List<WaitingRoomPlayerModel> get players =>
       throw _privateConstructorUsedError;
   bool get isLocked => throw _privateConstructorUsedError;
+  bool get dropInDropOut => throw _privateConstructorUsedError;
+  int get entryFee => throw _privateConstructorUsedError;
 
   /// Create a copy of WaitingRoomModel
   /// with the given fields replaced by the non-null parameter values.
@@ -42,6 +44,8 @@ abstract class $WaitingRoomModelCopyWith<$Res> {
     String hostId,
     List<WaitingRoomPlayerModel> players,
     bool isLocked,
+    bool dropInDropOut,
+    int entryFee,
   });
 }
 
@@ -64,6 +68,8 @@ class _$WaitingRoomModelCopyWithImpl<$Res, $Val extends WaitingRoomModel>
     Object? hostId = null,
     Object? players = null,
     Object? isLocked = null,
+    Object? dropInDropOut = null,
+    Object? entryFee = null,
   }) {
     return _then(
       _value.copyWith(
@@ -83,6 +89,14 @@ class _$WaitingRoomModelCopyWithImpl<$Res, $Val extends WaitingRoomModel>
                 ? _value.isLocked
                 : isLocked // ignore: cast_nullable_to_non_nullable
                       as bool,
+            dropInDropOut: null == dropInDropOut
+                ? _value.dropInDropOut
+                : dropInDropOut // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            entryFee: null == entryFee
+                ? _value.entryFee
+                : entryFee // ignore: cast_nullable_to_non_nullable
+                      as int,
           )
           as $Val,
     );
@@ -103,6 +117,8 @@ abstract class _$$WaitingRoomModelImplCopyWith<$Res>
     String hostId,
     List<WaitingRoomPlayerModel> players,
     bool isLocked,
+    bool dropInDropOut,
+    int entryFee,
   });
 }
 
@@ -124,6 +140,8 @@ class __$$WaitingRoomModelImplCopyWithImpl<$Res>
     Object? hostId = null,
     Object? players = null,
     Object? isLocked = null,
+    Object? dropInDropOut = null,
+    Object? entryFee = null,
   }) {
     return _then(
       _$WaitingRoomModelImpl(
@@ -143,6 +161,14 @@ class __$$WaitingRoomModelImplCopyWithImpl<$Res>
             ? _value.isLocked
             : isLocked // ignore: cast_nullable_to_non_nullable
                   as bool,
+        dropInDropOut: null == dropInDropOut
+            ? _value.dropInDropOut
+            : dropInDropOut // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        entryFee: null == entryFee
+            ? _value.entryFee
+            : entryFee // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -156,6 +182,8 @@ class _$WaitingRoomModelImpl implements _WaitingRoomModel {
     required this.hostId,
     required final List<WaitingRoomPlayerModel> players,
     this.isLocked = false,
+    this.dropInDropOut = false,
+    this.entryFee = 0,
   }) : _players = players;
 
   @override
@@ -173,10 +201,16 @@ class _$WaitingRoomModelImpl implements _WaitingRoomModel {
   @override
   @JsonKey()
   final bool isLocked;
+  @override
+  @JsonKey()
+  final bool dropInDropOut;
+  @override
+  @JsonKey()
+  final int entryFee;
 
   @override
   String toString() {
-    return 'WaitingRoomModel(roomId: $roomId, hostId: $hostId, players: $players, isLocked: $isLocked)';
+    return 'WaitingRoomModel(roomId: $roomId, hostId: $hostId, players: $players, isLocked: $isLocked, dropInDropOut: $dropInDropOut, entryFee: $entryFee)';
   }
 
   @override
@@ -188,7 +222,11 @@ class _$WaitingRoomModelImpl implements _WaitingRoomModel {
             (identical(other.hostId, hostId) || other.hostId == hostId) &&
             const DeepCollectionEquality().equals(other._players, _players) &&
             (identical(other.isLocked, isLocked) ||
-                other.isLocked == isLocked));
+                other.isLocked == isLocked) &&
+            (identical(other.dropInDropOut, dropInDropOut) ||
+                other.dropInDropOut == dropInDropOut) &&
+            (identical(other.entryFee, entryFee) ||
+                other.entryFee == entryFee));
   }
 
   @override
@@ -198,6 +236,8 @@ class _$WaitingRoomModelImpl implements _WaitingRoomModel {
     hostId,
     const DeepCollectionEquality().hash(_players),
     isLocked,
+    dropInDropOut,
+    entryFee,
   );
 
   /// Create a copy of WaitingRoomModel
@@ -218,6 +258,8 @@ abstract class _WaitingRoomModel implements WaitingRoomModel {
     required final String hostId,
     required final List<WaitingRoomPlayerModel> players,
     final bool isLocked,
+    final bool dropInDropOut,
+    final int entryFee,
   }) = _$WaitingRoomModelImpl;
 
   @override
@@ -228,6 +270,10 @@ abstract class _WaitingRoomModel implements WaitingRoomModel {
   List<WaitingRoomPlayerModel> get players;
   @override
   bool get isLocked;
+  @override
+  bool get dropInDropOut;
+  @override
+  int get entryFee;
 
   /// Create a copy of WaitingRoomModel
   /// with the given fields replaced by the non-null parameter values.

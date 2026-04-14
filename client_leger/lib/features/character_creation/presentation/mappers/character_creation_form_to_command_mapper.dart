@@ -7,11 +7,21 @@ import '../../core/enums/character_creation_dice_stat_choice.dart';
 import '../../domain/commands/create_character_commands.dart';
 import '../../domain/models/character_creation_form.dart';
 
-CreateCharacterCommand toCommand(CharacterCreationForm form, String roomCode) {
-  return CreateCharacterCommand(roomId: roomCode, player: _toPlayerData(form));
+CreateCharacterCommand toCommand(
+  CharacterCreationForm form,
+  String roomCode, {
+  String? activeBanner,
+}) {
+  return CreateCharacterCommand(
+    roomId: roomCode,
+    player: _toPlayerData(form, activeBanner: activeBanner),
+  );
 }
 
-CreateCharacterPlayerData _toPlayerData(CharacterCreationForm form) {
+CreateCharacterPlayerData _toPlayerData(
+  CharacterCreationForm form, {
+  String? activeBanner,
+}) {
   final characterId = form.selectedCharacterId.getOrElse(
     () => Avatar.dmitry.id,
   );
@@ -28,6 +38,7 @@ CreateCharacterPlayerData _toPlayerData(CharacterCreationForm form) {
     speed: form.speed,
     attackDice: form.attackDice,
     defenseDice: form.defenseDice,
+    activeBanner: activeBanner,
   );
 }
 

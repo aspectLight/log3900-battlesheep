@@ -6,7 +6,9 @@ import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/localisation/core_localizations.dart';
+import '../../../../../core/presentation/shell/shell_chrome_back_handler.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
 import '../../../core/enums/log_type.dart';
 import '../../../core/extensions/logs_history_failure_ext.dart';
@@ -23,13 +25,8 @@ class LogsHistoryScreen extends StatefulWidget {
 }
 
 class _LogsHistoryScreenState extends State<LogsHistoryScreen> {
-  static const Color _kRowBg = Color(0xFF2b2b2b);
-  static const Color _kHeaderBg = Color(0xFF3c3c3c);
-  static const Color _kBorder = Color(0xFF3a3a3a);
-  static const Color _kHeaderText = Color(0xFFe0d8c0);
   static const Color _kBadgeLogin = Color(0xFFc9ffe4);
   static const Color _kBadgeLogout = Color(0xFFfb8585);
-  static const Color _kStateBg = Color(0x40000000);
 
   late final LogsHistoryViewModel _viewModel;
 
@@ -37,7 +34,14 @@ class _LogsHistoryScreenState extends State<LogsHistoryScreen> {
   void initState() {
     super.initState();
     _viewModel = GetIt.I<LogsHistoryViewModel>();
+    GetIt.I<ShellChromeBackHandler>().register(_viewModel.requestLeave);
     unawaited(_viewModel.loadHistory());
+  }
+
+  @override
+  void dispose() {
+    GetIt.I<ShellChromeBackHandler>().clear();
+    super.dispose();
   }
 
   @override
@@ -47,70 +51,7 @@ class _LogsHistoryScreenState extends State<LogsHistoryScreen> {
     return AppBackground(
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildTopBar(l10n),
-            const SizedBox(height: 10),
-            Expanded(child: _buildBody(l10n)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTopBar(CoreLocalizations l10n) {
-    return SizedBox(
-      width: double.infinity,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: GestureDetector(
-              onTap: _viewModel.requestLeave,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.chevron_left,
-                      color: Colors.white,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 15),
-                    Text(
-                      l10n.homePage,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'CustomFont',
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Text(
-            l10n.connectionHistory,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 44,
-              fontFamily: 'CustomFont',
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
-              shadows: [
-                Shadow(
-                  color: Color(0x99000000),
-                  offset: Offset(0, 3),
-                  blurRadius: 12,
-                ),
-              ],
-            ),
-          ),
-        ],
+        child: Column(children: [Expanded(child: _buildBody(l10n))]),
       ),
     );
   }
@@ -133,7 +74,7 @@ class _LogsHistoryScreenState extends State<LogsHistoryScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildTableHeader(l10n),
+        _buildTableHeader(l10n, context),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.only(top: 12),
@@ -150,15 +91,15 @@ class _LogsHistoryScreenState extends State<LogsHistoryScreen> {
       margin: const EdgeInsets.only(top: 12),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: _kStateBg,
-        border: Border.all(color: _kBorder),
+        color: context.interactionColors.primaryStrong,
+        border: Border.all(color: context.interactionColors.outline),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
         text,
         textAlign: TextAlign.center,
         style: const TextStyle(
-          color: _kHeaderText,
+          color: Colors.white,
           fontFamily: 'CustomFont',
           fontSize: 18,
         ),
@@ -166,11 +107,14 @@ class _LogsHistoryScreenState extends State<LogsHistoryScreen> {
     );
   }
 
-  Widget _buildHistoryList(CoreLocalizations l10n, List<LogsHistoryItem> items) {
+  Widget _buildHistoryList(
+    CoreLocalizations l10n,
+    List<LogsHistoryItem> items,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildTableHeader(l10n),
+        _buildTableHeader(l10n, context),
         Expanded(
           child: items.isEmpty
               ? _buildStateBox(l10n.noEntries)
@@ -179,7 +123,12 @@ class _LogsHistoryScreenState extends State<LogsHistoryScreen> {
                   itemCount: items.length,
                   itemBuilder: (context, index) {
                     final item = items[index];
-                    return _buildRow(l10n, item, index, index == items.length - 1);
+                    return _buildRow(
+                      l10n,
+                      item,
+                      index,
+                      index == items.length - 1,
+                    );
                   },
                 ),
         ),
@@ -187,17 +136,17 @@ class _LogsHistoryScreenState extends State<LogsHistoryScreen> {
     );
   }
 
-  Widget _buildTableHeader(CoreLocalizations l10n) {
+  Widget _buildTableHeader(CoreLocalizations l10n, BuildContext context) {
     return Container(
       height: 56,
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-      decoration: const BoxDecoration(
-        color: _kHeaderBg,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+      decoration: BoxDecoration(
+        color: context.interactionColors.primary,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
         border: Border(
-          left: BorderSide(color: _kBorder),
-          right: BorderSide(color: _kBorder),
-          top: BorderSide(color: _kBorder),
+          left: BorderSide(color: context.interactionColors.outline),
+          right: BorderSide(color: context.interactionColors.outline),
+          top: BorderSide(color: context.interactionColors.outline),
         ),
       ),
       child: Row(
@@ -208,7 +157,7 @@ class _LogsHistoryScreenState extends State<LogsHistoryScreen> {
               l10n.action.toUpperCase(),
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: _kHeaderText,
+                color: Colors.white,
                 fontFamily: 'CustomFont',
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1,
@@ -221,7 +170,7 @@ class _LogsHistoryScreenState extends State<LogsHistoryScreen> {
               l10n.date.toUpperCase(),
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: _kHeaderText,
+                color: Colors.white,
                 fontFamily: 'CustomFont',
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1,
@@ -234,7 +183,7 @@ class _LogsHistoryScreenState extends State<LogsHistoryScreen> {
               l10n.time.toUpperCase(),
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: _kHeaderText,
+                color: Colors.white,
                 fontFamily: 'CustomFont',
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1,
@@ -247,7 +196,12 @@ class _LogsHistoryScreenState extends State<LogsHistoryScreen> {
     );
   }
 
-  Widget _buildRow(CoreLocalizations l10n, LogsHistoryItem item, int index, bool isLast) {
+  Widget _buildRow(
+    CoreLocalizations l10n,
+    LogsHistoryItem item,
+    int index,
+    bool isLast,
+  ) {
     final dateFormat = DateFormat('yyyy-MM-dd');
     final timeFormat = DateFormat('HH:mm:ss');
     final isLogin = item.type == LogType.login;
@@ -272,13 +226,15 @@ class _LogsHistoryScreenState extends State<LogsHistoryScreen> {
         height: 100,
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         decoration: BoxDecoration(
-          color: _kRowBg,
-          border: const Border(
-            left: BorderSide(color: _kBorder),
-            right: BorderSide(color: _kBorder),
-            bottom: BorderSide(color: _kBorder),
+          color: context.interactionColors.primaryStrong,
+          border: Border(
+            left: BorderSide(color: context.interactionColors.outline),
+            right: BorderSide(color: context.interactionColors.outline),
+            bottom: BorderSide(color: context.interactionColors.outline),
           ),
-          borderRadius: isLast ? const BorderRadius.vertical(bottom: Radius.circular(8)) : null,
+          borderRadius: isLast
+              ? const BorderRadius.vertical(bottom: Radius.circular(8))
+              : null,
           boxShadow: const [
             BoxShadow(
               color: Color(0x1A000000),
@@ -293,7 +249,10 @@ class _LogsHistoryScreenState extends State<LogsHistoryScreen> {
               width: 220,
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(999),
                     border: Border.all(color: Colors.transparent),

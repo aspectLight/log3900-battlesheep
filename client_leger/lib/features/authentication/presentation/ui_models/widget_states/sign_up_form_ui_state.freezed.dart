@@ -22,6 +22,7 @@ mixin _$SignUpFormUiState {
   String get password => throw _privateConstructorUsedError;
   String get confirmPassword => throw _privateConstructorUsedError;
   Option<AuthAvatar> get avatar => throw _privateConstructorUsedError;
+  String? get customAvatarPath => throw _privateConstructorUsedError;
   bool get hasAttemptedSubmit => throw _privateConstructorUsedError;
 
   /// Create a copy of SignUpFormUiState
@@ -44,6 +45,7 @@ abstract class $SignUpFormUiStateCopyWith<$Res> {
     String password,
     String confirmPassword,
     Option<AuthAvatar> avatar,
+    String? customAvatarPath,
     bool hasAttemptedSubmit,
   });
 }
@@ -68,6 +70,7 @@ class _$SignUpFormUiStateCopyWithImpl<$Res, $Val extends SignUpFormUiState>
     Object? password = null,
     Object? confirmPassword = null,
     Object? avatar = null,
+    Object? customAvatarPath = freezed,
     Object? hasAttemptedSubmit = null,
   }) {
     return _then(
@@ -92,6 +95,10 @@ class _$SignUpFormUiStateCopyWithImpl<$Res, $Val extends SignUpFormUiState>
                 ? _value.avatar
                 : avatar // ignore: cast_nullable_to_non_nullable
                       as Option<AuthAvatar>,
+            customAvatarPath: freezed == customAvatarPath
+                ? _value.customAvatarPath
+                : customAvatarPath // ignore: cast_nullable_to_non_nullable
+                      as String?,
             hasAttemptedSubmit: null == hasAttemptedSubmit
                 ? _value.hasAttemptedSubmit
                 : hasAttemptedSubmit // ignore: cast_nullable_to_non_nullable
@@ -117,6 +124,7 @@ abstract class _$$SignUpFormUiStateImplCopyWith<$Res>
     String password,
     String confirmPassword,
     Option<AuthAvatar> avatar,
+    String? customAvatarPath,
     bool hasAttemptedSubmit,
   });
 }
@@ -140,6 +148,7 @@ class __$$SignUpFormUiStateImplCopyWithImpl<$Res>
     Object? password = null,
     Object? confirmPassword = null,
     Object? avatar = null,
+    Object? customAvatarPath = freezed,
     Object? hasAttemptedSubmit = null,
   }) {
     return _then(
@@ -164,6 +173,10 @@ class __$$SignUpFormUiStateImplCopyWithImpl<$Res>
             ? _value.avatar
             : avatar // ignore: cast_nullable_to_non_nullable
                   as Option<AuthAvatar>,
+        customAvatarPath: freezed == customAvatarPath
+            ? _value.customAvatarPath
+            : customAvatarPath // ignore: cast_nullable_to_non_nullable
+                  as String?,
         hasAttemptedSubmit: null == hasAttemptedSubmit
             ? _value.hasAttemptedSubmit
             : hasAttemptedSubmit // ignore: cast_nullable_to_non_nullable
@@ -182,6 +195,7 @@ class _$SignUpFormUiStateImpl implements _SignUpFormUiState {
     required this.password,
     required this.confirmPassword,
     required this.avatar,
+    this.customAvatarPath,
     required this.hasAttemptedSubmit,
   });
 
@@ -196,11 +210,13 @@ class _$SignUpFormUiStateImpl implements _SignUpFormUiState {
   @override
   final Option<AuthAvatar> avatar;
   @override
+  final String? customAvatarPath;
+  @override
   final bool hasAttemptedSubmit;
 
   @override
   String toString() {
-    return 'SignUpFormUiState(username: $username, email: $email, password: $password, confirmPassword: $confirmPassword, avatar: $avatar, hasAttemptedSubmit: $hasAttemptedSubmit)';
+    return 'SignUpFormUiState(username: $username, email: $email, password: $password, confirmPassword: $confirmPassword, avatar: $avatar, customAvatarPath: $customAvatarPath, hasAttemptedSubmit: $hasAttemptedSubmit)';
   }
 
   @override
@@ -216,6 +232,8 @@ class _$SignUpFormUiStateImpl implements _SignUpFormUiState {
             (identical(other.confirmPassword, confirmPassword) ||
                 other.confirmPassword == confirmPassword) &&
             (identical(other.avatar, avatar) || other.avatar == avatar) &&
+            (identical(other.customAvatarPath, customAvatarPath) ||
+                other.customAvatarPath == customAvatarPath) &&
             (identical(other.hasAttemptedSubmit, hasAttemptedSubmit) ||
                 other.hasAttemptedSubmit == hasAttemptedSubmit));
   }
@@ -228,6 +246,7 @@ class _$SignUpFormUiStateImpl implements _SignUpFormUiState {
     password,
     confirmPassword,
     avatar,
+    customAvatarPath,
     hasAttemptedSubmit,
   );
 
@@ -250,6 +269,7 @@ abstract class _SignUpFormUiState implements SignUpFormUiState {
     required final String password,
     required final String confirmPassword,
     required final Option<AuthAvatar> avatar,
+    final String? customAvatarPath,
     required final bool hasAttemptedSubmit,
   }) = _$SignUpFormUiStateImpl;
 
@@ -263,6 +283,8 @@ abstract class _SignUpFormUiState implements SignUpFormUiState {
   String get confirmPassword;
   @override
   Option<AuthAvatar> get avatar;
+  @override
+  String? get customAvatarPath;
   @override
   bool get hasAttemptedSubmit;
 

@@ -15,7 +15,6 @@ sealed class LogsHistoryState with _$LogsHistoryState {
     required List<LogsHistoryItem> items,
   }) = LogsHistoryStateLoaded;
 
-  const factory LogsHistoryState.error(
-    LogsHistoryFailure failure,
-  ) = LogsHistoryStateError;
+  const factory LogsHistoryState.error(LogsHistoryFailure failure) =
+      LogsHistoryStateError;
 }

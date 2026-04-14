@@ -32,14 +32,14 @@ class ExecuteBoardActionUseCase {
     required GamePlayerRepository playerRepository,
     required GamePlayerMovementRepository movementRepository,
     required GameInventoryRepository inventoryRepository,
-  })  : _roomId = roomId,
-        _socketId = socketId,
-        _boardRepository = boardRepository,
-        _combatRepository = combatRepository,
-        _interactionRepository = interactionRepository,
-        _playerRepository = playerRepository,
-        _movementRepository = movementRepository,
-        _inventoryRepository = inventoryRepository;
+  }) : _roomId = roomId,
+       _socketId = socketId,
+       _boardRepository = boardRepository,
+       _combatRepository = combatRepository,
+       _interactionRepository = interactionRepository,
+       _playerRepository = playerRepository,
+       _movementRepository = movementRepository,
+       _inventoryRepository = inventoryRepository;
 
   void execute(int x, int y) {
     final boardState = _boardRepository.state.value;
@@ -49,8 +49,7 @@ class ExecuteBoardActionUseCase {
   }
 
   void _advanceInteractionMode() {
-    if (_interactionRepository.state.value ==
-        BoardInteractionMode.selection) {
+    if (_interactionRepository.state.value == BoardInteractionMode.selection) {
       _interactionRepository.enterActionMode();
     } else {
       _interactionRepository.enterSelectionMode();
@@ -71,7 +70,8 @@ class ExecuteBoardActionUseCase {
         break;
       }
     }
-    final isAdjacent = playerPos != null &&
+    final isAdjacent =
+        playerPos != null &&
         ((playerPos.x - pos.x).abs() == 1 && playerPos.y == pos.y ||
             (playerPos.y - pos.y).abs() == 1 && playerPos.x == pos.x);
     if (!isAdjacent) {
@@ -105,10 +105,8 @@ class ExecuteBoardActionUseCase {
     required String? opponentId,
   }) {
     final items = _inventoryRepository.state.value.getItems(_socketId);
-    final hasAirStrike =
-        items.any((item) => item.type == ItemType.airStrike);
-    final hasCamouflage =
-        items.any((item) => item.type == ItemType.camouflage);
+    final hasAirStrike = items.any((item) => item.type == ItemType.airStrike);
+    final hasCamouflage = items.any((item) => item.type == ItemType.camouflage);
     if (opponentId != null && opponentId.isNotEmpty && hasAirStrike) {
       _combatRepository.startCombat(
         StartCombatCommand(roomId: roomId, opponentId: opponentId),

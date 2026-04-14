@@ -11,4 +11,3 @@ class ProfileStatisticsModel {
     required this.averagePlaytimePerGame,
   });
 }
-

@@ -820,3 +820,183 @@ abstract class _SynchronizeMovementCommand
   _$$SynchronizeMovementCommandImplCopyWith<_$SynchronizeMovementCommandImpl>
   get copyWith => throw _privateConstructorUsedError;
 }
+
+/// @nodoc
+mixin _$TrapChoiceCommand {
+  String get roomId => throw _privateConstructorUsedError;
+  String get playerId => throw _privateConstructorUsedError;
+  String get choice => throw _privateConstructorUsedError;
+
+  /// Create a copy of TrapChoiceCommand
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $TrapChoiceCommandCopyWith<TrapChoiceCommand> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $TrapChoiceCommandCopyWith<$Res> {
+  factory $TrapChoiceCommandCopyWith(
+    TrapChoiceCommand value,
+    $Res Function(TrapChoiceCommand) then,
+  ) = _$TrapChoiceCommandCopyWithImpl<$Res, TrapChoiceCommand>;
+  @useResult
+  $Res call({String roomId, String playerId, String choice});
+}
+
+/// @nodoc
+class _$TrapChoiceCommandCopyWithImpl<$Res, $Val extends TrapChoiceCommand>
+    implements $TrapChoiceCommandCopyWith<$Res> {
+  _$TrapChoiceCommandCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of TrapChoiceCommand
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? roomId = null,
+    Object? playerId = null,
+    Object? choice = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            roomId: null == roomId
+                ? _value.roomId
+                : roomId // ignore: cast_nullable_to_non_nullable
+                      as String,
+            playerId: null == playerId
+                ? _value.playerId
+                : playerId // ignore: cast_nullable_to_non_nullable
+                      as String,
+            choice: null == choice
+                ? _value.choice
+                : choice // ignore: cast_nullable_to_non_nullable
+                      as String,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$TrapChoiceCommandImplCopyWith<$Res>
+    implements $TrapChoiceCommandCopyWith<$Res> {
+  factory _$$TrapChoiceCommandImplCopyWith(
+    _$TrapChoiceCommandImpl value,
+    $Res Function(_$TrapChoiceCommandImpl) then,
+  ) = __$$TrapChoiceCommandImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String roomId, String playerId, String choice});
+}
+
+/// @nodoc
+class __$$TrapChoiceCommandImplCopyWithImpl<$Res>
+    extends _$TrapChoiceCommandCopyWithImpl<$Res, _$TrapChoiceCommandImpl>
+    implements _$$TrapChoiceCommandImplCopyWith<$Res> {
+  __$$TrapChoiceCommandImplCopyWithImpl(
+    _$TrapChoiceCommandImpl _value,
+    $Res Function(_$TrapChoiceCommandImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of TrapChoiceCommand
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? roomId = null,
+    Object? playerId = null,
+    Object? choice = null,
+  }) {
+    return _then(
+      _$TrapChoiceCommandImpl(
+        roomId: null == roomId
+            ? _value.roomId
+            : roomId // ignore: cast_nullable_to_non_nullable
+                  as String,
+        playerId: null == playerId
+            ? _value.playerId
+            : playerId // ignore: cast_nullable_to_non_nullable
+                  as String,
+        choice: null == choice
+            ? _value.choice
+            : choice // ignore: cast_nullable_to_non_nullable
+                  as String,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+class _$TrapChoiceCommandImpl implements _TrapChoiceCommand {
+  const _$TrapChoiceCommandImpl({
+    required this.roomId,
+    required this.playerId,
+    required this.choice,
+  });
+
+  @override
+  final String roomId;
+  @override
+  final String playerId;
+  @override
+  final String choice;
+
+  @override
+  String toString() {
+    return 'TrapChoiceCommand(roomId: $roomId, playerId: $playerId, choice: $choice)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$TrapChoiceCommandImpl &&
+            (identical(other.roomId, roomId) || other.roomId == roomId) &&
+            (identical(other.playerId, playerId) ||
+                other.playerId == playerId) &&
+            (identical(other.choice, choice) || other.choice == choice));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, roomId, playerId, choice);
+
+  /// Create a copy of TrapChoiceCommand
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$TrapChoiceCommandImplCopyWith<_$TrapChoiceCommandImpl> get copyWith =>
+      __$$TrapChoiceCommandImplCopyWithImpl<_$TrapChoiceCommandImpl>(
+        this,
+        _$identity,
+      );
+}
+
+abstract class _TrapChoiceCommand implements TrapChoiceCommand {
+  const factory _TrapChoiceCommand({
+    required final String roomId,
+    required final String playerId,
+    required final String choice,
+  }) = _$TrapChoiceCommandImpl;
+
+  @override
+  String get roomId;
+  @override
+  String get playerId;
+  @override
+  String get choice;
+
+  /// Create a copy of TrapChoiceCommand
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$TrapChoiceCommandImplCopyWith<_$TrapChoiceCommandImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}

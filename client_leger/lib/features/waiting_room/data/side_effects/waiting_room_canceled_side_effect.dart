@@ -11,8 +11,8 @@ class WaitingRoomCanceledSideEffect with DisposableSideEffect {
     required AppTransitionEventBus appTransitionEventBus,
     required WaitingRoomEventBus waitingRoomEventBus,
     required NotificationIntentSink notificationIntentSink,
-  })  : _appTransitionEventBus = appTransitionEventBus,
-        _notificationIntentSink = notificationIntentSink {
+  }) : _appTransitionEventBus = appTransitionEventBus,
+       _notificationIntentSink = notificationIntentSink {
     trackSubscription(
       waitingRoomEventBus.on<WaitingRoomCanceledEvent>().listen(_onCanceled),
     );

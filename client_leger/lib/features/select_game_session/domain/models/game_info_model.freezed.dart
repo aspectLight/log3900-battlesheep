@@ -24,7 +24,9 @@ mixin _$GameModelInfo {
   int get boardSize => throw _privateConstructorUsedError;
   List<List<GameBoardPreviewCell>> get boardMatrix =>
       throw _privateConstructorUsedError;
-  bool get isVisible => throw _privateConstructorUsedError;
+  String get privacy => throw _privateConstructorUsedError;
+  String get owner => throw _privateConstructorUsedError;
+  int get actionPoints => throw _privateConstructorUsedError;
   String get lastModified => throw _privateConstructorUsedError;
 
   /// Create a copy of GameModelInfo
@@ -48,7 +50,9 @@ abstract class $GameModelInfoCopyWith<$Res> {
     GameMode mode,
     int boardSize,
     List<List<GameBoardPreviewCell>> boardMatrix,
-    bool isVisible,
+    String privacy,
+    String owner,
+    int actionPoints,
     String lastModified,
   });
 }
@@ -74,7 +78,9 @@ class _$GameModelInfoCopyWithImpl<$Res, $Val extends GameModelInfo>
     Object? mode = null,
     Object? boardSize = null,
     Object? boardMatrix = null,
-    Object? isVisible = null,
+    Object? privacy = null,
+    Object? owner = null,
+    Object? actionPoints = null,
     Object? lastModified = null,
   }) {
     return _then(
@@ -103,10 +109,18 @@ class _$GameModelInfoCopyWithImpl<$Res, $Val extends GameModelInfo>
                 ? _value.boardMatrix
                 : boardMatrix // ignore: cast_nullable_to_non_nullable
                       as List<List<GameBoardPreviewCell>>,
-            isVisible: null == isVisible
-                ? _value.isVisible
-                : isVisible // ignore: cast_nullable_to_non_nullable
-                      as bool,
+            privacy: null == privacy
+                ? _value.privacy
+                : privacy // ignore: cast_nullable_to_non_nullable
+                      as String,
+            owner: null == owner
+                ? _value.owner
+                : owner // ignore: cast_nullable_to_non_nullable
+                      as String,
+            actionPoints: null == actionPoints
+                ? _value.actionPoints
+                : actionPoints // ignore: cast_nullable_to_non_nullable
+                      as int,
             lastModified: null == lastModified
                 ? _value.lastModified
                 : lastModified // ignore: cast_nullable_to_non_nullable
@@ -133,7 +147,9 @@ abstract class _$$GameModelInfoImplCopyWith<$Res>
     GameMode mode,
     int boardSize,
     List<List<GameBoardPreviewCell>> boardMatrix,
-    bool isVisible,
+    String privacy,
+    String owner,
+    int actionPoints,
     String lastModified,
   });
 }
@@ -158,7 +174,9 @@ class __$$GameModelInfoImplCopyWithImpl<$Res>
     Object? mode = null,
     Object? boardSize = null,
     Object? boardMatrix = null,
-    Object? isVisible = null,
+    Object? privacy = null,
+    Object? owner = null,
+    Object? actionPoints = null,
     Object? lastModified = null,
   }) {
     return _then(
@@ -187,10 +205,18 @@ class __$$GameModelInfoImplCopyWithImpl<$Res>
             ? _value._boardMatrix
             : boardMatrix // ignore: cast_nullable_to_non_nullable
                   as List<List<GameBoardPreviewCell>>,
-        isVisible: null == isVisible
-            ? _value.isVisible
-            : isVisible // ignore: cast_nullable_to_non_nullable
-                  as bool,
+        privacy: null == privacy
+            ? _value.privacy
+            : privacy // ignore: cast_nullable_to_non_nullable
+                  as String,
+        owner: null == owner
+            ? _value.owner
+            : owner // ignore: cast_nullable_to_non_nullable
+                  as String,
+        actionPoints: null == actionPoints
+            ? _value.actionPoints
+            : actionPoints // ignore: cast_nullable_to_non_nullable
+                  as int,
         lastModified: null == lastModified
             ? _value.lastModified
             : lastModified // ignore: cast_nullable_to_non_nullable
@@ -210,7 +236,9 @@ class _$GameModelInfoImpl implements _GameModelInfo {
     required this.mode,
     required this.boardSize,
     required final List<List<GameBoardPreviewCell>> boardMatrix,
-    required this.isVisible,
+    required this.privacy,
+    required this.owner,
+    required this.actionPoints,
     required this.lastModified,
   }) : _boardMatrix = boardMatrix;
 
@@ -233,13 +261,17 @@ class _$GameModelInfoImpl implements _GameModelInfo {
   }
 
   @override
-  final bool isVisible;
+  final String privacy;
+  @override
+  final String owner;
+  @override
+  final int actionPoints;
   @override
   final String lastModified;
 
   @override
   String toString() {
-    return 'GameModelInfo(id: $id, name: $name, description: $description, mode: $mode, boardSize: $boardSize, boardMatrix: $boardMatrix, isVisible: $isVisible, lastModified: $lastModified)';
+    return 'GameModelInfo(id: $id, name: $name, description: $description, mode: $mode, boardSize: $boardSize, boardMatrix: $boardMatrix, privacy: $privacy, owner: $owner, actionPoints: $actionPoints, lastModified: $lastModified)';
   }
 
   @override
@@ -258,8 +290,10 @@ class _$GameModelInfoImpl implements _GameModelInfo {
               other._boardMatrix,
               _boardMatrix,
             ) &&
-            (identical(other.isVisible, isVisible) ||
-                other.isVisible == isVisible) &&
+            (identical(other.privacy, privacy) || other.privacy == privacy) &&
+            (identical(other.owner, owner) || other.owner == owner) &&
+            (identical(other.actionPoints, actionPoints) ||
+                other.actionPoints == actionPoints) &&
             (identical(other.lastModified, lastModified) ||
                 other.lastModified == lastModified));
   }
@@ -273,7 +307,9 @@ class _$GameModelInfoImpl implements _GameModelInfo {
     mode,
     boardSize,
     const DeepCollectionEquality().hash(_boardMatrix),
-    isVisible,
+    privacy,
+    owner,
+    actionPoints,
     lastModified,
   );
 
@@ -294,7 +330,9 @@ abstract class _GameModelInfo implements GameModelInfo {
     required final GameMode mode,
     required final int boardSize,
     required final List<List<GameBoardPreviewCell>> boardMatrix,
-    required final bool isVisible,
+    required final String privacy,
+    required final String owner,
+    required final int actionPoints,
     required final String lastModified,
   }) = _$GameModelInfoImpl;
 
@@ -311,7 +349,11 @@ abstract class _GameModelInfo implements GameModelInfo {
   @override
   List<List<GameBoardPreviewCell>> get boardMatrix;
   @override
-  bool get isVisible;
+  String get privacy;
+  @override
+  String get owner;
+  @override
+  int get actionPoints;
   @override
   String get lastModified;
 

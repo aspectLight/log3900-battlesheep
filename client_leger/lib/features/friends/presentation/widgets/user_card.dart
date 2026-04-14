@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-const _kRowBg = Color(0xFF2b2b2b);
-const _kBorder = Color(0xFF3a3a3a);
+import '../../../../core/appearance/app_interaction_colors.dart';
+import '../../../../core/localisation/core_localizations.dart';
+import '../../../../core/presentation/widgets/profile_avatar_thumb/profile_avatar_thumb.dart';
 
 class UserCard extends StatelessWidget {
   const UserCard({
@@ -10,38 +11,37 @@ class UserCard extends StatelessWidget {
     required this.actions,
     this.isOnline,
     this.avatarId,
+    this.avatarUrl,
   });
 
   final String username;
   final bool? isOnline;
   final String? avatarId;
+  final String? avatarUrl;
   final List<Widget> actions;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = CoreLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       margin: const EdgeInsets.only(bottom: 1),
       decoration: BoxDecoration(
-        color: _kRowBg,
-        border: Border.all(color: _kBorder),
+        color: Theme.of(context).colorScheme.primary,
+        border: Border.all(color: context.interactionColors.outline),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
           Expanded(
             child: Row(
               children: [
-                if (avatarId != null) ...[
-                  CircleAvatar(
-                    radius: 18,
-                    backgroundColor: const Color(0xFF4a3010),
-                    child: Text(
-                      username.isNotEmpty ? username[0].toUpperCase() : '?',
-                      style: const TextStyle(
-                        color: Color(0xFFffd39a),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                if (avatarId != null || avatarUrl != null) ...[
+                  ProfileAvatarThumb(
+                    displayName: username,
+                    avatarId: avatarId,
+                    avatarUrl: avatarUrl,
+                    size: 36,
                   ),
                   const SizedBox(width: 12),
                 ],
@@ -68,7 +68,7 @@ class UserCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
-                      isOnline! ? 'En ligne' : 'Hors ligne',
+                      isOnline! ? l10n.online : l10n.offline,
                       style: TextStyle(
                         color: isOnline!
                             ? const Color(0xFF32B464)

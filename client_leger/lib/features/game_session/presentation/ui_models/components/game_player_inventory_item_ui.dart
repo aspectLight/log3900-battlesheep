@@ -8,5 +8,6 @@ class GamePlayerInventoryItemUi {
   const GamePlayerInventoryItemUi({required this.type});
 
   String name(GameSessionLocalizations l10n) => type.getName(l10n);
-  String description(GameSessionLocalizations l10n) => type.getDescription(l10n);
+  String description(GameSessionLocalizations l10n) =>
+      type.getDescription(l10n);
 }
