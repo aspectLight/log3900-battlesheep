@@ -19,9 +19,9 @@ export class ProfileService {
     readonly profileUpdated$: Observable<UserProfile> = this.profileUpdatedSubject.asObservable();
 
     private readonly profileErrorKeyMap: Record<string, string> = {
-        'Erreur lors de la mise � jour du profil': 'profile.errors.update_profile',
+        'Erreur lors de la mise à jour du profil': 'profile.errors.update_profile',
         'Erreur lors du chargement du profil': 'profile.errors.load_profile',
-        'Utilisateur non authentifi�': 'profile.errors.unauthenticated',
+        'Utilisateur non authentifié': 'profile.errors.unauthenticated',
     };
 
     constructor(
