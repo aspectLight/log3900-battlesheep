@@ -229,7 +229,8 @@
     "game_deleted": "Le jeu a été supprimé.",
     "player_kicked": "Vous avez été expulsé de la partie.",
     "quit_error": "Erreur lors de la sortie de la salle.",
-    "room_locked_add_player": "La salle est verrouillée, impossible d'ajouter un joueur virtuel."
+    "room_locked_add_player": "La salle est verrouillée, impossible d'ajouter un joueur virtuel.",
+    "qr_alt": "Code QR du code de partie"
   },
   "channels": {
     "title": "Canaux de discussion",

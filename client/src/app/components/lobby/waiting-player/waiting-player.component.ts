@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { Player } from '@app/classes/entity/player';
 import { PlayerCardComponent } from '@app/components/player/player-card/player-card.component';
@@ -13,6 +14,7 @@ import { VirtualPlayerService } from '@app/services/gameplay/virtual-player.serv
 import { GameCreationService } from '@app/services/lobby/game-creation.service';
 import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import QRCode from 'qrcode';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -29,6 +31,7 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
     room: Room | null = null;
     isProfileSectionVisible: boolean = false;
     toDo: () => void;
+    joinQrUrl: SafeUrl | null = null;
 
     readonly routes = ROUTES;
 
@@ -42,6 +45,8 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
         private translate: TranslateService,
         public router: Router,
         public currencyService: VirtualCurrencyService,
+        private readonly sanitizer: DomSanitizer,
+        private readonly zone: NgZone,
     ) {}
 
     get code(): string {
@@ -73,7 +78,9 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
         this.errorMessage = this.translate.instant('waiting.welcome');
         this.roomSubscription = this.waitingRoomService.room$.subscribe((room) => {
             this.room = room;
+            this.refreshJoinQrCode();
         });
+        this.refreshJoinQrCode();
         this.socketService.roomExists$.subscribe((roomExists) => {
             if (!roomExists) {
                 this.errorMessage = this.translate.instant('waiting.game_deleted');
@@ -207,5 +214,28 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
         this.showError = false;
         this.showMessage = false;
         this.showConfirmation = false;
+    }
+
+    private refreshJoinQrCode(): void {
+        const rawCode = (this.gameCreationService.gameCode ?? '').trim();
+        if (!/^\d{4}$/.test(rawCode)) {
+            this.joinQrUrl = null;
+            return;
+        }
+        void QRCode.toDataURL(rawCode, {
+            width: 132,
+            margin: 2,
+            color: { dark: '#1a0a0aff', light: '#ffffffff' },
+        })
+            .then((dataUrl: string) => {
+                this.zone.run(() => {
+                    this.joinQrUrl = this.sanitizer.bypassSecurityTrustUrl(dataUrl);
+                });
+            })
+            .catch(() => {
+                this.zone.run(() => {
+                    this.joinQrUrl = null;
+                });
+            });
     }
 }

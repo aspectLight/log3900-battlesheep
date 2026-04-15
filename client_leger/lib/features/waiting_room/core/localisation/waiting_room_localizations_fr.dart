@@ -144,4 +144,8 @@ class WaitingRoomLocalizationsFr extends WaitingRoomLocalizations {
   @override
   String get waitingRoomWelcomeMessage =>
       'Bienvenue dans la salle d\'attente, partagez le code de la partie avec vos amis !';
+
+  @override
+  String get waitingRoomJoinQrLabel =>
+      'Code QR du code à 4 chiffres de la partie';
 }

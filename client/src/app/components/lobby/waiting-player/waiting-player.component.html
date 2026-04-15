@@ -47,9 +47,16 @@
     </div>
 
     <div class="game-info-container">
-        <div class="game-info">
-            <h3>{{ 'waiting.code' | translate }}</h3>
-            <h1>{{ code }}</h1>
+        <div class="game-code-row">
+            @if (joinQrUrl) {
+            <div class="waiting-room-join-qr" [attr.aria-label]="'waiting.qr_alt' | translate">
+                <img [src]="joinQrUrl" alt="" />
+            </div>
+            }
+            <div class="game-info">
+                <h3>{{ 'waiting.code' | translate }}</h3>
+                <h1>{{ code }}</h1>
+            </div>
         </div>
 
         <div class="currency-panel">
@@ -67,33 +74,36 @@
             }
         </div>
 
-        @if(isHost) {
-        <div class="host-options">
-            <label class="drop-in-toggle">
-                <input type="checkbox" [checked]="room?.dropInDropOut" (change)="toggleDropInDropOut()" />
-                <span class="checkmark"></span>
-                <span>{{ 'waiting.drop_in' | translate }}</span>
-            </label>
-            <button class="lock-btn" (click)="confirmAction('lock')">
-                {{ room?.isLocked ? ('waiting.unlock' | translate) : ('waiting.lock' | translate) }}
-            </button>
-            <button class="add-vp-btn" [class.isClickable]="!room?.isLocked" (click)="openProfileSection()">
-                {{ 'waiting.add_vp' | translate }}
-            </button>
-            <button class="startGame-btn" [class.isClickable]="isStartValid" (click)="startGame()">{{ 'waiting.start' | translate }}</button>
+        <div class="waiting-room-actions-wrap">
+                @if (isHost) {
+                <div class="host-options">
+                    <label class="drop-in-toggle">
+                        <input type="checkbox" [checked]="room?.dropInDropOut" (change)="toggleDropInDropOut()" />
+                        <span class="checkmark"></span>
+                        <span>{{ 'waiting.drop_in' | translate }}</span>
+                    </label>
+                    <button class="lock-btn" (click)="confirmAction('lock')">
+                        {{ room?.isLocked ? ('waiting.unlock' | translate) : ('waiting.lock' | translate) }}
+                    </button>
+                    <button class="add-vp-btn" [class.isClickable]="!room?.isLocked" (click)="openProfileSection()">
+                        {{ 'waiting.add_vp' | translate }}
+                    </button>
+                    <button class="startGame-btn" [class.isClickable]="isStartValid" (click)="startGame()">{{ 'waiting.start' | translate }}</button>
+                </div>
+                @if (isProfileSectionVisible) {
+                <app-pop-up
+                    [popUpMessage]="'waiting.vp_profile' | translate"
+                    [showSecondButton]="true"
+                    [firstOption]="'waiting.aggressive' | translate"
+                    [secondOption]="'waiting.defensive' | translate"
+                    (confirm)="handleAgressiveProfileClick()"
+                    (cancel)="handleDefensiveProfileClick()"
+                >
+                </app-pop-up>
+                }
+                } @else {
+                <div class="waiting-msg">{{ 'waiting.waiting_host' | translate }}</div>
+                }
         </div>
-        @if (isProfileSectionVisible) {
-        <app-pop-up
-            [popUpMessage]="'waiting.vp_profile' | translate"
-            [showSecondButton]="true"
-            [firstOption]="'waiting.aggressive' | translate"
-            [secondOption]="'waiting.defensive' | translate"
-            (confirm)="handleAgressiveProfileClick()"
-            (cancel)="handleDefensiveProfileClick()"
-        >
-        </app-pop-up>
-        } } @else {
-        <div class="waiting-msg">{{ 'waiting.waiting_host' | translate }}</div>
-        }
     </div>
 </div>

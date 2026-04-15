@@ -229,7 +229,8 @@
     "game_deleted": "The game has been deleted.",
     "player_kicked": "You have been kicked from the game.",
     "quit_error": "Error while leaving the room.",
-    "room_locked_add_player": "The room is locked, it is impossible to add a virtual player."
+    "room_locked_add_player": "The room is locked, it is impossible to add a virtual player.",
+    "qr_alt": "QR code with the game code"
   },
   "channels": {
     "title": "Discussion channels",

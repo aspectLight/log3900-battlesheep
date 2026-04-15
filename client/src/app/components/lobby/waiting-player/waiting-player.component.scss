@@ -114,6 +114,16 @@
     gap: 16px;
 }
 
+.game-code-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
 .game-info {
     display: flex;
     flex-direction: column;
@@ -352,4 +362,28 @@ button {
     height: 18px;
     accent-color: var(--theme-accent-hover);
     cursor: pointer;
+}
+
+.waiting-room-actions-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+}
+
+.waiting-room-join-qr {
+    flex-shrink: 0;
+    padding: 6px;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(85, 0, 0, 0.25);
+
+    img {
+        display: block;
+        width: 108px;
+        height: 108px;
+        image-rendering: pixelated;
+    }
 }

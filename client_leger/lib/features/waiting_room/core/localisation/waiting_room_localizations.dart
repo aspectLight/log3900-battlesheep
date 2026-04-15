@@ -364,6 +364,12 @@ abstract class WaitingRoomLocalizations {
   /// In en, this message translates to:
   /// **'Bienvenue dans la salle d\'attente, partagez le code de la partie avec vos amis !'**
   String get waitingRoomWelcomeMessage;
+
+  /// No description provided for @waitingRoomJoinQrLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'QR code with the 4-digit game code'**
+  String get waitingRoomJoinQrLabel;
 }
 
 class _WaitingRoomLocalizationsDelegate
