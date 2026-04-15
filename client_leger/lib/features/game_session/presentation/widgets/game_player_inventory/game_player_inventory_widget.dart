@@ -44,7 +44,10 @@ class _GamePlayerInventoryWidgetState extends State<GamePlayerInventoryWidget> {
         children: slots
             .asMap()
             .entries
-            .map((entry) => _InventorySlot(slot: entry.value, viewModel: _viewModel))
+            .map(
+              (entry) =>
+                  _InventorySlot(slot: entry.value, viewModel: _viewModel),
+            )
             .toList(),
       ),
     );
@@ -89,16 +92,8 @@ class _InventorySlotState extends State<_InventorySlot> {
           TargetPlatform.macOS,
         }.contains(defaultTargetPlatform);
 
-    // The game screen places this row in a short strip and translates it down; only
-    // the top of each card is inside the hit-test box unless we lift the card.
-    // Desktop uses hover to lift; touch has no hover, so torch (drop button at
-    // the bottom) would sit *below* the strip and never receive taps. Always lift
-    // torch cards so the drop control stays reachable on tablet/phone (and on
-    // desktop without hovering first).
     final shouldLift = hasItem && (_isHovered || isTorchItem);
 
-    // Fine‑tuned lift so the card is readable
-    // and sits slightly lower than before.
     final yOffset = shouldLift ? -95.0 : 0.0;
 
     Widget content = AnimatedContainer(
