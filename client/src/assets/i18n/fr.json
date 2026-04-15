@@ -22,7 +22,9 @@
     "password_digit": "Le mot de passe doit contenir au moins un chiffre",
     "password_spaces": "Le mot de passe ne doit pas contenir d'espace",
     "password_mismatch": "Les mots de passe ne correspondent pas",
-    "avatar_required": "Sélectionnez un avatar"
+    "avatar_required": "Sélectionnez un avatar",
+    "username_banned": "Ce nom d'utilisateur est réservé et ne peut pas être utilisé",
+    "username_profanity": "Ce nom d'utilisateur contient des mots non autorisés"
   },
   "auth": {
     "login": "Se connecter",
@@ -105,6 +107,7 @@
     "error_file_type": "Fichier de type \"{{ ext }}\" non autorisé. Formats permis : JPG, JPEG, PNG (taille maximale 2 MB).",
     "error_file_size": "Fichier trop volumineux ({{ size }} MB). Taille maximale autorisée : 2 MB.",
     "no_changes": "Aucune modification détectée",
+    "available_in_shop": "Disponible en boutique (500 pièces)",
     "errors": {
       "load_profile": "Erreur lors du chargement du profil",
       "update_profile": "Erreur lors de la sauvegarde des changements du profil",

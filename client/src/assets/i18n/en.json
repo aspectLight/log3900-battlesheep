@@ -22,7 +22,9 @@
     "password_digit": "Password must contain at least one digit",
     "password_spaces": "Password must not contain spaces",
     "password_mismatch": "Passwords do not match",
-    "avatar_required": "Please select an avatar"
+    "avatar_required": "Please select an avatar",
+    "username_banned": "This username is reserved and cannot be used",
+    "username_profanity": "This username contains inappropriate words"
   },
   "auth": {
     "login": "Sign in",
@@ -105,6 +107,7 @@
     "error_file_type": "File type \"{{ ext }}\" not allowed. Allowed formats: JPG, JPEG, PNG (max 2 MB).",
     "error_file_size": "File too large ({{ size }} MB). Maximum allowed size: 2 MB.",
     "no_changes": "No changes detected",
+    "available_in_shop": "Available in shop (500 coins)",
     "errors": {
       "load_profile": "Error while loading profile",
       "update_profile": "Error while saving profile changes",

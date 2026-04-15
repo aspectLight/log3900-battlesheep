@@ -290,10 +290,12 @@
     flex-direction: column;
     align-items: center;
     gap: 4px;
+    width: calc((450px - 3 * 8px) / 4);
+    height: calc((450px - 3 * 8px) / 4);
 
     .avatar-preview-img {
-        width: 64px;
-        height: 64px;
+        width: 100%;
+        height: 100%;
         border: 2px solid var(--theme-accent);
         border-radius: 10px;
         box-shadow: 0 0 8px 2px var(--theme-shadow-focus);

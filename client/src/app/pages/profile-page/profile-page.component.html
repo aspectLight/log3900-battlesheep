@@ -45,6 +45,8 @@
                         <small class="error">{{ 'validation.required' | translate }}</small>
                         } @if (form.controls.username.touched && form.controls.username.errors?.['pattern']) {
                         <small class="error">{{ 'validation.username_special' | translate }}</small>
+                        } @if (form.controls.username.touched && form.controls.username.errors?.['bannedUsername']) {
+                        <small class="error">{{ 'validation.username_banned' | translate }}</small>
                         }
                     </div>
 
@@ -69,7 +71,7 @@
                                 [class.premium-locked]="isPremiumLocked(a.id)"
                                 [disabled]="isPremiumLocked(a.id)"
                                 (click)="selectAvatar(a.id)"
-                                [title]="isPremiumLocked(a.id) ? a.label + ' - Disponible en boutique (500 pièces)' : a.label"
+                                [title]="isPremiumLocked(a.id) ? a.label + ' - ' + ('profile.available_in_shop' | translate) : a.label"
                             >
                                 <img [src]="a.image" [alt]="a.label" class="avatar-img" [class.dimmed]="isPremiumLocked(a.id)" />
                                 @if (isPremiumLocked(a.id)) {

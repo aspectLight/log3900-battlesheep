@@ -4,12 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
 import { AuthService } from '@app/services/communication/auth.service';
+import { AvatarRegistryService } from '@app/services/communication/avatar-registry.service';
 import { ChatService } from '@app/services/communication/chat.service';
 import { ChannelInfo, ChannelMessage, CustomChannelService } from '@app/services/communication/custom-channel.service';
 import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';
 import { isReservedGameChannelName, isReservedGeneralChannelName } from '@common/channel-name.utils';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 const MAX_MESSAGE_LENGTH = 200;
 
@@ -62,6 +64,7 @@ export class ChatboxComponent implements OnInit, OnChanges, AfterViewInit, OnDes
         private waitingRoomService: WaitingRoomService,
         private authService: AuthService,
         private translate: TranslateService,
+        private avatarRegistry: AvatarRegistryService,
     ) {
         this.scrollToBottom();
     }
@@ -89,11 +92,38 @@ export class ChatboxComponent implements OnInit, OnChanges, AfterViewInit, OnDes
         return this.authService.currentUser?.displayName ?? 'Utilisateur';
     }
 
+    private toAbsolute(path: string): string {
+        if (/^https?:\/\//i.test(path)) return path;
+        return `${environment.serverUrl}${path}`;
+    }
+
     resolveAvatar(avatarId?: string | null, avatarUrl?: string | null): string | null {
         if (avatarUrl) return avatarUrl;
         if (!avatarId) return null;
         const avatar = ACCOUNT_CREATION_AVATARS.find((a) => a.id === avatarId);
         return avatar ? avatar.image : null;
+    }
+
+    getAvatarFor(msg: { name?: string | null; avatarId?: string | null; avatarUrl?: string | null }): string | null {
+        const name = msg?.name;
+        if (!name) return null;
+        const state = this.avatarRegistry.registrySignal();
+        const entry = state[name];
+        if (entry) {
+            if (entry.deleted) return null;
+            const absoluteUrl = entry.avatarUrl ? this.toAbsolute(entry.avatarUrl) : null;
+            return this.resolveAvatar(entry.avatarId, absoluteUrl);
+        }
+        this.avatarRegistry.ensureLoaded([name]);
+        return this.resolveAvatar(msg.avatarId, msg.avatarUrl);
+    }
+
+    onAvatarImgError(msg: { avatarId?: string | null; avatarUrl?: string | null }): void {
+        // Le avatarUrl stocké pointe sur /auth/avatar/:uid ; si l'utilisateur a depuis
+        // basculé vers un avatar prédéfini, l'endpoint 400 → on bascule sur l'avatarId.
+        if (msg.avatarUrl) {
+            msg.avatarUrl = null;
+        }
     }
 
     ngOnInit() {

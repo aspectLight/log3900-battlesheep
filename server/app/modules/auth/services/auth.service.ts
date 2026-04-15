@@ -8,7 +8,8 @@ import { GeneralChatService } from '@app/modules/general-chat/services/general-c
 import { GameService } from '@app/modules/game/services/game.service';
 import { FriendshipService } from '@app/modules/social/services/friendship.service';
 import { BlockService } from '@app/modules/social/services/block.service';
-import { ConflictException, ForbiddenException, Inject, Injectable, Logger, NotFoundException, UnauthorizedException, forwardRef } from '@nestjs/common';
+import { ConflictException, BadRequestException, ForbiddenException, Inject, Injectable, Logger, NotFoundException, UnauthorizedException, forwardRef } from '@nestjs/common';
+import { ChatModerationService } from '@app/modules/general-chat/services/chat-moderation.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { DecodedIdToken } from 'firebase-admin/auth';
 import { Model } from 'mongoose';
@@ -30,6 +31,7 @@ export class AuthService {
         @Inject(forwardRef(() => GameService)) private readonly gameService: GameService,
         @Inject(forwardRef(() => FriendshipService)) private readonly friendshipService: FriendshipService,
         @Inject(forwardRef(() => BlockService)) private readonly blockService: BlockService,
+        @Inject(forwardRef(() => ChatModerationService)) private readonly chatModerationService: ChatModerationService,
     ) {}
 
     async verifyToken(idToken: string): Promise<DecodedIdToken> {
@@ -135,6 +137,20 @@ export class AuthService {
         return user.email;
     }
 
+    async getAvatarsForUsernames(
+        usernames: string[],
+    ): Promise<{ username: string; avatarId: string | null; avatarUrl: string | null; deleted: boolean }[]> {
+        if (!usernames || usernames.length === 0) return [];
+        const unique = [...new Set(usernames)];
+        const users = await this.userModel.find({ username: { $in: unique } }, { username: 1, avatarId: 1, avatarUrl: 1 });
+        const byUsername = new Map(users.map((u) => [u.username, u]));
+        return unique.map((username) => {
+            const u = byUsername.get(username);
+            if (!u) return { username, avatarId: null, avatarUrl: null, deleted: true };
+            return { username, avatarId: u.avatarId ?? null, avatarUrl: u.avatarUrl ?? null, deleted: false };
+        });
+    }
+
     async getUserByUsername(username: string): Promise<UserDocument> {
         const user = await this.userModel.findOne({ username });
         if (!user) {
@@ -173,6 +189,7 @@ export class AuthService {
             user.avatarUrl = undefined;
             user.avatarImageBuffer = undefined;
             user.avatarImageMimeType = undefined;
+            user.avatarVersion = undefined;
         }
 
         // Updating theme
@@ -232,9 +249,11 @@ export class AuthService {
     async updateAvatarFromFile(uid: string, file: Express.Multer.File): Promise<UserDocument> {
         const user = await this.getUserByUid(uid);
 
+        const version = uuidv4();
         user.avatarImageBuffer = file.buffer;
         user.avatarImageMimeType = file.mimetype;
-        user.avatarUrl = `/auth/avatar/${uid}`;
+        user.avatarVersion = version;
+        user.avatarUrl = `/auth/avatar/${uid}?v=${version}`;
 
         await user.save();
 
@@ -249,6 +268,11 @@ export class AuthService {
     }
 
     async checkUsername(username: string, excludeUid?: string): Promise<void> {
+        // Vérification de la censure (mots bannis)
+        if (this.chatModerationService.censor(username) !== username) {
+            throw new BadRequestException('validation.username_profanity');
+        }
+
         const query: any = { username };
         if (excludeUid) query.firebaseUid = { $ne: excludeUid };
 

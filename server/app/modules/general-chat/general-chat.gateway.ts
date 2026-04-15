@@ -337,6 +337,10 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         }
     }
 
+    broadcastAvatarUpdate(payload: { username: string; avatarId: string | null; avatarUrl: string | null }): void {
+        this.server.emit(GeneralChatEvents.AvatarUpdated, payload);
+    }
+
     async forceDisconnectUser(username: string): Promise<void> {
         // Cancel any pending disconnection timeout
         const existingTimeout = this.disconnectionTimeouts.get(username);
