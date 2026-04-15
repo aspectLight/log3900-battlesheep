@@ -27,12 +27,16 @@ export class PlayerCreationService {
     set selectedCharacter(chosenCharacter: { name: string; id: number }) {
         this._selectedCharacter = {
             character: AVATAR_TYPES[chosenCharacter.name.toLowerCase()],
-            bonus: this.defaultBonuses(),
+            bonus: this._selectedCharacter.bonus,
         };
     }
 
     set selectedBonus(chosenBonus: Bonus) {
         this._selectedCharacter.bonus = chosenBonus;
+    }
+
+    reset(): void {
+        this._selectedCharacter = this.defaultCharacter();
     }
 
     createPlayer(playerName: string): Player | null {
@@ -48,6 +52,7 @@ export class PlayerCreationService {
         const bonus = this._selectedCharacter.bonus;
         return (
             playerName.trim() !== '' &&
+            this._selectedCharacter.character.name.trim() !== '' &&
             (bonus.life !== DEFAULT_STATS_VALUE || bonus.speed !== DEFAULT_STATS_VALUE) &&
             bonus.defense !== null &&
             bonus.attack !== null

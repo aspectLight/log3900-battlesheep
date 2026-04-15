@@ -17,12 +17,6 @@
             </div>
             @if (activeTab ==='tiles') {
             <div class="controls" [@fadeInOut]>
-                <div class="instructions">
-                    <br />
-                    <li><strong>{{ 'toolbox.right_click' | translate }}</strong> {{ 'toolbox.right_click_desc' | translate }}</li>
-                    <li><strong>{{ 'toolbox.left_click' | translate }}</strong> {{ 'toolbox.left_click_desc' | translate }}</li>
-                </div>
-                <img class="tutorial-gif" src="./assets/ui/tile_controler.gif" alt="tile controler" />
             </div>
             }
         </div>
@@ -49,15 +43,8 @@
             <div class="controls" [@fadeInOut]>
                 <div class="item-count">
                     <br />
-                    <li>{{ 'toolbox.items_to_place' | translate }}: {{ getItemCount('random') }}</li>
-                    <li>{{ 'toolbox.spawns_to_place' | translate }}: {{ getSpawnPointCount() }}</li>
+                    <span>{{ 'toolbox.items_to_place' | translate }}: {{ getItemCount('random') }} &nbsp;|&nbsp; {{ 'toolbox.spawns_to_place' | translate }}: {{ getSpawnPointCount() }}@if (gameMode === 'ctf') { &nbsp;|&nbsp; {{ 'toolbox.flag_to_place' | translate }}: {{ getItemCount('flag') }}}</span>
                 </div>
-                <div class="instructions">
-                    <br />
-                    <li><strong>{{ 'toolbox.hold_right' | translate }}</strong> {{ 'toolbox.hold_right_desc' | translate }}</li>
-                    <li><strong>{{ 'toolbox.release' | translate }}</strong> {{ 'toolbox.release_desc' | translate }}</li>
-                </div>
-                <img class="tutorial-gif" src="./assets/ui/item_controler.gif" alt="item controler" />
             </div>
             }
         </div>

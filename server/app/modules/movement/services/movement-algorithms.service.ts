@@ -93,7 +93,7 @@ export class MovementAlgorithmsService {
             if (costMap.get(key) < current.cost) continue;
 
             const cell = this.gameMovementService.getCell(roomId, current.coord.x, current.coord.y);
-            if (cell && predicate(cell)) {
+            if (cell && predicate(cell) && (current.coord.x !== start.x || current.coord.y !== start.y)) {
                 const path = this.gameMovementService.getShortestPath(start, current.coord, pathMap);
                 return { path, cost: current.cost };
             }
@@ -246,6 +246,11 @@ export class MovementAlgorithmsService {
             const tileType = cell.tile.type.replace(/^\w/, (c) => c.toUpperCase());
             const moveCost = coord.x === startPoint.x && coord.y === startPoint.y ? 0 : MoveCosts[tileType];
             if (accumulatedCost + moveCost > movementPoints) break;
+
+            if ((coord.x !== startPoint.x || coord.y !== startPoint.y) && !this.gameMovementService.isCellFree(cell)) {
+                break;
+            }
+
             accumulatedCost += moveCost;
             truncatedPath.push({ coord, cost: accumulatedCost });
         }
@@ -255,15 +260,16 @@ export class MovementAlgorithmsService {
     lookForItemInPath(roomId: string, path: Coords[]) {
         const truncatedPath: Coords[] = [];
         let totalCost = 0;
-        for (const coord of path) {
+        for (let i = 0; i < path.length; i++) {
+            const coord = path[i];
             const cell = this.gameMovementService.getCell(roomId, coord.x, coord.y);
             truncatedPath.push(coord);
             const tileType = cell.tile.type.replace(/^\w/, (c) => c.toUpperCase());
-            totalCost += MoveCosts[tileType];
-            if (cell && cell.item && cell.item.type !== ItemType.SpawnPoint) {
+            totalCost += (i === 0) ? 0 : MoveCosts[tileType];
+            if (i > 0 && cell && cell.item && cell.item.type !== ItemType.SpawnPoint) {
                 return { path: truncatedPath, cost: totalCost };
             }
         }
-        return { path, cost: totalCost };
+        return null;
     }
 }

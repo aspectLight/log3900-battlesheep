@@ -12,7 +12,7 @@ import { GameManagerService } from '@app/services/state/game-manager.service';
 import { GameRoomService } from '@app/services/state/game-room.service';
 import { ErrorMessages } from '@common/error-messages.constants';
 import { GameRoomEvents, WaitingRoomEvents } from '@common/socket.constants';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';
 /* eslint-disable @typescript-eslint/naming-convention */
 const SIZE_LIMITS: Record<number, { min: number; max: number }> = {
@@ -29,12 +29,14 @@ export class RoomSocketService implements ISocketService {
     roomExists$: Observable<boolean>;
     isKicked$: Observable<boolean>;
     reservedAvatars$: Observable<Reservation[]>;
+    availableRoomsChanged$: Observable<void>;
     socket: Socket;
     private room: Room;
     private roomLockedSubject = new BehaviorSubject<boolean>(false);
     private roomExistsSubject = new BehaviorSubject<boolean>(true);
     private isKickedSubject = new BehaviorSubject<boolean>(false);
     private reservedAvatarsSubject = new BehaviorSubject<Reservation[]>([]);
+    private availableRoomsChangedSubject = new Subject<void>();
 
     constructor(
         private socketService: SocketService,
@@ -58,6 +60,7 @@ export class RoomSocketService implements ISocketService {
         this.roomExists$ = this.roomExistsSubject.asObservable();
         this.isKicked$ = this.isKickedSubject.asObservable();
         this.reservedAvatars$ = this.reservedAvatarsSubject.asObservable();
+        this.availableRoomsChanged$ = this.availableRoomsChangedSubject.asObservable();
 
         this.waitingPlayerService.room$.subscribe((room) => {
             this.room = room;
@@ -293,6 +296,10 @@ export class RoomSocketService implements ISocketService {
 
         this.socket.on(WaitingRoomEvents.DropInDropOutToggled, (data: { dropInDropOut: boolean }) => {
             this.waitingPlayerService.toggleDropInDropOut(data.dropInDropOut);
+        });
+
+        this.socket.on(WaitingRoomEvents.AvailableRoomsChanged, () => {
+            this.availableRoomsChangedSubject.next();
         });
 
         this.socket.on(GameRoomEvents.PlayerJoinedGame, (data: { player: any; isReturning: boolean; players: any[] }) => {

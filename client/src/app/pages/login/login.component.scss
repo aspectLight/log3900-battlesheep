@@ -8,6 +8,40 @@
     overflow: hidden;
 }
 
+.lang-switcher {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+}
+
+.lang-btn {
+    background: var(--theme-bg-overlay-medium);
+    color: var(--theme-text-muted);
+    border: 1px solid var(--theme-border-primary);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+}
+
+.lang-btn:hover {
+    background: var(--theme-bg-button-hover);
+    color: var(--theme-text-primary);
+    border-color: var(--theme-border-button);
+}
+
+.lang-btn.active {
+    background: var(--theme-bg-button);
+    color: var(--theme-text-primary);
+    border-color: var(--theme-accent);
+}
+
 .container {
     position: absolute;
     top: 0;
@@ -16,7 +50,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    overflow: auto;
+    overflow: hidden;
 }
 
 .container::before {
@@ -32,19 +66,24 @@
     animation: scaleBackground 20s ease-in-out infinite alternate;
 }
 
+.header {
+    position: relative;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 0;
+    min-height: 40px;
+    flex-shrink: 0;
+}
+
 .return-button {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    left: 10px;
     display: flex;
     align-items: center;
     gap: 15px;
     cursor: pointer;
-    background: none;
-    border: none;
-    font-size: 16px;
-    color: var(--theme-text-muted);
-    z-index: 10;
 }
 
 .return-button:active {
@@ -58,13 +97,14 @@
 .return-button img {
     width: 15px;
     max-width: 15px;
-    filter: brightness(0) invert(1);
+    color: var(--theme-text-hover);
 }
 
 .logo {
-    max-width: 200px;
+    width: 180px;
     height: auto;
-    margin-bottom: 2rem;
+    margin-bottom: 16px;
+    flex-shrink: 0;
 }
 
 .content-wrapper {
@@ -73,7 +113,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 16px 20px;
+    min-height: 0;
 }
 
 .login-form {
@@ -81,7 +122,7 @@
     flex-direction: column;
     width: 100%;
     max-width: 350px;
-    gap: 20px;
+    gap: 14px;
 }
 
 .login-form .field {

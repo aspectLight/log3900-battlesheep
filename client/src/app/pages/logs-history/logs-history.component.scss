@@ -7,52 +7,6 @@
     padding: 20px;
   }
   
-  .top-bar {
-    position: relative;
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-    padding: 10px 0;
-    overflow: hidden;
-  }
-  
-  .return-button {
-    position: absolute;
-    left: 10px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  
-    background: none;
-    border: none;
-    outline: none;
-    color: inherit;
-  }
-  
-  .return-button:hover {
-    color: var(--theme-text-hover);
-  }
-  
-  .return-button:active {
-    color: var(--theme-accent-hover);
-  }
-  
-  .return-button img {
-    width: 15px;
-    max-width: 15px;
-  }
-  
-  .title {
-    margin: 0;
-    color: var(--theme-text-primary);
-    letter-spacing: 2px;
-    font-size: 44px;
-    text-shadow: 0 3px 12px var(--theme-shadow-strong);
-  }
-  
   .history-list {
     display: flex;
     flex-direction: column;

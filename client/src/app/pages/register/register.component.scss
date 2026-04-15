@@ -8,6 +8,40 @@
     overflow: hidden;
 }
 
+.lang-switcher {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+}
+
+.lang-btn {
+    background: var(--theme-bg-overlay-medium);
+    color: var(--theme-text-muted);
+    border: 1px solid var(--theme-border-primary);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+}
+
+.lang-btn:hover {
+    background: var(--theme-bg-button-hover);
+    color: var(--theme-text-primary);
+    border-color: var(--theme-border-button);
+}
+
+.lang-btn.active {
+    background: var(--theme-bg-button);
+    color: var(--theme-text-primary);
+    border-color: var(--theme-accent);
+}
+
 .container {
     position: absolute;
     top: 0;
@@ -32,19 +66,29 @@
     animation: scaleBackground 20s ease-in-out infinite alternate;
 }
 
+.header {
+    position: relative;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 0;
+    min-height: 40px;
+    flex-shrink: 0;
+
+    h1 {
+        display: none;
+    }
+}
+
 .return-button {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    left: 10px;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
     cursor: pointer;
-    background: none;
-    border: none;
-    font-size: 16px;
-    color: var(--theme-text-muted);
-    z-index: 10;
+    font-size: 1rem;
 }
 
 .return-button:active {
@@ -58,13 +102,14 @@
 .return-button img {
     width: 15px;
     max-width: 15px;
-    filter: brightness(0) invert(1);
+    color: var(--theme-text-hover);
 }
 
 .logo {
-    max-width: 200px;
+    width: 160px;
     height: auto;
-    margin-bottom: 2rem;
+    margin-bottom: 12px;
+    flex-shrink: 0;
 }
 
 .content-wrapper {
@@ -72,8 +117,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 20px;
+    justify-content: flex-start;
+    padding: 16px 20px 16px;
+    min-height: 0;
 }
 
 .signup-form {
@@ -81,7 +127,7 @@
     flex-direction: column;
     width: 100%;
     max-width: 750px;
-    gap: 20px;
+    gap: 10px;
 }
 
 // Two-column layout
@@ -95,7 +141,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 8px;
 }
 
 .form-column-right {
@@ -114,32 +160,36 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
+    gap: 8px;
     max-width: 350px;
-    margin: 20px auto 0;
+    margin: 10px auto 0;
     width: 100%;
 }
 
 .signup-form .field {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
 }
 
 .signup-form label {
     font-weight: 600;
     color: var(--theme-text-primary);
     margin-bottom: 0;
+    font-size: 0.9rem;
+    line-height: 1.2;
 }
 
 .signup-form .label {
     font-weight: 600;
     color: var(--theme-text-primary);
     margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.2;
 }
 
 .signup-form input {
-    padding: 0.5rem;
+    padding: 0.35rem 0.5rem;
     font-family: inherit;
     font-size: 1rem;
     background-color: var(--theme-bg-input);
@@ -200,12 +250,13 @@
 
 .signup-form .error {
     color: var(--theme-error);
-    font-size: 0.875em;
-    margin-top: 4px;
+    font-size: 0.75rem;
+    line-height: 1.15;
+    margin-top: 0;
 }
 
 .btn-primary {
-    padding: 0.5rem 2rem;
+    padding: 0.4rem 2rem;
     background-color: var(--theme-bg-button);
     color: var(--theme-text-tertiary);
     border: 2px solid var(--theme-border-button);
@@ -217,8 +268,9 @@
         box-shadow 0.3s,
         color 0.3s;
     width: 100%;
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 600;
+    line-height: 1.3;
 }
 
 .btn-primary:hover {
@@ -245,8 +297,9 @@
 .login-link {
     text-align: center;
     color: var(--theme-text-muted);
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     margin: 0;
+    line-height: 1.2;
 }
 
 .login-link a {
@@ -265,8 +318,9 @@
 .avatar-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    gap: 6px;
     flex: 1;
+    max-width: 300px;
 }
 
 .avatar-btn {

@@ -33,6 +33,7 @@ export class CombatHandler {
             const playersFighting = [combatStarter, opponent];
 
             if (opponent.isVirtual) {
+                combatStarter.actionPoints = Math.max(0, (combatStarter.actionPoints ?? generalRoom.actionPointsPerTurn) - 1);
                 this.gameCombatService.startVirtualCombat(data.roomId, data.opponentId, socket.id, false);
                 return { success: true };
             }
@@ -42,6 +43,7 @@ export class CombatHandler {
             if (starterStats) starterStats.combats++;
             if (opponentStats) opponentStats.combats++;
 
+            combatStarter.actionPoints = Math.max(0, (combatStarter.actionPoints ?? generalRoom.actionPointsPerTurn) - 1);
             this.gameRoomService.pauseTimer(data.roomId);
             socket.join(combatRoom);
             opponentSocket.join(combatRoom);
@@ -88,6 +90,7 @@ export class CombatHandler {
      */
     handleStartVirtualCombat(data: { roomId: string; playerId: string; opponentId: string }, socket: Socket, server: Server): void {
         try {
+            if (!this.gameRoomService.isPlayerTurn(data.roomId, data.playerId)) return;
             this.gameCombatService.setServer(server);
             this.gameCombatService.startVirtualCombat(data.roomId, data.playerId, data.opponentId, true);
         } catch (error) {

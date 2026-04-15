@@ -4,12 +4,11 @@
 </div>
 } @else {
 <div class="container">
-    <div class="header">
+    <div class="page-header">
         <button class="return-button" routerLink="/home" type="button">
             <img src="./assets/ui/left.png" alt="Back" />
-            {{ 'common.home' | translate }}
+            {{ 'common.back' | translate }}
         </button>
-        <h1>{{ 'profile.title' | translate }}</h1>
     </div>
 
     <div class="content-wrapper">
@@ -46,6 +45,8 @@
                         <small class="error">{{ 'validation.required' | translate }}</small>
                         } @if (form.controls.username.touched && form.controls.username.errors?.['pattern']) {
                         <small class="error">{{ 'validation.username_special' | translate }}</small>
+                        } @if (form.controls.username.touched && form.controls.username.errors?.['bannedUsername']) {
+                        <small class="error">{{ 'validation.username_banned' | translate }}</small>
                         }
                     </div>
 
@@ -70,7 +71,7 @@
                                 [class.premium-locked]="isPremiumLocked(a.id)"
                                 [disabled]="isPremiumLocked(a.id)"
                                 (click)="selectAvatar(a.id)"
-                                [title]="isPremiumLocked(a.id) ? a.label + ' - Disponible en boutique (500 pièces)' : a.label"
+                                [title]="isPremiumLocked(a.id) ? a.label + ' - ' + ('profile.available_in_shop' | translate) : a.label"
                             >
                                 <img [src]="a.image" [alt]="a.label" class="avatar-img" [class.dimmed]="isPremiumLocked(a.id)" />
                                 @if (isPremiumLocked(a.id)) {
@@ -143,6 +144,31 @@
                 </div>
 
                 <div class="form-column-right">
+                    <div class="statistics-section">
+                        <h2 class="section-title">{{ 'profile.statistics' | translate }}</h2>
+                        <div class="statistics-grid">
+                            <div class="stat-card">
+                                <h3 class="stat-label">{{ 'profile.stats.classic' | translate }}</h3>
+                                <p class="stat-value">{{ statistics?.classicGamesPlayed ?? 0 }}</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 class="stat-label">{{ 'profile.stats.ctf' | translate }}</h3>
+                                <p class="stat-value">{{ statistics?.ctfGamesPlayed ?? 0 }}</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 class="stat-label">{{ 'profile.stats.won' | translate }}</h3>
+                                <p class="stat-value">{{ statistics?.totalGamesWon ?? 0 }}</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 class="stat-label">{{ 'profile.stats.avg_time' | translate }}</h3>
+                                <p class="stat-value">
+                                    @if (statistics) {
+                                    {{ formatTime(statistics.averagePlaytimePerGame) }}
+                                    } @else { 0s }
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                     <div class="language-section">
                         <h2 class="section-title">{{ 'profile.language' | translate }}</h2>
                         <div class="language-picker">
@@ -185,32 +211,6 @@
                                 }
                             </button>
                             }
-                        </div>
-                    </div>
-
-                    <div class="statistics-section">
-                        <h2 class="section-title">{{ 'profile.statistics' | translate }}</h2>
-                        <div class="statistics-grid">
-                            <div class="stat-card">
-                                <h3 class="stat-label">{{ 'profile.stats.classic' | translate }}</h3>
-                                <p class="stat-value">{{ statistics?.classicGamesPlayed ?? 0 }}</p>
-                            </div>
-                            <div class="stat-card">
-                                <h3 class="stat-label">{{ 'profile.stats.ctf' | translate }}</h3>
-                                <p class="stat-value">{{ statistics?.ctfGamesPlayed ?? 0 }}</p>
-                            </div>
-                            <div class="stat-card">
-                                <h3 class="stat-label">{{ 'profile.stats.won' | translate }}</h3>
-                                <p class="stat-value">{{ statistics?.totalGamesWon ?? 0 }}</p>
-                            </div>
-                            <div class="stat-card">
-                                <h3 class="stat-label">{{ 'profile.stats.avg_time' | translate }}</h3>
-                                <p class="stat-value">
-                                    @if (statistics) {
-                                    {{ formatTime(statistics.averagePlaytimePerGame) }}
-                                    } @else { 0s }
-                                </p>
-                            </div>
                         </div>
                     </div>
                 </div>

@@ -25,4 +25,5 @@ export interface GameRoom {
     entryFee: number;
     paidPlayerFirebaseUids: string[];
     isFinished?: boolean;
+    actionPointsPerTurn: number;
 }

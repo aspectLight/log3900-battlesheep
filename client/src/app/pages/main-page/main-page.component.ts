@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ACCOUNT_CREATION_AVATARS, PROFILE_AVATARS } from '@app/constants/profile.constants';
 import { AuthService } from '@app/services/communication/auth.service';
+import { AvatarRegistryService } from '@app/services/communication/avatar-registry.service';
 import { ChatService } from '@app/services/communication/chat.service';
 import { CustomChannelService } from '@app/services/communication/custom-channel.service';
 import { ProfileService } from '@app/services/communication/profile.service';
@@ -23,6 +24,7 @@ import { environment } from 'src/environments/environment';
 })
 export class MainPageComponent implements OnInit, OnDestroy {
     private pendingRequestsSub?: Subscription;
+    private profileUpdatedSub?: Subscription;
     @ViewChild('settingsMenu') settingsMenu!: ElementRef;
     readonly title: string = 'Eastern Solace';
     showSettingsMenu = false;
@@ -40,6 +42,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
         private socialService: SocialService,
         private router: Router,
         public currencyService: VirtualCurrencyService,
+        private avatarRegistry: AvatarRegistryService,
     ) {}
 
     get isGameCanceled(): boolean {
@@ -50,6 +53,10 @@ export class MainPageComponent implements OnInit, OnDestroy {
         return this.gameManagerService.isGameFinished;
     }
 
+    get gameCanceledMessageKey(): string {
+        return this.gameManagerService.gameCanceledMessageKey;
+    }
+
     @HostListener('document:click', ['$event'])
     onDocumentClick(event: MouseEvent) {
         if (this.showSettingsMenu && this.settingsMenu && !this.settingsMenu.nativeElement.contains(event.target)) {
@@ -58,11 +65,21 @@ export class MainPageComponent implements OnInit, OnDestroy {
     }
 
     async ngOnInit(): Promise<void> {
+        this.customChannelService.resetState();
+
         this.pendingRequestsSub = this.socialService.pendingRequests$.subscribe((requests) => {
             this.pendingRequestCount = requests.length;
         });
 
+        this.profileUpdatedSub = this.profileService.profileUpdated$.subscribe((profile) => {
+            this.refreshAvatarFromProfile(profile.avatarId ?? null, profile.avatarUrl ?? null);
+        });
+
         const username = this.authService.currentUser?.displayName || 'Utilisateur';
+
+        // Reconnect the socket immediately so the server can cancel the auto-logout timeout
+        // before it fires. The profile fetch below can take a moment and must not delay this.
+        await this.socketService.reconnect();
 
         // Fetch the user profile to get the avatar of the logged-in user
         let avatarId: string | null = null;
@@ -71,27 +88,20 @@ export class MainPageComponent implements OnInit, OnDestroy {
             const profile = await this.profileService.getProfile();
             avatarId = profile.avatarId ?? null;
             avatarUrl = profile.avatarUrl ? `${environment.serverUrl}${profile.avatarUrl}` : null;
-            if (avatarUrl) {
-                this.avatarDisplayUrl = avatarUrl;
-            } else if (avatarId) {
-                const allAvatars = [...PROFILE_AVATARS, ...ACCOUNT_CREATION_AVATARS];
-                const match = allAvatars.find((a) => a.id === avatarId);
-                if (match) this.avatarDisplayUrl = match.image;
-            }
+            this.refreshAvatarFromProfile(avatarId, profile.avatarUrl ?? null);
         } catch {
             // Continue without avatar on error
         }
-
-        // Wait for the socket to be fully reconnected
-        await this.socketService.reconnect();
         // Then, configure listeners and join the chat
         this.chatService.setupListeners();
         this.customChannelService.setupListeners();
         this.socialService.setupListeners();
         this.currencyService.setupListeners();
+        this.avatarRegistry.setupListeners();
         this.chatService.joinGeneralChat(username, avatarId, avatarUrl);
         this.customChannelService.avatarId = avatarId;
         this.customChannelService.avatarUrl = avatarUrl;
+        this.avatarRegistry.setLocal(username, { avatarId, avatarUrl });
 
         // Load pending friend requests after socket is connected
         this.socialService.loadPendingRequests();
@@ -101,10 +111,28 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.pendingRequestsSub?.unsubscribe();
+        this.profileUpdatedSub?.unsubscribe();
+    }
+
+    private refreshAvatarFromProfile(avatarId: string | null, avatarUrlPath: string | null): void {
+        if (avatarUrlPath) {
+            this.avatarDisplayUrl = `${environment.serverUrl}${avatarUrlPath}`;
+            return;
+        }
+        if (avatarId) {
+            const allAvatars = [...PROFILE_AVATARS, ...ACCOUNT_CREATION_AVATARS];
+            const match = allAvatars.find((a) => a.id === avatarId);
+            if (match) {
+                this.avatarDisplayUrl = match.image;
+                return;
+            }
+        }
+        this.avatarDisplayUrl = './assets/ui/profile.png';
     }
 
     understandError() {
         this.gameManagerService.isGameCanceled = false;
+        this.gameManagerService.gameCanceledMessageKey = 'main.game_canceled';
     }
 
     understandMessage() {

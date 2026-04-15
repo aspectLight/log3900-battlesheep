@@ -51,5 +51,7 @@ export class LanguageService {
     private apply(lang: LanguageType): void {
         this.translate.use(lang);
         this.langSubject.next(lang);
+        const electron = (window as unknown as { electron?: { setLanguage?: (lang: string) => void } }).electron;
+        electron?.setLanguage?.(lang);
     }
 }

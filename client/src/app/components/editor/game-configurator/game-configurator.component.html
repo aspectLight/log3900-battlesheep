@@ -1,94 +1,102 @@
-<div class="game-creation-container">
+<div class="page-header">
+    <button class="return-button" (click)="cancel()">
+        <img src="./assets/ui/left.png" />
+        {{ 'common.back' | translate }}
+    </button>
     <h1>{{ 'game_creator.create_new' | translate }}</h1>
+</div>
 
-    <div class="mode-selection">
-        <h2>{{ 'game_creator.game_mode' | translate }}</h2>
-        <div class="mode-selection-buttons">
-            <label>
-                <input type="radio" name="mode" value="classique" (change)="onModeChange('classique')" checked />
-                {{ 'game_creator.classic' | translate }}
-            </label>
-            <label class="ctf-label">
-                <input type="radio" name="mode" value="ctf" (change)="onModeChange('ctf')" />
-                {{ 'game_creator.ctf' | translate }}
-            </label>
-        </div>
-        <span class="mode-description">{{ modeDescriptionKey | translate }}</span>
-    </div>
+<div class="game-creation-container">
 
-    <div class="size-selection">
-        <h2>{{ 'game_creator.board_size' | translate }}</h2>
-        <div class="size-selection-buttons">
-            <label>
-                <input type="radio" name="size" value="petite" (change)="onSizeChange(boardSizes.Petite)" />
-                {{ 'game_creator.small' | translate }}
-            </label>
-            <label>
-                <input type="radio" name="size" value="moyenne" (change)="onSizeChange(boardSizes.Moyenne)" checked />
-                {{ 'game_creator.medium' | translate }}
-            </label>
-            <label>
-                <input type="radio" name="size" value="grande" (change)="onSizeChange(boardSizes.Grande)" />
-                {{ 'game_creator.large' | translate }}
-            </label>
+    <div class="options-grid">
+        <div class="mode-selection">
+            <h2>{{ 'game_creator.game_mode' | translate }}</h2>
+            <div class="mode-selection-buttons">
+                <label>
+                    <input type="radio" name="mode" value="classique" (change)="onModeChange('classique')" checked />
+                    {{ 'game_creator.classic' | translate }}
+                </label>
+                <label class="ctf-label">
+                    <input type="radio" name="mode" value="ctf" (change)="onModeChange('ctf')" />
+                    {{ 'game_creator.ctf' | translate }}
+                </label>
+            </div>
+            <span class="mode-description">{{ modeDescriptionKey | translate }}</span>
         </div>
-        <div class="size-description">
-            <span><strong>{{ 'game_creator.grid' | translate }}</strong>{{ board }}x{{ board }}</span>
-            <span><strong>{{ 'game_creator.players' | translate }}</strong>{{ players }}</span>
-            <span><strong>{{ 'game_creator.items' | translate }}</strong>{{ items }}</span>
-        </div>
-    </div>
 
-    <div class="actions-selection">
-        <h2>{{ 'game_creator.actions_points' | translate }}</h2>
-        <div class="actions-selection-buttons">
-            <label>
-                <input type="radio" name="name" value="petite" (change)="onActionsChange(1)" checked/>
-                1
-            </label>
-            <label>
-                <input type="radio" name="name" value="moyenne" (change)="onActionsChange(2)" />
-                2
-            </label>
-            <label>
-                <input type="radio" name="name" value="grande" (change)="onActionsChange(3)" />
-                3
-            </label>
-            <label>
-                <input type="radio" name="name" value="grande" (change)="onActionsChange(4)" />
-                4
-            </label>
-            <label>
-                <input type="radio" name="name" value="grande" (change)="onActionsChange(5)" />
-                5
-            </label>
+        <div class="actions-selection">
+            <h2>{{ 'game_creator.actions_points' | translate }}</h2>
+            <div class="actions-selection-buttons">
+                <label>
+                    <input type="radio" name="name" value="petite" (change)="onActionsChange(1)" checked/>
+                    1
+                </label>
+                <label>
+                    <input type="radio" name="name" value="moyenne" (change)="onActionsChange(2)" />
+                    2
+                </label>
+                <label>
+                    <input type="radio" name="name" value="grande" (change)="onActionsChange(3)" />
+                    3
+                </label>
+                <label>
+                    <input type="radio" name="name" value="grande" (change)="onActionsChange(4)" />
+                    4
+                </label>
+                <label>
+                    <input type="radio" name="name" value="grande" (change)="onActionsChange(5)" />
+                    5
+                </label>
+            </div>
+            <div class="actions-description">
+                <span class="mode-description">{{ 'game_configurator.actions_desc' | translate }}</span>
+            </div>
         </div>
-        <div class="actions-description">
-            <span class="mode-description">{{ 'game_configurator.actions_desc' | translate }}</span>
-        </div>
-    </div>
 
-    <div class="privacy-selection">
-        <h2>{{ 'game_creator.privacy' | translate }}</h2>
-        <div class="privacy-selection-buttons">
-            <label>
-                <input type="radio" name="privacy" value="public" (change)="onPrivacyChange('public')" checked />
-                {{ 'game_list.public' | translate }}
-            </label>
-            <label>
-                <input type="radio" name="privacy" value="private" (change)="onPrivacyChange('private')" />
-                {{ 'game_list.private' | translate }}
-            </label>
-            <label>
-                <input type="radio" name="privacy" value="protected" (change)="onPrivacyChange('protected')" />
-                {{ 'game_list.private_shared' | translate }}
-            </label>
+        <div class="size-selection">
+            <h2>{{ 'game_creator.board_size' | translate }}</h2>
+            <div class="size-selection-buttons">
+                <label>
+                    <input type="radio" name="size" value="petite" (change)="onSizeChange(boardSizes.Petite)" />
+                    {{ 'game_creator.small' | translate }}
+                </label>
+                <label>
+                    <input type="radio" name="size" value="moyenne" (change)="onSizeChange(boardSizes.Moyenne)" checked />
+                    {{ 'game_creator.medium' | translate }}
+                </label>
+                <label>
+                    <input type="radio" name="size" value="grande" (change)="onSizeChange(boardSizes.Grande)" />
+                    {{ 'game_creator.large' | translate }}
+                </label>
+            </div>
+            <div class="size-description">
+                <span><strong>{{ 'game_creator.grid' | translate }}</strong>{{ board }}x{{ board }}</span>
+                <span><strong>{{ 'game_creator.players' | translate }}</strong>{{ players }}</span>
+                <span><strong>{{ 'game_creator.items' | translate }}</strong>{{ items }}</span>
+            </div>
+        </div>
+
+        <div class="privacy-selection">
+            <h2>{{ 'game_creator.privacy' | translate }}</h2>
+            <div class="privacy-selection-buttons">
+                <label>
+                    <input type="radio" name="privacy" value="public" (change)="onPrivacyChange('public')" checked />
+                    {{ 'game_list.public' | translate }}
+                </label>
+                <label>
+                    <input type="radio" name="privacy" value="private" (change)="onPrivacyChange('private')" />
+                    {{ 'game_list.private' | translate }}
+                </label>
+                <label>
+                    <input type="radio" name="privacy" value="protected" (change)="onPrivacyChange('protected')" />
+                    {{ 'game_list.private_shared' | translate }}
+                </label>
+            </div>
+            <span class="mode-description">{{ privacyDescriptionKey | translate }}</span>
         </div>
     </div>
 
     <div class="actions">
-        <br />
-        <button class="cancel-btn" (click)="cancel()">{{ 'game_creator.cancel' | translate }}</button>
         <button class="create-btn" (click)="createGame()">{{ 'game_creator.create' | translate }}</button>
     </div>
 </div>

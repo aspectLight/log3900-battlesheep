@@ -69,7 +69,7 @@ export class GameController {
     @Post(':id/duplicate')
     async duplicateGame(@Param('id') id: string, @CurrentUser() user: UserDocument, @Res() response: Response) {
         try {
-            await this.gameService.duplicateGame(id, user.username);
+            await this.gameService.duplicateGame(id, user.username, user.language ?? 'fr');
             return response.status(HttpStatus.CREATED).send();
         } catch (error) {
             const status = error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR;

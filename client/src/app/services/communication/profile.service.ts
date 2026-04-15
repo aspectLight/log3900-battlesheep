@@ -5,7 +5,7 @@ import { UpdateProfilePayload, UserProfile, UserStatistics } from '@app/interfac
 import { LanguageService } from '@app/services/state/language.service';
 import { SessionService } from '@app/services/state/session.service';
 import { ThemeService } from '@app/services/state/theme.service';
-import { firstValueFrom } from 'rxjs';
+import { Observable, Subject, firstValueFrom } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -15,10 +15,13 @@ export class ProfileService {
     // In-memory profile cache. Cleared at logout.
     private cachedProfile: UserProfile | null = null;
 
+    private readonly profileUpdatedSubject = new Subject<UserProfile>();
+    readonly profileUpdated$: Observable<UserProfile> = this.profileUpdatedSubject.asObservable();
+
     private readonly profileErrorKeyMap: Record<string, string> = {
-        'Erreur lors de la mise à jour du profil': 'profile.errors.update_profile',
+        'Erreur lors de la mise Ã  jour du profil': 'profile.errors.update_profile',
         'Erreur lors du chargement du profil': 'profile.errors.load_profile',
-        'Utilisateur non authentifié': 'profile.errors.unauthenticated',
+        'Utilisateur non authentifiÃ©': 'profile.errors.unauthenticated',
     };
 
     constructor(
@@ -54,6 +57,7 @@ export class ProfileService {
             this.http.patch<{ message: string; user: UserProfile }>(`${this.apiUrl}/profile`, payload, { headers }),
         );
         this.cachedProfile = response.user;
+        this.profileUpdatedSubject.next(response.user);
         return response.user;
     }
 
@@ -68,6 +72,8 @@ export class ProfileService {
             }),
         );
 
+        this.cachedProfile = response.user;
+        this.profileUpdatedSubject.next(response.user);
         return response.user;
     }
 
@@ -143,6 +149,7 @@ export class ProfileService {
         const headers = await this.getAuthHeaders();
         try {
             await firstValueFrom(this.http.delete(`${this.apiUrl}/account`, { headers }));
+            this.invalidateCache();
             return { success: true };
         } catch (error: unknown) {
             return { success: false, error: this.extractErrorMessage(error) };

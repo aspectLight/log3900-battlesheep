@@ -118,8 +118,9 @@ export class GameRoomGateway implements OnGatewayConnection, OnGatewayDisconnect
     @SubscribeMessage(GameRoomEvents.PlayerMoved)
     async handlePlayerMoved(
         @MessageBody() data: { roomId: string; playerId: string; selectedPath: Coords[] },
+        @ConnectedSocket() socket: Socket,
     ): Promise<{ success: boolean; error?: string; movementPoints?: number }> {
-        return this.movementHandler.handlePlayerMoved(data, this.server);
+        return this.movementHandler.handlePlayerMoved(data, this.server, socket);
     }
 
     @SubscribeMessage(GameRoomEvents.PlayerTeleported)

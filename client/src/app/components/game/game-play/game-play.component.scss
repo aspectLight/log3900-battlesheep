@@ -306,8 +306,11 @@ app-chatbox {
 }
 
 .right-side app-actions-hud {
-    flex: 0 0 auto;
+    flex: 0 0 42%;
     width: 100%;
+    min-height: 0;
+    max-height: 42%;
+    overflow: hidden;
     z-index: 1;
 }
 
