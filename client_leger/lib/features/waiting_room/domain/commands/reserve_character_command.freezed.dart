@@ -20,6 +20,7 @@ mixin _$ReserveCharacterCommand {
   String get roomId => throw _privateConstructorUsedError;
   Character get chosenCharacter => throw _privateConstructorUsedError;
   String get playerId => throw _privateConstructorUsedError;
+  bool get isVirtual => throw _privateConstructorUsedError;
 
   /// Create a copy of ReserveCharacterCommand
   /// with the given fields replaced by the non-null parameter values.
@@ -35,7 +36,12 @@ abstract class $ReserveCharacterCommandCopyWith<$Res> {
     $Res Function(ReserveCharacterCommand) then,
   ) = _$ReserveCharacterCommandCopyWithImpl<$Res, ReserveCharacterCommand>;
   @useResult
-  $Res call({String roomId, Character chosenCharacter, String playerId});
+  $Res call({
+    String roomId,
+    Character chosenCharacter,
+    String playerId,
+    bool isVirtual,
+  });
 }
 
 /// @nodoc
@@ -59,6 +65,7 @@ class _$ReserveCharacterCommandCopyWithImpl<
     Object? roomId = null,
     Object? chosenCharacter = null,
     Object? playerId = null,
+    Object? isVirtual = null,
   }) {
     return _then(
       _value.copyWith(
@@ -74,6 +81,10 @@ class _$ReserveCharacterCommandCopyWithImpl<
                 ? _value.playerId
                 : playerId // ignore: cast_nullable_to_non_nullable
                       as String,
+            isVirtual: null == isVirtual
+                ? _value.isVirtual
+                : isVirtual // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -89,7 +100,12 @@ abstract class _$$ReserveCharacterCommandImplCopyWith<$Res>
   ) = __$$ReserveCharacterCommandImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String roomId, Character chosenCharacter, String playerId});
+  $Res call({
+    String roomId,
+    Character chosenCharacter,
+    String playerId,
+    bool isVirtual,
+  });
 }
 
 /// @nodoc
@@ -113,6 +129,7 @@ class __$$ReserveCharacterCommandImplCopyWithImpl<$Res>
     Object? roomId = null,
     Object? chosenCharacter = null,
     Object? playerId = null,
+    Object? isVirtual = null,
   }) {
     return _then(
       _$ReserveCharacterCommandImpl(
@@ -128,6 +145,10 @@ class __$$ReserveCharacterCommandImplCopyWithImpl<$Res>
             ? _value.playerId
             : playerId // ignore: cast_nullable_to_non_nullable
                   as String,
+        isVirtual: null == isVirtual
+            ? _value.isVirtual
+            : isVirtual // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -140,6 +161,7 @@ class _$ReserveCharacterCommandImpl implements _ReserveCharacterCommand {
     required this.roomId,
     required this.chosenCharacter,
     required this.playerId,
+    this.isVirtual = false,
   });
 
   @override
@@ -148,10 +170,13 @@ class _$ReserveCharacterCommandImpl implements _ReserveCharacterCommand {
   final Character chosenCharacter;
   @override
   final String playerId;
+  @override
+  @JsonKey()
+  final bool isVirtual;
 
   @override
   String toString() {
-    return 'ReserveCharacterCommand(roomId: $roomId, chosenCharacter: $chosenCharacter, playerId: $playerId)';
+    return 'ReserveCharacterCommand(roomId: $roomId, chosenCharacter: $chosenCharacter, playerId: $playerId, isVirtual: $isVirtual)';
   }
 
   @override
@@ -163,12 +188,14 @@ class _$ReserveCharacterCommandImpl implements _ReserveCharacterCommand {
             (identical(other.chosenCharacter, chosenCharacter) ||
                 other.chosenCharacter == chosenCharacter) &&
             (identical(other.playerId, playerId) ||
-                other.playerId == playerId));
+                other.playerId == playerId) &&
+            (identical(other.isVirtual, isVirtual) ||
+                other.isVirtual == isVirtual));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, roomId, chosenCharacter, playerId);
+      Object.hash(runtimeType, roomId, chosenCharacter, playerId, isVirtual);
 
   /// Create a copy of ReserveCharacterCommand
   /// with the given fields replaced by the non-null parameter values.
@@ -187,6 +214,7 @@ abstract class _ReserveCharacterCommand implements ReserveCharacterCommand {
     required final String roomId,
     required final Character chosenCharacter,
     required final String playerId,
+    final bool isVirtual,
   }) = _$ReserveCharacterCommandImpl;
 
   @override
@@ -195,6 +223,8 @@ abstract class _ReserveCharacterCommand implements ReserveCharacterCommand {
   Character get chosenCharacter;
   @override
   String get playerId;
+  @override
+  bool get isVirtual;
 
   /// Create a copy of ReserveCharacterCommand
   /// with the given fields replaced by the non-null parameter values.

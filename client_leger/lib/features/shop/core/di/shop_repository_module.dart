@@ -6,5 +6,6 @@ import '../../data/services/shop_socket.dart';
 void registerShopRepositories(GetIt getIt) {
   getIt.registerLazySingleton<ShopRepository>(
     () => ShopRepository(shopSocket: getIt<ShopSocket>()),
+    dispose: (repository) => repository.dispose(),
   );
 }

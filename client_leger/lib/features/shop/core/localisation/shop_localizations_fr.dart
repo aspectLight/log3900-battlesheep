@@ -45,6 +45,10 @@ class ShopLocalizationsFr extends ShopLocalizations {
   String get shopUnequipped => 'Cosmétique déséquipé.';
 
   @override
+  String get shopBannerPreferenceUpdateFailed =>
+      'Impossible de mettre à jour la bannière. Veuillez réessayer.';
+
+  @override
   String get shopPurchaseFailedTitle => 'Échec de l\'achat';
 
   @override

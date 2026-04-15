@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import '../../../../core/app_transition/app_transition_bus.dart';
 import '../../../../core/connected_scope/session_scope_manager.dart';
 import '../../../../core/services/socket_service.dart';
+import '../../../authentication/core/interfaces/auth_repository.dart';
 import '../../../game_session/core/context/drop_in_join_sync_holder.dart';
 import '../../../../routing/app_navigator.dart';
 import '../../data/services/character_creation_socket.dart';
@@ -46,6 +47,7 @@ void registerCharacterCreationScope(
     CharacterCreationSocket(
       socketService: rootGetIt<SocketService>(),
       dropInJoinSyncHolder: rootGetIt<DropInJoinSyncHolder>(),
+      authRepository: rootGetIt<AuthRepository>(),
     ),
     dispose: (socket) => socket.dispose(),
   );

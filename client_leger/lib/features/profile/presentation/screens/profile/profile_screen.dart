@@ -109,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (state is ProfileStateLoaded) {
       _usernameController.text = state.profile.username;
       _emailController.text = state.profile.email;
-      _viewModel.setSelectedAvatarId(state.profile.avatarId);
+      _viewModel.syncSelectedAvatarIdFromProfile(state.profile.avatarId);
       _viewModel.syncPreferencesFromProfile(state.profile);
       _avatarFileError = null;
       _hasAttemptedSave = false;
@@ -125,7 +125,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
     try {
-      final picked = await _imagePicker.pickImage(source: source);
+      final picked = await _imagePicker.pickImage(
+        source: source,
+        preferredCameraDevice: CameraDevice.front,
+      );
       if (picked == null) return;
       final error = await _validateAvatarFile(picked, l10n);
       if (error != null) {
@@ -395,6 +398,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String selectedAvatarId,
     ShopState shopState,
   ) {
+    final pendingPath = _viewModel.avatarPreviewPath.value;
+    final hasPending = pendingPath != null && pendingPath.isNotEmpty;
+    final hasRemote =
+        (profile.avatarUrl?.trim().isNotEmpty ?? false) && !hasPending;
+    final uploadedAvatarSelected =
+        hasPending || (hasRemote && selectedAvatarId == profile.avatarId);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -426,12 +436,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        _buildAvatarGrid(selectedAvatarId, shopState),
+        _buildAvatarGrid(
+          selectedAvatarId,
+          shopState,
+          suppressGridSelection: uploadedAvatarSelected,
+        ),
         const SizedBox(height: 20),
         _buildAvatarUploadRow(
           l10n,
           profile,
           isSaving || isDeleting || isUploading,
+          isSelected: uploadedAvatarSelected,
         ),
         const SizedBox(height: 24),
         Column(
@@ -503,8 +518,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildAvatarUploadRow(
     ProfileLocalizations l10n,
     ProfileModel profile,
-    bool disabled,
-  ) {
+    bool disabled, {
+    required bool isSelected,
+  }) {
     final pendingPath = _viewModel.avatarPreviewPath.value;
     final hasPending = pendingPath != null && pendingPath.isNotEmpty;
     final hasRemote =
@@ -536,7 +552,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: 56,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFF444444)),
+                border: Border.all(
+                  color: isSelected
+                      ? context.interactionColors.outline
+                      : const Color(0xFF444444),
+                  width: 2,
+                ),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.65),
+                          blurRadius: 8,
+                          spreadRadius: 2,
+                        ),
+                      ]
+                    : null,
               ),
               clipBehavior: Clip.antiAlias,
               child: hasPending
@@ -766,7 +798,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return fallback;
   }
 
-  Widget _buildAvatarGrid(String selectedAvatarId, ShopState shopState) {
+  Widget _buildAvatarGrid(
+    String selectedAvatarId,
+    ShopState shopState, {
+    bool suppressGridSelection = false,
+  }) {
     final scheme = Theme.of(context).colorScheme;
     final outline = context.interactionColors.outline;
     const avatars = AuthAvatar.values;
@@ -778,7 +814,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Row(
           children: rowAvatars.map((AuthAvatar avatar) {
             final id = avatar.id;
-            final isSelected = selectedAvatarId == id;
+            final isSelected = !suppressGridSelection && selectedAvatarId == id;
             final locked = _isProfileAvatarLocked(avatar, shopState);
             final price = _exclusiveAvatarPrice(avatar, shopState);
             return Expanded(

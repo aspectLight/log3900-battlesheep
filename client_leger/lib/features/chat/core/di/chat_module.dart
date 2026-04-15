@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import '../../../../core/connected_scope/session_scope_manager.dart';
 import '../../../../core/di/scoped_projection_subscriptions.dart';
 import '../../../../core/services/socket_service.dart';
+import '../../../authentication/core/interfaces/auth_repository.dart';
 import '../../data/projections/chat_events_projection.dart';
 import '../../data/repositories/discussion_canals_repository.dart';
 import '../../data/repositories/discussion_canals_socket.dart';
@@ -22,6 +23,7 @@ void registerChatRoot(GetIt getIt) {
     () => DiscussionCanalsSocket(
       socketService: getIt<SocketService>(),
       username: getIt<SessionScopeManager>().currentSession!.username,
+      authRepository: getIt<AuthRepository>(),
     ),
   );
   registerChatReducer(getIt);

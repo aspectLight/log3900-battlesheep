@@ -33,6 +33,7 @@ class ProfileRepository {
                     .fetchProfileStatistics();
                 final profile = ProfileModel(
                   id: profileDto.id,
+                  firebaseUid: profileDto.firebaseUid,
                   username: profileDto.username,
                   email: profileDto.email,
                   avatarId: profileDto.avatarId,
@@ -104,6 +105,7 @@ class ProfileRepository {
         );
         final model = ProfileModel(
           id: updatedDto.id,
+          firebaseUid: updatedDto.firebaseUid,
           username: updatedDto.username,
           email: updatedDto.email,
           avatarId: updatedDto.avatarId,
@@ -144,6 +146,7 @@ class ProfileRepository {
         final dto = await _httpProfileService.uploadAvatar(filePath);
         final model = ProfileModel(
           id: dto.id,
+          firebaseUid: dto.firebaseUid,
           username: dto.username,
           email: dto.email,
           avatarId: dto.avatarId,
