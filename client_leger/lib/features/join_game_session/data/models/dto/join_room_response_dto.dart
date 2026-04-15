@@ -39,6 +39,7 @@ class JoinRoomPlayerDto {
     required this.isVirtual,
     this.virtualType,
     required this.stats,
+    this.activeBanner,
   });
 
   final String id;
@@ -53,6 +54,7 @@ class JoinRoomPlayerDto {
   @VirtualPlayerTypeConverter()
   final VirtualPlayerType? virtualType;
   final JoinRoomPlayerStatsDto stats;
+  final String? activeBanner;
 
   factory JoinRoomPlayerDto.fromJson(Map<String, dynamic> json) =>
       _$JoinRoomPlayerDtoFromJson(json);
@@ -84,11 +86,7 @@ class JoinRoomDto {
 
 @JsonSerializable(explicitToJson: true)
 class JoinRoomResponseDto {
-  const JoinRoomResponseDto({
-    required this.success,
-    this.error,
-    this.room,
-  });
+  const JoinRoomResponseDto({required this.success, this.error, this.room});
 
   final bool success;
   final String? error;

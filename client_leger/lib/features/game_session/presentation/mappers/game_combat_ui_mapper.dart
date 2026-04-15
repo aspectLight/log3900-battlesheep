@@ -74,8 +74,7 @@ GameCombatActive _buildActive(GameCombatState combatState, CombatContext ctx) {
     isCombatInitiator: ctx.isInitiator,
     showResults: combatState is CombatWithResult,
     isAttackSuccess: attackSuccess,
-    showFlightAttemptResult:
-        flightAttemptSuccessOpt.isSome(),
+    showFlightAttemptResult: flightAttemptSuccessOpt.isSome(),
     isFlightAttemptSuccess: flightAttemptSuccessOpt.getOrElse(() => false),
     canAttack: ctx.isPlayerTurn,
     canFlee: canFlee,

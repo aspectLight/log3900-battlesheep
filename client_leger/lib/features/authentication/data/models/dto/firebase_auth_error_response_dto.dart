@@ -23,4 +23,3 @@ class FirebaseAuthErrorDetailDto {
   factory FirebaseAuthErrorDetailDto.fromJson(Map<String, dynamic> json) =>
       _$FirebaseAuthErrorDetailDtoFromJson(json);
 }
-

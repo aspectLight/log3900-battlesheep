@@ -4,8 +4,8 @@ class WaitingRoomConfirmUnlockNotificationViewModel {
   WaitingRoomConfirmUnlockNotificationViewModel({
     required WaitingRoomConfirmUnlockNotificationIntent intent,
     required void Function() onDismiss,
-  })  : _intent = intent,
-        _onDismiss = onDismiss;
+  }) : _intent = intent,
+       _onDismiss = onDismiss;
 
   final WaitingRoomConfirmUnlockNotificationIntent _intent;
   final void Function() _onDismiss;

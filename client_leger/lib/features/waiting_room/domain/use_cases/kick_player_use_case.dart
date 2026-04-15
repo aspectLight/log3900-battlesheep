@@ -3,9 +3,8 @@ import '../commands/kick_player_command.dart';
 import '../../data/repositories/waiting_room_room_repository.dart';
 
 class KickPlayerUseCase {
-  KickPlayerUseCase({
-    required WaitingRoomRoomRepository roomRepository,
-  }) : _roomRepository = roomRepository;
+  KickPlayerUseCase({required WaitingRoomRoomRepository roomRepository})
+    : _roomRepository = roomRepository;
 
   final WaitingRoomRoomRepository _roomRepository;
 

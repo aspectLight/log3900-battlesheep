@@ -17,9 +17,7 @@ BoardCharacterOrientation orientationFromStep(
   return BoardCharacterOrientation.down;
 }
 
-BoardCharacterOrientation orientationFromPath(
-  List<GameBoardPosition> path,
-) {
+BoardCharacterOrientation orientationFromPath(List<GameBoardPosition> path) {
   if (path.length < 2) return BoardCharacterOrientation.down;
   return orientationFromStep(path[path.length - 2], path[path.length - 1]);
 }
@@ -49,37 +47,25 @@ GameBoardCellPathDirections pathDirectionsForCell(
         () => false,
         (GameBoardPosition p) => p.x == x - 1,
       ) ||
-      nextPosition.fold(
-        () => false,
-        (GameBoardPosition p) => p.x == x - 1,
-      );
+      nextPosition.fold(() => false, (GameBoardPosition p) => p.x == x - 1);
   final hasDown =
       previousPosition.fold(
         () => false,
         (GameBoardPosition p) => p.x == x + 1,
       ) ||
-      nextPosition.fold(
-        () => false,
-        (GameBoardPosition p) => p.x == x + 1,
-      );
+      nextPosition.fold(() => false, (GameBoardPosition p) => p.x == x + 1);
   final hasLeft =
       previousPosition.fold(
         () => false,
         (GameBoardPosition p) => p.y == y - 1,
       ) ||
-      nextPosition.fold(
-        () => false,
-        (GameBoardPosition p) => p.y == y - 1,
-      );
+      nextPosition.fold(() => false, (GameBoardPosition p) => p.y == y - 1);
   final hasRight =
       previousPosition.fold(
         () => false,
         (GameBoardPosition p) => p.y == y + 1,
       ) ||
-      nextPosition.fold(
-        () => false,
-        (GameBoardPosition p) => p.y == y + 1,
-      );
+      nextPosition.fold(() => false, (GameBoardPosition p) => p.y == y + 1);
   return GameBoardCellPathDirections(
     up: hasUp,
     down: hasDown,

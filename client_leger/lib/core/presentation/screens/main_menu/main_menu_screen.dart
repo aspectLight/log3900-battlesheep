@@ -7,8 +7,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/localisation/core_localizations.dart';
-import '../../../../../routing/app_navigator.dart';
-import '../../../../../routing/navigation_command.dart';
+import '../../../../../core/presentation/shell/shell_chrome_back_handler.dart';
 import '../../../constants/ui_assets.dart';
 import '../../widgets/app_background/app_background.dart';
 import 'main_menu_view_model.dart';
@@ -24,31 +23,14 @@ class MainMenuScreen extends StatefulWidget {
 class _MainMenuScreenState extends State<MainMenuScreen>
     with AutoRouteAwareStateMixin<MainMenuScreen> {
   late final MainMenuViewModel _viewModel;
-  late final AppNavigator _appNavigator;
-  bool _showSettings = false;
 
   @override
   void initState() {
     super.initState();
     _viewModel = GetIt.I<MainMenuViewModel>();
-    _appNavigator = GetIt.I<AppNavigator>();
+    GetIt.I<ShellChromeBackHandler>().clear();
     unawaited(_viewModel.loadPendingRequests());
     unawaited(_viewModel.checkTutorialStatus());
-  }
-
-  void _openSettings() {
-    if (_showSettings) return;
-    setState(() => _showSettings = true);
-  }
-
-  void _closeSettings() {
-    if (!_showSettings) return;
-    setState(() => _showSettings = false);
-  }
-
-  @override
-  void didPushNext() {
-    _closeSettings();
   }
 
   @override
@@ -77,7 +59,6 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                         _buildMenuButton(
                           label: CoreLocalizations.of(context)!.joinGame,
                           onPressed: () {
-                            _closeSettings();
                             _viewModel.joinGame();
                           },
                         ),
@@ -85,7 +66,6 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                         _buildMenuButton(
                           label: CoreLocalizations.of(context)!.createGame,
                           onPressed: () {
-                            _closeSettings();
                             _viewModel.administerGames();
                           },
                         ),
@@ -118,8 +98,14 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                             },
                           ),
                           onPressed: () {
-                            _closeSettings();
                             _viewModel.administerFriends();
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        _buildMenuButton(
+                          label: CoreLocalizations.of(context)!.shop,
+                          onPressed: () {
+                            _viewModel.openShop();
                           },
                         ),
                       ],
@@ -150,91 +136,6 @@ class _MainMenuScreenState extends State<MainMenuScreen>
               ),
             ],
           ),
-          Positioned(
-            top: 20,
-            right: 20,
-            child: SafeArea(
-              child: GestureDetector(
-                onTap: () {
-                  if (_showSettings) {
-                    _closeSettings();
-                    return;
-                  }
-                  _openSettings();
-                },
-                child: Image.asset(
-                  UiAssets.settingsGear,
-                  width: 50,
-                  height: 50,
-                ),
-              ),
-            ),
-          ),
-          if (_showSettings)
-            Positioned(
-              top: 85,
-              right: 20,
-              child: SafeArea(
-                child: TapRegion(
-                  onTapOutside: (_) => _closeSettings(),
-                  child: Material(
-                    color: Colors.transparent,
-                    elevation: 15,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      width: 220,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: context.interactionColors.outline,
-                          width: 1.5,
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _buildSettingsOption(
-                            label: CoreLocalizations.of(context)!.profile,
-                            onTap: () {
-                              _closeSettings();
-                              _viewModel.openProfile();
-                            },
-                          ),
-                          const Divider(height: 1),
-                          _buildSettingsOption(
-                            label: CoreLocalizations.of(context)!.signOut,
-                            onTap: () {
-                              _closeSettings();
-                              unawaited(_viewModel.signOut());
-                              _appNavigator.request(GoToAuth());
-                            },
-                          ),
-                          const Divider(height: 1),
-                          _buildSettingsOption(
-                            label: CoreLocalizations.of(
-                              context,
-                            )!.connectionHistory,
-                            onTap: () {
-                              _closeSettings();
-                              _viewModel.openConnectionHistory();
-                            },
-                          ),
-                          const Divider(height: 1),
-                          _buildSettingsOption(
-                            label: CoreLocalizations.of(context)!.gameHistory,
-                            onTap: () {
-                              _closeSettings();
-                              _viewModel.openGameHistory();
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
     );
@@ -298,35 +199,6 @@ class _MainMenuScreenState extends State<MainMenuScreen>
           ),
           Positioned(top: 4, right: 60, child: badge),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSettingsOption({
-    required String label,
-    required VoidCallback? onTap,
-  }) {
-    final scheme = Theme.of(context).colorScheme;
-    return InkWell(
-      onTap: onTap,
-      splashColor: scheme.primary.withValues(alpha: 0.25),
-      highlightColor: scheme.primary.withValues(alpha: 0.12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: onTap == null ? Colors.grey : scheme.onSurface,
-                  fontFamily: 'CustomFont',
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

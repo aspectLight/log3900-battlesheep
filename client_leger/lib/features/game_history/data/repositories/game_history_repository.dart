@@ -9,7 +9,7 @@ import '../services/http_game_history_service.dart';
 
 class GameHistoryRepository {
   GameHistoryRepository(this._service)
-      : state = signal<GameHistoryState>(const GameHistoryState.idle());
+    : state = signal<GameHistoryState>(const GameHistoryState.idle());
 
   final HttpGameHistoryService _service;
   final Signal<GameHistoryState> state;

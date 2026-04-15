@@ -15,12 +15,15 @@
   "joinGameRoomListMode": "Mode",
   "joinGameRoomListAccessibility": "Accessibility",
   "joinGameRoomListCode": "Code",
+  "joinGameRoomListPrice": "Price",
   "joinGameStatusWaiting": "Waiting",
   "joinGameStatusPlaying": "Playing",
   "joinGameModeDropIn": "Drop-in",
   "joinGameAccessibilityOpen": "Open",
   "joinGameAccessibilityFull": "Full",
+  "joinGamePriceFree": "Free",
   "waitingRoomRoomNotFound": "Game not found",
   "waitingRoomRoomLocked": "Game is locked",
-  "joinGameMaxPlayerLimitReached": "Maximum player limit reached"
+  "joinGameMaxPlayerLimitReached": "Maximum player limit reached",
+  "joinGameInsufficientBalance": "Insufficient balance to join this game"
 }

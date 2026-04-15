@@ -3,7 +3,7 @@ import '../models/available_room_model.dart';
 
 class GetAvailableRoomsUseCase {
   GetAvailableRoomsUseCase({required JoinGameSessionRepository repository})
-      : _repository = repository;
+    : _repository = repository;
 
   final JoinGameSessionRepository _repository;
 

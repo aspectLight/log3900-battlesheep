@@ -42,7 +42,9 @@ class GamePlayerCardsHudCardPainter extends CustomPainter {
 
     var colors = [const Color(0xFFD4AF37), const Color(0xFF8B0000)];
 
-    final isTeamUsa = team.map((t) => t == GameTeamConstants.teamUsa).orElse(false);
+    final isTeamUsa = team
+        .map((t) => t == GameTeamConstants.teamUsa)
+        .orElse(false);
     if (isTeamUsa) {
       colors = [Colors.white, const Color(0xFF0000FF)];
     }

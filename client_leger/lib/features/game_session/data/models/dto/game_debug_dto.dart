@@ -19,7 +19,6 @@ class DebugModeEnabledDto {
 
   factory DebugModeEnabledDto.fromObject(dynamic _) =>
       const DebugModeEnabledDto();
-
 }
 
 class DebugModeDisabledDto {
@@ -27,5 +26,4 @@ class DebugModeDisabledDto {
 
   factory DebugModeDisabledDto.fromObject(dynamic _) =>
       const DebugModeDisabledDto();
-
 }

@@ -8,7 +8,7 @@ import '../services/join_game_session_socket.dart';
 
 class JoinGameSessionRepository {
   JoinGameSessionRepository({required JoinGameSessionSocket socket})
-      : _socket = socket;
+    : _socket = socket;
 
   final JoinGameSessionSocket _socket;
 

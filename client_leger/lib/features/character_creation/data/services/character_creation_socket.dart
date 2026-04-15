@@ -26,8 +26,8 @@ class CharacterCreationSocket {
   CharacterCreationSocket({
     required SocketService socketService,
     required DropInJoinSyncHolder dropInJoinSyncHolder,
-  })  : _socketService = socketService,
-        _dropInJoinSyncHolder = dropInJoinSyncHolder {
+  }) : _socketService = socketService,
+       _dropInJoinSyncHolder = dropInJoinSyncHolder {
     _setupListeners();
   }
 
@@ -42,8 +42,8 @@ class CharacterCreationSocket {
       ReplayLatestBroadcastController<UpdateCharacterReservedPayloadDto>();
   int _reservedUpdateSeq = 0;
 
-  Stream<UpdateCharacterReservedPayloadDto> get reservedCharactersPayloadStream =>
-      _reservedCharactersController.stream;
+  Stream<UpdateCharacterReservedPayloadDto>
+  get reservedCharactersPayloadStream => _reservedCharactersController.stream;
 
   Stream<void> get roomLockedStream => _socketService
       .on(CharacterCreationSocketEvents.waitingRoomLocked)

@@ -39,3 +39,12 @@ class SynchronizeMovementCommand with _$SynchronizeMovementCommand {
     required GameBoardPosition destination,
   }) = _SynchronizeMovementCommand;
 }
+
+@freezed
+class TrapChoiceCommand with _$TrapChoiceCommand {
+  const factory TrapChoiceCommand({
+    required String roomId,
+    required String playerId,
+    required String choice,
+  }) = _TrapChoiceCommand;
+}

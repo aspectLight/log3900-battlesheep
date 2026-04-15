@@ -8,8 +8,7 @@ class CharacterCreationFormValidator {
   static const int d4 = CharacterCreationConstants.d4Value;
   static const int d6 = CharacterCreationConstants.d6Value;
 
-  static bool isValidDiceValue(int value) =>
-      value == d4 || value == d6;
+  static bool isValidDiceValue(int value) => value == d4 || value == d6;
 
   static List<CharacterCreationValidationError> validateAll(
     CharacterCreationForm form,

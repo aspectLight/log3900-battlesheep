@@ -10,9 +10,9 @@ class GameDeletedNotificationWidget extends StatelessWidget {
     required WaitingRoomDeletedNotificationIntent intent,
     required VoidCallback onDismiss,
   }) : _viewModel = GameDeletedNotificationViewModel(
-          intent: intent,
-          onDismiss: onDismiss,
-        );
+         intent: intent,
+         onDismiss: onDismiss,
+       );
 
   final GameDeletedNotificationViewModel _viewModel;
 
@@ -55,7 +55,10 @@ class GameDeletedNotificationWidget extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _GameButton(label: l10n.ok, onTap: _viewModel.handleDismiss),
+                    _GameButton(
+                      label: l10n.ok,
+                      onTap: _viewModel.handleDismiss,
+                    ),
                   ],
                 ),
               ],

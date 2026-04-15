@@ -6,7 +6,6 @@ part 'session_commands.freezed.dart';
 
 @freezed
 class SetSessionStateCommand with _$SetSessionStateCommand {
-  const factory SetSessionStateCommand({
-    required SessionState sessionState,
-  }) = _SetSessionStateCommand;
+  const factory SetSessionStateCommand({required SessionState sessionState}) =
+      _SetSessionStateCommand;
 }

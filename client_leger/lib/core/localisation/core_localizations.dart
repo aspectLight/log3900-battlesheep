@@ -350,6 +350,12 @@ abstract class CoreLocalizations {
   /// **'Loading...'**
   String get loading;
 
+  /// No description provided for @shop.
+  ///
+  /// In en, this message translates to:
+  /// **'Shop'**
+  String get shop;
+
   /// No description provided for @discussionCanals.
   ///
   /// In en, this message translates to:

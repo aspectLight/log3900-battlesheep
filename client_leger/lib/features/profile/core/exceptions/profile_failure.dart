@@ -1,26 +1,62 @@
 sealed class ProfileFailure implements Exception {
-  final String devMessage;
-
   const ProfileFailure(this.devMessage);
+
+  final String devMessage;
 
   @override
   String toString() => devMessage;
 }
 
 class NetworkProfileFailure extends ProfileFailure {
-  const NetworkProfileFailure() : super('Network error while loading profile');
+  const NetworkProfileFailure() : super('Network connection problem');
 }
 
 class UnauthorizedProfileFailure extends ProfileFailure {
-  const UnauthorizedProfileFailure()
-      : super('Unauthorized when accessing profile');
+  const UnauthorizedProfileFailure() : super('Unauthorized');
 }
 
-class ValidationProfileFailure extends ProfileFailure {
-  const ValidationProfileFailure() : super('Profile validation failed');
+class BadRequestProfileFailure extends ProfileFailure {
+  const BadRequestProfileFailure() : super('Bad request');
+}
+
+class ForbiddenProfileFailure extends ProfileFailure {
+  const ForbiddenProfileFailure() : super('Forbidden');
+}
+
+class NotFoundProfileFailure extends ProfileFailure {
+  const NotFoundProfileFailure() : super('Not found');
+}
+
+class UsernameAlreadyInUseProfileFailure extends ProfileFailure {
+  const UsernameAlreadyInUseProfileFailure() : super('Username already in use');
+}
+
+class EmailAlreadyInUseProfileFailure extends ProfileFailure {
+  const EmailAlreadyInUseProfileFailure() : super('Email already in use');
+}
+
+class ServerProfileFailure extends ProfileFailure {
+  final int? statusCode;
+
+  const ServerProfileFailure({
+    this.statusCode,
+    String devMessage = 'Server error',
+  }) : super(devMessage);
+}
+
+class NoChangesProfileFailure extends ProfileFailure {
+  const NoChangesProfileFailure() : super('No profile changes');
+}
+
+class AvatarFileTooLargeProfileFailure extends ProfileFailure {
+  const AvatarFileTooLargeProfileFailure() : super('Avatar file too large');
+}
+
+class AvatarInvalidFileTypeProfileFailure extends ProfileFailure {
+  const AvatarInvalidFileTypeProfileFailure()
+    : super('Invalid avatar file type');
 }
 
 class UnknownProfileFailure extends ProfileFailure {
-  const UnknownProfileFailure() : super('Unknown profile error');
+  const UnknownProfileFailure([super.devMessage = 'Unknown profile error']);
 }
-

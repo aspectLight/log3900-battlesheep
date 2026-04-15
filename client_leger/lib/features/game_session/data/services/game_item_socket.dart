@@ -41,14 +41,12 @@ class GameItemSocket {
     GameItemSocketEvents.flagCollected,
   ];
 
-
   void itemDropped(ItemDroppedCommand command) {
     _socketService.emit(
       GameItemSocketEvents.itemDropped,
       command.toDto().toJson(),
     );
   }
-
 
   void itemCollected(ItemCollectedCommand command) {
     _socketService.emit(
@@ -57,18 +55,14 @@ class GameItemSocket {
     );
   }
 
-
   Stream<ItemDroppedEvent> get itemDroppedStream =>
       _itemDroppedController.stream;
-
 
   Stream<ItemCollectedEvent> get itemCollectedStream =>
       _itemCollectedController.stream;
 
-
   Stream<ItemDroppedDisconnectedEvent> get itemDroppedDisconnectedStream =>
       _itemDroppedDisconnectedController.stream;
-
 
   Stream<FlagCollectedEvent> get flagCollectedStream =>
       _flagCollectedController.stream;
@@ -116,7 +110,6 @@ class GameItemSocket {
     }
     _eventSubscriptions.clear();
   }
-
 
   Future<void> dispose() async {
     await _connectionSubscription?.cancel();

@@ -7,6 +7,8 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/localisation/core_localizations.dart';
+import '../../../../../core/presentation/shell/shell_chrome_back_handler.dart';
+import '../../../../../core/presentation/shell/shell_chrome_metrics.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
 import '../widgets/friends_tab_bar.dart';
 import '../widgets/user_card.dart';
@@ -36,11 +38,13 @@ class _FriendsScreenState extends State<FriendsScreen> {
   void initState() {
     super.initState();
     _viewModel = GetIt.I<FriendsViewModel>();
+    GetIt.I<ShellChromeBackHandler>().register(_viewModel.requestLeave);
     unawaited(_viewModel.loadAll());
   }
 
   @override
   void dispose() {
+    GetIt.I<ShellChromeBackHandler>().clear();
     _searchController.dispose();
     _debounce?.cancel();
     super.dispose();
@@ -57,13 +61,12 @@ class _FriendsScreenState extends State<FriendsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = CoreLocalizations.of(context)!;
+    final topInset = shellChromeBodyTopInset(context);
     return AppBackground(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.fromLTRB(20, topInset + 20, 20, 20),
         child: Column(
           children: [
-            _buildHeader(l10n),
-            const SizedBox(height: 12),
             Watch((context) {
               final err = _viewModel.errorMessage.value;
               if (err == null) return const SizedBox.shrink();
@@ -81,63 +84,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
             Expanded(child: Watch((context) => _buildTabContent(l10n))),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(CoreLocalizations l10n) {
-    return SizedBox(
-      width: double.infinity,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: GestureDetector(
-              onTap: _viewModel.requestLeave,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.chevron_left,
-                      color: Colors.white,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 18),
-                    Text(
-                      l10n.homePage,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'CustomFont',
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Text(
-            l10n.friends,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 44,
-              fontFamily: 'CustomFont',
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
-              shadows: [
-                Shadow(
-                  color: Color(0x99000000),
-                  offset: Offset(0, 3),
-                  blurRadius: 12,
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -182,6 +128,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
         return UserCard(
           username: f.username,
           avatarId: f.avatarId,
+          avatarUrl: f.avatarUrl,
           isOnline: f.isOnline,
           actions: [
             FriendActionButton(
@@ -290,6 +237,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                 return UserCard(
                   username: u.username,
                   avatarId: u.avatarId,
+                  avatarUrl: u.avatarUrl,
                   isOnline: u.isOnline,
                   actions: isBlocked
                       ? [

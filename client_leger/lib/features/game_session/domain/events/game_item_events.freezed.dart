@@ -477,6 +477,8 @@ abstract class _ItemDroppedDisconnectedEvent
 mixin _$ItemCollectedEvent {
   String get playerId => throw _privateConstructorUsedError;
   GameItem get item => throw _privateConstructorUsedError;
+  GameBoardPosition? get position => throw _privateConstructorUsedError;
+  bool get inventoryFull => throw _privateConstructorUsedError;
 
   /// Create a copy of ItemCollectedEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -492,9 +494,15 @@ abstract class $ItemCollectedEventCopyWith<$Res> {
     $Res Function(ItemCollectedEvent) then,
   ) = _$ItemCollectedEventCopyWithImpl<$Res, ItemCollectedEvent>;
   @useResult
-  $Res call({String playerId, GameItem item});
+  $Res call({
+    String playerId,
+    GameItem item,
+    GameBoardPosition? position,
+    bool inventoryFull,
+  });
 
   $GameItemCopyWith<$Res> get item;
+  $GameBoardPositionCopyWith<$Res>? get position;
 }
 
 /// @nodoc
@@ -511,7 +519,12 @@ class _$ItemCollectedEventCopyWithImpl<$Res, $Val extends ItemCollectedEvent>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? playerId = null, Object? item = null}) {
+  $Res call({
+    Object? playerId = null,
+    Object? item = null,
+    Object? position = freezed,
+    Object? inventoryFull = null,
+  }) {
     return _then(
       _value.copyWith(
             playerId: null == playerId
@@ -522,6 +535,14 @@ class _$ItemCollectedEventCopyWithImpl<$Res, $Val extends ItemCollectedEvent>
                 ? _value.item
                 : item // ignore: cast_nullable_to_non_nullable
                       as GameItem,
+            position: freezed == position
+                ? _value.position
+                : position // ignore: cast_nullable_to_non_nullable
+                      as GameBoardPosition?,
+            inventoryFull: null == inventoryFull
+                ? _value.inventoryFull
+                : inventoryFull // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -536,6 +557,20 @@ class _$ItemCollectedEventCopyWithImpl<$Res, $Val extends ItemCollectedEvent>
       return _then(_value.copyWith(item: value) as $Val);
     });
   }
+
+  /// Create a copy of ItemCollectedEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GameBoardPositionCopyWith<$Res>? get position {
+    if (_value.position == null) {
+      return null;
+    }
+
+    return $GameBoardPositionCopyWith<$Res>(_value.position!, (value) {
+      return _then(_value.copyWith(position: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -547,10 +582,17 @@ abstract class _$$ItemCollectedEventImplCopyWith<$Res>
   ) = __$$ItemCollectedEventImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String playerId, GameItem item});
+  $Res call({
+    String playerId,
+    GameItem item,
+    GameBoardPosition? position,
+    bool inventoryFull,
+  });
 
   @override
   $GameItemCopyWith<$Res> get item;
+  @override
+  $GameBoardPositionCopyWith<$Res>? get position;
 }
 
 /// @nodoc
@@ -566,7 +608,12 @@ class __$$ItemCollectedEventImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? playerId = null, Object? item = null}) {
+  $Res call({
+    Object? playerId = null,
+    Object? item = null,
+    Object? position = freezed,
+    Object? inventoryFull = null,
+  }) {
     return _then(
       _$ItemCollectedEventImpl(
         playerId: null == playerId
@@ -577,6 +624,14 @@ class __$$ItemCollectedEventImplCopyWithImpl<$Res>
             ? _value.item
             : item // ignore: cast_nullable_to_non_nullable
                   as GameItem,
+        position: freezed == position
+            ? _value.position
+            : position // ignore: cast_nullable_to_non_nullable
+                  as GameBoardPosition?,
+        inventoryFull: null == inventoryFull
+            ? _value.inventoryFull
+            : inventoryFull // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -585,16 +640,26 @@ class __$$ItemCollectedEventImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$ItemCollectedEventImpl implements _ItemCollectedEvent {
-  const _$ItemCollectedEventImpl({required this.playerId, required this.item});
+  const _$ItemCollectedEventImpl({
+    required this.playerId,
+    required this.item,
+    this.position,
+    this.inventoryFull = false,
+  });
 
   @override
   final String playerId;
   @override
   final GameItem item;
+  @override
+  final GameBoardPosition? position;
+  @override
+  @JsonKey()
+  final bool inventoryFull;
 
   @override
   String toString() {
-    return 'ItemCollectedEvent(playerId: $playerId, item: $item)';
+    return 'ItemCollectedEvent(playerId: $playerId, item: $item, position: $position, inventoryFull: $inventoryFull)';
   }
 
   @override
@@ -604,11 +669,16 @@ class _$ItemCollectedEventImpl implements _ItemCollectedEvent {
             other is _$ItemCollectedEventImpl &&
             (identical(other.playerId, playerId) ||
                 other.playerId == playerId) &&
-            (identical(other.item, item) || other.item == item));
+            (identical(other.item, item) || other.item == item) &&
+            (identical(other.position, position) ||
+                other.position == position) &&
+            (identical(other.inventoryFull, inventoryFull) ||
+                other.inventoryFull == inventoryFull));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, playerId, item);
+  int get hashCode =>
+      Object.hash(runtimeType, playerId, item, position, inventoryFull);
 
   /// Create a copy of ItemCollectedEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -626,12 +696,18 @@ abstract class _ItemCollectedEvent implements ItemCollectedEvent {
   const factory _ItemCollectedEvent({
     required final String playerId,
     required final GameItem item,
+    final GameBoardPosition? position,
+    final bool inventoryFull,
   }) = _$ItemCollectedEventImpl;
 
   @override
   String get playerId;
   @override
   GameItem get item;
+  @override
+  GameBoardPosition? get position;
+  @override
+  bool get inventoryFull;
 
   /// Create a copy of ItemCollectedEvent
   /// with the given fields replaced by the non-null parameter values.

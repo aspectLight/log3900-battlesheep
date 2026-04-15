@@ -13,6 +13,7 @@ import '../features/game_session/presentation/screens/game_screen/game_screen.da
 import '../features/join_game_session/presentation/screens/join_game_session/join_game_session_screen.dart';
 import '../features/logs_history/presentation/screens/logs_history/logs_history_screen.dart';
 import '../features/profile/presentation/screens/profile/profile_screen.dart';
+import '../features/shop/presentation/screens/shop/shop_screen.dart';
 import '../features/select_game_session/presentation/screens/select_game_session/select_game_session_screen.dart';
 import '../features/statistics/presentation/screens/statistics_screen/statistics_screen.dart';
 import '../features/tutorial/presentation/screens/tutorial_screen.dart';
@@ -104,6 +105,11 @@ class AppRouter extends RootStackRouter {
         CustomRoute(
           page: ProfileRoute.page,
           path: 'profile',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+        ),
+        CustomRoute(
+          page: ShopRoute.page,
+          path: 'shop',
           transitionsBuilder: TransitionsBuilders.fadeIn,
         ),
         CustomRoute(

@@ -5,10 +5,6 @@ import '../../data/services/http_profile_service.dart';
 
 void registerProfileRepositories(GetIt getIt) {
   getIt.registerLazySingleton<ProfileRepository>(
-    () => ProfileRepository(
-      httpProfileService: getIt<HttpProfileService>(),
-    ),
+    () => ProfileRepository(httpProfileService: getIt<HttpProfileService>()),
   );
 }
-
-

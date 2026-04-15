@@ -17,8 +17,7 @@ sealed class JoinGameSessionEntryAppEvent
 sealed class JoinGameSessionCompletedAppEvent
     with _$JoinGameSessionCompletedAppEvent
     implements AppTransitionEvent {
-  const factory JoinGameSessionCompletedAppEvent.ready() =
-      JoinGameSessionReady;
+  const factory JoinGameSessionCompletedAppEvent.ready() = JoinGameSessionReady;
 }
 
 @freezed

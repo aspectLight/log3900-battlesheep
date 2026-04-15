@@ -1,6 +1,5 @@
 import 'package:get_it/get_it.dart';
 
-import '../../features/authentication/core/interfaces/auth_repository.dart';
 import '../../features/friends/domain/interfaces/friends_repository.dart';
 import '../../features/tutorial/core/coordinators/tutorial_coordinator.dart';
 import '../app_transition/app_transition_bus.dart';
@@ -13,7 +12,6 @@ void registerViewModels(GetIt getIt) {
   );
   getIt.registerFactory<MainMenuViewModel>(
     () => MainMenuViewModel(
-      authRepository: getIt<AuthRepository>(),
       appTransitionEventBus: getIt<AppTransitionEventBus>(),
       friendsRepository: getIt<FriendsRepository>(),
       tutorialCoordinator: getIt<TutorialCoordinator>(),

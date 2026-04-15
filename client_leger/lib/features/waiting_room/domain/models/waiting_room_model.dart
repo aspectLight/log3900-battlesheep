@@ -12,15 +12,11 @@ class WaitingRoomModel with _$WaitingRoomModel {
     required List<WaitingRoomPlayerModel> players,
     @Default(false) bool isLocked,
     @Default(false) bool dropInDropOut,
+    @Default(0) int entryFee,
   }) = _WaitingRoomModel;
 
   factory WaitingRoomModel.initial({
     required String roomId,
     required String hostId,
-  }) =>
-      WaitingRoomModel(
-        roomId: roomId,
-        hostId: hostId,
-        players: const [],
-      );
+  }) => WaitingRoomModel(roomId: roomId, hostId: hostId, players: const []);
 }

@@ -46,11 +46,16 @@ class _GamePlayerCardsHudWidgetState extends State<GamePlayerCardsHudWidget> {
 
           // Spread cards evenly across the width, leaving a small gap.
           const gap = 12.0;
-          final totalGapWidth =
-              cards.length > 1 ? gap * (cards.length - 1) : 0.0;
-          final availableWidth = (maxWidth - totalGapWidth).clamp(0.0, maxWidth);
-          final cardWidth =
-              cards.isNotEmpty ? availableWidth / cards.length : 0.0;
+          final totalGapWidth = cards.length > 1
+              ? gap * (cards.length - 1)
+              : 0.0;
+          final availableWidth = (maxWidth - totalGapWidth).clamp(
+            0.0,
+            maxWidth,
+          );
+          final cardWidth = cards.isNotEmpty
+              ? availableWidth / cards.length
+              : 0.0;
 
           return Align(
             alignment: Alignment.topCenter,

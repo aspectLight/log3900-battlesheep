@@ -7,14 +7,10 @@ class ReserveCharacterAckDto {
   final bool success;
   final String? error;
 
-  const ReserveCharacterAckDto({
-    required this.success,
-    this.error,
-  });
+  const ReserveCharacterAckDto({required this.success, this.error});
 
   factory ReserveCharacterAckDto.fromJson(Map<String, dynamic> json) =>
       _$ReserveCharacterAckDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$ReserveCharacterAckDtoToJson(this);
 }
-

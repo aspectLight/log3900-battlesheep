@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 
+import '../../../authentication/core/interfaces/auth_repository.dart';
 import '../../data/services/game_actions_socket.dart';
 import '../../data/services/game_board_socket.dart';
 import '../../data/services/game_combat_socket.dart';
@@ -12,7 +13,9 @@ import '../../../../core/services/socket_service.dart';
 import 'package:dio/dio.dart';
 
 void registerGameRootServices(GetIt getIt) {
-  getIt.registerLazySingleton<GameService>(() => GameService(getIt<Dio>()));
+  getIt.registerLazySingleton<GameService>(
+    () => GameService(getIt<Dio>(), getIt<AuthRepository>()),
+  );
 }
 
 void registerGameScopeServices(GetIt scope, GetIt rootGetIt) {

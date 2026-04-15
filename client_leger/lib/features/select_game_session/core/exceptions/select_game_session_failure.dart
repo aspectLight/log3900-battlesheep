@@ -22,6 +22,16 @@ class GameNotFoundSelectGameSessionFailure extends SelectGameSessionFailure {
     : super('Game not found or was deleted');
 }
 
+class GameNotVisibleSelectGameSessionFailure extends SelectGameSessionFailure {
+  const GameNotVisibleSelectGameSessionFailure() : super('Game is not visible');
+}
+
+class InsufficientFundsSelectGameSessionFailure
+    extends SelectGameSessionFailure {
+  const InsufficientFundsSelectGameSessionFailure()
+    : super('Insufficient balance for entry fee');
+}
+
 class UnknownSelectGameSessionFailure extends SelectGameSessionFailure {
   const UnknownSelectGameSessionFailure(super.devMessage);
 }

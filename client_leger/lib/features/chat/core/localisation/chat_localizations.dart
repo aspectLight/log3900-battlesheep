@@ -110,36 +110,100 @@ abstract class ChatLocalizations {
   /// **'Send'**
   String get send;
 
+  /// No description provided for @chatGeneralTab.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
   String get chatGeneralTab;
 
+  /// No description provided for @discussionCanals.
+  ///
+  /// In en, this message translates to:
+  /// **'Discussion Channels'**
   String get discussionCanals;
 
+  /// No description provided for @createChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'CREATE A NEW CHANNEL'**
   String get createChannel;
 
+  /// No description provided for @channelNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Channel name (ex: ABC)'**
   String get channelNameHint;
 
+  /// No description provided for @create.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
   String get create;
 
+  /// No description provided for @availableChannels.
+  ///
+  /// In en, this message translates to:
+  /// **'AVAILABLE CHANNELS'**
   String get availableChannels;
 
+  /// No description provided for @searchChannelsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for a channel by name...'**
   String get searchChannelsHint;
 
+  /// No description provided for @loadingChannels.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading channels...'**
   String get loadingChannels;
 
+  /// No description provided for @noChannelsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No channels match your search.'**
   String get noChannelsFound;
 
+  /// No description provided for @channelName.
+  ///
+  /// In en, this message translates to:
+  /// **'NAME'**
   String get channelName;
 
+  /// No description provided for @channelCreator.
+  ///
+  /// In en, this message translates to:
+  /// **'CREATOR'**
   String get channelCreator;
 
+  /// No description provided for @channelActions.
+  ///
+  /// In en, this message translates to:
+  /// **'ACTIONS'**
   String get channelActions;
 
+  /// No description provided for @creatorBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
   String get creatorBadge;
 
+  /// No description provided for @leaveChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave'**
   String get leaveChannel;
 
+  /// No description provided for @joinChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Join'**
   String get joinChannel;
 
+  /// No description provided for @deleteChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
   String get deleteChannel;
 }
 

@@ -4,7 +4,5 @@ part 'chat_data.freezed.dart';
 
 @freezed
 class ChatData with _$ChatData {
-  const factory ChatData({
-    required String username,
-  }) = _ChatData;
+  const factory ChatData({required String username}) = _ChatData;
 }

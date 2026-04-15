@@ -15,12 +15,15 @@
   "joinGameRoomListMode": "Mode",
   "joinGameRoomListAccessibility": "Accessibilité",
   "joinGameRoomListCode": "Code",
+  "joinGameRoomListPrice": "Prix",
   "joinGameStatusWaiting": "En attente",
   "joinGameStatusPlaying": "En cours",
   "joinGameModeDropIn": "Drop-in",
   "joinGameAccessibilityOpen": "Ouverte",
   "joinGameAccessibilityFull": "Complète",
+  "joinGamePriceFree": "Gratuit",
   "waitingRoomRoomNotFound": "Partie introuvable",
   "waitingRoomRoomLocked": "Partie verrouillée",
-  "joinGameMaxPlayerLimitReached": "Nombre maximum de joueurs atteint"
+  "joinGameMaxPlayerLimitReached": "Nombre maximum de joueurs atteint",
+  "joinGameInsufficientBalance": "Solde insuffisant pour rejoindre cette partie"
 }

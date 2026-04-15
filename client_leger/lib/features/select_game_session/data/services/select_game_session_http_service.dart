@@ -9,8 +9,8 @@ class SelectGameSessionHttpService {
   SelectGameSessionHttpService({
     required AuthRepository authRepository,
     Dio? dio,
-  })  : _authRepository = authRepository,
-        _dio = dio ?? Dio(BaseOptions(baseUrl: EnvConfig.baseUrl));
+  }) : _authRepository = authRepository,
+       _dio = dio ?? Dio(BaseOptions(baseUrl: EnvConfig.baseUrl));
 
   final AuthRepository _authRepository;
   final Dio _dio;

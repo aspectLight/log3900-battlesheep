@@ -7,6 +7,7 @@ class DropInJoinSyncHolder {
   String gameRoomHostId = '';
   String? currentPlayerId;
   int? turnTimeRemaining;
+
   /// `break` = pause entre tours, `play` = compte à rebours du tour actif (cf. événements socket serveur).
   String? turnCountdownPhase;
 

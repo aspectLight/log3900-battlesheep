@@ -24,5 +24,4 @@ class GameDebugRepository {
   void applyDebugModeDisabled(DebugModeDisabledEvent event) {
     state.value = state.value.copyWith(isDebugMode: false);
   }
-
 }

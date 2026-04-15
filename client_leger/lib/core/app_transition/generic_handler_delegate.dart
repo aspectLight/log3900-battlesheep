@@ -71,14 +71,13 @@ class GenericHandlerDelegate<T extends AppTransitionEvent>
   factory GenericHandlerDelegate.simple(
     Type eventType,
     Future<Object?> Function(T) handler,
-  ) =>
-      GenericHandlerDelegate<T>(
-        eventType: eventType,
-        canHandleFn: (e) => e is T,
-        handleFn: (e) async {
-          await handler(e as T);
-        },
-      );
+  ) => GenericHandlerDelegate<T>(
+    eventType: eventType,
+    canHandleFn: (e) => e is T,
+    handleFn: (e) async {
+      await handler(e as T);
+    },
+  );
 
   @override
   final Type eventType;

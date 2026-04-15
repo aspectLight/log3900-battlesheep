@@ -17,7 +17,7 @@ extension GameDtoToEntity on GameDto {
         final pos = GameBoardPosition(x: i, y: j);
         row.add(
           BoardCell(
-            tile: Tile.fromType(cellDto.tileType, cellDto.tileState),
+            tile: Tile.fromType(cellDto.tileType, cellDto.tileData.state),
             position: pos,
             tileOrientation: cellDto.tileData.orientation,
           ),

@@ -12,5 +12,7 @@ class ChatMessageUi with _$ChatMessageUi {
     required String content,
     required String time,
     required bool isMe,
+    String? avatarId,
+    String? avatarUrl,
   }) = _ChatMessageUi;
 }

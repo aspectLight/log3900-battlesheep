@@ -25,14 +25,84 @@ class ProfileLocalizationsEn extends ProfileLocalizations {
   String get profileAvatarLabel => 'Avatar';
 
   @override
+  String get profileAvatarUploadLabel => 'Upload photo';
+
+  @override
+  String get profileAvatarCameraLabel => 'Take photo';
+
+  @override
+  String get profileAvatarOrUpload => 'Or upload a custom photo';
+
+  @override
+  String get profileAvatarFileTooLarge => 'Image must be under 2 MB.';
+
+  @override
+  String get profileAvatarInvalidFileType =>
+      'Only JPG and PNG images are accepted.';
+
+  @override
+  String get profileAvatarUploadFailed =>
+      'Avatar upload failed. Your previous avatar was kept.';
+
+  @override
+  String get profileAvatarUploading => 'Uploading...';
+
+  @override
   String get profileSave => 'Save changes';
 
   @override
   String get profileSaveInProgress => 'Saving...';
 
   @override
+  String get profileSuccessTitle => 'Success';
+
+  @override
+  String get profileErrorTitle => 'Error';
+
+  @override
+  String get profileSaveSuccess => 'Profile updated successfully.';
+
+  @override
   String get profileFillAllFieldsError =>
       'Please fill all fields and select an avatar.';
+
+  @override
+  String get profileNetworkError =>
+      'Network connection problem. Check your connection and try again.';
+
+  @override
+  String get profileUnauthorizedError =>
+      'Session expired or unauthorized. Please sign in again.';
+
+  @override
+  String get profileUsernameTaken => 'This username is already in use.';
+
+  @override
+  String get profileEmailTaken => 'This email is already in use.';
+
+  @override
+  String get profileInvalidDataError =>
+      'The information entered is invalid. Check your fields and try again.';
+
+  @override
+  String get profileForbiddenError =>
+      'This action is not allowed. You may need to unlock this item in the shop first.';
+
+  @override
+  String get profileNotFoundError => 'Profile could not be found.';
+
+  @override
+  String get profileServerError => 'Server error. Please try again later.';
+
+  @override
+  String get profileUnexpectedError =>
+      'Something went wrong. Please try again.';
+
+  @override
+  String get profileNoChanges => 'No changes to save.';
+
+  @override
+  String get profileRetry => 'Retry';
 
   @override
   String get profileStatisticsTitle => 'Statistics';
@@ -50,28 +120,44 @@ class ProfileLocalizationsEn extends ProfileLocalizations {
   String get profileAverageTime => 'Average time per game';
 
   @override
-  String get profileDeleteAccount => 'Delete account';
-
-  @override
-  String get profileThemeLabel => 'Visual theme';
+  String get profileThemeLabel => 'Theme';
 
   @override
   String get profileLanguageLabel => 'Language';
 
   @override
-  String get themeNameDefault => 'Main';
+  String get themeNameDefault => 'Default';
 
   @override
-  String get themeNameFrost => 'Siberian frost';
+  String get themeNameFrost => 'Frost';
 
   @override
-  String get themeNameVillage => 'Abandoned village';
+  String get themeNameVillage => 'Village';
+
+  @override
+  String get profileDeleteAccount => 'Delete account';
+
+  @override
+  String get profileDeleteConfirmTitle => 'Delete account?';
+
+  @override
+  String get profileDeleteConfirmBody =>
+      'This action is permanent. Your account and data will be removed.';
+
+  @override
+  String get profileCancel => 'Cancel';
+
+  @override
+  String get profileConfirmDelete => 'Delete';
 
   @override
   String get languageNameFr => 'French';
 
   @override
   String get languageNameEn => 'English';
+
+  @override
+  String get profileDeleting => 'Deleting...';
 
   @override
   String get tutorial => 'Tutorial';

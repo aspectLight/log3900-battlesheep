@@ -9,16 +9,17 @@ class WaitingRoomWelcomeNotificationSideEffect with DisposableSideEffect {
     required NotificationIntentSink notificationIntentSink,
   }) : _notificationIntentSink = notificationIntentSink {
     trackSubscription(
-      waitingRoomEventBus
-          .on<WaitingRoomWelcomeRequestedEvent>()
-          .listen(_onWelcomeRequested),
+      waitingRoomEventBus.on<WaitingRoomWelcomeRequestedEvent>().listen(
+        _onWelcomeRequested,
+      ),
     );
   }
 
   final NotificationIntentSink _notificationIntentSink;
 
   void _onWelcomeRequested(WaitingRoomWelcomeRequestedEvent event) {
-    _notificationIntentSink.addIntent(const WaitingRoomWelcomeNotificationIntent());
+    _notificationIntentSink.addIntent(
+      const WaitingRoomWelcomeNotificationIntent(),
+    );
   }
 }
-

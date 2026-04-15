@@ -35,19 +35,20 @@ sealed class GameSessionEntryAppEvent
 class GameSessionCompletedAppEvent
     with _$GameSessionCompletedAppEvent
     implements AppTransitionEvent {
-  const factory GameSessionCompletedAppEvent() =
-      _GameSessionCompletedAppEvent;
+  const factory GameSessionCompletedAppEvent() = _GameSessionCompletedAppEvent;
 }
 
 @freezed
 sealed class GameSessionExitAppEvent
     with _$GameSessionExitAppEvent
     implements AppTransitionEvent {
-  const factory GameSessionExitAppEvent.leaveRequested(PlayerLeaveReason reason) =
-      LeaveGameSessionRequestedCommand;
+  const factory GameSessionExitAppEvent.leaveRequested(
+    PlayerLeaveReason reason,
+  ) = LeaveGameSessionRequestedCommand;
 
-  const factory GameSessionExitAppEvent.sessionTerminated(SessionEndReason reason) =
-      SessionTerminatedEvent;
+  const factory GameSessionExitAppEvent.sessionTerminated(
+    SessionEndReason reason,
+  ) = SessionTerminatedEvent;
 
   const factory GameSessionExitAppEvent.gameFinished({
     required String roomId,

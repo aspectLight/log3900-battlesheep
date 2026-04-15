@@ -3,6 +3,7 @@ class ProfileModel {
   final String username;
   final String email;
   final String avatarId;
+  final String? avatarUrl;
   final String theme;
   final String language;
 
@@ -11,8 +12,8 @@ class ProfileModel {
     required this.username,
     required this.email,
     required this.avatarId,
+    this.avatarUrl,
     this.theme = 'default',
     this.language = 'fr',
   });
 }
-

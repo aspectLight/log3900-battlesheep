@@ -38,8 +38,12 @@ bool canPlayerMoveOrAct(
   if (currentPlayer.actionPoints > 0 && hasActiveItem) return true;
   final pos = boardState.playerPositions[playerId];
   if (pos == null) return false;
-  final positionToPlayerId = invertMap(boardState.playerPositions);
   final board = boardState.board;
+  if (currentPlayer.actionPoints > 0 &&
+      board.matrix[pos.x][pos.y].tile is TeleportPadTile) {
+    return true;
+  }
+  final positionToPlayerId = invertMap(boardState.playerPositions);
   const directions = [(0, 1), (0, -1), (1, 0), (-1, 0)];
   for (final (dx, dy) in directions) {
     final nx = pos.x + dx;
@@ -51,8 +55,7 @@ bool canPlayerMoveOrAct(
     if (otherPlayerId != null && otherPlayerId != playerId) {
       final other = playerState.findById(otherPlayerId);
       if (other case Some(value: final o)) {
-        final isCTF =
-            metadataState is GameSessionActive && metadataState.isCTF;
+        final isCTF = metadataState is GameSessionActive && metadataState.isCTF;
         if (!isCTF || o.team != currentPlayer.team) return true;
       }
     }

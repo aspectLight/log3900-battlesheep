@@ -25,7 +25,9 @@ class AuthCompletedAppEvent
 }
 
 @freezed
-sealed class AuthExitAppEvent with _$AuthExitAppEvent implements AppTransitionEvent {
+sealed class AuthExitAppEvent
+    with _$AuthExitAppEvent
+    implements AppTransitionEvent {
   const factory AuthExitAppEvent.signOut() = UserSignedOutEvent;
 
   const factory AuthExitAppEvent.appLifecycleDetached() =

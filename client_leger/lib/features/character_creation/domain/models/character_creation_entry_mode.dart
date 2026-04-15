@@ -11,6 +11,7 @@ class CharacterCreationHostEntryMode extends CharacterCreationEntryMode {
     required this.gameDescription,
     required this.boardSize,
     required this.isCTF,
+    this.entryFee = 0,
     this.friendsOnly = false,
   });
 
@@ -19,6 +20,7 @@ class CharacterCreationHostEntryMode extends CharacterCreationEntryMode {
   final String gameDescription;
   final int boardSize;
   final bool isCTF;
+  final int entryFee;
   final bool friendsOnly;
 }
 

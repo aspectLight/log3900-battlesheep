@@ -8,6 +8,8 @@ extension TileReachability on Tile {
     IceTile() => true,
     WaterTile() => true,
     DoorTile(:final state) => state == TileState.opened,
+    TrapTile() => true,
+    TeleportPadTile() => true,
     TreeTile() => false,
     StoneTile() => false,
     WallTile() => false,
@@ -27,6 +29,8 @@ extension TileTypeExtension on TileType {
     TileType.wall => l10n.tileWallName,
     TileType.corner => l10n.tileCornerName,
     TileType.intersection => l10n.tileIntersectionName,
+    TileType.trap => l10n.tileTrapName,
+    TileType.teleportPad => l10n.tileTeleportPadName,
   };
 
   String getDescription(GameSessionLocalizations l10n) => switch (this) {
@@ -39,10 +43,13 @@ extension TileTypeExtension on TileType {
     TileType.wall => l10n.tileWallDesc,
     TileType.corner => l10n.tileCornerDesc,
     TileType.intersection => l10n.tileIntersectionDesc,
+    TileType.trap => l10n.tileTrapDesc,
+    TileType.teleportPad => l10n.tileTeleportPadDesc,
   };
 }
 
 extension TileExtension on Tile {
   String getName(GameSessionLocalizations l10n) => type.getName(l10n);
-  String getDescription(GameSessionLocalizations l10n) => type.getDescription(l10n);
+  String getDescription(GameSessionLocalizations l10n) =>
+      type.getDescription(l10n);
 }

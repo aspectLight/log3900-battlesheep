@@ -5,14 +5,18 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/app_transition/app_transition_bus.dart';
 import '../../../../../core/enums/character.dart';
+import '../../../../../core/enums/shop_item_type.dart';
 import '../../../../../core/helpers/functional_programming.dart';
 import '../../../../../core/notification/notification_intent.dart';
 import '../../../../../core/notification/notification_intent_sink.dart';
 import '../../../../join_game_session/core/exceptions/join_game_session_failure.dart';
+import '../../../../shop/data/repositories/shop_repository.dart';
+import '../../../../shop/domain/state/shop_state.dart';
 import '../../../core/app_events/character_creation_events.dart';
 import '../../../core/constants/character_creation_constants.dart';
 import '../../../core/event_bus/character_creation_event_bus.dart';
 import '../../../core/helpers/character_creation_form_validator.dart';
+import '../../../../profile/data/services/http_profile_service.dart';
 import '../../../data/repositories/character_creation_repository.dart';
 import '../../../domain/models/character_creation_entry_mode.dart';
 import '../../../domain/state/character_creation_state.dart';
@@ -26,6 +30,8 @@ class CharacterCreationViewModel {
     required CreateCharacterUseCase createCharacterUseCase,
     required ReserveCharacterUseCase reserveCharacterUseCase,
     required CharacterCreationRepository repository,
+    required HttpProfileService profileService,
+    required ShopRepository shopRepository,
     required NotificationIntentSink notificationIntentSink,
     required CharacterCreationEventBus eventBus,
     required AppTransitionEventBus appTransitionEventBus,
@@ -35,6 +41,8 @@ class CharacterCreationViewModel {
   }) : _createCharacterUseCase = createCharacterUseCase,
        _reserveCharacterUseCase = reserveCharacterUseCase,
        _repository = repository,
+       _profileService = profileService,
+       _shopRepository = shopRepository,
        _notificationIntentSink = notificationIntentSink,
        _eventBus = eventBus,
        _appTransitionEventBus = appTransitionEventBus,
@@ -45,6 +53,8 @@ class CharacterCreationViewModel {
   final CreateCharacterUseCase _createCharacterUseCase;
   final ReserveCharacterUseCase _reserveCharacterUseCase;
   final CharacterCreationRepository _repository;
+  final HttpProfileService _profileService;
+  final ShopRepository _shopRepository;
   final NotificationIntentSink _notificationIntentSink;
   final CharacterCreationEventBus _eventBus;
   final AppTransitionEventBus _appTransitionEventBus;
@@ -87,12 +97,14 @@ class CharacterCreationViewModel {
       createSubmitState.value is CreateCharacterSubmitStateSubmitting;
   bool get isHost => _entryMode is CharacterCreationHostEntryMode;
   bool get isDropIn => switch (_entryMode) {
-        CharacterCreationJoinEntryMode(:final isDropIn) => isDropIn,
-        _ => false,
-      };
+    CharacterCreationJoinEntryMode(:final isDropIn) => isDropIn,
+    _ => false,
+  };
   String get username => _username;
 
-  List<Character> get charactersForGrid => Character.values;
+  List<Character> get charactersForGrid => Character.values
+      .where((character) => !_isPremiumLocked(character))
+      .toList(growable: false);
 
   void requestExitToCreateGame() {
     _appTransitionEventBus.fire(
@@ -101,6 +113,7 @@ class CharacterCreationViewModel {
   }
 
   void init() {
+    _shopRepository.refreshCatalogueAndBalance();
     _repository.setName(_username);
     final form = _repository.state.value.form;
     if (!CharacterCreationFormValidator.hasValidDicePairing(form)) {
@@ -119,11 +132,25 @@ class CharacterCreationViewModel {
   }
 
   bool isCharacterDisabled(Character character) {
+    if (_isPremiumLocked(character)) return true;
     return _repository.state.value.reservedCharacters.any(
       (reservedCharacter) =>
           reservedCharacter.chosenAvatar.toLowerCase() == character.id &&
           reservedCharacter.reservorId != _socketId,
     );
+  }
+
+  bool _isPremiumLocked(Character character) {
+    final shopState = _shopRepository.state.value;
+    if (shopState is! ShopStateLoaded) return true;
+    final matchingItem = shopState.catalogue.where(
+      (item) =>
+          item.type == ShopItemType.character &&
+          item.id.wireValue == character.id,
+    );
+    if (matchingItem.isEmpty) return false;
+    final premiumItemId = matchingItem.first.id;
+    return !shopState.purchasedItems.contains(premiumItemId);
   }
 
   void selectHealthBonus() {
@@ -159,7 +186,12 @@ class CharacterCreationViewModel {
     }
     if (isSubmitting) return;
     createSubmitState.value = const CreateCharacterSubmitState.submitting();
-    final command = toCommand(form, _repository.roomCode);
+    final activeBanner = await _fetchActiveBannerPreference();
+    final command = toCommand(
+      form,
+      _repository.roomCode,
+      activeBanner: activeBanner,
+    );
     try {
       await _createCharacterUseCase.execute(command);
     } on JoinGameSessionFailure catch (failure) {
@@ -182,6 +214,19 @@ class CharacterCreationViewModel {
     }
     _repository.setDefenseDice(sides);
     _repository.setAttackDice(opposite);
+  }
+
+  Future<String?> _fetchActiveBannerPreference() async {
+    try {
+      final profile = await _profileService.fetchProfile();
+      final raw = profile.preferences['activeBanner'];
+      if (raw is String && raw.isNotEmpty) {
+        return raw;
+      }
+    } on Exception {
+      // Submit still proceeds without cosmetic banner.
+    }
+    return null;
   }
 
   Future<void> _reserveSelectedCharacter(String characterId) async {

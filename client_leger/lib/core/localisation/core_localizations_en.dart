@@ -137,6 +137,9 @@ class CoreLocalizationsEn extends CoreLocalizations {
   String get loading => 'Loading...';
 
   @override
+  String get shop => 'Shop';
+
+  @override
   String get discussionCanals => 'Discussion Channels';
 
   @override

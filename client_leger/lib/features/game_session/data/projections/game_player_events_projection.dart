@@ -15,9 +15,9 @@ class GamePlayerEventsProjection implements EventProjection {
     required GameEventsSocket eventsSocket,
     required GamePlayerRepository playerRepository,
     required GameSessionEventBus gameSessionEventBus,
-  })  : _eventsSocket = eventsSocket,
-        _playerRepository = playerRepository,
-        _gameSessionEventBus = gameSessionEventBus;
+  }) : _eventsSocket = eventsSocket,
+       _playerRepository = playerRepository,
+       _gameSessionEventBus = gameSessionEventBus;
 
   @override
   List<StreamSubscription> subscribe() => [
@@ -26,12 +26,15 @@ class GamePlayerEventsProjection implements EventProjection {
   ];
 
   void _onPlayerAbandoned(PlayerAbandonedEvent event) {
-    final spawnPoint =
-        _playerRepository.state.value.spawnPointOfAbandoned(event.playerId);
+    final spawnPoint = _playerRepository.state.value.spawnPointOfAbandoned(
+      event.playerId,
+    );
     _playerRepository.applyPlayerAbandoned(event);
-    _gameSessionEventBus.fire(PlayerAbandonedWithSpawnPoint(
-      playerId: event.playerId,
-      spawnPoint: spawnPoint,
-    ));
+    _gameSessionEventBus.fire(
+      PlayerAbandonedWithSpawnPoint(
+        playerId: event.playerId,
+        spawnPoint: spawnPoint,
+      ),
+    );
   }
 }

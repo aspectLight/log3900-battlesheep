@@ -4,6 +4,7 @@ import '../../../core/app_events/statistics_events.dart';
 import '../../../../../core/app_transition/app_transition_bus.dart';
 import '../../../core/enums/player_stats_sort_field.dart';
 import '../../../data/repositories/statistics_repository.dart';
+import '../../../domain/models/game_rewards_info.dart';
 import '../../../domain/models/game_statistics.dart';
 
 class StatisticsContentViewModel {
@@ -15,6 +16,10 @@ class StatisticsContentViewModel {
   final isAscending = signal<bool>(false);
 
   late final statistics = computed(() => _statisticsRepository.state.value);
+  late final rewards = computed(() => _statisticsRepository.rewardsInfo.value);
+  late final rewardsRows = computed<List<PlayerRewardInfo>>(
+    () => rewards.value.rewards,
+  );
 
   late final sortedPlayerStats = computed(() {
     final players = List<PlayerStatistics>.from(

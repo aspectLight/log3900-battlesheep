@@ -33,9 +33,10 @@ import 'app_transition_bus.dart';
 /// The AppEventHandler ensures onEntry runs before onCompleted, and
 /// onCompleted before onExit. You can rely on this ordering.
 abstract interface class FeatureCoordinator<
-    Entry extends AppTransitionEvent,
-    Completed extends AppTransitionEvent,
-    Exit extends AppTransitionEvent> {
+  Entry extends AppTransitionEvent,
+  Completed extends AppTransitionEvent,
+  Exit extends AppTransitionEvent
+> {
   /// Phase 1: Feature is entering
   ///
   /// # Responsibilities

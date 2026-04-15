@@ -9,7 +9,7 @@ part 'game_info_model.freezed.dart';
 
 class GameBoardPreviewCell {
   final TileType tileType;
-  final TileState? tileState;
+  final String? tileState;
   final TileOrientation? orientation;
   final ItemType? itemType;
 

@@ -8,10 +8,9 @@ class LogsHistoryCoordinator
         FeatureCoordinator<
           LogsHistoryEntryAppEvent,
           LogsHistoryCompletedAppEvent,
-          LogsHistoryExitAppEvent> {
-  LogsHistoryCoordinator({
-    required this.appNavigator,
-  });
+          LogsHistoryExitAppEvent
+        > {
+  LogsHistoryCoordinator({required this.appNavigator});
 
   final AppNavigator appNavigator;
 

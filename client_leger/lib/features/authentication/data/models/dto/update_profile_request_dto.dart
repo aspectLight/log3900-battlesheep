@@ -8,15 +8,10 @@ class UpdateProfileRequestDto {
   final String? email;
   final String? avatarId;
 
-  const UpdateProfileRequestDto({
-    this.username,
-    this.email,
-    this.avatarId,
-  });
+  const UpdateProfileRequestDto({this.username, this.email, this.avatarId});
 
   factory UpdateProfileRequestDto.fromJson(Map<String, dynamic> json) =>
       _$UpdateProfileRequestDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$UpdateProfileRequestDtoToJson(this);
 }
-

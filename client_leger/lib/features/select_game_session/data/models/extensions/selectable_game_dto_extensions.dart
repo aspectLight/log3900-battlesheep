@@ -16,7 +16,7 @@ List<List<GameBoardPreviewCell>> previewMatrixFromGameSummaryBoard(
             .map(
               (cell) => GameBoardPreviewCell(
                 tileType: tileTypeFromServerString(cell.tileType),
-                tileState: tileStateFromServerString(cell.tileState),
+                tileState: cell.tileState,
                 orientation: tileOrientationFromServerString(
                   cell.tileOrientation,
                 ),
@@ -47,14 +47,6 @@ TileType tileTypeFromServerString(String serverType) {
   return TileType.snow;
 }
 
-TileState? tileStateFromServerString(String? serverState) {
-  if (serverState == null) return null;
-  for (final s in TileState.values) {
-    if (s.name == serverState) return s;
-  }
-  return null;
-}
-
 TileOrientation? tileOrientationFromServerString(String? serverOrientation) {
   if (serverOrientation == null) return null;
   final lower = serverOrientation.toLowerCase();
@@ -74,15 +66,15 @@ ItemType? itemTypeFromServerString(String? serverItemType) {
 
 extension GameSummaryDtoToModel on GameSummaryDto {
   GameModelInfo toModel() => GameModelInfo(
-        id: id,
-        name: name,
-        description: description,
-        mode: mode,
-        boardSize: board.size,
-        boardMatrix: previewMatrixFromGameSummaryBoard(board),
-        privacy: privacy,
-        owner: owner,
-        actionPoints: actionPoints,
-        lastModified: modificationDate,
-      );
+    id: id,
+    name: name,
+    description: description,
+    mode: mode,
+    boardSize: board.size,
+    boardMatrix: previewMatrixFromGameSummaryBoard(board),
+    privacy: privacy,
+    owner: owner,
+    actionPoints: actionPoints,
+    lastModified: modificationDate,
+  );
 }

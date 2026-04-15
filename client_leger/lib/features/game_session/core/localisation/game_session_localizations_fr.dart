@@ -15,6 +15,23 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
   String get gameInventoryFullDiscardTitle => 'Inventaire plein';
 
   @override
+  String get gameTrapTitle => 'Piège';
+
+  @override
+  String get gameTrapDescriptionCanAvoid =>
+      'Vous pouvez éviter le piège ou tenter de le traverser.';
+
+  @override
+  String get gameTrapDescriptionMustTraverse =>
+      'Vous n\'avez pas assez de points pour éviter le piège. Vous devez le traverser.';
+
+  @override
+  String get gameTrapAvoid => 'Éviter';
+
+  @override
+  String get gameTrapTraverse => 'Traverser';
+
+  @override
   String get gamePlayersListPlaying => 'Joue...';
 
   @override
@@ -274,6 +291,13 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
   String get itemAirStrikeDesc => 'Permet d\'attaquer à distance';
 
   @override
+  String get itemTorchName => 'Torche';
+
+  @override
+  String get itemTorchDesc =>
+      'Une torche enflammée qui améliore les capacités à la lumière';
+
+  @override
   String get itemRandomName => 'Random';
 
   @override
@@ -320,6 +344,12 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
   String get tileIntersectionName => 'Intersection';
 
   @override
+  String get tileTrapName => 'Piège';
+
+  @override
+  String get tileTeleportPadName => 'Téléporteur';
+
+  @override
   String get tileSnowDesc => 'Une tuile de neige basique';
 
   @override
@@ -345,6 +375,12 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
 
   @override
   String get tileIntersectionDesc => 'Un mur infranchissable';
+
+  @override
+  String get tileTrapDesc => 'Un piège qui freine les déplacements';
+
+  @override
+  String get tileTeleportPadDesc => 'Téléporte vers le téléporteur jumelé';
 
   @override
   String get unknownError => 'Une erreur inconnue est survenue';

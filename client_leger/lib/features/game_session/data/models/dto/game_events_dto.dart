@@ -41,6 +41,7 @@ class SpawnedPlayerDto {
   final int movementPoints;
   final int actionPoints;
   final GameBoardPositionDto spawnPoint;
+
   /// Case courante sur le plateau (`position` côté serveur). Si null, on utilise [spawnPoint].
   @JsonKey(name: 'position')
   final GameBoardPositionDto? boardPosition;
@@ -88,8 +89,9 @@ class SpawnedPlayerDto {
     } else {
       logicalSpawn = _readCoords(posRaw);
     }
-    final GameBoardPositionDto? boardPosition =
-        posRaw != null ? _readCoords(posRaw) : null;
+    final GameBoardPositionDto? boardPosition = posRaw != null
+        ? _readCoords(posRaw)
+        : null;
     final invRaw = map['inventory'] as List<Object?>? ?? [];
     final inventory = invRaw
         .whereType<Map<String, dynamic>>()

@@ -64,6 +64,7 @@ class CharacterCreationCoordinator
         :final gameDescription,
         :final boardSize,
         :final isCTF,
+        :final entryFee,
         :final friendsOnly,
       ) =>
         (
@@ -75,6 +76,7 @@ class CharacterCreationCoordinator
             gameDescription: gameDescription,
             boardSize: boardSize,
             isCTF: isCTF,
+            entryFee: entryFee,
             friendsOnly: friendsOnly,
           ),
         ),
@@ -84,15 +86,16 @@ class CharacterCreationCoordinator
         :final hostId,
         :final initialRoom,
         :final isDropIn,
-      ) => (
-        socketId,
-        roomCode,
-        CharacterCreationJoinEntryMode(
-          hostId: hostId,
-          initialRoom: initialRoom,
-          isDropIn: isDropIn,
+      ) =>
+        (
+          socketId,
+          roomCode,
+          CharacterCreationJoinEntryMode(
+            hostId: hostId,
+            initialRoom: initialRoom,
+            isDropIn: isDropIn,
+          ),
         ),
-      ),
     };
     return CharacterCreationData(
       roomCode: roomCode,
@@ -148,6 +151,7 @@ class CharacterCreationCoordinator
         :final gameName,
         :final gameDescription,
         :final friendsOnly,
+        :final entryFee,
       ):
         appTransitionEventBus.fire(
           WaitingRoomEntryAppEvent.enteredAsHost(
@@ -159,6 +163,7 @@ class CharacterCreationCoordinator
             boardSize: boardSize,
             isCTF: isCTF,
             friendsOnly: friendsOnly,
+            entryFee: entryFee,
           ),
         );
       case CharacterCreationJoinEntryMode(:final hostId, :final initialRoom):

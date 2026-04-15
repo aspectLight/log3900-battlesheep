@@ -29,6 +29,7 @@ mixin _$CharacterCreationEntryAppEvent {
       String gameDescription,
       int boardSize,
       bool isCTF,
+      int entryFee,
       bool friendsOnly,
     )
     hostEntered,
@@ -51,6 +52,7 @@ mixin _$CharacterCreationEntryAppEvent {
       String gameDescription,
       int boardSize,
       bool isCTF,
+      int entryFee,
       bool friendsOnly,
     )?
     hostEntered,
@@ -73,6 +75,7 @@ mixin _$CharacterCreationEntryAppEvent {
       String gameDescription,
       int boardSize,
       bool isCTF,
+      int entryFee,
       bool friendsOnly,
     )?
     hostEntered,
@@ -175,6 +178,7 @@ abstract class _$$CharacterCreationHostEnteredImplCopyWith<$Res>
     String gameDescription,
     int boardSize,
     bool isCTF,
+    int entryFee,
     bool friendsOnly,
   });
 }
@@ -204,6 +208,7 @@ class __$$CharacterCreationHostEnteredImplCopyWithImpl<$Res>
     Object? gameDescription = null,
     Object? boardSize = null,
     Object? isCTF = null,
+    Object? entryFee = null,
     Object? friendsOnly = null,
   }) {
     return _then(
@@ -236,6 +241,10 @@ class __$$CharacterCreationHostEnteredImplCopyWithImpl<$Res>
             ? _value.isCTF
             : isCTF // ignore: cast_nullable_to_non_nullable
                   as bool,
+        entryFee: null == entryFee
+            ? _value.entryFee
+            : entryFee // ignore: cast_nullable_to_non_nullable
+                  as int,
         friendsOnly: null == friendsOnly
             ? _value.friendsOnly
             : friendsOnly // ignore: cast_nullable_to_non_nullable
@@ -257,6 +266,7 @@ class _$CharacterCreationHostEnteredImpl
     required this.gameDescription,
     required this.boardSize,
     required this.isCTF,
+    this.entryFee = 0,
     this.friendsOnly = false,
   });
 
@@ -276,11 +286,14 @@ class _$CharacterCreationHostEnteredImpl
   final bool isCTF;
   @override
   @JsonKey()
+  final int entryFee;
+  @override
+  @JsonKey()
   final bool friendsOnly;
 
   @override
   String toString() {
-    return 'CharacterCreationEntryAppEvent.hostEntered(socketId: $socketId, roomCode: $roomCode, gameId: $gameId, gameName: $gameName, gameDescription: $gameDescription, boardSize: $boardSize, isCTF: $isCTF, friendsOnly: $friendsOnly)';
+    return 'CharacterCreationEntryAppEvent.hostEntered(socketId: $socketId, roomCode: $roomCode, gameId: $gameId, gameName: $gameName, gameDescription: $gameDescription, boardSize: $boardSize, isCTF: $isCTF, entryFee: $entryFee, friendsOnly: $friendsOnly)';
   }
 
   @override
@@ -300,6 +313,8 @@ class _$CharacterCreationHostEnteredImpl
             (identical(other.boardSize, boardSize) ||
                 other.boardSize == boardSize) &&
             (identical(other.isCTF, isCTF) || other.isCTF == isCTF) &&
+            (identical(other.entryFee, entryFee) ||
+                other.entryFee == entryFee) &&
             (identical(other.friendsOnly, friendsOnly) ||
                 other.friendsOnly == friendsOnly));
   }
@@ -314,6 +329,7 @@ class _$CharacterCreationHostEnteredImpl
     gameDescription,
     boardSize,
     isCTF,
+    entryFee,
     friendsOnly,
   );
 
@@ -341,6 +357,7 @@ class _$CharacterCreationHostEnteredImpl
       String gameDescription,
       int boardSize,
       bool isCTF,
+      int entryFee,
       bool friendsOnly,
     )
     hostEntered,
@@ -361,6 +378,7 @@ class _$CharacterCreationHostEnteredImpl
       gameDescription,
       boardSize,
       isCTF,
+      entryFee,
       friendsOnly,
     );
   }
@@ -376,6 +394,7 @@ class _$CharacterCreationHostEnteredImpl
       String gameDescription,
       int boardSize,
       bool isCTF,
+      int entryFee,
       bool friendsOnly,
     )?
     hostEntered,
@@ -396,6 +415,7 @@ class _$CharacterCreationHostEnteredImpl
       gameDescription,
       boardSize,
       isCTF,
+      entryFee,
       friendsOnly,
     );
   }
@@ -411,6 +431,7 @@ class _$CharacterCreationHostEnteredImpl
       String gameDescription,
       int boardSize,
       bool isCTF,
+      int entryFee,
       bool friendsOnly,
     )?
     hostEntered,
@@ -433,6 +454,7 @@ class _$CharacterCreationHostEnteredImpl
         gameDescription,
         boardSize,
         isCTF,
+        entryFee,
         friendsOnly,
       );
     }
@@ -481,6 +503,7 @@ abstract class CharacterCreationHostEntered
     required final String gameDescription,
     required final int boardSize,
     required final bool isCTF,
+    final int entryFee,
     final bool friendsOnly,
   }) = _$CharacterCreationHostEnteredImpl;
 
@@ -493,6 +516,7 @@ abstract class CharacterCreationHostEntered
   String get gameDescription;
   int get boardSize;
   bool get isCTF;
+  int get entryFee;
   bool get friendsOnly;
 
   /// Create a copy of CharacterCreationEntryAppEvent
@@ -653,6 +677,7 @@ class _$CharacterCreationJoinEnteredImpl
       String gameDescription,
       int boardSize,
       bool isCTF,
+      int entryFee,
       bool friendsOnly,
     )
     hostEntered,
@@ -679,6 +704,7 @@ class _$CharacterCreationJoinEnteredImpl
       String gameDescription,
       int boardSize,
       bool isCTF,
+      int entryFee,
       bool friendsOnly,
     )?
     hostEntered,
@@ -705,6 +731,7 @@ class _$CharacterCreationJoinEnteredImpl
       String gameDescription,
       int boardSize,
       bool isCTF,
+      int entryFee,
       bool friendsOnly,
     )?
     hostEntered,

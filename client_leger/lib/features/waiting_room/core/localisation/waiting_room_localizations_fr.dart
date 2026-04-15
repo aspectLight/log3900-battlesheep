@@ -130,6 +130,12 @@ class WaitingRoomLocalizationsFr extends WaitingRoomLocalizations {
   String get waitingRoomStatDefense => 'Défense';
 
   @override
+  String get waitingRoomBalanceLabel => 'Solde :';
+
+  @override
+  String get waitingRoomEntryFeeLabel => 'Prix d\'entrée :';
+
+  @override
   String get gameNotFound => 'Partie introuvable';
 
   @override

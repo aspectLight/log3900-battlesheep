@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/constants/ui_assets.dart';
 import '../../../../select_game_session/presentation/widgets/select_game_session/select_game_session_board_preview_widget.dart';
 import '../../../core/localisation/join_game_session_localizations.dart';
 import '../../../domain/models/available_room_model.dart';
@@ -40,45 +41,43 @@ class _AvailableRoomsPanelState extends State<AvailableRoomsPanel> {
   @override
   Widget build(BuildContext context) {
     final l10n = JoinGameSessionLocalizations.of(context)!;
-    return Watch(
-      (context) {
-        final rooms = _viewModel.rooms.value;
-        final loading = _viewModel.isLoading.value;
-        final showLoading = loading && rooms.isEmpty;
-        return Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: const Color(0xFF2b2b2b),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFF7f1f1f)),
-          ),
-          child: Column(
-            children: [
-              _buildHeader(l10n),
-              if (showLoading)
-                const Padding(
-                  padding: EdgeInsets.all(24),
-                  child: CircularProgressIndicator(color: Color(0xFFf5e6e6)),
-                )
-              else if (rooms.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Text(
-                    l10n.joinGameNoRooms,
-                    style: const TextStyle(
-                      color: Color(0xFFc0c0c0),
-                      fontFamily: 'CustomFont',
-                      fontSize: 16,
-                    ),
+    return Watch((context) {
+      final rooms = _viewModel.rooms.value;
+      final loading = _viewModel.isLoading.value;
+      final showLoading = loading && rooms.isEmpty;
+      return Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: const Color(0xFF2b2b2b),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFF7f1f1f)),
+        ),
+        child: Column(
+          children: [
+            _buildHeader(l10n),
+            if (showLoading)
+              const Padding(
+                padding: EdgeInsets.all(24),
+                child: CircularProgressIndicator(color: Color(0xFFf5e6e6)),
+              )
+            else if (rooms.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  l10n.joinGameNoRooms,
+                  style: const TextStyle(
+                    color: Color(0xFFc0c0c0),
+                    fontFamily: 'CustomFont',
+                    fontSize: 16,
                   ),
-                )
-              else
-                ...rooms.map((room) => _buildRow(context, room, l10n)),
-            ],
-          ),
-        );
-      },
-    );
+                ),
+              )
+            else
+              ...rooms.map((room) => _buildRow(context, room, l10n)),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildHeader(JoinGameSessionLocalizations l10n) {
@@ -100,6 +99,7 @@ class _AvailableRoomsPanelState extends State<AvailableRoomsPanel> {
           _headerCell(l10n.joinGameRoomListMode),
           _headerCell(l10n.joinGameRoomListAccessibility),
           _headerCell(l10n.joinGameRoomListCode),
+          _headerCell(l10n.joinGameRoomListPrice),
         ],
       ),
     );
@@ -129,8 +129,8 @@ class _AvailableRoomsPanelState extends State<AvailableRoomsPanel> {
     final accessibilityLabel = room.playerCount >= room.maxPlayers
         ? l10n.joinGameAccessibilityFull
         : (room.isPlaying && room.dropInDropOut
-            ? l10n.joinGameModeDropIn
-            : l10n.joinGameAccessibilityOpen);
+              ? l10n.joinGameModeDropIn
+              : l10n.joinGameAccessibilityOpen);
     return InkWell(
       onTap: joinable ? () => unawaited(_viewModel.onRoomTap(room)) : null,
       child: Opacity(
@@ -139,9 +139,7 @@ class _AvailableRoomsPanelState extends State<AvailableRoomsPanel> {
           height: 90,
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           decoration: const BoxDecoration(
-            border: Border(
-              top: BorderSide(color: Color(0xFF3a3a3a)),
-            ),
+            border: Border(top: BorderSide(color: Color(0xFF3a3a3a))),
           ),
           child: Row(
             children: [
@@ -186,6 +184,7 @@ class _AvailableRoomsPanelState extends State<AvailableRoomsPanel> {
                 fontFamily: 'monospace',
                 letterSpacing: 2,
               ),
+              _priceCell(room, l10n),
             ],
           ),
         ),
@@ -210,4 +209,36 @@ class _AvailableRoomsPanelState extends State<AvailableRoomsPanel> {
       ),
     ),
   );
+
+  Widget _priceCell(
+    AvailableRoomModel room,
+    JoinGameSessionLocalizations l10n,
+  ) {
+    if (room.entryFee <= 0) {
+      return _cell(l10n.joinGamePriceFree);
+    }
+    return Expanded(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '${room.entryFee}',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Color(0xFFf5e6e6),
+              fontFamily: 'CustomFont',
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Image.asset(
+            UiAssets.goldCoin,
+            width: 14,
+            height: 14,
+            filterQuality: FilterQuality.none,
+          ),
+        ],
+      ),
+    );
+  }
 }

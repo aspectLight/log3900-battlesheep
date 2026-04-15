@@ -25,6 +25,7 @@ import '../../data/side_effects/game_player_movement_animation_completed_side_ef
 import '../../data/side_effects/game_player_movement_animation_side_effect.dart';
 import '../../data/side_effects/game_turn_auto_forward_side_effect.dart';
 import '../../data/side_effects/game_turn_auto_selection_side_effect.dart';
+import '../../data/side_effects/game_trap_flow_side_effect.dart';
 import '../../data/side_effects/game_turn_end_item_cleanup_side_effect.dart';
 import '../../data/side_effects/game_turn_side_effect.dart';
 import '../../data/side_effects/game_combat_started_notification_side_effect.dart';
@@ -86,7 +87,12 @@ void registerGameSessionScope(
   registerGameScopeRepositories(scope);
   state_repo.registerGameStateRepositories(scope);
   vm.registerGameSessionScopeViewModels(scope, rootGetIt, socketId: socketId);
-  proj.registerGameProjections(scope, rootGetIt, socketId: socketId);
+  proj.registerGameProjections(
+    scope,
+    rootGetIt,
+    socketId: socketId,
+    roomId: roomId,
+  );
   se.registerGameSideEffects(
     scope,
     rootGetIt,
@@ -138,6 +144,7 @@ void bootstrapGameSessionScope(
   scope.get<GameItemDroppedDisconnectedSideEffect>();
   scope.get<GameTurnEndItemCleanupSideEffect>();
   scope.get<GameDebugShakeSideEffect>();
+  scope.get<GameTrapFlowSideEffect>();
   scope.get<GameSessionEventBus>().fire(
     GameSessionScopeReady(roomId: roomId, isHost: isHost),
   );

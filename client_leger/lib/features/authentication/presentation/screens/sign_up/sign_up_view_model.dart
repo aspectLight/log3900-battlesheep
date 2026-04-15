@@ -12,20 +12,25 @@ import '../../../core/helpers/username_validator.dart';
 import '../../../domain/commands/auth_commands.dart';
 import '../../../domain/state/auth_state.dart';
 import '../../../domain/use_cases/sign_up_use_case.dart';
+import '../../../../profile/data/services/http_profile_service.dart';
 import '../../ui_models/widget_states/sign_up_form_ui_state.dart';
 
 class SignUpViewModel {
   final SignUpUseCase _signUpUseCase;
   final AppTransitionEventBus _appTransitionEventBus;
+  final HttpProfileService _profileService;
 
   SignUpViewModel({
     required SignUpUseCase signUpUseCase,
     required AppTransitionEventBus appTransitionEventBus,
+    required HttpProfileService profileService,
   }) : _signUpUseCase = signUpUseCase,
-       _appTransitionEventBus = appTransitionEventBus;
+       _appTransitionEventBus = appTransitionEventBus,
+       _profileService = profileService;
 
   final formState = signal<SignUpFormUiState>(SignUpFormUiState.initial());
   final authState = signal<AuthState>(const AuthState.initial());
+  final customAvatarUploadFailed = signal<bool>(false);
 
   late final usernameErrors = computed<List<AuthValidationError>>(() {
     final state = formState.value;
@@ -76,7 +81,9 @@ class SignUpViewModel {
 
   late final avatarError = computed<Option<AuthValidationError>>(() {
     final state = formState.value;
-    if (state.avatar.isNone() && state.hasAttemptedSubmit) {
+    if (state.avatar.isNone() &&
+        (state.customAvatarPath == null || state.customAvatarPath!.isEmpty) &&
+        state.hasAttemptedSubmit) {
       return const Option.of(AuthValidationError.avatarRequired);
     }
     return const Option.none();
@@ -93,7 +100,9 @@ class SignUpViewModel {
         state.email.isNotEmpty &&
         state.password.isNotEmpty &&
         state.confirmPassword.isNotEmpty &&
-        state.avatar.isSome();
+        (state.avatar.isSome() ||
+            (state.customAvatarPath != null &&
+                state.customAvatarPath!.isNotEmpty));
   });
 
   void setUsername(String value) {
@@ -113,43 +122,61 @@ class SignUpViewModel {
   }
 
   void selectAvatar(AuthAvatar? value) {
-    formState.value =
-        formState.value.copyWith(avatar: Option.fromNullable(value));
+    formState.value = formState.value.copyWith(
+      avatar: Option.fromNullable(value),
+      customAvatarPath: null,
+    );
+  }
+
+  void setCustomAvatarPath(String path) {
+    formState.value = formState.value.copyWith(
+      avatar: const Option.none(),
+      customAvatarPath: path,
+    );
+  }
+
+  void clearCustomAvatarPath() {
+    formState.value = formState.value.copyWith(customAvatarPath: null);
   }
 
   Future<void> signUpSubmit() async {
-    formState.value =
-        formState.value.copyWith(hasAttemptedSubmit: true);
+    formState.value = formState.value.copyWith(hasAttemptedSubmit: true);
+    customAvatarUploadFailed.value = false;
     if (!isFormValid.value) return;
     final state = formState.value;
-    switch (state.avatar) {
-      case None():
-        return;
-      case Some(value: final selectedAvatar):
-        authState.value = const AuthStateLoading();
-        final result = await _signUpUseCase
-            .execute(
-              SignUpCommand(
-                username: state.username,
-                email: state.email,
-                password: state.password,
-                avatarId: selectedAvatar.id,
-              ),
-            )
-            .run();
-        switch (result) {
-          case Left(value: final exception):
-            authState.value = AuthState.error(exception);
-          case Right(value: final user):
-            authState.value = AuthState.authenticated(user);
-            _appTransitionEventBus.fire(AuthEntryAppEvent.signInSuccess(user));
+    final avatarId = state.avatar.match(() => 'custom', (a) => a.id);
+    authState.value = const AuthStateLoading();
+    final result = await _signUpUseCase
+        .execute(
+          SignUpCommand(
+            username: state.username,
+            email: state.email,
+            password: state.password,
+            avatarId: avatarId,
+          ),
+        )
+        .run();
+    switch (result) {
+      case Left(value: final exception):
+        authState.value = AuthState.error(exception);
+      case Right(value: final user):
+        final customPath = state.customAvatarPath;
+        if (customPath != null && customPath.isNotEmpty) {
+          try {
+            await _profileService.uploadAvatar(customPath);
+          } on Exception {
+            customAvatarUploadFailed.value = true;
+          }
         }
+        authState.value = AuthState.authenticated(user);
+        _appTransitionEventBus.fire(AuthEntryAppEvent.signInSuccess(user));
     }
   }
 
   void resetForm() {
     formState.value = SignUpFormUiState.initial();
     authState.value = const AuthState.initial();
+    customAvatarUploadFailed.value = false;
   }
 
   void dispose() {
@@ -161,5 +188,6 @@ class SignUpViewModel {
     confirmPasswordErrors.dispose();
     avatarError.dispose();
     isFormValid.dispose();
+    customAvatarUploadFailed.dispose();
   }
 }

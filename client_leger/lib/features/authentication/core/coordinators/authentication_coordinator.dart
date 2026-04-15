@@ -16,8 +16,11 @@ import '../di/auth_module.dart';
 
 class AuthenticationCoordinator
     implements
-        FeatureCoordinator<AuthEntryAppEvent, AuthCompletedAppEvent,
-            AuthExitAppEvent> {
+        FeatureCoordinator<
+          AuthEntryAppEvent,
+          AuthCompletedAppEvent,
+          AuthExitAppEvent
+        > {
   AuthenticationCoordinator({
     required this.getIt,
     required this.sessionScopeManager,

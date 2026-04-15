@@ -88,10 +88,7 @@ class _InfoShell extends StatelessWidget {
 }
 
 class _ActionButton extends StatelessWidget {
-  const _ActionButton({
-    required this.label,
-    required this.onTap,
-  });
+  const _ActionButton({required this.label, required this.onTap});
 
   final String label;
   final VoidCallback onTap;

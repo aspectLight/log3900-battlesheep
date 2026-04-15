@@ -1,11 +1,6 @@
-import 'dart:async';
-
-import 'package:fpdart/fpdart.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../features/authentication/core/app_events/auth_events.dart';
-import '../../../../features/authentication/core/interfaces/auth_repository.dart';
-import '../../../../features/authentication/domain/models/user.dart';
 import '../../../../features/friends/core/app_transition/friends_events.dart';
 import '../../../../features/friends/domain/interfaces/friends_repository.dart';
 import '../../../../features/game_history/core/app_events/game_history_events.dart';
@@ -13,41 +8,25 @@ import '../../../../features/join_game_session/core/app_events/join_game_session
 import '../../../../features/logs_history/core/app_events/logs_history_events.dart';
 import '../../../../features/profile/core/app_events/profile_events.dart';
 import '../../../../features/select_game_session/core/app_events/select_game_session_events.dart';
+import '../../../../features/shop/core/app_events/shop_events.dart';
 import '../../../../features/tutorial/core/coordinators/tutorial_coordinator.dart';
 import '../../../app_transition/app_transition_bus.dart';
-import '../../../helpers/functional_programming.dart';
 
 class MainMenuViewModel {
   MainMenuViewModel({
-    required AuthRepository authRepository,
     required AppTransitionEventBus appTransitionEventBus,
     required FriendsRepository friendsRepository,
     required TutorialCoordinator tutorialCoordinator,
-  }) : _authRepository = authRepository,
-       _appTransitionEventBus = appTransitionEventBus,
+  }) : _appTransitionEventBus = appTransitionEventBus,
        _friendsRepository = friendsRepository,
-       _tutorialCoordinator = tutorialCoordinator {
-    _authSub = _authRepository.authStateChanges.listen((userOption) {
-      _currentUser.value = userOption;
-    });
-  }
+       _tutorialCoordinator = tutorialCoordinator;
 
-  final AuthRepository _authRepository;
   final AppTransitionEventBus _appTransitionEventBus;
   final FriendsRepository _friendsRepository;
   final TutorialCoordinator _tutorialCoordinator;
   final pendingRequestCount = signal<int>(0);
-  StreamSubscription<Option<UserModel>>? _authSub;
 
-  final _currentUser = signal<Option<UserModel>>(const Option.none());
-
-  late final username = computed(
-    () => _currentUser.value.map((user) => user.username).orElse(''),
-  );
-
-  void dispose() {
-    unawaited(_authSub?.cancel());
-  }
+  void dispose() {}
 
   Future<void> signOut() async {
     _appTransitionEventBus.fire(const AuthExitAppEvent.signOut());
@@ -84,6 +63,10 @@ class MainMenuViewModel {
 
   void openProfile() {
     _appTransitionEventBus.fire(const ProfileEntryAppEvent.requested());
+  }
+
+  void openShop() {
+    _appTransitionEventBus.fire(const ShopEntryAppEvent.requested());
   }
 
   Future<void> checkTutorialStatus() async {

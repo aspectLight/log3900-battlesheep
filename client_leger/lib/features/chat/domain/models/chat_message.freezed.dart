@@ -21,6 +21,8 @@ mixin _$ChatMessage {
   String get name => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
   String get time => throw _privateConstructorUsedError;
+  String? get avatarId => throw _privateConstructorUsedError;
+  String? get avatarUrl => throw _privateConstructorUsedError;
 
   /// Create a copy of ChatMessage
   /// with the given fields replaced by the non-null parameter values.
@@ -36,7 +38,14 @@ abstract class $ChatMessageCopyWith<$Res> {
     $Res Function(ChatMessage) then,
   ) = _$ChatMessageCopyWithImpl<$Res, ChatMessage>;
   @useResult
-  $Res call({ChatMessageType type, String name, String content, String time});
+  $Res call({
+    ChatMessageType type,
+    String name,
+    String content,
+    String time,
+    String? avatarId,
+    String? avatarUrl,
+  });
 }
 
 /// @nodoc
@@ -58,6 +67,8 @@ class _$ChatMessageCopyWithImpl<$Res, $Val extends ChatMessage>
     Object? name = null,
     Object? content = null,
     Object? time = null,
+    Object? avatarId = freezed,
+    Object? avatarUrl = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -77,6 +88,14 @@ class _$ChatMessageCopyWithImpl<$Res, $Val extends ChatMessage>
                 ? _value.time
                 : time // ignore: cast_nullable_to_non_nullable
                       as String,
+            avatarId: freezed == avatarId
+                ? _value.avatarId
+                : avatarId // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            avatarUrl: freezed == avatarUrl
+                ? _value.avatarUrl
+                : avatarUrl // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -92,7 +111,14 @@ abstract class _$$ChatMessageImplCopyWith<$Res>
   ) = __$$ChatMessageImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({ChatMessageType type, String name, String content, String time});
+  $Res call({
+    ChatMessageType type,
+    String name,
+    String content,
+    String time,
+    String? avatarId,
+    String? avatarUrl,
+  });
 }
 
 /// @nodoc
@@ -113,6 +139,8 @@ class __$$ChatMessageImplCopyWithImpl<$Res>
     Object? name = null,
     Object? content = null,
     Object? time = null,
+    Object? avatarId = freezed,
+    Object? avatarUrl = freezed,
   }) {
     return _then(
       _$ChatMessageImpl(
@@ -132,6 +160,14 @@ class __$$ChatMessageImplCopyWithImpl<$Res>
             ? _value.time
             : time // ignore: cast_nullable_to_non_nullable
                   as String,
+        avatarId: freezed == avatarId
+            ? _value.avatarId
+            : avatarId // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        avatarUrl: freezed == avatarUrl
+            ? _value.avatarUrl
+            : avatarUrl // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -145,6 +181,8 @@ class _$ChatMessageImpl implements _ChatMessage {
     required this.name,
     required this.content,
     required this.time,
+    this.avatarId,
+    this.avatarUrl,
   });
 
   @override
@@ -155,10 +193,14 @@ class _$ChatMessageImpl implements _ChatMessage {
   final String content;
   @override
   final String time;
+  @override
+  final String? avatarId;
+  @override
+  final String? avatarUrl;
 
   @override
   String toString() {
-    return 'ChatMessage(type: $type, name: $name, content: $content, time: $time)';
+    return 'ChatMessage(type: $type, name: $name, content: $content, time: $time, avatarId: $avatarId, avatarUrl: $avatarUrl)';
   }
 
   @override
@@ -169,11 +211,16 @@ class _$ChatMessageImpl implements _ChatMessage {
             (identical(other.type, type) || other.type == type) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.content, content) || other.content == content) &&
-            (identical(other.time, time) || other.time == time));
+            (identical(other.time, time) || other.time == time) &&
+            (identical(other.avatarId, avatarId) ||
+                other.avatarId == avatarId) &&
+            (identical(other.avatarUrl, avatarUrl) ||
+                other.avatarUrl == avatarUrl));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, type, name, content, time);
+  int get hashCode =>
+      Object.hash(runtimeType, type, name, content, time, avatarId, avatarUrl);
 
   /// Create a copy of ChatMessage
   /// with the given fields replaced by the non-null parameter values.
@@ -190,6 +237,8 @@ abstract class _ChatMessage implements ChatMessage {
     required final String name,
     required final String content,
     required final String time,
+    final String? avatarId,
+    final String? avatarUrl,
   }) = _$ChatMessageImpl;
 
   @override
@@ -200,6 +249,10 @@ abstract class _ChatMessage implements ChatMessage {
   String get content;
   @override
   String get time;
+  @override
+  String? get avatarId;
+  @override
+  String? get avatarUrl;
 
   /// Create a copy of ChatMessage
   /// with the given fields replaced by the non-null parameter values.
