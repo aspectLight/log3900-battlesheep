@@ -67,6 +67,8 @@ class AppNavigationHandler extends AppNavigator {
         _pushAuthenticated(const ProfileRoute());
       case GoToFriends():
         _pushAuthenticated(const FriendsRoute());
+      case GoToTutorial():
+        _pushAuthenticated(const TutorialRoute());
     }
   }
 

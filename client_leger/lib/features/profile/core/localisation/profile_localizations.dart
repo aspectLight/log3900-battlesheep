@@ -198,6 +198,10 @@ abstract class ProfileLocalizations {
   String get languageNameFr;
 
   String get languageNameEn;
+
+  String get tutorial;
+
+  String get continueTutorial;
 }
 
 class _ProfileLocalizationsDelegate

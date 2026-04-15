@@ -13,6 +13,8 @@
   "profileCtfGames": "Parties CTF",
   "profileGamesWon": "Parties gagnées",
   "profileAverageTime": "Temps moyen par partie",
-  "profileDeleteAccount": "Supprimer le compte"
+  "profileDeleteAccount": "Supprimer le compte",
+  "tutorial": "Tutoriel",
+  "continueTutorial": "Continuer"
 }
 

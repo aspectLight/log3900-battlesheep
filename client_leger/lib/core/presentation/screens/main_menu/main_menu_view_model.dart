@@ -13,6 +13,7 @@ import '../../../../features/join_game_session/core/app_events/join_game_session
 import '../../../../features/logs_history/core/app_events/logs_history_events.dart';
 import '../../../../features/profile/core/app_events/profile_events.dart';
 import '../../../../features/select_game_session/core/app_events/select_game_session_events.dart';
+import '../../../../features/tutorial/core/coordinators/tutorial_coordinator.dart';
 import '../../../app_transition/app_transition_bus.dart';
 import '../../../helpers/functional_programming.dart';
 
@@ -21,9 +22,11 @@ class MainMenuViewModel {
     required AuthRepository authRepository,
     required AppTransitionEventBus appTransitionEventBus,
     required FriendsRepository friendsRepository,
+    required TutorialCoordinator tutorialCoordinator,
   }) : _authRepository = authRepository,
        _appTransitionEventBus = appTransitionEventBus,
-       _friendsRepository = friendsRepository {
+       _friendsRepository = friendsRepository,
+       _tutorialCoordinator = tutorialCoordinator {
     _authSub = _authRepository.authStateChanges.listen((userOption) {
       _currentUser.value = userOption;
     });
@@ -32,6 +35,7 @@ class MainMenuViewModel {
   final AuthRepository _authRepository;
   final AppTransitionEventBus _appTransitionEventBus;
   final FriendsRepository _friendsRepository;
+  final TutorialCoordinator _tutorialCoordinator;
   final pendingRequestCount = signal<int>(0);
   StreamSubscription<Option<UserModel>>? _authSub;
 
@@ -80,5 +84,9 @@ class MainMenuViewModel {
 
   void openProfile() {
     _appTransitionEventBus.fire(const ProfileEntryAppEvent.requested());
+  }
+
+  Future<void> checkTutorialStatus() async {
+    await _tutorialCoordinator.checkAndLaunchTutorial();
   }
 }

@@ -33,6 +33,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>
     _viewModel = GetIt.I<MainMenuViewModel>();
     _appNavigator = GetIt.I<AppNavigator>();
     unawaited(_viewModel.loadPendingRequests());
+    unawaited(_viewModel.checkTutorialStatus());
   }
 
   void _openSettings() {

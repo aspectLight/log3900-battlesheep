@@ -22,6 +22,8 @@ import '../../features/select_game_session/core/app_events/select_game_session_e
 import '../../features/select_game_session/core/coordinators/select_game_session_coordinator.dart';
 import '../../features/statistics/core/app_events/statistics_events.dart';
 import '../../features/statistics/core/coordinators/statistics_coordinator.dart';
+import '../../features/tutorial/core/app_transition/tutorial_events.dart';
+import '../../features/tutorial/core/coordinators/tutorial_coordinator.dart';
 import '../../features/waiting_room/core/app_events/waiting_room_events.dart';
 import '../../features/waiting_room/core/coordinators/waiting_room_coordinator.dart';
 import '../app_transition/app_event_handler.dart';
@@ -44,6 +46,7 @@ void registerAppEventHandler(GetIt getIt) {
       waitingRoom: getIt<WaitingRoomCoordinator>(),
       profile: getIt<ProfileCoordinator>(),
       friends: getIt<FriendsCoordinator>(),
+      tutorial: getIt<TutorialCoordinator>(),
     ),
   );
 }
@@ -72,6 +75,7 @@ AppEventHandler _buildHandler({
   required WaitingRoomCoordinator waitingRoom,
   required ProfileCoordinator profile,
   required FriendsCoordinator friends,
+  required TutorialCoordinator tutorial,
 }) {
   return AppEventHandler(
     appTransitionEventBus: bus,
@@ -222,6 +226,15 @@ AppEventHandler _buildHandler({
       GenericHandlerDelegate<FriendsExitAppEvent>.simple(
         FriendsExitAppEvent,
         friends.onExit,
+      ),
+      // --- Tutorial ---
+      GenericHandlerDelegate<TutorialEntryAppEvent>.simple(
+        TutorialEntryAppEvent,
+        tutorial.onEntry,
+      ),
+      GenericHandlerDelegate<TutorialExitAppEvent>.simple(
+        TutorialExitAppEvent,
+        tutorial.onExit,
       ),
     ],
   );

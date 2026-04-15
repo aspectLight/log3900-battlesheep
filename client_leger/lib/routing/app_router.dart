@@ -15,6 +15,7 @@ import '../features/logs_history/presentation/screens/logs_history/logs_history_
 import '../features/profile/presentation/screens/profile/profile_screen.dart';
 import '../features/select_game_session/presentation/screens/select_game_session/select_game_session_screen.dart';
 import '../features/statistics/presentation/screens/statistics_screen/statistics_screen.dart';
+import '../features/tutorial/presentation/screens/tutorial_screen.dart';
 import '../features/waiting_room/presentation/screens/waiting_room/waiting_room_screen.dart';
 import 'auth_guard.dart';
 
@@ -108,6 +109,11 @@ class AppRouter extends RootStackRouter {
         CustomRoute(
           page: FriendsRoute.page,
           path: 'friends',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+        ),
+        CustomRoute(
+          page: TutorialRoute.page,
+          path: 'tutorial',
           transitionsBuilder: TransitionsBuilders.fadeIn,
         ),
       ],

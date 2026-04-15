@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'profile_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -71,4 +72,10 @@ class ProfileLocalizationsFr extends ProfileLocalizations {
 
   @override
   String get languageNameEn => 'Anglais';
+
+  @override
+  String get tutorial => 'Tutoriel';
+
+  @override
+  String get continueTutorial => 'Continuer';
 }

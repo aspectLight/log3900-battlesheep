@@ -4,6 +4,7 @@ import '../../../../../../core/app_transition/app_transition_bus.dart';
 import '../../../../../../core/appearance/app_appearance_service.dart';
 import '../../../../../../core/helpers/functional_programming.dart';
 import '../../../../authentication/core/app_events/auth_events.dart';
+import '../../../../tutorial/core/app_transition/tutorial_events.dart';
 import '../../../data/repositories/profile_repository.dart';
 import '../../../domain/commands/profile_commands.dart';
 import '../../../domain/models/profile_model.dart';
@@ -73,5 +74,9 @@ class ProfileViewModel {
       right: (_) =>
           _appTransitionEventBus.fire(const AuthExitAppEvent.signOut()),
     );
+  }
+
+  void openTutorial() {
+    _appTransitionEventBus.fire(const TutorialEntryAppEvent.requested());
   }
 }
