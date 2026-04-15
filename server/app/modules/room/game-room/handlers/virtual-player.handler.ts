@@ -47,7 +47,10 @@ export class VirtualPlayerHandler {
                         const originalPosition = { ...player.position };
 
                         const movement = this.gameMovementVPService.determineVPMovement(data.roomId, player, room.players, data.isCTF);
-                        if (!movement) return;
+                        if (!movement) {
+                            this.gameRoomService.endTurn(data.roomId);
+                            return;
+                        }
                         const neighborPlayer = this.movementAlgorithms.findNeighborPlayer(data.roomId, player);
 
                         if (movement.path.length <= 1) {

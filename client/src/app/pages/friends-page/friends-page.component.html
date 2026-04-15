@@ -40,9 +40,6 @@
                 <div class="user-info">
                     <img [src]="getAvatarSrc(friend.avatarId, friend.avatarUrl)" alt="Avatar" class="avatar" />
                     <span class="username">{{ friend.username }}</span>
-                    <span class="status" [class.online]="friend.isOnline" [class.offline]="!friend.isOnline">
-                        {{ friend.isOnline ? ('friends.online' | translate) : ('friends.offline' | translate) }}
-                    </span>
                 </div>
                 <div class="actions">
                     <button class="btn btn-danger" (click)="removeFriend(friend.username)">{{ 'friends.remove' | translate }}</button>
@@ -101,9 +98,6 @@
                     <div class="user-info">
                         <img [src]="getAvatarSrc(user.avatarId, user.avatarUrl)" alt="Avatar" class="avatar" />
                         <span class="username">{{ user.username }}</span>
-                        <span class="status" [class.online]="user.isOnline" [class.offline]="!user.isOnline">
-                            {{ user.isOnline ? ('friends.online' | translate) : ('friends.offline' | translate) }}
-                        </span>
                     </div>
                     <div class="actions">
                         @if (!isBlocked(user.username)) {

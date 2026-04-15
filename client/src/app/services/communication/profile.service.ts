@@ -149,6 +149,7 @@ export class ProfileService {
         const headers = await this.getAuthHeaders();
         try {
             await firstValueFrom(this.http.delete(`${this.apiUrl}/account`, { headers }));
+            this.invalidateCache();
             return { success: true };
         } catch (error: unknown) {
             return { success: false, error: this.extractErrorMessage(error) };

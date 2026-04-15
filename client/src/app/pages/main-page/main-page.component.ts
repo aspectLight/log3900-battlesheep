@@ -77,6 +77,10 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
         const username = this.authService.currentUser?.displayName || 'Utilisateur';
 
+        // Reconnect the socket immediately so the server can cancel the auto-logout timeout
+        // before it fires. The profile fetch below can take a moment and must not delay this.
+        await this.socketService.reconnect();
+
         // Fetch the user profile to get the avatar of the logged-in user
         let avatarId: string | null = null;
         let avatarUrl: string | null = null;
@@ -88,9 +92,6 @@ export class MainPageComponent implements OnInit, OnDestroy {
         } catch {
             // Continue without avatar on error
         }
-
-        // Wait for the socket to be fully reconnected
-        await this.socketService.reconnect();
         // Then, configure listeners and join the chat
         this.chatService.setupListeners();
         this.customChannelService.setupListeners();
