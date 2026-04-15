@@ -44,5 +44,7 @@
   "profileDeleteConfirmBody": "Cette action est permanente. Votre compte et vos données seront supprimés.",
   "profileCancel": "Annuler",
   "profileConfirmDelete": "Supprimer",
-  "profileDeleting": "Suppression..."
+  "profileDeleting": "Suppression...",
+  "tutorial": "Tutoriel",
+  "continueTutorial": "Continuer"
 }

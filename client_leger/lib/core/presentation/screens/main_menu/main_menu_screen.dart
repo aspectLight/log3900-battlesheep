@@ -30,6 +30,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>
     _viewModel = GetIt.I<MainMenuViewModel>();
     GetIt.I<ShellChromeBackHandler>().clear();
     unawaited(_viewModel.loadPendingRequests());
+    unawaited(_viewModel.checkTutorialStatus());
   }
 
   @override

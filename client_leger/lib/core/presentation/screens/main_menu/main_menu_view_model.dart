@@ -7,19 +7,23 @@ import '../../../../features/game_history/core/app_events/game_history_events.da
 import '../../../../features/join_game_session/core/app_events/join_game_session_events.dart';
 import '../../../../features/logs_history/core/app_events/logs_history_events.dart';
 import '../../../../features/profile/core/app_events/profile_events.dart';
-import '../../../../features/shop/core/app_events/shop_events.dart';
 import '../../../../features/select_game_session/core/app_events/select_game_session_events.dart';
+import '../../../../features/shop/core/app_events/shop_events.dart';
+import '../../../../features/tutorial/core/coordinators/tutorial_coordinator.dart';
 import '../../../app_transition/app_transition_bus.dart';
 
 class MainMenuViewModel {
   MainMenuViewModel({
     required AppTransitionEventBus appTransitionEventBus,
     required FriendsRepository friendsRepository,
+    required TutorialCoordinator tutorialCoordinator,
   }) : _appTransitionEventBus = appTransitionEventBus,
-       _friendsRepository = friendsRepository;
+       _friendsRepository = friendsRepository,
+       _tutorialCoordinator = tutorialCoordinator;
 
   final AppTransitionEventBus _appTransitionEventBus;
   final FriendsRepository _friendsRepository;
+  final TutorialCoordinator _tutorialCoordinator;
   final pendingRequestCount = signal<int>(0);
 
   void dispose() {}
@@ -63,5 +67,9 @@ class MainMenuViewModel {
 
   void openShop() {
     _appTransitionEventBus.fire(const ShopEntryAppEvent.requested());
+  }
+
+  Future<void> checkTutorialStatus() async {
+    await _tutorialCoordinator.checkAndLaunchTutorial();
   }
 }
