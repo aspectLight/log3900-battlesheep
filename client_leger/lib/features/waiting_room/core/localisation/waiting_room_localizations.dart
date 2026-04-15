@@ -293,12 +293,6 @@ abstract class WaitingRoomLocalizations {
   /// **'Character already taken'**
   String get waitingRoomCharacterAlreadyReserved;
 
-  /// No description provided for @waitingRoomPlayerAlreadyInRoom.
-  ///
-  /// In en, this message translates to:
-  /// **'This player is already in the room'**
-  String get waitingRoomPlayerAlreadyInRoom;
-
   /// No description provided for @waitingRoomPlayerKicked.
   ///
   /// In en, this message translates to:

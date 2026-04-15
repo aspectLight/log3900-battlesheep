@@ -3,7 +3,6 @@ import 'package:get_it/get_it.dart';
 import '../../../../core/app_transition/app_transition_bus.dart';
 import '../../../../core/app_transition/auto_scope_coordinator.dart';
 import '../../../../core/connected_scope/session_scope_manager.dart';
-import '../../../../core/services/log_service.dart';
 import '../../../../core/services/socket_service.dart';
 import '../../../../routing/app_navigator.dart';
 import '../../../../routing/navigation_command.dart';
@@ -59,23 +58,18 @@ class StatisticsCoordinator
   @override
   Future<StatisticsData?> onEntryImpl(StatisticsEntryAppEvent event) async {
     if (event is! StatisticsRequested) return null;
-    final captured = event.capturedRewards;
-    LogService.d('[StatsCoord] onEntryImpl capturedRewards=${captured?.rewards.length ?? "null"} entryFee=${captured?.entryFee} pool=${captured?.pool}');
-    _initialRewards = captured ?? GameRewardsInfo.empty;
+    _initialRewards = GameRewardsInfo.empty;
     final statisticsSocket = StatisticsSocket(
       socketService: getIt<SocketService>(),
     );
     final rewardsSubscription = statisticsSocket.rewardsInfoStream.listen((
       dto,
     ) {
-      final entity = dto.toEntity();
-      LogService.d('[StatsCoord] live rewardsInfoStream received: ${entity.rewards.length} reward(s)');
-      _initialRewards = entity;
+      _initialRewards = dto.toEntity();
     });
     statisticsSocket.getStatistics(event.roomId);
     try {
       final dto = await statisticsSocket.statisticsResponseStream.first;
-      LogService.d('[StatsCoord] getStatisticsResponse received, navigating. _initialRewards has ${_initialRewards.rewards.length} reward(s)');
       appNavigator.request(GoToStatistics());
       appTransitionEventBus.fire(const StatisticsCompletedAppEvent());
       return StatisticsData(
@@ -84,7 +78,6 @@ class StatisticsCoordinator
         isCTF: event.isCTF,
       );
     } finally {
-      LogService.d('[StatsCoord] finally: disposing temp socket. _initialRewards has ${_initialRewards.rewards.length} reward(s)');
       await rewardsSubscription.cancel();
       await statisticsSocket.dispose();
     }

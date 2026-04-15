@@ -294,9 +294,6 @@ class GameSessionLocalizationsEn extends GameSessionLocalizations {
       'A lit torch that improves your abilities in the light';
 
   @override
-  String get dropTorchButton => 'Drop';
-
-  @override
   String get itemRandomName => 'Random';
 
   @override

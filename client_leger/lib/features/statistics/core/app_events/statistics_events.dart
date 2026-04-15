@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../../../core/app_transition/app_transition_bus.dart';
-import '../../domain/models/game_rewards_info.dart';
 
 part 'statistics_events.freezed.dart';
 
@@ -12,7 +11,6 @@ sealed class StatisticsEntryAppEvent
   const factory StatisticsEntryAppEvent.statisticsRequested({
     required String roomId,
     required bool isCTF,
-    GameRewardsInfo? capturedRewards,
   }) = StatisticsRequested;
 }
 

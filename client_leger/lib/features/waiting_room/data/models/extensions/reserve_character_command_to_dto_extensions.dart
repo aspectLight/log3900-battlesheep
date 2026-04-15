@@ -7,6 +7,5 @@ extension ReserveCharacterCommandToDto on ReserveCharacterCommand {
         roomId: roomId,
         chosenCharacter: chosenCharacter,
         playerId: playerId,
-        isVirtual: isVirtual,
       );
 }

@@ -101,7 +101,6 @@ export class AuthController {
     getProfile(@CurrentUser() user: UserDocument) {
         return {
             id: user._id,
-            firebaseUid: user.firebaseUid,
             email: user.email,
             username: user.username,
             avatarId: user.avatarId,
@@ -121,7 +120,6 @@ export class AuthController {
             message: 'Profil mis à jour',
             user: {
                 id: user._id,
-                firebaseUid: user.firebaseUid,
                 username: user.username,
                 email: user.email,
                 avatarId: user.avatarId,
@@ -213,13 +211,10 @@ export class AuthController {
             message: 'Avatar mis à jour',
             user: {
                 id: user._id,
-                firebaseUid: user.firebaseUid,
                 email: user.email,
                 username: user.username,
                 avatarId: user.avatarId,
                 avatarUrl: user.avatarUrl,
-                theme: user.theme ?? 'default',
-                language: user.language ?? 'fr',
                 preferences: user.preferences,
             },
         };

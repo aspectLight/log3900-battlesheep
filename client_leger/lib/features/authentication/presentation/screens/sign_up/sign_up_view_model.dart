@@ -12,7 +12,6 @@ import '../../../core/helpers/username_validator.dart';
 import '../../../domain/commands/auth_commands.dart';
 import '../../../domain/state/auth_state.dart';
 import '../../../domain/use_cases/sign_up_use_case.dart';
-import '../../../core/interfaces/auth_repository.dart';
 import '../../../../profile/data/services/http_profile_service.dart';
 import '../../ui_models/widget_states/sign_up_form_ui_state.dart';
 
@@ -20,17 +19,14 @@ class SignUpViewModel {
   final SignUpUseCase _signUpUseCase;
   final AppTransitionEventBus _appTransitionEventBus;
   final HttpProfileService _profileService;
-  final AuthRepository _authRepository;
 
   SignUpViewModel({
     required SignUpUseCase signUpUseCase,
     required AppTransitionEventBus appTransitionEventBus,
     required HttpProfileService profileService,
-    required AuthRepository authRepository,
   }) : _signUpUseCase = signUpUseCase,
        _appTransitionEventBus = appTransitionEventBus,
-       _profileService = profileService,
-       _authRepository = authRepository;
+       _profileService = profileService;
 
   final formState = signal<SignUpFormUiState>(SignUpFormUiState.initial());
   final authState = signal<AuthState>(const AuthState.initial());
@@ -164,28 +160,16 @@ class SignUpViewModel {
       case Left(value: final exception):
         authState.value = AuthState.error(exception);
       case Right(value: final user):
-        var authenticatedUser = user;
         final customPath = state.customAvatarPath;
         if (customPath != null && customPath.isNotEmpty) {
           try {
-            final updatedProfile = await _profileService.uploadAvatar(
-              customPath,
-            );
-            authenticatedUser = authenticatedUser.copyWith(
-              username: updatedProfile.username,
-              email: updatedProfile.email,
-              avatarId: updatedProfile.avatarId,
-              avatarUrl: updatedProfile.avatarUrl,
-            );
-          } on Object {
+            await _profileService.uploadAvatar(customPath);
+          } on Exception {
             customAvatarUploadFailed.value = true;
           }
         }
-        _authRepository.syncCurrentUser(authenticatedUser);
-        authState.value = AuthState.authenticated(authenticatedUser);
-        _appTransitionEventBus.fire(
-          AuthEntryAppEvent.signInSuccess(authenticatedUser),
-        );
+        authState.value = AuthState.authenticated(user);
+        _appTransitionEventBus.fire(AuthEntryAppEvent.signInSuccess(user));
     }
   }
 

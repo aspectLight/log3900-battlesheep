@@ -12,14 +12,11 @@ class ReserveCharacterCommandDto {
   @ChosenAvatarCharacterConverter()
   final Character chosenCharacter;
   final String playerId;
-  @JsonKey(defaultValue: false)
-  final bool isVirtual;
 
   const ReserveCharacterCommandDto({
     required this.roomId,
     required this.chosenCharacter,
     required this.playerId,
-    this.isVirtual = false,
   });
 
   factory ReserveCharacterCommandDto.fromJson(Map<String, dynamic> json) =>

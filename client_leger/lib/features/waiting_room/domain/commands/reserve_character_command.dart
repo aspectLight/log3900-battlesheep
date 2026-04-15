@@ -10,6 +10,5 @@ class ReserveCharacterCommand with _$ReserveCharacterCommand {
     required String roomId,
     required Character chosenCharacter,
     required String playerId,
-    @Default(false) bool isVirtual,
   }) = _ReserveCharacterCommand;
 }

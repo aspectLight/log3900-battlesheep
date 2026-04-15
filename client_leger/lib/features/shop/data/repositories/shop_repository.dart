@@ -29,11 +29,6 @@ class ShopRepository {
     _purchaseSub = _socket.purchaseStream.listen(_applyPurchase);
   }
 
-  /// Clears cached catalogue/balance (e.g. before session scope disposal or account switch).
-  void resetToInitial() {
-    state.value = const ShopState.loading();
-  }
-
   void load() {
     state.value = const ShopState.loading();
     _socket.fetchBalance();

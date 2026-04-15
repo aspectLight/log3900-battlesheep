@@ -13,7 +13,6 @@ import '../context/auth_data.dart';
 import '../interfaces/auth_repository.dart';
 import '../../domain/commands/auth_commands.dart' as auth_commands;
 import '../di/auth_module.dart';
-import '../../../shop/data/repositories/shop_repository.dart';
 
 class AuthenticationCoordinator
     implements
@@ -44,9 +43,6 @@ class AuthenticationCoordinator
       case SignInSuccessEvent(:final user):
         _authData = AuthData(username: user.username, socketId: '');
         appNavigator.request(GoToMainMenu());
-        // Always tear down any previous session scope so a new login never reuses
-        // another user's GetIt registrations (e.g. ShopRepository balance cache).
-        await sessionScopeManager.dropScope();
         sessionScopeManager.createScope();
         final scope = sessionScopeManager.currentScope;
         if (scope == null) return;
@@ -81,11 +77,7 @@ class AuthenticationCoordinator
   @override
   Future<void> onExit(AuthExitAppEvent event) async {
     await authRepository.signOut(const auth_commands.SignOutCommand()).run();
-    final scope = sessionScopeManager.currentScope;
-    if (scope != null && scope.isRegistered<ShopRepository>()) {
-      scope.get<ShopRepository>().resetToInitial();
-    }
-    await sessionScopeManager.dropScope();
+    sessionScopeManager.dropScope();
     // Only Auth drops root scope; feature scopes are dropped by their coordinators
     appNavigator.request(ForceUnauthenticated());
   }

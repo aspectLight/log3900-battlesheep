@@ -1,6 +1,5 @@
 class ProfileModel {
   final String id;
-  final String? firebaseUid;
   final String username;
   final String email;
   final String avatarId;
@@ -10,7 +9,6 @@ class ProfileModel {
 
   const ProfileModel({
     required this.id,
-    this.firebaseUid,
     required this.username,
     required this.email,
     required this.avatarId,

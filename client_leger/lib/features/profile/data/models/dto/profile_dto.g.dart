@@ -8,7 +8,6 @@ part of 'profile_dto.dart';
 
 ProfileDto _$ProfileDtoFromJson(Map<String, dynamic> json) => ProfileDto(
   id: json['id'] as String,
-  firebaseUid: json['firebaseUid'] as String?,
   username: json['username'] as String,
   email: json['email'] as String,
   avatarId: json['avatarId'] as String,
@@ -21,7 +20,6 @@ ProfileDto _$ProfileDtoFromJson(Map<String, dynamic> json) => ProfileDto(
 Map<String, dynamic> _$ProfileDtoToJson(ProfileDto instance) =>
     <String, dynamic>{
       'id': instance.id,
-      if (instance.firebaseUid case final value?) 'firebaseUid': value,
       'username': instance.username,
       'email': instance.email,
       'avatarId': instance.avatarId,

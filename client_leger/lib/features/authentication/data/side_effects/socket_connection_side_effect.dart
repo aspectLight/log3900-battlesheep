@@ -3,12 +3,9 @@ import 'dart:async';
 import 'package:fpdart/fpdart.dart';
 
 import '../../../../core/app_transition/app_transition_bus.dart';
-import '../../../../core/connected_scope/session_scope_manager.dart';
 import '../../../../core/helpers/functional_programming.dart';
 import '../../../../core/services/log_service.dart';
 import '../../../../core/services/socket_service.dart';
-import '../../../select_game_session/data/repositories/select_game_session_currency_repository.dart';
-import '../../../shop/data/repositories/shop_repository.dart';
 import '../../core/app_events/auth_events.dart';
 import '../../core/interfaces/auth_repository.dart';
 import '../../domain/models/user.dart';
@@ -28,25 +25,17 @@ class SocketConnectionSideEffect {
   final AuthRepository _authRepository;
   final SocketService _socketService;
   final AppTransitionEventBus _appTransitionEventBus;
-  final SessionScopeManager _sessionScopeManager;
-  final SelectGameSessionCurrencyRepository _currencyRepository;
   StreamSubscription<Option<UserModel>>? _authSubscription;
   StreamSubscription<bool>? _connectionSubscription;
   bool _isConnecting = false;
-  /// Last account identity we cleared cached money UI for (avoids flicker on duplicate emits).
-  String? _lastAccountKey;
 
   SocketConnectionSideEffect({
     required AuthRepository authRepository,
     required SocketService socketService,
     required AppTransitionEventBus appTransitionEventBus,
-    required SessionScopeManager sessionScopeManager,
-    required SelectGameSessionCurrencyRepository currencyRepository,
   }) : _authRepository = authRepository,
        _socketService = socketService,
-       _appTransitionEventBus = appTransitionEventBus,
-       _sessionScopeManager = sessionScopeManager,
-       _currencyRepository = currencyRepository {
+       _appTransitionEventBus = appTransitionEventBus {
     _authSubscription = _authRepository.authStateChanges.listen(_onUserChanged);
     _connectionSubscription = _socketService.connectionStream.listen(
       _onConnectionChanged,
@@ -84,38 +73,9 @@ class SocketConnectionSideEffect {
   }
 
   void _onUserChanged(Option<UserModel> userOption) {
-    userOption.fold(
-      () {
-        _lastAccountKey = null;
-        _currencyRepository.resetBalance();
-        _resetShopIfScoped();
-        if (_socketService.isConnected) _socketService.disconnect();
-      },
-      (user) {
-        final key = _accountKey(user);
-        if (key != null && key != _lastAccountKey) {
-          _lastAccountKey = key;
-          _currencyRepository.resetBalance();
-          _resetShopIfScoped();
-        }
-        _connectIfNeeded();
-      },
-    );
-  }
-
-  static String? _accountKey(UserModel user) {
-    final f = user.firebaseUid?.trim();
-    if (f != null && f.isNotEmpty) return f;
-    final id = user.uid.trim();
-    if (id.isNotEmpty) return id;
-    return null;
-  }
-
-  void _resetShopIfScoped() {
-    final scope = _sessionScopeManager.currentScope;
-    if (scope != null && scope.isRegistered<ShopRepository>()) {
-      scope.get<ShopRepository>().resetToInitial();
-    }
+    userOption.fold(() {
+      if (_socketService.isConnected) _socketService.disconnect();
+    }, (_) => _connectIfNeeded());
   }
 
   void _onConnectionChanged(bool connected) {

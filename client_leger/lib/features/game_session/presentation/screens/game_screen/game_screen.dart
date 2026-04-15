@@ -278,8 +278,7 @@ class _MiddleSection extends StatelessWidget {
           SizedBox(
             // Reserve full card height but push the inventory
             // further DOWN so only a slimmer strip is visible.
-            // Tall enough for torch card (extra height + drop button) after lift.
-            height: 240,
+            height: 200,
             child: Transform.translate(
               offset: const Offset(0, 130),
               child: const Align(

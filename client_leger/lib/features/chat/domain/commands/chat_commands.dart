@@ -7,8 +7,6 @@ class SendChatMessageCommand with _$SendChatMessageCommand {
   const factory SendChatMessageCommand({
     required String username,
     required String content,
-    String? avatarId,
-    String? avatarUrl,
   }) = _SendChatMessageCommand;
 }
 

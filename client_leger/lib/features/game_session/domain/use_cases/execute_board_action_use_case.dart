@@ -70,18 +70,6 @@ class ExecuteBoardActionUseCase {
         break;
       }
     }
-    if (_isTeleportPadPartner(cell, boardState)) {
-      _movementRepository.teleportPlayer(
-        PlayerTeleportedCommand(
-          roomId: roomId,
-          playerId: _socketId,
-          destination: pos,
-          hasCamouflage: false,
-        ),
-      );
-      _playerRepository.decrementActionPointsForPlayer(_socketId);
-      return;
-    }
     final isAdjacent =
         playerPos != null &&
         ((playerPos.x - pos.x).abs() == 1 && playerPos.y == pos.y ||
@@ -137,33 +125,5 @@ class ExecuteBoardActionUseCase {
       );
       _playerRepository.decrementActionPointsForPlayer(_socketId);
     }
-  }
-
-  bool _isTeleportPadPartner(BoardCell targetCell, GameBoardState boardState) {
-    final playerPos = boardState.playerPositions[_socketId];
-    if (playerPos == null) {
-      return false;
-    }
-
-    final playerCell = boardState.board.matrix[playerPos.x][playerPos.y];
-    final playerTile = playerCell.tile;
-    final targetTile = targetCell.tile;
-
-    if (playerTile is! TeleportPadTile || targetTile is! TeleportPadTile) {
-      return false;
-    }
-
-    if (playerTile.state != targetTile.state) {
-      return false;
-    }
-
-    if (playerPos.x == targetCell.x && playerPos.y == targetCell.y) {
-      return false;
-    }
-
-    final hasPlayerOnTarget = boardState.playerPositions.values.any(
-      (position) => position.x == targetCell.x && position.y == targetCell.y,
-    );
-    return !hasPlayerOnTarget;
   }
 }

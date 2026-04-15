@@ -12,8 +12,8 @@ class PlayerRewardInfoDto {
   factory PlayerRewardInfoDto.fromJson(Map<String, dynamic> json) {
     return PlayerRewardInfoDto(
       name: json['name'] as String? ?? '',
-      gain: (json['gain'] as num?)?.toInt() ?? 0,
-      avatarName: json['avatarName']?.toString() ?? '',
+      gain: json['gain'] as int? ?? 0,
+      avatarName: json['avatarName'] as String? ?? '',
     );
   }
 }
@@ -31,22 +31,16 @@ class GameRewardsInfoDto {
 
   factory GameRewardsInfoDto.fromJson(Map<String, dynamic> json) {
     final rewardsRaw = json['rewards'];
-    final rewards = <PlayerRewardInfoDto>[];
-    if (rewardsRaw is List) {
-      for (final item in rewardsRaw) {
-        if (item is Map<String, dynamic>) {
-          rewards.add(PlayerRewardInfoDto.fromJson(item));
-        } else if (item is Map) {
-          rewards.add(PlayerRewardInfoDto.fromJson(
-            Map<String, dynamic>.from(item),
-          ));
-        }
-      }
-    }
+    final rewards = rewardsRaw is List
+        ? rewardsRaw
+              .whereType<Map<String, dynamic>>()
+              .map(PlayerRewardInfoDto.fromJson)
+              .toList(growable: false)
+        : const <PlayerRewardInfoDto>[];
     return GameRewardsInfoDto(
       rewards: rewards,
-      entryFee: (json['entryFee'] as num?)?.toInt() ?? 0,
-      pool: (json['pool'] as num?)?.toInt() ?? 0,
+      entryFee: json['entryFee'] as int? ?? 0,
+      pool: json['pool'] as int? ?? 0,
     );
   }
 

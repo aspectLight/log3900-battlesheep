@@ -178,10 +178,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
     try {
-      final picked = await _imagePicker.pickImage(
-        source: source,
-        preferredCameraDevice: CameraDevice.front,
-      );
+      final picked = await _imagePicker.pickImage(source: source);
       if (picked == null) return;
       final error = await _validateCustomAvatar(picked, l10n);
       if (error != null) {

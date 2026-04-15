@@ -33,8 +33,6 @@ import '../../data/side_effects/game_turn_start_notification_side_effect.dart';
 import '../../data/side_effects/game_virtual_player_move_side_effect.dart';
 import '../../data/side_effects/game_virtual_player_turn_side_effect.dart';
 import '../../data/side_effects/game_win_condition_side_effect.dart';
-import '../../data/side_effects/game_rewards_capture_side_effect.dart';
-import '../../data/repositories/game_rewards_holder.dart';
 import '../context/drop_in_join_sync_holder.dart';
 import '../context/game_history_record_holder.dart';
 import '../context/game_session_scope_holder.dart';
@@ -59,18 +57,9 @@ void registerGameSessionRoot(GetIt getIt) {
   getIt.registerLazySingleton<GameSessionScopeHolder>(
     GameSessionScopeHolder.new,
   );
-  getIt.registerLazySingleton<GameRewardsHolder>(GameRewardsHolder.new);
   registerGameRootServices(getIt);
   registerGameReducers(getIt);
   registerGameSessionEventBus(getIt);
-  getIt.registerLazySingleton<GameRewardsCaptureSideEffect>(
-    () => GameRewardsCaptureSideEffect(
-      socketService: getIt(),
-      gameSessionEventBus: getIt(),
-      gameRewardsHolder: getIt(),
-    ),
-  );
-  getIt.get<GameRewardsCaptureSideEffect>();
   registerGameSessionCoordinator(getIt);
   se.registerGameSessionEventSideEffect(getIt);
   vm.registerGameSessionRootViewModels(getIt);

@@ -35,11 +35,6 @@ class MaxPlayerLimitReachedWaitingRoomFailure extends WaitingRoomFailure {
     : super('Max player limit reached');
 }
 
-class PlayerAlreadyInRoomWaitingRoomFailure extends WaitingRoomFailure {
-  const PlayerAlreadyInRoomWaitingRoomFailure()
-    : super('Player already in room');
-}
-
 class StartGameFailedWaitingRoomFailure extends WaitingRoomFailure {
   const StartGameFailedWaitingRoomFailure() : super('Start game failed');
 }

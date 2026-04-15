@@ -298,9 +298,6 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
       'Une torche enflammée qui améliore les capacités à la lumière';
 
   @override
-  String get dropTorchButton => 'Déposer';
-
-  @override
   String get itemRandomName => 'Random';
 
   @override

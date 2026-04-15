@@ -108,10 +108,6 @@ class WaitingRoomLocalizationsFr extends WaitingRoomLocalizations {
   String get waitingRoomCharacterAlreadyReserved => 'Personnage déjà réservé';
 
   @override
-  String get waitingRoomPlayerAlreadyInRoom =>
-      'Ce joueur est déjà dans la salle';
-
-  @override
   String get waitingRoomPlayerKicked => 'Vous avez été expulsé';
 
   @override

@@ -31,9 +31,6 @@ extension WaitingRoomServerMessageToFailure on String? {
       return const RoomLockedWaitingRoomFailure();
     if (msg.contains('expulsé de la partie'))
       return const PlayerKickedWaitingRoomFailure();
-    if (msg.contains('est déjà dans la salle')) {
-      return const PlayerAlreadyInRoomWaitingRoomFailure();
-    }
     if (msg.contains('nombre maximum de joueurs')) {
       return const MaxPlayerLimitReachedWaitingRoomFailure();
     }

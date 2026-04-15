@@ -6,9 +6,7 @@ import '../../../../../core/enums/auth_avatar.dart';
 class AvatarPickerViewModel {
   final selectedAvatar = signal<Option<AuthAvatar>>(const Option.none());
 
-  List<AuthAvatar> get avatars => AuthAvatar.values
-      .where((avatar) => !avatar.isExclusiveAtSignUp)
-      .toList(growable: false);
+  List<AuthAvatar> get avatars => AuthAvatar.values;
 
   bool isSelected(AuthAvatar avatar) =>
       selectedAvatar.value.fold(() => false, (s) => s == avatar);

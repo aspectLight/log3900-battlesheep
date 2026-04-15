@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:auto_route/auto_route.dart';
@@ -6,12 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
-import '../../../../../core/enums/shop_item_type.dart';
 import '../../../../../core/notification/notification_intent.dart';
 import '../../../../../core/notification/notification_intent_sink.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
 import '../../../core/localisation/shop_localizations.dart';
-import '../../../../profile/core/exceptions/profile_failure.dart';
 import '../../../core/exceptions/shop_purchase_exception.dart';
 import '../../../domain/models/shop_item_model.dart';
 import '../../../domain/state/shop_state.dart';
@@ -103,38 +100,12 @@ class _ShopScreenState extends State<ShopScreen> {
     _viewModel.requestPurchase(item);
   }
 
-  Future<void> _onEquipToggle(ShopItemModel item, ShopLocalizations l10n) async {
-    try {
-      final outcome = await _viewModel.toggleBannerEquip(item);
-      if (!mounted) return;
-      if (outcome == null) return;
-      final text = switch (outcome) {
-        BannerEquipOutcome.equipped => l10n.shopEquipped,
-        BannerEquipOutcome.unequipped => l10n.shopUnequipped,
-      };
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(text)));
-    } on ProfileFailure catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.devMessage)));
-    } on Object {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.shopBannerPreferenceUpdateFailed)),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = ShopLocalizations.of(context)!;
 
     return Watch((context) {
       final state = _viewModel.state.value;
-      _viewModel.activeBannerWire.value;
 
       return AppBackground(
         child: SafeArea(
@@ -176,15 +147,15 @@ class _ShopScreenState extends State<ShopScreen> {
                 children: [
                   _sectionTitle(l10n.shopBannersSection),
                   const SizedBox(height: 14),
-                  _buildItemWrap(_viewModel.banners, state, l10n),
+                  _buildItemWrap(_viewModel.banners, state),
                   const SizedBox(height: 36),
                   _sectionTitle(l10n.shopCharactersSection),
                   const SizedBox(height: 14),
-                  _buildItemWrap(_viewModel.characters, state, l10n),
+                  _buildItemWrap(_viewModel.characters, state),
                   const SizedBox(height: 36),
                   _sectionTitle(l10n.shopAvatarsSection),
                   const SizedBox(height: 14),
-                  _buildItemWrap(_viewModel.avatars, state, l10n),
+                  _buildItemWrap(_viewModel.avatars, state),
                 ],
               ),
             ),
@@ -194,25 +165,16 @@ class _ShopScreenState extends State<ShopScreen> {
     );
   }
 
-  Widget _buildItemWrap(
-    List<ShopItemModel> items,
-    ShopStateLoaded state,
-    ShopLocalizations l10n,
-  ) {
+  Widget _buildItemWrap(List<ShopItemModel> items, ShopStateLoaded state) {
     return Wrap(
       spacing: _shopWrapSpacing,
       runSpacing: _shopWrapSpacing,
       children: items.map((item) {
         final owned = state.purchasedItems.contains(item.id);
-        final isBanner = item.type == ShopItemType.banner;
         return ShopItemCard(
           item: item,
           owned: owned,
-          equipped: isBanner && _viewModel.isBannerEquipped(item),
           onBuy: () => _onBuyPressed(item, state),
-          onEquipToggle: owned && isBanner
-              ? () => unawaited(_onEquipToggle(item, l10n))
-              : null,
         );
       }).toList(),
     );

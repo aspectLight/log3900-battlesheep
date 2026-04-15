@@ -45,10 +45,6 @@ class ShopLocalizationsEn extends ShopLocalizations {
   String get shopUnequipped => 'Cosmetic unequipped.';
 
   @override
-  String get shopBannerPreferenceUpdateFailed =>
-      'Could not update your banner preference. Please try again.';
-
-  @override
   String get shopPurchaseFailedTitle => 'Purchase failed';
 
   @override

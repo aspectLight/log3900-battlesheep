@@ -32,7 +32,6 @@
   "waitingRoomRoomNotFound": "Game not found",
   "waitingRoomRoomLocked": "Game is locked",
   "waitingRoomCharacterAlreadyReserved": "Character already taken",
-  "waitingRoomPlayerAlreadyInRoom": "This player is already in the room",
   "waitingRoomPlayerKicked": "You have been kicked",
   "waitingRoomMaxPlayerLimitReached": "Maximum player limit reached",
   "waitingRoomStartGameFailed": "Could not start game",

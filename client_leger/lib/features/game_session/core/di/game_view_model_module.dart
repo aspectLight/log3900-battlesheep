@@ -10,7 +10,6 @@ import '../../data/repositories/game_board_selected_cell_repository.dart';
 import '../../data/repositories/game_combat_repository.dart';
 import '../../data/repositories/game_debug_repository.dart';
 import '../../data/repositories/game_inventory_repository.dart';
-import '../../data/repositories/game_item_repository.dart';
 import '../context/game_session_data.dart';
 import '../../data/repositories/game_metadata_repository.dart';
 import '../../data/repositories/game_player_repository.dart';
@@ -52,11 +51,7 @@ void registerGameSessionScopeViewModels(
   );
   scope.registerFactory<GamePlayerInventoryViewModel>(
     () => GamePlayerInventoryViewModel(
-      roomId: scope.get<GameSessionData>().roomId,
       inventoryRepository: scope.get<GameInventoryRepository>(),
-      boardRepository: scope.get<GameBoardRepository>(),
-      turnRepository: scope.get<GameTurnRepository>(),
-      itemRepository: scope.get<GameItemRepository>(),
       playerId: socketId,
     ),
   );

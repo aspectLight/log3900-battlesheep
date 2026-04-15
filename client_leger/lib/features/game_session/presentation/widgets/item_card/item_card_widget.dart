@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/constants/item_assets.dart';
@@ -11,18 +10,12 @@ class ItemCardWidget extends StatelessWidget {
   final double width;
   final double height;
   final VoidCallback? onTap;
-  final bool showDropButton;
-  final bool dropEnabled;
-  final VoidCallback? onDropPressed;
 
   const ItemCardWidget({
     required this.item,
     this.width = 110,
     this.height = 160,
     this.onTap,
-    this.showDropButton = false,
-    this.dropEnabled = false,
-    this.onDropPressed,
     super.key,
   });
 
@@ -33,15 +26,11 @@ class ItemCardWidget extends StatelessWidget {
     final description = item.description(l10n);
     final cornerLetter = name.isNotEmpty ? name[0].toUpperCase() : '?';
 
-    // Without extra height + tighter layout, the middle Column overflows (~100px
-    // tall): the Drop button sits in a clipped region and never receives taps.
-    final cardHeight = showDropButton ? 196.0 : height;
-    final insetV = showDropButton ? 18.0 : 30.0;
-    final imageSize = showDropButton ? 52.0 : 80.0;
-
-    Widget card = Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
         width: width,
-        height: cardHeight,
+        height: height,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
@@ -59,7 +48,6 @@ class ItemCardWidget extends StatelessWidget {
           ],
         ),
         child: Stack(
-          clipBehavior: Clip.none,
           children: [
             const Positioned(top: -2, left: -2, child: _CornerRing()),
             const Positioned(top: -2, right: -2, child: _CornerRing()),
@@ -102,7 +90,7 @@ class ItemCardWidget extends StatelessWidget {
               right: 8,
               child: Container(width: 4, color: const Color(0x33990000)),
             ),
-            ..._buildDiamonds(cardHeight),
+            ..._buildDiamonds(),
             const Positioned(
               top: 8,
               left: 25,
@@ -116,29 +104,26 @@ class ItemCardWidget extends StatelessWidget {
               child: _BorderGradientLine(),
             ),
             Positioned(
-              top: insetV,
-              bottom: insetV,
+              top: 30,
+              bottom: 30,
               left: 16,
               right: 16,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize:
-                    showDropButton ? MainAxisSize.min : MainAxisSize.max,
                 children: [
-                  SizedBox(
-                    height: imageSize,
-                    width: imageSize,
+                  Container(
+                    height: 80,
+                    width: 80,
+                    alignment: Alignment.center,
                     child: Image.asset(
                       ItemAssets.gameBoardItem(item.type),
                       fit: BoxFit.contain,
                     ),
                   ),
-                  SizedBox(height: showDropButton ? 4 : 8),
+                  const SizedBox(height: 8),
                   Text(
                     name,
                     textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -148,11 +133,11 @@ class ItemCardWidget extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  if (showDropButton)
-                    Text(
+                  Flexible(
+                    child: Text(
                       description,
                       textAlign: TextAlign.center,
-                      maxLines: 2,
+                      maxLines: 4,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 10,
@@ -160,70 +145,15 @@ class ItemCardWidget extends StatelessWidget {
                         decoration: TextDecoration.none,
                         fontFamily: 'CustomFont',
                       ),
-                    )
-                  else
-                    Flexible(
-                      child: Text(
-                        description,
-                        textAlign: TextAlign.center,
-                        maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          color: Colors.black,
-                          decoration: TextDecoration.none,
-                          fontFamily: 'CustomFont',
-                        ),
-                      ),
                     ),
-                  if (showDropButton) ...[
-                    const SizedBox(height: 6),
-                    SizedBox(
-                      height: 28,
-                      width: double.infinity,
-                      child: OutlinedButton(
-                        onPressed: dropEnabled
-                            ? () {
-                                if (kDebugMode) {
-                                  debugPrint(
-                                    '[torch-drop] Drop button activated (item=${item.type})',
-                                  );
-                                }
-                                onDropPressed?.call();
-                              }
-                            : null,
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          minimumSize: const Size(0, 26),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          foregroundColor: const Color(0xFF5A1A1A),
-                          side: const BorderSide(color: Color(0x995A1A1A)),
-                          textStyle: const TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            fontFamily: 'CustomFont',
-                          ),
-                        ),
-                        child: Text(l10n.dropTorchButton),
-                      ),
-                    ),
-                  ],
+                  ),
                 ],
               ),
             ),
           ],
         ),
-      );
-
-    if (onTap != null) {
-      card = GestureDetector(
-        behavior: HitTestBehavior.deferToChild,
-        onTap: onTap,
-        child: card,
-      );
-    }
-
-    return card;
+      ),
+    );
   }
 
   TextStyle get _cornerTextStyle => const TextStyle(
@@ -234,9 +164,8 @@ class ItemCardWidget extends StatelessWidget {
     fontFamily: 'CustomFont',
   );
 
-  List<Widget> _buildDiamonds(double cardHeight) {
-    final third = (cardHeight * 0.55).clamp(90.0, cardHeight - 24.0);
-    final positions = [36.0, 96.0, third];
+  List<Widget> _buildDiamonds() {
+    final positions = [40, 110, 180];
     final widgets = <Widget>[];
 
     for (final top in positions) {

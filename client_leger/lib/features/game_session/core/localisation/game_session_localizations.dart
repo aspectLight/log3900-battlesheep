@@ -608,12 +608,6 @@ abstract class GameSessionLocalizations {
   /// **'A lit torch that improves your abilities in the light'**
   String get itemTorchDesc;
 
-  /// No description provided for @dropTorchButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Drop'**
-  String get dropTorchButton;
-
   /// No description provided for @itemRandomName.
   ///
   /// In en, this message translates to:
