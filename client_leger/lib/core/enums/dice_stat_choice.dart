@@ -1,4 +1,1 @@
-enum DiceStatChoice {
-  attack,
-  defense,
-}
+enum DiceStatChoice { attack, defense }

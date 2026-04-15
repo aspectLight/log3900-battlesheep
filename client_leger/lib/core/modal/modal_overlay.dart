@@ -20,9 +20,7 @@ class ModalOverlay extends StatelessWidget {
           Positioned.fill(
             child: GestureDetector(
               onTap: () => coordinator.remove(entry.id),
-              child: const ColoredBox(
-                color: Colors.black54,
-              ),
+              child: const ColoredBox(color: Colors.black54),
             ),
           ),
           Positioned.fill(

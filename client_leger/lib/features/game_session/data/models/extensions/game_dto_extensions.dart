@@ -17,7 +17,7 @@ extension GameDtoToEntity on GameDto {
         final pos = GameBoardPosition(x: i, y: j);
         row.add(
           BoardCell(
-            tile: Tile.fromType(cellDto.tileType, cellDto.tileState),
+            tile: Tile.fromType(cellDto.tileType, cellDto.tileData.state),
             position: pos,
             tileOrientation: cellDto.tileData.orientation,
           ),
@@ -36,7 +36,9 @@ extension GameDtoToEntity on GameDto {
       mode: const GameModeConverter().fromJson(mode),
       board: Board(matrix: matrix, size: board.size),
       initialItems: items,
-      isVisible: isVisible,
+      privacy: privacy,
+      owner: owner,
+      actionPoints: actionPoints,
       modificationDate: modificationDate,
     );
   }

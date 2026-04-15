@@ -10,6 +10,7 @@ extension WaitingRoomPlayerModelToDto on WaitingRoomPlayerModel {
         name: p.name,
         avatar: {'name': p.character.id},
         stats: p.stats.toDto(),
+        activeBanner: p.activeBanner,
       ),
       virtual: (p) => WaitingRoomPlayerDto(
         id: p.id,
@@ -20,6 +21,7 @@ extension WaitingRoomPlayerModelToDto on WaitingRoomPlayerModel {
         virtualType: p.virtualType,
         d6Choice: p.d6Choice,
         d4Choice: p.d4Choice,
+        activeBanner: p.activeBanner,
       ),
     );
   }

@@ -8,12 +8,11 @@ part 'update_character_reserved_payload_dto.g.dart';
 class UpdateCharacterReservedPayloadDto {
   final List<ReservedCharacterItemDto> reservedAvatars;
 
-  const UpdateCharacterReservedPayloadDto({
-    required this.reservedAvatars,
-  });
+  const UpdateCharacterReservedPayloadDto({required this.reservedAvatars});
 
-  factory UpdateCharacterReservedPayloadDto.fromJson(Map<String, dynamic> json) =>
-      _$UpdateCharacterReservedPayloadDtoFromJson(json);
+  factory UpdateCharacterReservedPayloadDto.fromJson(
+    Map<String, dynamic> json,
+  ) => _$UpdateCharacterReservedPayloadDtoFromJson(json);
 
   factory UpdateCharacterReservedPayloadDto.fromObject(Object? data) {
     if (data is! Map<String, dynamic>) {

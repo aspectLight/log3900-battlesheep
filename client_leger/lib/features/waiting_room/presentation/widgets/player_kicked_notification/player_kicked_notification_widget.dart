@@ -10,9 +10,9 @@ class PlayerKickedNotificationWidget extends StatelessWidget {
     required WaitingRoomPlayerKickedNotificationIntent intent,
     required VoidCallback onDismiss,
   }) : _viewModel = PlayerKickedNotificationViewModel(
-          intent: intent,
-          onDismiss: onDismiss,
-        );
+         intent: intent,
+         onDismiss: onDismiss,
+       );
 
   final PlayerKickedNotificationViewModel _viewModel;
 
@@ -55,7 +55,10 @@ class PlayerKickedNotificationWidget extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _GameButton(label: l10n.ok, onTap: _viewModel.handleDismiss),
+                    _GameButton(
+                      label: l10n.ok,
+                      onTap: _viewModel.handleDismiss,
+                    ),
                   ],
                 ),
               ],

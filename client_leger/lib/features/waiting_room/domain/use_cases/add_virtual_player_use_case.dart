@@ -20,8 +20,8 @@ class AddVirtualPlayerUseCase {
   AddVirtualPlayerUseCase({
     required WaitingRoomReservationsRepository reservationsRepository,
     required WaitingRoomRoomRepository roomRepository,
-  })  : _reservationsRepository = reservationsRepository,
-        _roomRepository = roomRepository;
+  }) : _reservationsRepository = reservationsRepository,
+       _roomRepository = roomRepository;
 
   final WaitingRoomReservationsRepository _reservationsRepository;
   final WaitingRoomRoomRepository _roomRepository;

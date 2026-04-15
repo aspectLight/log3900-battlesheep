@@ -19,6 +19,7 @@ void registerCharacterCreationUseCases(
       appTransitionEventBus: rootGetIt.get<AppTransitionEventBus>(),
       roomCode: roomCode,
       entryMode: entryMode,
+      socketId: socketId,
     ),
   );
   scope.registerFactory<ReserveCharacterUseCase>(

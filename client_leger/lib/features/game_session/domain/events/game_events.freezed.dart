@@ -24,6 +24,8 @@ mixin _$SpawnedPlayerEvent {
   int get movementPoints => throw _privateConstructorUsedError;
   int get actionPoints => throw _privateConstructorUsedError;
   GameBoardPosition get spawnPoint => throw _privateConstructorUsedError;
+  GameBoardPosition get currentBoardPosition =>
+      throw _privateConstructorUsedError;
   List<GameItem> get inventory => throw _privateConstructorUsedError;
   Map<StatType, int> get stats => throw _privateConstructorUsedError;
   StatType get diceChoice => throw _privateConstructorUsedError;
@@ -52,6 +54,7 @@ abstract class $SpawnedPlayerEventCopyWith<$Res> {
     int movementPoints,
     int actionPoints,
     GameBoardPosition spawnPoint,
+    GameBoardPosition currentBoardPosition,
     List<GameItem> inventory,
     Map<StatType, int> stats,
     StatType diceChoice,
@@ -60,6 +63,7 @@ abstract class $SpawnedPlayerEventCopyWith<$Res> {
   });
 
   $GameBoardPositionCopyWith<$Res> get spawnPoint;
+  $GameBoardPositionCopyWith<$Res> get currentBoardPosition;
 }
 
 /// @nodoc
@@ -84,6 +88,7 @@ class _$SpawnedPlayerEventCopyWithImpl<$Res, $Val extends SpawnedPlayerEvent>
     Object? movementPoints = null,
     Object? actionPoints = null,
     Object? spawnPoint = null,
+    Object? currentBoardPosition = null,
     Object? inventory = null,
     Object? stats = null,
     Object? diceChoice = null,
@@ -120,6 +125,10 @@ class _$SpawnedPlayerEventCopyWithImpl<$Res, $Val extends SpawnedPlayerEvent>
                 ? _value.spawnPoint
                 : spawnPoint // ignore: cast_nullable_to_non_nullable
                       as GameBoardPosition,
+            currentBoardPosition: null == currentBoardPosition
+                ? _value.currentBoardPosition
+                : currentBoardPosition // ignore: cast_nullable_to_non_nullable
+                      as GameBoardPosition,
             inventory: null == inventory
                 ? _value.inventory
                 : inventory // ignore: cast_nullable_to_non_nullable
@@ -154,6 +163,18 @@ class _$SpawnedPlayerEventCopyWithImpl<$Res, $Val extends SpawnedPlayerEvent>
       return _then(_value.copyWith(spawnPoint: value) as $Val);
     });
   }
+
+  /// Create a copy of SpawnedPlayerEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GameBoardPositionCopyWith<$Res> get currentBoardPosition {
+    return $GameBoardPositionCopyWith<$Res>(_value.currentBoardPosition, (
+      value,
+    ) {
+      return _then(_value.copyWith(currentBoardPosition: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -173,6 +194,7 @@ abstract class _$$SpawnedPlayerEventImplCopyWith<$Res>
     int movementPoints,
     int actionPoints,
     GameBoardPosition spawnPoint,
+    GameBoardPosition currentBoardPosition,
     List<GameItem> inventory,
     Map<StatType, int> stats,
     StatType diceChoice,
@@ -182,6 +204,8 @@ abstract class _$$SpawnedPlayerEventImplCopyWith<$Res>
 
   @override
   $GameBoardPositionCopyWith<$Res> get spawnPoint;
+  @override
+  $GameBoardPositionCopyWith<$Res> get currentBoardPosition;
 }
 
 /// @nodoc
@@ -205,6 +229,7 @@ class __$$SpawnedPlayerEventImplCopyWithImpl<$Res>
     Object? movementPoints = null,
     Object? actionPoints = null,
     Object? spawnPoint = null,
+    Object? currentBoardPosition = null,
     Object? inventory = null,
     Object? stats = null,
     Object? diceChoice = null,
@@ -240,6 +265,10 @@ class __$$SpawnedPlayerEventImplCopyWithImpl<$Res>
         spawnPoint: null == spawnPoint
             ? _value.spawnPoint
             : spawnPoint // ignore: cast_nullable_to_non_nullable
+                  as GameBoardPosition,
+        currentBoardPosition: null == currentBoardPosition
+            ? _value.currentBoardPosition
+            : currentBoardPosition // ignore: cast_nullable_to_non_nullable
                   as GameBoardPosition,
         inventory: null == inventory
             ? _value._inventory
@@ -277,6 +306,7 @@ class _$SpawnedPlayerEventImpl implements _SpawnedPlayerEvent {
     required this.movementPoints,
     required this.actionPoints,
     required this.spawnPoint,
+    required this.currentBoardPosition,
     final List<GameItem> inventory = const [],
     required final Map<StatType, int> stats,
     required this.diceChoice,
@@ -299,6 +329,8 @@ class _$SpawnedPlayerEventImpl implements _SpawnedPlayerEvent {
   final int actionPoints;
   @override
   final GameBoardPosition spawnPoint;
+  @override
+  final GameBoardPosition currentBoardPosition;
   final List<GameItem> _inventory;
   @override
   @JsonKey()
@@ -326,7 +358,7 @@ class _$SpawnedPlayerEventImpl implements _SpawnedPlayerEvent {
 
   @override
   String toString() {
-    return 'SpawnedPlayerEvent(id: $id, name: $name, characterType: $characterType, color: $color, movementPoints: $movementPoints, actionPoints: $actionPoints, spawnPoint: $spawnPoint, inventory: $inventory, stats: $stats, diceChoice: $diceChoice, isVirtual: $isVirtual, team: $team)';
+    return 'SpawnedPlayerEvent(id: $id, name: $name, characterType: $characterType, color: $color, movementPoints: $movementPoints, actionPoints: $actionPoints, spawnPoint: $spawnPoint, currentBoardPosition: $currentBoardPosition, inventory: $inventory, stats: $stats, diceChoice: $diceChoice, isVirtual: $isVirtual, team: $team)';
   }
 
   @override
@@ -345,6 +377,8 @@ class _$SpawnedPlayerEventImpl implements _SpawnedPlayerEvent {
                 other.actionPoints == actionPoints) &&
             (identical(other.spawnPoint, spawnPoint) ||
                 other.spawnPoint == spawnPoint) &&
+            (identical(other.currentBoardPosition, currentBoardPosition) ||
+                other.currentBoardPosition == currentBoardPosition) &&
             const DeepCollectionEquality().equals(
               other._inventory,
               _inventory,
@@ -367,6 +401,7 @@ class _$SpawnedPlayerEventImpl implements _SpawnedPlayerEvent {
     movementPoints,
     actionPoints,
     spawnPoint,
+    currentBoardPosition,
     const DeepCollectionEquality().hash(_inventory),
     const DeepCollectionEquality().hash(_stats),
     diceChoice,
@@ -395,6 +430,7 @@ abstract class _SpawnedPlayerEvent implements SpawnedPlayerEvent {
     required final int movementPoints,
     required final int actionPoints,
     required final GameBoardPosition spawnPoint,
+    required final GameBoardPosition currentBoardPosition,
     final List<GameItem> inventory,
     required final Map<StatType, int> stats,
     required final StatType diceChoice,
@@ -416,6 +452,8 @@ abstract class _SpawnedPlayerEvent implements SpawnedPlayerEvent {
   int get actionPoints;
   @override
   GameBoardPosition get spawnPoint;
+  @override
+  GameBoardPosition get currentBoardPosition;
   @override
   List<GameItem> get inventory;
   @override

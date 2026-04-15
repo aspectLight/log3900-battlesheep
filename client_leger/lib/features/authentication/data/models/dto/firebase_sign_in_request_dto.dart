@@ -21,4 +21,3 @@ class FirebaseSignInRequestDto {
 
   Map<String, dynamic> toJson() => _$FirebaseSignInRequestDtoToJson(this);
 }
-

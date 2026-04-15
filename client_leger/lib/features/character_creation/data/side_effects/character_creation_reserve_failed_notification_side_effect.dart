@@ -3,16 +3,17 @@ import '../../../../core/notification/notification_intent.dart';
 import '../../../../core/notification/notification_intent_sink.dart';
 import '../../core/event_bus/character_creation_event_bus.dart';
 
-class CharacterCreationReserveFailedNotificationSideEffect with DisposableSideEffect {
+class CharacterCreationReserveFailedNotificationSideEffect
+    with DisposableSideEffect {
   CharacterCreationReserveFailedNotificationSideEffect({
     required CharacterCreationEventBus eventBus,
     required NotificationIntentSink notificationIntentSink,
-  })  : _eventBus = eventBus,
-        _notificationIntentSink = notificationIntentSink {
+  }) : _eventBus = eventBus,
+       _notificationIntentSink = notificationIntentSink {
     trackSubscription(
-      _eventBus
-          .on<CharacterCreationReserveFailedEvent>()
-          .listen(_onReserveFailed),
+      _eventBus.on<CharacterCreationReserveFailedEvent>().listen(
+        _onReserveFailed,
+      ),
     );
   }
 
@@ -25,4 +26,3 @@ class CharacterCreationReserveFailedNotificationSideEffect with DisposableSideEf
     );
   }
 }
-

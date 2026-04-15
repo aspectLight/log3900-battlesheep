@@ -3,6 +3,8 @@ import 'package:fpdart/fpdart.dart';
 
 import '../../../../../core/enums/virtual_player_type.dart';
 import '../../../../../core/helpers/functional_programming.dart';
+import '../../../../shop/data/repositories/shop_repository.dart';
+import '../../../../shop/domain/state/shop_state.dart';
 import '../../../core/exceptions/waiting_room_failure.dart';
 import '../../../core/typedefs/waiting_room_start_validation_params.dart';
 import '../../../core/helpers/waiting_room_start_validation.dart';
@@ -13,6 +15,7 @@ import '../../../domain/use_cases/add_virtual_player_use_case.dart';
 import '../../../domain/use_cases/kick_player_use_case.dart';
 import '../../../domain/use_cases/leave_waiting_room_use_case.dart';
 import '../../../domain/use_cases/start_waiting_room_game_use_case.dart';
+import '../../../domain/use_cases/toggle_drop_in_drop_out_use_case.dart';
 import '../../../domain/use_cases/toggle_lock_waiting_room_use_case.dart';
 
 class WaitingRoomViewModel {
@@ -22,23 +25,29 @@ class WaitingRoomViewModel {
     required AddVirtualPlayerUseCase addVirtualPlayerUseCase,
     required LeaveWaitingRoomUseCase leaveWaitingRoomUseCase,
     required ToggleLockWaitingRoomUseCase toggleLockWaitingRoomUseCase,
+    required ToggleDropInDropOutUseCase toggleDropInDropOutUseCase,
     required KickPlayerUseCase kickPlayerUseCase,
     required StartWaitingRoomGameUseCase startWaitingRoomGameUseCase,
-  })  : _roomRepository = roomRepository,
-        _startParams = startParams,
-        _addVirtualPlayerUseCase = addVirtualPlayerUseCase,
-        _leaveWaitingRoomUseCase = leaveWaitingRoomUseCase,
-        _toggleLockWaitingRoomUseCase = toggleLockWaitingRoomUseCase,
-        _kickPlayerUseCase = kickPlayerUseCase,
-        _startWaitingRoomGameUseCase = startWaitingRoomGameUseCase;
+    required ShopRepository shopRepository,
+  }) : _roomRepository = roomRepository,
+       _startParams = startParams,
+       _addVirtualPlayerUseCase = addVirtualPlayerUseCase,
+       _leaveWaitingRoomUseCase = leaveWaitingRoomUseCase,
+       _toggleLockWaitingRoomUseCase = toggleLockWaitingRoomUseCase,
+       _toggleDropInDropOutUseCase = toggleDropInDropOutUseCase,
+       _kickPlayerUseCase = kickPlayerUseCase,
+       _startWaitingRoomGameUseCase = startWaitingRoomGameUseCase,
+       _shopRepository = shopRepository;
 
   final WaitingRoomRoomRepository _roomRepository;
   final WaitingRoomStartValidationParams _startParams;
   final AddVirtualPlayerUseCase _addVirtualPlayerUseCase;
   final LeaveWaitingRoomUseCase _leaveWaitingRoomUseCase;
   final ToggleLockWaitingRoomUseCase _toggleLockWaitingRoomUseCase;
+  final ToggleDropInDropOutUseCase _toggleDropInDropOutUseCase;
   final KickPlayerUseCase _kickPlayerUseCase;
   final StartWaitingRoomGameUseCase _startWaitingRoomGameUseCase;
+  final ShopRepository _shopRepository;
 
   late final room = computed<WaitingRoomModel>(
     () => _roomRepository.state.value.room,
@@ -52,6 +61,12 @@ class WaitingRoomViewModel {
   );
   late final isAtMaxPlayers = computed<bool>(
     () => isWaitingRoomAtMaxPlayers(room.value, _startParams),
+  );
+  late final balance = computed<int>(
+    () => switch (_shopRepository.state.value) {
+      ShopStateLoaded(:final balance) => balance,
+      _ => 0,
+    },
   );
 
   Future<Option<WaitingRoomFailure>> leaveRoom() async {
@@ -68,19 +83,23 @@ class WaitingRoomViewModel {
   Future<Option<WaitingRoomFailure>> toggleLock() async {
     if (!isHost.value) return none();
     final currentRoom = room.value;
-    if (currentRoom.isLocked && isWaitingRoomAtMaxPlayers(currentRoom, _startParams)) {
+    if (currentRoom.isLocked &&
+        isWaitingRoomAtMaxPlayers(currentRoom, _startParams)) {
       return const Option.of(MaxPlayerLimitReachedWaitingRoomFailure());
     }
     _toggleLockWaitingRoomUseCase.execute();
     return none();
   }
 
-  Future<Option<WaitingRoomFailure>> kickPlayer(
-    WaitingRoomPlayerModel player,
-  ) {
+  Future<Option<WaitingRoomFailure>> kickPlayer(WaitingRoomPlayerModel player) {
     if (!isHost.value) return Future.value(none());
     _kickPlayerUseCase.execute(player);
     return Future.value(none());
+  }
+
+  void toggleDropInDropOut() {
+    if (!isHost.value) return;
+    _toggleDropInDropOutUseCase.execute();
   }
 
   Future<Option<WaitingRoomFailure>> addVirtualPlayer({

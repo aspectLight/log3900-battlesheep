@@ -13,16 +13,16 @@ class SignUpFormUiState with _$SignUpFormUiState {
     required String password,
     required String confirmPassword,
     required Option<AuthAvatar> avatar,
+    String? customAvatarPath,
     required bool hasAttemptedSubmit,
   }) = _SignUpFormUiState;
 
   factory SignUpFormUiState.initial() => const SignUpFormUiState(
-        username: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        avatar: Option.none(),
-        hasAttemptedSubmit: false,
-      );
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    avatar: Option.none(),
+    hasAttemptedSubmit: false,
+  );
 }
-

@@ -11,5 +11,7 @@ ChatMessageUi toChatMessageUi(
     content: entity.content,
     time: entity.time,
     isMe: entity.name == currentUsername,
+    avatarId: entity.avatarId,
+    avatarUrl: entity.avatarUrl,
   );
 }

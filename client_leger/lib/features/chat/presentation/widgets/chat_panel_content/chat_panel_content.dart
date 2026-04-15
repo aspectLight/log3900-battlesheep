@@ -8,6 +8,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/appearance/app_interaction_colors.dart';
+import '../../../../../core/presentation/widgets/profile_avatar_thumb/profile_avatar_thumb.dart';
 import '../../../core/constants/chat_constants.dart';
 import '../../../core/event_bus/chat_event_bus.dart';
 import '../../../core/localisation/chat_localizations.dart';
@@ -248,7 +249,7 @@ class _ChatPanelContentView extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  color: context.interactionColors.primaryStrong,
                   border: Border(
                     top: BorderSide(
                       color: context.interactionColors.outline.withValues(
@@ -266,15 +267,15 @@ class _ChatPanelContentView extends StatelessWidget {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
+                          color: const Color(0xFF2B2B2B),
                           borderRadius: BorderRadius.circular(4),
                           border: Border.all(color: const Color(0xFF444444)),
                         ),
                         child: EditableText(
                           controller: messageController,
                           focusNode: focusNode,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
+                          style: const TextStyle(
+                            color: Colors.white,
                             fontSize: 14,
                             fontFamily: 'CustomFont',
                           ),
@@ -304,8 +305,8 @@ class _ChatPanelContentView extends StatelessWidget {
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context).colorScheme.surface,
+                                    ? context.interactionColors.primaryStrong
+                                    : context.interactionColors.primary,
                                 borderRadius: BorderRadius.circular(4),
                                 border: Border.all(
                                   color: isSelected
@@ -335,7 +336,7 @@ class _ChatPanelContentView extends StatelessWidget {
                           vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary,
+                          color: context.interactionColors.primary,
                           borderRadius: BorderRadius.circular(4),
                           border: Border.all(
                             color: context.interactionColors.outline,
@@ -343,8 +344,8 @@ class _ChatPanelContentView extends StatelessWidget {
                         ),
                         child: Text(
                           l10n.send,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onPrimary,
+                          style: const TextStyle(
+                            color: Colors.white,
                             fontSize: 14,
                             fontFamily: 'CustomFont',
                           ),
@@ -370,6 +371,7 @@ class _ChatLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final showAvatar = message.name.trim().isNotEmpty;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -398,12 +400,26 @@ class _ChatLine extends StatelessWidget {
             ),
             if (message.name.isNotEmpty)
               TextSpan(
-                text: '${message.name}: ',
+                text: message.name,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontFamily: 'CustomFont',
                 ),
               ),
+            if (showAvatar)
+              WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: ProfileAvatarThumb(
+                    displayName: message.name,
+                    avatarId: message.avatarId,
+                    avatarUrl: message.avatarUrl,
+                    size: 18,
+                  ),
+                ),
+              ),
+            if (message.name.isNotEmpty) const TextSpan(text: ': '),
             TextSpan(
               text: message.content,
               style: const TextStyle(fontFamily: 'CustomFont'),

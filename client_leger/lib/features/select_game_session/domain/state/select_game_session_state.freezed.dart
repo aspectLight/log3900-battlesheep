@@ -17,53 +17,56 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$SelectGameSessionState {
+  List<GameModelInfo> get games => throw _privateConstructorUsedError;
+  bool get isConfirming => throw _privateConstructorUsedError;
+  bool get isLoadingGames => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() loading,
     required TResult Function(
       List<GameModelInfo> games,
-      Option<String> selectedGameId,
       bool isConfirming,
+      bool isLoadingGames,
     )
     loaded,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? loading,
     TResult? Function(
       List<GameModelInfo> games,
-      Option<String> selectedGameId,
       bool isConfirming,
+      bool isLoadingGames,
     )?
     loaded,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? loading,
     TResult Function(
       List<GameModelInfo> games,
-      Option<String> selectedGameId,
       bool isConfirming,
+      bool isLoadingGames,
     )?
     loaded,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(SelectGameSessionStateLoading value) loading,
     required TResult Function(SelectGameSessionStateLoaded value) loaded,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(SelectGameSessionStateLoading value)? loading,
     TResult? Function(SelectGameSessionStateLoaded value)? loaded,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(SelectGameSessionStateLoading value)? loading,
     TResult Function(SelectGameSessionStateLoaded value)? loaded,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
+
+  /// Create a copy of SelectGameSessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $SelectGameSessionStateCopyWith<SelectGameSessionState> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -72,6 +75,12 @@ abstract class $SelectGameSessionStateCopyWith<$Res> {
     SelectGameSessionState value,
     $Res Function(SelectGameSessionState) then,
   ) = _$SelectGameSessionStateCopyWithImpl<$Res, SelectGameSessionState>;
+  @useResult
+  $Res call({
+    List<GameModelInfo> games,
+    bool isConfirming,
+    bool isLoadingGames,
+  });
 }
 
 /// @nodoc
@@ -89,148 +98,46 @@ class _$SelectGameSessionStateCopyWithImpl<
 
   /// Create a copy of SelectGameSessionState
   /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? games = null,
+    Object? isConfirming = null,
+    Object? isLoadingGames = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            games: null == games
+                ? _value.games
+                : games // ignore: cast_nullable_to_non_nullable
+                      as List<GameModelInfo>,
+            isConfirming: null == isConfirming
+                ? _value.isConfirming
+                : isConfirming // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            isLoadingGames: null == isLoadingGames
+                ? _value.isLoadingGames
+                : isLoadingGames // ignore: cast_nullable_to_non_nullable
+                      as bool,
+          )
+          as $Val,
+    );
+  }
 }
 
 /// @nodoc
-abstract class _$$SelectGameSessionStateLoadingImplCopyWith<$Res> {
-  factory _$$SelectGameSessionStateLoadingImplCopyWith(
-    _$SelectGameSessionStateLoadingImpl value,
-    $Res Function(_$SelectGameSessionStateLoadingImpl) then,
-  ) = __$$SelectGameSessionStateLoadingImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$SelectGameSessionStateLoadingImplCopyWithImpl<$Res>
-    extends
-        _$SelectGameSessionStateCopyWithImpl<
-          $Res,
-          _$SelectGameSessionStateLoadingImpl
-        >
-    implements _$$SelectGameSessionStateLoadingImplCopyWith<$Res> {
-  __$$SelectGameSessionStateLoadingImplCopyWithImpl(
-    _$SelectGameSessionStateLoadingImpl _value,
-    $Res Function(_$SelectGameSessionStateLoadingImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of SelectGameSessionState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$SelectGameSessionStateLoadingImpl
-    implements SelectGameSessionStateLoading {
-  const _$SelectGameSessionStateLoadingImpl();
-
-  @override
-  String toString() {
-    return 'SelectGameSessionState.loading()';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$SelectGameSessionStateLoadingImpl);
-  }
-
-  @override
-  int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() loading,
-    required TResult Function(
-      List<GameModelInfo> games,
-      Option<String> selectedGameId,
-      bool isConfirming,
-    )
-    loaded,
-  }) {
-    return loading();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? loading,
-    TResult? Function(
-      List<GameModelInfo> games,
-      Option<String> selectedGameId,
-      bool isConfirming,
-    )?
-    loaded,
-  }) {
-    return loading?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? loading,
-    TResult Function(
-      List<GameModelInfo> games,
-      Option<String> selectedGameId,
-      bool isConfirming,
-    )?
-    loaded,
-    required TResult orElse(),
-  }) {
-    if (loading != null) {
-      return loading();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(SelectGameSessionStateLoading value) loading,
-    required TResult Function(SelectGameSessionStateLoaded value) loaded,
-  }) {
-    return loading(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(SelectGameSessionStateLoading value)? loading,
-    TResult? Function(SelectGameSessionStateLoaded value)? loaded,
-  }) {
-    return loading?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(SelectGameSessionStateLoading value)? loading,
-    TResult Function(SelectGameSessionStateLoaded value)? loaded,
-    required TResult orElse(),
-  }) {
-    if (loading != null) {
-      return loading(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class SelectGameSessionStateLoading implements SelectGameSessionState {
-  const factory SelectGameSessionStateLoading() =
-      _$SelectGameSessionStateLoadingImpl;
-}
-
-/// @nodoc
-abstract class _$$SelectGameSessionStateLoadedImplCopyWith<$Res> {
+abstract class _$$SelectGameSessionStateLoadedImplCopyWith<$Res>
+    implements $SelectGameSessionStateCopyWith<$Res> {
   factory _$$SelectGameSessionStateLoadedImplCopyWith(
     _$SelectGameSessionStateLoadedImpl value,
     $Res Function(_$SelectGameSessionStateLoadedImpl) then,
   ) = __$$SelectGameSessionStateLoadedImplCopyWithImpl<$Res>;
+  @override
   @useResult
   $Res call({
     List<GameModelInfo> games,
-    Option<String> selectedGameId,
     bool isConfirming,
+    bool isLoadingGames,
   });
 }
 
@@ -253,8 +160,8 @@ class __$$SelectGameSessionStateLoadedImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? games = null,
-    Object? selectedGameId = null,
     Object? isConfirming = null,
+    Object? isLoadingGames = null,
   }) {
     return _then(
       _$SelectGameSessionStateLoadedImpl(
@@ -262,13 +169,13 @@ class __$$SelectGameSessionStateLoadedImplCopyWithImpl<$Res>
             ? _value._games
             : games // ignore: cast_nullable_to_non_nullable
                   as List<GameModelInfo>,
-        selectedGameId: null == selectedGameId
-            ? _value.selectedGameId
-            : selectedGameId // ignore: cast_nullable_to_non_nullable
-                  as Option<String>,
         isConfirming: null == isConfirming
             ? _value.isConfirming
             : isConfirming // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        isLoadingGames: null == isLoadingGames
+            ? _value.isLoadingGames
+            : isLoadingGames // ignore: cast_nullable_to_non_nullable
                   as bool,
       ),
     );
@@ -281,8 +188,8 @@ class _$SelectGameSessionStateLoadedImpl
     implements SelectGameSessionStateLoaded {
   const _$SelectGameSessionStateLoadedImpl({
     required final List<GameModelInfo> games,
-    required this.selectedGameId,
     this.isConfirming = false,
+    this.isLoadingGames = false,
   }) : _games = games;
 
   final List<GameModelInfo> _games;
@@ -294,14 +201,15 @@ class _$SelectGameSessionStateLoadedImpl
   }
 
   @override
-  final Option<String> selectedGameId;
-  @override
   @JsonKey()
   final bool isConfirming;
+  @override
+  @JsonKey()
+  final bool isLoadingGames;
 
   @override
   String toString() {
-    return 'SelectGameSessionState.loaded(games: $games, selectedGameId: $selectedGameId, isConfirming: $isConfirming)';
+    return 'SelectGameSessionState.loaded(games: $games, isConfirming: $isConfirming, isLoadingGames: $isLoadingGames)';
   }
 
   @override
@@ -310,18 +218,18 @@ class _$SelectGameSessionStateLoadedImpl
         (other.runtimeType == runtimeType &&
             other is _$SelectGameSessionStateLoadedImpl &&
             const DeepCollectionEquality().equals(other._games, _games) &&
-            (identical(other.selectedGameId, selectedGameId) ||
-                other.selectedGameId == selectedGameId) &&
             (identical(other.isConfirming, isConfirming) ||
-                other.isConfirming == isConfirming));
+                other.isConfirming == isConfirming) &&
+            (identical(other.isLoadingGames, isLoadingGames) ||
+                other.isLoadingGames == isLoadingGames));
   }
 
   @override
   int get hashCode => Object.hash(
     runtimeType,
     const DeepCollectionEquality().hash(_games),
-    selectedGameId,
     isConfirming,
+    isLoadingGames,
   );
 
   /// Create a copy of SelectGameSessionState
@@ -340,45 +248,42 @@ class _$SelectGameSessionStateLoadedImpl
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() loading,
     required TResult Function(
       List<GameModelInfo> games,
-      Option<String> selectedGameId,
       bool isConfirming,
+      bool isLoadingGames,
     )
     loaded,
   }) {
-    return loaded(games, selectedGameId, isConfirming);
+    return loaded(games, isConfirming, isLoadingGames);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? loading,
     TResult? Function(
       List<GameModelInfo> games,
-      Option<String> selectedGameId,
       bool isConfirming,
+      bool isLoadingGames,
     )?
     loaded,
   }) {
-    return loaded?.call(games, selectedGameId, isConfirming);
+    return loaded?.call(games, isConfirming, isLoadingGames);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? loading,
     TResult Function(
       List<GameModelInfo> games,
-      Option<String> selectedGameId,
       bool isConfirming,
+      bool isLoadingGames,
     )?
     loaded,
     required TResult orElse(),
   }) {
     if (loaded != null) {
-      return loaded(games, selectedGameId, isConfirming);
+      return loaded(games, isConfirming, isLoadingGames);
     }
     return orElse();
   }
@@ -386,7 +291,6 @@ class _$SelectGameSessionStateLoadedImpl
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(SelectGameSessionStateLoading value) loading,
     required TResult Function(SelectGameSessionStateLoaded value) loaded,
   }) {
     return loaded(this);
@@ -395,7 +299,6 @@ class _$SelectGameSessionStateLoadedImpl
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(SelectGameSessionStateLoading value)? loading,
     TResult? Function(SelectGameSessionStateLoaded value)? loaded,
   }) {
     return loaded?.call(this);
@@ -404,7 +307,6 @@ class _$SelectGameSessionStateLoadedImpl
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(SelectGameSessionStateLoading value)? loading,
     TResult Function(SelectGameSessionStateLoaded value)? loaded,
     required TResult orElse(),
   }) {
@@ -418,16 +320,20 @@ class _$SelectGameSessionStateLoadedImpl
 abstract class SelectGameSessionStateLoaded implements SelectGameSessionState {
   const factory SelectGameSessionStateLoaded({
     required final List<GameModelInfo> games,
-    required final Option<String> selectedGameId,
     final bool isConfirming,
+    final bool isLoadingGames,
   }) = _$SelectGameSessionStateLoadedImpl;
 
+  @override
   List<GameModelInfo> get games;
-  Option<String> get selectedGameId;
+  @override
   bool get isConfirming;
+  @override
+  bool get isLoadingGames;
 
   /// Create a copy of SelectGameSessionState
   /// with the given fields replaced by the non-null parameter values.
+  @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$SelectGameSessionStateLoadedImplCopyWith<
     _$SelectGameSessionStateLoadedImpl

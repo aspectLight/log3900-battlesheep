@@ -14,9 +14,7 @@ import '../../data/services/game_player_movement_socket.dart';
 
 void registerGameScopeRepositories(GetIt scope) {
   scope.registerLazySingleton<GameActionsRepository>(
-    () => GameActionsRepository(
-      actionsSocket: scope.get<GameActionsSocket>(),
-    ),
+    () => GameActionsRepository(actionsSocket: scope.get<GameActionsSocket>()),
   );
   scope.registerLazySingleton<GameCombatRepository>(
     () => GameCombatRepository(

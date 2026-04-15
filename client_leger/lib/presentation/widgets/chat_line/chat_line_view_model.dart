@@ -1,3 +1,0 @@
-class ChatLineViewModel {
-  void dispose() {}
-}

@@ -17,8 +17,7 @@ class PlayerCreatedPayloadDto {
       PlayerCreatedPayloadDto(
         players: data
             .map(
-              (e) =>
-                  WaitingRoomPlayerDto.fromJson(e as Map<String, dynamic>),
+              (e) => WaitingRoomPlayerDto.fromJson(e as Map<String, dynamic>),
             )
             .toList(),
       );

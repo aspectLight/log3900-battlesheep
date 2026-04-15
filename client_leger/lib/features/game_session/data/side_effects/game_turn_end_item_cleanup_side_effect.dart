@@ -41,16 +41,19 @@ class GameTurnEndItemCleanupSideEffect with DisposableSideEffect {
       return;
     }
     final boardState = _boardRepository.state.value;
-    final pending = boardState.pendingItemPickup
-        .filter((p) => p.playerId == _socketId);
-    pending.whenPresent((p) => _itemRepository.dropItem(
-          ItemDroppedCommand(
-            roomId: _roomId,
-            source: PlayerItemDropSource(playerId: p.playerId),
-            item: p.item,
-            coords: p.cellCoords,
-          ),
-        ));
+    final pending = boardState.pendingItemPickup.filter(
+      (p) => p.playerId == _socketId,
+    );
+    pending.whenPresent(
+      (p) => _itemRepository.dropItem(
+        ItemDroppedCommand(
+          roomId: _roomId,
+          source: PlayerItemDropSource(playerId: p.playerId),
+          item: p.item,
+          coords: p.cellCoords,
+        ),
+      ),
+    );
     _completeNotifications();
   }
 

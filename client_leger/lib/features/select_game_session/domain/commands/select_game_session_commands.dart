@@ -9,8 +9,6 @@ class LoadGamesCommand with _$LoadGamesCommand {
 
 @freezed
 class ConfirmSelectionCommand with _$ConfirmSelectionCommand {
-  const factory ConfirmSelectionCommand({
-    required String selectedGameId,
-  }) = _ConfirmSelectionCommand;
+  const factory ConfirmSelectionCommand({required String selectedGameId}) =
+      _ConfirmSelectionCommand;
 }
-

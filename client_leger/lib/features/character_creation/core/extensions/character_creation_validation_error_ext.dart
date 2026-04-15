@@ -1,7 +1,8 @@
 import '../localisation/character_creation_localizations.dart';
 import '../enums/character_creation_validation_error.dart';
 
-extension CharacterCreationValidationErrorExt on CharacterCreationValidationError {
+extension CharacterCreationValidationErrorExt
+    on CharacterCreationValidationError {
   String localize(CharacterCreationLocalizations l10n) {
     return switch (this) {
       CharacterCreationValidationError.characterRequired =>

@@ -9,7 +9,7 @@ part 'game_info_model.freezed.dart';
 
 class GameBoardPreviewCell {
   final TileType tileType;
-  final TileState? tileState;
+  final String? tileState;
   final TileOrientation? orientation;
   final ItemType? itemType;
 
@@ -30,7 +30,9 @@ class GameModelInfo with _$GameModelInfo {
     required GameMode mode,
     required int boardSize,
     required List<List<GameBoardPreviewCell>> boardMatrix,
-    required bool isVisible,
+    required String privacy,
+    required String owner,
+    required int actionPoints,
     required String lastModified,
   }) = _GameModelInfo;
 }

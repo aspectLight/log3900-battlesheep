@@ -33,6 +33,7 @@ mixin _$WaitingRoomEntryData {
       int boardSize,
       bool isCTF,
       bool friendsOnly,
+      int entryFee,
     )
     host,
     required TResult Function(
@@ -56,6 +57,7 @@ mixin _$WaitingRoomEntryData {
       int boardSize,
       bool isCTF,
       bool friendsOnly,
+      int entryFee,
     )?
     host,
     TResult? Function(
@@ -79,6 +81,7 @@ mixin _$WaitingRoomEntryData {
       int boardSize,
       bool isCTF,
       bool friendsOnly,
+      int entryFee,
     )?
     host,
     TResult Function(
@@ -202,6 +205,7 @@ abstract class _$$WaitingRoomHostEntryDataImplCopyWith<$Res>
     int boardSize,
     bool isCTF,
     bool friendsOnly,
+    int entryFee,
   });
 }
 
@@ -228,6 +232,7 @@ class __$$WaitingRoomHostEntryDataImplCopyWithImpl<$Res>
     Object? boardSize = null,
     Object? isCTF = null,
     Object? friendsOnly = null,
+    Object? entryFee = null,
   }) {
     return _then(
       _$WaitingRoomHostEntryDataImpl(
@@ -263,6 +268,10 @@ class __$$WaitingRoomHostEntryDataImplCopyWithImpl<$Res>
             ? _value.friendsOnly
             : friendsOnly // ignore: cast_nullable_to_non_nullable
                   as bool,
+        entryFee: null == entryFee
+            ? _value.entryFee
+            : entryFee // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -280,6 +289,7 @@ class _$WaitingRoomHostEntryDataImpl implements WaitingRoomHostEntryData {
     required this.boardSize,
     required this.isCTF,
     this.friendsOnly = false,
+    this.entryFee = 0,
   });
 
   @override
@@ -299,10 +309,13 @@ class _$WaitingRoomHostEntryDataImpl implements WaitingRoomHostEntryData {
   @override
   @JsonKey()
   final bool friendsOnly;
+  @override
+  @JsonKey()
+  final int entryFee;
 
   @override
   String toString() {
-    return 'WaitingRoomEntryData.host(roomId: $roomId, hostId: $hostId, socketId: $socketId, gameName: $gameName, gameDescription: $gameDescription, boardSize: $boardSize, isCTF: $isCTF, friendsOnly: $friendsOnly)';
+    return 'WaitingRoomEntryData.host(roomId: $roomId, hostId: $hostId, socketId: $socketId, gameName: $gameName, gameDescription: $gameDescription, boardSize: $boardSize, isCTF: $isCTF, friendsOnly: $friendsOnly, entryFee: $entryFee)';
   }
 
   @override
@@ -322,7 +335,9 @@ class _$WaitingRoomHostEntryDataImpl implements WaitingRoomHostEntryData {
                 other.boardSize == boardSize) &&
             (identical(other.isCTF, isCTF) || other.isCTF == isCTF) &&
             (identical(other.friendsOnly, friendsOnly) ||
-                other.friendsOnly == friendsOnly));
+                other.friendsOnly == friendsOnly) &&
+            (identical(other.entryFee, entryFee) ||
+                other.entryFee == entryFee));
   }
 
   @override
@@ -336,6 +351,7 @@ class _$WaitingRoomHostEntryDataImpl implements WaitingRoomHostEntryData {
     boardSize,
     isCTF,
     friendsOnly,
+    entryFee,
   );
 
   /// Create a copy of WaitingRoomEntryData
@@ -361,6 +377,7 @@ class _$WaitingRoomHostEntryDataImpl implements WaitingRoomHostEntryData {
       int boardSize,
       bool isCTF,
       bool friendsOnly,
+      int entryFee,
     )
     host,
     required TResult Function(
@@ -382,6 +399,7 @@ class _$WaitingRoomHostEntryDataImpl implements WaitingRoomHostEntryData {
       boardSize,
       isCTF,
       friendsOnly,
+      entryFee,
     );
   }
 
@@ -397,6 +415,7 @@ class _$WaitingRoomHostEntryDataImpl implements WaitingRoomHostEntryData {
       int boardSize,
       bool isCTF,
       bool friendsOnly,
+      int entryFee,
     )?
     host,
     TResult? Function(
@@ -418,6 +437,7 @@ class _$WaitingRoomHostEntryDataImpl implements WaitingRoomHostEntryData {
       boardSize,
       isCTF,
       friendsOnly,
+      entryFee,
     );
   }
 
@@ -433,6 +453,7 @@ class _$WaitingRoomHostEntryDataImpl implements WaitingRoomHostEntryData {
       int boardSize,
       bool isCTF,
       bool friendsOnly,
+      int entryFee,
     )?
     host,
     TResult Function(
@@ -456,6 +477,7 @@ class _$WaitingRoomHostEntryDataImpl implements WaitingRoomHostEntryData {
         boardSize,
         isCTF,
         friendsOnly,
+        entryFee,
       );
     }
     return orElse();
@@ -503,6 +525,7 @@ abstract class WaitingRoomHostEntryData implements WaitingRoomEntryData {
     required final int boardSize,
     required final bool isCTF,
     final bool friendsOnly,
+    final int entryFee,
   }) = _$WaitingRoomHostEntryDataImpl;
 
   @override
@@ -518,6 +541,7 @@ abstract class WaitingRoomHostEntryData implements WaitingRoomEntryData {
   int get boardSize;
   bool get isCTF;
   bool get friendsOnly;
+  int get entryFee;
 
   /// Create a copy of WaitingRoomEntryData
   /// with the given fields replaced by the non-null parameter values.
@@ -692,6 +716,7 @@ class _$WaitingRoomJoinEntryDataImpl implements WaitingRoomJoinEntryData {
       int boardSize,
       bool isCTF,
       bool friendsOnly,
+      int entryFee,
     )
     host,
     required TResult Function(
@@ -726,6 +751,7 @@ class _$WaitingRoomJoinEntryDataImpl implements WaitingRoomJoinEntryData {
       int boardSize,
       bool isCTF,
       bool friendsOnly,
+      int entryFee,
     )?
     host,
     TResult? Function(
@@ -760,6 +786,7 @@ class _$WaitingRoomJoinEntryDataImpl implements WaitingRoomJoinEntryData {
       int boardSize,
       bool isCTF,
       bool friendsOnly,
+      int entryFee,
     )?
     host,
     TResult Function(

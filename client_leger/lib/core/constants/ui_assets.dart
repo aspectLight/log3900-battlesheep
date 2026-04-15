@@ -3,8 +3,10 @@ class UiAssets {
   static const String avatarsPath = 'assets/images/avatars';
 
   static const String background = 'assets/images/background.png';
-  static const String backgroundFrost = 'assets/images/themes/froid_siberie.png';
-  static const String backgroundVillage = 'assets/images/themes/village_abadonne.png';
+  static const String backgroundFrost =
+      'assets/images/themes/froid_siberie.png';
+  static const String backgroundVillage =
+      'assets/images/themes/village_abadonne.png';
   static const String snow = 'assets/images/snow.gif';
   static const String loading = 'assets/images/loading.gif';
   static const String logo = 'assets/images/logo.png';
@@ -21,6 +23,7 @@ class UiAssets {
   static const String teamAmericanBg = '$path/team_american_bg.png';
 
   static const String flagIcon = '$path/flag_icon.png';
+  static const String goldCoin = '$path/gold_coin.png';
   static const String settingsGear = '$path/settings_gear.png';
   static const String characterCreationBackArrowIcon =
       '$path/character_creation_back_arrow.png';

@@ -35,34 +35,34 @@ class GamePlayer with _$GamePlayer {
   const GamePlayer._();
 
   factory GamePlayer.fromSpawned(SpawnedPlayerEvent player) => GamePlayer(
-        id: player.id,
-        name: player.name,
-        characterType: player.characterType,
-        color: player.color,
-        orientation: BoardCharacterOrientation.down,
-        state: BoardCharacterState.idle,
-        movementPoints: player.movementPoints,
-        actionPoints: player.actionPoints,
-        stats: player.stats,
-        diceChoice: player.diceChoice,
-        inventory: [
-          if (player.inventory.isNotEmpty) player.inventory[0] else null,
-          if (player.inventory.length >= GameRulesConstants.inventorySlotCount)
-            player.inventory[GameRulesConstants.inventorySlotCount - 1]
-          else
-            null,
-        ],
-        isVirtual: player.isVirtual,
-        team: player.team,
-        spawnPoint: player.spawnPoint,
-      );
+    id: player.id,
+    name: player.name,
+    characterType: player.characterType,
+    color: player.color,
+    orientation: BoardCharacterOrientation.down,
+    state: BoardCharacterState.idle,
+    movementPoints: player.movementPoints,
+    actionPoints: player.actionPoints,
+    stats: player.stats,
+    diceChoice: player.diceChoice,
+    inventory: [
+      if (player.inventory.isNotEmpty) player.inventory[0] else null,
+      if (player.inventory.length >= GameRulesConstants.inventorySlotCount)
+        player.inventory[GameRulesConstants.inventorySlotCount - 1]
+      else
+        null,
+    ],
+    isVirtual: player.isVirtual,
+    team: player.team,
+    spawnPoint: player.spawnPoint,
+  );
 
   int statValue(StatType stat) => switch (stat) {
-        StatType.health => stats[StatType.health]!,
-        StatType.speed => stats[StatType.speed]!,
-        StatType.attack => stats[StatType.attack]!,
-        StatType.defense => stats[StatType.defense]!,
-      };
+    StatType.health => stats[StatType.health]!,
+    StatType.speed => stats[StatType.speed]!,
+    StatType.attack => stats[StatType.attack]!,
+    StatType.defense => stats[StatType.defense]!,
+  };
 
   GamePlayer withItemCollected(GameItem item) {
     final newInventory = List<GameItem?>.from(inventory);
@@ -77,27 +77,32 @@ class GamePlayer with _$GamePlayer {
     switch (item.type) {
       case ItemType.adrenaline:
         nextStats[StatType.health] =
-            nextStats[StatType.health]! + ItemEffectConstants.adrenalineHealthBoost;
+            nextStats[StatType.health]! +
+            ItemEffectConstants.adrenalineHealthBoost;
       case ItemType.vodka:
         nextStats[StatType.attack] =
             nextStats[StatType.attack]! + ItemEffectConstants.vodkaAttackBoost;
-        nextStats[StatType.speed] = (nextStats[StatType.speed]! -
-                ItemEffectConstants.vodkaSpeedReduction)
-            .clamp(0, 999);
+        nextStats[StatType.speed] =
+            (nextStats[StatType.speed]! -
+                    ItemEffectConstants.vodkaSpeedReduction)
+                .clamp(0, 999);
       case ItemType.propaganda:
         final currentHealth = nextStats[StatType.health]!;
         if (currentHealth < ItemEffectConstants.propagandaHealthThreshold &&
             !propagandaActive) {
           nextStats[StatType.attack] =
-              nextStats[StatType.attack]! + ItemEffectConstants.propagandaAttackBoost;
+              nextStats[StatType.attack]! +
+              ItemEffectConstants.propagandaAttackBoost;
           nextStats[StatType.defense] =
-              nextStats[StatType.defense]! + ItemEffectConstants.propagandaDefenseBoost;
+              nextStats[StatType.defense]! +
+              ItemEffectConstants.propagandaDefenseBoost;
           nextPropagandaActive = true;
         }
       case ItemType.barbedWire:
       case ItemType.camouflage:
       case ItemType.waterproofBoots:
       case ItemType.airStrike:
+      case ItemType.torch:
       case ItemType.random:
       case ItemType.flag:
       case ItemType.spawnPoint:
@@ -125,29 +130,34 @@ class GamePlayer with _$GamePlayer {
 
     switch (item.type) {
       case ItemType.adrenaline:
-        nextStats[StatType.health] = (nextStats[StatType.health]! -
-                ItemEffectConstants.adrenalineHealthBoost)
-            .clamp(0, 999);
+        nextStats[StatType.health] =
+            (nextStats[StatType.health]! -
+                    ItemEffectConstants.adrenalineHealthBoost)
+                .clamp(0, 999);
       case ItemType.vodka:
-        nextStats[StatType.attack] = (nextStats[StatType.attack]! -
-                ItemEffectConstants.vodkaAttackBoost)
-            .clamp(0, 999);
+        nextStats[StatType.attack] =
+            (nextStats[StatType.attack]! - ItemEffectConstants.vodkaAttackBoost)
+                .clamp(0, 999);
         nextStats[StatType.speed] =
-            nextStats[StatType.speed]! + ItemEffectConstants.vodkaSpeedReduction;
+            nextStats[StatType.speed]! +
+            ItemEffectConstants.vodkaSpeedReduction;
       case ItemType.propaganda:
         if (propagandaActive) {
-          nextStats[StatType.attack] = (nextStats[StatType.attack]! -
-                  ItemEffectConstants.propagandaAttackBoost)
-              .clamp(0, 999);
-          nextStats[StatType.defense] = (nextStats[StatType.defense]! -
-                  ItemEffectConstants.propagandaDefenseBoost)
-              .clamp(0, 999);
+          nextStats[StatType.attack] =
+              (nextStats[StatType.attack]! -
+                      ItemEffectConstants.propagandaAttackBoost)
+                  .clamp(0, 999);
+          nextStats[StatType.defense] =
+              (nextStats[StatType.defense]! -
+                      ItemEffectConstants.propagandaDefenseBoost)
+                  .clamp(0, 999);
           nextPropagandaActive = false;
         }
       case ItemType.barbedWire:
       case ItemType.camouflage:
       case ItemType.waterproofBoots:
       case ItemType.airStrike:
+      case ItemType.torch:
       case ItemType.random:
       case ItemType.flag:
       case ItemType.spawnPoint:
@@ -176,8 +186,9 @@ class GamePlayer with _$GamePlayer {
   }
 
   GamePlayer withReevaluatedPropaganda() {
-    final hasPropaganda =
-        inventory.any((entry) => entry?.type == ItemType.propaganda);
+    final hasPropaganda = inventory.any(
+      (entry) => entry?.type == ItemType.propaganda,
+    );
     if (!hasPropaganda && !propagandaActive) {
       return this;
     }
@@ -186,21 +197,24 @@ class GamePlayer with _$GamePlayer {
 
     if (below && !propagandaActive && hasPropaganda) {
       final next = Map<StatType, int>.from(stats)
-        ..[StatType.attack] = stats[StatType.attack]! +
-            ItemEffectConstants.propagandaAttackBoost
-        ..[StatType.defense] = stats[StatType.defense]! +
+        ..[StatType.attack] =
+            stats[StatType.attack]! + ItemEffectConstants.propagandaAttackBoost
+        ..[StatType.defense] =
+            stats[StatType.defense]! +
             ItemEffectConstants.propagandaDefenseBoost;
       return copyWith(stats: next, propagandaActive: true);
     }
 
     if ((!below || !hasPropaganda) && propagandaActive) {
       final next = Map<StatType, int>.from(stats)
-        ..[StatType.attack] = (stats[StatType.attack]! -
-                ItemEffectConstants.propagandaAttackBoost)
-            .clamp(0, 999)
-        ..[StatType.defense] = (stats[StatType.defense]! -
-                ItemEffectConstants.propagandaDefenseBoost)
-            .clamp(0, 999);
+        ..[StatType.attack] =
+            (stats[StatType.attack]! -
+                    ItemEffectConstants.propagandaAttackBoost)
+                .clamp(0, 999)
+        ..[StatType.defense] =
+            (stats[StatType.defense]! -
+                    ItemEffectConstants.propagandaDefenseBoost)
+                .clamp(0, 999);
       return copyWith(stats: next, propagandaActive: false);
     }
 
@@ -220,11 +234,11 @@ class GamePlayerState with _$GamePlayerState {
   const GamePlayerState._();
 
   factory GamePlayerState.initial() => const GamePlayerState(
-        players: [],
-        activePlayerId: Option.none(),
-        disconnectedPlayerIds: [],
-        winsByPlayerId: {},
-      );
+    players: [],
+    activePlayerId: Option.none(),
+    disconnectedPlayerIds: [],
+    winsByPlayerId: {},
+  );
 
   int getWins(String playerId) => winsByPlayerId[playerId] ?? 0;
 

@@ -8,12 +8,10 @@ import '../models/user.dart';
 class SignUpUseCase {
   final AuthRepository _authRepository;
 
-  SignUpUseCase({
-    required AuthRepository authRepository,
-  }) : _authRepository = authRepository;
+  SignUpUseCase({required AuthRepository authRepository})
+    : _authRepository = authRepository;
 
   TaskEither<AuthException, UserModel> execute(SignUpCommand command) {
     return _authRepository.signUp(command);
   }
 }
-

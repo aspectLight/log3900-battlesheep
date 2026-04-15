@@ -8,5 +8,7 @@ extension ChatMessageDtoToModel on ChatMessageDto {
     name: name,
     content: content,
     time: time,
+    avatarId: avatarId,
+    avatarUrl: avatarUrl,
   );
 }

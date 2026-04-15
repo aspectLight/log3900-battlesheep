@@ -8,21 +8,33 @@ part 'waiting_room_player_stats_model.freezed.dart';
 @freezed
 class WaitingRoomPlayerStatsModel with _$WaitingRoomPlayerStatsModel {
   const factory WaitingRoomPlayerStatsModel({
-    @Default(WaitingRoomPlayerStatValueModel(
+    @Default(
+      WaitingRoomPlayerStatValueModel(
         value: WaitingRoomStatConstants.defaultWaitingRoomStatValue,
-        maxValue: WaitingRoomStatConstants.defaultWaitingRoomStatMaxValue))
+        maxValue: WaitingRoomStatConstants.defaultWaitingRoomStatMaxValue,
+      ),
+    )
     WaitingRoomPlayerStatValueModel health,
-    @Default(WaitingRoomPlayerStatValueModel(
+    @Default(
+      WaitingRoomPlayerStatValueModel(
         value: WaitingRoomStatConstants.defaultWaitingRoomStatValue,
-        maxValue: WaitingRoomStatConstants.defaultWaitingRoomStatMaxValue))
+        maxValue: WaitingRoomStatConstants.defaultWaitingRoomStatMaxValue,
+      ),
+    )
     WaitingRoomPlayerStatValueModel speed,
-    @Default(WaitingRoomPlayerStatValueModel(
+    @Default(
+      WaitingRoomPlayerStatValueModel(
         value: WaitingRoomStatConstants.defaultWaitingRoomStatValue,
-        maxValue: WaitingRoomStatConstants.defaultWaitingRoomStatMaxValue))
+        maxValue: WaitingRoomStatConstants.defaultWaitingRoomStatMaxValue,
+      ),
+    )
     WaitingRoomPlayerStatValueModel attack,
-    @Default(WaitingRoomPlayerStatValueModel(
+    @Default(
+      WaitingRoomPlayerStatValueModel(
         value: WaitingRoomStatConstants.defaultWaitingRoomStatValue,
-        maxValue: WaitingRoomStatConstants.defaultWaitingRoomStatMaxValue))
+        maxValue: WaitingRoomStatConstants.defaultWaitingRoomStatMaxValue,
+      ),
+    )
     WaitingRoomPlayerStatValueModel defense,
   }) = _WaitingRoomPlayerStatsModel;
 }

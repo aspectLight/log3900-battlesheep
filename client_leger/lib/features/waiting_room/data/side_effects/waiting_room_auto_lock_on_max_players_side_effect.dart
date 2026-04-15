@@ -11,9 +11,9 @@ class WaitingRoomAutoLockOnMaxPlayersSideEffect with DisposableSideEffect {
     required WaitingRoomSocket waitingRoomSocket,
     required WaitingRoomRoomRepository roomRepository,
     required WaitingRoomStartValidationParams startParams,
-  })  : _waitingRoomSocket = waitingRoomSocket,
-        _roomRepository = roomRepository,
-        _startParams = startParams {
+  }) : _waitingRoomSocket = waitingRoomSocket,
+       _roomRepository = roomRepository,
+       _startParams = startParams {
     trackEffect(_autoLockIfNeeded);
   }
 

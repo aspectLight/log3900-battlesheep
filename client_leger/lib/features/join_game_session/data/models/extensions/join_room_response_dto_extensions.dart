@@ -16,6 +16,9 @@ extension JoinRoomResponseDtoFailureExtensions on JoinRoomResponseDto {
     if (normalized.contains('nombre maximum de joueurs')) {
       return const MaxPlayerLimitReachedJoinGameSessionFailure();
     }
+    if (normalized.contains('solde insuffisant')) {
+      return const InsufficientBalanceJoinGameSessionFailure();
+    }
     return UnknownJoinGameSessionFailure(error ?? 'Unknown error');
   }
 }
@@ -26,6 +29,7 @@ extension JoinRoomDtoRoomExtensions on JoinRoomDto {
     hostId: hostId,
     players: players.map((p) => p.toLobbyPlayerModel()).toList(),
     isLocked: isLocked,
+    dropInDropOut: dropInDropOut,
   );
 }
 
@@ -40,5 +44,6 @@ extension JoinRoomPlayerDtoLobbyExtensions on JoinRoomPlayerDto {
     speed: stats.speed,
     attack: stats.attack,
     defense: stats.defense,
+    activeBanner: activeBanner,
   );
 }

@@ -5,10 +5,7 @@ import '../enums/tile_type.dart';
 
 typedef BitmaskToOrientation = Map<int, TileOrientation>;
 
-typedef TileTypeAndOrientation = ({
-  TileType type,
-  TileOrientation orientation,
-});
+typedef TileTypeAndOrientation = ({TileType type, TileOrientation orientation});
 
 typedef BitmaskToTypeAndOrientation = Map<int, TileTypeAndOrientation>;
 

@@ -137,6 +137,12 @@ class CoreLocalizationsEn extends CoreLocalizations {
   String get loading => 'Loading...';
 
   @override
+  String get shop => 'Shop';
+
+  @override
+  String get discussionCanals => 'Discussion Channels';
+
+  @override
   String get noFriends => 'No friends yet. Search for users to add!';
 
   @override

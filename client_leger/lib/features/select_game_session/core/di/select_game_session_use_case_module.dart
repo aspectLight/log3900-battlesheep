@@ -10,4 +10,3 @@ void registerSelectGameSessionUseCases(GetIt getIt) {
     ),
   );
 }
-

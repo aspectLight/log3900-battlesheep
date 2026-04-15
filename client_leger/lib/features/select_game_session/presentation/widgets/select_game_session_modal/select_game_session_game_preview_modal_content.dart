@@ -38,8 +38,10 @@ class _SelectGameSessionGamePreviewModalContentState
   @override
   Widget build(BuildContext context) {
     final l10n = SelectGameSessionLocalizations.of(context)!;
-    final maxPreview =
-        (MediaQuery.sizeOf(context).width - 80).clamp(200.0, 360.0);
+    final maxPreview = (MediaQuery.sizeOf(context).width - 80).clamp(
+      200.0,
+      360.0,
+    );
     final scheme = Theme.of(context).colorScheme;
     final panelBg = scheme.surface;
     final headerBarBg = scheme.surfaceContainerHighest;
@@ -76,7 +78,10 @@ class _SelectGameSessionGamePreviewModalContentState
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: headerBarBg,
                   border: const Border(

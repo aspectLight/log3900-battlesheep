@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
@@ -9,14 +11,37 @@ import 'avatar_picker_view_model.dart';
 class AvatarPicker extends StatelessWidget {
   const AvatarPicker({
     required this.viewModel,
+    required this.onPickFromGallery,
+    required this.onPickFromCamera,
     this.error,
+    this.customAvatarPath,
+    this.customAvatarError,
     this.onSelectionChange,
     super.key,
   });
 
   final AvatarPickerViewModel viewModel;
+  final VoidCallback onPickFromGallery;
+  final VoidCallback onPickFromCamera;
   final String? error;
+  final String? customAvatarPath;
+  final String? customAvatarError;
   final void Function(AuthAvatar)? onSelectionChange;
+
+  ButtonStyle _uploadButtonStyle() {
+    return OutlinedButton.styleFrom(
+      foregroundColor: const Color(0xFFF5E6E6),
+      backgroundColor: const Color(0x33000000),
+      side: const BorderSide(color: Color(0xFF7F1F1F), width: 1.5),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      textStyle: const TextStyle(
+        fontFamily: 'CustomFont',
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +100,58 @@ class AvatarPicker extends StatelessWidget {
             });
           },
         ),
+        const SizedBox(height: 12),
+        Text(
+          l10n.avatarCustomHint,
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 14,
+            fontFamily: 'CustomFont',
+          ),
+        ),
+        const SizedBox(height: 8),
+        if (customAvatarPath != null && customAvatarPath!.isNotEmpty) ...[
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: const Color(0xFF444444), width: 1.5),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Image.file(File(customAvatarPath!), fit: BoxFit.cover),
+          ),
+          const SizedBox(height: 8),
+        ],
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            OutlinedButton.icon(
+              onPressed: onPickFromGallery,
+              style: _uploadButtonStyle(),
+              icon: const Icon(Icons.upload_file, size: 18),
+              label: Text(l10n.avatarUploadLabel),
+            ),
+            OutlinedButton.icon(
+              onPressed: onPickFromCamera,
+              style: _uploadButtonStyle(),
+              icon: const Icon(Icons.photo_camera, size: 18),
+              label: Text(l10n.avatarCameraLabel),
+            ),
+          ],
+        ),
+        if (customAvatarError != null) ...[
+          const SizedBox(height: 8),
+          Text(
+            customAvatarError!,
+            style: const TextStyle(
+              color: Color(0xFFE34B4B),
+              fontSize: 12,
+              fontFamily: 'CustomFont',
+            ),
+          ),
+        ],
         if (error != null) ...[
           const SizedBox(height: 12),
           Text(

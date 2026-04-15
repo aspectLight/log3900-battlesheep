@@ -57,6 +57,9 @@ class WaitingRoomLocalizationsEn extends WaitingRoomLocalizations {
   String get waitingRoomAddVirtualPlayer => 'Add virtual player';
 
   @override
+  String get waitingRoomDropInDropOut => 'Drop-in/Drop-out';
+
+  @override
   String get addVirtualPlayer => 'Add virtual player';
 
   @override
@@ -121,6 +124,12 @@ class WaitingRoomLocalizationsEn extends WaitingRoomLocalizations {
 
   @override
   String get waitingRoomStatDefense => 'Defense';
+
+  @override
+  String get waitingRoomBalanceLabel => 'Balance:';
+
+  @override
+  String get waitingRoomEntryFeeLabel => 'Entry fee:';
 
   @override
   String get gameNotFound => 'Game not found';

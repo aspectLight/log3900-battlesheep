@@ -4,8 +4,8 @@ class WaitingRoomSelectVirtualProfileNotificationViewModel {
   WaitingRoomSelectVirtualProfileNotificationViewModel({
     required WaitingRoomSelectVirtualProfileNotificationIntent intent,
     required void Function() onDismiss,
-  })  : _intent = intent,
-        _onDismiss = onDismiss;
+  }) : _intent = intent,
+       _onDismiss = onDismiss;
 
   final WaitingRoomSelectVirtualProfileNotificationIntent _intent;
   final void Function() _onDismiss;

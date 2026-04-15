@@ -29,6 +29,8 @@ class ItemCollectedEvent with _$ItemCollectedEvent {
   const factory ItemCollectedEvent({
     required String playerId,
     required GameItem item,
+    GameBoardPosition? position,
+    @Default(false) bool inventoryFull,
   }) = _ItemCollectedEvent;
 }
 

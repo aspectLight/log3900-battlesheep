@@ -19,4 +19,3 @@ sealed class ProfileState with _$ProfileState {
 
   const factory ProfileState.error(ProfileFailure failure) = ProfileStateError;
 }
-

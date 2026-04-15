@@ -7,6 +7,7 @@ import '../../domain/models/game_item.dart';
 import '../../domain/events/game_movement_events.dart';
 import '../../domain/state/game_board_state.dart';
 import '../../domain/events/game_events.dart';
+import '../../domain/events/game_environment_events.dart';
 
 class GameBoardStateReducer {
   GameBoardState reduce(GameBoardState previous, Object event) {
@@ -31,6 +32,9 @@ class GameBoardStateReducer {
     if (event is SpawnPointClearedEvent) {
       return _reduceSpawnPointCleared(previous, event);
     }
+    if (event is BoardIlluminationUpdatedEvent) {
+      return previous.copyWith(illuminatedCellKeys: event.illuminatedCellKeys);
+    }
     return previous;
   }
 
@@ -39,16 +43,15 @@ class GameBoardStateReducer {
     PlayerSpawnedEvent event,
   ) {
     final board = previous.board;
-    final nextPositions = Map<String, GameBoardPosition>.from(
-      previous.playerPositions,
-    );
+    final nextPositions = <String, GameBoardPosition>{};
     for (final player in event.players) {
-      final pos = player.spawnPoint;
+      final pos = player.currentBoardPosition;
       if (!board.isInBounds(pos.x, pos.y)) continue;
       nextPositions[player.id] = pos;
     }
-    final occupiedSpawnPositions =
-        Set<GameBoardPosition>.from(nextPositions.values);
+    final occupiedSpawnPositions = Set<GameBoardPosition>.from(
+      nextPositions.values,
+    );
     final nextItems = Map<GameBoardPosition, GameItem>.from(previous.items);
     for (final entry in previous.items.entries) {
       if (entry.value.type == ItemType.spawnPoint &&
@@ -56,10 +59,7 @@ class GameBoardStateReducer {
         nextItems.remove(entry.key);
       }
     }
-    return previous.copyWith(
-      playerPositions: nextPositions,
-      items: nextItems,
-    );
+    return previous.copyWith(playerPositions: nextPositions, items: nextItems);
   }
 
   GameBoardState _reduceDoorToggled(
@@ -120,11 +120,13 @@ class GameBoardStateReducer {
       ..remove(dest);
     return previous.copyWith(
       selectedPathCoords: const [],
-      pendingItemPickup: Option.of(PendingItemPickup(
-        playerId: event.playerId,
-        item: GameItem(type: cellItem.type),
-        cellCoords: dest,
-      )),
+      pendingItemPickup: Option.of(
+        PendingItemPickup(
+          playerId: event.playerId,
+          item: GameItem(type: cellItem.type),
+          cellCoords: dest,
+        ),
+      ),
       playerPositions: nextPositions,
       items: nextItems,
     );

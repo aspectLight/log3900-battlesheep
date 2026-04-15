@@ -1,18 +1,38 @@
+import 'dart:io';
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:fpdart/fpdart.dart' show Option;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/appearance/app_interaction_colors.dart';
+import '../../../../../core/config/env_config.dart';
 import '../../../../../core/constants/auth_avatar_assets.dart';
 import '../../../../../core/constants/ui_assets.dart';
 import '../../../../../core/enums/auth_avatar.dart';
+import '../../../../../core/enums/shop_catalog_item_id.dart';
+import '../../../../../core/localisation/core_localizations.dart';
+import '../../../../../core/modal/modal_coordinator.dart';
+import '../../../../../core/modal/modal_intent_sink.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
+import '../../../../shop/data/repositories/shop_repository.dart';
+import '../../../../shop/domain/state/shop_state.dart';
+import '../../../../authentication/core/constants/auth_constants.dart';
+import '../../../../authentication/core/enums/auth_validation_error.dart';
+import '../../../../authentication/core/extensions/auth_validation_error_ext.dart';
+import '../../../../authentication/core/helpers/email_validator.dart';
+import '../../../../authentication/core/helpers/username_validator.dart';
+import '../../../../authentication/core/localisation/auth_localizations.dart';
+import '../../../core/exceptions/profile_failure.dart';
 import '../../../core/extensions/profile_failure_ext.dart';
 import '../../../core/localisation/profile_localizations.dart';
+import '../../../core/modal/profile_modal_intents.dart';
 import '../../../domain/commands/profile_commands.dart';
+import '../../../domain/models/profile_model.dart';
 import '../../../domain/models/profile_statistics_model.dart';
 import '../../../domain/state/profile_state.dart';
 import 'profile_view_model.dart';
@@ -26,19 +46,52 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  static const int _maxAvatarBytes = 2 * 1024 * 1024;
+  static const Set<String> _allowedAvatarExtensions = {'jpg', 'jpeg', 'png'};
+
   late final ProfileViewModel _viewModel;
+  late final ShopRepository _shopRepository;
+  late final ModalIntentSink _modalIntentSink;
+  late final ModalCoordinator _modalCoordinator;
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _imagePicker = ImagePicker();
+  Timer? _successModalTimer;
+  String? _lastLoadErrorMessage;
+  String? _avatarFileError;
+  bool _hasAttemptedSave = false;
+  int _avatarRefreshEpoch = DateTime.now().millisecondsSinceEpoch;
+
+  bool get _supportsCameraCapture => Platform.isAndroid || Platform.isIOS;
+
+  ButtonStyle _uploadButtonStyle() {
+    return OutlinedButton.styleFrom(
+      foregroundColor: const Color(0xFFF5E6E6),
+      backgroundColor: const Color(0x33000000),
+      side: const BorderSide(color: Color(0xFF7F1F1F), width: 1.5),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      textStyle: const TextStyle(
+        fontFamily: 'CustomFont',
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+    );
+  }
 
   @override
   void initState() {
     super.initState();
     _viewModel = GetIt.I<ProfileViewModel>();
+    _shopRepository = GetIt.I<ShopRepository>();
+    _modalIntentSink = GetIt.I<ModalIntentSink>();
+    _modalCoordinator = GetIt.I<ModalCoordinator>();
     unawaited(_init());
   }
 
   @override
   void dispose() {
+    _successModalTimer?.cancel();
     _usernameController.dispose();
     _emailController.dispose();
     super.dispose();
@@ -46,13 +99,147 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _init() async {
     await _viewModel.load();
+    _shopRepository.refreshCatalogueAndBalance();
+    _syncFormFromState();
+    _presentLoadErrorIfAny();
+  }
+
+  void _syncFormFromState() {
     final state = _viewModel.state.value;
     if (state is ProfileStateLoaded) {
       _usernameController.text = state.profile.username;
       _emailController.text = state.profile.email;
       _viewModel.setSelectedAvatarId(state.profile.avatarId);
       _viewModel.syncPreferencesFromProfile(state.profile);
+      _avatarFileError = null;
+      _hasAttemptedSave = false;
     }
+  }
+
+  Future<void> _pickAvatarImage(ImageSource source) async {
+    final l10n = ProfileLocalizations.of(context)!;
+    if (source == ImageSource.camera && !_supportsCameraCapture) {
+      setState(() {
+        _avatarFileError = l10n.profileAvatarUploadFailed;
+      });
+      return;
+    }
+    try {
+      final picked = await _imagePicker.pickImage(source: source);
+      if (picked == null) return;
+      final error = await _validateAvatarFile(picked, l10n);
+      if (error != null) {
+        setState(() {
+          _avatarFileError = error;
+        });
+        return;
+      }
+      setState(() {
+        _avatarFileError = null;
+        _viewModel.setPendingAvatarFile(picked.path);
+      });
+    } on Object {
+      setState(() {
+        _avatarFileError = l10n.profileAvatarUploadFailed;
+      });
+    }
+  }
+
+  Future<String?> _validateAvatarFile(
+    XFile file,
+    ProfileLocalizations l10n,
+  ) async {
+    final fileName = file.name.toLowerCase();
+    final extension = fileName.contains('.') ? fileName.split('.').last : '';
+    if (!_allowedAvatarExtensions.contains(extension)) {
+      return l10n.profileAvatarInvalidFileType;
+    }
+    final size = await file.length();
+    if (size > _maxAvatarBytes) {
+      return l10n.profileAvatarFileTooLarge;
+    }
+    return null;
+  }
+
+  List<AuthValidationError> _usernameValidationErrors() {
+    final errors = UsernameValidator.validateAll(
+      Option.of(_usernameController.text.trim()),
+    );
+    if (errors.isNotEmpty &&
+        errors.first == AuthValidationError.usernameRequired &&
+        !_hasAttemptedSave) {
+      return [];
+    }
+    return errors;
+  }
+
+  List<AuthValidationError> _emailValidationErrors() {
+    final errors = EmailValidator.validateAll(
+      Option.of(_emailController.text.trim()),
+    );
+    if (errors.isNotEmpty &&
+        errors.first == AuthValidationError.emailRequired &&
+        !_hasAttemptedSave) {
+      return [];
+    }
+    return errors;
+  }
+
+  Future<void> _retryLoad() async {
+    await _viewModel.load();
+    _syncFormFromState();
+    _presentLoadErrorIfAny();
+  }
+
+  void _presentLoadErrorIfAny() {
+    final state = _viewModel.state.value;
+    if (state is! ProfileStateError) {
+      _lastLoadErrorMessage = null;
+      return;
+    }
+    final l10n = ProfileLocalizations.of(context)!;
+    final message = state.failure.localize(l10n);
+    if (_lastLoadErrorMessage == message) return;
+    _lastLoadErrorMessage = message;
+    _showProfileModal(
+      title: l10n.profileErrorTitle,
+      description: message,
+      isError: true,
+    );
+  }
+
+  void _showProfileModal({
+    required String title,
+    required String description,
+    required bool isError,
+    String? primaryLabel,
+    void Function()? onPrimaryAction,
+    String? secondaryLabel,
+    void Function()? onSecondaryAction,
+    String? modalKey,
+  }) {
+    final coreL10n = CoreLocalizations.of(context)!;
+    _modalIntentSink.addIntent(
+      ProfilePopupModalIntent(
+        title: title,
+        description: description,
+        isError: isError,
+        primaryLabel: primaryLabel ?? coreL10n.ok,
+        onPrimaryAction: onPrimaryAction ?? () {},
+        secondaryLabel: secondaryLabel,
+        onSecondaryAction: onSecondaryAction,
+        modalKey: modalKey,
+      ),
+    );
+  }
+
+  void _dismissSuccessModalIfCurrent(String modalKey) {
+    final current = _modalCoordinator.current.value;
+    if (current == null) return;
+    final intent = current.intent;
+    if (intent is! ProfilePopupModalIntent) return;
+    if (intent.modalKey != modalKey) return;
+    _modalCoordinator.remove(current.id);
   }
 
   @override
@@ -71,42 +258,81 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: const TextStyle(fontFamily: 'CustomFont'),
                   child: Watch((context) {
                     final state = _viewModel.state.value;
+                    final shopState = _shopRepository.state.value;
                     final isSaving = _viewModel.isSaving.value;
+                    final isDeleting = _viewModel.isDeleting.value;
+                    final isUploading = _viewModel.isUploading.value;
                     final selectedAvatarId = _viewModel.selectedAvatarId.value;
+                    _viewModel.avatarPreviewPath.value;
                     _viewModel.selectedThemeId.value;
                     _viewModel.selectedLanguage.value;
                     if (state is ProfileStateLoading) {
-                      return const Center(
-                        child: CircularProgressIndicator(color: Colors.white),
+                      return const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 8),
+                          Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       );
                     }
                     return switch (state) {
-                      ProfileStateError(:final failure) => Column(
+                      ProfileStateError() => Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildHeader(l10n),
-                          const SizedBox(height: 24),
-                          _buildErrorBanner(failure.localize(l10n)),
-                        ],
-                      ),
-                      ProfileStateLoaded(:final statistics) => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildHeader(l10n),
-                          const SizedBox(height: 24),
-                          _buildContent(
-                            l10n,
-                            statistics,
-                            isSaving,
-                            selectedAvatarId,
-                            _viewModel.selectedThemeId.value,
-                            _viewModel.selectedLanguage.value,
+                          const SizedBox(height: 8),
+                          ElevatedButton(
+                            onPressed: _retryLoad,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF550000),
+                              foregroundColor: const Color(0xFFF5E6E6),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 24,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                                side: const BorderSide(
+                                  color: Color(0xFF7F1F1F),
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              l10n.profileRetry,
+                              style: const TextStyle(
+                                fontFamily: 'CustomFont',
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                      _ => Column(
+                      ProfileStateLoaded(:final statistics, :final profile) =>
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 8),
+                            _buildContent(
+                              l10n,
+                              profile,
+                              statistics,
+                              isSaving,
+                              isDeleting,
+                              isUploading,
+                              selectedAvatarId,
+                              shopState,
+                              _viewModel.selectedThemeId.value,
+                              _viewModel.selectedLanguage.value,
+                            ),
+                          ],
+                        ),
+                      _ => const Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [_buildHeader(l10n)],
+                        children: [SizedBox(height: 8)],
                       ),
                     };
                   }),
@@ -119,75 +345,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildHeader(ProfileLocalizations l10n) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        GestureDetector(
-          onTap: () => context.router.maybePop(),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.chevron_left, color: Colors.white, size: 22),
-              const SizedBox(width: 4),
-              Text(
-                l10n.profileBack,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'CustomFont',
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Text(
-          l10n.profileTitle,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontFamily: 'CustomFont',
-            fontWeight: FontWeight.bold,
-            letterSpacing: 2,
-          ),
-        ),
-        const SizedBox(width: 60),
-      ],
-    );
-  }
-
-  Widget _buildErrorBanner(String message) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0x33FF0000),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.redAccent),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.error_outline, color: Colors.redAccent),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              message,
-              style: const TextStyle(
-                color: Colors.white,
-                fontFamily: 'CustomFont',
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildContent(
     ProfileLocalizations l10n,
+    ProfileModel profile,
     ProfileStatisticsModel statistics,
     bool isSaving,
+    bool isDeleting,
+    bool isUploading,
     String selectedAvatarId,
+    ShopState shopState,
     String selectedThemeId,
     String selectedLanguage,
   ) {
@@ -195,7 +361,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(child: _buildFormColumn(l10n, isSaving, selectedAvatarId)),
+          Expanded(
+            child: _buildFormColumn(
+              l10n,
+              profile,
+              isSaving,
+              isDeleting,
+              isUploading,
+              selectedAvatarId,
+              shopState,
+            ),
+          ),
           const SizedBox(width: 32),
           Expanded(
             child: _buildStatsColumn(
@@ -212,8 +388,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildFormColumn(
     ProfileLocalizations l10n,
+    ProfileModel profile,
     bool isSaving,
+    bool isDeleting,
+    bool isUploading,
     String selectedAvatarId,
+    ShopState shopState,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,13 +402,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
           label: l10n.profileUsernameLabel,
           controller: _usernameController,
           keyboardType: TextInputType.text,
+          maxLength: AuthConstants.usernameMaxLength,
+          onChanged: (_) => setState(() {}),
         ),
+        _ProfileValidationErrors(errors: _usernameValidationErrors()),
         const SizedBox(height: 16),
         _ProfileTextField(
           label: l10n.profileEmailLabel,
           controller: _emailController,
           keyboardType: TextInputType.emailAddress,
+          maxLength: AuthConstants.emailMaxLength,
+          onChanged: (_) => setState(() {}),
         ),
+        _ProfileValidationErrors(errors: _emailValidationErrors()),
         const SizedBox(height: 16),
         Text(
           l10n.profileAvatarLabel,
@@ -240,14 +426,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        _buildAvatarGrid(selectedAvatarId),
+        _buildAvatarGrid(selectedAvatarId, shopState),
         const SizedBox(height: 20),
+        _buildAvatarUploadRow(
+          l10n,
+          profile,
+          isSaving || isDeleting || isUploading,
+        ),
         const SizedBox(height: 24),
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ElevatedButton(
-              onPressed: isSaving ? null : _handleSave,
+              onPressed: (isSaving || isDeleting || isUploading)
+                  ? null
+                  : _handleSave,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -264,7 +457,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               child: Text(
-                isSaving ? l10n.profileSaveInProgress : l10n.profileSave,
+                (isSaving || isUploading)
+                    ? l10n.profileAvatarUploading
+                    : l10n.profileSave,
                 style: const TextStyle(
                   fontFamily: 'CustomFont',
                   fontWeight: FontWeight.w600,
@@ -273,7 +468,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 12),
             ElevatedButton(
-              onPressed: isSaving ? null : _handleDelete,
+              onPressed: (isSaving || isDeleting || isUploading)
+                  ? null
+                  : _handleDelete,
               style: ElevatedButton.styleFrom(
                 backgroundColor: context.interactionColors.danger,
                 foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -290,7 +487,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               child: Text(
-                l10n.profileDeleteAccount,
+                isDeleting ? l10n.profileDeleting : l10n.profileDeleteAccount,
                 style: const TextStyle(
                   fontFamily: 'CustomFont',
                   fontWeight: FontWeight.w600,
@@ -299,6 +496,98 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ],
         ),
+      ],
+    );
+  }
+
+  Widget _buildAvatarUploadRow(
+    ProfileLocalizations l10n,
+    ProfileModel profile,
+    bool disabled,
+  ) {
+    final pendingPath = _viewModel.avatarPreviewPath.value;
+    final hasPending = pendingPath != null && pendingPath.isNotEmpty;
+    final hasRemote =
+        (profile.avatarUrl?.trim().isNotEmpty ?? false) && !hasPending;
+    final resolvedRemote = hasRemote
+        ? EnvConfig.resolveAvatarUrl(
+            profile.avatarUrl!,
+            cacheBust: _avatarRefreshEpoch,
+          )
+        : null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.profileAvatarOrUpload,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontFamily: 'CustomFont',
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFF444444)),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: hasPending
+                  ? Image.file(File(pendingPath), fit: BoxFit.cover)
+                  : hasRemote
+                  ? Image.network(
+                      resolvedRemote!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: disabled
+                        ? null
+                        : () =>
+                              unawaited(_pickAvatarImage(ImageSource.gallery)),
+                    style: _uploadButtonStyle(),
+                    icon: const Icon(Icons.upload_file, size: 18),
+                    label: Text(l10n.profileAvatarUploadLabel),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: disabled
+                        ? null
+                        : () => unawaited(_pickAvatarImage(ImageSource.camera)),
+                    style: _uploadButtonStyle(),
+                    icon: const Icon(Icons.photo_camera, size: 18),
+                    label: Text(l10n.profileAvatarCameraLabel),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        if (_avatarFileError != null) ...[
+          const SizedBox(height: 6),
+          Text(
+            _avatarFileError!,
+            style: const TextStyle(
+              color: Color(0xFFE34B4B),
+              fontSize: 12,
+              fontFamily: 'CustomFont',
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -408,8 +697,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildLanguageSelector(String selectedLanguage) {
-    final languages = [('fr', 'French'), ('en', 'English')];
+  Widget _buildLanguageSelector(
+    String selectedLanguage,
+    ProfileLocalizations l10n,
+  ) {
+    final languages = [
+      ('fr', l10n.languageNameFr),
+      ('en', l10n.languageNameEn),
+    ];
     return Row(
       children: languages.map((l) {
         final isSelected = selectedLanguage == l.$1;
@@ -457,7 +752,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildAvatarGrid(String selectedAvatarId) {
+  bool _isProfileAvatarLocked(AuthAvatar avatar, ShopState shopState) {
+    if (!avatar.isExclusiveAtSignUp) return false;
+    if (shopState is! ShopStateLoaded) return true;
+    final shopItemId = ShopCatalogItemId.values.firstWhere(
+      (e) => e.wireValue == avatar.id,
+    );
+    return !shopState.purchasedItems.contains(shopItemId);
+  }
+
+  int _exclusiveAvatarPrice(AuthAvatar avatar, ShopState shopState) {
+    const fallback = 500;
+    if (!avatar.isExclusiveAtSignUp) return fallback;
+    if (shopState is ShopStateLoaded) {
+      for (final item in shopState.catalogue) {
+        if (item.id.wireValue == avatar.id) return item.price;
+      }
+    }
+    return fallback;
+  }
+
+  Widget _buildAvatarGrid(String selectedAvatarId, ShopState shopState) {
     final scheme = Theme.of(context).colorScheme;
     final outline = context.interactionColors.outline;
     const avatars = AuthAvatar.values;
@@ -470,11 +785,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: rowAvatars.map((AuthAvatar avatar) {
             final id = avatar.id;
             final isSelected = selectedAvatarId == id;
+            final locked = _isProfileAvatarLocked(avatar, shopState);
+            final price = _exclusiveAvatarPrice(avatar, shopState);
             return Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(5),
                 child: GestureDetector(
-                  onTap: () => _viewModel.setSelectedAvatarId(id),
+                  onTap: locked
+                      ? null
+                      : () {
+                          setState(() {
+                            _avatarFileError = null;
+                          });
+                          _viewModel.setSelectedAvatarId(id);
+                        },
                   child: AspectRatio(
                     aspectRatio: 1,
                     child: Container(
@@ -498,9 +822,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(6),
-                        child: Image.asset(
-                          AuthAvatarAssets.assetPath(avatar),
-                          fit: BoxFit.contain,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            Opacity(
+                              opacity: locked ? 0.45 : 1,
+                              child: Image.asset(
+                                AuthAvatarAssets.assetPath(avatar),
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            if (locked)
+                              Container(
+                                color: Colors.black.withValues(alpha: 0.38),
+                                alignment: Alignment.center,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.lock_rounded,
+                                      size: 22,
+                                      color: Colors.white.withValues(
+                                        alpha: 0.92,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Image.asset(
+                                          UiAssets.goldCoin,
+                                          width: 18,
+                                          height: 18,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '$price',
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(
+                                              alpha: 0.95,
+                                            ),
+                                            fontFamily: 'CustomFont',
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                     ),
@@ -570,6 +942,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
             ),
+            textAlign: TextAlign.center,
           ),
           _buildThemeSelector(selectedThemeId, l10n),
           const SizedBox(height: 16),
@@ -581,9 +954,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
             ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
-          _buildLanguageSelector(selectedLanguage),
+          _buildLanguageSelector(selectedLanguage, l10n),
+          const SizedBox(height: 16),
+          Text(
+            l10n.tutorial,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'CustomFont',
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          ElevatedButton(
+            onPressed: _viewModel.openTutorial,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: context.interactionColors.primary,
+              shadowColor: Colors.transparent,
+              side: BorderSide(
+                color: context.interactionColors.outline,
+                width: 2,
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              textStyle: const TextStyle(
+                fontSize: 16,
+                fontFamily: 'CustomFont',
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(l10n.continueTutorial),
+          ),
         ],
       ),
     );
@@ -627,32 +1035,119 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _handleSave() async {
     final state = _viewModel.state.value;
     if (state is! ProfileStateLoaded) return;
+    setState(() {
+      _hasAttemptedSave = true;
+    });
     final username = _usernameController.text.trim();
     final email = _emailController.text.trim();
     final avatarId = _viewModel.selectedAvatarId.value;
-    if (username.isEmpty || email.isEmpty || avatarId.isEmpty) {
-      final l10n = ProfileLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.profileFillAllFieldsError,
-            style: const TextStyle(fontFamily: 'CustomFont'),
-          ),
-        ),
+    final l10n = ProfileLocalizations.of(context)!;
+    final usernameErrors = _usernameValidationErrors();
+    final emailErrors = _emailValidationErrors();
+    final pendingFilePath = _viewModel.pendingAvatarFilePath.value;
+    if (usernameErrors.isNotEmpty || emailErrors.isNotEmpty) {
+      return;
+    }
+    final hasExistingCustomAvatar =
+        state.profile.avatarUrl?.trim().isNotEmpty ?? false;
+    if (avatarId.isEmpty &&
+        pendingFilePath == null &&
+        !hasExistingCustomAvatar) {
+      _showProfileModal(
+        title: l10n.profileErrorTitle,
+        description: l10n.profileFillAllFieldsError,
+        isError: true,
       );
       return;
     }
-    await _viewModel.submitUpdate(
+    final updateResult = await _viewModel.submitUpdate(
       UpdateProfileCommand(
         username: username,
         email: email,
-        avatarId: avatarId,
+        avatarId: avatarId.isEmpty ? null : avatarId,
       ),
+    );
+    if (!mounted) return;
+    var canContinue = true;
+    updateResult.match((failure) {
+      final hasPendingUpload =
+          pendingFilePath != null && pendingFilePath.isNotEmpty;
+      final onlyNoChanges =
+          failure is NoChangesProfileFailure && hasPendingUpload;
+      if (!onlyNoChanges) {
+        canContinue = false;
+        _showProfileModal(
+          title: l10n.profileErrorTitle,
+          description: failure.localize(l10n),
+          isError: true,
+        );
+      }
+    }, (_) {});
+    if (!canContinue || !mounted) return;
+
+    if (pendingFilePath != null && pendingFilePath.isNotEmpty) {
+      final uploadResult = await _viewModel.uploadAvatar(pendingFilePath);
+      if (!mounted) return;
+      var uploadFailed = false;
+      uploadResult.match(
+        (failure) {
+          uploadFailed = true;
+          _showProfileModal(
+            title: l10n.profileErrorTitle,
+            description: failure.localize(l10n),
+            isError: true,
+          );
+        },
+        (_) {
+          _avatarRefreshEpoch = DateTime.now().millisecondsSinceEpoch;
+        },
+      );
+      if (uploadFailed) return;
+    }
+
+    final modalKey = DateTime.now().microsecondsSinceEpoch.toString();
+    _successModalTimer?.cancel();
+    _successModalTimer = Timer(const Duration(seconds: 3), () {
+      if (!mounted) return;
+      _dismissSuccessModalIfCurrent(modalKey);
+    });
+    _showProfileModal(
+      title: l10n.profileSuccessTitle,
+      description: l10n.profileSaveSuccess,
+      isError: false,
+      modalKey: modalKey,
+      onPrimaryAction: () {
+        _successModalTimer?.cancel();
+        unawaited(_retryLoad());
+      },
     );
   }
 
   Future<void> _handleDelete() async {
-    await _viewModel.deleteAccount();
+    final l10n = ProfileLocalizations.of(context)!;
+    _showProfileModal(
+      title: l10n.profileDeleteConfirmTitle,
+      description: l10n.profileDeleteConfirmBody,
+      isError: true,
+      primaryLabel: l10n.profileCancel,
+      secondaryLabel: l10n.profileConfirmDelete,
+      onSecondaryAction: () => unawaited(_confirmDelete()),
+    );
+  }
+
+  Future<void> _confirmDelete() async {
+    if (!mounted) return;
+    final l10n = ProfileLocalizations.of(context)!;
+    final result = await _viewModel.deleteAccount();
+    if (!mounted) return;
+    result.match(
+      (failure) => _showProfileModal(
+        title: l10n.profileErrorTitle,
+        description: failure.localize(l10n),
+        isError: true,
+      ),
+      (_) {},
+    );
   }
 
   Future<void> _savePreferences({String? themeId, String? language}) async {
@@ -671,11 +1166,15 @@ class _ProfileTextField extends StatefulWidget {
   final String label;
   final TextEditingController controller;
   final TextInputType keyboardType;
+  final ValueChanged<String>? onChanged;
+  final int? maxLength;
 
   const _ProfileTextField({
     required this.label,
     required this.controller,
     required this.keyboardType,
+    this.onChanged,
+    this.maxLength,
   });
 
   @override
@@ -761,6 +1260,21 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
               controller: widget.controller,
               focusNode: _focusNode,
               keyboardType: widget.keyboardType,
+              onChanged: widget.onChanged,
+              maxLength: widget.maxLength,
+              maxLengthEnforcement: widget.maxLength != null
+                  ? MaxLengthEnforcement.enforced
+                  : MaxLengthEnforcement.none,
+              buildCounter:
+                  (
+                    context, {
+                    required currentLength,
+                    required isFocused,
+                    required maxLength,
+                  }) => null,
+              inputFormatters: widget.maxLength != null
+                  ? [LengthLimitingTextInputFormatter(widget.maxLength)]
+                  : null,
               style: TextStyle(
                 color: scheme.onSurface,
                 fontFamily: 'CustomFont',
@@ -779,6 +1293,36 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
           ],
         ),
       ],
+    );
+  }
+}
+
+class _ProfileValidationErrors extends StatelessWidget {
+  const _ProfileValidationErrors({required this.errors});
+
+  final List<AuthValidationError> errors;
+
+  @override
+  Widget build(BuildContext context) {
+    if (errors.isEmpty) return const SizedBox.shrink();
+    final l10n = AuthLocalizations.of(context)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: errors
+          .map(
+            (error) => Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                error.localize(l10n),
+                style: const TextStyle(
+                  color: Color(0xFFE34B4B),
+                  fontSize: 12,
+                  fontFamily: 'CustomFont',
+                ),
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 }

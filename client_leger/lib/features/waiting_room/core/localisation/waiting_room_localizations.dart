@@ -197,6 +197,12 @@ abstract class WaitingRoomLocalizations {
   /// **'Add virtual player'**
   String get waitingRoomAddVirtualPlayer;
 
+  /// No description provided for @waitingRoomDropInDropOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop-in/Drop-out'**
+  String get waitingRoomDropInDropOut;
+
   /// No description provided for @addVirtualPlayer.
   ///
   /// In en, this message translates to:
@@ -329,6 +335,18 @@ abstract class WaitingRoomLocalizations {
   /// **'Defense'**
   String get waitingRoomStatDefense;
 
+  /// No description provided for @waitingRoomBalanceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance:'**
+  String get waitingRoomBalanceLabel;
+
+  /// No description provided for @waitingRoomEntryFeeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry fee:'**
+  String get waitingRoomEntryFeeLabel;
+
   /// No description provided for @gameNotFound.
   ///
   /// In en, this message translates to:
@@ -344,7 +362,7 @@ abstract class WaitingRoomLocalizations {
   /// No description provided for @waitingRoomWelcomeMessage.
   ///
   /// In en, this message translates to:
-  /// **'Bienvenue dans la salle d'attente, partagez le code de la partie avec vos amis !'**
+  /// **'Bienvenue dans la salle d\'attente, partagez le code de la partie avec vos amis !'**
   String get waitingRoomWelcomeMessage;
 }
 

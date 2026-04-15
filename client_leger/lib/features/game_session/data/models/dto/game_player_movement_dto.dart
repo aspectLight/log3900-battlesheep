@@ -73,8 +73,7 @@ class SynchronizeMovementCommandDto {
   factory SynchronizeMovementCommandDto.fromJson(Map<String, dynamic> json) =>
       _$SynchronizeMovementCommandDtoFromJson(json);
 
-  Map<String, dynamic> toJson() =>
-      _$SynchronizeMovementCommandDtoToJson(this);
+  Map<String, dynamic> toJson() => _$SynchronizeMovementCommandDtoToJson(this);
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -199,5 +198,4 @@ class ReachablePathsResponseDto {
     }).toList();
     return ReachablePathsResponseDto(paths: paths);
   }
-
 }

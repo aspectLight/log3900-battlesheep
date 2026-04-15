@@ -1,0 +1,22 @@
+{
+  "@@locale": "fr",
+  "tutorial": "Tutoriel",
+  "quit": "Quitter",
+  "finish": "Finir",
+  "next": "Suivant",
+  "previous": "Précédent",
+  "profileTitle": "Profil",
+  "profileDesc": "Personnalisez votre avatar, votre pseudo et vos préférences depuis la vue Profil. Vos statistiques de jeu y sont également disponibles.",
+  "friendsTitle": "Amis",
+  "friendsDesc": "Ajoutez des amis, bloquez vos ennemis, gérez vos demandes et voyez qui est en ligne.",
+  "chatTitle": "Clavardage",
+  "chatDesc": "Discutez en temps réel avec tous les joueurs connectés via le chat général, ou en privé à travers des canaux de communication customisés.",
+  "shopTitle": "Boutique",
+  "shopDesc": "Achetez de nouveaux avatars et cosmétiques avec vos pièces gagnées en jouant.",
+  "gameModesTitle": "Modes de jeu",
+  "gameModesDesc": "Deux modes disponibles : Classique (Atteignez 3 victoires en combat) et CTF (Capturez le drapeau et ramenez-le à votre feu de camp).",
+  "createGameTitle": "Créer une partie",
+  "createGameDesc": "Appuyez sur "Créer une partie" depuis le menu principal, choisissez votre mode, votre carte et vos paramètres, puis attendez que des joueurs vous rejoignent ou créez des joueurs controllés par IA.",
+  "joinGameTitle": "Rejoindre une partie",
+  "joinGameDesc": Appuyez sur "Rejoindre une partie" depuis le menu principal, puis rejoignez une partie à travers la liste de parties en cours, à l'aide d'un code ou avec le code QR associé"
+}

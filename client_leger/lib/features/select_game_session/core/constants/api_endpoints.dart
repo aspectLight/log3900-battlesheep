@@ -3,4 +3,3 @@ class SelectGameSessionApiEndpoints {
 
   static const String games = '/games';
 }
-

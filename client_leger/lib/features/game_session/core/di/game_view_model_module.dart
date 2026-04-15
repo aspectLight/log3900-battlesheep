@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 
 import '../../../../core/app_transition/app_transition_bus.dart';
 import '../../../../core/notification/notification_coordinator.dart';
+import '../../../../core/services/socket_service.dart';
 import '../../data/repositories/game_actions_repository.dart';
 import '../../data/repositories/game_board_interaction_repository.dart';
 import '../../data/repositories/game_board_repository.dart';
@@ -111,7 +112,7 @@ void registerGameSessionScopeViewModels(
           .get<GameBoardSelectedCellRepository>(),
       boardRepository: scope.get<GameBoardRepository>(),
       playerRepository: scope.get<GamePlayerRepository>(),
-      socketId: socketId,
+      socketService: rootGetIt.get<SocketService>(),
     ),
   );
   scope.registerFactory<GameCombatViewModel>(

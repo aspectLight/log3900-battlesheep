@@ -1,10 +1,12 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../join_game_session/core/exceptions/join_game_session_failure.dart';
 import '../../core/exceptions/reserve_character_failure.dart';
 import '../../domain/commands/create_character_commands.dart';
 import '../../domain/commands/get_reserved_characters_command.dart';
 import '../../domain/commands/reserve_character_command.dart';
+import '../../domain/result/drop_in_join_result.dart';
 import 'dart:async';
 
 import '../../domain/events/character_creation_events.dart';
@@ -106,6 +108,10 @@ class CharacterCreationRepository {
       ),
     );
   }
+
+  Future<Either<JoinGameSessionFailure, DropInJoinResult>> joinGameRoom(
+    CreateCharacterCommand command,
+  ) => _socket.joinGameRoom(command);
 
   void createWaitingRoom({required CreateWaitingRoomCommand command}) {
     _socket.createWaitingRoom(command: command);

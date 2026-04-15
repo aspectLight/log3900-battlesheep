@@ -12,7 +12,6 @@ sealed class JoinGameSessionState with _$JoinGameSessionState {
 
   const factory JoinGameSessionState.success() = JoinGameSessionStateSuccess;
 
-  const factory JoinGameSessionState.error(
-    JoinGameSessionFailure failure,
-  ) = JoinGameSessionStateError;
+  const factory JoinGameSessionState.error(JoinGameSessionFailure failure) =
+      JoinGameSessionStateError;
 }

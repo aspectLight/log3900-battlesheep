@@ -16,7 +16,8 @@ class AbandonGameCommand with _$AbandonGameCommand {
 
 @freezed
 class QuitEndGameCommand with _$QuitEndGameCommand {
-  const factory QuitEndGameCommand({required String roomId}) = _QuitEndGameCommand;
+  const factory QuitEndGameCommand({required String roomId}) =
+      _QuitEndGameCommand;
 }
 
 @freezed

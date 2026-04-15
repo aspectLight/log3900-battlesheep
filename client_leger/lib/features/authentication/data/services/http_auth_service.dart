@@ -199,9 +199,9 @@ class HttpAuthService {
         const UsernameAlreadyInUseException(),
       HttpStatus.conflict => const EmailAlreadyInUseException(),
       final code => ServerException(
-          statusCode: code,
-          devMessage: errorDto?.errorMessage ?? 'Server error: $code',
-        ),
+        statusCode: code,
+        devMessage: errorDto?.errorMessage ?? 'Server error: $code',
+      ),
     };
   }
 }

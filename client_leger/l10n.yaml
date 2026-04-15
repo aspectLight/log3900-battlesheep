@@ -1,3 +1,4 @@
+# Default template for IDE / `flutter gen-l10n`. Regenerate all feature bundles with: dart run tool/gen_l10n.dart
 enabled: true
 arb-dir: lib/core/localisation
 template-arb-file: core_en.arb

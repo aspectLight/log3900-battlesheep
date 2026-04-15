@@ -62,7 +62,9 @@ class GameMovementSideEffect with DisposableSideEffect {
     _movementRepository.getMovements(
       PlayerGetMovementsCommand(
         roomId: _roomId,
-        hasBoots: inventory.any((item) => item.type == ItemType.waterproofBoots),
+        hasBoots: inventory.any(
+          (item) => item.type == ItemType.waterproofBoots,
+        ),
       ),
     );
   }

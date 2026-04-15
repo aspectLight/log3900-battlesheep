@@ -8,6 +8,8 @@ enum TileType {
   wall,
   corner,
   intersection,
+  trap,
+  teleportPad,
 }
 
 enum TileState { closed, opened }

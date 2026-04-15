@@ -15,27 +15,31 @@ class SessionConnectionProjection implements EventProjection {
     required SessionRepository sessionRepository,
   }) : _socketService = socketService,
        _sessionRepository = sessionRepository {
-    _sessionRepository.setSessionState(SetSessionStateCommand(
-      sessionState: _socketService.isConnected
-          ? _socketService.socketIdOption.fold(
-              SessionState.initial,
-              SessionState.connected,
-            )
-          : const SessionState.initial(),
-    ));
-  }
-
-  @override
-  List<StreamSubscription> subscribe() => [
-    _socketService.connectionStream.listen((connected) {
-      _sessionRepository.setSessionState(SetSessionStateCommand(
-        sessionState: connected
+    _sessionRepository.setSessionState(
+      SetSessionStateCommand(
+        sessionState: _socketService.isConnected
             ? _socketService.socketIdOption.fold(
                 SessionState.initial,
                 SessionState.connected,
               )
             : const SessionState.initial(),
-      ));
+      ),
+    );
+  }
+
+  @override
+  List<StreamSubscription> subscribe() => [
+    _socketService.connectionStream.listen((connected) {
+      _sessionRepository.setSessionState(
+        SetSessionStateCommand(
+          sessionState: connected
+              ? _socketService.socketIdOption.fold(
+                  SessionState.initial,
+                  SessionState.connected,
+                )
+              : const SessionState.initial(),
+        ),
+      );
     }),
   ];
 }

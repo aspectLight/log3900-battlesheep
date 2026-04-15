@@ -11,10 +11,10 @@ class GamePlayerHudWidgetViewModel {
 
   late final hudModel = computed<GamePlayerHudUiState?>(() {
     final playerState = _playerRepository.state.value;
-    return toGamePlayerHudUiState(playerState, _socketId).when(
-      none: () => null,
-      some: (x) => x,
-    );
+    return toGamePlayerHudUiState(
+      playerState,
+      _socketId,
+    ).when(none: () => null, some: (x) => x);
   });
 
   GamePlayerHudWidgetViewModel({

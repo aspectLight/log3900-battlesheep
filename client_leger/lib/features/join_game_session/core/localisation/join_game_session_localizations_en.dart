@@ -31,6 +31,51 @@ class JoinGameSessionLocalizationsEn extends JoinGameSessionLocalizations {
   String get joinGameFailed => 'Failed to join game';
 
   @override
+  String get joinGameNoRooms => 'No available game';
+
+  @override
+  String get joinGameRoomListPreview => 'Preview';
+
+  @override
+  String get joinGameRoomListPlayers => 'Players';
+
+  @override
+  String get joinGameRoomListSize => 'Size';
+
+  @override
+  String get joinGameRoomListStatus => 'Status';
+
+  @override
+  String get joinGameRoomListMode => 'Mode';
+
+  @override
+  String get joinGameRoomListAccessibility => 'Accessibility';
+
+  @override
+  String get joinGameRoomListCode => 'Code';
+
+  @override
+  String get joinGameRoomListPrice => 'Price';
+
+  @override
+  String get joinGameStatusWaiting => 'Waiting';
+
+  @override
+  String get joinGameStatusPlaying => 'Playing';
+
+  @override
+  String get joinGameModeDropIn => 'Drop-in';
+
+  @override
+  String get joinGameAccessibilityOpen => 'Open';
+
+  @override
+  String get joinGameAccessibilityFull => 'Full';
+
+  @override
+  String get joinGamePriceFree => 'Free';
+
+  @override
   String get waitingRoomRoomNotFound => 'Game not found';
 
   @override
@@ -38,4 +83,8 @@ class JoinGameSessionLocalizationsEn extends JoinGameSessionLocalizations {
 
   @override
   String get joinGameMaxPlayerLimitReached => 'Maximum player limit reached';
+
+  @override
+  String get joinGameInsufficientBalance =>
+      'Insufficient balance to join this game';
 }

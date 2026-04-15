@@ -3,17 +3,16 @@ import '../../../../core/notification/notification_intent.dart';
 import '../../../../core/notification/notification_intent_sink.dart';
 import '../../core/event_bus/waiting_room_event_bus.dart';
 
-class WaitingRoomReserveFailedNotificationSideEffect
-    with DisposableSideEffect {
+class WaitingRoomReserveFailedNotificationSideEffect with DisposableSideEffect {
   WaitingRoomReserveFailedNotificationSideEffect({
     required WaitingRoomEventBus waitingRoomEventBus,
     required NotificationIntentSink notificationIntentSink,
-  })  : _waitingRoomEventBus = waitingRoomEventBus,
-        _notificationIntentSink = notificationIntentSink {
+  }) : _waitingRoomEventBus = waitingRoomEventBus,
+       _notificationIntentSink = notificationIntentSink {
     trackSubscription(
-      _waitingRoomEventBus
-          .on<WaitingRoomReserveFailedEvent>()
-          .listen(_onReserveFailed),
+      _waitingRoomEventBus.on<WaitingRoomReserveFailedEvent>().listen(
+        _onReserveFailed,
+      ),
     );
   }
 

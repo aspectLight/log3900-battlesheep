@@ -19,6 +19,7 @@ class GameBoardCellUi {
   final bool hasPathDown;
   final bool hasPathLeft;
   final bool hasPathRight;
+  final bool isIlluminated;
 
   const GameBoardCellUi({
     required this.tile,
@@ -32,6 +33,7 @@ class GameBoardCellUi {
     this.hasPathDown = false,
     this.hasPathLeft = false,
     this.hasPathRight = false,
+    this.isIlluminated = false,
   });
 
   int get x => positionUi.x;

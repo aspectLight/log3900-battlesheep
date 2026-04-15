@@ -113,6 +113,36 @@ abstract class GameSessionLocalizations {
   /// **'Inventory full'**
   String get gameInventoryFullDiscardTitle;
 
+  /// No description provided for @gameTrapTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trap'**
+  String get gameTrapTitle;
+
+  /// No description provided for @gameTrapDescriptionCanAvoid.
+  ///
+  /// In en, this message translates to:
+  /// **'You can avoid the trap or try to cross it.'**
+  String get gameTrapDescriptionCanAvoid;
+
+  /// No description provided for @gameTrapDescriptionMustTraverse.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have enough movement points to avoid the trap. You must cross it.'**
+  String get gameTrapDescriptionMustTraverse;
+
+  /// No description provided for @gameTrapAvoid.
+  ///
+  /// In en, this message translates to:
+  /// **'Avoid'**
+  String get gameTrapAvoid;
+
+  /// No description provided for @gameTrapTraverse.
+  ///
+  /// In en, this message translates to:
+  /// **'Cross'**
+  String get gameTrapTraverse;
+
   /// No description provided for @gamePlayersListPlaying.
   ///
   /// In en, this message translates to:
@@ -380,6 +410,10 @@ abstract class GameSessionLocalizations {
   /// **'Game abandoned'**
   String get notificationGameAbandoned;
 
+  /// No description provided for @notificationGameCanceled.
+  ///
+  /// In en, this message translates to:
+  /// **'Game canceled'**
   String get notificationGameCanceled;
 
   /// No description provided for @notificationDisconnectAutomatic.
@@ -562,6 +596,18 @@ abstract class GameSessionLocalizations {
   /// **'Allows attacking at range'**
   String get itemAirStrikeDesc;
 
+  /// No description provided for @itemTorchName.
+  ///
+  /// In en, this message translates to:
+  /// **'Torch'**
+  String get itemTorchName;
+
+  /// No description provided for @itemTorchDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'A lit torch that improves your abilities in the light'**
+  String get itemTorchDesc;
+
   /// No description provided for @itemRandomName.
   ///
   /// In en, this message translates to:
@@ -652,6 +698,18 @@ abstract class GameSessionLocalizations {
   /// **'Intersection'**
   String get tileIntersectionName;
 
+  /// No description provided for @tileTrapName.
+  ///
+  /// In en, this message translates to:
+  /// **'Trap'**
+  String get tileTrapName;
+
+  /// No description provided for @tileTeleportPadName.
+  ///
+  /// In en, this message translates to:
+  /// **'Teleport pad'**
+  String get tileTeleportPadName;
+
   /// No description provided for @tileSnowDesc.
   ///
   /// In en, this message translates to:
@@ -705,6 +763,18 @@ abstract class GameSessionLocalizations {
   /// In en, this message translates to:
   /// **'An impassable wall'**
   String get tileIntersectionDesc;
+
+  /// No description provided for @tileTrapDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'A trap that slows movement'**
+  String get tileTrapDesc;
+
+  /// No description provided for @tileTeleportPadDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Teleports you to the paired pad'**
+  String get tileTeleportPadDesc;
 
   /// No description provided for @unknownError.
   ///
