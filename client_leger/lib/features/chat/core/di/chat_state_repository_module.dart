@@ -1,6 +1,7 @@
 import 'package:event_bus/event_bus.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../../authentication/core/interfaces/auth_repository.dart';
 import '../event_bus/chat_event_bus.dart';
 import '../../data/reducers/chat_state_reducer.dart';
 import '../../data/repositories/chat_panel_state_repository.dart';
@@ -19,6 +20,7 @@ void registerChatRepositories(GetIt scope, GetIt rootGetIt) {
     () => ChatRepository(
       chatSocket: scope.get<ChatSocket>(),
       reducer: rootGetIt.get<ChatStateReducer>(),
+      authRepository: rootGetIt<AuthRepository>(),
     ),
   );
 }
