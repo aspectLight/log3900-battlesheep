@@ -57,9 +57,22 @@ export class ItemsHandler {
     handleItemDropped(data: { roomId: string; playerId: string; item: Item; coords: Coords }, socket: Socket, server: Server): void {
         try {
             const room = this.gameRoomService.findRoomById(data.roomId);
-            server.to(data.roomId).emit(GameRoomEvents.ItemDropped, data);
-            this.gameRoomService.removeItemFromInventory(data.roomId, data.playerId, data.item);
+            if (!room) {
+                socket.emit(GameRoomEvents.GameRoomError, 'Room not found');
+                return;
+            }
+
+            // Remove item from server inventory. Wrapped separately so that even if
+            // the player is not found (e.g. disconnect/reconnect ID mismatch), the
+            // drop is still broadcast and the item appears on the board.
+            try {
+                this.gameRoomService.removeItemFromInventory(data.roomId, data.playerId, data.item);
+            } catch {
+                // Inventory removal failed — continue so clients stay in sync visually
+            }
+
             this.gameMovementService.addItemToBoard(data.roomId, data.item, data.coords);
+            server.to(data.roomId).emit(GameRoomEvents.ItemDropped, data);
 
             // Recalculate torch illumination after item drop
             const illuminatedCells = this.torchService.recalculateIllumination(data.roomId, room.players);

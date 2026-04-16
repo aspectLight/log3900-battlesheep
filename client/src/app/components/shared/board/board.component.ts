@@ -11,12 +11,13 @@ import { PaintService } from '@app/services/editor/paint.service';
 import { TeleportService } from '@app/services/editor/teleport.service';
 import { MovementSocketService } from '@app/services/communication/socket-handlers/movement-socket.service';
 import { Subscription } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-board',
     templateUrl: './board.component.html',
     styleUrls: ['./board.component.scss'],
-    imports: [PlayerComponent],
+    imports: [PlayerComponent, TranslateModule],
 })
 
 /*

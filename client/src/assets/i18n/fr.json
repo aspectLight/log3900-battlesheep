@@ -415,6 +415,19 @@
     "item_flag": "Un drapeau à ramener à la base",
     "item_spawnPoint": "Un feu de camp servant de base"
   },
+  "items_names": {
+    "adrenaline": "Adrénaline",
+    "torch": "Torche",
+    "vodka": "Vodka",
+    "propaganda": "Propagande",
+    "barbedWire": "Fil barbelé",
+    "camouflage": "Camouflage",
+    "waterproofBoots": "Bottes imperméables",
+    "airStrike": "Frappe aérienne",
+    "random": "Objet aléatoire",
+    "flag": "Drapeau",
+    "spawnPoint": "Point d'apparition"
+  },
   "tiles_names": {
     "tree": "Arbre",
     "stone": "Pierre",

@@ -415,6 +415,19 @@
     "item_flag": "A flag to bring back to base",
     "item_spawnPoint": "A campfire serving as a base"
   },
+  "items_names": {
+    "adrenaline": "Adrenaline",
+    "torch": "Torch",
+    "vodka": "Vodka",
+    "propaganda": "Propaganda",
+    "barbedWire": "Barbed Wire",
+    "camouflage": "Camouflage",
+    "waterproofBoots": "Waterproof Boots",
+    "airStrike": "Air Strike",
+    "random": "Random Item",
+    "flag": "Flag",
+    "spawnPoint": "Spawn Point"
+  },
   "tiles_names": {
     "tree": "Tree",
     "stone": "Stone",

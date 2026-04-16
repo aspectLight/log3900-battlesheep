@@ -1,9 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Item } from '@app/classes/entity/item';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-pop-up',
-    imports: [],
+    imports: [TranslateModule],
     templateUrl: './pop-up.component.html',
     styleUrl: './pop-up.component.scss',
 })
