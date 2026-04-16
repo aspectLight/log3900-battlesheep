@@ -109,6 +109,7 @@ export class PlayerHudComponent {
         const index = player.inventory.findIndex((i) => i === item);
         if (index !== -1) {
             player.inventory[index] = null;
+            player.removeItemEffect(item);
         }
 
         this.gameManager.dropItem(item, coords);
