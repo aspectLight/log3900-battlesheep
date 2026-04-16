@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../../../../core/services/log_service.dart';
 import '../../../../core/services/socket_service.dart';
 import '../models/dto/game_rewards_info_dto.dart';
 import '../models/dto/statistics_dto.dart';
@@ -15,17 +16,31 @@ class StatisticsSocket {
 
   StatisticsSocket({required SocketService socketService})
     : _socketService = socketService {
+    LogService.d('[StatisticsSocket] created, subscribing to events');
     _statisticsSubscription = _socketService
         .on<Map<String, dynamic>>(StatisticsSocketEvents.getStatisticsResponse)
         .listen(
-          (data) =>
-              _responseController.add(GameStatisticsDto.fromSocketData(data)),
+          (data) {
+            LogService.d('[StatisticsSocket] getStatisticsResponse received');
+            _responseController.add(GameStatisticsDto.fromSocketData(data));
+          },
         );
     _rewardsSubscription = _socketService
-        .on<Map<String, dynamic>>(StatisticsSocketEvents.gameRewardsInfo)
+        .on<Object>(StatisticsSocketEvents.gameRewardsInfo)
         .listen(
-          (data) =>
-              _rewardsController.add(GameRewardsInfoDto.fromSocketData(data)),
+          (rawData) {
+            LogService.d('[StatisticsSocket] gameRewardsInfo received, type=${rawData.runtimeType}');
+            final Map<String, dynamic> data;
+            if (rawData is Map<String, dynamic>) {
+              data = rawData;
+            } else if (rawData is Map) {
+              data = Map<String, dynamic>.from(rawData);
+            } else {
+              LogService.e('[StatisticsSocket] unexpected data type: ${rawData.runtimeType}');
+              return;
+            }
+            _rewardsController.add(GameRewardsInfoDto.fromSocketData(data));
+          },
         );
   }
 
@@ -40,8 +55,6 @@ class StatisticsSocket {
   Future<void> dispose() async {
     await _statisticsSubscription?.cancel();
     await _rewardsSubscription?.cancel();
-    _socketService.off(StatisticsSocketEvents.getStatisticsResponse);
-    _socketService.off(StatisticsSocketEvents.gameRewardsInfo);
     await _responseController.close();
     await _rewardsController.close();
   }

@@ -84,6 +84,7 @@
   "itemAirStrikeDesc": "Allows attacking at range",
   "itemTorchName": "Torch",
   "itemTorchDesc": "A lit torch that improves your abilities in the light",
+  "dropTorchButton": "Drop",
   "itemRandomName": "Random",
   "itemRandomDesc": "A random item revealed during the game",
   "itemFlagName": "Flag",

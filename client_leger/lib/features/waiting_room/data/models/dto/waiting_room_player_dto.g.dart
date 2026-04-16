@@ -19,13 +19,11 @@ WaitingRoomPlayerDto _$WaitingRoomPlayerDtoFromJson(
   virtualType: json['profile'] == null
       ? VirtualPlayerType.aggressive
       : const VirtualPlayerTypeConverter().fromJson(json['profile'] as String),
-  d6Choice: _$JsonConverterFromJson<String, DiceStatChoice>(
+  d6Choice: const WaitingRoomDiceStatChoiceConverter().fromJson(
     json['d6Choice'],
-    const DiceStatChoiceConverter().fromJson,
   ),
-  d4Choice: _$JsonConverterFromJson<String, DiceStatChoice>(
+  d4Choice: const WaitingRoomDiceStatChoiceConverter().fromJson(
     json['d4Choice'],
-    const DiceStatChoiceConverter().fromJson,
   ),
   profileAvatarId: json['profileAvatarId'] as String?,
   profileAvatarUrl: json['profileAvatarUrl'] as String?,
@@ -41,25 +39,13 @@ Map<String, dynamic> _$WaitingRoomPlayerDtoToJson(
   'isVirtual': instance.isVirtual,
   'profile': const VirtualPlayerTypeConverter().toJson(instance.virtualType),
   'stats': instance.stats,
-  'd6Choice': _$JsonConverterToJson<String, DiceStatChoice>(
+  'd6Choice': const WaitingRoomDiceStatChoiceConverter().toJson(
     instance.d6Choice,
-    const DiceStatChoiceConverter().toJson,
   ),
-  'd4Choice': _$JsonConverterToJson<String, DiceStatChoice>(
+  'd4Choice': const WaitingRoomDiceStatChoiceConverter().toJson(
     instance.d4Choice,
-    const DiceStatChoiceConverter().toJson,
   ),
   'profileAvatarId': instance.profileAvatarId,
   'profileAvatarUrl': instance.profileAvatarUrl,
   'activeBanner': instance.activeBanner,
 };
-
-Value? _$JsonConverterFromJson<Json, Value>(
-  Object? json,
-  Value? Function(Json json) fromJson,
-) => json == null ? null : fromJson(json as Json);
-
-Json? _$JsonConverterToJson<Json, Value>(
-  Value? value,
-  Json? Function(Value value) toJson,
-) => value == null ? null : toJson(value);

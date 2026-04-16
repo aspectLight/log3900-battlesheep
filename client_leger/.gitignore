@@ -23,6 +23,10 @@ migrate_working_dir/
 # is commented out by default.
 #.vscode/
 
+# Local short-path workaround (e.g. Windows MAX_PATH / custom PUB_CACHE layout).
+# Do not commit: mirrors dependency sources and is huge; regenerate locally if needed.
+none/
+
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
@@ -46,3 +50,6 @@ app.*.map.json
 
 # Generated code
 /lib/generated/
+
+# Tooling / analyzer mirror (duplicate tree; source is under lib/)
+none/

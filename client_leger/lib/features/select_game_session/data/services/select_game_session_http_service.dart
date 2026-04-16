@@ -36,7 +36,8 @@ class SelectGameSessionHttpService {
     );
     final data = response.data ?? <dynamic>[];
     return data
-        .whereType<Map<String, dynamic>>()
+        .whereType<Map>()
+        .map(Map<String, dynamic>.from)
         .map(GameSummaryDto.fromJson)
         .toList();
   }

@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:fpdart/fpdart.dart';
 
+import '../../../../core/helpers/merge_profile_avatar_into_player_payload.dart';
 import '../../../../core/helpers/replay_latest_broadcast_controller.dart';
 import '../../../../core/helpers/socket_listener_helper.dart';
 import '../../../../core/services/socket_service.dart';
+import '../../../authentication/core/interfaces/auth_repository.dart';
 import '../../core/exceptions/waiting_room_failure.dart';
 import '../../domain/commands/add_virtual_player_command.dart';
 import '../../domain/commands/create_waiting_room_command.dart';
@@ -35,8 +37,11 @@ import '../models/extensions/waiting_room_dto_extensions.dart';
 import '../models/extensions/waiting_room_error_payload_dto_extensions.dart';
 
 class WaitingRoomSocket {
-  WaitingRoomSocket({required SocketService socketService})
-    : _socketService = socketService {
+  WaitingRoomSocket({
+    required SocketService socketService,
+    required AuthRepository authRepository,
+  }) : _socketService = socketService,
+       _authRepository = authRepository {
     _connectionSubscription = _socketService.connectionStream.listen((
       connected,
     ) async {
@@ -49,6 +54,7 @@ class WaitingRoomSocket {
   }
 
   final SocketService _socketService;
+  final AuthRepository _authRepository;
 
   final _waitingRoomCreatedController =
       ReplayLatestBroadcastController<WaitingRoomModel>();
@@ -108,12 +114,11 @@ class WaitingRoomSocket {
     await _cancelEventListeners();
     _eventSubscriptions.addAll([
       _socketService
-          .on<Map<String, dynamic>>(
-            WaitingRoomSocketEvents.inbound.waitingRoomCreated,
-          )
+          .on<Object?>(WaitingRoomSocketEvents.inbound.waitingRoomCreated)
           .listen((data) {
+            if (data is! Map) return;
             _waitingRoomCreatedController.add(
-              WaitingRoomDto.fromJson(data).toModel(),
+              WaitingRoomDto.fromJson(Map<String, dynamic>.from(data)).toModel(),
             );
           }),
       subscribeSocketEvent<Object?>(
@@ -153,13 +158,12 @@ class WaitingRoomSocket {
         (_) => null,
       ),
       _socketService
-          .on<Map<String, dynamic>>(
-            WaitingRoomSocketEvents.inbound.updateAvatarReserved,
-          )
+          .on<Object?>(WaitingRoomSocketEvents.inbound.updateAvatarReserved)
           .listen((data) {
+            if (data is! Map) return;
             _updateCharacterReservedController.add(
               UpdateCharacterReservedPayloadDto.fromJson(
-                data,
+                Map<String, dynamic>.from(data),
               ).reservedCharacters.map((d) => d.toModel()).toList(),
             );
           }),
@@ -176,12 +180,13 @@ class WaitingRoomSocket {
         (data) => PlayerCreatedPayloadDto.fromList(data).toModels(),
       ),
       _socketService
-          .on<Map<String, dynamic>>(
-            WaitingRoomSocketEvents.inbound.gameRoomCreated,
-          )
+          .on<Object?>(WaitingRoomSocketEvents.inbound.gameRoomCreated)
           .listen((data) {
+            if (data is! Map) return;
             _gameRoomCreatedController.add(
-              GameRoomCreatedPayloadDto.fromJson(data),
+              GameRoomCreatedPayloadDto.fromJson(
+                Map<String, dynamic>.from(data),
+              ),
             );
           }),
     ]);
@@ -195,11 +200,34 @@ class WaitingRoomSocket {
   }
 
   void createWaitingRoom(CreateWaitingRoomCommand command) {
+    unawaited(_createWaitingRoom(command));
+  }
+
+  Future<void> _createWaitingRoom(CreateWaitingRoomCommand command) async {
     final payload = command.toCreateWaitingRoomPayloadDto().toJson();
+    final host = payload['host'];
+    if (host is Map<String, dynamic>) {
+      final uid = await _resolveFirebaseUid();
+      if (uid != null && uid.isNotEmpty) {
+        host['firebaseUid'] = uid;
+      }
+      await mergeProfileAvatarFieldsFromAuth(_authRepository, host);
+    }
     _socketService.emit(
       WaitingRoomSocketEvents.outbound.createWaitingRoom,
       payload,
     );
+  }
+
+  Future<String?> _resolveFirebaseUid() async {
+    final currentUserResult = await _authRepository.getCurrentUser().run();
+    return switch (currentUserResult) {
+      Left() => null,
+      Right(value: final userOption) => switch (userOption) {
+        Some(value: final user) => user.firebaseUid,
+        None() => null,
+      },
+    };
   }
 
   Future<Either<WaitingRoomFailure, void>> leaveWaitingRoom(

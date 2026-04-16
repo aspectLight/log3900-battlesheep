@@ -106,8 +106,13 @@ class GamePlayerStateReducer {
     GamePlayerState previous,
     UpdateScoreEvent event,
   ) {
+    final absolute = event.fightsWon;
+    // Match Angular socket handling: only apply when server sent fightsWon.
+    // A missing field must not increment locally (avoids runaway wins if the
+    // payload shape is list/string-only or fightsWon failed to parse).
+    if (absolute == null) return previous;
     final wins = Map<String, int>.from(previous.winsByPlayerId);
-    wins[event.winnerId] = (wins[event.winnerId] ?? 0) + 1;
+    wins[event.winnerId] = absolute;
     return previous.copyWith(winsByPlayerId: wins);
   }
 

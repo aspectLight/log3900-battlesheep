@@ -5,6 +5,7 @@ part 'user_dto.g.dart';
 @JsonSerializable()
 class UserDto {
   final String id;
+  final String? firebaseUid;
   final String email;
   final String username;
   final String avatarId;
@@ -12,6 +13,7 @@ class UserDto {
 
   UserDto({
     required this.id,
+    this.firebaseUid,
     required this.email,
     required this.username,
     required this.avatarId,

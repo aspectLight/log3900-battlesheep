@@ -83,8 +83,11 @@ class CurrentPlayerChangedEvent with _$CurrentPlayerChangedEvent {
 
 @freezed
 class UpdateScoreEvent with _$UpdateScoreEvent {
-  const factory UpdateScoreEvent({required String winnerId}) =
-      _UpdateScoreEvent;
+  const factory UpdateScoreEvent({
+    required String winnerId,
+    /// When set (server sends this), replaces the winner's win count (Angular parity).
+    int? fightsWon,
+  }) = _UpdateScoreEvent;
 }
 
 @freezed

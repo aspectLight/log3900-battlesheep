@@ -1,3 +1,4 @@
+import '../../../../core/chat/chat_outgoing_avatars.dart';
 import '../../../../core/helpers/functional_programming.dart';
 import '../../../../core/interfaces/disposable_side_effect.dart';
 import '../../core/constants/chat_constants.dart';
@@ -11,16 +12,19 @@ class ChatShakeSideEffect with DisposableSideEffect {
   final ChatEventBus _chatEventBus;
   final ChatRepository _chatRepository;
   final ChatPanelStateRepository _panelStateRepository;
+  final ChatOutgoingAvatars _outgoingAvatars;
 
   ChatShakeSideEffect({
     required String username,
     required ChatEventBus chatEventBus,
     required ChatRepository chatRepository,
     required ChatPanelStateRepository panelStateRepository,
+    required ChatOutgoingAvatars outgoingAvatars,
   }) : _username = username,
        _chatEventBus = chatEventBus,
        _chatRepository = chatRepository,
-       _panelStateRepository = panelStateRepository {
+       _panelStateRepository = panelStateRepository,
+       _outgoingAvatars = outgoingAvatars {
     trackSubscription(
       _chatEventBus.on<ChatVerticalShakeDetected>().listen(_onVerticalShake),
     );
@@ -34,7 +38,12 @@ class ChatShakeSideEffect with DisposableSideEffect {
   void _onVerticalShake(ChatVerticalShakeDetected event) {
     _panelStateRepository.lastSentMessage.value.whenPresent((content) {
       _chatRepository.sendMessage(
-        SendChatMessageCommand(username: _username, content: content),
+        SendChatMessageCommand(
+          username: _username,
+          content: content,
+          avatarId: _outgoingAvatars.avatarId,
+          avatarUrl: _outgoingAvatars.avatarUrlForSocket,
+        ),
       );
     });
   }

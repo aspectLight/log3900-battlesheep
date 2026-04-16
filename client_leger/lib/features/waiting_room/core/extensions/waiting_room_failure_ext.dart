@@ -12,6 +12,9 @@ extension WaitingRoomFailureExt on WaitingRoomFailure {
     if (this is CharacterAlreadyReservedWaitingRoomFailure) {
       return l10n.waitingRoomCharacterAlreadyReserved;
     }
+    if (this is PlayerAlreadyInRoomWaitingRoomFailure) {
+      return l10n.waitingRoomPlayerAlreadyInRoom;
+    }
     if (this is PlayerKickedWaitingRoomFailure) {
       return l10n.waitingRoomPlayerKicked;
     }

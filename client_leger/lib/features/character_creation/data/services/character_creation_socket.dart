@@ -2,14 +2,16 @@ import 'dart:async';
 
 import 'package:fpdart/fpdart.dart';
 
+import '../../../../core/helpers/merge_profile_avatar_into_player_payload.dart';
+import '../../../../core/helpers/replay_latest_broadcast_controller.dart';
 import '../../../../core/services/socket_service.dart';
+import '../../../authentication/core/interfaces/auth_repository.dart';
 import '../../../game_session/core/context/drop_in_join_sync_holder.dart';
 import '../../../join_game_session/core/exceptions/join_game_session_failure.dart';
 import '../../core/exceptions/reserve_character_failure.dart';
-import '../../../../core/helpers/replay_latest_broadcast_controller.dart';
-import '../../domain/commands/get_reserved_characters_command.dart';
 import '../../core/helpers/reserve_character_failure_mapper.dart';
 import '../../domain/commands/create_character_commands.dart';
+import '../../domain/commands/get_reserved_characters_command.dart';
 import '../../domain/commands/reserve_character_command.dart';
 import '../../domain/events/character_creation_events.dart';
 import '../../domain/result/drop_in_join_result.dart';
@@ -26,13 +28,16 @@ class CharacterCreationSocket {
   CharacterCreationSocket({
     required SocketService socketService,
     required DropInJoinSyncHolder dropInJoinSyncHolder,
+    required AuthRepository authRepository,
   }) : _socketService = socketService,
-       _dropInJoinSyncHolder = dropInJoinSyncHolder {
+       _dropInJoinSyncHolder = dropInJoinSyncHolder,
+       _authRepository = authRepository {
     _setupListeners();
   }
 
   final SocketService _socketService;
   final DropInJoinSyncHolder _dropInJoinSyncHolder;
+  final AuthRepository _authRepository;
 
   // Cancelled in dispose().
   // ignore: cancel_subscriptions
@@ -124,11 +129,21 @@ class CharacterCreationSocket {
   }
 
   void submitCharacter(CreateCharacterCommand command) {
+    unawaited(_submitCharacter(command));
+  }
+
+  Future<void> _submitCharacter(CreateCharacterCommand command) async {
     final request = command.toCreatePlayerRequestDto();
-    _socketService.emit(
-      CharacterCreationSocketEvents.createPlayer,
-      request.toJson(),
-    );
+    final payload = request.toJson();
+    final player = payload['player'];
+    if (player is Map<String, dynamic>) {
+      final uid = await _resolveCurrentUserUid();
+      if (uid != null && uid.isNotEmpty) {
+        player['firebaseUid'] = uid;
+      }
+      await mergeProfileAvatarFieldsFromAuth(_authRepository, player);
+    }
+    _socketService.emit(CharacterCreationSocketEvents.createPlayer, payload);
   }
 
   Future<Either<JoinGameSessionFailure, DropInJoinResult>> joinGameRoom(
@@ -136,12 +151,21 @@ class CharacterCreationSocket {
   ) async {
     _dropInJoinSyncHolder.clear();
     final request = command.toCreatePlayerRequestDto();
+    final payload = request.toJson();
+    final player = payload['player'];
+    if (player is Map<String, dynamic>) {
+      final uid = await _resolveCurrentUserUid();
+      if (uid != null && uid.isNotEmpty) {
+        player['firebaseUid'] = uid;
+      }
+      await mergeProfileAvatarFieldsFromAuth(_authRepository, player);
+    }
     final responseFuture = _socketService
         .on<Object?>(CharacterCreationSocketEvents.joinGameRoomResponse)
         .first;
     final raw = await _socketService.emitWithAck<Object?>(
       CharacterCreationSocketEvents.joinGameRoom,
-      request.toJson(),
+      payload,
     );
     if (raw is! Map<String, dynamic>) {
       return left(
@@ -220,11 +244,35 @@ class CharacterCreationSocket {
     return UnknownJoinGameSessionFailure(message);
   }
 
+  Future<String?> _resolveCurrentUserUid() async {
+    final currentUserResult = await _authRepository.getCurrentUser().run();
+    return switch (currentUserResult) {
+      Left() => null,
+      Right(value: final userOption) => switch (userOption) {
+        Some(value: final user) => user.firebaseUid,
+        None() => null,
+      },
+    };
+  }
+
   void createWaitingRoom({required CreateWaitingRoomCommand command}) {
+    unawaited(_createWaitingRoom(command));
+  }
+
+  Future<void> _createWaitingRoom(CreateWaitingRoomCommand command) async {
     final request = command.toCreateWaitingRoomRequestDto();
+    final payload = request.toJson();
+    final host = payload['host'];
+    if (host is Map<String, dynamic>) {
+      final uid = await _resolveCurrentUserUid();
+      if (uid != null && uid.isNotEmpty) {
+        host['firebaseUid'] = uid;
+      }
+      await mergeProfileAvatarFieldsFromAuth(_authRepository, host);
+    }
     _socketService.emit(
       CharacterCreationSocketEvents.createWaitingRoom,
-      request.toJson(),
+      payload,
     );
   }
 

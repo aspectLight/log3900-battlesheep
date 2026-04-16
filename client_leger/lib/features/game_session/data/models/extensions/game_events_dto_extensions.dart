@@ -39,8 +39,12 @@ extension PlayerSpawnedPayloadOnMap on Map<String, dynamic> {
 
 extension PlayerSpawnedPayloadOnList on List<dynamic> {
   PlayerSpawnedDto toPlayerSpawnedDto() => PlayerSpawnedDto(
-    players: whereType<Map<String, dynamic>>()
-        .map((e) => e.toSpawnedPlayerDto())
+    players: whereType<Map>()
+        .map(
+          (e) => SpawnedPlayerDto.fromPlayerSpawnedPayload(
+            Map<String, dynamic>.from(e),
+          ),
+        )
         .toList(),
   );
 }
@@ -71,7 +75,10 @@ extension UpdateStartingCountdownDtoToEntity on UpdateStartingCountdownDto {
 }
 
 extension UpdateScoreDtoToEntity on UpdateScoreDto {
-  UpdateScoreEvent toEntity() => UpdateScoreEvent(winnerId: winnerId);
+  UpdateScoreEvent toEntity() => UpdateScoreEvent(
+    winnerId: winnerId,
+    fightsWon: fightsWon,
+  );
 }
 
 extension FinishGameDtoToEntity on FinishGameDto {

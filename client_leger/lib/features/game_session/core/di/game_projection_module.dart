@@ -60,6 +60,7 @@ void registerGameProjections(
     () => GamePlayerEventsProjection(
       eventsSocket: scope.get<GameEventsSocket>(),
       playerRepository: scope.get<GamePlayerRepository>(),
+      combatRepository: scope.get<GameCombatRepository>(),
       gameSessionEventBus: rootGetIt.get<GameSessionEventBus>(),
     ),
   );

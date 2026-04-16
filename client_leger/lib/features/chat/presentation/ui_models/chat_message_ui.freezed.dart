@@ -24,6 +24,7 @@ mixin _$ChatMessageUi {
   bool get isMe => throw _privateConstructorUsedError;
   String? get avatarId => throw _privateConstructorUsedError;
   String? get avatarUrl => throw _privateConstructorUsedError;
+  int? get avatarDisplayNonce => throw _privateConstructorUsedError;
 
   /// Create a copy of ChatMessageUi
   /// with the given fields replaced by the non-null parameter values.
@@ -47,6 +48,7 @@ abstract class $ChatMessageUiCopyWith<$Res> {
     bool isMe,
     String? avatarId,
     String? avatarUrl,
+    int? avatarDisplayNonce,
   });
 }
 
@@ -72,6 +74,7 @@ class _$ChatMessageUiCopyWithImpl<$Res, $Val extends ChatMessageUi>
     Object? isMe = null,
     Object? avatarId = freezed,
     Object? avatarUrl = freezed,
+    Object? avatarDisplayNonce = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -103,6 +106,10 @@ class _$ChatMessageUiCopyWithImpl<$Res, $Val extends ChatMessageUi>
                 ? _value.avatarUrl
                 : avatarUrl // ignore: cast_nullable_to_non_nullable
                       as String?,
+            avatarDisplayNonce: freezed == avatarDisplayNonce
+                ? _value.avatarDisplayNonce
+                : avatarDisplayNonce // ignore: cast_nullable_to_non_nullable
+                      as int?,
           )
           as $Val,
     );
@@ -126,6 +133,7 @@ abstract class _$$ChatMessageUiImplCopyWith<$Res>
     bool isMe,
     String? avatarId,
     String? avatarUrl,
+    int? avatarDisplayNonce,
   });
 }
 
@@ -150,6 +158,7 @@ class __$$ChatMessageUiImplCopyWithImpl<$Res>
     Object? isMe = null,
     Object? avatarId = freezed,
     Object? avatarUrl = freezed,
+    Object? avatarDisplayNonce = freezed,
   }) {
     return _then(
       _$ChatMessageUiImpl(
@@ -181,6 +190,10 @@ class __$$ChatMessageUiImplCopyWithImpl<$Res>
             ? _value.avatarUrl
             : avatarUrl // ignore: cast_nullable_to_non_nullable
                   as String?,
+        avatarDisplayNonce: freezed == avatarDisplayNonce
+            ? _value.avatarDisplayNonce
+            : avatarDisplayNonce // ignore: cast_nullable_to_non_nullable
+                  as int?,
       ),
     );
   }
@@ -197,6 +210,7 @@ class _$ChatMessageUiImpl implements _ChatMessageUi {
     required this.isMe,
     this.avatarId,
     this.avatarUrl,
+    this.avatarDisplayNonce,
   });
 
   @override
@@ -213,10 +227,12 @@ class _$ChatMessageUiImpl implements _ChatMessageUi {
   final String? avatarId;
   @override
   final String? avatarUrl;
+  @override
+  final int? avatarDisplayNonce;
 
   @override
   String toString() {
-    return 'ChatMessageUi(type: $type, name: $name, content: $content, time: $time, isMe: $isMe, avatarId: $avatarId, avatarUrl: $avatarUrl)';
+    return 'ChatMessageUi(type: $type, name: $name, content: $content, time: $time, isMe: $isMe, avatarId: $avatarId, avatarUrl: $avatarUrl, avatarDisplayNonce: $avatarDisplayNonce)';
   }
 
   @override
@@ -232,7 +248,9 @@ class _$ChatMessageUiImpl implements _ChatMessageUi {
             (identical(other.avatarId, avatarId) ||
                 other.avatarId == avatarId) &&
             (identical(other.avatarUrl, avatarUrl) ||
-                other.avatarUrl == avatarUrl));
+                other.avatarUrl == avatarUrl) &&
+            (identical(other.avatarDisplayNonce, avatarDisplayNonce) ||
+                other.avatarDisplayNonce == avatarDisplayNonce));
   }
 
   @override
@@ -245,6 +263,7 @@ class _$ChatMessageUiImpl implements _ChatMessageUi {
     isMe,
     avatarId,
     avatarUrl,
+    avatarDisplayNonce,
   );
 
   /// Create a copy of ChatMessageUi
@@ -265,6 +284,7 @@ abstract class _ChatMessageUi implements ChatMessageUi {
     required final bool isMe,
     final String? avatarId,
     final String? avatarUrl,
+    final int? avatarDisplayNonce,
   }) = _$ChatMessageUiImpl;
 
   @override
@@ -281,6 +301,8 @@ abstract class _ChatMessageUi implements ChatMessageUi {
   String? get avatarId;
   @override
   String? get avatarUrl;
+  @override
+  int? get avatarDisplayNonce;
 
   /// Create a copy of ChatMessageUi
   /// with the given fields replaced by the non-null parameter values.
