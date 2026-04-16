@@ -1,7 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Player } from '@app/classes/entity/player';
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
+import { AVATAR_TYPES } from '@app/constants/player.constants';
 import { TranslateModule } from '@ngx-translate/core';
+
 @Component({
     selector: 'app-player-card',
     imports: [TranslateModule],
@@ -23,7 +25,10 @@ export class PlayerCardComponent implements OnInit {
 
     ngOnInit() {
         if (this.player && this.player.avatar) {
-            this.avatar = this.player.avatar.avatarFull;
+            this.avatar =
+                this.player.avatar.avatarFull ??
+                AVATAR_TYPES[this.player.avatar.name?.toLowerCase()]?.avatarFull ??
+                '';
         }
 
         if (this.player && this.player.isVirtual) {
