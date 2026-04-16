@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostBinding, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
@@ -29,6 +29,11 @@ export class ChatboxComponent implements OnInit, OnChanges, AfterViewInit, OnDes
 
     isCollapsed: boolean = false;
     newMessage: string = '';
+
+    @HostBinding('class.collapsed')
+    get isHostCollapsed(): boolean {
+        return this.isCollapsed;
+    }
 
     /** null = général, string = channelId du canal custom/partie actif */
     activeChannelId: string | null = null;
