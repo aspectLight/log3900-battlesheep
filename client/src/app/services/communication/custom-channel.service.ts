@@ -42,6 +42,7 @@ export class CustomChannelService {
     private joinedChannelNames = new Map<string, string>(); // channelId → display name
     private gameChannelIds = new Set<string>(); // canaux éphémères de partie (exclus du dropdown)
     private messagesByChannel: Record<string, ChannelMessage[]> = {};
+    private explicitUsername: string | null = null;
     private usernameOverride: string | null = null;
 
     constructor(
@@ -52,7 +53,12 @@ export class CustomChannelService {
     ) {}
 
     get username(): string {
-        return this.usernameOverride ?? (this.authService.currentUser?.displayName as string);
+        return this.usernameOverride ?? this.explicitUsername ?? (this.authService.currentUser?.displayName as string);
+    }
+
+    setUsername(username: string | null | undefined): void {
+        const normalized = username?.trim();
+        this.explicitUsername = normalized ? normalized : null;
     }
 
     resetState(): void {
@@ -64,6 +70,7 @@ export class CustomChannelService {
         this.joinedChannelNames.clear();
         this.gameChannelIds.clear();
         this.messagesByChannel = {};
+        this.explicitUsername = null;
         this.usernameOverride = null;
 
         this.channelsUpdated$.next([]);
@@ -317,5 +324,3 @@ export class CustomChannelService {
         return null;
     }
 }
-
-

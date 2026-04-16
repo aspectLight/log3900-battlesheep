@@ -4,6 +4,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 class ChatPanelStateRepository {
   final Signal<Option<String>> lastSentMessage = signal(const Option.none());
   final Signal<int> selectedEmojiIndex = signal(0);
+  final Signal<String?> activeCustomChannelId = signal(null);
 
   void setLastSentMessage(Option<String> value) {
     lastSentMessage.value = value;
@@ -11,5 +12,9 @@ class ChatPanelStateRepository {
 
   void setSelectedEmojiIndex(int index) {
     selectedEmojiIndex.value = index;
+  }
+
+  void setActiveCustomChannelId(String? channelId) {
+    activeCustomChannelId.value = channelId;
   }
 }
