@@ -77,6 +77,22 @@ export class ChatService {
                 this.triggerScroll();
             },
         );
+
+        this.socketService.on<{ oldUsername: string; newUsername: string }>(GeneralChatEvents.UsernameUpdated, (payload) => {
+            if (!payload?.oldUsername || !payload?.newUsername || payload.oldUsername === payload.newUsername) return;
+            for (const msg of this.messages) {
+                if (msg.name === payload.oldUsername) {
+                    msg.name = payload.newUsername;
+                }
+            }
+            if (this.username === payload.oldUsername) {
+                this.username = payload.newUsername;
+            }
+            if (this.playerName === payload.oldUsername) {
+                this.playerName = payload.newUsername;
+            }
+        });
+
         this.socketService.on('connect', () => {
             if (this.username) {
                 this.socketService.send(GeneralChatEvents.JoinGeneralChat, this.username);

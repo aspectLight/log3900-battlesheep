@@ -40,6 +40,18 @@ export class AvatarRegistryService {
                 }));
             },
         );
+
+        this.socketService.on<{ oldUsername: string; newUsername: string }>(GeneralChatEvents.UsernameUpdated, (payload) => {
+            if (!payload?.oldUsername || !payload?.newUsername || payload.oldUsername === payload.newUsername) return;
+            this.registry.update((current) => {
+                const entry = current[payload.oldUsername];
+                if (!entry) return current;
+                const next = { ...current };
+                next[payload.newUsername] = entry;
+                delete next[payload.oldUsername];
+                return next;
+            });
+        });
     }
 
     get(username: string | null | undefined): AvatarEntry | null {

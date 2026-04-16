@@ -201,6 +201,23 @@ export class CustomChannelService {
         await this.channelModel.deleteMany({ members: { $size: 0 } });
     }
 
+    /** Renomme un utilisateur partout (messages, membres, créateur) sans supprimer ses canaux. */
+    async renameUser(oldName: string, newName: string): Promise<void> {
+        await this.channelModel.updateMany(
+            { 'messages.name': oldName },
+            { $set: { 'messages.$[elem].name': newName } },
+            { arrayFilters: [{ 'elem.name': oldName }] },
+        );
+
+        await this.channelModel.updateMany(
+            { members: oldName },
+            { $set: { 'members.$[m]': newName } },
+            { arrayFilters: [{ m: oldName }] },
+        );
+
+        await this.channelModel.updateMany({ creator: oldName }, { $set: { creator: newName } });
+    }
+
     private generateChannelId(name: string): string {
         return name
             .toLowerCase()

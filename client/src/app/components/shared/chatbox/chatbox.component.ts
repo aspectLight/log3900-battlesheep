@@ -94,7 +94,7 @@ export class ChatboxComponent implements OnInit, OnChanges, AfterViewInit, OnDes
     }
 
     get cp_username(): string {
-        return this.authService.currentUser?.displayName ?? 'Utilisateur';
+        return this.customChannelService.username ?? this.authService.currentUser?.displayName ?? 'Utilisateur';
     }
 
     private toAbsolute(path: string): string {
