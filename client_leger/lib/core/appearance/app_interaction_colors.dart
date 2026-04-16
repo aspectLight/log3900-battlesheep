@@ -9,6 +9,7 @@ class AppInteractionColors extends ThemeExtension<AppInteractionColors> {
     required this.danger,
     required this.dangerBorder,
     required this.focus,
+    required this.text,
   });
 
   final Color primary;
@@ -17,6 +18,7 @@ class AppInteractionColors extends ThemeExtension<AppInteractionColors> {
   final Color danger;
   final Color dangerBorder;
   final Color focus;
+  final Color text;
 
   static const AppInteractionColors defaultPalette = AppInteractionColors(
     primary: Color(0xFF550000),
@@ -25,6 +27,7 @@ class AppInteractionColors extends ThemeExtension<AppInteractionColors> {
     danger: Color(0xFF8B0000),
     dangerBorder: Color(0xFFDC3545),
     focus: Color(0xFFC60D0D),
+    text: Color(0xFFf5e6e6),
   );
 
   static const AppInteractionColors frostPalette = AppInteractionColors(
@@ -34,6 +37,7 @@ class AppInteractionColors extends ThemeExtension<AppInteractionColors> {
     danger: Color(0xFF8B0000),
     dangerBorder: Color(0xFFDC3545),
     focus: Color(0xFF4A9CC4),
+    text: Color(0xFFd0eaf8),
   );
 
   static const AppInteractionColors villagePalette = AppInteractionColors(
@@ -43,6 +47,7 @@ class AppInteractionColors extends ThemeExtension<AppInteractionColors> {
     danger: Color(0xFF8B0000),
     dangerBorder: Color(0xFFDC3545),
     focus: Color(0xFFC8924A),
+    text: Color(0xFFddd4ae),
   );
 
   @override
@@ -53,6 +58,7 @@ class AppInteractionColors extends ThemeExtension<AppInteractionColors> {
     Color? danger,
     Color? dangerBorder,
     Color? focus,
+    Color? text,
   }) {
     return AppInteractionColors(
       primary: primary ?? this.primary,
@@ -61,6 +67,7 @@ class AppInteractionColors extends ThemeExtension<AppInteractionColors> {
       danger: danger ?? this.danger,
       dangerBorder: dangerBorder ?? this.dangerBorder,
       focus: focus ?? this.focus,
+      text: text ?? this.text,
     );
   }
 
@@ -77,6 +84,7 @@ class AppInteractionColors extends ThemeExtension<AppInteractionColors> {
       danger: Color.lerp(danger, other.danger, t)!,
       dangerBorder: Color.lerp(dangerBorder, other.dangerBorder, t)!,
       focus: Color.lerp(focus, other.focus, t)!,
+      text: Color.lerp(text, other.text, t)!,
     );
   }
 }

@@ -235,6 +235,16 @@ abstract class ShopLocalizations {
   /// In en, this message translates to:
   /// **'Defense'**
   String get shopBannerPreviewDefense;
+
+  String get bannerGold;
+
+  String get bannerShadow;
+
+  String get bannerFlame;
+
+  String get bannerIce;
+
+  String get bannerNeon;
 }
 
 class _ShopLocalizationsDelegate

@@ -18,15 +18,19 @@ void registerFriendsRoot(GetIt getIt) {
       authRepository: getIt<AuthRepository>(),
     ),
   );
+
   getIt.registerLazySingleton<FriendsCoordinator>(
     () => FriendsCoordinator(appNavigator: getIt<AppNavigator>()),
   );
+
   getIt.registerLazySingleton<FriendsViewModel>(
     () => FriendsViewModel(
       appTransitionEventBus: getIt<AppTransitionEventBus>(),
       repository: getIt<FriendsRepository>(),
+      socketService: getIt<SocketService>(),
     ),
   );
+
   getIt.registerLazySingleton<FriendsSocketListener>(
     () => FriendsSocketListener(
       socketService: getIt<SocketService>(),

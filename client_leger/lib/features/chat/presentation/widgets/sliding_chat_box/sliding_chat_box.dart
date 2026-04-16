@@ -257,6 +257,8 @@ class _ChannelTab extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        alignment: Alignment.center,
+        constraints: const BoxConstraints(minHeight: 40),
         margin: const EdgeInsets.only(right: 4),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
@@ -401,9 +403,9 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            l10n.discussionCanals,
-            style: const TextStyle(
-              color: Color(0xFFFFFFFF),
+            l10n.discussionCanals.toUpperCase(),
+            style: TextStyle(
+              color: context.interactionColors.text,
               fontSize: 18,
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
@@ -467,8 +469,8 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
         children: [
           Text(
             l10n.createChannel,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.interactionColors.text,
               fontSize: 12,
               fontFamily: 'CustomFont',
               fontWeight: FontWeight.bold,
@@ -491,6 +493,7 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
                 label: l10n.create,
                 textColor: Colors.white,
                 backgroundColor: context.interactionColors.primary,
+                borderColor: context.interactionColors.outline,
                 onPressed: _submitCreate,
               ),
             ],
@@ -507,33 +510,41 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
     bool isLoading,
     ChatLocalizations l10n,
   ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.availableChannels,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontFamily: 'CustomFont',
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1,
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: context.interactionColors.primary,
+        border: Border.all(color: context.interactionColors.outline),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.availableChannels,
+            style: TextStyle(
+              color: context.interactionColors.text,
+              fontSize: 12,
+              fontFamily: 'CustomFont',
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        _StyledTextField(
-          controller: _searchController,
-          hint: l10n.searchChannelsHint,
-          onChanged: (v) => setState(() => _filterTerm = v),
-        ),
-        const SizedBox(height: 8),
-        if (isLoading)
-          _buildStateBox(l10n.loadingChannels)
-        else if (filtered.isEmpty)
-          _buildStateBox(l10n.noChannelsFound)
-        else
-          _buildChannelTable(filtered, l10n),
-      ],
+          const SizedBox(height: 8),
+          _StyledTextField(
+            controller: _searchController,
+            hint: l10n.searchChannelsHint,
+            onChanged: (v) => setState(() => _filterTerm = v),
+          ),
+          const SizedBox(height: 8),
+          if (isLoading)
+            _buildStateBox(l10n.loadingChannels)
+          else if (filtered.isEmpty)
+            _buildStateBox(l10n.noChannelsFound)
+          else
+            _buildChannelTable(filtered, l10n),
+        ],
+      ),
     );
   }
 
@@ -639,8 +650,9 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
                     child: Text(
                       l10n.creatorBadge,
                       style: const TextStyle(
-                        color: Color(0xFFff9090),
+                        color: Colors.white,
                         fontSize: 10,
+                        fontFamily: 'CustomFont',
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -654,7 +666,11 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
             flex: 2,
             child: Text(
               channel.creator,
-              style: const TextStyle(color: Color(0xFFb0b0b0), fontSize: 12),
+              style: const TextStyle(
+                color: Color(0xFFb0b0b0),
+                fontSize: 12,
+                fontFamily: 'CustomFont',
+              ),
             ),
           ),
           // Action buttons
@@ -681,8 +697,9 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
                   const SizedBox(width: 4),
                   _PanelButton(
                     label: l10n.deleteChannel,
-                    textColor: const Color(0xFFff6b6b),
+                    textColor: Colors.white,
                     borderColor: const Color(0xFF7f1f1f),
+                    backgroundColor: const Color(0xFF7f1f1f),
                     onPressed: () => _requestDelete(channel.id),
                   ),
                 ],
@@ -783,10 +800,14 @@ class _PanelButton extends StatelessWidget {
             ? BorderSide(color: borderColor!)
             : BorderSide.none,
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        minimumSize: Size.zero,
+        minimumSize: const Size(60, 35),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-        textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+        textStyle: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          fontFamily: 'CustomFont',
+        ),
       ),
       child: Text(label, style: TextStyle(color: textColor)),
     );
@@ -804,8 +825,8 @@ class _TableHeaderCell extends StatelessWidget {
     return Text(
       text,
       textAlign: align,
-      style: const TextStyle(
-        color: Colors.white,
+      style: TextStyle(
+        color: context.interactionColors.text,
         fontFamily: 'CustomFont',
         fontWeight: FontWeight.bold,
         letterSpacing: 1,

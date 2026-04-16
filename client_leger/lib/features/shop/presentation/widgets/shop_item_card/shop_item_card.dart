@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/enums/shop_catalog_item_id.dart';
 import '../../../../../core/enums/shop_item_type.dart';
 import '../../../core/constants/shop_asset_paths.dart';
 import '../../../core/localisation/shop_localizations.dart';
@@ -62,15 +63,27 @@ class ShopItemCard extends StatelessWidget {
               ),
             ),
           const SizedBox(height: 6),
-          Text(
-            item.name,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Color(0xFFF0F0F0),
-              fontFamily: 'CustomFont',
-              fontSize: 14,
+          if (item.type == ShopItemType.banner)
+            Text(
+              getBannerName(item.id, l10n),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFF0F0F0),
+                fontFamily: 'CustomFont',
+                fontSize: 14,
+              ),
+            )
+          else if (asset != null)
+            Text(
+              item.name,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFF0F0F0),
+                fontFamily: 'CustomFont',
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
             ),
-          ),
           const SizedBox(height: 4),
           ShopCoinPrice(price: item.price),
           const SizedBox(height: 8),
@@ -123,4 +136,15 @@ class ShopItemCard extends StatelessWidget {
       ),
     );
   }
+}
+
+String getBannerName(ShopCatalogItemId name, ShopLocalizations l10n) {
+  return switch (name) {
+    ShopCatalogItemId.bannerGold => l10n.bannerGold,
+    ShopCatalogItemId.bannerShadow => l10n.bannerShadow,
+    ShopCatalogItemId.bannerFlame => l10n.bannerFlame,
+    ShopCatalogItemId.bannerIce => l10n.bannerIce,
+    ShopCatalogItemId.bannerNeon => l10n.bannerNeon,
+    _ => name.wireValue,
+  };
 }
