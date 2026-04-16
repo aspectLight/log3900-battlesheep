@@ -23,6 +23,7 @@ import 'features/profile/core/localisation/profile_localizations.dart';
 import 'features/shop/core/localisation/shop_localizations.dart';
 import 'features/select_game_session/core/localisation/select_game_session_localizations.dart';
 import 'features/statistics/core/localisation/statistics_localizations.dart';
+import 'features/tutorial/core/localisation/tutorial_localizations.dart';
 import 'features/waiting_room/core/localisation/waiting_room_localizations.dart';
 import 'routing/app_router.dart';
 import 'routing/app_router_observer.dart';
@@ -186,6 +187,7 @@ class _AppRootState extends State<AppRoot> with WidgetsBindingObserver {
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
+          TutorialLocalizations.delegate,
         ],
         supportedLocales: CoreLocalizations.supportedLocales,
         builder: (context, child) {

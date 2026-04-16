@@ -1,8 +1,24 @@
 <div class="container">
-    <button class="return-button" routerLink="/auth-landing" type="button">
-        <img src="./assets/ui/left.png" alt="Back" />
-        {{ 'common.back' | translate }}
-    </button>
+    <div class="lang-switcher">
+        <button
+            class="lang-btn"
+            [class.active]="languageService.getCurrentLanguage() === 'fr'"
+            (click)="setLanguage('fr')"
+        >FR</button>
+        <button
+            class="lang-btn"
+            [class.active]="languageService.getCurrentLanguage() === 'en'"
+            (click)="setLanguage('en')"
+        >EN</button>
+    </div>
+
+    <div class="header">
+        <button class="return-button" routerLink="/auth-landing" type="button">
+            <img src="./assets/ui/left.png" alt="Back" />
+            {{ 'common.back' | translate }}
+        </button>
+        <h1 style="visibility: hidden;">A</h1>
+    </div>
 
     <div class="content-wrapper">
         <img class="logo" src="./assets/ui/eastern_solace_logo-removebg-preview.png" alt="Logo Jeu" />
@@ -20,6 +36,8 @@
                         <small class="error">{{ 'validation.username_length' | translate }}</small>
                         } @if (form.controls.username.touched && form.controls.username.errors?.['pattern']) {
                         <small class="error">{{ 'validation.username_special' | translate }}</small>
+                        } @if (form.controls.username.touched && form.controls.username.errors?.['bannedUsername']) {
+                        <small class="error">{{ 'validation.username_banned' | translate }}</small>
                         }
                     </div>
 
@@ -180,7 +198,7 @@
                     </div>
 
                     <div class="field" style="margin-top: 12px;">
-                        <label class="label">Téléverser un avatar personnalisé</label>
+                        <label class="label">{{ 'profile.avatar_upload' | translate }}</label>
                         <div class="avatar-upload-row">
                             @if (avatarPreviewUrl) {
                             <div class="avatar-upload-preview">
@@ -190,11 +208,11 @@
                             <div class="upload-input-wrapper">
                                 <div class="avatar-source-picker">
                                     <button type="button" class="btn-choose-file" (click)="showAvatarMenu = !showAvatarMenu">
-                                        Choisir un fichier
+                                        {{ 'profile.choose_file' | translate }}
                                         <span class="chevron" [class.open]="showAvatarMenu">&#9660;</span>
                                     </button>
                                     @if (!avatarPreviewUrl) {
-                                    <span class="no-file-label">Aucun fichier choisi</span>
+                                    <span class="no-file-label">{{ 'profile.no_file' | translate }}</span>
                                     }
                                     @if (showAvatarMenu) {
                                     <div class="avatar-source-menu">

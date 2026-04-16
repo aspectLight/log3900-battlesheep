@@ -166,6 +166,7 @@ export class GameMovementVPService {
 
     goCloserToTarget(roomId: string, player: Player, wayToTarget: Coords[]) {
         const truncatedPath = this.movementAlgorithms.truncatePath(roomId, wayToTarget, player.movementPoints, player.position);
+        if (truncatedPath.length === 0) return { path: [], remainingMovementPoints: player.movementPoints };
         const destination = truncatedPath[truncatedPath.length - 1];
         const remainingMovementPoints = this.moveVirtualPlayer(roomId, player, destination);
         return { path: truncatedPath, remainingMovementPoints };
@@ -194,12 +195,12 @@ export class GameMovementVPService {
             if (this.gameMovementService.isCellFree(spawnPoint, player.id)) return this.goForReachableTarget(roomId, player, reachableSpawnPoint, pathsMap, costMap);
             else {
                 const neighborOpponentTarget = this.movementAlgorithms.findNeighborPlayer(roomId, player, true);
-                if (!neighborOpponentTarget) {
+                if (neighborOpponentTarget) {
                     return { path: emptyPath, remainingMovementPoints: player.movementPoints };
                 } else {
                     const spawnPointCoords = { x: spawnPoint.x, y: spawnPoint.y };
                     const { path, destination } = this.movementAlgorithms.findWayToTarget(roomId, player, spawnPointCoords, reachableTiles, pathsMap);
-                    if (!path || !destination) return null;
+                    if (!path || !destination) return { path: emptyPath, remainingMovementPoints: player.movementPoints };
                     const remainingMovementPoints = this.moveVirtualPlayer(roomId, player, destination, costMap);
                     return { path, remainingMovementPoints };
                 }
@@ -210,7 +211,7 @@ export class GameMovementVPService {
             ? this.movementAlgorithms.findSpawnPoint(roomId, player, otherPlayer)
             : this.movementAlgorithms.findSpawnPoint(roomId, player);
 
-        if (!distantSpawnPoint || !distantSpawnPoint.path) return null;
+        if (!distantSpawnPoint || !distantSpawnPoint.path) return { path: emptyPath, remainingMovementPoints: player.movementPoints };
         return this.goCloserToTarget(roomId, player, distantSpawnPoint.path);
     }
 
@@ -240,6 +241,7 @@ export class GameMovementVPService {
             ? this.movementAlgorithms.findClosestPlayer(roomId, player, true)
             : this.movementAlgorithms.findClosestPlayer(roomId, player);
         if (distantOpponent) return this.goCloserToTarget(roomId, player, distantOpponent.path);
+        return null;
     }
 
     moveVirtualPlayer(roomId: string, player: Player, destination: { coord: Coords; cost: number }, costMap?: Map<string, number>) {

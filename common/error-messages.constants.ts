@@ -46,6 +46,7 @@ export const enum ErrorMessages {
     SocketIdNotDefined = 'Socket ID non défini !',
     RoomLockedAddPlayer = "La salle est verrouillée, impossible d'ajouter un joueur virtuel.",
     MaxPlayerLimitReached = 'Le nombre maximum de joueurs a été atteint, impossible de déverouiller la salle.',
+    NotPlayerTurn = "Ce n'est pas le tour de ce joueur",
 }
 
 export const SPECIFIC_ERROR = {

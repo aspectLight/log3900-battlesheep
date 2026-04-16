@@ -7,7 +7,7 @@
         <span>{{ 'room.status' | translate }}</span>
         <span>{{ 'room.accessibility' | translate }}</span>
         <span>{{ 'room.code' | translate }}</span>
-        <span>Prix</span>
+        <span>{{ 'room.price' | translate }}</span>
     </li>
     <div class="list">
         @if (isLoading) {
@@ -30,7 +30,9 @@
                 <span class="entry-fee">
                     @if (room.entryFee && room.entryFee > 0) {
                     {{ room.entryFee }}<img src="assets/gold_coin.png" alt="coins" class="coin-icon" />
-                    } @else { Gratuit }
+                    } @else {
+                    {{ 'room.free' | translate }}
+                    }
                 </span>
             </li>
             }

@@ -13,11 +13,11 @@
           <img [src]="player.avatar?.avatar" alt="Player Avatar">
         </div>
         <div class="player-info">
-          <div class="name-row">
+            <div class="name-row">
             <h1 class="player-name">{{ player.name || 'viktor' }}</h1>
             <div class="points-info">
-              <span class="point-value">{{ movementPoints }} {{ 'bonus.speed' | translate }}</span>
-              <span class="point-value">{{ actionPoints }} {{ 'bonus.attack' | translate }}</span>
+              <span class="point-value">{{ movementPoints }} {{ 'player_hud.movements' | translate }}</span>
+              <span class="point-value">{{ actionPoints }} {{ 'player_hud.actions' | translate }}</span>
             </div>
           </div>
         </div>

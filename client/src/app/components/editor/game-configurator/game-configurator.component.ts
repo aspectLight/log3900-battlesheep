@@ -16,6 +16,7 @@ export class GameConfiguratorComponent {
     mode: string = 'classique';
     privacy: 'public' | 'private' | 'protected' = 'public';
     modeDescriptionKey: string = MODE_DESCRIPTIONS[this.mode as MODES];
+    privacyDescriptionKey: string = 'game_configurator.privacy_desc_public';
     boardSize: BoardSizes = BoardSizes.Moyenne;
     board: number = BOARD_CONFIGS[this.boardSize].board;
     players: string = BOARD_CONFIGS[this.boardSize].players;
@@ -43,6 +44,7 @@ export class GameConfiguratorComponent {
 
     onPrivacyChange(privacy: string): void {
         this.privacy = privacy as 'public' | 'private' | 'protected';
+        this.privacyDescriptionKey = `game_configurator.privacy_desc_${privacy}`;
     }
 
     onActionsChange(actions: number): void {

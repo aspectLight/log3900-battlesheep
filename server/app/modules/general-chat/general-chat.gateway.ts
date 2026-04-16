@@ -4,6 +4,7 @@ import { ChatMessage } from '@app/modules/general-chat/interfaces/chat';
 import { ChatModerationService } from '@app/modules/general-chat/services/chat-moderation.service';
 import { CustomChannelService } from '@app/modules/general-chat/services/custom-channel.service';
 import { GeneralChatService } from '@app/modules/general-chat/services/general-chat.service';
+import { BlockService } from '@app/modules/social/services/block.service';
 import { CustomChannelEvents, GeneralChatEvents } from '@common/socket.constants';
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import {
@@ -31,6 +32,7 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         private readonly customChannelService: CustomChannelService,
         private readonly authService: AuthService,
         private readonly chatModerationService: ChatModerationService,
+        private readonly blockService: BlockService,
     ) {}
 
     // ===== General Chat Events =====
@@ -38,8 +40,10 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
     @SubscribeMessage(GeneralChatEvents.JoinGeneralChat)
     async handleJoinGeneralChat(socket: Socket): Promise<void> {
         socket.join(GENERAL_CHAT_ROOM);
+        const username = this.socketIdToUsername.get(socket.id);
         const messages = await this.generalChatService.getMessages();
-        socket.emit(GeneralChatEvents.GetGeneralChatMessagesResponse, messages);
+        const filtered = username ? await this.filterBlockedMessages(messages, username) : messages;
+        socket.emit(GeneralChatEvents.GetGeneralChatMessagesResponse, filtered);
     }
 
     @SubscribeMessage(GeneralChatEvents.SendMessageToGeneralChat)
@@ -65,7 +69,8 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         };
         await this.generalChatService.addMessage(chatMessage);
 
-        socket.to(GENERAL_CHAT_ROOM).emit(GeneralChatEvents.GeneralChatMessage, chatMessage);
+        const blockedSocketIds = await this.getBlockedSocketIds(data.username);
+        this.server.except([socket.id, ...blockedSocketIds]).to(GENERAL_CHAT_ROOM).emit(GeneralChatEvents.GeneralChatMessage, chatMessage);
         socket.emit(GeneralChatEvents.GeneralChatMessage, chatMessage);
         this.logger.log(`Message de ${data.username}: ${censoredMessage}`);
     }
@@ -85,13 +90,16 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         };
         await this.generalChatService.addMessage(chatEmoji);
 
-        socket.to(GENERAL_CHAT_ROOM).emit(GeneralChatEvents.GeneralChatEmoji, chatEmoji);
+        const blockedSocketIds = await this.getBlockedSocketIds(data.username);
+        this.server.except([socket.id, ...blockedSocketIds]).to(GENERAL_CHAT_ROOM).emit(GeneralChatEvents.GeneralChatEmoji, chatEmoji);
     }
 
     @SubscribeMessage(GeneralChatEvents.GetGeneralChatMessages)
     async handleGetMessages(socket: Socket): Promise<void> {
+        const username = this.socketIdToUsername.get(socket.id);
         const messages = await this.generalChatService.getMessages();
-        socket.emit(GeneralChatEvents.GetGeneralChatMessagesResponse, messages);
+        const filtered = username ? await this.filterBlockedMessages(messages, username) : messages;
+        socket.emit(GeneralChatEvents.GetGeneralChatMessagesResponse, filtered);
     }
 
     // ===== Custom Channel Events =====
@@ -144,8 +152,9 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
 
             const channel = await this.customChannelService.getChannel(data.channelId);
             const messages = await this.customChannelService.getMessages(data.channelId);
+            const filtered = await this.filterBlockedMessages(messages, username);
             socket.emit(CustomChannelEvents.CustomChannelJoined, { channelId: data.channelId, channelName: channel?.name ?? data.channelId });
-            socket.emit(CustomChannelEvents.CustomChannelMessagesResponse, { channelId: data.channelId, messages });
+            socket.emit(CustomChannelEvents.CustomChannelMessagesResponse, { channelId: data.channelId, messages: filtered });
 
             // Notifier tous les clients du nouveau memberCount
             const channels = await this.customChannelService.getAllChannels();
@@ -234,7 +243,8 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
 
             await this.customChannelService.addMessage(data.channelId, chatMessage);
 
-            this.server.to(`custom-channel-${data.channelId}`).emit(CustomChannelEvents.CustomChannelMessage, {
+            const blockedSocketIds = await this.getBlockedSocketIds(data.username);
+            this.server.except(blockedSocketIds).to(`custom-channel-${data.channelId}`).emit(CustomChannelEvents.CustomChannelMessage, {
                 channelId: data.channelId,
                 message: chatMessage,
             });
@@ -275,7 +285,8 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
 
             await this.customChannelService.addMessage(data.channelId, chatEmoji);
 
-            socket.to(`custom-channel-${data.channelId}`).emit(CustomChannelEvents.CustomChannelEmoji, {
+            const blockedSocketIds = await this.getBlockedSocketIds(data.username);
+            this.server.except([socket.id, ...blockedSocketIds]).to(`custom-channel-${data.channelId}`).emit(CustomChannelEvents.CustomChannelEmoji, {
                 channelId: data.channelId,
                 emoji: chatEmoji,
             });
@@ -283,11 +294,14 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
             socket.emit(CustomChannelEvents.CustomChannelError, { message: this.getFriendlyError(error) });
         }
     }
+
     @SubscribeMessage(CustomChannelEvents.GetCustomChannelMessages)
     async handleGetCustomChannelMessages(@ConnectedSocket() socket: Socket, @MessageBody() data: { channelId: string }): Promise<void> {
         try {
+            const username = this.socketIdToUsername.get(socket.id);
             const messages = await this.customChannelService.getMessages(data.channelId);
-            socket.emit(CustomChannelEvents.CustomChannelMessagesResponse, { channelId: data.channelId, messages });
+            const filtered = username ? await this.filterBlockedMessages(messages, username) : messages;
+            socket.emit(CustomChannelEvents.CustomChannelMessagesResponse, { channelId: data.channelId, messages: filtered });
         } catch (error) {
             socket.emit(CustomChannelEvents.CustomChannelError, { message: this.getFriendlyError(error) });
         }
@@ -337,6 +351,10 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         }
     }
 
+    broadcastAvatarUpdate(payload: { username: string; avatarId: string | null; avatarUrl: string | null }): void {
+        this.server.emit(GeneralChatEvents.AvatarUpdated, payload);
+    }
+
     async forceDisconnectUser(username: string): Promise<void> {
         // Cancel any pending disconnection timeout
         const existingTimeout = this.disconnectionTimeouts.get(username);
@@ -377,6 +395,13 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
 
                 try {
                     const user = await this.authService.getUserByUsername(username);
+                    if (!user.isOnline) {
+                        // The user already went through the explicit HTTP logout (isOnline=false),
+                        // so a logout history entry was already recorded. Skip to avoid a duplicate.
+                        this.disconnectionTimeouts.delete(username);
+                        this.logger.log(`Déconnexion automatique annulée pour ${username} (déjà déconnecté explicitement).`);
+                        return;
+                    }
                     await this.authService.logout(user.firebaseUid);
                     this.socketIdToUsername.delete(socket.id);
                     this.disconnectionTimeouts.delete(username);
@@ -391,6 +416,38 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
     }
 
     // ===== Helpers =====
+
+    /**
+     * Returns all socket IDs connected to this gateway that belong to users
+     * in a bidirectional block relationship with senderUsername.
+     */
+    private async getBlockedSocketIds(senderUsername: string): Promise<string[]> {
+        const [blockedByMe, whoBlockedMe] = await Promise.all([
+            this.blockService.getBlockedUsers(senderUsername),
+            this.blockService.getUsersWhoBlocked(senderUsername),
+        ]);
+        const blocked = new Set([...blockedByMe, ...whoBlockedMe]);
+        const socketIds: string[] = [];
+        for (const [socketId, username] of this.socketIdToUsername.entries()) {
+            if (blocked.has(username)) {
+                socketIds.push(socketId);
+            }
+        }
+        return socketIds;
+    }
+
+    /**
+     * Filters out messages authored by users who are in a block relationship
+     * with the requesting user.
+     */
+    private async filterBlockedMessages(messages: ChatMessage[], username: string): Promise<ChatMessage[]> {
+        const [blockedByMe, whoBlockedMe] = await Promise.all([
+            this.blockService.getBlockedUsers(username),
+            this.blockService.getUsersWhoBlocked(username),
+        ]);
+        const blocked = new Set([...blockedByMe, ...whoBlockedMe]);
+        return messages.filter((m) => !m.name || !blocked.has(m.name));
+    }
 
     /**
      * Convertit n'importe quelle erreur en message lisible en français.

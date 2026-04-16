@@ -6,6 +6,7 @@ import { GeneralChatHistory, GeneralChatHistorySchema } from '@app/modules/gener
 import { ChatModerationService } from '@app/modules/general-chat/services/chat-moderation.service';
 import { CustomChannelService } from '@app/modules/general-chat/services/custom-channel.service';
 import { GeneralChatService } from '@app/modules/general-chat/services/general-chat.service';
+import { SocialModule } from '@app/modules/social/social.module';
 import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
@@ -13,6 +14,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     // Use forwardRef to avoid circular dependency between AuthModule and GeneralChatModule
     imports: [
         forwardRef(() => AuthModule),
+        forwardRef(() => SocialModule),
         MongooseModule.forFeature([
             { name: CustomChannel.name, schema: customChannelSchema },
             { name: GeneralChatHistory.name, schema: GeneralChatHistorySchema },

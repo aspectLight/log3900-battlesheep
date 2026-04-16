@@ -25,6 +25,7 @@ export class GameJoinerComponent implements OnInit, OnDestroy {
     errorMessage: string;
     showBlockedWarning = false;
     blockedWarningMessage = '';
+    isJoinButtonEnabled = false;
 
     private readonly SERVER_ERROR_MAP: Record<string, string> = {
         "La salle n'existe pas": 'errors.room_not_found',
@@ -75,9 +76,18 @@ export class GameJoinerComponent implements OnInit, OnDestroy {
         this.globalSocketService.send(SocialEvents.BlockedUserRoomChoice, { choice: 'cancel' });
     }
 
-    joinGame() {
+    joinGame(): void {
         const gameCode = this.gameCodeInput.nativeElement.value;
+        if (!/^\d{4}$/.test(gameCode)) {
+            return;
+        }
         this.joinByCode(gameCode);
+    }
+
+    onGameCodeInput(input: HTMLInputElement): void {
+        const sanitizedGameCode = input.value.replace(/\D/g, '').slice(0, 4);
+        input.value = sanitizedGameCode;
+        this.isJoinButtonEnabled = sanitizedGameCode.length === 4;
     }
 
     onRoomSelected(room: RoomInfo) {
@@ -93,18 +103,10 @@ export class GameJoinerComponent implements OnInit, OnDestroy {
             this.gameCreationService.gameCode = room.roomId;
             this.gameCreationService.isDropIn = true;
 
-            if (isReturning) {
-                // Returning player: bypass character creation and rejoin directly with saved data
-                this.socketService.rejoinGame(room.roomId, currentUid, (success, error) => {
-                    if (!success) {
-                        this.errorMessage = this.translateServerError(error);
-                        this.showError = true;
-                    }
-                });
-            } else {
-                // New drop-in player: go through character creation
-                this.router.navigate([ROUTES.createPlayer]);
-            }
+            // All drop-in players (new or returning) go through character creation.
+            // Store the uid for returning players so their stats can be restored server-side.
+            this.gameCreationService.returningDropInUid = isReturning ? currentUid : undefined;
+            this.router.navigate([ROUTES.createPlayer]);
         } else {
             this.joinByCode(room.roomId);
         }

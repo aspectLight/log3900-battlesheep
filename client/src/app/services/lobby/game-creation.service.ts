@@ -9,6 +9,7 @@ export class GameCreationService {
     selectedGame: Game;
     gameCode: string;
     isDropIn: boolean = false;
+    returningDropInUid?: string;
     friendsOnly: boolean = false;
     entryFee: number = 0;
 

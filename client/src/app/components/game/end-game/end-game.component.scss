@@ -8,10 +8,6 @@
     overflow: hidden;
 }
 
-img {
-    width: 15px;
-}
-
 .return-button {
     position: absolute;
     left: 10px;
@@ -19,16 +15,27 @@ img {
     align-items: center;
     gap: 15px;
     cursor: pointer;
+    background: none;
+    border: none;
     transition: all 0.3s ease;
 }
 
 .return-button:hover {
-    color: var(--theme-bg-button);
-    transform: scale(1.05);
+    color: var(--theme-text-hover);
 }
 
 .return-button:active {
-    transform: scale(0.95);
+    color: var(--theme-text-hover-active);
+}
+
+.return-button img {
+    width: 15px;
+    max-width: 15px;
+    filter: brightness(0) invert(1);
+}
+
+.stats-header img {
+    width: 15px;
 }
 
 .end-game {

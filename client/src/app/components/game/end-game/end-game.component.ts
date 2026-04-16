@@ -5,6 +5,7 @@ import { GlobalStats } from '@app/classes/stats/global-stats';
 import { PlayerStats } from '@app/classes/stats/player-stats';
 import { AVATAR_TYPES } from '@app/constants/player.constants';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
+import { PlayerCreationService } from '@app/services/lobby/player-creation.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -36,6 +37,7 @@ export class EndGameComponent {
         private socketService: SocketService,
         private gameManagerService: GameManagerService,
         private translate: TranslateService,
+        private playerCreationService: PlayerCreationService,
     ) {
         this.hasWon = this.gameManagerService.hasWon();
         this.socketService.on(
@@ -117,6 +119,7 @@ export class EndGameComponent {
     }
 
     quitGame(): void {
+        this.playerCreationService.reset();
         this.socketService.quitEndGame();
         this.router.navigate(['/home']);
     }

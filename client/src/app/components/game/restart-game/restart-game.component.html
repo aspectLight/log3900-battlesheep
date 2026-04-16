@@ -4,16 +4,14 @@
     </button>
 
     @if (isToggled) {
-    <div class="dialogue">
-        <div class="errors">
-            <h2>{{ 'restart.confirm' | translate }}</h2>
-            <h3>{{ 'restart.warning' | translate }}</h3>
-
-            <div class="options">
-                <button (click)="onConfirmRestart()">{{ 'restart.yes' | translate }}</button>
-                <button (click)="onCancelRestart()">{{ 'restart.no' | translate }}</button>
-            </div>
-        </div>
-    </div>
+    <app-pop-up
+        [popUpMessage]="'restart.confirm' | translate"
+        [description]="'restart.warning' | translate"
+        [firstOption]="'restart.yes' | translate"
+        [showSecondButton]="true"
+        [secondOption]="'restart.no' | translate"
+        (confirm)="onConfirmRestart()"
+        (cancel)="onCancelRestart()"
+    ></app-pop-up>
     }
 </div>

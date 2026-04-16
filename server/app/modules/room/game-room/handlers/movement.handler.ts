@@ -56,6 +56,7 @@ export class MovementHandler {
     async handlePlayerMoved(
         data: { roomId: string; playerId: string; selectedPath: Coords[] },
         server: Server,
+        socket: Socket,
     ): Promise<{ success: boolean; error?: string; movementPoints?: number }> {
         try {
             const { roomId, playerId, selectedPath } = data;
@@ -64,6 +65,10 @@ export class MovementHandler {
 
             if (!player) {
                 return { success: false, error: ErrorMessages.PlayerNotFound };
+            }
+
+            if (room.players[0].id !== socket.id) {
+                return { success: false, error: ErrorMessages.NotPlayerTurn };
             }
 
             const validation = this.gameMovementService.validatePath(roomId, playerId, selectedPath, room.players);
@@ -185,6 +190,8 @@ export class MovementHandler {
     handleDoorToggled(data: { roomId: string; x: number; y: number }, socket: Socket, server: Server): void {
         try {
             const room = this.gameRoomService.findRoomById(data.roomId);
+            const currentPlayer = room?.players.find((p) => p.id === socket.id);
+            if (currentPlayer) currentPlayer.actionPoints = Math.max(0, (currentPlayer.actionPoints ?? room?.actionPointsPerTurn ?? 1) - 1);
             this.gameMovementService.toggleDoor(data.roomId, data.x, data.y, room);
             server.to(data.roomId).emit(GameRoomEvents.DoorToggled, data);
 

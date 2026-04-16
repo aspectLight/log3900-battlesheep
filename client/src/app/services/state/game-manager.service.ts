@@ -35,6 +35,7 @@ export class GameManagerService {
     illuminatedCells: Set<string> = new Set();
 
     isGameCanceled: boolean = false;
+    gameCanceledMessageKey: string = 'main.game_canceled';
     isGameFinished: boolean = false;
     isGameLoaded: boolean = false;
     gameCountdown: Subject<number> = new Subject<number>();
@@ -121,6 +122,7 @@ export class GameManagerService {
 
     resetManager() {
         this.isGameCanceled = false;
+        this.gameCanceledMessageKey = 'main.game_canceled';
         this.isGameFinished = false;
         this.isGameLoaded = false;
         this.disconnectedPlayer = [];
@@ -130,6 +132,7 @@ export class GameManagerService {
 
     cancelGame() {
         this.isGameCanceled = true;
+        this.gameCanceledMessageKey = 'main.game_left';
         const startDate = this.historyStartDateIso;
         if (startDate) {
             this.historyService.abandonGameHistory(startDate).catch((e) => console.warn('abandonGameHistory failed', e));
@@ -338,10 +341,12 @@ export class GameManagerService {
         }
     }
 
-    updateScore(playerId: string): number {
+    updateScore(playerId: string, fightsWon?: number): number {
         const foundPlayer = this.room.players.find((p) => p.id === playerId);
         if (!foundPlayer) return 0;
-        foundPlayer.fightsWon++;
+        if (fightsWon !== undefined) {
+            foundPlayer.fightsWon = fightsWon;
+        }
         return foundPlayer.fightsWon;
     }
 
@@ -498,7 +503,8 @@ export class GameManagerService {
         if (coords.x < 0 || coords.y < 0 || coords.x >= this.board.matrix.length || coords.y >= this.board.matrix[0].length) {
             return;
         }
-        this.board.matrix[coords.x][coords.y].addItem(item);
+        const fullItem = ITEM_TYPES[item.type] ? new Item(item.type) : item;
+        this.board.matrix[coords.x][coords.y].addItem(fullItem);
     }
 
     combatLost(loserId: string): void {
@@ -550,7 +556,7 @@ export class GameManagerService {
     collectItem(playerId: string, item: Item, position: Coords, inventoryFull: boolean): void {
         // Remove the item from the board cell — the server has already removed it
         const cell = this.board.getCell(position.x, position.y);
-        if (cell?.item) {
+        if (cell?.item && cell.item.type === item.type) {
             cell.removeItem();
         }
 
@@ -599,6 +605,7 @@ export class GameManagerService {
 
     endCanceledGame() {
         this.isGameCanceled = true;
+        this.gameCanceledMessageKey = 'main.game_canceled';
         const startDate = this.historyStartDateIso;
 
         if (startDate) {

@@ -15,6 +15,15 @@ export class TurnHandler {
      */
     handleEndTurn(roomId: string, socket: Socket): void {
         try {
+            const room = this.gameRoomService.findRoomById(roomId);
+            if (!room || room.players.length === 0) return;
+
+            const currentPlayer = room.players[0];
+            const isCurrentPlayer = currentPlayer.id === socket.id;
+            const isHostEndingForVirtual = room.hostId === socket.id && currentPlayer.isVirtual;
+
+            if (!isCurrentPlayer && !isHostEndingForVirtual) return;
+
             this.gameRoomService.endTurn(roomId);
         } catch (error) {
             socket.emit(GameRoomEvents.GameRoomError, error.message);

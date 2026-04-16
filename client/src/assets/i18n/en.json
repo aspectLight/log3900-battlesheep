@@ -22,7 +22,9 @@
         "password_digit": "Password must contain at least one digit",
         "password_spaces": "Password must not contain spaces",
         "password_mismatch": "Passwords do not match",
-        "avatar_required": "Please select an avatar"
+        "avatar_required": "Please select an avatar",
+        "username_banned": "This username is reserved and cannot be used",
+        "username_profanity": "This username contains inappropriate words"
     },
     "auth": {
         "login": "Sign in",
@@ -59,7 +61,8 @@
         "games_history": "Game history",
         "login_history": "Login history",
         "logout": "Sign out",
-        "game_canceled": "Game cancelled due to lack of players",
+        "game_left": "You left the game!",
+    "game_canceled": "Game cancelled due to lack of players",
         "game_finished": "Game over, victory limit of 3 reached by a character"
     },
     "profile": {
@@ -104,7 +107,8 @@
         "error_file_type": "File type \"{{ ext }}\" not allowed. Allowed formats: JPG, JPEG, PNG (max 2 MB).",
         "error_file_size": "File too large ({{ size }} MB). Maximum allowed size: 2 MB.",
         "no_changes": "No changes detected",
-        "errors": {
+        "available_in_shop": "Available in shop (500 coins)",
+    "errors": {
             "load_profile": "Error while loading profile",
             "update_profile": "Error while saving profile changes",
             "unauthenticated": "User not authenticated"
@@ -211,7 +215,9 @@
         "back": "Leave game",
         "title": "Waiting room",
         "code": "Game code:",
-        "drop_in": "Drop-in/Drop-out",
+        "balance": "Balance",
+    "entry_fee": "Entry fee",
+    "drop_in": "Drop-in/Drop-out",
         "lock": "Lock room",
         "unlock": "Unlock room",
         "start": "Start game",
@@ -302,11 +308,15 @@
         "mode": "Mode",
         "accessibility": "Accessibility",
         "code": "Code",
-        "no_rooms": "No games available",
+        "price": "Price",
+    "no_rooms": "No games available",
         "status_waiting": "Waiting",
         "status_playing": "In progress",
         "status_full": "Full",
-        "status_open": "Open"
+        "status_open": "Open",
+    "accessibility_friends_only": "Friends only",
+    "accessibility_drop_in": "Drop-in",
+    "free": "Free"
     },
     "game_list": {
         "preview": "Preview",
@@ -368,7 +378,8 @@
         "left_click_desc": "to erase",
         "items_to_place": "Items to place",
         "spawns_to_place": "Spawn points to place",
-        "hold_right": "Hold right click",
+        "flag_to_place": "Flag to place",
+    "hold_right": "Hold right click",
         "hold_right_desc": "to select",
         "release": "Release",
         "release_desc": "to place",
@@ -427,7 +438,7 @@
         "error_accessibility": "All terrain tiles must be accessible.",
         "error_no_terrain": "No terrain tiles were found.",
         "error_flag": "The game must contain a flag.",
-        "error_spawn_points": "There must be between {{min}} and {{max}} spawn points.",
+        "error_spawn_points": "There must be exactly {{count}} spawn points.",
         "error_items": "There must be {{count}} items.",
         "error_door_edge": "The door at ({{x}}, {{y}}) is on the edge of the board.",
         "error_door_walls": "The door at ({{x}}, {{y}}) is not surrounded by walls on the same axis.",
@@ -500,7 +511,8 @@
     },
     "end_game": {
         "title": "Statistics",
-        "players": "Players",
+        "rewards": "Rewards",
+    "players": "Players",
         "combats": "Number of combats",
         "evasions": "Number of evasions",
         "victories": "Number of victories",
@@ -535,7 +547,9 @@
         "flag": "Flag"
     },
     "player_hud": {
-        "dice": "DICE"
+        "dice": "DICE",
+    "movements": "movements",
+    "actions": "actions"
     },
     "game_info": {
         "continue": "continue",
@@ -554,7 +568,10 @@
     "game_configurator": {
         "mode_desc_classic": "Win 3 combats to be declared the winner and end the game.",
         "mode_desc_ctf": "Capture the enemy flag and bring it back to your starting point to win the game.",
-        "actions_desc": "Number of action points allocated to each player each turn"
+        "actions_desc": "Number of action points allocated to each player each turn",
+    "privacy_desc_public": "Can be modified, deleted, and used to create a game by any user. The owner is always the original creator.",
+    "privacy_desc_private": "Can only be modified, deleted, or used to create a game by its owner. A game using this map can still be joined by other users.",
+    "privacy_desc_protected": "Can only be modified or deleted by its owner. Can be used by any user to create a game."
     },
     "game_result": {
         "win_classic": "Victory! You won three combats",

@@ -697,8 +697,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildLanguageSelector(String selectedLanguage) {
-    final languages = [('fr', 'French'), ('en', 'English')];
+  Widget _buildLanguageSelector(
+    String selectedLanguage,
+    ProfileLocalizations l10n,
+  ) {
+    final languages = [
+      ('fr', l10n.languageNameFr),
+      ('en', l10n.languageNameEn),
+    ];
     return Row(
       children: languages.map((l) {
         final isSelected = selectedLanguage == l.$1;
@@ -936,6 +942,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
             ),
+            textAlign: TextAlign.center,
           ),
           _buildThemeSelector(selectedThemeId, l10n),
           const SizedBox(height: 16),
@@ -947,9 +954,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
             ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
-          _buildLanguageSelector(selectedLanguage),
+          _buildLanguageSelector(selectedLanguage, l10n),
+          const SizedBox(height: 16),
+          Text(
+            l10n.tutorial,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'CustomFont',
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          ElevatedButton(
+            onPressed: _viewModel.openTutorial,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: context.interactionColors.primary,
+              shadowColor: Colors.transparent,
+              side: BorderSide(
+                color: context.interactionColors.outline,
+                width: 2,
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              textStyle: const TextStyle(
+                fontSize: 16,
+                fontFamily: 'CustomFont',
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(l10n.continueTutorial),
+          ),
         ],
       ),
     );

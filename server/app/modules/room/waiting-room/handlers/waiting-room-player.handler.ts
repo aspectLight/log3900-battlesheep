@@ -47,6 +47,7 @@ export class WaitingRoomPlayerHandler {
                 }
 
                 server.to(data.roomId).emit(WaitingRoomEvents.PlayerCreated, room.players);
+                server.emit(WaitingRoomEvents.AvailableRoomsChanged);
                 this.logger.log(`Joueur ${data.player.name} ajouté à la salle : ${data.roomId}`);
             }
         } catch (error) {
@@ -145,6 +146,7 @@ export class WaitingRoomPlayerHandler {
                 const updatedRoom = this.waitingRoomService.findRoomById(data.roomId);
                 server.to(data.roomId).emit(WaitingRoomEvents.UpdateAvatarReserved, { reservedAvatars: updatedRoom.reservedAvatars });
                 server.to(data.player.id).emit(WaitingRoomEvents.PlayerKicked);
+                server.emit(WaitingRoomEvents.AvailableRoomsChanged);
                 this.logger.log(`Joueur ${data.player.name} expulsé de la salle ${data.roomId}`);
             }
         } catch (error) {

@@ -341,6 +341,10 @@ abstract class ProfileLocalizations {
   /// **'Delete account'**
   String get profileDeleteAccount;
 
+  String get languageNameFr;
+
+  String get languageNameEn;
+
   /// No description provided for @profileDeleteConfirmTitle.
   ///
   /// In en, this message translates to:
@@ -370,6 +374,10 @@ abstract class ProfileLocalizations {
   /// In en, this message translates to:
   /// **'Deleting...'**
   String get profileDeleting;
+
+  String get tutorial;
+
+  String get continueTutorial;
 }
 
 class _ProfileLocalizationsDelegate

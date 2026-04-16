@@ -169,8 +169,15 @@ export class SocketService implements ISocketService {
             this.gameManagerService.turnCountdown.next(countdown);
         });
 
-        this.socket.on(GameRoomEvents.UpdateScore, (winnerId) => {
-            const result = this.gameManagerService.updateScore(winnerId);
+        this.socket.on(GameRoomEvents.ResumeTurn, (data: { playerId: string; timeRemaining: number }) => {
+            this.handleResumeTurn(data);
+        });
+
+        this.socket.on(GameRoomEvents.UpdateScore, (data: { winnerId: string; fightsWon: number } | string) => {
+            // Support both old string and new object payload for backwards compatibility
+            const winnerId = typeof data === 'string' ? data : data.winnerId;
+            const fightsWon = typeof data === 'string' ? undefined : data.fightsWon;
+            const result = this.gameManagerService.updateScore(winnerId, fightsWon);
             const winner = this.gameManagerService.room.players.find((p) => p.id === winnerId);
             const mainPlayer = this.gameManagerService.getMainPlayer();
             if (!mainPlayer) return;
@@ -255,6 +262,14 @@ export class SocketService implements ISocketService {
 
         if (!currentPlayer) return;
 
+        // Sync fresh movement points from server when it's this client's turn.
+        // The client-side room object may hold stale movementPoints from the player's
+        // previous turn. Without this sync, the 3.1s safety check in movement-socket.service
+        // reads movementPoints=0 and incorrectly auto-ends the turn, skipping the player.
+        if (data.nextPlayer.id === this.socket.id && data.nextPlayer.movementPoints !== undefined) {
+            currentPlayer.movementPoints = data.nextPlayer.movementPoints;
+        }
+
         this.setupPlayerPoints(currentPlayer);
         this.handlePlayerTurn(data.nextPlayer, currentPlayer, room);
     }
@@ -318,6 +333,28 @@ export class SocketService implements ISocketService {
                     }
                 },
             );
+        }
+    }
+
+    private handleResumeTurn(data: { playerId: string; timeRemaining: number }): void {
+        // Update which player currently has the turn (it's still the combat winner)
+        this.gameManagerService.currentPlayerId = data.playerId;
+
+        const room = this.gameManagerService.room;
+        const resumingPlayer = room.players.find((p) => p.id === data.playerId);
+        if (!resumingPlayer) return;
+
+        const isMyTurn = this.socket.id === data.playerId;
+        const isOrganizerAndVirtualTurn = this.socket.id === room.hostId && resumingPlayer.isVirtual;
+
+        if (isOrganizerAndVirtualTurn) {
+            // Virtual player won — host triggers VP turn logic immediately
+            this.virtualPlayerTurn(resumingPlayer.id, true);
+        } else if (isMyTurn) {
+            // Human winner: re-fetch available movements so they can act
+            if (!room.isDebugging) {
+                this.getPlayerMovements();
+            }
         }
     }
 

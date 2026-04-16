@@ -36,6 +36,7 @@ export class ToolboxComponent implements OnInit, OnChanges {
     @Input() resetSignal: boolean;
     @Input() board!: Board;
     @Output() mapGenerated = new EventEmitter<void>();
+    @Output() restartConfirmed = new EventEmitter<void>();
 
     items = ITEM_TYPES;
 
@@ -149,6 +150,7 @@ export class ToolboxComponent implements OnInit, OnChanges {
 
     onRestartConfirmed(): void {
         this.resetInputs();
+        this.restartConfirmed.emit();
     }
 
     onMapGenerated(): void {

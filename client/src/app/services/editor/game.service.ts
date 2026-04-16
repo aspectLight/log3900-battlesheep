@@ -99,7 +99,7 @@ export class GameService {
 
     setGame(gameData: Game) {
         this.game = new Game(gameData);
-        this.setGameSettings(this.game.mode, this.game.board.size, this.game.privacy);
+        this.setGameSettings(this.game.mode, this.game.board.size, this.game.privacy, this.game.actionPoints);
         this.isGameBeingModified = true;
 
         this.tempGame = new Game(gameData);

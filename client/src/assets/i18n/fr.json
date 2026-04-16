@@ -22,7 +22,9 @@
     "password_digit": "Le mot de passe doit contenir au moins un chiffre",
     "password_spaces": "Le mot de passe ne doit pas contenir d'espace",
     "password_mismatch": "Les mots de passe ne correspondent pas",
-    "avatar_required": "Sélectionnez un avatar"
+    "avatar_required": "Sélectionnez un avatar",
+    "username_banned": "Ce nom d'utilisateur est réservé et ne peut pas être utilisé",
+    "username_profanity": "Ce nom d'utilisateur contient des mots non autorisés"
   },
   "auth": {
     "login": "Se connecter",
@@ -59,6 +61,7 @@
     "games_history": "Historique des parties",
     "login_history": "Historique de connexion",
     "logout": "Se déconnecter",
+    "game_left": "Vous avez quitté la partie!",
     "game_canceled": "Partie annulée par manque de joueurs",
     "game_finished": "Partie terminée, limite de 3 victoires atteintes par un personnage"
   },
@@ -104,6 +107,7 @@
     "error_file_type": "Fichier de type \"{{ ext }}\" non autorisé. Formats permis : JPG, JPEG, PNG (taille maximale 2 MB).",
     "error_file_size": "Fichier trop volumineux ({{ size }} MB). Taille maximale autorisée : 2 MB.",
     "no_changes": "Aucune modification détectée",
+    "available_in_shop": "Disponible en boutique (500 pièces)",
     "errors": {
       "load_profile": "Erreur lors du chargement du profil",
       "update_profile": "Erreur lors de la sauvegarde des changements du profil",
@@ -211,6 +215,8 @@
     "back": "Quitter la partie",
     "title": "Salle d'attente",
     "code": "Code de la partie :",
+    "balance": "Solde",
+    "entry_fee": "Prix d'entrée",
     "drop_in": "Drop-in/Drop-out",
     "lock": "Verrouiller la salle",
     "unlock": "Déverrouiller la salle",
@@ -302,11 +308,15 @@
     "mode": "Mode",
     "accessibility": "Accessibilité",
     "code": "Code",
+    "price": "Prix",
     "no_rooms": "Aucune partie disponible",
     "status_waiting": "En attente",
     "status_playing": "En cours",
     "status_full": "Complète",
-    "status_open": "Ouverte"
+    "status_open": "Ouverte",
+    "accessibility_friends_only": "Amis seulement",
+    "accessibility_drop_in": "Drop-in",
+    "free": "Gratuit"
   },
   "game_list": {
     "preview": "Prévisualisation",
@@ -368,6 +378,7 @@
     "left_click_desc": "pour effacer",
     "items_to_place": "Items à placer",
     "spawns_to_place": "Point de départs à placer",
+    "flag_to_place": "Drapeau à placer",
     "hold_right": "Maintenir clic droit",
     "hold_right_desc": "pour sélectionner",
     "release": "Relâcher",
@@ -426,7 +437,7 @@
     "error_accessibility": "Toutes les tuiles de terrain doivent être accessibles.",
     "error_no_terrain": "Aucune tuile de terrain n'a été trouvée.",
     "error_flag": "Le jeu doit contenir un drapeau.",
-    "error_spawn_points": "Il doit y avoir entre {{min}} et {{max}} points de départ.",
+    "error_spawn_points": "Il doit y avoir exactement {{count}} points de départ.",
     "error_items": "Il doit y avoir {{count}} items.",
     "error_door_edge": "La porte à ({{x}}, {{y}}) est sur le bord du plateau.",
     "error_door_walls": "La porte à ({{x}}, {{y}}) n'est pas entourée par des murs sur le même axe.",
@@ -499,6 +510,7 @@
   },
   "end_game": {
     "title": "Statistiques",
+    "rewards": "Récompenses",
     "players": "Joueurs",
     "combats": "Nombre de combats",
     "evasions": "Nombre d'évasions",
@@ -534,7 +546,9 @@
     "flag": "Drapeau"
   },
   "player_hud": {
-    "dice": "DÉS"
+    "dice": "DÉS",
+    "movements": "déplacements",
+    "actions": "actions"
   },
   "game_info": {
     "continue": "continuer",
@@ -553,7 +567,10 @@
   "game_configurator": {
     "mode_desc_classic": "Gagnez 3 combats pour être déclaré vainqueur et mettre fin à la partie.",
     "mode_desc_ctf": "Capturez le drapeau adverse et ramenez-le à votre point de départ pour gagner la partie.",
-    "actions_desc": "Nombre de points d'actions alloués à chaque joueur à chaque tour"
+    "actions_desc": "Nombre de points d'actions alloués à chaque joueur à chaque tour",
+    "privacy_desc_public": "Peut être modifié, supprimé et utilisé pour créer une partie par n'importe quel utilisateur. Le propriétaire est toujours le créateur original.",
+    "privacy_desc_private": "Ne peut être modifié, supprimé ou utilisé pour créer une partie que par son propriétaire. Une partie utilisant ce jeu est joignable par les autres utilisateurs.",
+    "privacy_desc_protected": "Ne peut être modifié ou supprimé que par son propriétaire. Peut être utilisé par n'importe quel utilisateur pour créer une partie."
   },
   "game_result": {
     "win_classic": "Victoire ! Tu as gagné trois combats",

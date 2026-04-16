@@ -18,11 +18,11 @@ export const REQUIRED_OBJECTS = {
             max: 2,
         },
         [BOARD_SIZES.medium]: {
-            min: 2,
+            min: 4,
             max: 4,
         },
         [BOARD_SIZES.large]: {
-            min: 2,
+            min: 6,
             max: 6,
         },
     },

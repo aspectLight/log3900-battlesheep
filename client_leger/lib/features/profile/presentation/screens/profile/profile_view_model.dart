@@ -3,9 +3,10 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../../core/app_transition/app_transition_bus.dart';
 import '../../../../../../core/appearance/app_appearance_service.dart';
+import '../../../../authentication/core/app_events/auth_events.dart';
 import '../../../../authentication/core/interfaces/auth_repository.dart';
 import '../../../../authentication/domain/models/user.dart';
-import '../../../../authentication/core/app_events/auth_events.dart';
+import '../../../../tutorial/core/app_transition/tutorial_events.dart';
 import '../../../core/exceptions/profile_failure.dart';
 import '../../../data/repositories/profile_repository.dart';
 import '../../../domain/commands/profile_commands.dart';
@@ -133,5 +134,9 @@ class ProfileViewModel {
       },
     );
     return result;
+  }
+
+  void openTutorial() {
+    _appTransitionEventBus.fire(const TutorialEntryAppEvent.requested());
   }
 }

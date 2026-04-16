@@ -25,11 +25,9 @@ export class StatisticsHandler {
             }
             const statistics = {
                 playerStats: room.playersStats,
-                globalStats: {
-                    ...room.globalStats,
-                    walkableTiles: this.gameMovementService.getWalkableTiles(roomId),
-                    toggableDoors: this.gameMovementService.getAllDoors(roomId),
-                },
+                globalStats: room.globalStats,
+                walkableTiles: this.gameMovementService.getWalkableTiles(roomId),
+                toggableDoors: this.gameMovementService.getAllDoors(roomId),
             };
             socket.emit(GameRoomEvents.GetStatisticsResponse, statistics);
         } catch (error) {
