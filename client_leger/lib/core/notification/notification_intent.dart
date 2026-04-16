@@ -65,30 +65,6 @@ class GameCanceledNotificationIntent extends NotificationIntent {
   const GameCanceledNotificationIntent({this.onComplete});
 }
 
-class CombatStartedNotificationIntent extends NotificationIntent {
-  final String attackerName;
-  final String defenderName;
-
-  const CombatStartedNotificationIntent({
-    required this.attackerName,
-    required this.defenderName,
-  });
-}
-
-class EndCombatNotificationIntent extends NotificationIntent {
-  final String winnerId;
-  final String loserId;
-  final bool isByFlight;
-  final String currentUserSocketId;
-
-  const EndCombatNotificationIntent({
-    required this.winnerId,
-    required this.loserId,
-    required this.isByFlight,
-    required this.currentUserSocketId,
-  });
-}
-
 class InventoryFullDiscardIntent extends NotificationIntent {
   final List<ItemType> candidateItems;
   final void Function(Option<ItemType>) onComplete;

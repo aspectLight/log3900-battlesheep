@@ -57,3 +57,7 @@ class FlightAttemptFeedbackClearedEvent
   const factory FlightAttemptFeedbackClearedEvent() =
       _FlightAttemptFeedbackClearedEvent;
 }
+
+class CombatEndOverlayClearedEvent {
+  const CombatEndOverlayClearedEvent();
+}

@@ -145,15 +145,25 @@ class GameEventsSocket {
               UpdateStartingCountdownDto(countdown: v).toEntity(),
             );
           }),
-      _socketService.on<String>(GameEventsSocketEvents.updateScore).listen((
+      _socketService.on<Object?>(GameEventsSocketEvents.updateScore).listen((
         data,
       ) {
-        _updateScoreController.add(UpdateScoreDto.fromObject(data).toEntity());
+        try {
+          _updateScoreController.add(
+            UpdateScoreDto.fromObject(data).toEntity(),
+          );
+        } on FormatException {
+          return;
+        }
       }),
-      _socketService.on<String>(GameEventsSocketEvents.finishGame).listen((
+      _socketService.on<Object?>(GameEventsSocketEvents.finishGame).listen((
         data,
       ) {
-        _finishGameController.add(FinishGameDto.fromObject(data).toEntity());
+        try {
+          _finishGameController.add(FinishGameDto.fromObject(data).toEntity());
+        } on FormatException {
+          return;
+        }
       }),
       _socketService
           .on<Map<String, dynamic>>(GameEventsSocketEvents.gameCanceled)
@@ -169,13 +179,17 @@ class GameEventsSocket {
           GameAbandonedDto.fromObject(data).toEntity(),
         );
       }),
-      _socketService.on<String>(GameEventsSocketEvents.playerAbandoned).listen((
-        data,
-      ) {
-        _playerAbandonedController.add(
-          PlayerAbandonedDto.fromObject(data).toEntity(),
-        );
-      }),
+      _socketService.on<Object?>(GameEventsSocketEvents.playerAbandoned).listen(
+        (data) {
+          try {
+            _playerAbandonedController.add(
+              PlayerAbandonedDto.fromObject(data).toEntity(),
+            );
+          } on FormatException {
+            return;
+          }
+        },
+      ),
       _socketService
           .on<Map<String, dynamic>>(GameEventsSocketEvents.organizatorChanged)
           .listen((data) {

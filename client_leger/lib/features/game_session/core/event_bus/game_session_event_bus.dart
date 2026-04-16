@@ -57,13 +57,6 @@ class GameSessionFinishedEvent {
   });
 }
 
-class CombatStarted {
-  final String attackerId;
-  final String defenderId;
-
-  const CombatStarted({required this.attackerId, required this.defenderId});
-}
-
 class GameCombatEnded {
   final String winnerId;
   final String loserId;

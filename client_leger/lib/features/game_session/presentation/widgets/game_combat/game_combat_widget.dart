@@ -46,7 +46,9 @@ class _GameCombatWidgetState extends State<GameCombatWidget> {
     _notificationEffectCleanup = effect(() {
       final model = _viewModel.combatUiModel.value;
       if (model is GameCombatActive &&
-          (model.showResults || model.showFlightAttemptResult) &&
+          (model.endOverlay != null ||
+              model.showResults ||
+              model.showFlightAttemptResult) &&
           _l10n == null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) _handleCombatStateChange(_viewModel.combatUiModel.value);
@@ -66,6 +68,42 @@ class _GameCombatWidgetState extends State<GameCombatWidget> {
     final l10n = _l10n;
     const duration = CombatUiConstants.feedbackDurationMs;
     GameCombatNotificationUi? notification;
+
+    final endOverlay = state.endOverlay;
+    if (endOverlay != null) {
+      if (l10n == null) return;
+      final endNotification = switch (endOverlay.kind) {
+        GameCombatEndOverlayKind.victory => GameCombatNotificationUi(
+          title: l10n.combatNotificationVictory,
+          message: l10n.combatNotificationVictoryMessage,
+          isSuccess: true,
+          isWinLossNotification: true,
+        ),
+        GameCombatEndOverlayKind.defeat => GameCombatNotificationUi(
+          title: l10n.combatNotificationDefeat,
+          message: l10n.combatNotificationDefeatMessage(endOverlay.winnerName),
+          isSuccess: false,
+          isWinLossNotification: true,
+        ),
+        GameCombatEndOverlayKind.fled => GameCombatNotificationUi(
+          title: l10n.combatNotificationFlightSuccessTitle,
+          message: l10n.combatNotificationFlightSuccess,
+          isSuccess: true,
+          isWinLossNotification: true,
+        ),
+        GameCombatEndOverlayKind.enemyFled => GameCombatNotificationUi(
+          title: l10n.combatNotificationFlightSuccessTitle,
+          message: l10n.combatNotificationEnemyFled(endOverlay.enemyName),
+          isSuccess: false,
+          isWinLossNotification: true,
+        ),
+      };
+      _showNotification(
+        endNotification,
+        CombatUiConstants.notificationDurationMs,
+      );
+      return;
+    }
 
     if (state.showFlightAttemptResult) {
       if (l10n == null) return;
@@ -117,6 +155,9 @@ class _GameCombatWidgetState extends State<GameCombatWidget> {
     setState(() {
       _currentNotification = notification;
     });
+    if (notification.isWinLossNotification) {
+      return;
+    }
     _notificationTimer = Timer(Duration(milliseconds: durationMs), () {
       if (mounted && _currentNotification == notification) {
         setState(() {
@@ -152,7 +193,9 @@ class _GameCombatWidgetState extends State<GameCombatWidget> {
     final l10n = GameSessionLocalizations.of(context)!;
     _l10n = l10n;
     if (state is GameCombatActive &&
-        (state.showResults || state.showFlightAttemptResult) &&
+        (state.endOverlay != null ||
+            state.showResults ||
+            state.showFlightAttemptResult) &&
         _currentNotification == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _handleCombatStateChange(state);

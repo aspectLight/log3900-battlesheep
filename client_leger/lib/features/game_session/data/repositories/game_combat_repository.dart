@@ -67,4 +67,11 @@ class GameCombatRepository {
       const FlightAttemptFeedbackClearedEvent(),
     );
   }
+
+  void clearCombatEndOverlay() {
+    state.value = _reducer.reduce(
+      state.value,
+      const CombatEndOverlayClearedEvent(),
+    );
+  }
 }

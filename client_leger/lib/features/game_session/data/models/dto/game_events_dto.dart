@@ -11,6 +11,48 @@ import 'game_item_dto.dart';
 
 part 'game_events_dto.g.dart';
 
+/// Normalizes server payloads that may be a bare string, a list (socket_io_client
+/// multi-arg frames), or a map with the given mapKey — same idea as
+/// EndCombatResultDto.fromObject in game_combat_dto.dart.
+String _parseSingleStringSocketEvent(dynamic data, {required String mapKey}) {
+  String parseId(Object? v) => (v?.toString() ?? '').trim();
+
+  if (data == null) {
+    throw FormatException('Missing socket event payload', data);
+  }
+  if (data is String) {
+    final id = parseId(data);
+    if (id.isEmpty) {
+      throw FormatException('Empty socket event payload', data);
+    }
+    return id;
+  }
+  if (data is List) {
+    if (data.isEmpty) {
+      throw FormatException('Empty list socket event payload', data);
+    }
+    final id = parseId(data.first);
+    if (id.isEmpty) {
+      throw FormatException('Empty id in socket event list', data);
+    }
+    return id;
+  }
+  if (data is Map) {
+    final map = Map<String, dynamic>.from(data);
+    final raw = map[mapKey];
+    final id = parseId(raw);
+    if (id.isEmpty) {
+      throw FormatException('Missing or empty $mapKey in map', data);
+    }
+    return id;
+  }
+  final id = parseId(data);
+  if (id.isEmpty) {
+    throw FormatException('Unusable socket event payload', data);
+  }
+  return id;
+}
+
 @JsonSerializable()
 class ToggleDoorCommandDto {
   final String roomId;
@@ -273,8 +315,9 @@ class UpdateScoreDto {
   factory UpdateScoreDto.fromJson(Map<String, dynamic> json) =>
       _$UpdateScoreDtoFromJson(json);
 
-  factory UpdateScoreDto.fromObject(dynamic data) =>
-      UpdateScoreDto(winnerId: data as String);
+  factory UpdateScoreDto.fromObject(dynamic data) => UpdateScoreDto(
+    winnerId: _parseSingleStringSocketEvent(data, mapKey: 'winnerId'),
+  );
 
   Map<String, dynamic> toJson() => _$UpdateScoreDtoToJson(this);
 }
@@ -288,8 +331,9 @@ class FinishGameDto {
   factory FinishGameDto.fromJson(Map<String, dynamic> json) =>
       _$FinishGameDtoFromJson(json);
 
-  factory FinishGameDto.fromObject(dynamic data) =>
-      FinishGameDto(winnerId: data as String);
+  factory FinishGameDto.fromObject(dynamic data) => FinishGameDto(
+    winnerId: _parseSingleStringSocketEvent(data, mapKey: 'winnerId'),
+  );
 
   Map<String, dynamic> toJson() => _$FinishGameDtoToJson(this);
 }
@@ -324,8 +368,9 @@ class PlayerAbandonedDto {
   factory PlayerAbandonedDto.fromJson(Map<String, dynamic> json) =>
       _$PlayerAbandonedDtoFromJson(json);
 
-  factory PlayerAbandonedDto.fromObject(dynamic data) =>
-      PlayerAbandonedDto(playerId: data as String);
+  factory PlayerAbandonedDto.fromObject(dynamic data) => PlayerAbandonedDto(
+    playerId: _parseSingleStringSocketEvent(data, mapKey: 'playerId'),
+  );
 
   Map<String, dynamic> toJson() => _$PlayerAbandonedDtoToJson(this);
 }

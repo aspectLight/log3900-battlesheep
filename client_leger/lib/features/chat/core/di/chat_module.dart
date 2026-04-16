@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 
+import '../../../../core/chat/chat_outgoing_avatars.dart';
 import '../../../../core/connected_scope/session_scope_manager.dart';
 import '../../../../core/di/scoped_projection_subscriptions.dart';
 import '../../../../core/services/socket_service.dart';
@@ -18,11 +19,12 @@ import 'chat_state_repository_module.dart';
 import 'chat_view_model_module.dart';
 
 void registerChatRoot(GetIt getIt) {
+  getIt.registerLazySingleton<ChatOutgoingAvatars>(ChatOutgoingAvatars.new);
   getIt.registerLazySingleton<ChatScopeHolder>(ChatScopeHolder.new);
   getIt.registerLazySingleton<DiscussionCanalsRepository>(
     () => DiscussionCanalsSocket(
       socketService: getIt<SocketService>(),
-      username: getIt<SessionScopeManager>().currentSession!.username,
+           username: getIt<SessionScopeManager>().currentSession!.username,
       authRepository: getIt<AuthRepository>(),
     ),
   );
@@ -52,7 +54,7 @@ void registerChatScope(
   registerChatRepositories(scope, rootGetIt);
   registerChatViewModels(scope, rootGetIt, username: username);
   registerChatProjection(scope, rootGetIt);
-  registerChatSideEffects(scope, username: username);
+  registerChatSideEffects(scope, rootGetIt, username: username);
 }
 
 void bootstrapChatScope(GetIt scope) {
