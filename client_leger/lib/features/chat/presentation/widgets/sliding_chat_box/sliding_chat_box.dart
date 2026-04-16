@@ -884,7 +884,7 @@ class _ChannelChatPanelState extends State<_ChannelChatPanel> {
         children: [
           Expanded(
             child: Watch((context) {
-              final messages = widget.viewModel.activeChannelMessages.value;
+              final messages = widget.viewModel.displayChannelMessages.value;
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (_scrollController.hasClients) {
                   _scrollController.jumpTo(
@@ -958,6 +958,7 @@ class _ChannelChatPanelState extends State<_ChannelChatPanel> {
                                   displayName: msg.senderName,
                                   avatarId: msg.avatarId,
                                   avatarUrl: msg.avatarUrl,
+                                  avatarDisplayNonce: msg.avatarDisplayNonce,
                                   size: 18,
                                 ),
                               ),

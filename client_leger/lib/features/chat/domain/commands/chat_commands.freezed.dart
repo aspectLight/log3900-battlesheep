@@ -19,6 +19,8 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$SendChatMessageCommand {
   String get username => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
+  String? get avatarId => throw _privateConstructorUsedError;
+  String? get avatarUrl => throw _privateConstructorUsedError;
 
   /// Create a copy of SendChatMessageCommand
   /// with the given fields replaced by the non-null parameter values.
@@ -34,7 +36,12 @@ abstract class $SendChatMessageCommandCopyWith<$Res> {
     $Res Function(SendChatMessageCommand) then,
   ) = _$SendChatMessageCommandCopyWithImpl<$Res, SendChatMessageCommand>;
   @useResult
-  $Res call({String username, String content});
+  $Res call({
+    String username,
+    String content,
+    String? avatarId,
+    String? avatarUrl,
+  });
 }
 
 /// @nodoc
@@ -54,7 +61,12 @@ class _$SendChatMessageCommandCopyWithImpl<
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? username = null, Object? content = null}) {
+  $Res call({
+    Object? username = null,
+    Object? content = null,
+    Object? avatarId = freezed,
+    Object? avatarUrl = freezed,
+  }) {
     return _then(
       _value.copyWith(
             username: null == username
@@ -65,6 +77,14 @@ class _$SendChatMessageCommandCopyWithImpl<
                 ? _value.content
                 : content // ignore: cast_nullable_to_non_nullable
                       as String,
+            avatarId: freezed == avatarId
+                ? _value.avatarId
+                : avatarId // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            avatarUrl: freezed == avatarUrl
+                ? _value.avatarUrl
+                : avatarUrl // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -80,7 +100,12 @@ abstract class _$$SendChatMessageCommandImplCopyWith<$Res>
   ) = __$$SendChatMessageCommandImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String username, String content});
+  $Res call({
+    String username,
+    String content,
+    String? avatarId,
+    String? avatarUrl,
+  });
 }
 
 /// @nodoc
@@ -97,7 +122,12 @@ class __$$SendChatMessageCommandImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? username = null, Object? content = null}) {
+  $Res call({
+    Object? username = null,
+    Object? content = null,
+    Object? avatarId = freezed,
+    Object? avatarUrl = freezed,
+  }) {
     return _then(
       _$SendChatMessageCommandImpl(
         username: null == username
@@ -108,6 +138,14 @@ class __$$SendChatMessageCommandImplCopyWithImpl<$Res>
             ? _value.content
             : content // ignore: cast_nullable_to_non_nullable
                   as String,
+        avatarId: freezed == avatarId
+            ? _value.avatarId
+            : avatarId // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        avatarUrl: freezed == avatarUrl
+            ? _value.avatarUrl
+            : avatarUrl // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -119,16 +157,22 @@ class _$SendChatMessageCommandImpl implements _SendChatMessageCommand {
   const _$SendChatMessageCommandImpl({
     required this.username,
     required this.content,
+    this.avatarId,
+    this.avatarUrl,
   });
 
   @override
   final String username;
   @override
   final String content;
+  @override
+  final String? avatarId;
+  @override
+  final String? avatarUrl;
 
   @override
   String toString() {
-    return 'SendChatMessageCommand(username: $username, content: $content)';
+    return 'SendChatMessageCommand(username: $username, content: $content, avatarId: $avatarId, avatarUrl: $avatarUrl)';
   }
 
   @override
@@ -138,11 +182,16 @@ class _$SendChatMessageCommandImpl implements _SendChatMessageCommand {
             other is _$SendChatMessageCommandImpl &&
             (identical(other.username, username) ||
                 other.username == username) &&
-            (identical(other.content, content) || other.content == content));
+            (identical(other.content, content) || other.content == content) &&
+            (identical(other.avatarId, avatarId) ||
+                other.avatarId == avatarId) &&
+            (identical(other.avatarUrl, avatarUrl) ||
+                other.avatarUrl == avatarUrl));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, username, content);
+  int get hashCode =>
+      Object.hash(runtimeType, username, content, avatarId, avatarUrl);
 
   /// Create a copy of SendChatMessageCommand
   /// with the given fields replaced by the non-null parameter values.
@@ -161,12 +210,18 @@ abstract class _SendChatMessageCommand implements SendChatMessageCommand {
   const factory _SendChatMessageCommand({
     required final String username,
     required final String content,
+    final String? avatarId,
+    final String? avatarUrl,
   }) = _$SendChatMessageCommandImpl;
 
   @override
   String get username;
   @override
   String get content;
+  @override
+  String? get avatarId;
+  @override
+  String? get avatarUrl;
 
   /// Create a copy of SendChatMessageCommand
   /// with the given fields replaced by the non-null parameter values.

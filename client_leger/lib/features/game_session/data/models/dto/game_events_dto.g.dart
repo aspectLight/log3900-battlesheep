@@ -117,10 +117,16 @@ Map<String, dynamic> _$UpdateStartingCountdownDtoToJson(
 ) => <String, dynamic>{'countdown': instance.countdown};
 
 UpdateScoreDto _$UpdateScoreDtoFromJson(Map<String, dynamic> json) =>
-    UpdateScoreDto(winnerId: json['winnerId'] as String);
+    UpdateScoreDto(
+      winnerId: json['winnerId'] as String,
+      fightsWon: (json['fightsWon'] as num?)?.toInt(),
+    );
 
 Map<String, dynamic> _$UpdateScoreDtoToJson(UpdateScoreDto instance) =>
-    <String, dynamic>{'winnerId': instance.winnerId};
+    <String, dynamic>{
+      'winnerId': instance.winnerId,
+      'fightsWon': instance.fightsWon,
+    };
 
 FinishGameDto _$FinishGameDtoFromJson(Map<String, dynamic> json) =>
     FinishGameDto(winnerId: json['winnerId'] as String);

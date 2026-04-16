@@ -415,6 +415,7 @@ class _ChatLine extends StatelessWidget {
                     displayName: message.name,
                     avatarId: message.avatarId,
                     avatarUrl: message.avatarUrl,
+                    avatarDisplayNonce: message.avatarDisplayNonce,
                     size: 18,
                   ),
                 ),

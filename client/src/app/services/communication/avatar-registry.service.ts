@@ -26,20 +26,17 @@ export class AvatarRegistryService {
     readonly registrySignal = this.registry.asReadonly();
 
     setupListeners(): void {
-        this.socketService.on<{ username: string; avatarId: string | null; avatarUrl: string | null }>(
-            GeneralChatEvents.AvatarUpdated,
-            (payload) => {
-                if (!payload?.username) return;
-                this.registry.update((current) => ({
-                    ...current,
-                    [payload.username]: {
-                        avatarId: payload.avatarId ?? null,
-                        avatarUrl: payload.avatarUrl ?? null,
-                        deleted: false,
-                    },
-                }));
-            },
-        );
+        this.socketService.on<{ username: string; avatarId: string | null; avatarUrl: string | null }>(GeneralChatEvents.AvatarUpdated, (payload) => {
+            if (!payload?.username) return;
+            this.registry.update((current) => ({
+                ...current,
+                [payload.username]: {
+                    avatarId: payload.avatarId ?? null,
+                    avatarUrl: payload.avatarUrl ?? null,
+                    deleted: false,
+                },
+            }));
+        });
     }
 
     get(username: string | null | undefined): AvatarEntry | null {

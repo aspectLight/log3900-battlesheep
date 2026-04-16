@@ -44,9 +44,9 @@ class SessionScopeManager {
     _currentSession = session;
   }
 
-  void dropScope() {
+  Future<void> dropScope() async {
     if (_scope == null) return;
-    unawaited(_getIt.dropScope('session'));
+    await _getIt.dropScope('session');
     _scope = null;
     _currentSession = null;
   }

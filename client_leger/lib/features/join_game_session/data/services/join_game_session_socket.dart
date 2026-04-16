@@ -67,9 +67,14 @@ class JoinGameSessionSocket {
       roomCode,
     );
     final data = await responseFuture;
-    final dto = data == null
-        ? const JoinRoomResponseDto(success: false)
-        : JoinRoomResponseDto.fromJson(data as Map<String, dynamic>);
+    final JoinRoomResponseDto dto;
+    if (data == null) {
+      dto = const JoinRoomResponseDto(success: false);
+    } else if (data is Map) {
+      dto = JoinRoomResponseDto.fromJson(Map<String, dynamic>.from(data));
+    } else {
+      dto = const JoinRoomResponseDto(success: false);
+    }
     if (!dto.success) return left(dto.toFailure());
     final room = dto.room;
     if (room == null) {
@@ -168,7 +173,8 @@ class JoinGameSessionSocket {
       _socketService.emit(JoinGameSessionSocketEvents.getAvailableRooms);
       final rooms = await responseFuture;
       return rooms
-          .whereType<Map<String, dynamic>>()
+          .whereType<Map>()
+          .map(Map<String, dynamic>.from)
           .where(_isJoinListStatus)
           .where((m) => !_isVirtualOnlyPartyRow(m))
           .map((m) => _RoomInfoDto.fromJson(m).toModel())
@@ -188,7 +194,7 @@ class JoinGameSessionSocket {
 bool _isVirtualOnlyPartyRow(Map<String, dynamic> json) {
   final raw = json['players'];
   if (raw is! List<dynamic>) return false;
-  final maps = raw.whereType<Map<String, dynamic>>().toList();
+  final maps = raw.whereType<Map>().map(Map<String, dynamic>.from).toList();
   if (maps.isEmpty) return false;
   return maps.every((p) => p['isVirtual'] == true);
 }

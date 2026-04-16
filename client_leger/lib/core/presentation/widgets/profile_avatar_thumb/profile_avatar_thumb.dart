@@ -9,6 +9,7 @@ class ProfileAvatarThumb extends StatelessWidget {
     super.key,
     this.avatarId,
     this.avatarUrl,
+    this.avatarDisplayNonce,
     this.size = 24,
     this.borderColor,
     this.backgroundColor = const Color(0xFF4a3010),
@@ -18,6 +19,7 @@ class ProfileAvatarThumb extends StatelessWidget {
   final String displayName;
   final String? avatarId;
   final String? avatarUrl;
+  final int? avatarDisplayNonce;
   final double size;
   final Color? borderColor;
   final Color backgroundColor;
@@ -35,7 +37,10 @@ class ProfileAvatarThumb extends StatelessWidget {
     final normalizedUrl = avatarUrl?.trim() ?? '';
     final resolvedNetworkUrl = normalizedUrl.isEmpty
         ? ''
-        : EnvConfig.resolveAvatarUrl(normalizedUrl);
+        : EnvConfig.resolveAvatarUrl(
+            normalizedUrl,
+            cacheBust: avatarDisplayNonce,
+          );
     final resolvedAsset = normalizedId.isEmpty
         ? null
         : AuthAvatarAssets.assetPathForAvatarId(normalizedId);
@@ -55,6 +60,9 @@ class ProfileAvatarThumb extends StatelessWidget {
           ? Image.network(
               resolvedNetworkUrl,
               fit: BoxFit.cover,
+              key: ValueKey<String>(
+                '$resolvedNetworkUrl|${avatarDisplayNonce ?? 0}',
+              ),
               errorBuilder: (_, _, _) => _fallback(hasAsset, resolvedAsset),
             )
           : _fallback(hasAsset, resolvedAsset),
@@ -65,6 +73,9 @@ class ProfileAvatarThumb extends StatelessWidget {
     if (hasAsset) {
       return Image.asset(
         resolvedAsset!,
+        key: ValueKey<String>(
+          '$resolvedAsset|${avatarDisplayNonce ?? 0}',
+        ),
         fit: BoxFit.cover,
         errorBuilder: (_, _, _) => _initial(),
       );

@@ -45,6 +45,10 @@ class ProfileViewModel {
     clearPendingAvatarFile();
   }
 
+  void syncSelectedAvatarIdFromProfile(String avatarId) {
+    selectedAvatarId.value = avatarId;
+  }
+
   void setSelectedThemeId(String themeId) {
     selectedThemeId.value = themeId;
   }
@@ -88,6 +92,7 @@ class ProfileViewModel {
         _authRepository.syncCurrentUser(
           UserModel(
             uid: profile.id,
+            firebaseUid: profile.firebaseUid,
             email: profile.email,
             username: profile.username,
             avatarId: profile.avatarId,
@@ -123,6 +128,7 @@ class ProfileViewModel {
         _authRepository.syncCurrentUser(
           UserModel(
             uid: profile.id,
+            firebaseUid: profile.firebaseUid,
             email: profile.email,
             username: profile.username,
             avatarId: profile.avatarId,

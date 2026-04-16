@@ -6,6 +6,20 @@ sealed class GameCombatUiState {
   const GameCombatUiState();
 }
 
+enum GameCombatEndOverlayKind { victory, defeat, fled, enemyFled }
+
+class GameCombatEndOverlay {
+  final GameCombatEndOverlayKind kind;
+  final String winnerName;
+  final String enemyName;
+
+  const GameCombatEndOverlay({
+    required this.kind,
+    this.winnerName = '',
+    this.enemyName = '',
+  });
+}
+
 class GameCombatInactive extends GameCombatUiState {
   const GameCombatInactive();
 }
@@ -25,6 +39,7 @@ class GameCombatActive extends GameCombatUiState {
   final GameCombatEnemyInfoUi enemyInfo;
   final GameCombatResultsUi combatResults;
   final GameCombatNotificationUi notification;
+  final GameCombatEndOverlay? endOverlay;
 
   const GameCombatActive({
     required this.isCombatPlayerTurn,
@@ -41,6 +56,7 @@ class GameCombatActive extends GameCombatUiState {
     required this.enemyInfo,
     required this.combatResults,
     required this.notification,
+    this.endOverlay,
   });
 }
 

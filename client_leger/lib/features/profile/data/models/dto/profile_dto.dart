@@ -5,6 +5,8 @@ part 'profile_dto.g.dart';
 @JsonSerializable()
 class ProfileDto {
   final String id;
+  @JsonKey(includeIfNull: false)
+  final String? firebaseUid;
   final String username;
   final String email;
   final String avatarId;
@@ -19,6 +21,7 @@ class ProfileDto {
 
   const ProfileDto({
     required this.id,
+    this.firebaseUid,
     required this.username,
     required this.email,
     required this.avatarId,

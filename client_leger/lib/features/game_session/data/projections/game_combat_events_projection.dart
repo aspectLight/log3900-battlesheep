@@ -13,7 +13,6 @@ class GameCombatEventsProjection implements EventProjection {
   final GameSessionEventBus _gameSessionEventBus;
   final String _socketId;
   final List<AttackResultEvent> _pendingAttackResults = [];
-  final List<FlightAttemptResultEvent> _pendingFlightAttemptResults = [];
 
   GameCombatEventsProjection({
     required GameCombatSocket combatSocket,
@@ -30,9 +29,6 @@ class GameCombatEventsProjection implements EventProjection {
     _combatSocket.combatTurnStartedStream
         .where(_isParticipant)
         .listen(_onCombatTurnStarted),
-    _combatSocket.combatTurnStartedStream.listen(
-      _onCombatStartedForNotification,
-    ),
     _combatSocket.attackResultStream.listen(_onAttackResult),
     _combatSocket.flightAttemptResultStream.listen(_onFlightAttemptResult),
     _combatSocket.endCombatStream.listen(_onEndCombat),
@@ -47,17 +43,6 @@ class GameCombatEventsProjection implements EventProjection {
       final pending = _pendingAttackResults.removeAt(0);
       _onAttackResult(pending);
     }
-    while (_pendingFlightAttemptResults.isNotEmpty) {
-      final pending = _pendingFlightAttemptResults.removeAt(0);
-      _combatRepository.applyFlightAttemptResult(pending);
-    }
-  }
-
-  void _onCombatStartedForNotification(CombatTurnStartedEvent event) {
-    if (_isParticipant(event)) return;
-    _gameSessionEventBus.fire(
-      CombatStarted(attackerId: event.attackerId, defenderId: event.defenderId),
-    );
   }
 
   bool _isParticipant(CombatTurnStartedEvent event) {
@@ -83,44 +68,62 @@ class GameCombatEventsProjection implements EventProjection {
 
   void _onFlightAttemptResult(FlightAttemptResultEvent event) {
     final currentState = _combatRepository.state.value;
-    if (currentState is! CombatActive) {
-      _pendingFlightAttemptResults.add(event);
+    // Combat already finished (server sends endCombat to the game room); ignore stale flight packets.
+    if (currentState is CombatIdle || currentState is CombatResolved) {
       return;
     }
+    if (currentState is! CombatActive) {
+      return;
+    }
+    // Angular combat.service: handleFlightResult / showFlightResult only run when
+    // isCombatPlayerTurn — i.e. only the acting player's client updates flightAttemptsLeft and
+    // flight toasts. Server emits flightAttemptResult for whoever is currentPlayerId.
+    if (currentState.currentPlayerIdRaw != _socketId) {
+      return;
+    }
+    if (event.isSuccess) {
+      _combatRepository.armSuppressUpdateScoreAfterFlightEnd(_socketId);
+    }
     _combatRepository.applyFlightAttemptResult(event);
-    if (!event.isSuccess) return;
-    _finalizeCombatOnSuccessfulFlight(currentState);
-  }
-
-  void _finalizeCombatOnSuccessfulFlight(CombatActive combatState) {
-    final fleeingPlayerId = combatState.currentPlayerIdRaw;
-    final opponentPlayerId = combatState.currentOpponentIdRaw;
-    _onEndCombat(
-      EndCombatResultEvent(
-        winnerId: fleeingPlayerId,
-        loserId: opponentPlayerId,
-        isByFlight: true,
-      ),
-    );
   }
 
   void _onEndCombat(EndCombatResultEvent event) {
+    // Mirrors Angular action-socket.service EndCombat handler.
     final trackedLocally = _combatRepository.state.value is! CombatIdle;
-    final localPlayerWasParticipant =
+    final isInvolved =
         event.winnerId == _socketId || event.loserId == _socketId;
+
+    if (event.isByFlight) {
+      // Server can wrongly emit updateScore for the fleeing player; GamePlayerEventsProjection drops it.
+      _combatRepository.armSuppressUpdateScoreAfterFlightEnd(event.winnerId);
+      if (isInvolved) {
+        if (trackedLocally) {
+          _combatRepository.applyEndCombat(event);
+        }
+        _gameSessionEventBus.fire(
+          GameCombatEnded(
+            winnerId: event.winnerId,
+            loserId: event.loserId,
+            isByFlight: true,
+          ),
+        );
+      }
+      _pendingAttackResults.clear();
+      return;
+    }
+
     if (trackedLocally) {
       _combatRepository.applyEndCombat(event);
     }
-    if (trackedLocally || !localPlayerWasParticipant) {
+    if (isInvolved) {
       _gameSessionEventBus.fire(
         GameCombatEnded(
           winnerId: event.winnerId,
           loserId: event.loserId,
-          isByFlight: event.isByFlight,
+          isByFlight: false,
         ),
       );
     }
     _pendingAttackResults.clear();
-    _pendingFlightAttemptResults.clear();
   }
 }

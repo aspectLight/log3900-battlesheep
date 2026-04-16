@@ -32,6 +32,7 @@
   "waitingRoomRoomNotFound": "Partie introuvable",
   "waitingRoomRoomLocked": "Partie verrouillée",
   "waitingRoomCharacterAlreadyReserved": "Personnage déjà réservé",
+  "waitingRoomPlayerAlreadyInRoom": "Ce joueur est déjà dans la salle",
   "waitingRoomPlayerKicked": "Vous avez été expulsé",
   "waitingRoomMaxPlayerLimitReached": "Nombre maximum de joueurs atteint",
   "waitingRoomStartGameFailed": "Impossible de lancer la partie",

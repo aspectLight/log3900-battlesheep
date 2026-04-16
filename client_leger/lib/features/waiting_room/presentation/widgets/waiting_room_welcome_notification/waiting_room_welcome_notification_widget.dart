@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/appearance/app_feature_colors.dart';
 import '../../../../../core/notification/notification_intent.dart';
 import '../../../core/localisation/waiting_room_localizations.dart';
 
@@ -40,8 +41,8 @@ class WaitingRoomWelcomeNotificationWidget extends StatelessWidget {
                 Text(
                   l10n.waitingRoomWelcomeMessage,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Color(0xFF550000),
+                  style: TextStyle(
+                    color: context.featureColors.bgButton,
                     fontWeight: FontWeight.w600,
                     fontSize: 20,
                     letterSpacing: 0.5,
@@ -68,8 +69,9 @@ class _WelcomeActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final f = context.featureColors;
     return Material(
-      color: const Color(0xFF550000),
+      color: f.bgButton,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onTap,
@@ -78,19 +80,19 @@ class _WelcomeActionButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFF7F1F1F)),
-            boxShadow: const [
+            border: Border.all(color: f.borderButton),
+            boxShadow: [
               BoxShadow(
-                color: Color(0x33550000),
+                color: f.shadowAccent,
                 blurRadius: 6,
-                offset: Offset(0, 4),
+                offset: const Offset(0, 4),
               ),
             ],
           ),
           child: Text(
             label,
-            style: const TextStyle(
-              color: Color(0xFFFFF0F0),
+            style: TextStyle(
+              color: f.textSpecialAlt,
               fontWeight: FontWeight.w500,
               fontSize: 15,
               letterSpacing: 0.5,
