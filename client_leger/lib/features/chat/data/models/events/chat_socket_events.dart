@@ -10,4 +10,6 @@ abstract class GeneralChatEvents {
       'getGeneralChatMessagesResponse';
   static const String generalChatMessage = 'generalChatMessage';
   static const String generalChatEmoji = 'generalChatEmoji';
+
+  static const String avatarUpdated = 'avatarUpdated';
 }

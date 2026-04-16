@@ -60,7 +60,8 @@ class GameCombatStateReducer {
         currentPlayerId: active.currentPlayerIdRaw,
         currentOpponentId: active.currentOpponentIdRaw,
         combatCountdown: active.combatCountdown,
-        flightAttemptsLeft: active.flightAttemptsLeft,
+        // Angular action-socket: on endCombat + isByFlight, flightAttemptsLeft = 2 before reset.
+        flightAttemptsLeft: event.isByFlight ? 2 : active.flightAttemptsLeft,
         winnerId: event.winnerId,
         loserId: event.loserId,
         isByFlight: event.isByFlight,
@@ -72,7 +73,7 @@ class GameCombatStateReducer {
         currentPlayerId: withResult.currentPlayerIdRaw,
         currentOpponentId: withResult.currentOpponentIdRaw,
         combatCountdown: withResult.combatCountdown,
-        flightAttemptsLeft: withResult.flightAttemptsLeft,
+        flightAttemptsLeft: event.isByFlight ? 2 : withResult.flightAttemptsLeft,
         winnerId: event.winnerId,
         loserId: event.loserId,
         isByFlight: event.isByFlight,

@@ -53,6 +53,17 @@ String _parseSingleStringSocketEvent(dynamic data, {required String mapKey}) {
   return id;
 }
 
+String _winnerIdFromUpdateScoreListElement(Object? v) {
+  if (v is Map) {
+    return _parseSingleStringSocketEvent(v, mapKey: 'winnerId');
+  }
+  final id = (v?.toString() ?? '').trim();
+  if (id.isEmpty) {
+    throw FormatException('Missing winnerId in updateScore list payload', v);
+  }
+  return id;
+}
+
 @JsonSerializable()
 class ToggleDoorCommandDto {
   final String roomId;
@@ -119,6 +130,9 @@ class SpawnedPlayerDto {
   factory SpawnedPlayerDto.fromJson(Map<String, dynamic> json) =>
       _$SpawnedPlayerDtoFromJson(json);
 
+  static String _spawnedPlayerId(Object? raw) =>
+      raw == null ? '' : raw.toString().trim();
+
   factory SpawnedPlayerDto.fromPlayerSpawnedPayload(Map<String, dynamic> map) {
     const avatarConverter = AvatarToCharacterTypeConverter();
     const colorConverter = BoardCharacterColorConverter();
@@ -136,22 +150,29 @@ class SpawnedPlayerDto {
         : null;
     final invRaw = map['inventory'] as List<Object?>? ?? [];
     final inventory = invRaw
-        .whereType<Map<String, dynamic>>()
-        .map(GameItemDto.fromJson)
+        .whereType<Map>()
+        .map((e) => GameItemDto.fromJson(Map<String, dynamic>.from(e)))
         .toList();
-    final statsRaw = map['stats'] as Map<String, dynamic>? ?? {};
+    final statsSource = map['stats'];
+    final statsRaw = statsSource is Map
+        ? Map<String, dynamic>.from(statsSource)
+        : <String, dynamic>{};
     final stats = <StatType, int>{};
     for (final type in StatType.values) {
       final obj = statsRaw[type.name];
-      if (obj is Map<String, dynamic>) {
-        final v = obj['value'];
+      if (obj is Map) {
+        final om = Map<String, dynamic>.from(obj);
+        final v = om['value'];
         stats[type] = v is int ? v : (v is num ? v.toInt() : 0);
       } else {
         stats[type] = 0;
       }
     }
     final int speed = stats[StatType.speed] ?? 0;
-    final avatarMap = map['avatar'] as Map<String, dynamic>?;
+    final avatarRaw = map['avatar'];
+    final Map<String, dynamic>? avatarMap = avatarRaw is Map
+        ? Map<String, dynamic>.from(avatarRaw)
+        : null;
     final characterType = avatarMap != null && avatarMap.isNotEmpty
         ? avatarConverter.fromJson(avatarMap)
         : BoardCharacterType.values.first;
@@ -181,7 +202,7 @@ class SpawnedPlayerDto {
               ? actionPointsRaw.toInt()
               : GameRulesConstants.actionPointsPerTurn);
     return SpawnedPlayerDto(
-      id: map['id'] as String,
+      id: SpawnedPlayerDto._spawnedPlayerId(map['id']),
       name: map['name'] as String? ?? '',
       characterType: characterType,
       color: color,
@@ -199,11 +220,12 @@ class SpawnedPlayerDto {
   }
 
   static GameBoardPositionDto _readCoords(Object? value) {
-    if (value is! Map<String, dynamic>) {
+    if (value is! Map) {
       return const GameBoardPositionDto(x: 0, y: 0);
     }
-    final x = (value['x'] as num?)?.toInt() ?? 0;
-    final y = (value['y'] as num?)?.toInt() ?? 0;
+    final m = Map<String, dynamic>.from(value);
+    final x = (m['x'] as num?)?.toInt() ?? 0;
+    final y = (m['y'] as num?)?.toInt() ?? 0;
     return GameBoardPositionDto(x: x, y: y);
   }
 
@@ -309,15 +331,36 @@ class UpdateStartingCountdownDto {
 @JsonSerializable()
 class UpdateScoreDto {
   final String winnerId;
+  final int? fightsWon;
 
-  const UpdateScoreDto({required this.winnerId});
+  const UpdateScoreDto({required this.winnerId, this.fightsWon});
 
   factory UpdateScoreDto.fromJson(Map<String, dynamic> json) =>
       _$UpdateScoreDtoFromJson(json);
 
-  factory UpdateScoreDto.fromObject(dynamic data) => UpdateScoreDto(
-    winnerId: _parseSingleStringSocketEvent(data, mapKey: 'winnerId'),
-  );
+  factory UpdateScoreDto.fromObject(dynamic data) {
+    if (data is List) {
+      if (data.length == 1 && data.first is Map) {
+        return UpdateScoreDto.fromObject(data.first);
+      }
+      if (data.isNotEmpty) {
+        final winnerId = _winnerIdFromUpdateScoreListElement(data.first);
+        final fightsWon = data.length >= 2
+            ? tryParseSocketInt(data[1])
+            : null;
+        return UpdateScoreDto(winnerId: winnerId, fightsWon: fightsWon);
+      }
+    }
+    if (data is Map) {
+      final map = Map<String, dynamic>.from(data);
+      final winnerId = _parseSingleStringSocketEvent(map, mapKey: 'winnerId');
+      final fightsWon = tryParseSocketInt(map['fightsWon']);
+      return UpdateScoreDto(winnerId: winnerId, fightsWon: fightsWon);
+    }
+    return UpdateScoreDto(
+      winnerId: _parseSingleStringSocketEvent(data, mapKey: 'winnerId'),
+    );
+  }
 
   Map<String, dynamic> toJson() => _$UpdateScoreDtoToJson(this);
 }

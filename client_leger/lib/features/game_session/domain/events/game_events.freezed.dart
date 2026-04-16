@@ -1669,6 +1669,9 @@ abstract class _CurrentPlayerChangedEvent implements CurrentPlayerChangedEvent {
 mixin _$UpdateScoreEvent {
   String get winnerId => throw _privateConstructorUsedError;
 
+  /// When set (server sends this), replaces the winner's win count (Angular parity).
+  int? get fightsWon => throw _privateConstructorUsedError;
+
   /// Create a copy of UpdateScoreEvent
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1683,7 +1686,7 @@ abstract class $UpdateScoreEventCopyWith<$Res> {
     $Res Function(UpdateScoreEvent) then,
   ) = _$UpdateScoreEventCopyWithImpl<$Res, UpdateScoreEvent>;
   @useResult
-  $Res call({String winnerId});
+  $Res call({String winnerId, int? fightsWon});
 }
 
 /// @nodoc
@@ -1700,13 +1703,17 @@ class _$UpdateScoreEventCopyWithImpl<$Res, $Val extends UpdateScoreEvent>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? winnerId = null}) {
+  $Res call({Object? winnerId = null, Object? fightsWon = freezed}) {
     return _then(
       _value.copyWith(
             winnerId: null == winnerId
                 ? _value.winnerId
                 : winnerId // ignore: cast_nullable_to_non_nullable
                       as String,
+            fightsWon: freezed == fightsWon
+                ? _value.fightsWon
+                : fightsWon // ignore: cast_nullable_to_non_nullable
+                      as int?,
           )
           as $Val,
     );
@@ -1722,7 +1729,7 @@ abstract class _$$UpdateScoreEventImplCopyWith<$Res>
   ) = __$$UpdateScoreEventImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String winnerId});
+  $Res call({String winnerId, int? fightsWon});
 }
 
 /// @nodoc
@@ -1738,13 +1745,17 @@ class __$$UpdateScoreEventImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? winnerId = null}) {
+  $Res call({Object? winnerId = null, Object? fightsWon = freezed}) {
     return _then(
       _$UpdateScoreEventImpl(
         winnerId: null == winnerId
             ? _value.winnerId
             : winnerId // ignore: cast_nullable_to_non_nullable
                   as String,
+        fightsWon: freezed == fightsWon
+            ? _value.fightsWon
+            : fightsWon // ignore: cast_nullable_to_non_nullable
+                  as int?,
       ),
     );
   }
@@ -1753,14 +1764,18 @@ class __$$UpdateScoreEventImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$UpdateScoreEventImpl implements _UpdateScoreEvent {
-  const _$UpdateScoreEventImpl({required this.winnerId});
+  const _$UpdateScoreEventImpl({required this.winnerId, this.fightsWon});
 
   @override
   final String winnerId;
 
+  /// When set (server sends this), replaces the winner's win count (Angular parity).
+  @override
+  final int? fightsWon;
+
   @override
   String toString() {
-    return 'UpdateScoreEvent(winnerId: $winnerId)';
+    return 'UpdateScoreEvent(winnerId: $winnerId, fightsWon: $fightsWon)';
   }
 
   @override
@@ -1769,11 +1784,13 @@ class _$UpdateScoreEventImpl implements _UpdateScoreEvent {
         (other.runtimeType == runtimeType &&
             other is _$UpdateScoreEventImpl &&
             (identical(other.winnerId, winnerId) ||
-                other.winnerId == winnerId));
+                other.winnerId == winnerId) &&
+            (identical(other.fightsWon, fightsWon) ||
+                other.fightsWon == fightsWon));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, winnerId);
+  int get hashCode => Object.hash(runtimeType, winnerId, fightsWon);
 
   /// Create a copy of UpdateScoreEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -1788,11 +1805,17 @@ class _$UpdateScoreEventImpl implements _UpdateScoreEvent {
 }
 
 abstract class _UpdateScoreEvent implements UpdateScoreEvent {
-  const factory _UpdateScoreEvent({required final String winnerId}) =
-      _$UpdateScoreEventImpl;
+  const factory _UpdateScoreEvent({
+    required final String winnerId,
+    final int? fightsWon,
+  }) = _$UpdateScoreEventImpl;
 
   @override
   String get winnerId;
+
+  /// When set (server sends this), replaces the winner's win count (Angular parity).
+  @override
+  int? get fightsWon;
 
   /// Create a copy of UpdateScoreEvent
   /// with the given fields replaced by the non-null parameter values.

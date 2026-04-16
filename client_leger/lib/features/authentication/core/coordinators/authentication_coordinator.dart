@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:get_it/get_it.dart';
 
 import '../../../../core/app_transition/app_transition_bus.dart';
+import '../../../../core/chat/chat_avatar_registry.dart';
 import '../../../../core/chat/chat_outgoing_avatars.dart';
 import '../../../../core/connected_scope/connected_session.dart';
 import '../../../../core/connected_scope/session_scope_manager.dart';
@@ -47,6 +48,11 @@ class AuthenticationCoordinator
           avatarId: user.avatarId,
           avatarRelativeUrl: user.avatarUrl,
         );
+        getIt<ChatAvatarRegistry>().setLocal(
+          user.username,
+          avatarId: user.avatarId,
+          avatarRelativeUrl: user.avatarUrl,
+        );
         _authData = AuthData(username: user.username, socketId: '');
         appNavigator.request(GoToMainMenu());
         // Always tear down any previous session scope so a new login never reuses
@@ -87,6 +93,7 @@ class AuthenticationCoordinator
   Future<void> onExit(AuthExitAppEvent event) async {
     await authRepository.signOut(const auth_commands.SignOutCommand()).run();
     getIt<ChatOutgoingAvatars>().clear();
+    getIt<ChatAvatarRegistry>().clear();
     final scope = sessionScopeManager.currentScope;
     if (scope != null && scope.isRegistered<ShopRepository>()) {
       scope.get<ShopRepository>().resetToInitial();

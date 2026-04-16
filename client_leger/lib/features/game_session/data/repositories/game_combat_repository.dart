@@ -12,6 +12,10 @@ class GameCombatRepository {
 
   final Signal<GameCombatState> state = signal(const GameCombatState.initial());
 
+  /// Server may emit a spurious updateScore after combat ends by flight (flee-er id as winnerId).
+  /// Arm when we process endCombat with isByFlight; consume one matching updateScore on the client.
+  String? _suppressNextUpdateScoreWinnerId;
+
   GameCombatRepository({
     required GameCombatSocket combatSocket,
     required GameCombatStateReducer reducer,
@@ -34,7 +38,20 @@ class GameCombatRepository {
     _combatSocket.startVirtualCombat(command);
   }
 
+  void armSuppressUpdateScoreAfterFlightEnd(String fleeingPlayerId) {
+    _suppressNextUpdateScoreWinnerId = fleeingPlayerId;
+  }
+
+  /// Returns true if this updateScore winner should not be applied (spurious post-flight score).
+  bool consumeSuppressUpdateScoreIfMatches(String updateScoreWinnerId) {
+    final id = _suppressNextUpdateScoreWinnerId;
+    if (id == null || id != updateScoreWinnerId) return false;
+    _suppressNextUpdateScoreWinnerId = null;
+    return true;
+  }
+
   void applyCombatTurnStarted(CombatTurnStartedEvent event) {
+    _suppressNextUpdateScoreWinnerId = null;
     state.value = _reducer.reduce(state.value, event);
   }
 

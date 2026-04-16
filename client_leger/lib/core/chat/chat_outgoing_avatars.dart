@@ -25,10 +25,8 @@ class ChatOutgoingAvatars {
     _avatarUrlForSocket = null;
   }
 
+  /// Same as Angular: `${environment.serverUrl}${profile.avatarUrl}`.
   String? _resolveRelative(String? relative) {
-    final t = relative?.trim() ?? '';
-    if (t.isEmpty) return null;
-    final full = EnvConfig.resolveAvatarUrl(t);
-    return full.isEmpty ? null : full;
+    return EnvConfig.absoluteProfileAvatarUrlForChatSocket(relative);
   }
 }

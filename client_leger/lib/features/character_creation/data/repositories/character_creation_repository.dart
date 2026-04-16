@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
@@ -6,10 +8,8 @@ import '../../core/exceptions/reserve_character_failure.dart';
 import '../../domain/commands/create_character_commands.dart';
 import '../../domain/commands/get_reserved_characters_command.dart';
 import '../../domain/commands/reserve_character_command.dart';
-import '../../domain/result/drop_in_join_result.dart';
-import 'dart:async';
-
 import '../../domain/events/character_creation_events.dart';
+import '../../domain/result/drop_in_join_result.dart';
 import '../../domain/state/character_creation_state.dart';
 import '../services/character_creation_socket.dart';
 

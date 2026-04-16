@@ -16,6 +16,7 @@ import '../../data/projections/game_turn_events_projection.dart';
 import '../../data/side_effects/game_debug_shake_side_effect.dart';
 import '../../data/side_effects/game_finish_notification_side_effect.dart';
 import '../../data/side_effects/game_session_play_game_side_effect.dart';
+import '../../data/side_effects/player_spawn_catchup_side_effect.dart';
 import '../../data/side_effects/game_item_dropped_disconnected_side_effect.dart';
 import '../../data/side_effects/game_movement_side_effect.dart';
 import '../../data/side_effects/game_pending_item_pickup_side_effect.dart';
@@ -55,6 +56,13 @@ class _GameSessionScopeBootstrapped {
 
 void registerGameSessionRoot(GetIt getIt) {
   getIt.registerLazySingleton<DropInJoinSyncHolder>(DropInJoinSyncHolder.new);
+  getIt.registerLazySingleton<PlayerSpawnCatchupSideEffect>(
+    () => PlayerSpawnCatchupSideEffect(
+      socketService: getIt(),
+      dropInJoinSyncHolder: getIt(),
+    ),
+  );
+  getIt<PlayerSpawnCatchupSideEffect>();
   getIt.registerLazySingleton<GameSessionScopeHolder>(
     GameSessionScopeHolder.new,
   );

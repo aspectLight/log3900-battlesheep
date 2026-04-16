@@ -1,6 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../core/chat/chat_avatar_registry.dart';
 import '../../../../core/chat/chat_outgoing_avatars.dart';
 import '../../core/exceptions/profile_failure.dart';
 import '../../domain/commands/profile_commands.dart';
@@ -15,12 +16,15 @@ class ProfileRepository {
   ProfileRepository({
     required HttpProfileService httpProfileService,
     required ChatOutgoingAvatars chatOutgoingAvatars,
+    required ChatAvatarRegistry chatAvatarRegistry,
   }) : _httpProfileService = httpProfileService,
        _chatOutgoingAvatars = chatOutgoingAvatars,
+       _chatAvatarRegistry = chatAvatarRegistry,
        state = signal<ProfileState>(const ProfileState.idle());
 
   final HttpProfileService _httpProfileService;
   final ChatOutgoingAvatars _chatOutgoingAvatars;
+  final ChatAvatarRegistry _chatAvatarRegistry;
 
   final Signal<ProfileState> state;
 
@@ -64,6 +68,11 @@ class ProfileRepository {
       (tuple) {
         final profile = tuple.$1;
         _chatOutgoingAvatars.setFromAvatarFields(
+          avatarId: profile.avatarId,
+          avatarRelativeUrl: profile.avatarUrl,
+        );
+        _chatAvatarRegistry.setLocal(
+          profile.username,
           avatarId: profile.avatarId,
           avatarRelativeUrl: profile.avatarUrl,
         );
@@ -136,6 +145,11 @@ class ProfileRepository {
           avatarId: model.avatarId,
           avatarRelativeUrl: model.avatarUrl,
         );
+        _chatAvatarRegistry.setLocal(
+          model.username,
+          avatarId: model.avatarId,
+          avatarRelativeUrl: model.avatarUrl,
+        );
         return model;
       },
       (error, _) =>
@@ -178,6 +192,11 @@ class ProfileRepository {
           );
         }
         _chatOutgoingAvatars.setFromAvatarFields(
+          avatarId: model.avatarId,
+          avatarRelativeUrl: model.avatarUrl,
+        );
+        _chatAvatarRegistry.setLocal(
+          model.username,
           avatarId: model.avatarId,
           avatarRelativeUrl: model.avatarUrl,
         );

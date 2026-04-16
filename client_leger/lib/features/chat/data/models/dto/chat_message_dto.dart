@@ -33,20 +33,25 @@ class ChatMessageDto {
   }
 
   factory ChatMessageDto.fromSocketPayload(Object? data) {
-    if (data is Map<String, dynamic>) return ChatMessageDto.fromJson(data);
+    if (data is Map) {
+      return ChatMessageDto.fromJson(Map<String, dynamic>.from(data));
+    }
     return const ChatMessageDto(type: '', name: '', content: '', time: '');
   }
 
   static List<ChatMessageDto> listFromSocketPayload(Object? data) {
-    final Object? raw = switch (data) {
-      final List<dynamic> list => list,
-      final Map<String, dynamic> map => map['messages'],
-      _ => null,
-    };
+    final Object? raw;
+    if (data is List<dynamic>) {
+      raw = data;
+    } else if (data is Map) {
+      raw = data['messages'];
+    } else {
+      raw = null;
+    }
     if (raw is! List<dynamic>) return const <ChatMessageDto>[];
     return raw
-        .whereType<Map<String, dynamic>>()
-        .map(ChatMessageDto.fromJson)
+        .whereType<Map>()
+        .map((e) => ChatMessageDto.fromJson(Map<String, dynamic>.from(e)))
         .where(
           (m) =>
               m.type.isNotEmpty &&

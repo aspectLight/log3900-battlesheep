@@ -95,6 +95,10 @@ GameCombatActive _buildActive(
   );
 }
 
+/// End-of-combat UI. Server `endCombat` sends `(currentPlayerId, currentOpponentId, isByFlight)`;
+/// Angular names those `winnerId`/`loserId` but skips win/loss handling when `isByFlight` is true.
+/// Here, `!isByFlight` maps those ids to victory/defeat; when `isByFlight`, the first id is the
+/// fleeing player (who had the turn on the server).
 GameCombatEndOverlay _buildEndOverlay(
   CombatResolved resolved,
   GamePlayerState playerState,

@@ -2,16 +2,16 @@ import 'dart:async';
 
 import 'package:fpdart/fpdart.dart';
 
-import '../../../authentication/core/interfaces/auth_repository.dart';
+import '../../../../core/helpers/merge_profile_avatar_into_player_payload.dart';
+import '../../../../core/helpers/replay_latest_broadcast_controller.dart';
 import '../../../../core/services/socket_service.dart';
+import '../../../authentication/core/interfaces/auth_repository.dart';
 import '../../../game_session/core/context/drop_in_join_sync_holder.dart';
 import '../../../join_game_session/core/exceptions/join_game_session_failure.dart';
 import '../../core/exceptions/reserve_character_failure.dart';
-import '../../../../core/helpers/merge_profile_avatar_into_player_payload.dart';
-import '../../../../core/helpers/replay_latest_broadcast_controller.dart';
-import '../../domain/commands/get_reserved_characters_command.dart';
 import '../../core/helpers/reserve_character_failure_mapper.dart';
 import '../../domain/commands/create_character_commands.dart';
+import '../../domain/commands/get_reserved_characters_command.dart';
 import '../../domain/commands/reserve_character_command.dart';
 import '../../domain/events/character_creation_events.dart';
 import '../../domain/result/drop_in_join_result.dart';
@@ -270,7 +270,10 @@ class CharacterCreationSocket {
       }
       await mergeProfileAvatarFieldsFromAuth(_authRepository, host);
     }
-    _socketService.emit(CharacterCreationSocketEvents.createWaitingRoom, payload);
+    _socketService.emit(
+      CharacterCreationSocketEvents.createWaitingRoom,
+      payload,
+    );
   }
 
   void dispose() {
