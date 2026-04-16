@@ -525,7 +525,7 @@
       "clipboard_notice": "✓ Texte copié !",
       "victory": "Victoire",
       "defeat": "Défaite",
-      "text": "🎮 Résultat de partie : {{ result }} !\n💀 Morts : {{ deaths }}\n⚔️ Combats gagnés : {{ combatPct }}%\n🗺️ Carte parcourue : {{ tilePct }}%\n#LOG3900 #Jeux"
+      "text": "🎮 Résultat de partie : {{ result }} !\n💀 Morts : {{ deaths }}\n⚔️ Combats gagnés : {{ combatPct }}%\n🗺️ Cases visitées : {{ tilePct }}%\n#EasternSolace #Jeux"
     }
   },
   "player_card": {

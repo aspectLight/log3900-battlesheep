@@ -526,7 +526,7 @@
             "clipboard_notice": "✓ Text copied!",
             "victory": "Victory",
             "defeat": "Defeat",
-            "text": "🎮 Game result: {{ result }}!\n💀 Deaths: {{ deaths }}\n⚔️ Combats won: {{ combatPct }}%\n🗺️ Map explored: {{ tilePct }}%\n#LOG3900 #Gaming"
+            "text": "🎮 Game result: {{ result }}!\n💀 Deaths: {{ deaths }}\n⚔️ Combats won: {{ combatPct }}%\n🗺️ Tiles visited: {{ tilePct }}%\n#EasternSolace #Gaming"
         }
     },
     "player_card": {
