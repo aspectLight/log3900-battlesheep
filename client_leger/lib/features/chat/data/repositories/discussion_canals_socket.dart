@@ -1,7 +1,9 @@
 import 'dart:async';
 
-import '../../../../../core/chat/chat_outgoing_avatars.dart';
+import 'package:fpdart/fpdart.dart';
+
 import '../../../../../core/services/socket_service.dart';
+import '../../../authentication/core/interfaces/auth_repository.dart';
 import '../../core/constants/discussion_canals_events.dart';
 import '../models/channel_info.dart';
 import '../models/channel_message.dart';
@@ -16,10 +18,10 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   DiscussionCanalsSocket({
     required SocketService socketService,
     required String username,
-    required ChatOutgoingAvatars outgoingAvatars,
+    required AuthRepository authRepository,
   }) : _socketService = socketService,
        _username = username,
-       _outgoingAvatars = outgoingAvatars {
+       _authRepository = authRepository {
     if (socketService.isConnected) _setupListeners();
     _connectionSub = socketService.connectionStream.listen((connected) {
       if (connected) _setupListeners();
@@ -28,7 +30,7 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
 
   final SocketService _socketService;
   final String _username;
-  final ChatOutgoingAvatars _outgoingAvatars;
+  final AuthRepository _authRepository;
 
   final _channelsController = StreamController<List<ChannelInfo>>.broadcast();
   final _channelCreatedController = StreamController<String>.broadcast();
@@ -260,16 +262,40 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   );
 
   @override
-  void sendMessage(String channelId, String content) => _socketService.emit(
-    DiscussionCanalsSocketEvents.sendMessageToCustomChannel,
-    {
+  void sendMessage(String channelId, String content) {
+    unawaited(_sendMessageWithProfileAvatars(channelId, content));
+  }
+
+  Future<void> _sendMessageWithProfileAvatars(
+    String channelId,
+    String content,
+  ) async {
+    String? avatarId;
+    String? avatarUrl;
+    final userResult = await _authRepository.getCurrentUser().run();
+    if (userResult case Right(value: final opt)) {
+      opt.match(() {}, (user) {
+        avatarId = user.avatarId;
+        avatarUrl = user.avatarUrl;
+      });
+    }
+    final trimmedAvatarUrl = avatarUrl?.trim();
+    final payload = <String, dynamic>{
       'channelId': channelId,
       'username': _username,
       'message': content,
-      'avatarId': _outgoingAvatars.avatarId,
-      'avatarUrl': _outgoingAvatars.avatarUrlForSocket,
-    },
-  );
+    };
+    if (avatarId != null) {
+      payload['avatarId'] = avatarId;
+    }
+    if (trimmedAvatarUrl != null && trimmedAvatarUrl.isNotEmpty) {
+      payload['avatarUrl'] = trimmedAvatarUrl;
+    }
+    _socketService.emit(
+      DiscussionCanalsSocketEvents.sendMessageToCustomChannel,
+      payload,
+    );
+  }
 
   @override
   List<ChannelMessage> getMessages(String channelId) =>

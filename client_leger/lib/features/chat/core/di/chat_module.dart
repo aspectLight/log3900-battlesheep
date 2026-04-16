@@ -4,6 +4,7 @@ import '../../../../core/chat/chat_outgoing_avatars.dart';
 import '../../../../core/connected_scope/session_scope_manager.dart';
 import '../../../../core/di/scoped_projection_subscriptions.dart';
 import '../../../../core/services/socket_service.dart';
+import '../../../authentication/core/interfaces/auth_repository.dart';
 import '../../data/projections/chat_events_projection.dart';
 import '../../data/repositories/discussion_canals_repository.dart';
 import '../../data/repositories/discussion_canals_socket.dart';
@@ -23,8 +24,8 @@ void registerChatRoot(GetIt getIt) {
   getIt.registerLazySingleton<DiscussionCanalsRepository>(
     () => DiscussionCanalsSocket(
       socketService: getIt<SocketService>(),
-      username: getIt<SessionScopeManager>().currentSession!.username,
-      outgoingAvatars: getIt<ChatOutgoingAvatars>(),
+           username: getIt<SessionScopeManager>().currentSession!.username,
+      authRepository: getIt<AuthRepository>(),
     ),
   );
   registerChatReducer(getIt);

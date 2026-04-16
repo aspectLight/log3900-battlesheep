@@ -46,6 +46,8 @@ class AvatarPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AuthLocalizations.of(context)!;
+    final hasCustomAvatarSelected =
+        customAvatarPath != null && customAvatarPath!.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -116,7 +118,21 @@ class AvatarPicker extends StatelessWidget {
             height: 80,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: const Color(0xFF444444), width: 1.5),
+              border: Border.all(
+                color: hasCustomAvatarSelected
+                    ? const Color(0xFFC60D0D)
+                    : const Color(0xFF444444),
+                width: 2,
+              ),
+              boxShadow: hasCustomAvatarSelected
+                  ? const [
+                      BoxShadow(
+                        color: Color(0x66C60D0D),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                    ]
+                  : null,
             ),
             clipBehavior: Clip.antiAlias,
             child: Image.file(File(customAvatarPath!), fit: BoxFit.cover),

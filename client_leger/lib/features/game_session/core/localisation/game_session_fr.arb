@@ -84,6 +84,7 @@
   "itemAirStrikeDesc": "Permet d'attaquer à distance",
   "itemTorchName": "Torche",
   "itemTorchDesc": "Une torche enflammée qui améliore les capacités à la lumière",
+  "dropTorchButton": "Déposer",
   "itemRandomName": "Random",
   "itemRandomDesc": "Un item aléatoire qui sera révélé en pleine partie",
   "itemFlagName": "Flag",

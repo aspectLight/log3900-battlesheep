@@ -26,6 +26,8 @@ import '../../data/repositories/game_board_repository.dart';
 import '../../data/repositories/game_inventory_repository.dart';
 import '../../data/repositories/game_metadata_repository.dart';
 import '../../data/repositories/game_player_repository.dart';
+import '../../data/repositories/game_rewards_holder.dart';
+import '../../../../core/services/log_service.dart';
 import '../../data/repositories/game_turn_repository.dart';
 import '../../data/services/game_service.dart';
 import '../../domain/events/game_events.dart';
@@ -264,10 +266,13 @@ class GameSessionCoordinator
     notificationCoordinator.clearScopeEntries();
     switch (event) {
       case GameFinishedEvent(:final roomId, :final isCTF):
+        final capturedRewards = getIt<GameRewardsHolder>().captured;
+        LogService.d('[GameSessionCoord] onExitImpl: capturedRewards has ${capturedRewards.rewards.length} reward(s), entryFee=${capturedRewards.entryFee}, pool=${capturedRewards.pool}');
         appTransitionEventBus.fire(
           StatisticsEntryAppEvent.statisticsRequested(
             roomId: roomId,
             isCTF: isCTF,
+            capturedRewards: capturedRewards,
           ),
         );
       case LeaveGameSessionRequestedCommand():

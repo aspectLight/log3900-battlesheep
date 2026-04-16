@@ -14,6 +14,7 @@ ReserveCharacterCommandDto _$ReserveCharacterCommandDtoFromJson(
     json['chosenAvatar'] as String,
   ),
   playerId: json['playerId'] as String,
+  isVirtual: json['isVirtual'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$ReserveCharacterCommandDtoToJson(
@@ -24,4 +25,5 @@ Map<String, dynamic> _$ReserveCharacterCommandDtoToJson(
     instance.chosenCharacter,
   ),
   'playerId': instance.playerId,
+  'isVirtual': instance.isVirtual,
 };
