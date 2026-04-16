@@ -1,1 +1,0 @@
-enum DiceStatChoice { attack, defense }

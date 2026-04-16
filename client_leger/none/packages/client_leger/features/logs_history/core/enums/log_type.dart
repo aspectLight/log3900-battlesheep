@@ -1,1 +1,0 @@
-enum LogType { login, logout }

@@ -1,1 +1,0 @@
-enum SessionNotificationType { turnStarting, finishGame }

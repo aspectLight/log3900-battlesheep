@@ -1,1 +1,0 @@
-enum SessionEndReason { abandoned, canceled }

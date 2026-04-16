@@ -1,1 +1,0 @@
-enum TeamType { ussr, usa }
