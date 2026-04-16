@@ -11,6 +11,8 @@ SendMessagePayloadDto _$SendMessagePayloadDtoFromJson(
 ) => SendMessagePayloadDto(
   username: json['username'] as String,
   message: json['message'] as String,
+  avatarId: json['avatarId'] as String?,
+  avatarUrl: json['avatarUrl'] as String?,
 );
 
 Map<String, dynamic> _$SendMessagePayloadDtoToJson(
@@ -18,4 +20,6 @@ Map<String, dynamic> _$SendMessagePayloadDtoToJson(
 ) => <String, dynamic>{
   'username': instance.username,
   'message': instance.message,
+  if (instance.avatarId case final value?) 'avatarId': value,
+  if (instance.avatarUrl case final value?) 'avatarUrl': value,
 };

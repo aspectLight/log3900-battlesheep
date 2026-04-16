@@ -46,3 +46,6 @@ app.*.map.json
 
 # Generated code
 /lib/generated/
+
+# Tooling / analyzer mirror (duplicate tree; source is under lib/)
+none/

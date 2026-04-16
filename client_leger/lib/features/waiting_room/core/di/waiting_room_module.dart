@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 
 import '../../../../core/connected_scope/session_scope_manager.dart';
 import '../../../../core/services/socket_service.dart';
+import '../../../authentication/core/interfaces/auth_repository.dart';
 import '../../../../routing/app_navigator.dart';
 import '../../data/services/waiting_room_socket.dart';
 import '../context/waiting_room_entry_data.dart';
@@ -51,7 +52,10 @@ void registerWaitingRoomScope(
   required WaitingRoomEntryData entryData,
 }) {
   scope.registerSingleton<WaitingRoomSocket>(
-    WaitingRoomSocket(socketService: rootGetIt<SocketService>()),
+    WaitingRoomSocket(
+      socketService: rootGetIt<SocketService>(),
+      authRepository: rootGetIt<AuthRepository>(),
+    ),
     dispose: (socket) => socket.dispose(),
   );
   scope.registerLazySingleton<WaitingRoomEntryData>(() => entryData);
