@@ -11,6 +11,7 @@ import '../../../core/painters/game_player_cards_hud_card_painter.dart';
 import '../../ui_models/components/game_player_ui_card.dart';
 import 'game_player_cards_hud_view_model.dart';
 
+/// Other players list: one compact card per row, hex clip-path, scrolls vertically.
 class GamePlayerCardsHudWidget extends StatefulWidget {
   const GamePlayerCardsHudWidget({super.key});
 
@@ -33,51 +34,15 @@ class _GamePlayerCardsHudWidgetState extends State<GamePlayerCardsHudWidget> {
     final cards = _viewModel.cards.watch(context);
     if (cards.isEmpty) return const SizedBox.shrink();
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          // Distribute cards across the full available WIDTH,
-          // but keep a fixed vertical size for each card.
-          final maxWidth = constraints.maxWidth;
-
-          // Fixed card height (no vertical stretching).
-          const cardHeight = 270.0;
-
-          // Spread cards evenly across the width, leaving a small gap.
-          const gap = 12.0;
-          final totalGapWidth = cards.length > 1
-              ? gap * (cards.length - 1)
-              : 0.0;
-          final availableWidth = (maxWidth - totalGapWidth).clamp(
-            0.0,
-            maxWidth,
-          );
-          final cardWidth = cards.isNotEmpty
-              ? availableWidth / cards.length
-              : 0.0;
-
-          return Align(
-            alignment: Alignment.topCenter,
-            child: SizedBox(
-              height: cardHeight,
-              width: maxWidth,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  for (var i = 0; i < cards.length; i++)
-                    SizedBox(
-                      width: cardWidth,
-                      height: cardHeight,
-                      child: _PlayerCardsHudCard(
-                        card: cards[i],
-                        width: cardWidth,
-                        height: cardHeight,
-                      ),
-                    ),
-                ],
-              ),
-            ),
+    return Padding(
+      padding: const EdgeInsets.only(right: 4),
+      child: ListView.builder(
+        padding: EdgeInsets.zero,
+        itemCount: cards.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: EdgeInsets.only(bottom: index < cards.length - 1 ? 4 : 0),
+            child: _PlayerCardsHudCard(card: cards[index]),
           );
         },
       ),
@@ -87,14 +52,15 @@ class _GamePlayerCardsHudWidgetState extends State<GamePlayerCardsHudWidget> {
 
 class _PlayerCardsHudCard extends StatelessWidget {
   final GamePlayerUiCard card;
-  final double width;
-  final double height;
 
-  const _PlayerCardsHudCard({
-    required this.card,
-    required this.width,
-    required this.height,
-  });
+  const _PlayerCardsHudCard({required this.card});
+
+  /// Hex row height; avatar fills the inner bar vertically (frame + bar padding).
+  static const double _cardHeight = 68;
+  static const double _framePadV = 6;
+  static const double _barPadV = 2;
+  static const double _avatarExtent =
+      _cardHeight - 2 * _framePadV - 2 * _barPadV;
 
   @override
   Widget build(BuildContext context) {
@@ -109,255 +75,281 @@ class _PlayerCardsHudCard extends StatelessWidget {
       some: GameTeamConstants.backgroundAssetFor,
     );
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.ease,
-      transform: isActive
-          ? (Matrix4.diagonal3Values(1.05, 1.05, 1)
-              ..setTranslationRaw(0, 40, 0))
-          : Matrix4.identity(),
-      child: PhysicalShape(
+    Widget cardFace = SizedBox(
+      height: _cardHeight,
+      width: double.infinity,
+      child: ClipPath(
         clipper: GamePlayerCardsHudCardClipper(),
-        color: Colors.transparent,
-        elevation: isActive ? 20 : 5,
-        child: ClipPath(
-          clipper: GamePlayerCardsHudCardClipper(),
-          child: Container(
-            width: width,
-            height: height,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF660000), Color(0xFF990000)],
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF660000), Color(0xFF990000)],
+                ),
+                image: backgroundImage != null
+                    ? DecorationImage(
+                        image: AssetImage(backgroundImage),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
               ),
-              image: backgroundImage != null
-                  ? DecorationImage(
-                      image: AssetImage(backgroundImage),
-                      fit: BoxFit.cover,
-                      alignment: Alignment.topLeft,
-                    )
-                  : null,
             ),
-            child: Opacity(
-              opacity: isDisconnected ? 0.7 : 1.0,
-              child: Stack(
-                children: [
-                  Container(color: Colors.black.withValues(alpha: 0.5)),
-
-                  Positioned.fill(
-                    child: CustomPaint(
-                      painter: GamePlayerCardsHudCardPainter(
-                        team: card.team,
-                        isVirtual: isVirtual,
-                        isActive: isActive,
+            if (isVirtual) ...[
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 2,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF00BFFF),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF00BFFF).withValues(alpha: 0.6),
+                        blurRadius: 8,
                       ),
-                    ),
+                    ],
                   ),
-
-                  if (isActive)
-                    Positioned(
-                      top: 60,
-                      left: 0,
-                      right: 0,
-                      child: Center(
-                        child: Text(
-                          l10n.gamePlayersListPlaying,
-                          style: const TextStyle(
-                            color: Color(0xFFCCCCCC),
-                            fontSize: 12,
-                            fontFamily: 'CustomFont',
-                          ),
-                        ),
+                ),
+              ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: 2,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF00BFFF),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF00BFFF).withValues(alpha: 0.6),
+                        blurRadius: 8,
                       ),
-                    ),
-
-                  if (card.isHost)
-                    Positioned(
-                      top: 75,
-                      left: 0,
-                      right: 0,
-                      child: Center(
-                        child: Image.asset(UiAssets.hostBadge, width: 15),
-                      ),
-                    ),
-
-                  if (isVirtual)
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      height: 40,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF00BFFF),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(
-                                0xFF00BFFF,
-                              ).withValues(alpha: 0.6),
-                              blurRadius: 15,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          l10n.gamePlayersListVirtual,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontFamily: 'CustomFont',
-                            fontWeight: FontWeight.bold,
-                            shadows: [
-                              Shadow(
-                                color: Colors.black45,
-                                offset: Offset(1, 1),
-                                blurRadius: 2,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-
-                  Positioned(
-                    top: 92,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: Container(
-                        width: 15,
-                        height: 15,
-                        decoration: BoxDecoration(
-                          color: playerColor,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
+                    ],
                   ),
-
-                  if (card.hasFlag)
-                    Positioned(
-                      top: 73,
-                      left: width * 0.65 - 15,
-                      child: Image.asset(
-                        UiAssets.flagIcon,
-                        width: 30,
-                        height: 30,
-                        color: Colors.white,
-                        colorBlendMode: BlendMode.srcIn,
-                      ),
-                    ),
-
-                  Positioned(
-                    top: 110,
-                    left: 0,
-                    right: 0,
-                    child: Column(
+                ),
+              ),
+            ],
+            Positioned.fill(
+              child: CustomPaint(
+                painter: GamePlayerCardsHudCardPainter(
+                  team: card.team,
+                  isVirtual: isVirtual,
+                  isActive: isActive,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: _framePadV,
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.35),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: _barPadV,
+                ),
+                child: Row(
+                  children: [
+                    Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          card.name,
-                          style: TextStyle(
-                            color: isVirtual
-                                ? const Color(0xFF00BFFF)
-                                : Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'CustomFont',
-                            decoration: isDisconnected
-                                ? TextDecoration.lineThrough
-                                : TextDecoration.none,
-                            decorationColor: isDisconnected
-                                ? Colors.black
-                                : null,
-                            decorationThickness: isDisconnected ? 2.0 : null,
-                            shadows: const [
-                              Shadow(
-                                color: Colors.black87,
-                                offset: Offset(2, 2),
-                                blurRadius: 4,
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 4),
                         Container(
-                          width: 50,
-                          height: 2,
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.transparent,
-                                Color(0xFFFFD700),
-                                Colors.transparent,
-                              ],
-                              stops: [0.0, 0.5, 1.0],
+                          width: _avatarExtent,
+                          height: _avatarExtent,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2A2A2A),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
+                              color: const Color(0xFF2A2A2A),
                             ),
-                            boxShadow: [
+                            boxShadow: const [
                               BoxShadow(
                                 color: Colors.black54,
-                                offset: Offset(0, 1),
-                                blurRadius: 2,
+                                blurRadius: 5,
+                              ),
+                            ],
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              ColorFiltered(
+                                colorFilter: const ColorFilter.matrix([
+                                  2.5, 0, 0, 0, 0,
+                                  0, 2.5, 0, 0, 0,
+                                  0, 0, 2.5, 0, 0,
+                                  0, 0, 0, 1, 0,
+                                ]),
+                                child: Image.asset(
+                                  AvatarAssets.avatarPath(card.avatar),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(4),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      Colors.black.withValues(alpha: 0.35),
+                                      Colors.transparent,
+                                    ],
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-
-                  Positioned(
-                    top: 145,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: Container(
-                        width: 70,
-                        height: 70,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF333333),
-                          borderRadius: BorderRadius.circular(3),
-                          border: Border.all(color: const Color(0xFF333333)),
-                          boxShadow: const [
-                            BoxShadow(color: Colors.black54, blurRadius: 5),
-                          ],
-                          image: DecorationImage(
-                            image: AssetImage(
-                              AvatarAssets.avatarPath(card.avatar),
-                            ),
-                            fit: BoxFit.cover,
+                        const SizedBox(width: 6),
+                        Container(
+                          width: 17,
+                          height: 17,
+                          decoration: BoxDecoration(
+                            color: playerColor,
+                            shape: BoxShape.circle,
                           ),
                         ),
+                        if (card.hasFlag) ...[
+                          const SizedBox(width: 6),
+                          Image.asset(
+                            UiAssets.flagIcon,
+                            width: 24,
+                            height: 24,
+                            color: Colors.white,
+                            colorBlendMode: BlendMode.srcIn,
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  card.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: isVirtual
+                                        ? const Color(0xFF00BFFF)
+                                        : Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: 'CustomFont',
+                                    decoration: isDisconnected
+                                        ? TextDecoration.lineThrough
+                                        : TextDecoration.none,
+                                    decorationColor: Colors.black87,
+                                    decorationThickness: 2,
+                                    shadows: const [
+                                      Shadow(
+                                        color: Colors.black87,
+                                        offset: Offset(2, 2),
+                                        blurRadius: 4,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              if (isVirtual) ...[
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                    vertical: 1,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF00BFFF)
+                                        .withValues(alpha: 0.7),
+                                    borderRadius: BorderRadius.circular(5),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(0xFF00BFFF)
+                                            .withValues(alpha: 0.7),
+                                        blurRadius: 6,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Text(
+                                    l10n.gamePlayersListVirtual,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'CustomFont',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          const SizedBox(height: 3),
+                          Row(
+                            children: [
+                              if (isActive)
+                                Text(
+                                  l10n.gamePlayersListPlaying,
+                                  style: const TextStyle(
+                                    color: Color(0xFFC89B05),
+                                    fontSize: 11,
+                                    fontFamily: 'CustomFont',
+                                    height: 1.1,
+                                  ),
+                                ),
+                              if (isActive) const SizedBox(width: 6),
+                              Text(
+                                '${card.fightsWon}',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.85),
+                                  fontSize: 11,
+                                  fontFamily: 'CustomFont',
+                                  height: 1.1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  Positioned(
-                    top: 220,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: Text(
-                        '${card.fightsWon}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontFamily: 'CustomFont',
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(offset: Offset(0, 2), blurRadius: 4),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                    if (card.isHost)
+                      Image.asset(UiAssets.hostBadge, width: 24, height: 24),
+                  ],
+                ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
+
+    if (isDisconnected) {
+      cardFace = ColorFiltered(
+        colorFilter: const ColorFilter.matrix([
+          0.2126, 0.7152, 0.0722, 0, 0,
+          0.2126, 0.7152, 0.0722, 0, 0,
+          0.2126, 0.7152, 0.0722, 0, 0,
+          0, 0, 0, 0.85, 0,
+        ]),
+        child: cardFace,
+      );
+    }
+
+    return cardFace;
   }
 }

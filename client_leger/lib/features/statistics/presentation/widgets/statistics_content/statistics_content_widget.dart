@@ -1,6 +1,9 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_feature_colors.dart';
 import '../../../../../core/constants/character_assets.dart';
 import '../../../../../core/constants/ui_assets.dart';
 import '../../../../../core/enums/character.dart';
@@ -15,6 +18,9 @@ class StatisticsContentWidget extends StatelessWidget {
   const StatisticsContentWidget({super.key, required this.viewModel});
 
   final StatisticsContentViewModel viewModel;
+
+  /// Minimum width used when laying out the global summary row before scaling to fit.
+  static const double _globalStatsRowDesignWidth = 520;
 
   String _formatPercentage(int part, int total) {
     if (total <= 0 || part <= 0) return '0';
@@ -32,17 +38,18 @@ class StatisticsContentWidget extends StatelessWidget {
       final rewards = viewModel.rewardsRows.value;
       return LayoutBuilder(
         builder: (context, constraints) {
-          const horizontalPadding = 80.0;
+          const scrollPadding = 40.0;
           final rawWidth =
               constraints.maxWidth.isFinite && constraints.maxWidth > 0
               ? constraints.maxWidth
               : MediaQuery.sizeOf(context).width;
-          final contentWidth = (rawWidth - horizontalPadding).clamp(
+          // Only subtract scroll insets (40+40); do not shrink again or the table floats in empty space.
+          final contentWidth = (rawWidth - 2 * scrollPadding).clamp(
             200.0,
             double.infinity,
           );
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(40),
+            padding: const EdgeInsets.all(scrollPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -65,153 +72,147 @@ class StatisticsContentWidget extends StatelessWidget {
     BuildContext context,
     StatisticsLocalizations l10n,
     GameStatistics statistics,
-    double contentWidth,
+    double tableWidth,
   ) {
     final sortedPlayers = viewModel.sortedPlayerStats.value;
     final sortField = viewModel.sortField.value;
     final isAscending = viewModel.isAscending.value;
 
+    final f = context.featureColors;
+    final headerBg = f.panelElevated;
+    final dataBg = f.panel;
+    final borderColor = f.borderHairline;
+    final cellTextStyle = TextStyle(
+      color: Theme.of(context).colorScheme.onSurface,
+      fontFamily: 'CustomFont',
+      fontSize: 16,
+      fontWeight: FontWeight.w500,
+      letterSpacing: 1,
+    );
+
+    final headerDefs = <(String, PlayerStatsSortField)>[
+      (l10n.statisticsPlayerName, PlayerStatsSortField.name),
+      (l10n.statisticsCombats, PlayerStatsSortField.combats),
+      (l10n.statisticsEvasions, PlayerStatsSortField.evasions),
+      (l10n.statisticsVictories, PlayerStatsSortField.victories),
+      (l10n.statisticsDefeats, PlayerStatsSortField.defeats),
+      (l10n.statisticsHealthLost, PlayerStatsSortField.healthLost),
+      (l10n.statisticsDamage, PlayerStatsSortField.damage),
+      (l10n.statisticsItemsCollected, PlayerStatsSortField.itemsCollected),
+      (l10n.statisticsTilesVisited, PlayerStatsSortField.tilesVisited),
+    ];
+
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: const Color(0xFF2b2b2b),
-        border: Border.all(color: const Color(0xFF3a3a3a)),
+        color: dataBg,
+        border: Border.all(color: borderColor),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color(0x1A000000),
-            offset: Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.1),
+            offset: const Offset(0, 4),
             blurRadius: 6,
           ),
         ],
       ),
-      child: SizedBox(
-        width: contentWidth,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DataTable(
-              headingRowColor: WidgetStateProperty.all(const Color(0xFF3c3c3c)),
-              dataRowColor: WidgetStateProperty.resolveWith(
-                (states) => const Color(0xFF2b2b2b),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+        child: SizedBox(
+          width: tableWidth,
+          child: Table(
+            border: TableBorder.all(color: borderColor, width: 1),
+            columnWidths: {
+              for (var i = 0; i < headerDefs.length; i++)
+                i: FlexColumnWidth(i == 0 ? 1.2 : 1),
+            },
+            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+            children: [
+              TableRow(
+                decoration: BoxDecoration(color: headerBg),
+                children: [
+                  for (final pair in headerDefs)
+                    TableCell(
+                      child: _PlayerStatsSortableHeader(
+                        label: pair.$1,
+                        field: pair.$2,
+                        currentSort: sortField,
+                        isAscending: isAscending,
+                        onTap: () => viewModel.sortBy(pair.$2),
+                      ),
+                    ),
+                ],
               ),
-              columns: [
-                _buildSortableColumn(
-                  l10n.statisticsPlayerName,
-                  PlayerStatsSortField.name,
-                  sortField,
-                  isAscending,
-                ),
-                _buildSortableColumn(
-                  l10n.statisticsCombats,
-                  PlayerStatsSortField.combats,
-                  sortField,
-                  isAscending,
-                ),
-                _buildSortableColumn(
-                  l10n.statisticsEvasions,
-                  PlayerStatsSortField.evasions,
-                  sortField,
-                  isAscending,
-                ),
-                _buildSortableColumn(
-                  l10n.statisticsVictories,
-                  PlayerStatsSortField.victories,
-                  sortField,
-                  isAscending,
-                ),
-                _buildSortableColumn(
-                  l10n.statisticsDefeats,
-                  PlayerStatsSortField.defeats,
-                  sortField,
-                  isAscending,
-                ),
-                _buildSortableColumn(
-                  l10n.statisticsHealthLost,
-                  PlayerStatsSortField.healthLost,
-                  sortField,
-                  isAscending,
-                ),
-                _buildSortableColumn(
-                  l10n.statisticsDamage,
-                  PlayerStatsSortField.damage,
-                  sortField,
-                  isAscending,
-                ),
-                _buildSortableColumn(
-                  l10n.statisticsItemsCollected,
-                  PlayerStatsSortField.itemsCollected,
-                  sortField,
-                  isAscending,
-                ),
-                _buildSortableColumn(
-                  l10n.statisticsTilesVisited,
-                  PlayerStatsSortField.tilesVisited,
-                  sortField,
-                  isAscending,
-                ),
-              ],
-              rows: sortedPlayers.map((player) {
-                final tilePercentage = _formatPercentage(
-                  player.tilesVisited.length,
-                  statistics.walkableTiles,
-                );
-                const cellTextStyle = TextStyle(
-                  color: Color(0xFFFFFFFF),
-                  fontFamily: 'CustomFont',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 1,
-                );
-                return DataRow(
-                  cells: [
-                    DataCell(
-                      _wrapCell(Text(player.name, style: cellTextStyle)),
-                    ),
-                    DataCell(
-                      _wrapCell(
-                        Text('${player.combats}', style: cellTextStyle),
+              for (final player in sortedPlayers)
+                TableRow(
+                  children: [
+                    TableCell(
+                      child: _PlayerStatsDataCell(
+                        text: player.name,
+                        style: cellTextStyle,
+                        maxLines: 2,
                       ),
                     ),
-                    DataCell(
-                      _wrapCell(
-                        Text('${player.evasions}', style: cellTextStyle),
+                    TableCell(
+                      child: _PlayerStatsDataCell(
+                        text: '${player.combats}',
+                        style: cellTextStyle,
+                        maxLines: 1,
                       ),
                     ),
-                    DataCell(
-                      _wrapCell(
-                        Text('${player.victories}', style: cellTextStyle),
+                    TableCell(
+                      child: _PlayerStatsDataCell(
+                        text: '${player.evasions}',
+                        style: cellTextStyle,
+                        maxLines: 1,
                       ),
                     ),
-                    DataCell(
-                      _wrapCell(
-                        Text('${player.defeats}', style: cellTextStyle),
+                    TableCell(
+                      child: _PlayerStatsDataCell(
+                        text: '${player.victories}',
+                        style: cellTextStyle,
+                        maxLines: 1,
                       ),
                     ),
-                    DataCell(
-                      _wrapCell(
-                        Text('${player.healthLost}', style: cellTextStyle),
+                    TableCell(
+                      child: _PlayerStatsDataCell(
+                        text: '${player.defeats}',
+                        style: cellTextStyle,
+                        maxLines: 1,
                       ),
                     ),
-                    DataCell(
-                      _wrapCell(Text('${player.damage}', style: cellTextStyle)),
-                    ),
-                    DataCell(
-                      _wrapCell(
-                        Text(
-                          '${player.itemsCollected.length}',
-                          style: cellTextStyle,
-                        ),
+                    TableCell(
+                      child: _PlayerStatsDataCell(
+                        text: '${player.healthLost}',
+                        style: cellTextStyle,
+                        maxLines: 1,
                       ),
                     ),
-                    DataCell(
-                      _wrapCell(Text('$tilePercentage%', style: cellTextStyle)),
+                    TableCell(
+                      child: _PlayerStatsDataCell(
+                        text: '${player.damage}',
+                        style: cellTextStyle,
+                        maxLines: 1,
+                      ),
+                    ),
+                    TableCell(
+                      child: _PlayerStatsDataCell(
+                        text: '${player.itemsCollected.length}',
+                        style: cellTextStyle,
+                        maxLines: 1,
+                      ),
+                    ),
+                    TableCell(
+                      child: _PlayerStatsDataCell(
+                        text:
+                            '${_formatPercentage(player.tilesVisited.length, statistics.walkableTiles)}%',
+                        style: cellTextStyle,
+                        maxLines: 1,
+                      ),
                     ),
                   ],
-                );
-              }).toList(),
-            ),
-          ],
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -240,15 +241,16 @@ class StatisticsContentWidget extends StatelessWidget {
     final flagCount = playersWithFlag.length;
     final isCTF = viewModel.isCTF;
 
-    const headerStyle = TextStyle(
-      color: Color(0xFFe0d8c0),
+    final f = context.featureColors;
+    final headerStyle = TextStyle(
+      color: f.textSpecial,
       fontFamily: 'CustomFont',
       fontSize: 12,
       fontWeight: FontWeight.bold,
       letterSpacing: 1,
     );
-    const cellStyle = TextStyle(
-      color: Color(0xFFFFFFFF),
+    final cellStyle = TextStyle(
+      color: Theme.of(context).colorScheme.onSurface,
       fontFamily: 'CustomFont',
       fontSize: 16,
       fontWeight: FontWeight.w500,
@@ -273,13 +275,13 @@ class StatisticsContentWidget extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: const Color(0xFF2b2b2b),
-        border: Border.all(color: const Color(0xFF3a3a3a)),
+        color: f.panel,
+        border: Border.all(color: f.borderHairline),
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color(0x1A000000),
-            offset: Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.1),
+            offset: const Offset(0, 4),
             blurRadius: 6,
           ),
         ],
@@ -289,42 +291,70 @@ class StatisticsContentWidget extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(15),
-            color: const Color(0xFF3c3c3c),
-            child: Row(
-              children: List.generate(
-                columnCount,
-                (i) => Expanded(
-                  child: Center(
-                    child: Text(
-                      headerLabels[i].toUpperCase(),
-                      style: headerStyle,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          DecoratedBox(
-            decoration: const BoxDecoration(
-              color: Color(0xFF2b2b2b),
-              border: Border(top: BorderSide(color: Color(0xFF3a3a3a))),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(15),
-              child: Row(
-                children: List.generate(
-                  columnCount,
-                  (i) => Expanded(
-                    child: Center(
-                      child: Text(
-                        values[i],
-                        style: cellStyle,
-                        textAlign: TextAlign.center,
+            color: f.panelElevated,
+            child: LayoutBuilder(
+              builder: (context, c) {
+                return FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    width: math.max(c.maxWidth, _globalStatsRowDesignWidth),
+                    child: Row(
+                      children: List.generate(
+                        columnCount,
+                        (i) => Expanded(
+                          child: Center(
+                            child: Text(
+                              headerLabels[i].toUpperCase(),
+                              style: headerStyle,
+                              textAlign: TextAlign.center,
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: true,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
+                );
+              },
+            ),
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: f.panel,
+              border: Border(top: BorderSide(color: f.borderHairline)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(15),
+              child: LayoutBuilder(
+                builder: (context, c) {
+                  return FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.center,
+                    child: SizedBox(
+                      width: math.max(c.maxWidth, _globalStatsRowDesignWidth),
+                      child: Row(
+                        children: List.generate(
+                          columnCount,
+                          (i) => Expanded(
+                            child: Center(
+                              child: Text(
+                                values[i],
+                                style: cellStyle,
+                                textAlign: TextAlign.center,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                softWrap: true,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -333,153 +363,62 @@ class StatisticsContentWidget extends StatelessWidget {
     );
   }
 
-  Widget _wrapCell(Widget child) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final w = constraints.maxWidth.isFinite && constraints.maxWidth > 0
-            ? constraints.maxWidth
-            : 80.0;
-        return SizedBox(width: w, child: child);
-      },
-    );
-  }
-
-  DataColumn _buildSortableColumn(
-    String label,
-    PlayerStatsSortField field,
-    PlayerStatsSortField currentSort,
-    bool isAscending,
-  ) {
-    return DataColumn(
-      columnWidth: const FlexColumnWidth(),
-      label: LayoutBuilder(
-        builder: (context, constraints) {
-          final w = constraints.maxWidth.isFinite && constraints.maxWidth > 0
-              ? constraints.maxWidth
-              : 120.0;
-          return SizedBox(
-            width: w,
-            child: Text(
-              label.toUpperCase(),
-              style: const TextStyle(
-                color: Color(0xFFe0d8c0),
-                fontFamily: 'CustomFont',
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1,
-              ),
-              softWrap: true,
-            ),
-          );
-        },
-      ),
-      onSort: (columnIndex, ascending) {
-        viewModel.sortBy(field);
-      },
-    );
-  }
-
+  /// Matches Angular `end-game.component` `.rewards-section` / `.reward-entry`.
   Widget _buildRewardsSection(
     BuildContext context,
     StatisticsLocalizations l10n,
     List<PlayerRewardInfo> rewards,
   ) {
+    final f = context.featureColors;
+    final goldBorder = f.goldAccent;
     return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 440),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: const Color(0xFF2b2b2b),
-            border: Border.all(color: const Color(0xFF3a3a3a)),
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x1A000000),
-                offset: Offset(0, 4),
-                blurRadius: 6,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 20),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [f.panel, f.panelInset],
               ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-                child: Text(
-                  l10n.statisticsRewardsTitle,
-                  style: const TextStyle(
-                    color: Color(0xFFe0d8c0),
+              border: Border.all(color: goldBorder, width: 2),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: goldBorder.withValues(alpha: 0.15),
+                  blurRadius: 20,
+                  spreadRadius: 0,
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  l10n.statisticsRewardsTitle.toUpperCase(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: goldBorder,
                     fontFamily: 'CustomFont',
-                    fontSize: 20,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
+                    letterSpacing: 2,
                   ),
                 ),
-              ),
-              ...List.generate(rewards.length, (index) {
-                final reward = rewards[index];
-                final avatarPath = _avatarPathFor(reward.avatarName);
-                return Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      top: BorderSide(
-                        color: index == 0
-                            ? const Color(0xFF3a3a3a)
-                            : const Color(0xFF2b2b2b),
-                      ),
-                    ),
+                const SizedBox(height: 16),
+                for (var i = 0; i < rewards.length; i++) ...[
+                  if (i > 0) const SizedBox(height: 10),
+                  _StatisticsRewardEntry(
+                    reward: rewards[i],
+                    avatarPath: _avatarPathFor(rewards[i].avatarName),
                   ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
-                  ),
-                  child: Row(
-                    children: [
-                      if (avatarPath != null) ...[
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(999),
-                          child: Image.asset(
-                            avatarPath,
-                            width: 30,
-                            height: 30,
-                            fit: BoxFit.cover,
-                            filterQuality: FilterQuality.none,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                      ],
-                      Expanded(
-                        child: Text(
-                          reward.playerName,
-                          style: const TextStyle(
-                            color: Color(0xFFFFFFFF),
-                            fontFamily: 'CustomFont',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        '+${reward.coinsEarned}',
-                        style: const TextStyle(
-                          color: Color(0xFFF6D365),
-                          fontFamily: 'CustomFont',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Image.asset(
-                        UiAssets.goldCoin,
-                        width: 14,
-                        height: 14,
-                        filterQuality: FilterQuality.none,
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            ],
+                ],
+              ],
+            ),
           ),
         ),
       ),
@@ -490,5 +429,205 @@ class StatisticsContentWidget extends StatelessWidget {
     if (avatarName.isEmpty) return null;
     final character = Character.fromAvatarName(avatarName);
     return CharacterAssets.characterAvatarPath(character);
+  }
+}
+
+class _PlayerStatsSortableHeader extends StatelessWidget {
+  const _PlayerStatsSortableHeader({
+    required this.label,
+    required this.field,
+    required this.currentSort,
+    required this.isAscending,
+    required this.onTap,
+  });
+
+  final String label;
+  final PlayerStatsSortField field;
+  final PlayerStatsSortField currentSort;
+  final bool isAscending;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final headerStyle = TextStyle(
+      color: context.featureColors.textSpecial,
+      fontFamily: 'CustomFont',
+      fontSize: 12,
+      fontWeight: FontWeight.bold,
+      letterSpacing: 1,
+    );
+    final active = currentSort == field;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: LayoutBuilder(
+          builder: (context, c) {
+            final maxW = c.maxWidth.isFinite && c.maxWidth > 0
+                ? c.maxWidth
+                : 120.0;
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: maxW,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        label.toUpperCase(),
+                        style: headerStyle,
+                        textAlign: TextAlign.center,
+                        maxLines: 4,
+                        softWrap: true,
+                      ),
+                      if (active)
+                        Text(
+                          isAscending ? '\u25B2' : '\u25BC',
+                          style: headerStyle.copyWith(fontSize: 10),
+                          textAlign: TextAlign.center,
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _PlayerStatsDataCell extends StatelessWidget {
+  const _PlayerStatsDataCell({
+    required this.text,
+    required this.style,
+    required this.maxLines,
+  });
+
+  final String text;
+  final TextStyle style;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+      child: Center(
+        child: Text(
+          text,
+          style: style,
+          maxLines: maxLines,
+          softWrap: true,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+}
+
+/// One row in the rewards list; mirrors Angular `.reward-entry` hover/background.
+class _StatisticsRewardEntry extends StatefulWidget {
+  const _StatisticsRewardEntry({
+    required this.reward,
+    required this.avatarPath,
+  });
+
+  final PlayerRewardInfo reward;
+  final String? avatarPath;
+
+  @override
+  State<_StatisticsRewardEntry> createState() => _StatisticsRewardEntryState();
+}
+
+class _StatisticsRewardEntryState extends State<_StatisticsRewardEntry> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final reward = widget.reward;
+    final avatarPath = widget.avatarPath;
+    final f = context.featureColors;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.ease,
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: _hover ? 0.1 : 0.05),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  if (avatarPath != null) ...[
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: f.goldAccent),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: Image.asset(
+                        avatarPath,
+                        fit: BoxFit.cover,
+                        filterQuality: FilterQuality.medium,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                  ],
+                  Expanded(
+                    child: Text(
+                      reward.playerName,
+                      style: TextStyle(
+                        color: f.textSpecial,
+                        fontFamily: 'CustomFont',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '+${reward.coinsEarned}',
+                  style: TextStyle(
+                    color: f.goldAccent,
+                    fontFamily: 'CustomFont',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 5),
+                  child: Image.asset(
+                    UiAssets.goldCoin,
+                    width: 24,
+                    height: 24,
+                    filterQuality: FilterQuality.medium,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

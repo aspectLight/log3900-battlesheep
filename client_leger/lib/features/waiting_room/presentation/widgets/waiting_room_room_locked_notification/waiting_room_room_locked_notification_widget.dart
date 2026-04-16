@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../core/appearance/app_interaction_colors.dart';
+import '../../../../../core/appearance/app_feature_colors.dart';
 import '../../../../../core/notification/notification_intent.dart';
 import '../../../core/localisation/waiting_room_localizations.dart';
 import 'waiting_room_room_locked_notification_view_model.dart';
@@ -66,7 +66,7 @@ class _InfoShell extends StatelessWidget {
                   message,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: context.interactionColors.primary,
+                    color: context.featureColors.bgButton,
                     fontWeight: FontWeight.w600,
                     fontSize: 22,
                     letterSpacing: 0.5,
@@ -92,8 +92,9 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final f = context.featureColors;
     return Material(
-      color: context.interactionColors.primary,
+      color: f.bgButton,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onTap,
@@ -102,10 +103,10 @@ class _ActionButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: context.interactionColors.outline),
+            border: Border.all(color: f.borderButton),
             boxShadow: [
               BoxShadow(
-                color: context.interactionColors.primaryStrong,
+                color: f.shadowAccent,
                 blurRadius: 6,
                 offset: const Offset(0, 4),
               ),
@@ -113,8 +114,8 @@ class _ActionButton extends StatelessWidget {
           ),
           child: Text(
             label,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: f.textSpecialAlt,
               fontWeight: FontWeight.w500,
               fontSize: 15,
               letterSpacing: 0.5,

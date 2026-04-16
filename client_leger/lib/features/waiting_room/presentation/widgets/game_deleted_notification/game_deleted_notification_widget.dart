@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/appearance/app_feature_colors.dart';
 import '../../../../../core/notification/notification_intent.dart';
 import '../../../core/localisation/waiting_room_localizations.dart';
 import 'game_deleted_notification_view_model.dart';
@@ -43,8 +44,8 @@ class GameDeletedNotificationWidget extends StatelessWidget {
                 Text(
                   l10n.gameNotFound,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Color(0xFF550000),
+                  style: TextStyle(
+                    color: context.featureColors.bgButton,
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,
@@ -78,8 +79,9 @@ class _GameButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final f = context.featureColors;
     return Material(
-      color: const Color(0xFF550000),
+      color: f.bgButton,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onTap,
@@ -88,19 +90,19 @@ class _GameButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFF7f1f1f)),
-            boxShadow: const [
+            border: Border.all(color: f.borderButton),
+            boxShadow: [
               BoxShadow(
-                color: Color(0x33550000),
+                color: f.shadowAccent,
                 blurRadius: 6,
-                offset: Offset(0, 4),
+                offset: const Offset(0, 4),
               ),
             ],
           ),
           child: Text(
             label,
-            style: const TextStyle(
-              color: Color(0xFFfff0f0),
+            style: TextStyle(
+              color: f.textSpecialAlt,
               fontWeight: FontWeight.w500,
               letterSpacing: 0.5,
               fontSize: 15,
