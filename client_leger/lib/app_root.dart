@@ -5,6 +5,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 import 'core/app_transition/app_initialization.dart';
 import 'core/app_transition/app_transition_bus.dart';
 import 'core/appearance/app_appearance_service.dart';
+import 'core/appearance/app_feature_colors.dart';
 import 'core/appearance/app_interaction_colors.dart';
 import 'core/appearance/app_visual_theme.dart';
 import 'core/di/injection_container.dart';
@@ -67,12 +68,14 @@ ThemeData _appMaterialTheme(AppVisualTheme visual) {
       interaction = AppInteractionColors.villagePalette;
   }
 
+  final featureColors = AppFeatureColors.fromVisualTheme(visual);
+
   return ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
     colorScheme: scheme,
     scaffoldBackgroundColor: Colors.black,
-    extensions: <ThemeExtension<dynamic>>[interaction],
+    extensions: <ThemeExtension<dynamic>>[interaction, featureColors],
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.resolveWith((states) {

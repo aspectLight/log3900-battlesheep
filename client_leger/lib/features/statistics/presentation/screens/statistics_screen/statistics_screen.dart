@@ -35,6 +35,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = StatisticsLocalizations.of(context)!;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
 
     return PopScope(
       canPop: false,
@@ -53,12 +54,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.arrow_back, color: Colors.white),
+                    Icon(Icons.arrow_back, color: onSurface),
                     const SizedBox(width: 15),
                     Text(
                       l10n.statisticsReturnHome,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: onSurface,
                         fontFamily: 'CustomFont',
                       ),
                     ),
@@ -69,8 +70,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             leadingWidth: 180,
             title: Text(
               l10n.statisticsTitle,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: onSurface,
                 fontFamily: 'CustomFont',
               ),
             ),

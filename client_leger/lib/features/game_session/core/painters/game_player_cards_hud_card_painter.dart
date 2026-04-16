@@ -4,17 +4,20 @@ import 'package:fpdart/fpdart.dart';
 import '../constants/game_team_constants.dart';
 import '../../../../core/helpers/functional_programming.dart';
 
+/// Angular `actions-hud`: polygon(0 0, 97% 0, 100% 50%, 97% 100%, 0 100%, 3% 50%)
 class GamePlayerCardsHudCardClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
-    final path = Path()
+    final w = size.width;
+    final h = size.height;
+    return Path()
       ..moveTo(0, 0)
-      ..lineTo(size.width, 0)
-      ..lineTo(size.width, size.height * 0.75)
-      ..lineTo(size.width * 0.5, size.height * 0.93)
-      ..lineTo(0, size.height * 0.75)
+      ..lineTo(w * 0.97, 0)
+      ..lineTo(w, h * 0.5)
+      ..lineTo(w * 0.97, h)
+      ..lineTo(0, h)
+      ..lineTo(w * 0.03, h * 0.5)
       ..close();
-    return path;
   }
 
   @override
@@ -38,7 +41,7 @@ class GamePlayerCardsHudCardPainter extends CustomPainter {
 
     final paint = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 6.0;
+      ..strokeWidth = isVirtual ? 2.0 : 2.5;
 
     var colors = [const Color(0xFFD4AF37), const Color(0xFF8B0000)];
 
@@ -52,7 +55,6 @@ class GamePlayerCardsHudCardPainter extends CustomPainter {
     if (isVirtual) {
       paint.color = const Color(0xFF00BFFF);
       paint.shader = null;
-      paint.strokeWidth = 4.0;
     } else {
       if (isActive) {
         paint.color = const Color(0xFFC89B05);
