@@ -24,7 +24,8 @@
     "password_mismatch": "Les mots de passe ne correspondent pas",
     "avatar_required": "Sélectionnez un avatar",
     "username_banned": "Ce nom d'utilisateur est réservé et ne peut pas être utilisé",
-    "username_profanity": "Ce nom d'utilisateur contient des mots non autorisés"
+    "username_profanity": "Ce nom d'utilisateur contient des mots non autorisés",
+    "username_taken": "Ce nom d'utilisateur est déjà utilisé"
   },
   "auth": {
     "login": "Se connecter",
@@ -99,6 +100,10 @@
     "new_avatar": "Nouvel avatar",
     "current_avatar": "Avatar actuel",
     "camera_error": "Erreur de caméra",
+    "camera_error_not_supported": "Votre navigateur ne supporte pas l'accès à la caméra.",
+    "camera_error_not_allowed": "Accès à la caméra refusé. Veuillez autoriser l'accès dans les paramètres de votre navigateur.",
+    "camera_error_not_found": "Aucune caméra détectée sur votre appareil.",
+    "camera_error_generic": "Impossible d'accéder à la caméra. Veuillez réessayer.",
     "close": "Fermer",
     "camera_title": "Capturer un selfie",
     "camera_loading": "Initialisation de la caméra...",
@@ -464,7 +469,8 @@
     "game_channel": "Canal de partie {{id}}",
     "send": "Envoyer",
     "placeholder_general": "Écrire un message...",
-    "placeholder_channel": "Écrire dans {{ name }}..."
+    "placeholder_channel": "Écrire dans {{ name }}...",
+    "deleted_user": "[supprimé]"
   },
   "bonus": {
     "title": "Stats",
@@ -527,7 +533,21 @@
     "turns": "Nombre de tours de jeu",
     "tiles_global": "Pourcentage des tuiles de terrain visitées par au moins un joueur",
     "doors": "Pourcentage des portes ayant été manipulées au moins une fois",
-    "flag_players": "Nombre de joueurs différents ayant détenu le drapeau"
+    "flag_players": "Nombre de joueurs différents ayant détenu le drapeau",
+    "share": {
+      "title": "Partager mes résultats",
+      "subtitle": "Partagez vos statistiques de partie sur les réseaux sociaux",
+      "copy": "Copier le texte",
+      "copied": "Copié !",
+      "share_x": "Publier sur X",
+      "share_bluesky": "Partager sur Bluesky",
+      "hint_x": "Votre tweet sera pré-rempli. Connectez-vous à X si ce n'est pas déjà fait.",
+      "hint_bluesky": "Votre publication sera pré-rempli. Connectez-vous à Bluesky si ce n'est pas déjà fait.",
+      "clipboard_notice": "✓ Texte copié !",
+      "victory": "Victoire",
+      "defeat": "Défaite",
+      "text": "🎮 Résultat de partie : {{ result }} !\n💀 Morts : {{ deaths }}\n⚔️ Combats gagnés : {{ combatPct }}%\n🗺️ Cases visitées : {{ tilePct }}%\n#EasternSolace #Jeux"
+    }
   },
   "player_card": {
     "playing": "Joue...",

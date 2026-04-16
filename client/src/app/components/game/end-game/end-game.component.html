@@ -118,25 +118,51 @@
             }
         </li>
     </div>
-    @if (playerRewards.length > 0) {
-    <div class="rewards-section">
-        <h2 class="rewards-title">{{ 'end_game.rewards' | translate }}</h2>
-        <div class="rewards-list">
-            @for (reward of playerRewards; track reward.playerName) {
-            <div class="reward-entry">
-                <span class="reward-name">
-                    @if (reward.avatarImage) {
-                    <img class="reward-avatar" [src]="reward.avatarImage" alt="avatar" />
-                    }
-                    {{ reward.playerName }}
-                </span>
-                <span class="reward-coins">
-                    +{{ reward.coinsEarned }}
-                    <img class="coin-icon" src="./assets/gold_coin.png" alt="pièce" />
-                </span>
+    <div class="bottom-row">
+        @if (playerRewards.length > 0) {
+        <div class="rewards-section">
+            <h2 class="rewards-title">{{ 'end_game.rewards' | translate }}</h2>
+            <div class="rewards-list">
+                @for (reward of playerRewards; track reward.playerName) {
+                <div class="reward-entry">
+                    <span class="reward-name">
+                        @if (reward.avatarImage) {
+                        <img class="reward-avatar" [src]="reward.avatarImage" alt="avatar" />
+                        }
+                        {{ reward.playerName }}
+                    </span>
+                    <span class="reward-coins">
+                        +{{ reward.coinsEarned }}
+                        <img class="coin-icon" src="./assets/gold_coin.png" alt="pièce" />
+                    </span>
+                </div>
+                }
             </div>
-            }
+        </div>
+        }
+
+        <div class="share-section">
+            <h2 class="share-title">{{ 'end_game.share.title' | translate }}</h2>
+            <div class="share-list">
+                <button class="share-entry" (click)="shareOnX()">
+                    <span class="share-entry__label">
+                        <svg class="share-entry__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.265 5.638L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/>
+                        </svg>
+                        {{ 'end_game.share.share_x' | translate }}
+                    </span>
+                    <span class="share-entry__hint">{{ 'end_game.share.hint_x' | translate }}</span>
+                </button>
+                <button class="share-entry" (click)="shareOnBluesky()">
+                    <span class="share-entry__label">
+                        <svg class="share-entry__icon share-entry__icon--bluesky" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364.136-.02.275-.039.415-.056-.138.022-.276.04-.415.056-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078a8.741 8.741 0 0 1-.415-.056c.14.017.279.036.415.056 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.204-.659-.299-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8z"/>
+                        </svg>
+                        {{ 'end_game.share.share_bluesky' | translate }}
+                    </span>
+                    <span class="share-entry__hint">{{ 'end_game.share.hint_bluesky' | translate }}</span>
+                </button>
+            </div>
         </div>
     </div>
-    }
 </div>
