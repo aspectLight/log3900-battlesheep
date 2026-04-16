@@ -146,7 +146,7 @@
                 [(ngModel)]="newMessage"
                 (keydown.enter)="sendMessage()"
             />
-            <button (click)="sendMessage()" class="square-button">{{ 'chatbox.send' | translate }}</button>
+            <button (click)="sendMessage()" class="square-button" [disabled]="!newMessage.trim()">{{ 'chatbox.send' | translate }}</button>
         </div>
     </div>
 </div>

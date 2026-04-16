@@ -218,10 +218,13 @@
   padding: 10px 15px;
   gap: 10px;
   flex: 0 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .chatbox-input input {
-  flex: 1;
+  flex: 1 1 auto;
   padding: 8px 12px;
   font-size: 0.9rem;
   background-color: var(--theme-bg-input);
@@ -229,6 +232,7 @@
   border: 1px solid var(--theme-border-secondary);
   border-radius: 4px;
   outline: none;
+  min-width: 0;
 }
 
 .chatbox-input input:focus {
@@ -245,10 +249,18 @@
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
-.square-button:hover {
+.square-button:hover:not(:disabled) {
   background-color: var(--theme-bg-button-hover);
+}
+
+.square-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
 }
 
 .toggle-button {
