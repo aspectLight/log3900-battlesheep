@@ -238,11 +238,6 @@
     &::placeholder {
         color: var(--theme-text-placeholder);
     }
-
-    &:focus {
-        border-color: var(--theme-border-focus);
-        box-shadow: 0 0 0 2px var(--theme-border-focus-shadow);
-    }
 }
 
 /* ── Animations ──────────────────────────────────── */
