@@ -1,0 +1,23 @@
+{
+  "@@locale": "en",
+  "mainMenu": "Home",
+  "createGame": "Create Game",
+  "ok": "OK",
+  "selectedGameHiddenOrDeleted": "The selected game is hidden or deleted.",
+  "createGamePreviewHeader": "Preview",
+  "createGameNameHeader": "Name",
+  "createGameSizeHeader": "Size",
+  "createGameModeHeader": "Mode",
+  "createGameLastModifiedHeader": "Last modified",
+  "createGameModeClassic": "Classic",
+  "createGameModeCtf": "Capture the flag",
+  "createGameAccessibilityLabel": "Accessibility",
+  "createGameFriendsOnlyLabel": "Friends only",
+  "createGameEntryFeeSectionLabel": "Entry price",
+  "createGameEntryFeeLabel": "Entry fee",
+  "createGameEntryFeeHint": "0 = free",
+  "createGameBalanceLabel": "Your balance",
+  "createGameInsufficientFundsTitle": "Insufficient balance",
+  "createGameInsufficientFundsMessage": "You do not have enough coins to set this entry fee. Lower the fee or earn coins in the shop.",
+  "noGames": "No games available."
+}

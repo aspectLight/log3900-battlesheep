@@ -28,7 +28,6 @@ import '../../data/side_effects/game_turn_auto_selection_side_effect.dart';
 import '../../data/side_effects/game_trap_flow_side_effect.dart';
 import '../../data/side_effects/game_turn_end_item_cleanup_side_effect.dart';
 import '../../data/side_effects/game_turn_side_effect.dart';
-import '../../data/side_effects/game_combat_started_notification_side_effect.dart';
 import '../../data/side_effects/game_turn_start_notification_side_effect.dart';
 import '../../data/side_effects/game_virtual_player_move_side_effect.dart';
 import '../../data/side_effects/game_virtual_player_turn_side_effect.dart';
@@ -130,7 +129,6 @@ void bootstrapGameSessionScope(
   scope.get<GameReachableCellsOverlaySideEffect>();
   scope.get<GamePlayerAbandonedBoardSideEffect>();
   scope.get<GameTurnStartNotificationSideEffect>();
-  scope.get<GameCombatStartedNotificationSideEffect>();
   scope.get<GameVirtualPlayerTurnSideEffect>();
   scope.get<GameTurnSideEffect>();
   scope.get<GameTurnAutoForwardSideEffect>();

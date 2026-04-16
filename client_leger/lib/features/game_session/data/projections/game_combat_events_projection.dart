@@ -30,9 +30,6 @@ class GameCombatEventsProjection implements EventProjection {
     _combatSocket.combatTurnStartedStream
         .where(_isParticipant)
         .listen(_onCombatTurnStarted),
-    _combatSocket.combatTurnStartedStream.listen(
-      _onCombatStartedForNotification,
-    ),
     _combatSocket.attackResultStream.listen(_onAttackResult),
     _combatSocket.flightAttemptResultStream.listen(_onFlightAttemptResult),
     _combatSocket.endCombatStream.listen(_onEndCombat),
@@ -51,13 +48,6 @@ class GameCombatEventsProjection implements EventProjection {
       final pending = _pendingFlightAttemptResults.removeAt(0);
       _combatRepository.applyFlightAttemptResult(pending);
     }
-  }
-
-  void _onCombatStartedForNotification(CombatTurnStartedEvent event) {
-    if (_isParticipant(event)) return;
-    _gameSessionEventBus.fire(
-      CombatStarted(attackerId: event.attackerId, defenderId: event.defenderId),
-    );
   }
 
   bool _isParticipant(CombatTurnStartedEvent event) {

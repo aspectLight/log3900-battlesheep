@@ -1,0 +1,1 @@
+enum PlayerLeaveReason { left, abandoned }

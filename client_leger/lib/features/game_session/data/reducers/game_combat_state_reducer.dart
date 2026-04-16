@@ -26,6 +26,9 @@ class GameCombatStateReducer {
     if (event is FlightAttemptFeedbackClearedEvent) {
       return _reduceFlightAttemptFeedbackCleared(previous, event);
     }
+    if (event is CombatEndOverlayClearedEvent) {
+      return _reduceCombatEndOverlayCleared(previous, event);
+    }
     return previous;
   }
 
@@ -48,7 +51,34 @@ class GameCombatStateReducer {
     GameCombatState previous,
     EndCombatResultEvent event,
   ) {
-    return const CombatIdle();
+    return previous.when(
+      idle: (s) => s,
+      active: (active) => CombatResolved(
+        combatRoomId: active.combatRoomIdRaw,
+        attackerId: active.attackerIdRaw,
+        defenderId: active.defenderIdRaw,
+        currentPlayerId: active.currentPlayerIdRaw,
+        currentOpponentId: active.currentOpponentIdRaw,
+        combatCountdown: active.combatCountdown,
+        flightAttemptsLeft: active.flightAttemptsLeft,
+        winnerId: event.winnerId,
+        loserId: event.loserId,
+        isByFlight: event.isByFlight,
+      ),
+      withResult: (withResult) => CombatResolved(
+        combatRoomId: withResult.combatRoomIdRaw,
+        attackerId: withResult.attackerIdRaw,
+        defenderId: withResult.defenderIdRaw,
+        currentPlayerId: withResult.currentPlayerIdRaw,
+        currentOpponentId: withResult.currentOpponentIdRaw,
+        combatCountdown: withResult.combatCountdown,
+        flightAttemptsLeft: withResult.flightAttemptsLeft,
+        winnerId: event.winnerId,
+        loserId: event.loserId,
+        isByFlight: event.isByFlight,
+      ),
+      resolved: (s) => s,
+    );
   }
 
   GameCombatState _reduceAttackResult(
@@ -57,6 +87,7 @@ class GameCombatStateReducer {
   ) {
     return previous.when(
       idle: (s) => s,
+      resolved: (s) => s,
       active: (active) => CombatWithResult(
         combatRoomId: active.combatRoomIdRaw,
         attackerId: active.attackerIdRaw,
@@ -95,6 +126,7 @@ class GameCombatStateReducer {
               : 0);
     return previous.when(
       idle: (s) => s,
+      resolved: (s) => s,
       active: (active) => active.copyWith(
         flightAttemptsLeft: nextAttempts,
         lastFlightAttemptSuccess: Option.of(event.isSuccess),
@@ -115,6 +147,18 @@ class GameCombatStateReducer {
       active: (active) => active.copyWith(combatCountdown: event.seconds),
       withResult: (withResult) =>
           withResult.copyWith(combatCountdown: event.seconds),
+      resolved: (r) => CombatResolved(
+        combatRoomId: r.combatRoomIdRaw,
+        attackerId: r.attackerIdRaw,
+        defenderId: r.defenderIdRaw,
+        currentPlayerId: r.currentPlayerIdRaw,
+        currentOpponentId: r.currentOpponentIdRaw,
+        combatCountdown: event.seconds,
+        flightAttemptsLeft: r.flightAttemptsLeft,
+        winnerId: r.winnerId,
+        loserId: r.loserId,
+        isByFlight: r.isByFlight,
+      ),
     );
   }
 
@@ -141,10 +185,19 @@ class GameCombatStateReducer {
   ) {
     return previous.when(
       idle: (s) => s,
+      resolved: (s) => s,
       active: (active) =>
           active.copyWith(lastFlightAttemptSuccess: const Option.none()),
       withResult: (withResult) =>
           withResult.copyWith(lastFlightAttemptSuccess: const Option.none()),
     );
+  }
+
+  GameCombatState _reduceCombatEndOverlayCleared(
+    GameCombatState previous,
+    CombatEndOverlayClearedEvent event,
+  ) {
+    if (previous is! CombatResolved) return previous;
+    return CombatIdle(combatCountdown: previous.combatCountdown);
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../../../../../core/chat/chat_outgoing_avatars.dart';
 import '../../../../../core/services/socket_service.dart';
 import '../../core/constants/discussion_canals_events.dart';
 import '../models/channel_info.dart';
@@ -15,8 +16,10 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   DiscussionCanalsSocket({
     required SocketService socketService,
     required String username,
+    required ChatOutgoingAvatars outgoingAvatars,
   }) : _socketService = socketService,
-       _username = username {
+       _username = username,
+       _outgoingAvatars = outgoingAvatars {
     if (socketService.isConnected) _setupListeners();
     _connectionSub = socketService.connectionStream.listen((connected) {
       if (connected) _setupListeners();
@@ -25,6 +28,7 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
 
   final SocketService _socketService;
   final String _username;
+  final ChatOutgoingAvatars _outgoingAvatars;
 
   final _channelsController = StreamController<List<ChannelInfo>>.broadcast();
   final _channelCreatedController = StreamController<String>.broadcast();
@@ -258,7 +262,13 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   @override
   void sendMessage(String channelId, String content) => _socketService.emit(
     DiscussionCanalsSocketEvents.sendMessageToCustomChannel,
-    {'channelId': channelId, 'username': _username, 'message': content},
+    {
+      'channelId': channelId,
+      'username': _username,
+      'message': content,
+      'avatarId': _outgoingAvatars.avatarId,
+      'avatarUrl': _outgoingAvatars.avatarUrlForSocket,
+    },
   );
 
   @override

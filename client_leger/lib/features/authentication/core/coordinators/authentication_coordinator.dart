@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:get_it/get_it.dart';
 
 import '../../../../core/app_transition/app_transition_bus.dart';
+import '../../../../core/chat/chat_outgoing_avatars.dart';
 import '../../../../core/connected_scope/connected_session.dart';
 import '../../../../core/connected_scope/session_scope_manager.dart';
 import '../../../../core/app_transition/feature_coordinator.dart';
@@ -41,6 +42,10 @@ class AuthenticationCoordinator
   Future<void> onEntry(AuthEntryAppEvent event) async {
     switch (event) {
       case SignInSuccessEvent(:final user):
+        getIt<ChatOutgoingAvatars>().setFromAvatarFields(
+          avatarId: user.avatarId,
+          avatarRelativeUrl: user.avatarUrl,
+        );
         _authData = AuthData(username: user.username, socketId: '');
         appNavigator.request(GoToMainMenu());
         sessionScopeManager.createScope();
@@ -77,6 +82,7 @@ class AuthenticationCoordinator
   @override
   Future<void> onExit(AuthExitAppEvent event) async {
     await authRepository.signOut(const auth_commands.SignOutCommand()).run();
+    getIt<ChatOutgoingAvatars>().clear();
     sessionScopeManager.dropScope();
     // Only Auth drops root scope; feature scopes are dropped by their coordinators
     appNavigator.request(ForceUnauthenticated());

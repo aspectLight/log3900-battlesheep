@@ -3,8 +3,6 @@ import 'package:get_it/get_it.dart';
 import '../../features/character_creation/presentation/widgets/character_creation_room_locked_notification/character_creation_room_locked_notification_widget.dart';
 import '../../features/character_creation/presentation/widgets/character_creation_reserve_failed_notification/character_creation_reserve_failed_notification_widget.dart';
 import '../../features/character_creation/presentation/widgets/character_creation_validation_notification/character_creation_validation_notification_widget.dart';
-import '../../features/game_session/presentation/widgets/combat_started_notification/combat_started_notification_widget.dart';
-import '../../features/game_session/presentation/widgets/end_combat_notification/end_combat_notification_widget.dart';
 import '../../features/game_session/presentation/widgets/game_abandoned_notification/game_abandoned_notification_widget.dart';
 import '../../features/game_session/presentation/widgets/game_canceled_notification/game_canceled_notification_widget.dart';
 import '../../features/game_session/presentation/widgets/game_finish_notification/game_finish_notification_widget.dart';
@@ -48,14 +46,6 @@ void registerNotificationModule(GetIt getIt) {
   registry.register<GameCanceledNotificationIntent>(
     (c, intent, onDismiss) =>
         GameCanceledNotificationWidget(intent: intent, onDismiss: onDismiss),
-  );
-  registry.register<CombatStartedNotificationIntent>(
-    (c, intent, onDismiss) =>
-        CombatStartedNotificationWidget(intent: intent, onDismiss: onDismiss),
-  );
-  registry.register<EndCombatNotificationIntent>(
-    (c, intent, onDismiss) =>
-        EndCombatNotificationWidget(intent: intent, onDismiss: onDismiss),
   );
   registry.register<InventoryFullDiscardIntent>(
     (c, intent, onDismiss) => GameInventoryFullDiscardNotificationWidget(

@@ -1,0 +1,22 @@
+{
+  "@@locale": "fr",
+  "statisticsTitle": "Statistiques",
+  "statisticsReturnHome": "Page d'accueil",
+  "statisticsPlayersTitle": "Joueurs",
+  "statisticsPlayerName": "Joueurs",
+  "statisticsCombats": "Nombre de combats",
+  "statisticsEvasions": "Nombre d'évasions",
+  "statisticsVictories": "Nombre de victoires",
+  "statisticsDefeats": "Nombre de défaites",
+  "statisticsHealthLost": "Points de vie perdus",
+  "statisticsDamage": "Points de vie enlevés",
+  "statisticsItemsCollected": "Nombre d'objets différents ramassés",
+  "statisticsTilesVisited": "Pourcentage de tuiles de terrain visitées",
+  "statisticsGlobalTitle": "Global",
+  "statisticsRewardsTitle": "Récompenses",
+  "statisticsDuration": "Durée de la partie",
+  "statisticsTurns": "Nombre de tours de jeu",
+  "statisticsTilesExplored": "Pourcentage des tuiles de terrain visitées par au moins un joueur",
+  "statisticsDoorsToggled": "Pourcentage des portes ayant été manipulées au moins une fois",
+  "statisticsFlags": "Nombre de joueurs différents ayant détenu le drapeau"
+}

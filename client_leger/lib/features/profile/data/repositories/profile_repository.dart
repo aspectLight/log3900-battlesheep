@@ -1,6 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../core/chat/chat_outgoing_avatars.dart';
 import '../../core/exceptions/profile_failure.dart';
 import '../../domain/commands/profile_commands.dart';
 import '../../domain/models/profile_model.dart';
@@ -11,11 +12,15 @@ import '../models/dto/profile_statistics_dto.dart';
 import '../services/http_profile_service.dart';
 
 class ProfileRepository {
-  ProfileRepository({required HttpProfileService httpProfileService})
-    : _httpProfileService = httpProfileService,
-      state = signal<ProfileState>(const ProfileState.idle());
+  ProfileRepository({
+    required HttpProfileService httpProfileService,
+    required ChatOutgoingAvatars chatOutgoingAvatars,
+  }) : _httpProfileService = httpProfileService,
+       _chatOutgoingAvatars = chatOutgoingAvatars,
+       state = signal<ProfileState>(const ProfileState.idle());
 
   final HttpProfileService _httpProfileService;
+  final ChatOutgoingAvatars _chatOutgoingAvatars;
 
   final Signal<ProfileState> state;
 
@@ -55,10 +60,17 @@ class ProfileRepository {
             .run();
     result.match(
       (failure) => state.value = ProfileState.error(failure),
-      (tuple) => state.value = ProfileState.loaded(
-        profile: tuple.$1,
-        statistics: tuple.$2,
-      ),
+      (tuple) {
+        final profile = tuple.$1;
+        _chatOutgoingAvatars.setFromAvatarFields(
+          avatarId: profile.avatarId,
+          avatarRelativeUrl: profile.avatarUrl,
+        );
+        state.value = ProfileState.loaded(
+          profile: profile,
+          statistics: tuple.$2,
+        );
+      },
     );
   }
 
@@ -118,6 +130,10 @@ class ProfileRepository {
             statistics: loaded.statistics,
           );
         }
+        _chatOutgoingAvatars.setFromAvatarFields(
+          avatarId: model.avatarId,
+          avatarRelativeUrl: model.avatarUrl,
+        );
         return model;
       },
       (error, _) =>
@@ -158,6 +174,10 @@ class ProfileRepository {
             statistics: loaded.statistics,
           );
         }
+        _chatOutgoingAvatars.setFromAvatarFields(
+          avatarId: model.avatarId,
+          avatarRelativeUrl: model.avatarUrl,
+        );
         return model;
       },
       (error, _) =>

@@ -1,6 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/chat/chat_outgoing_avatars.dart';
 import '../../../../../core/helpers/functional_programming.dart';
 import '../../../core/constants/chat_constants.dart';
 import '../../../data/repositories/chat_panel_state_repository.dart';
@@ -12,12 +13,15 @@ class ChatPanelContentViewModel {
   ChatPanelContentViewModel({
     required ChatRepository repository,
     required ChatPanelStateRepository panelStateRepository,
+    required ChatOutgoingAvatars outgoingAvatars,
     required this.currentUsername,
   }) : _repository = repository,
-       _panelStateRepository = panelStateRepository;
+       _panelStateRepository = panelStateRepository,
+       _outgoingAvatars = outgoingAvatars;
 
   final ChatRepository _repository;
   final ChatPanelStateRepository _panelStateRepository;
+  final ChatOutgoingAvatars _outgoingAvatars;
   final String currentUsername;
 
   late final lastSentMessage = computed<Option<String>>(
@@ -41,6 +45,8 @@ class ChatPanelContentViewModel {
     final command = SendChatMessageCommand(
       username: currentUsername,
       content: content,
+      avatarId: _outgoingAvatars.avatarId,
+      avatarUrl: _outgoingAvatars.avatarUrlForSocket,
     );
     _repository.sendMessage(command);
     _panelStateRepository.setLastSentMessage(Option.of(content));

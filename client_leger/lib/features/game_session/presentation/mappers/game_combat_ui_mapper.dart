@@ -26,7 +26,7 @@ GameCombatUiState toGameCombatUiModel(
   );
   return ctxOpt.when(
     none: () => const GameCombatInactive(),
-    some: (ctx) => _buildActive(combatState, ctx),
+    some: (ctx) => _buildActive(combatState, ctx, playerState),
   );
 }
 
@@ -53,15 +53,24 @@ Option<CombatContext> _extractCombatContext(
   });
 }
 
-GameCombatActive _buildActive(GameCombatState combatState, CombatContext ctx) {
+GameCombatActive _buildActive(
+  GameCombatState combatState,
+  CombatContext ctx,
+  GamePlayerState playerState,
+) {
   final enemy = ctx.enemy;
   final hasEnemyBarbedWire = enemy.inventory.any(
     (item) => item?.type == ItemType.barbedWire,
   );
-  final canFlee =
+  final endOverlay = combatState is CombatResolved
+      ? _buildEndOverlay(combatState, playerState, ctx.selfId)
+      : null;
+  final inEndOverlay = endOverlay != null;
+  final canFleeBase =
       ctx.isPlayerTurn &&
       combatState.flightAttemptsLeft > 0 &&
       (!hasEnemyBarbedWire || ctx.isInitiator);
+  final canFlee = canFleeBase && !inEndOverlay;
   final attackSuccess = combatState.lastAttackSuccess.getOrElse(() => false);
   final flightAttemptSuccessOpt = combatState.lastFlightAttemptSuccess;
   final isPlayerAttacking = combatState is CombatWithResult
@@ -74,14 +83,48 @@ GameCombatActive _buildActive(GameCombatState combatState, CombatContext ctx) {
     isCombatInitiator: ctx.isInitiator,
     showResults: combatState is CombatWithResult,
     isAttackSuccess: attackSuccess,
-    showFlightAttemptResult: flightAttemptSuccessOpt.isSome(),
+    showFlightAttemptResult: flightAttemptSuccessOpt.isSome() && !inEndOverlay,
     isFlightAttemptSuccess: flightAttemptSuccessOpt.getOrElse(() => false),
-    canAttack: ctx.isPlayerTurn,
+    canAttack: ctx.isPlayerTurn && !inEndOverlay,
     canFlee: canFlee,
     hasEnemyBarbedWire: hasEnemyBarbedWire,
     enemyInfo: _buildEnemyInfo(enemy),
     combatResults: _buildResults(combatState, isPlayerAttacking),
     notification: GameCombatNotificationUi.empty,
+    endOverlay: endOverlay,
+  );
+}
+
+GameCombatEndOverlay _buildEndOverlay(
+  CombatResolved resolved,
+  GamePlayerState playerState,
+  String selfId,
+) {
+  final winnerDisplayName = playerState
+      .findById(resolved.winnerId)
+      .map((p) => p.name)
+      .getOrElse(() => '');
+  final enemyId =
+      selfId == resolved.winnerId ? resolved.loserId : resolved.winnerId;
+  final enemyDisplayName = playerState
+      .findById(enemyId)
+      .map((p) => p.name)
+      .getOrElse(() => '');
+  if (!resolved.isByFlight && selfId == resolved.winnerId) {
+    return const GameCombatEndOverlay(kind: GameCombatEndOverlayKind.victory);
+  }
+  if (!resolved.isByFlight && selfId == resolved.loserId) {
+    return GameCombatEndOverlay(
+      kind: GameCombatEndOverlayKind.defeat,
+      winnerName: winnerDisplayName,
+    );
+  }
+  if (resolved.isByFlight && selfId == resolved.winnerId) {
+    return const GameCombatEndOverlay(kind: GameCombatEndOverlayKind.fled);
+  }
+  return GameCombatEndOverlay(
+    kind: GameCombatEndOverlayKind.enemyFled,
+    enemyName: enemyDisplayName,
   );
 }
 

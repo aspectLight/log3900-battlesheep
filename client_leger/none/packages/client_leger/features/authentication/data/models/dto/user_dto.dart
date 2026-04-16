@@ -1,0 +1,27 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'user_dto.g.dart';
+
+@JsonSerializable()
+class UserDto {
+  final String id;
+  final String? firebaseUid;
+  final String email;
+  final String username;
+  final String avatarId;
+  final String? avatarUrl;
+
+  UserDto({
+    required this.id,
+    this.firebaseUid,
+    required this.email,
+    required this.username,
+    required this.avatarId,
+    this.avatarUrl,
+  });
+
+  factory UserDto.fromJson(Map<String, dynamic> json) =>
+      _$UserDtoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UserDtoToJson(this);
+}

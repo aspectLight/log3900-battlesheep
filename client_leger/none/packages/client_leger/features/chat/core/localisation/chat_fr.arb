@@ -1,0 +1,21 @@
+{
+  "@@locale": "fr",
+  "chat": "Clavardage",
+  "send": "Envoyer",
+  "chatGeneralTab": "Général",
+  "discussionCanals": "Canaux de discussion",
+  "createChannel": "CRÉER UN NOUVEAU CANAL",
+  "channelNameHint": "Nom du canal (ex: ABC)",
+  "create": "Créer",
+  "availableChannels": "CANAUX DISPONIBLES",
+  "searchChannelsHint": "Rechercher un canal par nom...",
+  "loadingChannels": "Chargement des canaux...",
+  "noChannelsFound": "Aucun canal ne correspond à la recherche.",
+  "channelName": "NOM",
+  "channelCreator": "CRÉATEUR",
+  "channelActions": "ACTIONS",
+  "creatorBadge": "Vous",
+  "leaveChannel": "Quitter",
+  "joinChannel": "Joindre",
+  "deleteChannel": "Supprimer"
+}

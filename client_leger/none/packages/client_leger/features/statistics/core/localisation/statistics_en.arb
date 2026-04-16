@@ -1,0 +1,22 @@
+{
+  "@@locale": "en",
+  "statisticsTitle": "Statistics",
+  "statisticsReturnHome": "Home",
+  "statisticsPlayersTitle": "Players",
+  "statisticsPlayerName": "Players",
+  "statisticsCombats": "Number of combats",
+  "statisticsEvasions": "Number of evasions",
+  "statisticsVictories": "Number of victories",
+  "statisticsDefeats": "Number of defeats",
+  "statisticsHealthLost": "Health points lost",
+  "statisticsDamage": "Health points dealt",
+  "statisticsItemsCollected": "Number of different items collected",
+  "statisticsTilesVisited": "Percentage of terrain tiles visited",
+  "statisticsGlobalTitle": "Global",
+  "statisticsRewardsTitle": "Rewards",
+  "statisticsDuration": "Game duration",
+  "statisticsTurns": "Number of game turns",
+  "statisticsTilesExplored": "Percentage of terrain tiles visited by at least one player",
+  "statisticsDoorsToggled": "Percentage of doors toggled at least once",
+  "statisticsFlags": "Number of different players who held the flag"
+}
