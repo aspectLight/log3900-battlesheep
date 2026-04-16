@@ -13,11 +13,9 @@ class GameTurnStartNotificationSideEffect with DisposableSideEffect {
     required GameEventsSocket eventsSocket,
     required GamePlayerRepository playerRepository,
     required NotificationIntentSink notificationIntentSink,
-  })  : _playerRepository = playerRepository,
-        _notificationIntentSink = notificationIntentSink {
-    trackSubscription(
-      eventsSocket.turnStartingStream.listen(_onTurnStarting),
-    );
+  }) : _playerRepository = playerRepository,
+       _notificationIntentSink = notificationIntentSink {
+    trackSubscription(eventsSocket.turnStartingStream.listen(_onTurnStarting));
   }
 
   void _onTurnStarting(TurnStartingEvent event) {

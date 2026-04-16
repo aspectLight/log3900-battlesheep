@@ -55,10 +55,21 @@ ItemCollectedDto _$ItemCollectedDtoFromJson(Map<String, dynamic> json) =>
     ItemCollectedDto(
       playerId: json['playerId'] as String,
       item: GameItemDto.fromJson(json['item'] as Map<String, dynamic>),
+      position: json['position'] == null
+          ? null
+          : GameBoardPositionDto.fromJson(
+              json['position'] as Map<String, dynamic>,
+            ),
+      inventoryFull: json['inventoryFull'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$ItemCollectedDtoToJson(ItemCollectedDto instance) =>
-    <String, dynamic>{'playerId': instance.playerId, 'item': instance.item};
+    <String, dynamic>{
+      'playerId': instance.playerId,
+      'item': instance.item,
+      'position': instance.position,
+      'inventoryFull': instance.inventoryFull,
+    };
 
 ItemDroppedDto _$ItemDroppedDtoFromJson(Map<String, dynamic> json) =>
     ItemDroppedDto(

@@ -25,7 +25,9 @@ class ChatShakeSideEffect with DisposableSideEffect {
       _chatEventBus.on<ChatVerticalShakeDetected>().listen(_onVerticalShake),
     );
     trackSubscription(
-      _chatEventBus.on<ChatHorizontalShakeDetected>().listen(_onHorizontalShake),
+      _chatEventBus.on<ChatHorizontalShakeDetected>().listen(
+        _onHorizontalShake,
+      ),
     );
   }
 

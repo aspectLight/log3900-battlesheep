@@ -22,6 +22,9 @@ mixin _$WaitingRoomPlayerModel {
   Character get character => throw _privateConstructorUsedError;
   WaitingRoomPlayerStatsModel get stats => throw _privateConstructorUsedError;
   String? get avatarDisplayPath => throw _privateConstructorUsedError;
+  String? get profileAvatarId => throw _privateConstructorUsedError;
+  String? get profileAvatarUrl => throw _privateConstructorUsedError;
+  String? get activeBanner => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(
@@ -30,6 +33,9 @@ mixin _$WaitingRoomPlayerModel {
       Character character,
       WaitingRoomPlayerStatsModel stats,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )
     human,
     required TResult Function(
@@ -41,6 +47,9 @@ mixin _$WaitingRoomPlayerModel {
       DiceStatChoice? d6Choice,
       DiceStatChoice? d4Choice,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )
     virtual,
   }) => throw _privateConstructorUsedError;
@@ -52,6 +61,9 @@ mixin _$WaitingRoomPlayerModel {
       Character character,
       WaitingRoomPlayerStatsModel stats,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )?
     human,
     TResult? Function(
@@ -63,6 +75,9 @@ mixin _$WaitingRoomPlayerModel {
       DiceStatChoice? d6Choice,
       DiceStatChoice? d4Choice,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )?
     virtual,
   }) => throw _privateConstructorUsedError;
@@ -74,6 +89,9 @@ mixin _$WaitingRoomPlayerModel {
       Character character,
       WaitingRoomPlayerStatsModel stats,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )?
     human,
     TResult Function(
@@ -85,6 +103,9 @@ mixin _$WaitingRoomPlayerModel {
       DiceStatChoice? d6Choice,
       DiceStatChoice? d4Choice,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )?
     virtual,
     required TResult orElse(),
@@ -126,6 +147,9 @@ abstract class $WaitingRoomPlayerModelCopyWith<$Res> {
     Character character,
     WaitingRoomPlayerStatsModel stats,
     String? avatarDisplayPath,
+    String? profileAvatarId,
+    String? profileAvatarUrl,
+    String? activeBanner,
   });
 
   $WaitingRoomPlayerStatsModelCopyWith<$Res> get stats;
@@ -154,6 +178,9 @@ class _$WaitingRoomPlayerModelCopyWithImpl<
     Object? character = null,
     Object? stats = null,
     Object? avatarDisplayPath = freezed,
+    Object? profileAvatarId = freezed,
+    Object? profileAvatarUrl = freezed,
+    Object? activeBanner = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -176,6 +203,18 @@ class _$WaitingRoomPlayerModelCopyWithImpl<
             avatarDisplayPath: freezed == avatarDisplayPath
                 ? _value.avatarDisplayPath
                 : avatarDisplayPath // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            profileAvatarId: freezed == profileAvatarId
+                ? _value.profileAvatarId
+                : profileAvatarId // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            profileAvatarUrl: freezed == profileAvatarUrl
+                ? _value.profileAvatarUrl
+                : profileAvatarUrl // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            activeBanner: freezed == activeBanner
+                ? _value.activeBanner
+                : activeBanner // ignore: cast_nullable_to_non_nullable
                       as String?,
           )
           as $Val,
@@ -208,6 +247,9 @@ abstract class _$$HumanWaitingRoomPlayerModelImplCopyWith<$Res>
     Character character,
     WaitingRoomPlayerStatsModel stats,
     String? avatarDisplayPath,
+    String? profileAvatarId,
+    String? profileAvatarUrl,
+    String? activeBanner,
   });
 
   @override
@@ -237,6 +279,9 @@ class __$$HumanWaitingRoomPlayerModelImplCopyWithImpl<$Res>
     Object? character = null,
     Object? stats = null,
     Object? avatarDisplayPath = freezed,
+    Object? profileAvatarId = freezed,
+    Object? profileAvatarUrl = freezed,
+    Object? activeBanner = freezed,
   }) {
     return _then(
       _$HumanWaitingRoomPlayerModelImpl(
@@ -260,6 +305,18 @@ class __$$HumanWaitingRoomPlayerModelImplCopyWithImpl<$Res>
             ? _value.avatarDisplayPath
             : avatarDisplayPath // ignore: cast_nullable_to_non_nullable
                   as String?,
+        profileAvatarId: freezed == profileAvatarId
+            ? _value.profileAvatarId
+            : profileAvatarId // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        profileAvatarUrl: freezed == profileAvatarUrl
+            ? _value.profileAvatarUrl
+            : profileAvatarUrl // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        activeBanner: freezed == activeBanner
+            ? _value.activeBanner
+            : activeBanner // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -274,6 +331,9 @@ class _$HumanWaitingRoomPlayerModelImpl implements HumanWaitingRoomPlayerModel {
     required this.character,
     required this.stats,
     this.avatarDisplayPath,
+    this.profileAvatarId,
+    this.profileAvatarUrl,
+    this.activeBanner,
   });
 
   @override
@@ -286,10 +346,16 @@ class _$HumanWaitingRoomPlayerModelImpl implements HumanWaitingRoomPlayerModel {
   final WaitingRoomPlayerStatsModel stats;
   @override
   final String? avatarDisplayPath;
+  @override
+  final String? profileAvatarId;
+  @override
+  final String? profileAvatarUrl;
+  @override
+  final String? activeBanner;
 
   @override
   String toString() {
-    return 'WaitingRoomPlayerModel.human(id: $id, name: $name, character: $character, stats: $stats, avatarDisplayPath: $avatarDisplayPath)';
+    return 'WaitingRoomPlayerModel.human(id: $id, name: $name, character: $character, stats: $stats, avatarDisplayPath: $avatarDisplayPath, profileAvatarId: $profileAvatarId, profileAvatarUrl: $profileAvatarUrl, activeBanner: $activeBanner)';
   }
 
   @override
@@ -303,12 +369,27 @@ class _$HumanWaitingRoomPlayerModelImpl implements HumanWaitingRoomPlayerModel {
                 other.character == character) &&
             (identical(other.stats, stats) || other.stats == stats) &&
             (identical(other.avatarDisplayPath, avatarDisplayPath) ||
-                other.avatarDisplayPath == avatarDisplayPath));
+                other.avatarDisplayPath == avatarDisplayPath) &&
+            (identical(other.profileAvatarId, profileAvatarId) ||
+                other.profileAvatarId == profileAvatarId) &&
+            (identical(other.profileAvatarUrl, profileAvatarUrl) ||
+                other.profileAvatarUrl == profileAvatarUrl) &&
+            (identical(other.activeBanner, activeBanner) ||
+                other.activeBanner == activeBanner));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, name, character, stats, avatarDisplayPath);
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    name,
+    character,
+    stats,
+    avatarDisplayPath,
+    profileAvatarId,
+    profileAvatarUrl,
+    activeBanner,
+  );
 
   /// Create a copy of WaitingRoomPlayerModel
   /// with the given fields replaced by the non-null parameter values.
@@ -330,6 +411,9 @@ class _$HumanWaitingRoomPlayerModelImpl implements HumanWaitingRoomPlayerModel {
       Character character,
       WaitingRoomPlayerStatsModel stats,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )
     human,
     required TResult Function(
@@ -341,10 +425,22 @@ class _$HumanWaitingRoomPlayerModelImpl implements HumanWaitingRoomPlayerModel {
       DiceStatChoice? d6Choice,
       DiceStatChoice? d4Choice,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )
     virtual,
   }) {
-    return human(id, name, character, stats, avatarDisplayPath);
+    return human(
+      id,
+      name,
+      character,
+      stats,
+      avatarDisplayPath,
+      profileAvatarId,
+      profileAvatarUrl,
+      activeBanner,
+    );
   }
 
   @override
@@ -356,6 +452,9 @@ class _$HumanWaitingRoomPlayerModelImpl implements HumanWaitingRoomPlayerModel {
       Character character,
       WaitingRoomPlayerStatsModel stats,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )?
     human,
     TResult? Function(
@@ -367,10 +466,22 @@ class _$HumanWaitingRoomPlayerModelImpl implements HumanWaitingRoomPlayerModel {
       DiceStatChoice? d6Choice,
       DiceStatChoice? d4Choice,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )?
     virtual,
   }) {
-    return human?.call(id, name, character, stats, avatarDisplayPath);
+    return human?.call(
+      id,
+      name,
+      character,
+      stats,
+      avatarDisplayPath,
+      profileAvatarId,
+      profileAvatarUrl,
+      activeBanner,
+    );
   }
 
   @override
@@ -382,6 +493,9 @@ class _$HumanWaitingRoomPlayerModelImpl implements HumanWaitingRoomPlayerModel {
       Character character,
       WaitingRoomPlayerStatsModel stats,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )?
     human,
     TResult Function(
@@ -393,12 +507,24 @@ class _$HumanWaitingRoomPlayerModelImpl implements HumanWaitingRoomPlayerModel {
       DiceStatChoice? d6Choice,
       DiceStatChoice? d4Choice,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )?
     virtual,
     required TResult orElse(),
   }) {
     if (human != null) {
-      return human(id, name, character, stats, avatarDisplayPath);
+      return human(
+        id,
+        name,
+        character,
+        stats,
+        avatarDisplayPath,
+        profileAvatarId,
+        profileAvatarUrl,
+        activeBanner,
+      );
     }
     return orElse();
   }
@@ -442,6 +568,9 @@ abstract class HumanWaitingRoomPlayerModel implements WaitingRoomPlayerModel {
     required final Character character,
     required final WaitingRoomPlayerStatsModel stats,
     final String? avatarDisplayPath,
+    final String? profileAvatarId,
+    final String? profileAvatarUrl,
+    final String? activeBanner,
   }) = _$HumanWaitingRoomPlayerModelImpl;
 
   @override
@@ -454,6 +583,12 @@ abstract class HumanWaitingRoomPlayerModel implements WaitingRoomPlayerModel {
   WaitingRoomPlayerStatsModel get stats;
   @override
   String? get avatarDisplayPath;
+  @override
+  String? get profileAvatarId;
+  @override
+  String? get profileAvatarUrl;
+  @override
+  String? get activeBanner;
 
   /// Create a copy of WaitingRoomPlayerModel
   /// with the given fields replaced by the non-null parameter values.
@@ -481,6 +616,9 @@ abstract class _$$VirtualWaitingRoomPlayerModelImplCopyWith<$Res>
     DiceStatChoice? d6Choice,
     DiceStatChoice? d4Choice,
     String? avatarDisplayPath,
+    String? profileAvatarId,
+    String? profileAvatarUrl,
+    String? activeBanner,
   });
 
   @override
@@ -513,6 +651,9 @@ class __$$VirtualWaitingRoomPlayerModelImplCopyWithImpl<$Res>
     Object? d6Choice = freezed,
     Object? d4Choice = freezed,
     Object? avatarDisplayPath = freezed,
+    Object? profileAvatarId = freezed,
+    Object? profileAvatarUrl = freezed,
+    Object? activeBanner = freezed,
   }) {
     return _then(
       _$VirtualWaitingRoomPlayerModelImpl(
@@ -548,6 +689,18 @@ class __$$VirtualWaitingRoomPlayerModelImplCopyWithImpl<$Res>
             ? _value.avatarDisplayPath
             : avatarDisplayPath // ignore: cast_nullable_to_non_nullable
                   as String?,
+        profileAvatarId: freezed == profileAvatarId
+            ? _value.profileAvatarId
+            : profileAvatarId // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        profileAvatarUrl: freezed == profileAvatarUrl
+            ? _value.profileAvatarUrl
+            : profileAvatarUrl // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        activeBanner: freezed == activeBanner
+            ? _value.activeBanner
+            : activeBanner // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -566,6 +719,9 @@ class _$VirtualWaitingRoomPlayerModelImpl
     this.d6Choice,
     this.d4Choice,
     this.avatarDisplayPath,
+    this.profileAvatarId,
+    this.profileAvatarUrl,
+    this.activeBanner,
   });
 
   @override
@@ -584,10 +740,16 @@ class _$VirtualWaitingRoomPlayerModelImpl
   final DiceStatChoice? d4Choice;
   @override
   final String? avatarDisplayPath;
+  @override
+  final String? profileAvatarId;
+  @override
+  final String? profileAvatarUrl;
+  @override
+  final String? activeBanner;
 
   @override
   String toString() {
-    return 'WaitingRoomPlayerModel.virtual(id: $id, name: $name, character: $character, stats: $stats, virtualType: $virtualType, d6Choice: $d6Choice, d4Choice: $d4Choice, avatarDisplayPath: $avatarDisplayPath)';
+    return 'WaitingRoomPlayerModel.virtual(id: $id, name: $name, character: $character, stats: $stats, virtualType: $virtualType, d6Choice: $d6Choice, d4Choice: $d4Choice, avatarDisplayPath: $avatarDisplayPath, profileAvatarId: $profileAvatarId, profileAvatarUrl: $profileAvatarUrl, activeBanner: $activeBanner)';
   }
 
   @override
@@ -607,7 +769,13 @@ class _$VirtualWaitingRoomPlayerModelImpl
             (identical(other.d4Choice, d4Choice) ||
                 other.d4Choice == d4Choice) &&
             (identical(other.avatarDisplayPath, avatarDisplayPath) ||
-                other.avatarDisplayPath == avatarDisplayPath));
+                other.avatarDisplayPath == avatarDisplayPath) &&
+            (identical(other.profileAvatarId, profileAvatarId) ||
+                other.profileAvatarId == profileAvatarId) &&
+            (identical(other.profileAvatarUrl, profileAvatarUrl) ||
+                other.profileAvatarUrl == profileAvatarUrl) &&
+            (identical(other.activeBanner, activeBanner) ||
+                other.activeBanner == activeBanner));
   }
 
   @override
@@ -621,6 +789,9 @@ class _$VirtualWaitingRoomPlayerModelImpl
     d6Choice,
     d4Choice,
     avatarDisplayPath,
+    profileAvatarId,
+    profileAvatarUrl,
+    activeBanner,
   );
 
   /// Create a copy of WaitingRoomPlayerModel
@@ -645,6 +816,9 @@ class _$VirtualWaitingRoomPlayerModelImpl
       Character character,
       WaitingRoomPlayerStatsModel stats,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )
     human,
     required TResult Function(
@@ -656,6 +830,9 @@ class _$VirtualWaitingRoomPlayerModelImpl
       DiceStatChoice? d6Choice,
       DiceStatChoice? d4Choice,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )
     virtual,
   }) {
@@ -668,6 +845,9 @@ class _$VirtualWaitingRoomPlayerModelImpl
       d6Choice,
       d4Choice,
       avatarDisplayPath,
+      profileAvatarId,
+      profileAvatarUrl,
+      activeBanner,
     );
   }
 
@@ -680,6 +860,9 @@ class _$VirtualWaitingRoomPlayerModelImpl
       Character character,
       WaitingRoomPlayerStatsModel stats,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )?
     human,
     TResult? Function(
@@ -691,6 +874,9 @@ class _$VirtualWaitingRoomPlayerModelImpl
       DiceStatChoice? d6Choice,
       DiceStatChoice? d4Choice,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )?
     virtual,
   }) {
@@ -703,6 +889,9 @@ class _$VirtualWaitingRoomPlayerModelImpl
       d6Choice,
       d4Choice,
       avatarDisplayPath,
+      profileAvatarId,
+      profileAvatarUrl,
+      activeBanner,
     );
   }
 
@@ -715,6 +904,9 @@ class _$VirtualWaitingRoomPlayerModelImpl
       Character character,
       WaitingRoomPlayerStatsModel stats,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )?
     human,
     TResult Function(
@@ -726,6 +918,9 @@ class _$VirtualWaitingRoomPlayerModelImpl
       DiceStatChoice? d6Choice,
       DiceStatChoice? d4Choice,
       String? avatarDisplayPath,
+      String? profileAvatarId,
+      String? profileAvatarUrl,
+      String? activeBanner,
     )?
     virtual,
     required TResult orElse(),
@@ -740,6 +935,9 @@ class _$VirtualWaitingRoomPlayerModelImpl
         d6Choice,
         d4Choice,
         avatarDisplayPath,
+        profileAvatarId,
+        profileAvatarUrl,
+        activeBanner,
       );
     }
     return orElse();
@@ -787,6 +985,9 @@ abstract class VirtualWaitingRoomPlayerModel implements WaitingRoomPlayerModel {
     final DiceStatChoice? d6Choice,
     final DiceStatChoice? d4Choice,
     final String? avatarDisplayPath,
+    final String? profileAvatarId,
+    final String? profileAvatarUrl,
+    final String? activeBanner,
   }) = _$VirtualWaitingRoomPlayerModelImpl;
 
   @override
@@ -802,6 +1003,12 @@ abstract class VirtualWaitingRoomPlayerModel implements WaitingRoomPlayerModel {
   DiceStatChoice? get d4Choice;
   @override
   String? get avatarDisplayPath;
+  @override
+  String? get profileAvatarId;
+  @override
+  String? get profileAvatarUrl;
+  @override
+  String? get activeBanner;
 
   /// Create a copy of WaitingRoomPlayerModel
   /// with the given fields replaced by the non-null parameter values.

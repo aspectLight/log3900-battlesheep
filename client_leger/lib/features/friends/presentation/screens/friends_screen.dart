@@ -7,6 +7,8 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/localisation/core_localizations.dart';
+import '../../../../../core/presentation/shell/shell_chrome_back_handler.dart';
+import '../../../../../core/presentation/shell/shell_chrome_metrics.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
 import '../widgets/friends_tab_bar.dart';
 import '../widgets/user_card.dart';
@@ -16,8 +18,6 @@ const _kBorder = Color(0xFF3a3a3a);
 const _kHeaderText = Color(0xFFe0d8c0);
 const _kStateBg = Color(0x40000000);
 const _kAccept = Color(0xFF145214);
-const _kDanger = Color(0xFFff6b6b);
-const _kDangerBorder = Color(0xFF7f1f1f);
 const _kBlock = Color(0xFFffb347);
 const _kBlockBorder = Color(0xFF8b5a00);
 
@@ -38,11 +38,13 @@ class _FriendsScreenState extends State<FriendsScreen> {
   void initState() {
     super.initState();
     _viewModel = GetIt.I<FriendsViewModel>();
-    _viewModel.loadAll();
+    GetIt.I<ShellChromeBackHandler>().register(_viewModel.requestLeave);
+    unawaited(_viewModel.loadAll());
   }
 
   @override
   void dispose() {
+    GetIt.I<ShellChromeBackHandler>().clear();
     _searchController.dispose();
     _debounce?.cancel();
     super.dispose();
@@ -59,13 +61,12 @@ class _FriendsScreenState extends State<FriendsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = CoreLocalizations.of(context)!;
+    final topInset = shellChromeBodyTopInset(context);
     return AppBackground(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.fromLTRB(20, topInset + 20, 20, 20),
         child: Column(
           children: [
-            _buildHeader(l10n),
-            const SizedBox(height: 12),
             Watch((context) {
               final err = _viewModel.errorMessage.value;
               if (err == null) return const SizedBox.shrink();
@@ -83,63 +84,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
             Expanded(child: Watch((context) => _buildTabContent(l10n))),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(CoreLocalizations l10n) {
-    return SizedBox(
-      width: double.infinity,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: GestureDetector(
-              onTap: _viewModel.requestLeave,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.chevron_left,
-                      color: Colors.white,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 18),
-                    Text(
-                      l10n.homePage,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'CustomFont',
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Text(
-            l10n.friends,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 44,
-              fontFamily: 'CustomFont',
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
-              shadows: [
-                Shadow(
-                  color: Color(0x99000000),
-                  offset: Offset(0, 3),
-                  blurRadius: 12,
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -184,13 +128,12 @@ class _FriendsScreenState extends State<FriendsScreen> {
         return UserCard(
           username: f.username,
           avatarId: f.avatarId,
+          avatarUrl: f.avatarUrl,
           isOnline: f.isOnline,
           actions: [
             FriendActionButton(
               label: l10n.removeFriend,
               onPressed: () => _viewModel.removeFriend(f.username),
-              color: _kDanger,
-              borderColor: _kDangerBorder,
             ),
             FriendActionButton(
               label: l10n.blockUser,
@@ -226,8 +169,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
                 FriendActionButton(
                   label: l10n.refuse,
                   onPressed: () => _viewModel.refuseRequest(r.id),
-                  color: _kDanger,
-                  borderColor: _kDangerBorder,
                 ),
               ],
             ),
@@ -242,8 +183,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
                 FriendActionButton(
                   label: l10n.cancel,
                   onPressed: () => _viewModel.cancelRequest(r.id),
-                  color: _kDanger,
-                  borderColor: _kDangerBorder,
                 ),
               ],
             ),
@@ -298,6 +237,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                 return UserCard(
                   username: u.username,
                   avatarId: u.avatarId,
+                  avatarUrl: u.avatarUrl,
                   isOnline: u.isOnline,
                   actions: isBlocked
                       ? [
@@ -315,8 +255,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
                               label: l10n.cancel,
                               onPressed: () => _viewModel
                                   .cancelRequestByUsername(u.username),
-                              color: _kDanger,
-                              borderColor: _kDangerBorder,
                             )
                           else
                             FriendActionButton(

@@ -9,4 +9,3 @@ class AuthCredentialsModel with _$AuthCredentialsModel {
     required String apiSessionId,
   }) = _AuthCredentialsModel;
 }
-

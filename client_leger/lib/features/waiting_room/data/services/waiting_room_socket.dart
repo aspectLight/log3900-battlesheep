@@ -55,6 +55,7 @@ class WaitingRoomSocket {
   final _roomCanceledController = StreamController<void>.broadcast();
   final _roomLockedController = StreamController<void>.broadcast();
   final _roomUnlockedController = StreamController<void>.broadcast();
+  final _dropInDropOutToggledController = StreamController<bool>.broadcast();
   final _playerLeftController = StreamController<String>.broadcast();
   final _playerCreatedController =
       StreamController<List<WaitingRoomPlayerModel>>.broadcast();
@@ -75,6 +76,7 @@ class WaitingRoomSocket {
     WaitingRoomSocketEvents.inbound.roomCanceled,
     WaitingRoomSocketEvents.inbound.waitingRoomLocked,
     WaitingRoomSocketEvents.inbound.waitingRoomUnlocked,
+    WaitingRoomSocketEvents.inbound.dropInDropOutToggled,
     WaitingRoomSocketEvents.inbound.playerLeft,
     WaitingRoomSocketEvents.inbound.playerCreated,
     WaitingRoomSocketEvents.inbound.playerKicked,
@@ -91,6 +93,8 @@ class WaitingRoomSocket {
   Stream<void> get roomCanceledStream => _roomCanceledController.stream;
   Stream<void> get roomLockedStream => _roomLockedController.stream;
   Stream<void> get roomUnlockedStream => _roomUnlockedController.stream;
+  Stream<bool> get dropInDropOutToggledStream =>
+      _dropInDropOutToggledController.stream;
   Stream<String> get playerLeftStream => _playerLeftController.stream;
   Stream<List<WaitingRoomPlayerModel>> get playerCreatedStream =>
       _playerCreatedController.stream;
@@ -132,6 +136,12 @@ class WaitingRoomSocket {
       ),
       subscribeSocketEvent<Map<String, dynamic>>(
         _socketService,
+        WaitingRoomSocketEvents.inbound.dropInDropOutToggled,
+        _dropInDropOutToggledController,
+        (data) => data['dropInDropOut'] as bool? ?? false,
+      ),
+      subscribeSocketEvent<Map<String, dynamic>>(
+        _socketService,
         WaitingRoomSocketEvents.inbound.playerLeft,
         _playerLeftController,
         (data) => PlayerLeftPayloadDto.fromJson(data).playerId,
@@ -144,16 +154,15 @@ class WaitingRoomSocket {
       ),
       _socketService
           .on<Map<String, dynamic>>(
-        WaitingRoomSocketEvents.inbound.updateAvatarReserved,
-      )
+            WaitingRoomSocketEvents.inbound.updateAvatarReserved,
+          )
           .listen((data) {
-        _updateCharacterReservedController.add(
-          UpdateCharacterReservedPayloadDto.fromJson(data)
-              .reservedCharacters
-              .map((d) => d.toModel())
-              .toList(),
-        );
-      }),
+            _updateCharacterReservedController.add(
+              UpdateCharacterReservedPayloadDto.fromJson(
+                data,
+              ).reservedCharacters.map((d) => d.toModel()).toList(),
+            );
+          }),
       subscribeSocketEvent<Object?>(
         _socketService,
         WaitingRoomSocketEvents.inbound.waitingRoomError,
@@ -215,6 +224,13 @@ class WaitingRoomSocket {
     _socketService.emit(
       WaitingRoomSocketEvents.outbound.toggleLockWaitingRoom,
       command.roomId,
+    );
+  }
+
+  void toggleDropInDropOut(String roomId) {
+    _socketService.emit(
+      WaitingRoomSocketEvents.outbound.toggleDropInDropOut,
+      roomId,
     );
   }
 
@@ -281,6 +297,7 @@ class WaitingRoomSocket {
     await _roomCanceledController.close();
     await _roomLockedController.close();
     await _roomUnlockedController.close();
+    await _dropInDropOutToggledController.close();
     await _playerLeftController.close();
     await _playerCreatedController.close();
     await _playerKickedController.close();

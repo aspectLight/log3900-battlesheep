@@ -4,9 +4,7 @@ part 'generate_room_code_response_dto.g.dart';
 
 @JsonSerializable()
 class GenerateRoomCodeResponseDto {
-  const GenerateRoomCodeResponseDto({
-    required this.code,
-  });
+  const GenerateRoomCodeResponseDto({required this.code});
 
   final String code;
 

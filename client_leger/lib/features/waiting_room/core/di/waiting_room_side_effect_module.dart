@@ -88,13 +88,14 @@ void registerWaitingRoomSideEffect(GetIt scope, GetIt rootGetIt) {
     ),
     dispose: (sideEffect) => sideEffect.dispose(),
   );
-  scope.registerSingleton<WaitingRoomSelectVirtualProfileNotificationSideEffect>(
-    WaitingRoomSelectVirtualProfileNotificationSideEffect(
-      waitingRoomEventBus: waitingRoomEventBus,
-      modalIntentSink: modalIntentSink,
-    ),
-    dispose: (sideEffect) => sideEffect.dispose(),
-  );
+  scope
+      .registerSingleton<WaitingRoomSelectVirtualProfileNotificationSideEffect>(
+        WaitingRoomSelectVirtualProfileNotificationSideEffect(
+          waitingRoomEventBus: waitingRoomEventBus,
+          modalIntentSink: modalIntentSink,
+        ),
+        dispose: (sideEffect) => sideEffect.dispose(),
+      );
   scope.registerSingleton<WaitingRoomRoomLockedNotificationSideEffect>(
     WaitingRoomRoomLockedNotificationSideEffect(
       waitingRoomEventBus: waitingRoomEventBus,

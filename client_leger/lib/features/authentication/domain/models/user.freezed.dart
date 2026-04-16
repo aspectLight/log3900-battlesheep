@@ -21,6 +21,7 @@ mixin _$UserModel {
   String get email => throw _privateConstructorUsedError;
   String get username => throw _privateConstructorUsedError;
   String get avatarId => throw _privateConstructorUsedError;
+  String? get avatarUrl => throw _privateConstructorUsedError;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -34,7 +35,13 @@ abstract class $UserModelCopyWith<$Res> {
   factory $UserModelCopyWith(UserModel value, $Res Function(UserModel) then) =
       _$UserModelCopyWithImpl<$Res, UserModel>;
   @useResult
-  $Res call({String uid, String email, String username, String avatarId});
+  $Res call({
+    String uid,
+    String email,
+    String username,
+    String avatarId,
+    String? avatarUrl,
+  });
 }
 
 /// @nodoc
@@ -56,6 +63,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? email = null,
     Object? username = null,
     Object? avatarId = null,
+    Object? avatarUrl = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -75,6 +83,10 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.avatarId
                 : avatarId // ignore: cast_nullable_to_non_nullable
                       as String,
+            avatarUrl: freezed == avatarUrl
+                ? _value.avatarUrl
+                : avatarUrl // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -90,7 +102,13 @@ abstract class _$$UserModelImplCopyWith<$Res>
   ) = __$$UserModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String uid, String email, String username, String avatarId});
+  $Res call({
+    String uid,
+    String email,
+    String username,
+    String avatarId,
+    String? avatarUrl,
+  });
 }
 
 /// @nodoc
@@ -111,6 +129,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? email = null,
     Object? username = null,
     Object? avatarId = null,
+    Object? avatarUrl = freezed,
   }) {
     return _then(
       _$UserModelImpl(
@@ -130,6 +149,10 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.avatarId
             : avatarId // ignore: cast_nullable_to_non_nullable
                   as String,
+        avatarUrl: freezed == avatarUrl
+            ? _value.avatarUrl
+            : avatarUrl // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -143,6 +166,7 @@ class _$UserModelImpl implements _UserModel {
     required this.email,
     required this.username,
     required this.avatarId,
+    this.avatarUrl,
   });
 
   @override
@@ -153,10 +177,12 @@ class _$UserModelImpl implements _UserModel {
   final String username;
   @override
   final String avatarId;
+  @override
+  final String? avatarUrl;
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, username: $username, avatarId: $avatarId)';
+    return 'UserModel(uid: $uid, email: $email, username: $username, avatarId: $avatarId, avatarUrl: $avatarUrl)';
   }
 
   @override
@@ -169,11 +195,14 @@ class _$UserModelImpl implements _UserModel {
             (identical(other.username, username) ||
                 other.username == username) &&
             (identical(other.avatarId, avatarId) ||
-                other.avatarId == avatarId));
+                other.avatarId == avatarId) &&
+            (identical(other.avatarUrl, avatarUrl) ||
+                other.avatarUrl == avatarUrl));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, uid, email, username, avatarId);
+  int get hashCode =>
+      Object.hash(runtimeType, uid, email, username, avatarId, avatarUrl);
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -190,6 +219,7 @@ abstract class _UserModel implements UserModel {
     required final String email,
     required final String username,
     required final String avatarId,
+    final String? avatarUrl,
   }) = _$UserModelImpl;
 
   @override
@@ -200,6 +230,8 @@ abstract class _UserModel implements UserModel {
   String get username;
   @override
   String get avatarId;
+  @override
+  String? get avatarUrl;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.

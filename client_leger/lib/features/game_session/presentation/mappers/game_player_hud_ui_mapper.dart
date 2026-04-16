@@ -30,10 +30,7 @@ Option<GamePlayerHudUiState> toGamePlayerHudUiState(
         .toList();
     final avatar = Avatar.values.byName(player.characterType.name);
     final avatarPath = AvatarAssets.avatarPath(avatar);
-    final attackAsset = StatAssets.dicePath(
-      StatType.attack,
-      player.diceChoice,
-    );
+    final attackAsset = StatAssets.dicePath(StatType.attack, player.diceChoice);
     final defenseAsset = StatAssets.dicePath(
       StatType.defense,
       player.diceChoice,

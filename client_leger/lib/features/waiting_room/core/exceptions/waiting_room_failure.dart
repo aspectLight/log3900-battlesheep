@@ -17,12 +17,13 @@ class RoomLockedWaitingRoomFailure extends WaitingRoomFailure {
 
 class CharacterAlreadyReservedWaitingRoomFailure extends WaitingRoomFailure {
   const CharacterAlreadyReservedWaitingRoomFailure()
-      : super('Character already reserved');
+    : super('Character already reserved');
 }
 
-class VirtualPlayerNameUnavailableWaitingRoomFailure extends WaitingRoomFailure {
+class VirtualPlayerNameUnavailableWaitingRoomFailure
+    extends WaitingRoomFailure {
   const VirtualPlayerNameUnavailableWaitingRoomFailure()
-      : super('No available virtual player name');
+    : super('No available virtual player name');
 }
 
 class PlayerKickedWaitingRoomFailure extends WaitingRoomFailure {
@@ -31,7 +32,7 @@ class PlayerKickedWaitingRoomFailure extends WaitingRoomFailure {
 
 class MaxPlayerLimitReachedWaitingRoomFailure extends WaitingRoomFailure {
   const MaxPlayerLimitReachedWaitingRoomFailure()
-      : super('Max player limit reached');
+    : super('Max player limit reached');
 }
 
 class StartGameFailedWaitingRoomFailure extends WaitingRoomFailure {

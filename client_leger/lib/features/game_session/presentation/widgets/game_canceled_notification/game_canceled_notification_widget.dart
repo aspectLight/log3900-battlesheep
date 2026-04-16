@@ -82,7 +82,10 @@ class _GameCanceledNotificationWidgetState
                 elevation: 0,
                 side: const BorderSide(color: Color.fromARGB(255, 127, 31, 31)),
                 padding: const EdgeInsets.symmetric(vertical: 10),
-                textStyle: const TextStyle(fontSize: 15, fontFamily: 'CustomFont'),
+                textStyle: const TextStyle(
+                  fontSize: 15,
+                  fontFamily: 'CustomFont',
+                ),
               ),
               child: Text(l10n.gameSessionInfoContinue),
             ),

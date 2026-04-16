@@ -19,6 +19,7 @@ sealed class WaitingRoomEntryAppEvent
     required int boardSize,
     required bool isCTF,
     @Default(false) bool friendsOnly,
+    @Default(0) int entryFee,
   }) = WaitingRoomEnteredAsHost;
   const factory WaitingRoomEntryAppEvent.enteredAsJoin({
     required String roomId,

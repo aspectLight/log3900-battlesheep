@@ -1,5 +1,1 @@
-enum GameMode {
-  classic,
-  captureTheFlag,
-}
-
+enum GameMode { classic, captureTheFlag }

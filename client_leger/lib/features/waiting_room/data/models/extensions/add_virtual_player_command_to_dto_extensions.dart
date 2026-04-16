@@ -3,8 +3,6 @@ import '../dto/create_player_payload_dto.dart';
 import 'waiting_room_player_model_extensions.dart';
 
 extension AddVirtualPlayerCommandToDto on AddVirtualPlayerCommand {
-  CreatePlayerPayloadDto toCreatePlayerPayloadDto() => CreatePlayerPayloadDto(
-        roomId: roomId,
-        player: player.toDto(),
-      );
+  CreatePlayerPayloadDto toCreatePlayerPayloadDto() =>
+      CreatePlayerPayloadDto(roomId: roomId, player: player.toDto());
 }

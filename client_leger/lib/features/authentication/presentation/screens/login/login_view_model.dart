@@ -19,8 +19,8 @@ class LoginViewModel {
   LoginViewModel({
     required LoginUseCase loginUseCase,
     required AppTransitionEventBus appTransitionEventBus,
-  })  : _loginUseCase = loginUseCase,
-        _appTransitionEventBus = appTransitionEventBus;
+  }) : _loginUseCase = loginUseCase,
+       _appTransitionEventBus = appTransitionEventBus;
 
   final formState = signal<LoginFormUiState>(LoginFormUiState.initial());
   final authState = signal<AuthState>(const AuthState.initial());
@@ -67,8 +67,7 @@ class LoginViewModel {
   }
 
   Future<void> signInSubmit() async {
-    formState.value =
-        formState.value.copyWith(hasAttemptedSubmit: true);
+    formState.value = formState.value.copyWith(hasAttemptedSubmit: true);
 
     if (!isFormValid.value) {
       return;
@@ -79,10 +78,7 @@ class LoginViewModel {
     final state = formState.value;
     final result = await _loginUseCase
         .execute(
-          SignInCommand(
-            username: state.username,
-            password: state.password,
-          ),
+          SignInCommand(username: state.username, password: state.password),
         )
         .run();
 
@@ -93,7 +89,6 @@ class LoginViewModel {
         authState.value = AuthState.authenticated(user);
         _appTransitionEventBus.fire(AuthEntryAppEvent.signInSuccess(user));
     }
-
   }
 
   void resetForm() {

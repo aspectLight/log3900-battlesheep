@@ -69,7 +69,9 @@ GameSummaryDto _$GameSummaryDtoFromJson(Map<String, dynamic> json) =>
       board: GameSummaryBoardDto.fromJson(
         json['board'] as Map<String, dynamic>,
       ),
-      isVisible: json['isVisible'] as bool,
+      privacy: json['privacy'] as String,
+      owner: json['owner'] as String,
+      actionPoints: (json['actionPoints'] as num?)?.toInt() ?? 1,
       modificationDate: json['modificationDate'] as String,
     );
 
@@ -80,6 +82,8 @@ Map<String, dynamic> _$GameSummaryDtoToJson(GameSummaryDto instance) =>
       'description': instance.description,
       'mode': const GameModeConverter().toJson(instance.mode),
       'board': instance.board,
-      'isVisible': instance.isVisible,
+      'privacy': instance.privacy,
+      'owner': instance.owner,
+      'actionPoints': instance.actionPoints,
       'modificationDate': instance.modificationDate,
     };

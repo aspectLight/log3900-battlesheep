@@ -112,9 +112,13 @@ class SocketService {
 
   Future<T?> emitWithAck<T extends Object?>(String event, Object? data) {
     final completer = Completer<T?>();
-    _socket!.emitWithAck(event, data, ack: (response) {
-      if (!completer.isCompleted) completer.complete(response as T?);
-    });
+    _socket!.emitWithAck(
+      event,
+      data,
+      ack: (response) {
+        if (!completer.isCompleted) completer.complete(response as T?);
+      },
+    );
     LogService.d('Emitted event with ack: $event');
     return completer.future;
   }
@@ -123,8 +127,7 @@ class SocketService {
     String event,
     Object? data,
     Either<E, R> Function(Object? raw) parse,
-  ) async =>
-      parse(await emitWithAck<Object?>(event, data));
+  ) async => parse(await emitWithAck<Object?>(event, data));
 
   Stream<T> on<T extends Object?>(String event) {
     return _eventControllers

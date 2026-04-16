@@ -1,4 +1,1 @@
-enum SessionEndReason {
-  abandoned,
-  canceled,
-}
+enum SessionEndReason { abandoned, canceled }

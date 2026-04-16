@@ -6,8 +6,6 @@ import 'modal_widget_registry.dart';
 
 void registerModalModule(GetIt getIt) {
   getIt.registerLazySingleton<ModalCoordinator>(ModalCoordinator.new);
-  getIt.registerLazySingleton<ModalIntentSink>(
-    () => getIt<ModalCoordinator>(),
-  );
+  getIt.registerLazySingleton<ModalIntentSink>(() => getIt<ModalCoordinator>());
   getIt.registerLazySingleton<ModalWidgetRegistry>(ModalWidgetRegistry.new);
 }

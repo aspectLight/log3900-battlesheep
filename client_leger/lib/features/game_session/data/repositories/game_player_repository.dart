@@ -3,6 +3,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 import '../../domain/events/game_events.dart';
 import '../../domain/events/game_item_events.dart';
 import '../../domain/events/game_movement_events.dart';
+import '../../domain/events/game_environment_events.dart';
 import '../../domain/state/game_player_state.dart';
 import '../reducers/game_player_state_reducer.dart';
 
@@ -12,7 +13,7 @@ class GamePlayerRepository {
   final Signal<GamePlayerState> state = signal(GamePlayerState.initial());
 
   GamePlayerRepository({required GamePlayerStateReducer reducer})
-      : _reducer = reducer;
+    : _reducer = reducer;
 
   void applyPlayersSpawned(PlayerSpawnedEvent event) {
     state.value = _reducer.reduce(state.value, event);
@@ -26,42 +27,43 @@ class GamePlayerRepository {
     state.value = _reducer.reduce(state.value, event);
   }
 
-
   void applyScoreUpdated(UpdateScoreEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
-
 
   void applyPlayerMoved(PlayerMovedEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
 
-
   void applyVirtualPlayerMoved(VirtualPlayerMovedEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
-
 
   void applyMovementStep(PlayerMovementStepEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
 
-
   void applyPlayerIdleReset(PlayerIdleResetEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
 
-
   void applyTurnStartingPlayerPoints(TurnStartingPlayerPointsEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
-
 
   void applyPlayerHealthUpdated(PlayerHealthUpdatedEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
 
   void applyItemCollected(ItemCollectedEvent event) {
+    state.value = _reducer.reduce(state.value, event);
+  }
+
+  void applyTrapResult(TrapResultSyncEvent event) {
+    state.value = _reducer.reduce(state.value, event);
+  }
+
+  void applyTorchPlayerStats(PlayerTorchStatsSyncEvent event) {
     state.value = _reducer.reduce(state.value, event);
   }
 

@@ -8,12 +8,10 @@ import '../models/user.dart';
 class LoginUseCase {
   final AuthRepository _authRepository;
 
-  LoginUseCase({
-    required AuthRepository authRepository,
-  }) : _authRepository = authRepository;
+  LoginUseCase({required AuthRepository authRepository})
+    : _authRepository = authRepository;
 
   TaskEither<AuthException, UserModel> execute(SignInCommand command) {
     return _authRepository.signIn(command);
   }
 }
-

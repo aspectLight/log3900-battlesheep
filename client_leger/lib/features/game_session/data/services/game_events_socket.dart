@@ -13,12 +13,14 @@ class GameEventsSocket {
 
   final _playerSpawnedController =
       ReplayLatestBroadcastController<PlayerSpawnedEvent>();
+  final _playerJoinedGameController =
+      StreamController<PlayerSpawnedEvent>.broadcast();
   final _turnStartingController =
       ReplayLatestBroadcastController<TurnStartingEvent>();
   final _updateCountdownController =
-      StreamController<UpdateCountdownEvent>.broadcast();
+      ReplayLatestBroadcastController<UpdateCountdownEvent>();
   final _updateStartingCountdownController =
-      StreamController<UpdateStartingCountdownEvent>.broadcast();
+      ReplayLatestBroadcastController<UpdateStartingCountdownEvent>();
   final _updateScoreController = StreamController<UpdateScoreEvent>.broadcast();
   final _finishGameController = StreamController<FinishGameEvent>.broadcast();
   final _gameCanceledController =
@@ -48,6 +50,7 @@ class GameEventsSocket {
 
   static const List<String> _ownedEvents = [
     GameEventsSocketEvents.playerSpawned,
+    GameEventsSocketEvents.playerJoinedGame,
     GameEventsSocketEvents.turnStarting,
     GameEventsSocketEvents.updateCountdown,
     GameEventsSocketEvents.updateStartingCountdown,
@@ -59,9 +62,11 @@ class GameEventsSocket {
     GameEventsSocketEvents.organizatorChanged,
   ];
 
-
   Stream<PlayerSpawnedEvent> get playerSpawnedStream =>
       _playerSpawnedController.stream;
+
+  Stream<PlayerSpawnedEvent> get playerJoinedGameStream =>
+      _playerJoinedGameController.stream;
 
   Stream<TurnStartingEvent> get turnStartingStream =>
       _turnStartingController.stream;
@@ -103,21 +108,34 @@ class GameEventsSocket {
             _playerSpawnedController.add(data.toPlayerSpawnedDto().toEntity());
           }),
       _socketService
+          .on<Map<String, dynamic>>(GameEventsSocketEvents.playerJoinedGame)
+          .listen((data) {
+            final raw = data['players'];
+            if (raw is! List<dynamic>) return;
+            final dto = PlayerSpawnedDto(
+              players: raw
+                  .whereType<Map<String, dynamic>>()
+                  .map(SpawnedPlayerDto.fromPlayerSpawnedPayload)
+                  .toList(),
+            );
+            _playerJoinedGameController.add(dto.toEntity());
+          }),
+      _socketService
           .on<Map<String, dynamic>>(GameEventsSocketEvents.turnStarting)
           .listen((data) {
             _turnStartingController.add(
               TurnStartingDto.fromObject(data).toEntity(),
             );
           }),
-      _socketService
-          .on<Object?>(GameEventsSocketEvents.updateCountdown)
-          .listen((data) {
-            final v = tryParseSocketWholeNumber(data);
-            if (v == null) return;
-            _updateCountdownController.add(
-              UpdateCountdownDto(countdown: v).toEntity(),
-            );
-          }),
+      _socketService.on<Object?>(GameEventsSocketEvents.updateCountdown).listen(
+        (data) {
+          final v = tryParseSocketWholeNumber(data);
+          if (v == null) return;
+          _updateCountdownController.add(
+            UpdateCountdownDto(countdown: v).toEntity(),
+          );
+        },
+      ),
       _socketService
           .on<Object?>(GameEventsSocketEvents.updateStartingCountdown)
           .listen((data) {
@@ -130,16 +148,12 @@ class GameEventsSocket {
       _socketService.on<String>(GameEventsSocketEvents.updateScore).listen((
         data,
       ) {
-        _updateScoreController.add(
-          UpdateScoreDto.fromObject(data).toEntity(),
-        );
+        _updateScoreController.add(UpdateScoreDto.fromObject(data).toEntity());
       }),
       _socketService.on<String>(GameEventsSocketEvents.finishGame).listen((
         data,
       ) {
-        _finishGameController.add(
-          FinishGameDto.fromObject(data).toEntity(),
-        );
+        _finishGameController.add(FinishGameDto.fromObject(data).toEntity());
       }),
       _socketService
           .on<Map<String, dynamic>>(GameEventsSocketEvents.gameCanceled)
@@ -179,7 +193,6 @@ class GameEventsSocket {
     _eventSubscriptions.clear();
   }
 
-
   Future<void> dispose() async {
     await _connectionSubscription?.cancel();
     for (final subscription in _eventSubscriptions) {
@@ -188,6 +201,7 @@ class GameEventsSocket {
     _eventSubscriptions.clear();
     _ownedEvents.forEach(_socketService.off);
     await _playerSpawnedController.close();
+    await _playerJoinedGameController.close();
     await _turnStartingController.close();
     await _updateCountdownController.close();
     await _updateStartingCountdownController.close();

@@ -6,8 +6,8 @@ class GameSessionPlayGameSideEffect with DisposableSideEffect {
   GameSessionPlayGameSideEffect({
     required GameSessionEventBus gameSessionEventBus,
     required GameEventsSocket gameEventsSocket,
-  })  : _gameSessionEventBus = gameSessionEventBus,
-        _gameEventsSocket = gameEventsSocket {
+  }) : _gameSessionEventBus = gameSessionEventBus,
+       _gameEventsSocket = gameEventsSocket {
     trackSubscription(
       _gameSessionEventBus.on<GameSessionScopeReady>().listen(_onScopeReady),
     );

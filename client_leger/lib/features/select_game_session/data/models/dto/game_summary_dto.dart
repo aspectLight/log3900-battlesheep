@@ -27,10 +27,7 @@ class GameSummaryCellDto {
   @JsonKey(name: 'item')
   final GameSummaryItemDto? itemData;
 
-  const GameSummaryCellDto({
-    required this.tileData,
-    this.itemData,
-  });
+  const GameSummaryCellDto({required this.tileData, this.itemData});
 
   factory GameSummaryCellDto.fromJson(Map<String, dynamic> json) =>
       _$GameSummaryCellDtoFromJson(json);
@@ -49,11 +46,7 @@ class GameSummaryTileDto {
   final String? orientation;
   final String? state;
 
-  const GameSummaryTileDto({
-    required this.type,
-    this.orientation,
-    this.state,
-  });
+  const GameSummaryTileDto({required this.type, this.orientation, this.state});
 
   factory GameSummaryTileDto.fromJson(Map<String, dynamic> json) =>
       _$GameSummaryTileDtoFromJson(json);
@@ -83,7 +76,10 @@ class GameSummaryDto {
   @GameModeConverter()
   final GameMode mode;
   final GameSummaryBoardDto board;
-  final bool isVisible;
+  final String privacy;
+  final String owner;
+  @JsonKey(defaultValue: 1)
+  final int actionPoints;
   final String modificationDate;
 
   const GameSummaryDto({
@@ -92,7 +88,9 @@ class GameSummaryDto {
     required this.description,
     required this.mode,
     required this.board,
-    required this.isVisible,
+    required this.privacy,
+    required this.owner,
+    required this.actionPoints,
     required this.modificationDate,
   });
 
@@ -101,5 +99,3 @@ class GameSummaryDto {
 
   Map<String, dynamic> toJson() => _$GameSummaryDtoToJson(this);
 }
-
-

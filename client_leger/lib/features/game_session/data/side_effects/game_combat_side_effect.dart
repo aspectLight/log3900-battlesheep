@@ -120,8 +120,9 @@ class GameCombatSideEffect with DisposableSideEffect {
           _socketId == event.loserId ||
           (loser.isVirtual && _socketId == meta.hostId);
       if (!shouldSendTeleport) return;
-      final hasCamouflage = loser.inventory
-          .any((item) => item?.type == ItemType.camouflage);
+      final hasCamouflage = loser.inventory.any(
+        (item) => item?.type == ItemType.camouflage,
+      );
       _movementRepository.teleportPlayer(
         PlayerTeleportedCommand(
           roomId: meta.roomId,
@@ -148,9 +149,7 @@ class GameCombatSideEffect with DisposableSideEffect {
     if (combat is CombatWithResult) {
       _combatResultsClearTimer?.cancel();
       _combatResultsClearTimer = Timer(
-        const Duration(
-          milliseconds: CombatUiConstants.notificationDurationMs,
-        ),
+        const Duration(milliseconds: CombatUiConstants.notificationDurationMs),
         _combatRepository.clearCombatResults,
       );
     } else {

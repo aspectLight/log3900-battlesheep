@@ -143,6 +143,96 @@ abstract class JoinGameSessionLocalizations {
   /// **'Failed to join game'**
   String get joinGameFailed;
 
+  /// No description provided for @joinGameNoRooms.
+  ///
+  /// In en, this message translates to:
+  /// **'No available game'**
+  String get joinGameNoRooms;
+
+  /// No description provided for @joinGameRoomListPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get joinGameRoomListPreview;
+
+  /// No description provided for @joinGameRoomListPlayers.
+  ///
+  /// In en, this message translates to:
+  /// **'Players'**
+  String get joinGameRoomListPlayers;
+
+  /// No description provided for @joinGameRoomListSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get joinGameRoomListSize;
+
+  /// No description provided for @joinGameRoomListStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get joinGameRoomListStatus;
+
+  /// No description provided for @joinGameRoomListMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Mode'**
+  String get joinGameRoomListMode;
+
+  /// No description provided for @joinGameRoomListAccessibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Accessibility'**
+  String get joinGameRoomListAccessibility;
+
+  /// No description provided for @joinGameRoomListCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Code'**
+  String get joinGameRoomListCode;
+
+  /// No description provided for @joinGameRoomListPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get joinGameRoomListPrice;
+
+  /// No description provided for @joinGameStatusWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting'**
+  String get joinGameStatusWaiting;
+
+  /// No description provided for @joinGameStatusPlaying.
+  ///
+  /// In en, this message translates to:
+  /// **'Playing'**
+  String get joinGameStatusPlaying;
+
+  /// No description provided for @joinGameModeDropIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop-in'**
+  String get joinGameModeDropIn;
+
+  /// No description provided for @joinGameAccessibilityOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get joinGameAccessibilityOpen;
+
+  /// No description provided for @joinGameAccessibilityFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Full'**
+  String get joinGameAccessibilityFull;
+
+  /// No description provided for @joinGamePriceFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get joinGamePriceFree;
+
   /// No description provided for @waitingRoomRoomNotFound.
   ///
   /// In en, this message translates to:
@@ -160,6 +250,12 @@ abstract class JoinGameSessionLocalizations {
   /// In en, this message translates to:
   /// **'Maximum player limit reached'**
   String get joinGameMaxPlayerLimitReached;
+
+  /// No description provided for @joinGameInsufficientBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient balance to join this game'**
+  String get joinGameInsufficientBalance;
 }
 
 class _JoinGameSessionLocalizationsDelegate

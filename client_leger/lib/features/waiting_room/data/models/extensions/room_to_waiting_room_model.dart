@@ -13,6 +13,7 @@ extension LobbyRoomToWaitingRoomModel on LobbyRoomModel {
     hostId: hostId,
     players: players.map((p) => p.toWaitingRoomPlayerModel()).toList(),
     isLocked: isLocked,
+    entryFee: entryFee,
   );
 }
 
@@ -27,6 +28,7 @@ extension LobbyPlayerToWaitingRoomPlayer on LobbyPlayerModel {
         character: character,
         stats: stats,
         virtualType: virtualType,
+        activeBanner: activeBanner,
       );
     }
     return WaitingRoomPlayerModel.human(
@@ -34,6 +36,7 @@ extension LobbyPlayerToWaitingRoomPlayer on LobbyPlayerModel {
       name: name,
       character: character,
       stats: stats,
+      activeBanner: activeBanner,
     );
   }
 

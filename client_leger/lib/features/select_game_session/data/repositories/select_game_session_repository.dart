@@ -14,12 +14,11 @@ class SelectGameSessionRepository {
     required SelectGameSessionHttpService httpService,
   }) : _httpService = httpService;
 
-  TaskEither<SelectGameSessionFailure, List<GameModelInfo>> loadVisibleGames() {
+  TaskEither<SelectGameSessionFailure, List<GameModelInfo>> loadGames() {
     return TaskEither<SelectGameSessionFailure, List<GameModelInfo>>.tryCatch(
       () async {
         final dtos = await _httpService.getGames();
-        final visibleDtos = dtos.where((dto) => dto.isVisible);
-        return visibleDtos.map((dto) => dto.toModel()).toList();
+        return dtos.map((dto) => dto.toModel()).toList();
       },
       _mapError,
     );
@@ -29,11 +28,7 @@ class SelectGameSessionRepository {
     return TaskEither<SelectGameSessionFailure, GameModelInfo>.tryCatch(
       () async {
         final dto = await _httpService.getGameById(id);
-        final model = dto.toModel();
-        if (!model.isVisible) {
-          throw const GameNotVisibleSelectGameSessionFailure();
-        }
-        return model;
+        return dto.toModel();
       },
       _mapError,
     );

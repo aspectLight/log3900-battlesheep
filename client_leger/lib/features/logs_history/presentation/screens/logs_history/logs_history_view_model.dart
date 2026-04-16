@@ -9,9 +9,9 @@ class LogsHistoryViewModel {
   LogsHistoryViewModel({
     required LogsHistoryRepository repository,
     required AppTransitionEventBus appTransitionEventBus,
-  })  : _repository = repository,
-        _appTransitionEventBus = appTransitionEventBus,
-        state = computed(() => repository.state.value);
+  }) : _repository = repository,
+       _appTransitionEventBus = appTransitionEventBus,
+       state = computed(() => repository.state.value);
 
   final LogsHistoryRepository _repository;
   final AppTransitionEventBus _appTransitionEventBus;

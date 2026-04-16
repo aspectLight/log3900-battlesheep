@@ -11,9 +11,9 @@ class CharacterCreationValidationNotificationWidget extends StatelessWidget {
     required CharacterCreationValidationNotificationIntent intent,
     required VoidCallback onDismiss,
   }) : _viewModel = CharacterCreationValidationNotificationViewModel(
-          intent: intent,
-          onDismiss: onDismiss,
-        );
+         intent: intent,
+         onDismiss: onDismiss,
+       );
 
   final CharacterCreationValidationNotificationViewModel _viewModel;
 
@@ -75,10 +75,7 @@ class _GameButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _GameButton({
-    required this.label,
-    required this.onTap,
-  });
+  const _GameButton({required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -115,4 +112,3 @@ class _GameButton extends StatelessWidget {
     );
   }
 }
-

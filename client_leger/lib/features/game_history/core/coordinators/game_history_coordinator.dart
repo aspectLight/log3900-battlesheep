@@ -8,10 +8,9 @@ class GameHistoryCoordinator
         FeatureCoordinator<
           GameHistoryEntryAppEvent,
           GameHistoryCompletedAppEvent,
-          GameHistoryExitAppEvent> {
-  GameHistoryCoordinator({
-    required this.appNavigator,
-  });
+          GameHistoryExitAppEvent
+        > {
+  GameHistoryCoordinator({required this.appNavigator});
 
   final AppNavigator appNavigator;
 

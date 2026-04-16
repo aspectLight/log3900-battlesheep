@@ -131,6 +131,48 @@ abstract class ProfileLocalizations {
   /// **'Avatar'**
   String get profileAvatarLabel;
 
+  /// No description provided for @profileAvatarUploadLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload photo'**
+  String get profileAvatarUploadLabel;
+
+  /// No description provided for @profileAvatarCameraLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get profileAvatarCameraLabel;
+
+  /// No description provided for @profileAvatarOrUpload.
+  ///
+  /// In en, this message translates to:
+  /// **'Or upload a custom photo'**
+  String get profileAvatarOrUpload;
+
+  /// No description provided for @profileAvatarFileTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Image must be under 2 MB.'**
+  String get profileAvatarFileTooLarge;
+
+  /// No description provided for @profileAvatarInvalidFileType.
+  ///
+  /// In en, this message translates to:
+  /// **'Only JPG and PNG images are accepted.'**
+  String get profileAvatarInvalidFileType;
+
+  /// No description provided for @profileAvatarUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar upload failed. Your previous avatar was kept.'**
+  String get profileAvatarUploadFailed;
+
+  /// No description provided for @profileAvatarUploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading...'**
+  String get profileAvatarUploading;
+
   /// No description provided for @profileSave.
   ///
   /// In en, this message translates to:
@@ -143,11 +185,95 @@ abstract class ProfileLocalizations {
   /// **'Saving...'**
   String get profileSaveInProgress;
 
+  /// No description provided for @profileSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get profileSuccessTitle;
+
+  /// No description provided for @profileErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get profileErrorTitle;
+
+  /// No description provided for @profileSaveSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully.'**
+  String get profileSaveSuccess;
+
   /// No description provided for @profileFillAllFieldsError.
   ///
   /// In en, this message translates to:
   /// **'Please fill all fields and select an avatar.'**
   String get profileFillAllFieldsError;
+
+  /// No description provided for @profileNetworkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Network connection problem. Check your connection and try again.'**
+  String get profileNetworkError;
+
+  /// No description provided for @profileUnauthorizedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Session expired or unauthorized. Please sign in again.'**
+  String get profileUnauthorizedError;
+
+  /// No description provided for @profileUsernameTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'This username is already in use.'**
+  String get profileUsernameTaken;
+
+  /// No description provided for @profileEmailTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'This email is already in use.'**
+  String get profileEmailTaken;
+
+  /// No description provided for @profileInvalidDataError.
+  ///
+  /// In en, this message translates to:
+  /// **'The information entered is invalid. Check your fields and try again.'**
+  String get profileInvalidDataError;
+
+  /// No description provided for @profileForbiddenError.
+  ///
+  /// In en, this message translates to:
+  /// **'This action is not allowed. You may need to unlock this item in the shop first.'**
+  String get profileForbiddenError;
+
+  /// No description provided for @profileNotFoundError.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile could not be found.'**
+  String get profileNotFoundError;
+
+  /// No description provided for @profileServerError.
+  ///
+  /// In en, this message translates to:
+  /// **'Server error. Please try again later.'**
+  String get profileServerError;
+
+  /// No description provided for @profileUnexpectedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get profileUnexpectedError;
+
+  /// No description provided for @profileNoChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'No changes to save.'**
+  String get profileNoChanges;
+
+  /// No description provided for @profileRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get profileRetry;
 
   /// No description provided for @profileStatisticsTitle.
   ///
@@ -179,25 +305,79 @@ abstract class ProfileLocalizations {
   /// **'Average time per game'**
   String get profileAverageTime;
 
+  /// No description provided for @profileThemeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get profileThemeLabel;
+
+  /// No description provided for @profileLanguageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get profileLanguageLabel;
+
+  /// No description provided for @themeNameDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get themeNameDefault;
+
+  /// No description provided for @themeNameFrost.
+  ///
+  /// In en, this message translates to:
+  /// **'Frost'**
+  String get themeNameFrost;
+
+  /// No description provided for @themeNameVillage.
+  ///
+  /// In en, this message translates to:
+  /// **'Village'**
+  String get themeNameVillage;
+
   /// No description provided for @profileDeleteAccount.
   ///
   /// In en, this message translates to:
   /// **'Delete account'**
   String get profileDeleteAccount;
 
-  String get profileThemeLabel;
-
-  String get profileLanguageLabel;
-
-  String get themeNameDefault;
-
-  String get themeNameFrost;
-
-  String get themeNameVillage;
-
   String get languageNameFr;
 
   String get languageNameEn;
+
+  /// No description provided for @profileDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account?'**
+  String get profileDeleteConfirmTitle;
+
+  /// No description provided for @profileDeleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This action is permanent. Your account and data will be removed.'**
+  String get profileDeleteConfirmBody;
+
+  /// No description provided for @profileCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get profileCancel;
+
+  /// No description provided for @profileConfirmDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get profileConfirmDelete;
+
+  /// No description provided for @profileDeleting.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting...'**
+  String get profileDeleting;
+
+  String get tutorial;
+
+  String get continueTutorial;
 }
 
 class _ProfileLocalizationsDelegate

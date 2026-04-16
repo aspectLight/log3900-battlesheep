@@ -108,6 +108,25 @@ class AuthLocalizationsEn extends AuthLocalizations {
   String get avatarRequired => 'Select an avatar';
 
   @override
+  String get avatarUploadLabel => 'Upload photo';
+
+  @override
+  String get avatarCameraLabel => 'Take photo';
+
+  @override
+  String get avatarCustomHint => 'Or choose a custom avatar';
+
+  @override
+  String get avatarFileTooLarge => 'Image must be under 2 MB.';
+
+  @override
+  String get avatarInvalidFileType => 'Only JPG and PNG images are accepted.';
+
+  @override
+  String get avatarUploadFallbackWarning =>
+      'Avatar upload failed. The default avatar was kept.';
+
+  @override
   String get invalidCredentials => 'Incorrect username or password';
 
   @override

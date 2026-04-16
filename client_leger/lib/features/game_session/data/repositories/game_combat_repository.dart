@@ -55,7 +55,10 @@ class GameCombatRepository {
   }
 
   void clearCombatResults() {
-    state.value = _reducer.reduce(state.value, const CombatResultsClearedEvent());
+    state.value = _reducer.reduce(
+      state.value,
+      const CombatResultsClearedEvent(),
+    );
   }
 
   void clearFlightAttemptFeedback() {
@@ -64,5 +67,4 @@ class GameCombatRepository {
       const FlightAttemptFeedbackClearedEvent(),
     );
   }
-
 }

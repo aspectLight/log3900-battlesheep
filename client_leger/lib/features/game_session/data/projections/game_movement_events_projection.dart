@@ -4,6 +4,8 @@ import '../../../../core/interfaces/event_projection.dart';
 import '../../core/event_bus/game_session_event_bus.dart';
 import '../../core/helpers/can_player_move_or_act.dart';
 import '../../domain/events/game_movement_events.dart';
+import '../models/dto/game_trap_torch_dto.dart';
+import '../models/extensions/game_trap_torch_dto_extensions.dart';
 import '../repositories/game_board_repository.dart';
 import '../repositories/game_metadata_repository.dart';
 import '../repositories/game_player_repository.dart';
@@ -43,6 +45,7 @@ class GameMovementEventsProjection implements EventProjection {
     _movementSocket.synchronizeMovementStream.listen(
       _boardRepository.applyMovementSync,
     ),
+    _movementSocket.torchIlluminationStream.listen(_onTorchIllumination),
   ];
 
   void _onReachablePathsResponse(ReachablePathsResponseEvent event) {
@@ -74,5 +77,10 @@ class GameMovementEventsProjection implements EventProjection {
   void _onVirtualPlayerMoved(VirtualPlayerMovedEvent event) {
     _playerRepository.applyVirtualPlayerMoved(event);
     _gameSessionEventBus.fire(VirtualPlayerMoved(event));
+  }
+
+  void _onTorchIllumination(TorchIlluminationUpdateDto dto) {
+    _boardRepository.applyIlluminationUpdate(dto.toBoardIlluminationEvent());
+    _playerRepository.applyTorchPlayerStats(dto.toPlayerTorchStatsEvent());
   }
 }

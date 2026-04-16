@@ -27,19 +27,19 @@ class GameCombatEventsProjection implements EventProjection {
 
   @override
   List<StreamSubscription> subscribe() => [
-        _combatSocket.combatTurnStartedStream
-            .where(_isParticipant)
-            .listen(_onCombatTurnStarted),
-        _combatSocket.combatTurnStartedStream
-            .listen(_onCombatStartedForNotification),
-        _combatSocket.attackResultStream.listen(_onAttackResult),
-        _combatSocket.flightAttemptResultStream
-            .listen(_onFlightAttemptResult),
-        _combatSocket.endCombatStream.listen(_onEndCombat),
-        _combatSocket.combatCountdownStream
-            .map((seconds) => CombatCountdownEvent(seconds: seconds))
-            .listen(_combatRepository.applyCombatCountdown),
-      ];
+    _combatSocket.combatTurnStartedStream
+        .where(_isParticipant)
+        .listen(_onCombatTurnStarted),
+    _combatSocket.combatTurnStartedStream.listen(
+      _onCombatStartedForNotification,
+    ),
+    _combatSocket.attackResultStream.listen(_onAttackResult),
+    _combatSocket.flightAttemptResultStream.listen(_onFlightAttemptResult),
+    _combatSocket.endCombatStream.listen(_onEndCombat),
+    _combatSocket.combatCountdownStream
+        .map((seconds) => CombatCountdownEvent(seconds: seconds))
+        .listen(_combatRepository.applyCombatCountdown),
+  ];
 
   void _onCombatTurnStarted(CombatTurnStartedEvent event) {
     _combatRepository.applyCombatTurnStarted(event);
@@ -56,10 +56,7 @@ class GameCombatEventsProjection implements EventProjection {
   void _onCombatStartedForNotification(CombatTurnStartedEvent event) {
     if (_isParticipant(event)) return;
     _gameSessionEventBus.fire(
-      CombatStarted(
-        attackerId: event.attackerId,
-        defenderId: event.defenderId,
-      ),
+      CombatStarted(attackerId: event.attackerId, defenderId: event.defenderId),
     );
   }
 

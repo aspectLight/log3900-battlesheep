@@ -16,9 +16,7 @@ class GameTurnSideEffect with DisposableSideEffect {
   }) : _socketId = socketId,
        _turnRepository = turnRepository,
        _eventsSocket = eventsSocket {
-    trackSubscription(
-      _eventsSocket.turnStartingStream.listen(_onTurnStarting),
-    );
+    trackSubscription(_eventsSocket.turnStartingStream.listen(_onTurnStarting));
     trackSubscription(
       _eventsSocket.updateStartingCountdownStream.listen(_onStartingCountdown),
     );

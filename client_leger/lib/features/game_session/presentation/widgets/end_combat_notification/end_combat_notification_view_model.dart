@@ -48,17 +48,21 @@ class EndCombatNotificationViewModel {
     _cancelTimer();
   }
 
-  late final hasWon = computed<bool>(() =>
-      !intent.isByFlight && intent.currentUserSocketId == intent.winnerId);
+  late final hasWon = computed<bool>(
+    () => !intent.isByFlight && intent.currentUserSocketId == intent.winnerId,
+  );
 
-  late final hasLost = computed<bool>(() =>
-      !intent.isByFlight && intent.currentUserSocketId == intent.loserId);
+  late final hasLost = computed<bool>(
+    () => !intent.isByFlight && intent.currentUserSocketId == intent.loserId,
+  );
 
-  late final hasFled = computed<bool>(() =>
-      intent.isByFlight && intent.currentUserSocketId == intent.winnerId);
+  late final hasFled = computed<bool>(
+    () => intent.isByFlight && intent.currentUserSocketId == intent.winnerId,
+  );
 
-  late final enemyFled = computed<bool>(() =>
-      intent.isByFlight && intent.currentUserSocketId == intent.loserId);
+  late final enemyFled = computed<bool>(
+    () => intent.isByFlight && intent.currentUserSocketId == intent.loserId,
+  );
 
   late final winnerName = computed<String>(() {
     final playerState = _playerRepository.state.value;

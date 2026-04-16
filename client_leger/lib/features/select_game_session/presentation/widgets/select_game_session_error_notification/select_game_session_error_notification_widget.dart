@@ -11,9 +11,9 @@ class SelectGameSessionErrorNotificationWidget extends StatelessWidget {
     required SelectGameSessionErrorNotificationIntent intent,
     required VoidCallback onDismiss,
   }) : _viewModel = SelectGameSessionErrorNotificationViewModel(
-          intent: intent,
-          onDismiss: onDismiss,
-        );
+         intent: intent,
+         onDismiss: onDismiss,
+       );
 
   final SelectGameSessionErrorNotificationViewModel _viewModel;
 
@@ -72,10 +72,7 @@ class SelectGameSessionErrorNotificationWidget extends StatelessWidget {
 }
 
 class _GameButton extends StatelessWidget {
-  const _GameButton({
-    required this.label,
-    required this.onTap,
-  });
+  const _GameButton({required this.label, required this.onTap});
 
   final String label;
   final VoidCallback onTap;

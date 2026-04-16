@@ -5,6 +5,7 @@ class WaitingRoomSocketEventsOutbound {
   String get joinWaitingRoom => 'joinWaitingRoom';
   String get leaveWaitingRoom => 'leaveWaitingRoom';
   String get toggleLockWaitingRoom => 'toggleLockWaitingRoom';
+  String get toggleDropInDropOut => 'toggleDropInDropOut';
   String get kickPlayer => 'kickPlayer';
   String get createPlayer => 'createPlayer';
   String get startGame => 'startGame';
@@ -22,6 +23,7 @@ class WaitingRoomSocketEventsInbound {
   String get roomCanceled => 'roomCanceled';
   String get waitingRoomLocked => 'waitingRoomLocked';
   String get waitingRoomUnlocked => 'waitingRoomUnlocked';
+  String get dropInDropOutToggled => 'dropInDropOutToggled';
   String get playerLeft => 'playerLeft';
   String get playerCreated => 'playerCreated';
   String get playerKicked => 'playerKicked';

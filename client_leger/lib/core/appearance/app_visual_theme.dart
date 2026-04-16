@@ -1,10 +1,6 @@
 import '../constants/ui_assets.dart';
 
-enum AppVisualTheme {
-  defaultTheme,
-  frost,
-  village,
-}
+enum AppVisualTheme { defaultTheme, frost, village }
 
 const String kThemeIdDefault = 'default';
 const String kThemeIdFrost = 'frost';

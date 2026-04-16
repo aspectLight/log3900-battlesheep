@@ -14,6 +14,8 @@ WaitingRoomDto _$WaitingRoomDtoFromJson(Map<String, dynamic> json) =>
           .map((e) => WaitingRoomPlayerDto.fromJson(e as Map<String, dynamic>))
           .toList(),
       isLocked: json['isLocked'] as bool,
+      dropInDropOut: json['dropInDropOut'] as bool? ?? false,
+      entryFee: (json['entryFee'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$WaitingRoomDtoToJson(WaitingRoomDto instance) =>
@@ -22,4 +24,6 @@ Map<String, dynamic> _$WaitingRoomDtoToJson(WaitingRoomDto instance) =>
       'hostId': instance.hostId,
       'players': instance.players.map((e) => e.toJson()).toList(),
       'isLocked': instance.isLocked,
+      'dropInDropOut': instance.dropInDropOut,
+      'entryFee': instance.entryFee,
     };

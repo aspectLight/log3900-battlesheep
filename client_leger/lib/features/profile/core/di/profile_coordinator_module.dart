@@ -8,4 +8,3 @@ void registerProfileCoordinator(GetIt getIt) {
     () => ProfileCoordinator(appNavigator: getIt<AppNavigator>()),
   );
 }
-

@@ -24,4 +24,3 @@ sealed class ProfileExitAppEvent
     implements AppTransitionEvent {
   const factory ProfileExitAppEvent.leaveRequested() = ProfileLeaveRequested;
 }
-

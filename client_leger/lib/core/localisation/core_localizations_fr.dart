@@ -138,6 +138,12 @@ class CoreLocalizationsFr extends CoreLocalizations {
   String get loading => 'Chargement...';
 
   @override
+  String get shop => 'Boutique';
+
+  @override
+  String get discussionCanals => 'Canaux de discussion';
+
+  @override
   String get noFriends =>
       'Aucun ami pour le moment. Recherchez des utilisateurs pour en ajouter !';
 

@@ -60,16 +60,14 @@ void registerWaitingRoomScope(
     entryData.hostId,
     entryData.socketId,
   );
-  final (boardSize, isCTF, initialRoom) = switch (entryData) {
-    WaitingRoomHostEntryData(:final boardSize, :final isCTF) => (
-      boardSize,
-      isCTF,
-      null,
-    ),
+  final (boardSize, isCTF, initialRoom, entryFee) = switch (entryData) {
+    WaitingRoomHostEntryData(:final boardSize, :final isCTF, :final entryFee) =>
+      (boardSize, isCTF, null, entryFee),
     WaitingRoomJoinEntryData(:final initialRoom) => (
       null,
       null,
       initialRoom,
+      0,
     ),
   };
   scope.registerLazySingleton<WaitingRoomStartValidationParams>(
@@ -83,6 +81,7 @@ void registerWaitingRoomScope(
     socketId: socketId,
     entryData: entryData,
     initialRoom: initialRoom,
+    entryFee: entryFee,
   );
   registerWaitingRoomUseCases(scope, rootGetIt);
   registerWaitingRoomProjections(scope, rootGetIt);
