@@ -24,7 +24,8 @@
         "password_mismatch": "Passwords do not match",
         "avatar_required": "Please select an avatar",
         "username_banned": "This username is reserved and cannot be used",
-        "username_profanity": "This username contains inappropriate words"
+        "username_profanity": "This username contains inappropriate words",
+        "username_taken": "This username is already taken"
     },
     "auth": {
         "login": "Sign in",
@@ -99,6 +100,10 @@
         "new_avatar": "New avatar",
         "current_avatar": "Current avatar",
         "camera_error": "Camera error",
+        "camera_error_not_supported": "Your browser does not support camera access.",
+        "camera_error_not_allowed": "Camera access denied. Please allow access in your browser settings.",
+        "camera_error_not_found": "No camera detected on your device.",
+        "camera_error_generic": "Unable to access the camera. Please try again.",
         "close": "Close",
         "camera_title": "Capture a selfie",
         "camera_loading": "Initializing camera...",
@@ -464,7 +469,8 @@
     "game_channel": "Game's Channel {{id}}",
     "send": "Send",
     "placeholder_general": "Write a message...",
-    "placeholder_channel": "Write in {{ name }}..."
+    "placeholder_channel": "Write in {{ name }}...",
+    "deleted_user": "[deleted]"
   },
   "bonus": {
     "title": "Stats",

@@ -277,7 +277,7 @@ export class AuthService {
         if (excludeUid) query.firebaseUid = { $ne: excludeUid };
 
         const user = await this.userModel.findOne(query);
-        if (user) throw new ConflictException("Ce nom d'utilisateur est déjà utilisé");
+        if (user) throw new ConflictException('validation.username_taken');
     }
 
     async checkEmail(email: string, excludeUid?: string): Promise<void> {

@@ -1,9 +1,11 @@
 import { ElementRef, Injectable } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({
     providedIn: 'root',
 })
 export class CameraCaptureService {
+    constructor(private translate: TranslateService) {}
     showCameraModal = false;
     cameraStream: MediaStream | null = null;
     capturedImageDataUrl: string | null = null;
@@ -18,7 +20,7 @@ export class CameraCaptureService {
 
     async startStream(): Promise<void> {
         if (!navigator.mediaDevices?.getUserMedia) {
-            this.cameraError = "Votre navigateur ne supporte pas l'accès à la caméra.";
+            this.cameraError = this.translate.instant('profile.camera_error_not_supported');
             this.showCameraModal = false;
             return;
         }
@@ -28,11 +30,11 @@ export class CameraCaptureService {
         } catch (err: unknown) {
             const error = err as { name?: string };
             if (error?.name === 'NotAllowedError' || error?.name === 'PermissionDeniedError') {
-                this.cameraError = "Accès à la caméra refusé. Veuillez autoriser l'accès dans les paramètres de votre navigateur.";
+                this.cameraError = this.translate.instant('profile.camera_error_not_allowed');
             } else if (error?.name === 'NotFoundError' || error?.name === 'DevicesNotFoundError') {
-                this.cameraError = 'Aucune caméra détectée sur votre appareil.';
+                this.cameraError = this.translate.instant('profile.camera_error_not_found');
             } else {
-                this.cameraError = "Impossible d'accéder à la caméra. Veuillez réessayer.";
+                this.cameraError = this.translate.instant('profile.camera_error_generic');
             }
             this.showCameraModal = false;
         }

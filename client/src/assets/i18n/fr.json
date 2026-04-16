@@ -24,7 +24,8 @@
     "password_mismatch": "Les mots de passe ne correspondent pas",
     "avatar_required": "Sélectionnez un avatar",
     "username_banned": "Ce nom d'utilisateur est réservé et ne peut pas être utilisé",
-    "username_profanity": "Ce nom d'utilisateur contient des mots non autorisés"
+    "username_profanity": "Ce nom d'utilisateur contient des mots non autorisés",
+    "username_taken": "Ce nom d'utilisateur est déjà utilisé"
   },
   "auth": {
     "login": "Se connecter",
@@ -99,6 +100,10 @@
     "new_avatar": "Nouvel avatar",
     "current_avatar": "Avatar actuel",
     "camera_error": "Erreur de caméra",
+    "camera_error_not_supported": "Votre navigateur ne supporte pas l'accès à la caméra.",
+    "camera_error_not_allowed": "Accès à la caméra refusé. Veuillez autoriser l'accès dans les paramètres de votre navigateur.",
+    "camera_error_not_found": "Aucune caméra détectée sur votre appareil.",
+    "camera_error_generic": "Impossible d'accéder à la caméra. Veuillez réessayer.",
     "close": "Fermer",
     "camera_title": "Capturer un selfie",
     "camera_loading": "Initialisation de la caméra...",
@@ -464,7 +469,8 @@
     "game_channel": "Canal de partie {{id}}",
     "send": "Envoyer",
     "placeholder_general": "Écrire un message...",
-    "placeholder_channel": "Écrire dans {{ name }}..."
+    "placeholder_channel": "Écrire dans {{ name }}...",
+    "deleted_user": "[supprimé]"
   },
   "bonus": {
     "title": "Stats",
