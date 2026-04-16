@@ -28,4 +28,12 @@ class EnvConfig {
     final separator = base.contains('?') ? '&' : '?';
     return '$base${separator}t=$cacheBust';
   }
+
+  /// Angular chat attaches `${environment.serverUrl}${profile.avatarUrl}` on send.
+  static String? absoluteProfileAvatarUrlForChatSocket(String? relativeOrAbsolute) {
+    final t = relativeOrAbsolute?.trim();
+    if (t == null || t.isEmpty) return null;
+    final full = resolveAvatarUrl(t);
+    return full.isEmpty ? null : full;
+  }
 }

@@ -114,12 +114,11 @@ class WaitingRoomSocket {
     await _cancelEventListeners();
     _eventSubscriptions.addAll([
       _socketService
-          .on<Map<String, dynamic>>(
-            WaitingRoomSocketEvents.inbound.waitingRoomCreated,
-          )
+          .on<Object?>(WaitingRoomSocketEvents.inbound.waitingRoomCreated)
           .listen((data) {
+            if (data is! Map) return;
             _waitingRoomCreatedController.add(
-              WaitingRoomDto.fromJson(data).toModel(),
+              WaitingRoomDto.fromJson(Map<String, dynamic>.from(data)).toModel(),
             );
           }),
       subscribeSocketEvent<Object?>(
@@ -159,13 +158,12 @@ class WaitingRoomSocket {
         (_) => null,
       ),
       _socketService
-          .on<Map<String, dynamic>>(
-            WaitingRoomSocketEvents.inbound.updateAvatarReserved,
-          )
+          .on<Object?>(WaitingRoomSocketEvents.inbound.updateAvatarReserved)
           .listen((data) {
+            if (data is! Map) return;
             _updateCharacterReservedController.add(
               UpdateCharacterReservedPayloadDto.fromJson(
-                data,
+                Map<String, dynamic>.from(data),
               ).reservedCharacters.map((d) => d.toModel()).toList(),
             );
           }),
@@ -182,12 +180,13 @@ class WaitingRoomSocket {
         (data) => PlayerCreatedPayloadDto.fromList(data).toModels(),
       ),
       _socketService
-          .on<Map<String, dynamic>>(
-            WaitingRoomSocketEvents.inbound.gameRoomCreated,
-          )
+          .on<Object?>(WaitingRoomSocketEvents.inbound.gameRoomCreated)
           .listen((data) {
+            if (data is! Map) return;
             _gameRoomCreatedController.add(
-              GameRoomCreatedPayloadDto.fromJson(data),
+              GameRoomCreatedPayloadDto.fromJson(
+                Map<String, dynamic>.from(data),
+              ),
             );
           }),
     ]);

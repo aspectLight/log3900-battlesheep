@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:fpdart/fpdart.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../core/config/env_config.dart';
 import '../../../authentication/core/interfaces/auth_repository.dart';
 import '../../domain/commands/chat_commands.dart';
 import '../../domain/events/chat_events.dart';
@@ -35,12 +36,19 @@ class ChatRepository {
     unawaited(_sendMessageWithProfileAvatars(command));
   }
 
-  Future<void> _sendMessageWithProfileAvatars(SendChatMessageCommand command) async {
+  Future<void> _sendMessageWithProfileAvatars(
+    SendChatMessageCommand command,
+  ) async {
     final userResult = await _authRepository.getCurrentUser().run();
     final enriched = switch (userResult) {
       Right(value: final opt) => opt.match(
         () => command,
-        (user) => command.copyWith(avatarId: user.avatarId, avatarUrl: user.avatarUrl),
+        (user) => command.copyWith(
+          avatarId: user.avatarId,
+          avatarUrl: EnvConfig.absoluteProfileAvatarUrlForChatSocket(
+            user.avatarUrl,
+          ),
+        ),
       ),
       Left() => command,
     };

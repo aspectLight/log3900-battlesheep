@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../../../core/chat/chat_avatar_registry.dart';
 import '../../../../core/chat/chat_outgoing_avatars.dart';
 import '../../../../core/connected_scope/session_scope_manager.dart';
 import '../../../../core/di/scoped_projection_subscriptions.dart';
@@ -20,6 +22,12 @@ import 'chat_view_model_module.dart';
 
 void registerChatRoot(GetIt getIt) {
   getIt.registerLazySingleton<ChatOutgoingAvatars>(ChatOutgoingAvatars.new);
+  getIt.registerLazySingleton<ChatAvatarRegistry>(
+    () => ChatAvatarRegistry(
+      socketService: getIt<SocketService>(),
+      dio: getIt<Dio>(),
+    ),
+  );
   getIt.registerLazySingleton<ChatScopeHolder>(ChatScopeHolder.new);
   getIt.registerLazySingleton<DiscussionCanalsRepository>(
     () => DiscussionCanalsSocket(

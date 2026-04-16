@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import '../../../../../core/converters/dice_stat_choice_converter.dart';
 import '../../../../../core/converters/safe_avatar_payload_converter.dart';
+import '../../../../../core/converters/waiting_room_dice_stat_choice_converter.dart';
 import '../../../../../core/converters/virtual_player_type_converter.dart';
 import '../../../../../core/enums/dice_stat_choice.dart';
 import '../../../../../core/enums/virtual_player_type.dart';
@@ -23,10 +23,10 @@ class WaitingRoomPlayerDto {
   final VirtualPlayerType virtualType;
   final WaitingRoomPlayerStatsDto stats;
   @JsonKey(name: 'd6Choice')
-  @DiceStatChoiceConverter()
+  @WaitingRoomDiceStatChoiceConverter()
   final DiceStatChoice? d6Choice;
   @JsonKey(name: 'd4Choice')
-  @DiceStatChoiceConverter()
+  @WaitingRoomDiceStatChoiceConverter()
   final DiceStatChoice? d4Choice;
   @JsonKey(name: 'profileAvatarId')
   final String? profileAvatarId;

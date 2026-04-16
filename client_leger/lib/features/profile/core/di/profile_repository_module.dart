@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 
+import '../../../../core/chat/chat_avatar_registry.dart';
 import '../../../../core/chat/chat_outgoing_avatars.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../../data/services/http_profile_service.dart';
@@ -9,6 +10,7 @@ void registerProfileRepositories(GetIt getIt) {
     () => ProfileRepository(
       httpProfileService: getIt<HttpProfileService>(),
       chatOutgoingAvatars: getIt<ChatOutgoingAvatars>(),
+      chatAvatarRegistry: getIt<ChatAvatarRegistry>(),
     ),
   );
 }

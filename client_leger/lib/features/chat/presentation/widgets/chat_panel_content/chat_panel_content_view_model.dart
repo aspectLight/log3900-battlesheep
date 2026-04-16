@@ -1,6 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/chat/chat_avatar_registry.dart';
 import '../../../../../core/chat/chat_outgoing_avatars.dart';
 import '../../../../../core/helpers/functional_programming.dart';
 import '../../../core/constants/chat_constants.dart';
@@ -14,14 +15,17 @@ class ChatPanelContentViewModel {
     required ChatRepository repository,
     required ChatPanelStateRepository panelStateRepository,
     required ChatOutgoingAvatars outgoingAvatars,
+    required ChatAvatarRegistry avatarRegistry,
     required this.currentUsername,
   }) : _repository = repository,
        _panelStateRepository = panelStateRepository,
-       _outgoingAvatars = outgoingAvatars;
+       _outgoingAvatars = outgoingAvatars,
+       _avatarRegistry = avatarRegistry;
 
   final ChatRepository _repository;
   final ChatPanelStateRepository _panelStateRepository;
   final ChatOutgoingAvatars _outgoingAvatars;
+  final ChatAvatarRegistry _avatarRegistry;
   final String currentUsername;
 
   late final lastSentMessage = computed<Option<String>>(
@@ -34,9 +38,24 @@ class ChatPanelContentViewModel {
   List<String> get defaultEmojis => ChatConstants.defaultEmojis;
 
   late final uiMessages = computed(() {
+    _avatarRegistry.entries.value;
     final chatState = _repository.state.value;
+    _avatarRegistry.ensureLoaded(chatState.messages.map((e) => e.name));
     return chatState.messages
-        .map((e) => toChatMessageUi(e, currentUsername: currentUsername))
+        .map((e) {
+          final resolved = _avatarRegistry.resolveForAuthor(
+            e.name,
+            messageAvatarId: e.avatarId,
+            messageAvatarUrl: e.avatarUrl,
+          );
+          return toChatMessageUi(
+            e,
+            currentUsername: currentUsername,
+            displayAvatarId: resolved.avatarId,
+            displayAvatarUrl: resolved.avatarUrl,
+            avatarDisplayNonce: resolved.avatarDisplayNonce,
+          );
+        })
         .toList();
   });
 

@@ -48,8 +48,10 @@ class GameEventsSocket {
     }
   }
 
+  /// playerSpawned is omitted: PlayerSpawnCatchupSideEffect also listens;
+  /// calling off(playerSpawned) on dispose would close the shared SocketService
+  /// stream and break catch-up after the first game session.
   static const List<String> _ownedEvents = [
-    GameEventsSocketEvents.playerSpawned,
     GameEventsSocketEvents.playerJoinedGame,
     GameEventsSocketEvents.turnStarting,
     GameEventsSocketEvents.updateCountdown,
@@ -114,8 +116,12 @@ class GameEventsSocket {
             if (raw is! List<dynamic>) return;
             final dto = PlayerSpawnedDto(
               players: raw
-                  .whereType<Map<String, dynamic>>()
-                  .map(SpawnedPlayerDto.fromPlayerSpawnedPayload)
+                  .whereType<Map>()
+                  .map(
+                    (e) => SpawnedPlayerDto.fromPlayerSpawnedPayload(
+                      Map<String, dynamic>.from(e),
+                    ),
+                  )
                   .toList(),
             );
             _playerJoinedGameController.add(dto.toEntity());

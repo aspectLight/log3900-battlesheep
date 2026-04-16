@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:fpdart/fpdart.dart';
 
-import '../../../../../core/services/socket_service.dart';
+import '../../../../core/config/env_config.dart';
+import '../../../../core/services/socket_service.dart';
 import '../../../authentication/core/interfaces/auth_repository.dart';
 import '../../core/constants/discussion_canals_events.dart';
 import '../models/channel_info.dart';
@@ -279,7 +280,9 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
         avatarUrl = user.avatarUrl;
       });
     }
-    final trimmedAvatarUrl = avatarUrl?.trim();
+    final absoluteAvatarUrl = EnvConfig.absoluteProfileAvatarUrlForChatSocket(
+      avatarUrl,
+    );
     final payload = <String, dynamic>{
       'channelId': channelId,
       'username': _username,
@@ -288,8 +291,8 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
     if (avatarId != null) {
       payload['avatarId'] = avatarId;
     }
-    if (trimmedAvatarUrl != null && trimmedAvatarUrl.isNotEmpty) {
-      payload['avatarUrl'] = trimmedAvatarUrl;
+    if (absoluteAvatarUrl != null && absoluteAvatarUrl.isNotEmpty) {
+      payload['avatarUrl'] = absoluteAvatarUrl;
     }
     _socketService.emit(
       DiscussionCanalsSocketEvents.sendMessageToCustomChannel,
