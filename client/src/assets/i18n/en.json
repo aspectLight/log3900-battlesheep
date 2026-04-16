@@ -371,7 +371,8 @@
         "actions_points": "Number of action points",
         "privacy": "Privacy",
         "cancel": "Cancel",
-        "create": "Create"
+        "create": "Create",
+        "game_private": "This game is now private and you are not its owner."
     },
     "toolbox": {
         "tiles": "TILES",

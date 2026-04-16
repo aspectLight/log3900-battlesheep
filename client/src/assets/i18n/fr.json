@@ -371,7 +371,8 @@
     "actions_points": "Nombre de points d'actions",
     "privacy": "Confidentialité",
     "cancel": "Annuler",
-    "create": "Créer"
+    "create": "Créer",
+    "game_private": "Ce jeu est maintenant privé et vous n'en êtes pas le propriétaire."
   },
   "toolbox": {
     "tiles": "TUILES",

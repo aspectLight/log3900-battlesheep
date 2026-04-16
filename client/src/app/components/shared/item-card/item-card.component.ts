@@ -19,13 +19,17 @@ export class ItemCardComponent {
     constructor(private translate: TranslateService) {}
 
     get itemDisplayName(): string {
+        if (!this.item || !this.item.type) return '';
         const key = `items_names.${this.item.type}`;
         const translated = this.translate.instant(key);
-        return translated !== key ? translated : this.item.name;
+        if (translated && translated !== key) {
+            return translated;
+        }
+        return this.item.name || this.item.type;
     }
 
     get itemDisplayInitial(): string {
-        return this.itemDisplayName?.[0] ?? '';
+        return this.itemDisplayName ? this.itemDisplayName[0] : '';
     }
 
     onDropClick(event: Event): void {

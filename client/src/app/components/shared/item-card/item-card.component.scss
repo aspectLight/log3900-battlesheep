@@ -207,7 +207,9 @@
   line-height: 1.15;
   overflow-wrap: anywhere;
   max-height: 2.4em;
+  min-height: 1.15em;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .drop-button {

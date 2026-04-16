@@ -3,8 +3,8 @@
 /* eslint-disable prettier/prettier */
 import { MAX_TIME, MAX_TIME_WITHOUT_EVASION, MIN_TIME } from '@app/modules/combat/constants/game-combat.constants';
 import { GameMovementService } from '@app/modules/movement/services/game-movement.service';
-import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
 import { GameRoom } from '@app/modules/shared-room/interfaces/game-room';
+import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
 import { Player, VirtualPlayerType } from '@app/shared/interfaces/player';
 import { DiceService } from '@app/shared/services/dice.service';
 import { GameRoomEvents } from '@common/socket.constants';

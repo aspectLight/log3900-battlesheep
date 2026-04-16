@@ -36,9 +36,9 @@
     </div>
     <div class="middle">
         @if(isTurnToFight){
-            <p class="combatCountdown">{{ 'combat.your_turn' | translate: { time: combatCountdown } }}</p>
+            <p class="combatCountdown">{{ 'combat.your_turn' | translate: { time: combatCountdown ?? '...' } }}</p>
         }@else {
-            <p class="combatCountdown">{{ 'combat.their_turn' | translate: { time: combatCountdown } }}</p>
+            <p class="combatCountdown">{{ 'combat.their_turn' | translate: { time: combatCountdown ?? '...' } }}</p>
         }
         <app-combat></app-combat>
     </div>
@@ -57,7 +57,7 @@
         <app-player-hud></app-player-hud>
     </div>
     <div class="middle">
-        <p class="gameCountdown">{{ 'combat.current_turn' | translate: { time: gameCountdown } }}</p>
+        <p class="gameCountdown">{{ 'combat.current_turn' | translate: { time: gameCountdown ?? '...' } }}</p>
         <div class="board-container">
             <div class="board">
                 <app-board [board]="board" mode="play"></app-board>
