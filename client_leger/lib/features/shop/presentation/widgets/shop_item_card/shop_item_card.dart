@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/enums/shop_catalog_item_id.dart';
 import '../../../../../core/enums/shop_item_type.dart';
 import '../../../core/constants/shop_asset_paths.dart';
@@ -95,13 +96,17 @@ class ShopItemCard extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: equipped
                     ? const Color(0xFF2E7D32)
-                    : const Color(0xD9D32F2F),
+                    : Colors.transparent,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 8),
+                side: const BorderSide(color: Color(0xFF266629)),
                 textStyle: const TextStyle(
                   fontFamily: 'CustomFont',
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
                 ),
               ),
               child: Text(equipped ? l10n.shopUnequip : l10n.shopEquip),
@@ -120,14 +125,17 @@ class ShopItemCard extends StatelessWidget {
             ElevatedButton(
               onPressed: onBuy,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xD9D32F2F),
+                backgroundColor: context.interactionColors.primary,
                 foregroundColor: Colors.white,
-                side: const BorderSide(color: Color(0xFFB71C1C)),
+                side: BorderSide(color: context.interactionColors.outline),
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 textStyle: const TextStyle(
                   fontFamily: 'CustomFont',
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
                 ),
               ),
               child: Text(l10n.shopBuy),

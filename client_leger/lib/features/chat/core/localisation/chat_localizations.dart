@@ -205,6 +205,12 @@ abstract class ChatLocalizations {
   /// In en, this message translates to:
   /// **'Delete'**
   String get deleteChannel;
+
+  String get confirmDeleteChannel;
+
+  String get yes;
+
+  String get no;
 }
 
 class _ChatLocalizationsDelegate

@@ -320,32 +320,50 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
     return all.where((c) => c.name.toLowerCase().contains(term)).toList();
   }
 
-  Future<void> _requestDelete(String channelId) async {
+  Future<void> _requestDelete(String channelId, ChatLocalizations l10n) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF2b2b2b),
-        title: const Text(
-          'Supprimer le canal',
-          style: TextStyle(color: Colors.white, fontFamily: 'CustomFont'),
+        backgroundColor: Colors.white,
+        title: Text(
+          l10n.confirmDeleteChannel,
+          style: TextStyle(
+            color: context.interactionColors.primary,
+            fontFamily: 'CustomFont',
+          ),
         ),
-        content: const Text(
-          'Voulez-vous vraiment supprimer ce canal ?',
-          style: TextStyle(color: Color(0xFFe0d8c0)),
-        ),
+        actionsAlignment: MainAxisAlignment.center,
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text(
-              'Non',
-              style: TextStyle(color: Color(0xFFffb347)),
+            style: TextButton.styleFrom(
+              backgroundColor: context.interactionColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            child: Text(
+              l10n.no,
+              style: const TextStyle(
+                color: Colors.white,
+                fontFamily: 'CustomFont',
+              ),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'Oui',
-              style: TextStyle(color: Color(0xFFff6b6b)),
+            style: TextButton.styleFrom(
+              backgroundColor: context.interactionColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            child: Text(
+              l10n.yes,
+              style: const TextStyle(
+                color: Colors.white,
+                fontFamily: 'CustomFont',
+              ),
             ),
           ),
         ],
@@ -557,13 +575,13 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
         // Table header
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          decoration: const BoxDecoration(
-            color: Color(0xFF3c3c3c),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(6)),
+          decoration: BoxDecoration(
+            color: context.interactionColors.outline,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
             border: Border(
-              left: BorderSide(color: Color(0xFF3a3a3a)),
-              right: BorderSide(color: Color(0xFF3a3a3a)),
-              top: BorderSide(color: Color(0xFF3a3a3a)),
+              left: BorderSide(color: context.interactionColors.outline),
+              right: BorderSide(color: context.interactionColors.outline),
+              top: BorderSide(color: context.interactionColors.outline),
             ),
           ),
           child: Row(
@@ -602,14 +620,14 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF2b2b2b),
+        color: context.interactionColors.primary,
         border: Border(
           left: BorderSide(
-            color: creator ? const Color(0xFF8b0000) : const Color(0xFF3a3a3a),
+            color: context.interactionColors.outline,
             width: creator ? 3 : 1,
           ),
-          right: const BorderSide(color: Color(0xFF3a3a3a)),
-          bottom: const BorderSide(color: Color(0xFF3a3a3a)),
+          right: BorderSide(color: context.interactionColors.outline),
+          bottom: BorderSide(color: context.interactionColors.outline),
         ),
         borderRadius: isLast
             ? const BorderRadius.vertical(bottom: Radius.circular(6))
@@ -700,7 +718,7 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
                     textColor: Colors.white,
                     borderColor: const Color(0xFF7f1f1f),
                     backgroundColor: const Color(0xFF7f1f1f),
-                    onPressed: () => _requestDelete(channel.id),
+                    onPressed: () => _requestDelete(channel.id, l10n),
                   ),
                 ],
               ],

@@ -126,13 +126,13 @@ class ProfileLocalizationsEn extends ProfileLocalizations {
   String get profileLanguageLabel => 'Language';
 
   @override
-  String get themeNameDefault => 'Default';
+  String get themeNameDefault => 'Classic';
 
   @override
-  String get themeNameFrost => 'Frost';
+  String get themeNameFrost => 'Siberian Cold';
 
   @override
-  String get themeNameVillage => 'Village';
+  String get themeNameVillage => 'Abandonned Village';
 
   @override
   String get profileDeleteAccount => 'Delete account';
