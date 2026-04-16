@@ -51,4 +51,7 @@
     (confirm)="showInsufficientFundsPopup = false"
 >
 </app-pop-up>
+} @if (showPrivateGamePopup) {
+<app-pop-up [isError]="true" [popUpMessage]="'game_creator.game_private' | translate" [showSecondButton]="false" (confirm)="handlePrivateGamePopup()">
+</app-pop-up>
 }

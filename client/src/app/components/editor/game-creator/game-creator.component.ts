@@ -6,6 +6,7 @@ import { GameListComponent } from '@app/components/editor/game-list/game-list.co
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ProfileMenuComponent } from '@app/components/shared/profile-menu/profile-menu.component';
 import { VirtualCurrencyService } from '@app/services/currency/virtual-currency.service';
+import { ProfileService } from '@app/services/communication/profile.service';
 import { GameCreationService } from '@app/services/lobby/game-creation.service';
 import { GameListService } from '@app/services/lobby/game-list.service';
 
@@ -27,6 +28,9 @@ export class GameCreatorComponent implements OnInit {
     friendsOnly = false;
     entryFee: number = 0;
     showInsufficientFundsPopup = false;
+    showPrivateGamePopup = false;
+
+    private currentUsername: string = '';
 
     constructor(
         private router: Router,
@@ -34,6 +38,7 @@ export class GameCreatorComponent implements OnInit {
         private gameCreationService: GameCreationService,
         private socketService: RoomSocketService,
         private currencyService: VirtualCurrencyService,
+        private profileService: ProfileService,
     ) {}
 
     ngOnInit() {
@@ -44,6 +49,9 @@ export class GameCreatorComponent implements OnInit {
         this.entryFee = 0;
         this.gameCreationService.entryFee = 0;
         this.currencyService.fetchBalance();
+        this.profileService.getProfile().then((profile) => {
+            this.currentUsername = profile.username;
+        });
     }
 
     onSelectGame(game: Game): void {
@@ -60,23 +68,33 @@ export class GameCreatorComponent implements OnInit {
                 this.showInsufficientFundsPopup = true;
                 return;
             }
-            this.gameModified = await this.gameListService.fetchGameById(this.selectedGame._id);
-            if (!this.gameModified) {
-                this.gameCreationService.friendsOnly = this.friendsOnly;
-                this.gameCreationService.entryFee = this.entryFee;
-                this.gameCreationService.setSelectedGame(this.selectedGame);
-                this.socketService.generateCode((code) => {
-                    if (code) {
-                        const gameCode = code;
-                        this.gameCreationService.setGameCode(gameCode);
-                    }
-                });
-                this.router.navigate([ROUTES.createPlayer]);
+            const freshGame = await this.gameListService.fetchGameById(this.selectedGame._id);
+            if (!freshGame) {
+                this.gameModified = true;
+                return;
             }
+            if (freshGame.privacy === 'private' && freshGame.owner !== this.currentUsername) {
+                this.showPrivateGamePopup = true;
+                return;
+            }
+            this.gameCreationService.friendsOnly = this.friendsOnly;
+            this.gameCreationService.entryFee = this.entryFee;
+            this.gameCreationService.setSelectedGame(this.selectedGame);
+            this.socketService.generateCode((code) => {
+                if (code) {
+                    const gameCode = code;
+                    this.gameCreationService.setGameCode(gameCode);
+                }
+            });
+            this.router.navigate([ROUTES.createPlayer]);
         }
     }
 
     handlePopUp(): void {
         this.gameModified = false;
+    }
+
+    handlePrivateGamePopup(): void {
+        this.showPrivateGamePopup = false;
     }
 }
