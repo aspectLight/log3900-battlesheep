@@ -5,8 +5,6 @@ import 'package:fpdart/fpdart.dart';
 import '../../../../core/enums/item_type.dart';
 import '../../../../core/helpers/functional_programming.dart';
 import '../../../../core/interfaces/disposable_side_effect.dart';
-import '../../../../core/notification/notification_intent.dart';
-import '../../../../core/notification/notification_intent_sink.dart';
 import '../../core/constants/combat_ui_constants.dart';
 import '../../core/enums/stat_type.dart';
 import '../../core/event_bus/game_session_event_bus.dart';
@@ -24,8 +22,8 @@ class GameCombatSideEffect with DisposableSideEffect {
   final GamePlayerRepository _playerRepository;
   final GamePlayerMovementRepository _movementRepository;
   final GameMetadataRepository _metadataRepository;
-  final NotificationIntentSink _notificationIntentSink;
   Timer? _combatResultsClearTimer;
+  Timer? _combatEndOverlayClearTimer;
   Timer? _flightAttemptFeedbackClearTimer;
   Option<bool> _lastFlightAttemptSuccess = const Option.none();
   Option<int> _initialSelfHealth = const Option.none();
@@ -39,13 +37,11 @@ class GameCombatSideEffect with DisposableSideEffect {
     required GamePlayerMovementRepository movementRepository,
     required GameMetadataRepository metadataRepository,
     required GameSessionEventBus gameSessionEventBus,
-    required NotificationIntentSink notificationIntentSink,
   }) : _socketId = socketId,
        _combatRepository = combatRepository,
        _playerRepository = playerRepository,
        _movementRepository = movementRepository,
-       _metadataRepository = metadataRepository,
-       _notificationIntentSink = notificationIntentSink {
+       _metadataRepository = metadataRepository {
     trackSubscription(
       gameSessionEventBus.on<GameCombatEnded>().listen(_onGameCombatEnded),
     );
@@ -82,14 +78,6 @@ class GameCombatSideEffect with DisposableSideEffect {
 
   void _onGameCombatEnded(GameCombatEnded event) {
     if (_socketId == event.winnerId || _socketId == event.loserId) {
-      _notificationIntentSink.addIntent(
-        EndCombatNotificationIntent(
-          winnerId: event.winnerId,
-          loserId: event.loserId,
-          isByFlight: event.isByFlight,
-          currentUserSocketId: _socketId,
-        ),
-      );
       // Resets pre-combat health locally on combat end; the server does
       // not always send an immediate post-combat "respawn/restore" update.
       // We mirror that behavior to avoid the HUD being stuck at 0 after combat.
@@ -146,13 +134,27 @@ class GameCombatSideEffect with DisposableSideEffect {
   void _scheduleCombatFeedbackClears() {
     final combat = _combatRepository.state.value;
     _cachePreCombatHealthIfNeeded();
+    if (combat is CombatResolved) {
+      _combatResultsClearTimer?.cancel();
+      _combatResultsClearTimer = null;
+      _combatEndOverlayClearTimer ??= Timer(
+        const Duration(milliseconds: CombatUiConstants.notificationDurationMs),
+        () {
+          _combatRepository.clearCombatEndOverlay();
+          _combatEndOverlayClearTimer = null;
+        },
+      );
+    } else {
+      _combatEndOverlayClearTimer?.cancel();
+      _combatEndOverlayClearTimer = null;
+    }
     if (combat is CombatWithResult) {
       _combatResultsClearTimer?.cancel();
       _combatResultsClearTimer = Timer(
         const Duration(milliseconds: CombatUiConstants.notificationDurationMs),
         _combatRepository.clearCombatResults,
       );
-    } else {
+    } else if (combat is! CombatResolved) {
       _combatResultsClearTimer?.cancel();
       _combatResultsClearTimer = null;
     }

@@ -6,6 +6,7 @@ part 'user.freezed.dart';
 class UserModel with _$UserModel {
   const factory UserModel({
     required String uid,
+    String? firebaseUid,
     required String email,
     required String username,
     required String avatarId,

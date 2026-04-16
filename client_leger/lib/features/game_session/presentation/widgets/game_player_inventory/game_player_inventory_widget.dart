@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/enums/item_type.dart';
 import '../../../../../core/helpers/functional_programming.dart';
 import '../../ui_models/components/game_player_inventory_slot_ui.dart';
 import '../item_card/item_card_widget.dart';
@@ -43,7 +44,10 @@ class _GamePlayerInventoryWidgetState extends State<GamePlayerInventoryWidget> {
         children: slots
             .asMap()
             .entries
-            .map((entry) => _InventorySlot(slot: entry.value))
+            .map(
+              (entry) =>
+                  _InventorySlot(slot: entry.value, viewModel: _viewModel),
+            )
             .toList(),
       ),
     );
@@ -52,8 +56,9 @@ class _GamePlayerInventoryWidgetState extends State<GamePlayerInventoryWidget> {
 
 class _InventorySlot extends StatefulWidget {
   final GamePlayerInventorySlotUi slot;
+  final GamePlayerInventoryViewModel viewModel;
 
-  const _InventorySlot({required this.slot});
+  const _InventorySlot({required this.slot, required this.viewModel});
 
   @override
   State<_InventorySlot> createState() => _InventorySlotState();
@@ -64,9 +69,19 @@ class _InventorySlotState extends State<_InventorySlot> {
 
   @override
   Widget build(BuildContext context) {
+    final canDropTorch = widget.viewModel.canDropTorch.watch(context);
+    final isTorchItem = widget.slot.item.when(
+      none: () => false,
+      some: (item) => item.type == ItemType.torch,
+    );
     final child = widget.slot.item.when(
       none: () => const _EmptySlotPlaceholder(),
-      some: (item) => ItemCardWidget(item: item),
+      some: (item) => ItemCardWidget(
+        item: item,
+        showDropButton: item.type == ItemType.torch,
+        dropEnabled: canDropTorch,
+        onDropPressed: widget.viewModel.dropTorch,
+      ),
     );
     final hasItem = widget.slot.item.isSome();
     final isDesktop =
@@ -77,9 +92,9 @@ class _InventorySlotState extends State<_InventorySlot> {
           TargetPlatform.macOS,
         }.contains(defaultTargetPlatform);
 
-    // Fine‑tuned lift so the card is readable
-    // and sits slightly lower than before.
-    final yOffset = _isHovered && hasItem ? -95.0 : 0.0;
+    final shouldLift = hasItem && (_isHovered || isTorchItem);
+
+    final yOffset = shouldLift ? -95.0 : 0.0;
 
     Widget content = AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -95,7 +110,7 @@ class _InventorySlotState extends State<_InventorySlot> {
         onExit: (_) => setState(() => _isHovered = false),
         child: content,
       );
-    } else {
+    } else if (!isTorchItem) {
       content = GestureDetector(
         onTap: hasItem ? () => setState(() => _isHovered = !_isHovered) : null,
         child: content,

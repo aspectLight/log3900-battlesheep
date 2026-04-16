@@ -70,7 +70,10 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         await this.generalChatService.addMessage(chatMessage);
 
         const blockedSocketIds = await this.getBlockedSocketIds(data.username);
-        this.server.except([socket.id, ...blockedSocketIds]).to(GENERAL_CHAT_ROOM).emit(GeneralChatEvents.GeneralChatMessage, chatMessage);
+        this.server
+            .except([socket.id, ...blockedSocketIds])
+            .to(GENERAL_CHAT_ROOM)
+            .emit(GeneralChatEvents.GeneralChatMessage, chatMessage);
         socket.emit(GeneralChatEvents.GeneralChatMessage, chatMessage);
         this.logger.log(`Message de ${data.username}: ${censoredMessage}`);
     }
@@ -91,7 +94,10 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         await this.generalChatService.addMessage(chatEmoji);
 
         const blockedSocketIds = await this.getBlockedSocketIds(data.username);
-        this.server.except([socket.id, ...blockedSocketIds]).to(GENERAL_CHAT_ROOM).emit(GeneralChatEvents.GeneralChatEmoji, chatEmoji);
+        this.server
+            .except([socket.id, ...blockedSocketIds])
+            .to(GENERAL_CHAT_ROOM)
+            .emit(GeneralChatEvents.GeneralChatEmoji, chatEmoji);
     }
 
     @SubscribeMessage(GeneralChatEvents.GetGeneralChatMessages)
@@ -286,10 +292,13 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
             await this.customChannelService.addMessage(data.channelId, chatEmoji);
 
             const blockedSocketIds = await this.getBlockedSocketIds(data.username);
-            this.server.except([socket.id, ...blockedSocketIds]).to(`custom-channel-${data.channelId}`).emit(CustomChannelEvents.CustomChannelEmoji, {
-                channelId: data.channelId,
-                emoji: chatEmoji,
-            });
+            this.server
+                .except([socket.id, ...blockedSocketIds])
+                .to(`custom-channel-${data.channelId}`)
+                .emit(CustomChannelEvents.CustomChannelEmoji, {
+                    channelId: data.channelId,
+                    emoji: chatEmoji,
+                });
         } catch (error) {
             socket.emit(CustomChannelEvents.CustomChannelError, { message: this.getFriendlyError(error) });
         }

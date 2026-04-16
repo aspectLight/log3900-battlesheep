@@ -7,48 +7,57 @@ sealed class GameCombatState {
   int get flightAttemptsLeft;
   Option<bool> get lastFlightAttemptSuccess;
 
-  bool get isCombatMode => this is CombatActive || this is CombatWithResult;
+  bool get isCombatMode =>
+      this is CombatActive || this is CombatWithResult || this is CombatResolved;
 
   Option<String> get combatRoomId => switch (this) {
     CombatActive() => (this as CombatActive).combatRoomId,
+    CombatResolved() => (this as CombatResolved).combatRoomId,
     CombatIdle() => const Option.none(),
   };
 
   Option<String> get attackerId => switch (this) {
     CombatActive() => (this as CombatActive).attackerId,
+    CombatResolved() => (this as CombatResolved).attackerId,
     CombatIdle() => const Option.none(),
   };
 
   Option<String> get defenderId => switch (this) {
     CombatActive() => (this as CombatActive).defenderId,
+    CombatResolved() => (this as CombatResolved).defenderId,
     CombatIdle() => const Option.none(),
   };
 
   Option<String> get currentPlayerId => switch (this) {
     CombatActive() => (this as CombatActive).currentPlayerId,
+    CombatResolved() => (this as CombatResolved).currentPlayerId,
     CombatIdle() => const Option.none(),
   };
 
   Option<String> get currentOpponentId => switch (this) {
     CombatActive() => (this as CombatActive).currentOpponentId,
+    CombatResolved() => (this as CombatResolved).currentOpponentId,
     CombatIdle() => const Option.none(),
   };
 
   Option<bool> get lastAttackSuccess => switch (this) {
     CombatWithResult() => (this as CombatWithResult).lastAttackSuccess,
     CombatActive() => const Option.none(),
+    CombatResolved() => const Option.none(),
     CombatIdle() => const Option.none(),
   };
 
   Option<int> get lastAttackValue => switch (this) {
     CombatWithResult() => (this as CombatWithResult).lastAttackValue,
     CombatActive() => const Option.none(),
+    CombatResolved() => const Option.none(),
     CombatIdle() => const Option.none(),
   };
 
   Option<int> get lastDefenseValue => switch (this) {
     CombatWithResult() => (this as CombatWithResult).lastDefenseValue,
     CombatActive() => const Option.none(),
+    CombatResolved() => const Option.none(),
     CombatIdle() => const Option.none(),
   };
 
@@ -58,9 +67,11 @@ sealed class GameCombatState {
     required T Function(CombatIdle) idle,
     required T Function(CombatActive) active,
     required T Function(CombatWithResult) withResult,
+    required T Function(CombatResolved) resolved,
   }) => switch (this) {
     CombatIdle() => idle(this as CombatIdle),
     CombatWithResult() => withResult(this as CombatWithResult),
+    CombatResolved() => resolved(this as CombatResolved),
     CombatActive() => active(this as CombatActive),
   };
 }
@@ -158,6 +169,63 @@ final class CombatActive extends GameCombatState {
           lastFlightAttemptSuccess ?? this.lastFlightAttemptSuccess,
     );
   }
+}
+
+/// Post-combat outcome overlay (participants only); clears to [CombatIdle] after a delay.
+final class CombatResolved extends GameCombatState {
+  final String _combatRoomId;
+  final String _attackerId;
+  final String _defenderId;
+  final String _currentPlayerId;
+  final String _currentOpponentId;
+  final String winnerId;
+  final String loserId;
+  final bool isByFlight;
+  @override
+  final int combatCountdown;
+  @override
+  final int flightAttemptsLeft;
+  @override
+  final Option<bool> lastFlightAttemptSuccess;
+
+  @override
+  Option<String> get combatRoomId => Option.of(_combatRoomId);
+
+  @override
+  Option<String> get attackerId => Option.of(_attackerId);
+
+  @override
+  Option<String> get defenderId => Option.of(_defenderId);
+
+  @override
+  Option<String> get currentPlayerId => Option.of(_currentPlayerId);
+
+  @override
+  Option<String> get currentOpponentId => Option.of(_currentOpponentId);
+
+  String get combatRoomIdRaw => _combatRoomId;
+  String get attackerIdRaw => _attackerId;
+  String get defenderIdRaw => _defenderId;
+  String get currentPlayerIdRaw => _currentPlayerId;
+  String get currentOpponentIdRaw => _currentOpponentId;
+
+  const CombatResolved({
+    required String combatRoomId,
+    required String attackerId,
+    required String defenderId,
+    required String currentPlayerId,
+    required String currentOpponentId,
+    required this.combatCountdown,
+    required this.flightAttemptsLeft,
+    required this.winnerId,
+    required this.loserId,
+    required this.isByFlight,
+    this.lastFlightAttemptSuccess = const Option.none(),
+  }) : _combatRoomId = combatRoomId,
+       _attackerId = attackerId,
+       _defenderId = defenderId,
+       _currentPlayerId = currentPlayerId,
+       _currentOpponentId = currentOpponentId;
 }
 
 final class CombatWithResult extends CombatActive {
