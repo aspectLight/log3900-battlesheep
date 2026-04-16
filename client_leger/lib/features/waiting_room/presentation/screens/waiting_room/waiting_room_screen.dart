@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_feature_colors.dart';
 import '../../../../../core/constants/ui_assets.dart';
 import '../../../../../core/enums/virtual_player_type.dart';
 import '../../../../../core/helpers/functional_programming.dart';
@@ -31,6 +32,11 @@ class WaitingRoomScreen extends StatefulWidget {
 }
 
 class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
+  /// Host action bar: one row, equal tiles (buttons + drop-in toggle).
+  static const double _hostActionWidth = 250;
+  static const double _hostActionHeight = 52;
+  static const double _hostActionSpacing = 12;
+
   late final WaitingRoomViewModel _viewModel;
   late final WaitingRoomEventBus _eventBus;
   final ScrollController _playersScrollController = ScrollController();
@@ -185,6 +191,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
             _buildGameCode(room.roomId, l10n),
             const SizedBox(height: 20),
             _buildCurrencyPanel(
+              context,
               l10n,
               balance: balance,
               entryFee: room.entryFee,
@@ -330,21 +337,23 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
   }
 
   Widget _buildCurrencyPanel(
+    BuildContext context,
     WaitingRoomLocalizations l10n, {
     required int balance,
     required int entryFee,
   }) {
+    final f = context.featureColors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xBF1E0A0A),
-        border: Border.all(color: const Color(0xFF7F1F1F)),
+        color: f.overlayPanel,
+        border: Border.all(color: f.borderButton),
         borderRadius: BorderRadius.circular(8),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color(0x4D550000),
+            color: f.shadowAccent,
             blurRadius: 8,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -352,12 +361,14 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildCurrencyRow(
+            context,
             label: l10n.waitingRoomBalanceLabel,
             value: '$balance',
           ),
           if (entryFee > 0) ...[
             const SizedBox(height: 6),
             _buildCurrencyRow(
+              context,
               label: l10n.waitingRoomEntryFeeLabel,
               value: '$entryFee',
             ),
@@ -367,14 +378,19 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
     );
   }
 
-  Widget _buildCurrencyRow({required String label, required String value}) {
-    const labelStyle = TextStyle(
-      color: Color(0xFFE0D8C0),
+  Widget _buildCurrencyRow(
+    BuildContext context, {
+    required String label,
+    required String value,
+  }) {
+    final f = context.featureColors;
+    final labelStyle = TextStyle(
+      color: f.textSpecial,
       fontSize: 16,
       fontFamily: 'CustomFont',
     );
-    const valueStyle = TextStyle(
-      color: Color(0xFFF5C842),
+    final valueStyle = TextStyle(
+      color: f.goldAccent,
       fontSize: 16,
       fontWeight: FontWeight.w600,
       fontFamily: 'CustomFont',
@@ -402,104 +418,141 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
     bool isAtMaxPlayers,
   ) {
     final canToggleLock = isHost && (!isLocked || !isAtMaxPlayers);
-    return Wrap(
-      spacing: 12,
-      runSpacing: 10,
-      alignment: WrapAlignment.center,
-      children: [
-        _buildMenuButton(
-          label: isLocked
-              ? l10n.waitingRoomUnlockRoom
-              : l10n.waitingRoomLockRoom,
-          onPressed: canToggleLock
-              ? _requestToggleLockConfirmationIfNeeded
-              : null,
-        ),
-        _buildDropInToggle(
-          enabled: isDropInDropOutEnabled,
-          onChanged: (_) => _viewModel.toggleDropInDropOut(),
-          label: l10n.waitingRoomDropInDropOut,
-        ),
-        _buildMenuButton(
-          label: l10n.startGame,
-          onPressed: _viewModel.isStartValid.value ? _requestStartGame : null,
-        ),
-        _buildMenuButton(
-          label: l10n.waitingRoomAddVirtualPlayer,
-          onPressed: (isHost && !isLocked && canAddVirtualPlayer)
-              ? _requestAddVirtualPlayerFlow
-              : null,
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final row = Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildMenuButton(
+              context,
+              label: isLocked
+                  ? l10n.waitingRoomUnlockRoom
+                  : l10n.waitingRoomLockRoom,
+              onPressed: canToggleLock
+                  ? _requestToggleLockConfirmationIfNeeded
+                  : null,
+            ),
+            const SizedBox(width: _hostActionSpacing),
+            _buildDropInToggle(
+              context,
+              enabled: isDropInDropOutEnabled,
+              onChanged: (_) => _viewModel.toggleDropInDropOut(),
+              label: l10n.waitingRoomDropInDropOut,
+            ),
+            const SizedBox(width: _hostActionSpacing),
+            _buildMenuButton(
+              context,
+              label: l10n.startGame,
+              onPressed:
+                  _viewModel.isStartValid.value ? _requestStartGame : null,
+            ),
+            const SizedBox(width: _hostActionSpacing),
+            _buildMenuButton(
+              context,
+              label: l10n.waitingRoomAddVirtualPlayer,
+              onPressed: (isHost && !isLocked && canAddVirtualPlayer)
+                  ? _requestAddVirtualPlayerFlow
+                  : null,
+            ),
+          ],
+        );
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: constraints.maxWidth),
+            child: row,
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildMenuButton({
+  Widget _buildMenuButton(
+    BuildContext context, {
     required String label,
     required VoidCallback? onPressed,
   }) {
+    final f = context.featureColors;
     return SizedBox(
-      width: 250,
+      width: _hostActionWidth,
+      height: _hostActionHeight,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color.fromARGB(255, 85, 0, 0),
-          disabledBackgroundColor: const Color.fromARGB(255, 52, 10, 10),
+          backgroundColor: f.bgButton,
+          disabledBackgroundColor: f.panelInset,
           foregroundColor: Colors.white,
-          disabledForegroundColor: Colors.grey,
+          disabledForegroundColor: f.textMuted,
           shadowColor: Colors.transparent,
           elevation: 0,
-          side: const BorderSide(color: Color.fromARGB(255, 127, 31, 31)),
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          textStyle: const TextStyle(fontSize: 16),
+          side: BorderSide(color: f.borderButton),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          fixedSize: const Size(_hostActionWidth, _hostActionHeight),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: Text(
           label,
-          style: const TextStyle(fontFamily: 'CustomFont', fontSize: 16),
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontFamily: 'CustomFont', fontSize: 15),
         ),
       ),
     );
   }
 
-  Widget _buildDropInToggle({
+  Widget _buildDropInToggle(
+    BuildContext context, {
     required bool enabled,
     required ValueChanged<bool> onChanged,
     required String label,
   }) {
-    return Container(
-      width: 250,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFF550000),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF7f1f1f)),
-      ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 18,
-            height: 18,
-            child: Checkbox(
-              value: enabled,
-              onChanged: (value) => onChanged(value ?? false),
-              activeColor: const Color(0xFF7f1f1f),
-              checkColor: const Color(0xFFfff0f0),
-              side: const BorderSide(color: Color(0xFFfff0f0)),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Color(0xFFfff0f0),
-                fontFamily: 'CustomFont',
-                fontSize: 16,
+    final f = context.featureColors;
+    return SizedBox(
+      width: _hostActionWidth,
+      height: _hostActionHeight,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: f.bgButton,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: f.borderButton),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 22,
+                height: 22,
+                child: Checkbox(
+                  value: enabled,
+                  onChanged: (value) => onChanged(value ?? false),
+                  activeColor: f.borderButton,
+                  checkColor: f.textSpecialAlt,
+                  side: BorderSide(color: f.textSpecialAlt),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
+                ),
               ),
-            ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: f.textSpecialAlt,
+                    fontFamily: 'CustomFont',
+                    fontSize: 15,
+                    height: 1.1,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

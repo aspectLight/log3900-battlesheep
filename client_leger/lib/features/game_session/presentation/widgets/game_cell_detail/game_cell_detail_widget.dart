@@ -98,8 +98,16 @@ class _DetailLayout extends StatelessWidget {
       child: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16),
-            child: Center(child: child),
+            padding: const EdgeInsets.all(8),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SizedBox(
+                  width: constraints.maxWidth,
+                  height: constraints.maxHeight,
+                  child: child,
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -109,51 +117,73 @@ class _DetailLayout extends StatelessWidget {
 
 class _MagnifyingGlass extends StatelessWidget {
   final String imagePath;
-  const _MagnifyingGlass({required this.imagePath});
+  final double height;
+
+  const _MagnifyingGlass({
+    required this.imagePath,
+    this.height = 216,
+  });
+
+  static const double _baseHeight = 216;
+  static const double _baseWidth = 180;
 
   @override
   Widget build(BuildContext context) {
+    final scale = height / _baseHeight;
+    final width = _baseWidth * scale;
+    final lensSize = 150 * scale;
+    final borderW = 8 * scale;
+    final handleTop = 132 * scale;
+    final handleRight = 30 * scale;
+    final handleW = 14 * scale;
+    final handleH = 60 * scale;
+    final handleBorder = 2 * scale;
+    final handleRadius = 4 * scale;
+    final shadowBlur = 10 * scale;
+    final shadowDy = 5 * scale;
+
     return SizedBox(
-      width: 150,
-      height: 180,
+      width: width,
+      height: height,
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.center,
         children: [
-          // Handle
           Positioned(
-            top: 110,
-            right: 25,
+            top: handleTop,
+            right: handleRight,
             child: Transform.rotate(
               angle: 0.785398, // 45 degrees
               child: Container(
-                width: 12,
-                height: 50,
+                width: handleW,
+                height: handleH,
                 decoration: BoxDecoration(
                   color: const Color(0xFF333333),
-                  border: Border.all(color: const Color(0xFF111111), width: 2),
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(4),
-                    bottomRight: Radius.circular(4),
+                  border: Border.all(
+                    color: const Color(0xFF111111),
+                    width: handleBorder,
+                  ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(handleRadius),
+                    bottomRight: Radius.circular(handleRadius),
                   ),
                 ),
               ),
             ),
           ),
-          // Lens
           Container(
-            width: 125,
-            height: 125,
+            width: lensSize,
+            height: lensSize,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: const Color(0xFF1A1A1A),
-              border: Border.all(color: const Color(0xFF555555), width: 7),
+              border: Border.all(color: const Color(0xFF555555), width: borderW),
               boxShadow: [
                 const BoxShadow(color: Color(0xFF111111), spreadRadius: 2),
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.5),
-                  offset: const Offset(0, 5),
-                  blurRadius: 10,
+                  offset: Offset(0, shadowDy),
+                  blurRadius: shadowBlur,
                 ),
               ],
             ),
@@ -193,7 +223,7 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -203,13 +233,13 @@ class _SectionHeader extends StatelessWidget {
             color: Colors.white.withValues(alpha: 0.15),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             color: const Color(0xFF222222), // Match layout background
             child: Text(
               title,
               style: const TextStyle(
                 color: Color(0xFF888888),
-                fontSize: 10,
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.5,
                 fontFamily: 'CustomFont',
@@ -229,62 +259,89 @@ class _TileDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _MagnifyingGlass(imagePath: info.imagePath),
-          const SizedBox(width: 8),
-          SizedBox(
-            width: 120,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  info.type.getName(l10n).toUpperCase(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'CustomFont',
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxH = constraints.maxHeight;
+        final glassHeight = maxH.isFinite
+            ? maxH.clamp(120.0, 560.0)
+            : 216.0;
+        return Row(
+          children: [
+            Flexible(
+              flex: 3,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: _MagnifyingGlass(
+                    imagePath: info.imagePath,
+                    height: glassHeight,
                   ),
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
                 ),
-                const SizedBox(height: 12),
-                if (info.baseMoveModifier >= 0) ...[
-                  _SectionHeader(title: l10n.gameCellDetailCost),
-                  Text(
-                    info.baseMoveModifier == 0
-                        ? '0'
-                        : '+${info.baseMoveModifier}',
-                    style: const TextStyle(
-                      color: Color(0xFFBB0000),
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'CustomFont',
-                    ),
-                  ),
-                ],
-                _SectionHeader(title: l10n.gameCellDetailDescription),
-                Text(
-                  info.type.getDescription(l10n),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Color(0xFFCCCCCC),
-                    fontSize: 13,
-                    height: 1.4,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 4,
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
-      ),
+            const SizedBox(width: 8),
+            Expanded(
+              flex: 2,
+              child: LayoutBuilder(
+                builder: (context, textConstraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: textConstraints.maxWidth,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            info.type.getName(l10n).toUpperCase(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'CustomFont',
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 10),
+                          if (info.baseMoveModifier >= 0) ...[
+                            _SectionHeader(title: l10n.gameCellDetailCost),
+                            Text(
+                              info.baseMoveModifier == 0
+                                  ? '0'
+                                  : '+${info.baseMoveModifier}',
+                              style: const TextStyle(
+                                color: Color(0xFFBB0000),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'CustomFont',
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                          _SectionHeader(title: l10n.gameCellDetailDescription),
+                          Text(
+                            info.type.getDescription(l10n),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Color(0xFFCCCCCC),
+                              fontSize: 13,
+                              height: 1.45,
+                              fontFamily: 'CustomFont',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -300,29 +357,49 @@ class _PlayerDetailView extends StatelessWidget {
       () => info.avatarPath,
       Option.of,
     );
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          (info.isCurrentPlayer ? l10n.gameCellDetailYou : info.name)
-              .toUpperCase(),
-          style: TextStyle(
-            color: info.isCurrentPlayer ? Colors.amber : Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'CustomFont',
-          ),
-        ),
-        const SizedBox(height: 8),
-        imagePath.fold(
-          () => const Icon(Icons.person, size: 80, color: Colors.white24),
-          (path) => SizedBox(
-            height: 140,
-            width: double.infinity,
-            child: Image.asset(path, fit: BoxFit.contain),
-          ),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final iconSize = (constraints.maxHeight * 0.28).clamp(48.0, 88.0);
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                (info.isCurrentPlayer ? l10n.gameCellDetailYou : info.name)
+                    .toUpperCase(),
+                style: TextStyle(
+                  color: info.isCurrentPlayer ? Colors.amber : Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'CustomFont',
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: imagePath.fold(
+                () => Center(
+                  child: Icon(
+                    Icons.person,
+                    size: iconSize,
+                    color: Colors.white24,
+                  ),
+                ),
+                (path) => Image.asset(
+                  path,
+                  fit: BoxFit.contain,
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -334,11 +411,11 @@ class _ItemDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Wrap ItemCardWidget in a centered container to match scale
     return Center(
-      child: Transform.scale(
-        scale: 1.2,
-        child: ItemCardWidget(item: GamePlayerInventoryItemUi(type: info.type)),
+      child: FittedBox(
+        child: ItemCardWidget(
+          item: GamePlayerInventoryItemUi(type: info.type),
+        ),
       ),
     );
   }

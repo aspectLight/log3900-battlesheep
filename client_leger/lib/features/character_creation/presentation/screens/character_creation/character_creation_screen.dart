@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/presentation/shell/shell_chrome_back_handler.dart';
+import '../../../../../core/appearance/app_feature_colors.dart';
 import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/constants/character_assets.dart';
 import '../../../../../core/constants/stat_assets.dart';
@@ -125,12 +126,13 @@ class _CharacterGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = CharacterCreationLocalizations.of(context)!;
+    final f = context.featureColors;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF2b2b2b),
+        color: f.panel,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFF444444), width: 2),
+        border: Border.all(color: f.borderStrong, width: 2),
         boxShadow: [
           BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 10),
         ],
@@ -157,9 +159,9 @@ class _CharacterGrid extends StatelessWidget {
                 thumbColor: WidgetStateProperty.all(
                   context.interactionColors.outline,
                 ),
-                trackColor: WidgetStateProperty.all(const Color(0xFF2b2b2b)),
+                trackColor: WidgetStateProperty.all(context.featureColors.panel),
                 trackBorderColor: WidgetStateProperty.all(
-                  const Color(0xFF2b2b2b),
+                  context.featureColors.panel,
                 ),
               ),
               child: Watch((context) {
@@ -218,9 +220,10 @@ class _CharacterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final f = context.featureColors;
     final borderColor = isSelected
-        ? const Color(0xFF7f1f1f)
-        : const Color(0xFF444444);
+        ? context.interactionColors.outline
+        : f.borderStrong;
     return Material(
       color: Colors.black.withValues(alpha: isDisabled ? 0.16 : 0.278),
       borderRadius: BorderRadius.circular(5),
@@ -263,8 +266,8 @@ class _CharacterCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 character.displayName,
-                style: const TextStyle(
-                  color: Color(0xFFf5e6e6),
+                style: TextStyle(
+                  color: context.featureColors.textTertiary,
                   fontSize: 14,
                   fontFamily: 'CustomFont',
                 ),
@@ -504,13 +507,14 @@ class _BonusSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = CharacterCreationLocalizations.of(context)!;
+    final f = context.featureColors;
     return Container(
       constraints: BoxConstraints(maxWidth: 400, maxHeight: maxHeight),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF2b2b2b),
+        color: f.panel,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFF444444), width: 2),
+        border: Border.all(color: f.borderStrong, width: 2),
         boxShadow: [
           BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 10),
         ],
@@ -531,9 +535,9 @@ class _BonusSection extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF2b2b2b),
+              color: f.panel,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFF444444), width: 2),
+              border: Border.all(color: f.borderStrong, width: 2),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.6),
@@ -686,6 +690,7 @@ class _StatBonusButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final f = context.featureColors;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -693,9 +698,9 @@ class _StatBonusButton extends StatelessWidget {
         height: 40,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF3c3c3c) : const Color(0xFF444444),
+          color: isSelected ? f.controlFillSelected : f.controlFill,
           borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: const Color(0xFF555555)),
+          border: Border.all(color: f.controlBorder),
           boxShadow: isSelected
               ? [
                   BoxShadow(
@@ -759,8 +764,8 @@ class _DiceRow extends StatelessWidget {
                   description,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFFc0c0c0),
+                  style: TextStyle(
+                    color: context.featureColors.textMuted,
                     fontSize: 12,
                     fontStyle: FontStyle.italic,
                     fontFamily: 'CustomFont',
@@ -808,6 +813,7 @@ class _DiceButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final f = context.featureColors;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -815,9 +821,9 @@ class _DiceButton extends StatelessWidget {
         height: 40,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF3c3c3c) : const Color(0xFF444444),
+          color: isSelected ? f.controlFillSelected : f.controlFill,
           borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: const Color(0xFF555555)),
+          border: Border.all(color: f.controlBorder),
           boxShadow: isSelected
               ? [
                   BoxShadow(

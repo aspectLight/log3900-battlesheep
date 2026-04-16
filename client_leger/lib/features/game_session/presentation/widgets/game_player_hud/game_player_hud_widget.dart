@@ -43,38 +43,43 @@ class _GamePlayerHudWidgetState extends State<GamePlayerHudWidget> {
     final l10n = GameSessionLocalizations.of(context)!;
     return Container(
       width: double.infinity,
-      constraints: const BoxConstraints(maxWidth: 600),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         gradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFF1A1A1A), Color(0xFF252525)],
+          colors: [Color(0xFF141414), Color(0xFF222222)],
         ),
+        border: Border.all(color: const Color(0xFF3A3A3A)),
         boxShadow: const [
           BoxShadow(
-            color: Colors.black45,
-            spreadRadius: 2,
-            blurRadius: 20,
-            offset: Offset(0, 4),
+            color: Colors.black54,
+            blurRadius: 12,
+            offset: Offset(0, 3),
           ),
         ],
       ),
-      child: SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(10, 12, 10, 10),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _PlayerHeader(model: model, l10n: l10n),
+            const SizedBox(height: 10),
             _SectionHeader(title: l10n.playerHudStatsSection),
-            _StatsGrid(statRows: model.statRows, l10n: l10n),
+            const SizedBox(height: 8),
+            Expanded(
+              child: _StatsOnePerRow(statRows: model.statRows, l10n: l10n),
+            ),
+            const SizedBox(height: 10),
             _SectionHeader(title: l10n.playerHudDiceSection),
-            _DiceGrid(
+            const SizedBox(height: 6),
+            _DiceRowPair(
               attackAsset: model.attackDiceAsset,
               defenseAsset: model.defenseDiceAsset,
               l10n: l10n,
             ),
-            const SizedBox(height: 4),
           ],
         ),
       ),
@@ -82,129 +87,170 @@ class _GamePlayerHudWidgetState extends State<GamePlayerHudWidget> {
   }
 }
 
-class _PlayerHeader extends StatelessWidget {
+class _PlayerHeader extends StatefulWidget {
   final GamePlayerHudUiState model;
   final GameSessionLocalizations l10n;
 
   const _PlayerHeader({required this.model, required this.l10n});
 
   @override
+  State<_PlayerHeader> createState() => _PlayerHeaderState();
+}
+
+class _PlayerHeaderState extends State<_PlayerHeader> {
+  final GlobalKey _chipsColumnKey = GlobalKey();
+  double _chipsStackHeight = 72;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(_measureChipsStack);
+  }
+
+  @override
+  void didUpdateWidget(covariant _PlayerHeader oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final m = widget.model;
+    final o = oldWidget.model;
+    if (m.name != o.name ||
+        m.movementPoints != o.movementPoints ||
+        m.actionPoints != o.actionPoints ||
+        m.avatarPath != o.avatarPath) {
+      WidgetsBinding.instance.addPostFrameCallback(_measureChipsStack);
+    }
+  }
+
+  void _measureChipsStack([Duration? _]) {
+    if (!mounted) return;
+    final ctx = _chipsColumnKey.currentContext;
+    if (ctx == null) return;
+    final box = ctx.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) {
+      WidgetsBinding.instance.addPostFrameCallback(_measureChipsStack);
+      return;
+    }
+    final h = box.size.height.clamp(48.0, 400.0);
+    if ((h - _chipsStackHeight).abs() > 0.5) {
+      setState(() => _chipsStackHeight = h);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Color(0xFF333333),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: ColorFiltered(
-              colorFilter: const ColorFilter.matrix([
-                2.5,
-                0,
-                0,
-                0,
-                0,
-                0,
-                2.5,
-                0,
-                0,
-                0,
-                0,
-                0,
-                2.5,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-              ]),
-              child: model.avatarPath.isEmpty
-                  ? const SizedBox.shrink()
-                  : Image.asset(model.avatarPath, fit: BoxFit.cover),
-            ),
+    final m = widget.model;
+    final l10n = widget.l10n;
+    final diameter = (_chipsStackHeight * 0.75).clamp(40.0, 200.0);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          m.name,
+          softWrap: true,
+          style: const TextStyle(
+            color: Color(0xFFF8F8F8),
+            fontSize: 20,
+            height: 1.2,
+            fontWeight: FontWeight.w700,
+            fontFamily: 'CustomFont',
+            letterSpacing: 0.2,
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              model.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.w500,
-                fontFamily: 'CustomFont',
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          IntrinsicWidth(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.04),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _PointValue(
-                    label: l10n.playerHudMovements(model.movementPoints),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: diameter,
+              child: Align(
+                child: SizedBox(
+                  width: diameter,
+                  height: diameter,
+                  child: DecoratedBox(
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFF2E2E2E),
+                    ),
+                    child: ClipOval(
+                      child: ColorFiltered(
+                        colorFilter: const ColorFilter.matrix([
+                          2.5,
+                          0,
+                          0,
+                          0,
+                          0,
+                          0,
+                          2.5,
+                          0,
+                          0,
+                          0,
+                          0,
+                          0,
+                          2.5,
+                          0,
+                          0,
+                          0,
+                          0,
+                          0,
+                          1,
+                          0,
+                        ]),
+                        child: m.avatarPath.isEmpty
+                            ? const SizedBox.shrink()
+                            : Image.asset(m.avatarPath, fit: BoxFit.cover),
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 4),
-                  _PointValue(label: l10n.playerHudActions(model.actionPoints)),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                key: _chipsColumnKey,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _MetaChip(text: l10n.playerHudMovements(m.movementPoints)),
+                  const SizedBox(height: 8),
+                  _MetaChip(text: l10n.playerHudActions(m.actionPoints)),
                 ],
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 }
 
-class _PointValue extends StatelessWidget {
-  final String label;
+class _MetaChip extends StatelessWidget {
+  final String text;
 
-  const _PointValue({required this.label});
+  const _MetaChip({required this.text});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Color(0xFFEEEEEE),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 0.3,
-            fontFamily: 'CustomFont',
-          ),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A2A2A),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: const Color(0xFF4A4A4A)),
+      ),
+      child: Text(
+        text,
+        softWrap: true,
+        style: const TextStyle(
+          color: Color(0xFFE8E8E8),
+          fontSize: 13,
+          height: 1.25,
+          fontWeight: FontWeight.w600,
+          fontFamily: 'CustomFont',
         ),
-        const SizedBox(height: 1),
-        Container(
-          height: 1,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.transparent,
-                Colors.white.withValues(alpha: 0.15),
-                Colors.transparent,
-              ],
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -222,24 +268,20 @@ class _SectionHeader extends StatelessWidget {
         Container(
           height: 1,
           width: double.infinity,
-          color: Colors.white.withValues(alpha: 0.1),
+          color: const Color(0xFF4A4A4A),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFF1A1A1A), Color(0xFF252525)],
-            ),
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          color: const Color(0xFF1C1C1C),
           child: Text(
             title.toUpperCase(),
+            softWrap: true,
+            textAlign: TextAlign.center,
             style: const TextStyle(
-              color: Color(0xFF888888),
-              fontSize: 14,
-              letterSpacing: 0.5,
-              fontWeight: FontWeight.w500,
+              color: Color(0xFFC8C8C8),
+              fontSize: 12,
+              letterSpacing: 1.0,
+              fontWeight: FontWeight.w700,
               fontFamily: 'CustomFont',
             ),
           ),
@@ -249,70 +291,113 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _StatsGrid extends StatelessWidget {
+/// One row per stat in HUD order: health, attack, defense, speed.
+class _StatsOnePerRow extends StatelessWidget {
   final List<GamePlayerUiStat> statRows;
   final GameSessionLocalizations l10n;
 
-  const _StatsGrid({required this.statRows, required this.l10n});
+  const _StatsOnePerRow({required this.statRows, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisExtent: 22,
-          crossAxisSpacing: 16,
-        ),
-        itemCount: statRows.length,
-        itemBuilder: (context, index) {
-          final stat = statRows[index];
-          return FittedBox(
-            alignment: Alignment.centerLeft,
-            fit: BoxFit.scaleDown,
-            child: Row(
+    if (statRows.length < 4) {
+      return const SizedBox.shrink();
+    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
-                  width: 65,
-                  child: Text(
-                    stat.statType.resolveStatLabel(l10n),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontFamily: 'CustomFont',
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: List.generate(
-                    stat.value.clamp(0, 999),
-                    (_) => Padding(
-                      padding: const EdgeInsets.only(right: 2),
-                      child: Image.asset(stat.assetPath, width: 15, height: 15),
-                    ),
-                  ),
-                ),
+                _StatLine(stat: statRows[0], l10n: l10n),
+                const SizedBox(height: 10),
+                _StatLine(stat: statRows[1], l10n: l10n),
+                const SizedBox(height: 10),
+                _StatLine(stat: statRows[2], l10n: l10n),
+                const SizedBox(height: 10),
+                _StatLine(stat: statRows[3], l10n: l10n),
               ],
             ),
-          );
-        },
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Label (full text) + icons in a single horizontal strip; scrolls horizontally if needed.
+class _StatLine extends StatelessWidget {
+  final GamePlayerUiStat stat;
+  final GameSessionLocalizations l10n;
+
+  const _StatLine({required this.stat, required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    final count = stat.value.clamp(0, 999);
+    final double iconSize = count > 10 ? 14.0 : (count > 6 ? 16.0 : 18.0);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            stat.statType.resolveStatLabel(l10n),
+            softWrap: true,
+            style: const TextStyle(
+              color: Color(0xFFF0F0F0),
+              fontSize: 14,
+              height: 1.35,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'CustomFont',
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                    child: Row(
+                      children: List.generate(
+                        count,
+                        (_) => Padding(
+                          padding: const EdgeInsets.only(right: 3),
+                          child: Image.asset(
+                            stat.assetPath,
+                            width: iconSize,
+                            height: iconSize,
+                            filterQuality: FilterQuality.medium,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _DiceGrid extends StatelessWidget {
+class _DiceRowPair extends StatelessWidget {
   final String attackAsset;
   final String defenseAsset;
   final GameSessionLocalizations l10n;
 
-  const _DiceGrid({
+  const _DiceRowPair({
     required this.attackAsset,
     required this.defenseAsset,
     required this.l10n,
@@ -320,46 +405,52 @@ class _DiceGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: GridView(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisExtent: 22,
-          crossAxisSpacing: 16,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: _DiceCell(label: l10n.statAttack, asset: attackAsset),
         ),
-        children: [
-          _buildDiceRow(l10n.statAttack, attackAsset),
-          _buildDiceRow(l10n.statDefense, defenseAsset),
-        ],
-      ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _DiceCell(label: l10n.statDefense, asset: defenseAsset),
+        ),
+      ],
     );
   }
+}
 
-  Widget _buildDiceRow(String label, String asset) {
-    return FittedBox(
-      alignment: Alignment.centerLeft,
-      fit: BoxFit.scaleDown,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: 65,
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontFamily: 'CustomFont',
-              ),
-              overflow: TextOverflow.ellipsis,
+class _DiceCell extends StatelessWidget {
+  final String label;
+  final String asset;
+
+  const _DiceCell({required this.label, required this.asset});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            softWrap: true,
+            style: const TextStyle(
+              color: Color(0xFFF0F0F0),
+              fontSize: 14,
+              height: 1.2,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'CustomFont',
             ),
           ),
-          Image.asset(asset, width: 18, height: 18),
-        ],
-      ),
+        ),
+        Image.asset(
+          asset,
+          width: 28,
+          height: 28,
+          filterQuality: FilterQuality.medium,
+        ),
+      ],
     );
   }
 }

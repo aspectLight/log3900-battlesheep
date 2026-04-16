@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
@@ -54,70 +53,28 @@ class _GamePlayerInventoryWidgetState extends State<GamePlayerInventoryWidget> {
   }
 }
 
-class _InventorySlot extends StatefulWidget {
+class _InventorySlot extends StatelessWidget {
   final GamePlayerInventorySlotUi slot;
   final GamePlayerInventoryViewModel viewModel;
 
   const _InventorySlot({required this.slot, required this.viewModel});
 
   @override
-  State<_InventorySlot> createState() => _InventorySlotState();
-}
-
-class _InventorySlotState extends State<_InventorySlot> {
-  bool _isHovered = false;
-
-  @override
   Widget build(BuildContext context) {
-    final canDropTorch = widget.viewModel.canDropTorch.watch(context);
-    final isTorchItem = widget.slot.item.when(
-      none: () => false,
-      some: (item) => item.type == ItemType.torch,
-    );
-    final child = widget.slot.item.when(
+    final canDropTorch = viewModel.canDropTorch.watch(context);
+    final child = slot.item.when(
       none: () => const _EmptySlotPlaceholder(),
       some: (item) => ItemCardWidget(
         item: item,
         showDropButton: item.type == ItemType.torch,
         dropEnabled: canDropTorch,
-        onDropPressed: widget.viewModel.dropTorch,
+        onDropPressed: viewModel.dropTorch,
       ),
     );
-    final hasItem = widget.slot.item.isSome();
-    final isDesktop =
-        kIsWeb ||
-        {
-          TargetPlatform.windows,
-          TargetPlatform.linux,
-          TargetPlatform.macOS,
-        }.contains(defaultTargetPlatform);
-
-    final shouldLift = hasItem && (_isHovered || isTorchItem);
-
-    final yOffset = shouldLift ? -95.0 : 0.0;
-
-    Widget content = AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-      transform: Matrix4.translationValues(0, yOffset, 0),
-      margin: const EdgeInsets.symmetric(horizontal: 6),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 3),
       child: child,
     );
-
-    if (isDesktop) {
-      content = MouseRegion(
-        onEnter: (_) => setState(() => _isHovered = true),
-        onExit: (_) => setState(() => _isHovered = false),
-        child: content,
-      );
-    } else if (!isTorchItem) {
-      content = GestureDetector(
-        onTap: hasItem ? () => setState(() => _isHovered = !_isHovered) : null,
-        child: content,
-      );
-    }
-
-    return content;
   }
 }
 
