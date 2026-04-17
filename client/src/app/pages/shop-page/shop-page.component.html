@@ -7,12 +7,9 @@
     <app-profile-menu></app-profile-menu>
 </div>
 
-@if (purchaseSuccess) {
-<div class="success-banner">{{ purchaseSuccess }}</div>
-}
-
 @if (showInsufficientFundsPopup) {
 <app-pop-up
+    [isError]="true"
     [popUpMessage]="'shop.insufficient_funds_title' | translate"
     [description]="'shop.insufficient_funds_desc' | translate"
     [firstOption]="'common.ok' | translate"

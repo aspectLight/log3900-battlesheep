@@ -26,6 +26,7 @@ export class GameJoinerComponent implements OnInit, OnDestroy {
     showBlockedWarning = false;
     blockedWarningMessage = '';
     isJoinButtonEnabled = false;
+    private suppressNextJoinError = false;
 
     private readonly SERVER_ERROR_MAP: Record<string, string> = {
         "La salle n'existe pas": 'errors.room_not_found',
@@ -73,6 +74,7 @@ export class GameJoinerComponent implements OnInit, OnDestroy {
 
     onBlockedWarningCancel(): void {
         this.showBlockedWarning = false;
+        this.suppressNextJoinError = true;
         this.globalSocketService.send(SocialEvents.BlockedUserRoomChoice, { choice: 'cancel' });
     }
 
@@ -118,10 +120,11 @@ export class GameJoinerComponent implements OnInit, OnDestroy {
                 this.gameCreationService.gameCode = gameCode;
                 this.gameCreationService.isDropIn = false;
                 this.router.navigate([ROUTES.createPlayer]);
-            } else {
+            } else if (!this.suppressNextJoinError) {
                 this.errorMessage = this.translateServerError(error);
                 this.showError = true;
             }
+            this.suppressNextJoinError = false;
         });
     }
 

@@ -15,7 +15,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     imports: [CommonModule, RouterLink, ProfileMenuComponent, PopUpComponent, TranslateModule],
 })
 export class ShopPageComponent implements OnInit {
-    purchaseSuccess: string = '';
     showInsufficientFundsPopup: boolean = false;
     activePreferences: Record<string, string> = {};
 
@@ -61,8 +60,6 @@ export class ShopPageComponent implements OnInit {
             return;
         }
         this.currencyService.purchaseItem(item.id);
-        this.purchaseSuccess = this.translate.instant('shop.success.purchase');
-        setTimeout(() => { this.purchaseSuccess = ''; }, 3000);
     }
 
     isEquipped(item: ShopItem): boolean {
@@ -84,7 +81,5 @@ export class ShopPageComponent implements OnInit {
             delete updated[key];
             this.activePreferences = updated;
         }
-        this.purchaseSuccess = newValue ? this.translate.instant('shop.success.equipped') : this.translate.instant('shop.success.unequipped');
-        setTimeout(() => { this.purchaseSuccess = ''; }, 3000);
     }
 }

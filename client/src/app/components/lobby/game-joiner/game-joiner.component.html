@@ -2,6 +2,7 @@
 <app-pop-up [isError]="true" popUpMessage="{{ errorMessage }}" [showSecondButton]="false" (confirm)="this.showError = false"> </app-pop-up>
 } @if (showBlockedWarning) {
 <app-pop-up
+    [isError]="true"
     popUpMessage="{{ blockedWarningMessage }}"
     [showSecondButton]="true"
     firstOption="Entrer quand même"
