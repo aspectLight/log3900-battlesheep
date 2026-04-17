@@ -334,6 +334,8 @@ export class GameRoomService {
         // Check if this is a returning player
         const abandonedEntry = player.firebaseUid ? room.abandonedPlayers.find((ap) => ap.firebaseUid === player.firebaseUid) : null;
 
+        let result: { player: Player; isReturning: boolean; restoredStats?: any };
+
         if (abandonedEntry) {
             // Returning player: use their new character/bonuses from character creation,
             // but preserve their original color, team, and previous stats.
@@ -361,7 +363,7 @@ export class GameRoomService {
             // Remove from abandoned list
             room.abandonedPlayers = room.abandonedPlayers.filter((ap) => ap.firebaseUid !== player.firebaseUid);
 
-            return { player, isReturning: true, restoredStats: abandonedEntry.stats };
+            result = { player, isReturning: true, restoredStats: abandonedEntry.stats };
         } else {
             // New player: assign color and add fresh stats
             const usedColors = room.players.map((p) => p.color);
@@ -401,8 +403,11 @@ export class GameRoomService {
                 tilesVisited: [],
             });
 
-            return { player, isReturning: false };
+            result = { player, isReturning: false };
         }
+
+        this.reorderTurnQueueAfterDropIn(room);
+        return result;
     }
 
     addItemToInventory(roomId: string, playerId: string, item: Item): { shouldDrop?: { item: Item }; inventoryFull?: boolean; player: Player } {
@@ -590,6 +595,19 @@ export class GameRoomService {
             const diff = b.stats['speed'].value - a.stats['speed'].value;
             return diff === 0 ? Math.random() - RANDOM_CALCULATOR_VALUE : diff;
         });
+    }
+
+    private reorderTurnQueueAfterDropIn(room: GameRoom): void {
+        if (!room.players.length) {
+            return;
+        }
+        const currentId = room.players[0].id;
+        const sorted = this.assignTurnOrder([...room.players]);
+        const k = sorted.findIndex((p) => p.id === currentId);
+        if (k < 0) {
+            return;
+        }
+        room.players = k === 0 ? sorted : [...sorted.slice(k), ...sorted.slice(0, k)];
     }
 
     private clearTurnTimeout(roomId: string): void {
