@@ -6,6 +6,7 @@ import { Subscription, debounceTime, distinctUntilChanged, Subject } from 'rxjs'
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
 import { environment } from 'src/environments/environment';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ProfileMenuComponent } from '@app/components/shared/profile-menu/profile-menu.component';
 
 type Tab = 'friends' | 'requests' | 'search' | 'blocked';
 
@@ -13,7 +14,7 @@ type Tab = 'friends' | 'requests' | 'search' | 'blocked';
     selector: 'app-friends-page',
     templateUrl: './friends-page.component.html',
     styleUrls: ['./friends-page.component.scss'],
-    imports: [RouterLink, FormsModule, TranslateModule],
+    imports: [RouterLink, FormsModule, TranslateModule, ProfileMenuComponent],
 })
 export class FriendsPageComponent implements OnInit, OnDestroy {
     activeTab: Tab = 'friends';

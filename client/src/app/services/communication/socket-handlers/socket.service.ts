@@ -87,6 +87,18 @@ export class SocketService implements ISocketService {
         return this.socket.id;
     }
 
+    /**
+     * Returns true if the socket is currently connected AND was established
+     * with authentication credentials (Firebase token + sessionId).
+     * An unauthenticated socket (created before login) will return false
+     * even if it is technically connected.
+     */
+    isAuthenticatedSocket(): boolean {
+        if (!this.socket?.connected) return false;
+        const socketAuth = (this.socket as any).auth as Record<string, unknown> | undefined;
+        return !!(socketAuth?.token && socketAuth?.sessionId);
+    }
+
     getRoomId(): string {
         return this.gameRoomService.room.roomId;
     }

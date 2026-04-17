@@ -57,19 +57,19 @@
 .avatar-circle {
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #cc0000;
+    border: 2px solid var(--theme-slider-accent);
 }
 
 .settings-dropdown {
     position: fixed;
     top: 70px;
     right: 20px;
-    background: rgba(22, 7, 7, 0.95);
+    background: var(--theme-bg-dropdown);
     border-radius: 8px;
-    border: 2px solid #3a1212;
+    border: 2px solid var(--theme-border-primary);
     padding: 8px 0;
     min-width: 220px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 10px var(--theme-shadow-strong);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
@@ -88,11 +88,11 @@
     padding: 12px 18px;
     background: none;
     border: none;
-    border-bottom: 1px solid #250808;
+    border-bottom: 1px solid var(--theme-border-light);
     text-align: left;
     cursor: pointer;
     font-size: 0.95rem;
-    color: #f0f0f0;
+    color: var(--theme-text-secondary);
     transition: all 0.2s ease;
 }
 
@@ -101,6 +101,6 @@
 }
 
 .settings-option:hover {
-    background-color: #550000;
-    color: #fff;
+    background-color: var(--theme-bg-button);
+    color: var(--theme-text-special-alt);
 }

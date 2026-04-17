@@ -21,17 +21,17 @@
 <div class="create-game-actions">
     <div class="game-options-row" [class.disabled]="!selectedGame">
         <div class="friends-only-wrapper">
-            <span class="entry-fee-label">Accessibilité</span>
+            <span class="entry-fee-label">{{ 'game_creator.accessibility' | translate }}</span>
             <label class="friends-only-toggle">
                 <input type="checkbox" [(ngModel)]="friendsOnly" [disabled]="!selectedGame" />
                 <span class="checkmark" [class.disabled]="!selectedGame"></span>
-                Amis seulement
+                {{ 'game_creator.friends_only' | translate }}
             </label>
         </div>
         <div class="entry-fee-wrapper">
-            <span class="entry-fee-label">Prix d'entrée</span>
+            <span class="entry-fee-label">{{ 'game_creator.entry_fee' | translate }}</span>
             <div class="entry-fee-field">
-                <input type="number" [(ngModel)]="entryFee" min="0" step="10" class="entry-fee-input" [disabled]="!selectedGame" />
+                <input type="number" [(ngModel)]="entryFee" (input)="onEntryFeeInput($event)" (keydown)="preventInvalidChars($event)" min="0" max="1000" step="10" class="entry-fee-input" [disabled]="!selectedGame" />
                 <img class="coin-icon" src="./assets/gold_coin.png" alt="pièce" />
             </div>
         </div>
@@ -45,8 +45,9 @@
 </app-pop-up>
 } @if (showInsufficientFundsPopup) {
 <app-pop-up
-    popUpMessage="Solde insuffisant"
-    description="Vous n'avez pas assez de pièces pour créer une partie avec ce prix d'entrée."
+    [isError]="true"
+    [popUpMessage]="'game_creator.insufficient_balance' | translate"
+    [description]="'game_creator.insufficient_balance_desc' | translate"
     [showSecondButton]="false"
     (confirm)="showInsufficientFundsPopup = false"
 >

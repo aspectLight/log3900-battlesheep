@@ -10,7 +10,6 @@
   overflow: hidden;
   border: 2px solid var(--theme-border-primary);
   min-height: 0;
-  max-height: 500px;
   position: relative;
   transition: all 0.3s ease-in-out;
 }
@@ -132,7 +131,7 @@
   height: 28px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #5a2020;
+  border: 1px solid var(--theme-slider-accent);
   display: block;
 }
 
@@ -140,14 +139,14 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background-color: #3a1212;
-  border: 1px solid #5a2020;
+  background-color: var(--theme-bg-card-dark);
+  border: 1px solid var(--theme-slider-accent);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.75rem;
   font-weight: bold;
-  color: #f0e0e0;
+  color: var(--theme-text-special-alt);
 }
 
 .message.sent {
@@ -166,7 +165,7 @@
   height: 28px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #5a2020;
+  border: 1px solid var(--theme-slider-accent);
   display: block;
 }
 
@@ -180,14 +179,14 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background-color: #3a1212;
-  border: 1px solid #5a2020;
+  background-color: var(--theme-bg-card-dark);
+  border: 1px solid var(--theme-slider-accent);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.75rem;
   font-weight: bold;
-  color: #f0e0e0;
+  color: var(--theme-text-special-alt);
 }
 
 .msg-time {
@@ -767,21 +766,21 @@ app-pop-up {
   height: 22px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #7a5a1a;
+  border: 1px solid var(--theme-slider-accent);
 }
 
 .cp-msg-avatar-placeholder {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background-color: #4a3010;
-  border: 1px solid #7a5a1a;
+  background-color: var(--theme-bg-card-dark);
+  border: 1px solid var(--theme-slider-accent);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.65rem;
   font-weight: bold;
-  color: #ffd39a;
+  color: var(--theme-text-special-alt);
 }
 
 .cp-msg-author {

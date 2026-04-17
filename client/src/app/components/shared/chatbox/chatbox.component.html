@@ -88,6 +88,7 @@
 
 @if (cp_showConfirmation) {
     <app-pop-up
+        [isError]="true"
         [popUpMessage]="cp_quitMessage"
         [showSecondButton]="true"
         [firstOption]="'common.yes' | translate"

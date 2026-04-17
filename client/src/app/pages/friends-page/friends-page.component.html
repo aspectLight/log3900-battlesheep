@@ -5,6 +5,7 @@
             {{ 'common.home' | translate }}
         </button>
         <h1 class="page-title">{{ 'friends.title' | translate }}</h1>
+        <app-profile-menu></app-profile-menu>
     </div>
 
     @if (errorMessage) {
@@ -13,7 +14,7 @@
 
     <div class="tabs">
         <button class="tab" [class.active]="activeTab === 'friends'" (click)="setTab('friends')">
-            {{ 'friends.tab_friends' | translate: { count: friends.length } }}
+            {{ 'friends.tab_friends' | translate }}
         </button>
         <button class="tab" [class.active]="activeTab === 'requests'" (click)="setTab('requests')">
             {{ 'friends.tab_requests' | translate }}

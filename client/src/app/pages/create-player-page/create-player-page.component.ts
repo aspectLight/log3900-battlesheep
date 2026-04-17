@@ -129,6 +129,15 @@ export class CreatePlayerPageComponent implements OnInit, OnDestroy {
 
     async onCharacterSelected(chosenAvatar: { name: string; id: number }): Promise<void> {
         this.playerCreationService.selectedCharacter = chosenAvatar;
+
+        // The host creates the waiting room only when clicking the final button,
+        // so the room doesn't exist yet — skip avatar reservation for the host.
+        if (this.isHost) {
+            this.validCharacter = true;
+            this.updateCreateButtonState();
+            return;
+        }
+
         try {
             await this.socketService.reserveAvatar(this.gameCreationService.gameCode, chosenAvatar.name, this.getId());
             this.validCharacter = true;

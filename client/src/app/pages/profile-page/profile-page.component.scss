@@ -97,6 +97,19 @@
     flex-direction: column;
 }
 
+.success-banner {
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--theme-bg-success-soft);
+    border: 1px solid var(--theme-border-success);
+    color: var(--theme-success-text);
+    margin-bottom: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
 .form-actions {
     display: flex;
     flex-direction: column;

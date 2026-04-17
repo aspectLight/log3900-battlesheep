@@ -9,6 +9,7 @@ import { ChatService } from '@app/services/communication/chat.service';
 import { CustomChannelService } from '@app/services/communication/custom-channel.service';
 import { ProfileService } from '@app/services/communication/profile.service';
 import { SocialService } from '@app/services/communication/social.service';
+import { RoomSocketService } from '@app/services/communication/socket-handlers/room-socket.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { VirtualCurrencyService } from '@app/services/currency/virtual-currency.service';
 import { GameManagerService } from '@app/services/state/game-manager.service';
@@ -43,6 +44,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
         private router: Router,
         public currencyService: VirtualCurrencyService,
         private avatarRegistry: AvatarRegistryService,
+        private roomSocketService: RoomSocketService,
     ) {}
 
     get isGameCanceled(): boolean {
@@ -77,9 +79,16 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
         let username = this.authService.currentUser?.displayName || 'Utilisateur';
 
-        // Reconnect the socket immediately so the server can cancel the auto-logout timeout
-        // before it fires. The profile fetch below can take a moment and must not delay this.
-        await this.socketService.reconnect();
+        // Reconnect if the socket is not connected, OR if it is connected but was established
+        // before login (unauthenticated — happens in the Electron executable where the socket
+        // initialises at app startup before Firebase restores the user session).
+        // Skip reconnect if the socket is already authenticated to avoid invalidating any
+        // in-flight room/game-code context (e.g. navigating home from the shop then to game creator).
+        if (!this.socketService.isAuthenticatedSocket()) {
+            await this.socketService.reconnect();
+        }
+
+        this.roomSocketService.resetRoomState();
 
         // Fetch the user profile to get the avatar of the logged-in user
         let avatarId: string | null = null;

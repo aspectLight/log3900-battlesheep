@@ -62,6 +62,38 @@ export class GameCreatorComponent implements OnInit {
         this.hasGames = length > 0;
     }
 
+    preventInvalidChars(event: KeyboardEvent): void {
+        const invalidChars = ['e', 'E', '+', '-', '.'];
+        if (invalidChars.includes(event.key)) {
+            event.preventDefault();
+        }
+    }
+
+    onEntryFeeInput(event: Event): void {
+        const inputElement = event.target as HTMLInputElement;
+        
+        let valueStr = inputElement.value;
+        // Keep only digits in case paste event bypassed keydown
+        valueStr = valueStr.replace(/[^0-9]/g, '');
+        
+        if (valueStr === '') {
+            inputElement.value = '0';
+            this.entryFee = 0;
+            return;
+        }
+
+        const value = parseInt(valueStr, 10);
+        
+        if (value > 1000) {
+            inputElement.value = '1000';
+            this.entryFee = 1000;
+        } else {
+            // Set value to clean string (removes leading zeros)
+            inputElement.value = value.toString();
+            this.entryFee = value;
+        }
+    }
+
     async createGame(): Promise<void> {
         if (this.selectedGame) {
             if (this.entryFee > this.currencyService.balance) {
@@ -82,11 +114,10 @@ export class GameCreatorComponent implements OnInit {
             this.gameCreationService.setSelectedGame(this.selectedGame);
             this.socketService.generateCode((code) => {
                 if (code) {
-                    const gameCode = code;
-                    this.gameCreationService.setGameCode(gameCode);
+                    this.gameCreationService.setGameCode(code);
+                    this.router.navigate([ROUTES.createPlayer]);
                 }
             });
-            this.router.navigate([ROUTES.createPlayer]);
         }
     }
 

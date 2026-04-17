@@ -14,14 +14,7 @@
 
     <div class="content-wrapper">
 
-        @if (showSuccessMessage) {
-        <app-pop-up
-            [popUpMessage]="'profile.success' | translate"
-            [description]="'profile.success_msg' | translate"
-            [firstOption]="'common.ok' | translate"
-            (confirm)="onSuccessConfirm()"
-        ></app-pop-up>
-        } @if (showErrorMessage) {
+        @if (showErrorMessage) {
         <app-pop-up [isError]="true" [popUpMessage]="'profile.error' | translate" [description]="errorMessage" [firstOption]="'common.ok' | translate" (confirm)="onErrorConfirm()"></app-pop-up>
         } @if (showDeleteConfirm) {
         <app-pop-up
@@ -134,6 +127,9 @@
                         }
                     </div>
 
+                    @if (showSuccessMessage) {
+                    <div class="success-banner">{{ 'profile.success_msg' | translate }}</div>
+                    }
                     <div class="form-actions">
                         <button type="submit" class="btn-primary" [disabled]="isSaving">
                             @if (isSaving) { {{ 'profile.saving' | translate }} } @else { {{ 'profile.save' | translate }} }

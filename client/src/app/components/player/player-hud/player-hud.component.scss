@@ -156,6 +156,10 @@
   display: flex;
   align-items: center;
   gap: 2px;
+
+  &:nth-child(even) {
+    justify-self: end;
+  }
 }
 
 .stat-label {
@@ -169,6 +173,13 @@
   display: flex;
   gap: 1px;
   align-items: center;
+}
+
+.stat-value {
+  color: var(--theme-text-primary);
+  font-size: clamp(0.75rem, 2vw, 1rem);
+  font-weight: 600;
+  margin-left: 4px;
 }
 
 .point {
@@ -188,6 +199,10 @@
   display: flex;
   align-items: center;
   gap: 2px;
+
+  &:nth-child(even) {
+    justify-self: end;
+  }
 }
 
 .dice-label {

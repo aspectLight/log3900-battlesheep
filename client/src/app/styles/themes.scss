@@ -119,6 +119,7 @@
     // Accent
     --theme-accent: #550000;
     --theme-accent-hover: #7f1f1f;
+    --theme-slider-accent: #cc1010;
     
     // Couleurs spéciales pour le jeu
     --theme-game-border: #8b5e34;
@@ -210,6 +211,10 @@
     // ── Accent ────────────────────────────────────────────────────────
     --theme-accent: #1c3d55;
     --theme-accent-hover: #28526e;
+    --theme-slider-accent: #2a88cc;
+
+    // ── Texte sur surface blanche (pop-up, modales) ───────────────────
+    --theme-text-on-surface: #1c3d55;
 
     // ── Couleurs spéciales pour le jeu ───────────────────────────────
     --theme-game-bg: #060f1a;
@@ -301,6 +306,10 @@
     // ── Accent ────────────────────────────────────────────────────────
     --theme-accent: #4a3018;
     --theme-accent-hover: #624028;
+    --theme-slider-accent: #9a5c28;
+
+    // ── Texte sur surface blanche (pop-up, modales) ───────────────────
+    --theme-text-on-surface: #4a3018;
 
     // ── Couleurs spéciales pour le jeu ───────────────────────────────
     --theme-game-bg: #100a04;

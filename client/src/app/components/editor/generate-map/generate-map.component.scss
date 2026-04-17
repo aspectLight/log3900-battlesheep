@@ -84,7 +84,7 @@
 
 .slider-group input[type='range'] {
     width: 100%;
-    accent-color: #8b0000;
+    accent-color: var(--theme-slider-accent);
 }
 
 .options {

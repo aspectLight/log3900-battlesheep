@@ -121,6 +121,11 @@ export class GamePlayComponent implements OnInit {
 
     @HostListener('window:keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
+        const target = event.target as HTMLElement;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
+            return;
+        }
+
         if (event.key === 'd') {
             this.actionSocketService.toggleDebugMode();
         }

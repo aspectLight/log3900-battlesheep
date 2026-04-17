@@ -219,8 +219,8 @@ export class ProfilePageComponent implements OnInit {
         }
 
         this.isSaving = true;
-        this.showErrorMessage = false;
         this.showSuccessMessage = false;
+        this.showErrorMessage = false;
 
         const formValues = this.form.getRawValue();
         const previousUsername = this.profile.username;
@@ -322,10 +322,6 @@ export class ProfilePageComponent implements OnInit {
 
     onErrorConfirm() {
         this.showErrorMessage = false;
-    }
-
-    onSuccessConfirm() {
-        this.showSuccessMessage = false;
     }
 
     formatTime(seconds: number): string {

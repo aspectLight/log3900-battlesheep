@@ -48,30 +48,33 @@
 
     <div class="game-info-container">
         <div class="game-code-row">
+            <div class="game-info">
+                <h3>{{ 'waiting.code' | translate }}</h3>
+                <h1>{{ code }}</h1>
+            </div>
             @if (joinQrUrl) {
             <div class="waiting-room-join-qr" [attr.aria-label]="'waiting.qr_alt' | translate">
                 <img [src]="joinQrUrl" alt="" />
             </div>
             }
-            <div class="game-info">
-                <h3>{{ 'waiting.code' | translate }}</h3>
-                <h1>{{ code }}</h1>
+            <div class="currency-panel">
+                <div class="currency-row">
+                    <span class="currency-label">{{ 'waiting.balance' | translate }}:</span>
+                    <span class="currency-value"
+                        ><strong>{{ currencyService.balance$ | async }}</strong> <img class="coin-icon" src="./assets/gold_coin.png" alt="pièce"
+                    /></span>
+                </div>
+                @if ((room?.entryFee ?? 0) > 0) {
+                <div class="currency-row">
+                    <span class="currency-label">{{ 'waiting.entry_fee' | translate }}:</span>
+                    <span class="currency-value">{{ room?.entryFee }} <img class="coin-icon" src="./assets/gold_coin.png" alt="pièce" /></span>
+                </div>
+                }
+                <div class="currency-row">
+                    <span class="currency-label">{{ 'game_creator.friends_only' | translate }}:</span>
+                    <span class="currency-value">{{ (room?.friendsOnly ? 'common.yes' : 'common.no') | translate }}</span>
+                </div>
             </div>
-        </div>
-
-        <div class="currency-panel">
-            <div class="currency-row">
-                <span class="currency-label">{{ 'waiting.balance' | translate }}:</span>
-                <span class="currency-value"
-                    ><strong>{{ currencyService.balance$ | async }}</strong> <img class="coin-icon" src="./assets/gold_coin.png" alt="pièce"
-                /></span>
-            </div>
-            @if ((room?.entryFee ?? 0) > 0) {
-            <div class="currency-row">
-                <span class="currency-label">{{ 'waiting.entry_fee' | translate }}:</span>
-                <span class="currency-value">{{ room?.entryFee }} <img class="coin-icon" src="./assets/gold_coin.png" alt="pièce" /></span>
-            </div>
-            }
         </div>
 
         <div class="waiting-room-actions-wrap">

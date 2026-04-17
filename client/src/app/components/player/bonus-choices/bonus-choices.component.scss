@@ -85,10 +85,6 @@
     font-style: italic;
     line-height: 1.3;
     text-align: left;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    text-overflow: ellipsis;
 }
 
 .button {
@@ -147,7 +143,7 @@
     }
 
     .stat-description {
-        -webkit-line-clamp: 3;
+        margin-top: 0.5rem;
     }
 
     .stat-container {
@@ -175,7 +171,6 @@
         margin-top: 0.25rem;
         line-height: 1.2;
         font-size: clamp(0.7rem, 1.8vw, 0.8rem);
-        -webkit-line-clamp: 3;
     }
 
     .button {
