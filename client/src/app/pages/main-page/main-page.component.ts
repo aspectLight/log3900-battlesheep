@@ -77,9 +77,12 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
         let username = this.authService.currentUser?.displayName || 'Utilisateur';
 
-        // Reconnect the socket immediately so the server can cancel the auto-logout timeout
-        // before it fires. The profile fetch below can take a moment and must not delay this.
-        await this.socketService.reconnect();
+        // Reconnect the socket only if it is not already connected, so that we cancel
+        // the server-side auto-logout timeout without invalidating any in-flight room/code
+        // context that was established with the current socket connection.
+        if (!this.socketService.socket?.connected) {
+            await this.socketService.reconnect();
+        }
 
         // Fetch the user profile to get the avatar of the logged-in user
         let avatarId: string | null = null;

@@ -114,11 +114,10 @@ export class GameCreatorComponent implements OnInit {
             this.gameCreationService.setSelectedGame(this.selectedGame);
             this.socketService.generateCode((code) => {
                 if (code) {
-                    const gameCode = code;
-                    this.gameCreationService.setGameCode(gameCode);
+                    this.gameCreationService.setGameCode(code);
+                    this.router.navigate([ROUTES.createPlayer]);
                 }
             });
-            this.router.navigate([ROUTES.createPlayer]);
         }
     }
 
