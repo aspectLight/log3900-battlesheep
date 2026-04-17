@@ -15,4 +15,7 @@ CreatePlayerRequestDto _$CreatePlayerRequestDtoFromJson(
 
 Map<String, dynamic> _$CreatePlayerRequestDtoToJson(
   CreatePlayerRequestDto instance,
-) => <String, dynamic>{'roomId': instance.roomId, 'player': instance.player};
+) => <String, dynamic>{
+  'roomId': instance.roomId,
+  'player': instance.player.toJson(),
+};

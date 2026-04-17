@@ -41,6 +41,11 @@ class ChatShakeSideEffect with DisposableSideEffect {
 
   void _onVerticalShake(ChatVerticalShakeDetected event) {
     _panelStateRepository.lastSentMessage.value.whenPresent((content) {
+      final customId = _panelStateRepository.activeCustomChannelId.value;
+      if (customId != null) {
+        _canalsRepository.sendMessage(customId, content);
+        return;
+      }
       _chatRepository.sendMessage(
         SendChatMessageCommand(
           username: _username,

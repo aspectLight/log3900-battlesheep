@@ -3,6 +3,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 import '../../../../../core/app_transition/app_transition_bus.dart';
 import '../../../core/app_events/join_game_session_events.dart';
 import '../../../core/event_bus/join_game_session_event_bus.dart';
+import '../../../core/utils/join_game_session_qr_payload_parser.dart';
 import '../../../domain/commands/join_game_session_command.dart';
 import '../../../domain/state/join_game_session_state.dart';
 import '../../../domain/use_cases/join_by_code_use_case.dart';
@@ -32,6 +33,13 @@ class JoinByCodePanelViewModel {
 
   void onCodeChanged(String value) {
     code.value = value;
+  }
+
+  void applyDetectedRoomCode(String raw) {
+    final String? parsed = JoinGameSessionQrPayloadParser.tryParseRoomCode(raw);
+    if (parsed != null) {
+      code.value = parsed;
+    }
   }
 
   Future<void> onJoinTap() async {

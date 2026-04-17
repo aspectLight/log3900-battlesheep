@@ -8,6 +8,9 @@ import '../services/socket_service.dart';
 /// Matches server `GeneralChatEvents.AvatarUpdated` / Angular `avatarUpdated`.
 const String _kAvatarUpdatedSocketEvent = 'avatarUpdated';
 
+/// Matches server `GeneralChatEvents.UsernameUpdated` / Angular `usernameUpdated`.
+const String _kUsernameUpdatedSocketEvent = 'usernameUpdated';
+
 class ChatAvatarRegistryEntry {
   const ChatAvatarRegistryEntry({
     this.avatarId,
@@ -40,6 +43,9 @@ class ChatAvatarRegistry {
     socketService
         .on<Object?>(_kAvatarUpdatedSocketEvent)
         .listen(_onAvatarUpdatedPayload);
+    socketService
+        .on<Object?>(_kUsernameUpdatedSocketEvent)
+        .listen(_onUsernameUpdatedPayload);
   }
 
   final Dio _dio;
@@ -155,6 +161,20 @@ class ChatAvatarRegistry {
     _batchScheduled = false;
   }
 
+  /// Same as the Angular avatar registry `UsernameUpdated` handler: move cached entry to the new key.
+  void applyUsernameRenamed(String oldUsername, String newUsername) {
+    final old = oldUsername.trim();
+    final nextName = newUsername.trim();
+    if (old.isEmpty || nextName.isEmpty || old == nextName) return;
+    final current = _entries.value;
+    final entry = current[old];
+    if (entry == null) return;
+    final next = Map<String, ChatAvatarRegistryEntry>.from(current);
+    next[nextName] = entry;
+    next.remove(old);
+    _entries.value = next;
+  }
+
   /// Prefer registry for [authorName], else message snapshot fields.
   ({
     String? avatarId,
@@ -222,5 +242,20 @@ class ChatAvatarRegistry {
       avatarId: avatarId,
       avatarRelativeUrl: avatarUrl,
     );
+  }
+
+  void _onUsernameUpdatedPayload(Object? raw) {
+    final m = _tryJsonMap(raw);
+    if (m == null) return;
+    final oldName = m['oldUsername'] as String?;
+    final newName = m['newUsername'] as String?;
+    if (oldName == null ||
+        newName == null ||
+        oldName.isEmpty ||
+        newName.isEmpty ||
+        oldName == newName) {
+      return;
+    }
+    applyUsernameRenamed(oldName, newName);
   }
 }

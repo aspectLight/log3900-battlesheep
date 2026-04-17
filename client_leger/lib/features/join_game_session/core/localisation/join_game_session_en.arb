@@ -25,5 +25,8 @@
   "waitingRoomRoomNotFound": "Game not found",
   "waitingRoomRoomLocked": "Game is locked",
   "joinGameMaxPlayerLimitReached": "Maximum player limit reached",
-  "joinGameInsufficientBalance": "Insufficient balance to join this game"
+  "joinGameInsufficientBalance": "Insufficient balance to join this game",
+  "joinGameScanQrButton": "Scan QR code",
+  "joinGameScanQrTitle": "Scan the waiting room QR code",
+  "joinGameScanQrUnsupportedPlatform": "QR scanning is not available on this device. Enter the code manually."
 }

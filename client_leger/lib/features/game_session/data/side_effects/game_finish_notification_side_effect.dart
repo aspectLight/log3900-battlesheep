@@ -49,10 +49,20 @@ class GameFinishNotificationSideEffect with DisposableSideEffect {
         currentUserSocketId: _socketId,
         onComplete: () {
           if (_gameSessionScopeHolder.scope == null) return;
+          final String statisticsPlayerName = _gamePlayerRepository
+              .state
+              .value
+              .players
+              .where((p) => p.id == _socketId)
+              .firstOrNull
+              ?.name ?? '';
           _appTransitionEventBus.fire(
             GameSessionExitAppEvent.gameFinished(
               roomId: e.roomId,
               isCTF: e.isCTF,
+              winnerId: e.winnerId,
+              currentUserSocketId: _socketId,
+              statisticsPlayerName: statisticsPlayerName,
             ),
           );
         },

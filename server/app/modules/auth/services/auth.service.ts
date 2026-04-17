@@ -1,15 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RegisterUserDto, UpdateUserDto } from '@app/modules/auth/dto/auth.dto';
-import { EXCLUSIVE_AVATAR_IDS, SHOP_CATALOGUE, ShopItem } from '@common/shop.constants';
 import { User, UserDocument } from '@app/modules/auth/schemas/user.schema';
 import { FirebaseAdminService } from '@app/modules/auth/services/firebase-admin.service';
+import { GameService } from '@app/modules/game/services/game.service';
+import { ChatModerationService } from '@app/modules/general-chat/services/chat-moderation.service';
 import { CustomChannelService } from '@app/modules/general-chat/services/custom-channel.service';
 import { GeneralChatService } from '@app/modules/general-chat/services/general-chat.service';
-import { GameService } from '@app/modules/game/services/game.service';
-import { FriendshipService } from '@app/modules/social/services/friendship.service';
 import { BlockService } from '@app/modules/social/services/block.service';
-import { ConflictException, BadRequestException, ForbiddenException, Inject, Injectable, Logger, NotFoundException, UnauthorizedException, forwardRef } from '@nestjs/common';
-import { ChatModerationService } from '@app/modules/general-chat/services/chat-moderation.service';
+import { FriendshipService } from '@app/modules/social/services/friendship.service';
+import { EXCLUSIVE_AVATAR_IDS, SHOP_CATALOGUE, ShopItem } from '@common/shop.constants';
+import {
+    BadRequestException,
+    ConflictException,
+    ForbiddenException,
+    Inject,
+    Injectable,
+    Logger,
+    NotFoundException,
+    UnauthorizedException,
+    forwardRef,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { DecodedIdToken } from 'firebase-admin/auth';
 import { Model } from 'mongoose';

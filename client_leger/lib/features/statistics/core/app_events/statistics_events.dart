@@ -12,6 +12,9 @@ sealed class StatisticsEntryAppEvent
   const factory StatisticsEntryAppEvent.statisticsRequested({
     required String roomId,
     required bool isCTF,
+    required String winnerId,
+    required String currentUserSocketId,
+    required String statisticsPlayerName,
     GameRewardsInfo? capturedRewards,
   }) = StatisticsRequested;
 }

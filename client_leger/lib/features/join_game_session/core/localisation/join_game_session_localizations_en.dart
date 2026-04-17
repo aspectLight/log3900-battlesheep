@@ -87,4 +87,14 @@ class JoinGameSessionLocalizationsEn extends JoinGameSessionLocalizations {
   @override
   String get joinGameInsufficientBalance =>
       'Insufficient balance to join this game';
+
+  @override
+  String get joinGameScanQrButton => 'Scan QR code';
+
+  @override
+  String get joinGameScanQrTitle => 'Scan the waiting room QR code';
+
+  @override
+  String get joinGameScanQrUnsupportedPlatform =>
+      'QR scanning is not available on this device. Enter the code manually.';
 }

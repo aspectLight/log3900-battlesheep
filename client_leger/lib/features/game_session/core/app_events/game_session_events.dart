@@ -53,5 +53,8 @@ sealed class GameSessionExitAppEvent
   const factory GameSessionExitAppEvent.gameFinished({
     required String roomId,
     required bool isCTF,
+    required String winnerId,
+    required String currentUserSocketId,
+    required String statisticsPlayerName,
   }) = GameFinishedEvent;
 }

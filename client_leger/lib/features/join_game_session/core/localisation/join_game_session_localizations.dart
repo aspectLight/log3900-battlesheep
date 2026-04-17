@@ -256,6 +256,24 @@ abstract class JoinGameSessionLocalizations {
   /// In en, this message translates to:
   /// **'Insufficient balance to join this game'**
   String get joinGameInsufficientBalance;
+
+  /// No description provided for @joinGameScanQrButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR code'**
+  String get joinGameScanQrButton;
+
+  /// No description provided for @joinGameScanQrTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan the waiting room QR code'**
+  String get joinGameScanQrTitle;
+
+  /// No description provided for @joinGameScanQrUnsupportedPlatform.
+  ///
+  /// In en, this message translates to:
+  /// **'QR scanning is not available on this device. Enter the code manually.'**
+  String get joinGameScanQrUnsupportedPlatform;
 }
 
 class _JoinGameSessionLocalizationsDelegate

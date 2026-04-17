@@ -7,6 +7,7 @@ import '../../../../core/services/socket_service.dart';
 import '../context/statistics_scope_holder.dart';
 import '../../../../routing/app_navigator.dart';
 import '../../data/projections/statistics_events_projection.dart';
+import '../../data/services/post_game_share_url_opener.dart';
 import '../../data/services/statistics_socket.dart';
 import '../../domain/models/game_rewards_info.dart';
 import '../../domain/models/game_statistics.dart';
@@ -16,6 +17,7 @@ import 'statistics_repository_module.dart';
 import 'statistics_view_model_module.dart';
 
 void registerStatisticsRoot(GetIt getIt) {
+  getIt.registerLazySingleton<PostGameShareUrlOpener>(PostGameShareUrlOpener.new);
   getIt.registerLazySingleton<StatisticsScopeHolder>(StatisticsScopeHolder.new);
   getIt.registerLazySingleton<StatisticsCoordinator>(
     () => StatisticsCoordinator(
@@ -34,6 +36,9 @@ void registerStatisticsScope(
   required GameStatistics initialData,
   required GameRewardsInfo initialRewards,
   required bool isCTF,
+  required String winnerId,
+  required String currentUserSocketId,
+  required String statisticsPlayerName,
 }) {
   scope.registerSingleton<StatisticsSocket>(
     StatisticsSocket(socketService: rootGetIt.get<SocketService>()),
@@ -45,7 +50,14 @@ void registerStatisticsScope(
     initialRewards: initialRewards,
   );
   registerStatisticsProjections(scope, rootGetIt);
-  registerStatisticsViewModels(scope, rootGetIt, isCTF: isCTF);
+  registerStatisticsViewModels(
+    scope,
+    rootGetIt,
+    isCTF: isCTF,
+    winnerId: winnerId,
+    currentUserSocketId: currentUserSocketId,
+    statisticsPlayerName: statisticsPlayerName,
+  );
 }
 
 void bootstrapStatisticsScope(GetIt scope) {

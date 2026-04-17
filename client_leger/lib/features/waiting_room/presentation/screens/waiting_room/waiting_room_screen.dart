@@ -21,6 +21,7 @@ import '../../mappers/waiting_room_player_ui_mapper.dart';
 import '../../styles/waiting_room_player_banner_shell.dart';
 import '../../styles/waiting_room_player_banner_styles.dart';
 import '../../ui_models/components/waiting_room_player_ui.dart';
+import '../../widgets/waiting_room_join_qr_corner/waiting_room_join_qr_corner.dart';
 import 'waiting_room_view_model.dart';
 
 @RoutePage()
@@ -312,25 +313,41 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
   }
 
   Widget _buildGameCode(String code, WaitingRoomLocalizations l10n) {
-    return Column(
-      children: [
-        Text(
-          l10n.waitingRoomGameCode,
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 16,
-            fontFamily: 'CustomFont',
+    final trimmed = code.trim();
+    final showQr = trimmed.length == 4;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        if (showQr) ...<Widget>[
+          WaitingRoomJoinQrCorner(
+            roomId: code,
+            semanticLabel: l10n.waitingRoomJoinQrLabel,
           ),
-        ),
-        Text(
-          code,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 36,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 6,
-            fontFamily: 'CustomFont',
-          ),
+          const SizedBox(width: 16),
+        ],
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(
+              l10n.waitingRoomGameCode,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 16,
+                fontFamily: 'CustomFont',
+              ),
+            ),
+            Text(
+              code,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 6,
+                fontFamily: 'CustomFont',
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -715,7 +732,6 @@ class _WaitingRoomPlayerCardInnerStack extends StatelessWidget {
                     displayName: playerUi.name,
                     avatarId: playerUi.profileAvatarId,
                     avatarUrl: playerUi.profileAvatarUrl,
-                    size: 24,
                   ),
                   const SizedBox(width: 8),
                   Flexible(

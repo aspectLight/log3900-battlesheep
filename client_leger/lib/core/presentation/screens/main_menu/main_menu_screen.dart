@@ -8,6 +8,8 @@ import 'package:signals_flutter/signals_flutter.dart';
 import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/localisation/core_localizations.dart';
 import '../../../../../core/presentation/shell/shell_chrome_back_handler.dart';
+import '../../../../features/friends/data/friends_socket_listener.dart';
+import '../../../../features/friends/presentation/screens/friends_view_model.dart';
 import '../../../constants/ui_assets.dart';
 import '../../widgets/app_background/app_background.dart';
 import 'main_menu_view_model.dart';
@@ -23,19 +25,17 @@ class MainMenuScreen extends StatefulWidget {
 class _MainMenuScreenState extends State<MainMenuScreen>
     with AutoRouteAwareStateMixin<MainMenuScreen> {
   late final MainMenuViewModel _viewModel;
+  late final FriendsViewModel friendViewModel;
 
   @override
   void initState() {
     super.initState();
     _viewModel = GetIt.I<MainMenuViewModel>();
+    friendViewModel = GetIt.I<FriendsViewModel>();
+    unawaited(friendViewModel.loadAll());
     GetIt.I<ShellChromeBackHandler>().clear();
-    unawaited(_viewModel.loadPendingRequests());
     unawaited(_viewModel.checkTutorialStatus());
-  }
-
-  @override
-  void didPopNext() {
-    unawaited(_viewModel.loadPendingRequests());
+    FriendsSocketListener(socketService: GetIt.I(), viewModel: friendViewModel);
   }
 
   @override
@@ -75,7 +75,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                           badge: Watch.builder(
                             builder: (ctx) {
                               final count =
-                                  _viewModel.pendingRequestCount.value;
+                                  friendViewModel.pendingRequests.value.length;
                               if (count == 0) return const SizedBox.shrink();
                               return Container(
                                 padding: const EdgeInsets.symmetric(

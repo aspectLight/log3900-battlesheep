@@ -22,5 +22,10 @@
   "shopBannerPreviewHp": "HP",
   "shopBannerPreviewSpeed": "Speed",
   "shopBannerPreviewAttack": "Attack",
-  "shopBannerPreviewDefense": "Defense"
+  "shopBannerPreviewDefense": "Defense",
+  "bannerGold": "Golden Banner",
+  "bannerShadow": "Shadow banner",
+  "bannerFlame": "Flame Banner",
+  "bannerIce": "Icy Banner",
+  "bannerNeon": "Neon Banner"
 }

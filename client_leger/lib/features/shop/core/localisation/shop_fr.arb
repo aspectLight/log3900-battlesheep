@@ -22,5 +22,10 @@
   "shopBannerPreviewHp": "Vie",
   "shopBannerPreviewSpeed": "Rapidité",
   "shopBannerPreviewAttack": "Attaque",
-  "shopBannerPreviewDefense": "Défense"
+  "shopBannerPreviewDefense": "Défense",
+  "bannerGold": "Bannière dorée",
+  "bannerShadow": "Bannière sombre",
+  "bannerFlame": "Bannière flamme",
+  "bannerIce": "Bannière glaciale",
+  "bannerNeon": "Bannière néon"
 }
