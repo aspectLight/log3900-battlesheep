@@ -214,6 +214,31 @@ abstract class StatisticsLocalizations {
   /// In en, this message translates to:
   /// **'Number of different players who held the flag'**
   String get statisticsFlags;
+
+  String statisticsShareSocialBlurb(
+    String result,
+    int deaths,
+    int combatPct,
+    int tilePct,
+  );
+
+  String get statisticsShareResultNounWin;
+
+  String get statisticsShareResultNounLoss;
+
+  String get statisticsShareX;
+
+  String get statisticsShareBluesky;
+
+  String get statisticsShareSectionTitle;
+
+  String get statisticsSharePublishX;
+
+  String get statisticsSharePublishBluesky;
+
+  String get statisticsShareXHint;
+
+  String get statisticsShareBlueskyHint;
 }
 
 class _StatisticsLocalizationsDelegate

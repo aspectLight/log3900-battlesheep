@@ -68,4 +68,42 @@ class StatisticsLocalizationsFr extends StatisticsLocalizations {
   @override
   String get statisticsFlags =>
       'Nombre de joueurs différents ayant détenu le drapeau';
+
+  @override
+  String statisticsShareSocialBlurb(
+    String result,
+    int deaths,
+    int combatPct,
+    int tilePct,
+  ) =>
+      '🎮 Résultat de partie : $result !\n💀 Morts : $deaths\n⚔️ Combats gagnés : $combatPct%\n🗺️ Cases visitées : $tilePct%\n#EasternSolace #Jeux';
+
+  @override
+  String get statisticsShareResultNounWin => 'victoire';
+
+  @override
+  String get statisticsShareResultNounLoss => 'défaite';
+
+  @override
+  String get statisticsShareX => 'Partager sur X';
+
+  @override
+  String get statisticsShareBluesky => 'Partager sur Bluesky';
+
+  @override
+  String get statisticsShareSectionTitle => 'Partager mes résultats';
+
+  @override
+  String get statisticsSharePublishX => 'Publier sur X';
+
+  @override
+  String get statisticsSharePublishBluesky => 'Publier sur Bluesky';
+
+  @override
+  String get statisticsShareXHint =>
+      'Connexion à X puis brouillon prêt avec vos stats — il ne reste qu’à publier.';
+
+  @override
+  String get statisticsShareBlueskyHint =>
+      'Ouvre Bluesky avec un brouillon prêt (300 caractères max). Connectez-vous si besoin, puis publiez.';
 }

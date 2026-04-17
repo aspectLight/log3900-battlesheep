@@ -10,5 +10,8 @@ class StatisticsData with _$StatisticsData {
     required String roomId,
     required GameStatistics initialData,
     required bool isCTF,
+    required String winnerId,
+    required String currentUserSocketId,
+    required String statisticsPlayerName,
   }) = _StatisticsData;
 }

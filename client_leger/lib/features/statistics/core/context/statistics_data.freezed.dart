@@ -20,6 +20,9 @@ mixin _$StatisticsData {
   String get roomId => throw _privateConstructorUsedError;
   GameStatistics get initialData => throw _privateConstructorUsedError;
   bool get isCTF => throw _privateConstructorUsedError;
+  String get winnerId => throw _privateConstructorUsedError;
+  String get currentUserSocketId => throw _privateConstructorUsedError;
+  String get statisticsPlayerName => throw _privateConstructorUsedError;
 
   /// Create a copy of StatisticsData
   /// with the given fields replaced by the non-null parameter values.
@@ -35,7 +38,14 @@ abstract class $StatisticsDataCopyWith<$Res> {
     $Res Function(StatisticsData) then,
   ) = _$StatisticsDataCopyWithImpl<$Res, StatisticsData>;
   @useResult
-  $Res call({String roomId, GameStatistics initialData, bool isCTF});
+  $Res call({
+    String roomId,
+    GameStatistics initialData,
+    bool isCTF,
+    String winnerId,
+    String currentUserSocketId,
+    String statisticsPlayerName,
+  });
 
   $GameStatisticsCopyWith<$Res> get initialData;
 }
@@ -58,6 +68,9 @@ class _$StatisticsDataCopyWithImpl<$Res, $Val extends StatisticsData>
     Object? roomId = null,
     Object? initialData = null,
     Object? isCTF = null,
+    Object? winnerId = null,
+    Object? currentUserSocketId = null,
+    Object? statisticsPlayerName = null,
   }) {
     return _then(
       _value.copyWith(
@@ -73,6 +86,18 @@ class _$StatisticsDataCopyWithImpl<$Res, $Val extends StatisticsData>
                 ? _value.isCTF
                 : isCTF // ignore: cast_nullable_to_non_nullable
                       as bool,
+            winnerId: null == winnerId
+                ? _value.winnerId
+                : winnerId // ignore: cast_nullable_to_non_nullable
+                      as String,
+            currentUserSocketId: null == currentUserSocketId
+                ? _value.currentUserSocketId
+                : currentUserSocketId // ignore: cast_nullable_to_non_nullable
+                      as String,
+            statisticsPlayerName: null == statisticsPlayerName
+                ? _value.statisticsPlayerName
+                : statisticsPlayerName // ignore: cast_nullable_to_non_nullable
+                      as String,
           )
           as $Val,
     );
@@ -98,7 +123,14 @@ abstract class _$$StatisticsDataImplCopyWith<$Res>
   ) = __$$StatisticsDataImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String roomId, GameStatistics initialData, bool isCTF});
+  $Res call({
+    String roomId,
+    GameStatistics initialData,
+    bool isCTF,
+    String winnerId,
+    String currentUserSocketId,
+    String statisticsPlayerName,
+  });
 
   @override
   $GameStatisticsCopyWith<$Res> get initialData;
@@ -121,6 +153,9 @@ class __$$StatisticsDataImplCopyWithImpl<$Res>
     Object? roomId = null,
     Object? initialData = null,
     Object? isCTF = null,
+    Object? winnerId = null,
+    Object? currentUserSocketId = null,
+    Object? statisticsPlayerName = null,
   }) {
     return _then(
       _$StatisticsDataImpl(
@@ -136,6 +171,18 @@ class __$$StatisticsDataImplCopyWithImpl<$Res>
             ? _value.isCTF
             : isCTF // ignore: cast_nullable_to_non_nullable
                   as bool,
+        winnerId: null == winnerId
+            ? _value.winnerId
+            : winnerId // ignore: cast_nullable_to_non_nullable
+                  as String,
+        currentUserSocketId: null == currentUserSocketId
+            ? _value.currentUserSocketId
+            : currentUserSocketId // ignore: cast_nullable_to_non_nullable
+                  as String,
+        statisticsPlayerName: null == statisticsPlayerName
+            ? _value.statisticsPlayerName
+            : statisticsPlayerName // ignore: cast_nullable_to_non_nullable
+                  as String,
       ),
     );
   }
@@ -148,6 +195,9 @@ class _$StatisticsDataImpl implements _StatisticsData {
     required this.roomId,
     required this.initialData,
     required this.isCTF,
+    required this.winnerId,
+    required this.currentUserSocketId,
+    required this.statisticsPlayerName,
   });
 
   @override
@@ -156,10 +206,16 @@ class _$StatisticsDataImpl implements _StatisticsData {
   final GameStatistics initialData;
   @override
   final bool isCTF;
+  @override
+  final String winnerId;
+  @override
+  final String currentUserSocketId;
+  @override
+  final String statisticsPlayerName;
 
   @override
   String toString() {
-    return 'StatisticsData(roomId: $roomId, initialData: $initialData, isCTF: $isCTF)';
+    return 'StatisticsData(roomId: $roomId, initialData: $initialData, isCTF: $isCTF, winnerId: $winnerId, currentUserSocketId: $currentUserSocketId, statisticsPlayerName: $statisticsPlayerName)';
   }
 
   @override
@@ -170,11 +226,25 @@ class _$StatisticsDataImpl implements _StatisticsData {
             (identical(other.roomId, roomId) || other.roomId == roomId) &&
             (identical(other.initialData, initialData) ||
                 other.initialData == initialData) &&
-            (identical(other.isCTF, isCTF) || other.isCTF == isCTF));
+            (identical(other.isCTF, isCTF) || other.isCTF == isCTF) &&
+            (identical(other.winnerId, winnerId) ||
+                other.winnerId == winnerId) &&
+            (identical(other.currentUserSocketId, currentUserSocketId) ||
+                other.currentUserSocketId == currentUserSocketId) &&
+            (identical(other.statisticsPlayerName, statisticsPlayerName) ||
+                other.statisticsPlayerName == statisticsPlayerName));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, roomId, initialData, isCTF);
+  int get hashCode => Object.hash(
+    runtimeType,
+    roomId,
+    initialData,
+    isCTF,
+    winnerId,
+    currentUserSocketId,
+    statisticsPlayerName,
+  );
 
   /// Create a copy of StatisticsData
   /// with the given fields replaced by the non-null parameter values.
@@ -193,6 +263,9 @@ abstract class _StatisticsData implements StatisticsData {
     required final String roomId,
     required final GameStatistics initialData,
     required final bool isCTF,
+    required final String winnerId,
+    required final String currentUserSocketId,
+    required final String statisticsPlayerName,
   }) = _$StatisticsDataImpl;
 
   @override
@@ -201,6 +274,12 @@ abstract class _StatisticsData implements StatisticsData {
   GameStatistics get initialData;
   @override
   bool get isCTF;
+  @override
+  String get winnerId;
+  @override
+  String get currentUserSocketId;
+  @override
+  String get statisticsPlayerName;
 
   /// Create a copy of StatisticsData
   /// with the given fields replaced by the non-null parameter values.

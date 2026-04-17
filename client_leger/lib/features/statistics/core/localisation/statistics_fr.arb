@@ -18,5 +18,23 @@
   "statisticsTurns": "Nombre de tours de jeu",
   "statisticsTilesExplored": "Pourcentage des tuiles de terrain visitées par au moins un joueur",
   "statisticsDoorsToggled": "Pourcentage des portes ayant été manipulées au moins une fois",
-  "statisticsFlags": "Nombre de joueurs différents ayant détenu le drapeau"
+  "statisticsFlags": "Nombre de joueurs différents ayant détenu le drapeau",
+  "statisticsShareSocialBlurb": "🎮 Résultat de partie : {result} !\n💀 Morts : {deaths}\n⚔️ Combats gagnés : {combatPct}%\n🗺️ Cases visitées : {tilePct}%\n#EasternSolace #Jeux",
+  "@statisticsShareSocialBlurb": {
+    "placeholders": {
+      "result": {"type": "String"},
+      "deaths": {"type": "int"},
+      "combatPct": {"type": "int"},
+      "tilePct": {"type": "int"}
+    }
+  },
+  "statisticsShareResultNounWin": "victoire",
+  "statisticsShareResultNounLoss": "défaite",
+  "statisticsShareX": "Partager sur X",
+  "statisticsShareBluesky": "Partager sur Bluesky",
+  "statisticsShareSectionTitle": "Partager mes résultats",
+  "statisticsSharePublishX": "Publier sur X",
+  "statisticsSharePublishBluesky": "Publier sur Bluesky",
+  "statisticsShareXHint": "Connexion à X puis brouillon prêt avec vos stats — il ne reste qu’à publier.",
+  "statisticsShareBlueskyHint": "Ouvre Bluesky avec un brouillon prêt (300 caractères max). Connectez-vous si besoin, puis publiez."
 }

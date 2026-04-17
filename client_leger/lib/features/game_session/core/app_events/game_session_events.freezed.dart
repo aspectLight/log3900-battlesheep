@@ -1008,19 +1008,40 @@ mixin _$GameSessionExitAppEvent {
   TResult when<TResult extends Object?>({
     required TResult Function(PlayerLeaveReason reason) leaveRequested,
     required TResult Function(SessionEndReason reason) sessionTerminated,
-    required TResult Function(String roomId, bool isCTF) gameFinished,
+    required TResult Function(
+      String roomId,
+      bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
+    )
+    gameFinished,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(PlayerLeaveReason reason)? leaveRequested,
     TResult? Function(SessionEndReason reason)? sessionTerminated,
-    TResult? Function(String roomId, bool isCTF)? gameFinished,
+    TResult? Function(
+      String roomId,
+      bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
+    )?
+    gameFinished,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(PlayerLeaveReason reason)? leaveRequested,
     TResult Function(SessionEndReason reason)? sessionTerminated,
-    TResult Function(String roomId, bool isCTF)? gameFinished,
+    TResult Function(
+      String roomId,
+      bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
+    )?
+    gameFinished,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -1152,7 +1173,14 @@ class _$LeaveGameSessionRequestedCommandImpl
   TResult when<TResult extends Object?>({
     required TResult Function(PlayerLeaveReason reason) leaveRequested,
     required TResult Function(SessionEndReason reason) sessionTerminated,
-    required TResult Function(String roomId, bool isCTF) gameFinished,
+    required TResult Function(
+      String roomId,
+      bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
+    )
+    gameFinished,
   }) {
     return leaveRequested(reason);
   }
@@ -1162,7 +1190,14 @@ class _$LeaveGameSessionRequestedCommandImpl
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(PlayerLeaveReason reason)? leaveRequested,
     TResult? Function(SessionEndReason reason)? sessionTerminated,
-    TResult? Function(String roomId, bool isCTF)? gameFinished,
+    TResult? Function(
+      String roomId,
+      bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
+    )?
+    gameFinished,
   }) {
     return leaveRequested?.call(reason);
   }
@@ -1172,7 +1207,14 @@ class _$LeaveGameSessionRequestedCommandImpl
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(PlayerLeaveReason reason)? leaveRequested,
     TResult Function(SessionEndReason reason)? sessionTerminated,
-    TResult Function(String roomId, bool isCTF)? gameFinished,
+    TResult Function(
+      String roomId,
+      bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
+    )?
+    gameFinished,
     required TResult orElse(),
   }) {
     if (leaveRequested != null) {
@@ -1314,7 +1356,14 @@ class _$SessionTerminatedEventImpl implements SessionTerminatedEvent {
   TResult when<TResult extends Object?>({
     required TResult Function(PlayerLeaveReason reason) leaveRequested,
     required TResult Function(SessionEndReason reason) sessionTerminated,
-    required TResult Function(String roomId, bool isCTF) gameFinished,
+    required TResult Function(
+      String roomId,
+      bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
+    )
+    gameFinished,
   }) {
     return sessionTerminated(reason);
   }
@@ -1324,7 +1373,14 @@ class _$SessionTerminatedEventImpl implements SessionTerminatedEvent {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(PlayerLeaveReason reason)? leaveRequested,
     TResult? Function(SessionEndReason reason)? sessionTerminated,
-    TResult? Function(String roomId, bool isCTF)? gameFinished,
+    TResult? Function(
+      String roomId,
+      bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
+    )?
+    gameFinished,
   }) {
     return sessionTerminated?.call(reason);
   }
@@ -1334,7 +1390,14 @@ class _$SessionTerminatedEventImpl implements SessionTerminatedEvent {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(PlayerLeaveReason reason)? leaveRequested,
     TResult Function(SessionEndReason reason)? sessionTerminated,
-    TResult Function(String roomId, bool isCTF)? gameFinished,
+    TResult Function(
+      String roomId,
+      bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
+    )?
+    gameFinished,
     required TResult orElse(),
   }) {
     if (sessionTerminated != null) {
@@ -1399,7 +1462,13 @@ abstract class _$$GameFinishedEventImplCopyWith<$Res> {
     $Res Function(_$GameFinishedEventImpl) then,
   ) = __$$GameFinishedEventImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({String roomId, bool isCTF});
+  $Res call({
+    String roomId,
+    bool isCTF,
+    String winnerId,
+    String currentUserSocketId,
+    String statisticsPlayerName,
+  });
 }
 
 /// @nodoc
@@ -1415,7 +1484,13 @@ class __$$GameFinishedEventImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? roomId = null, Object? isCTF = null}) {
+  $Res call({
+    Object? roomId = null,
+    Object? isCTF = null,
+    Object? winnerId = null,
+    Object? currentUserSocketId = null,
+    Object? statisticsPlayerName = null,
+  }) {
     return _then(
       _$GameFinishedEventImpl(
         roomId: null == roomId
@@ -1426,6 +1501,18 @@ class __$$GameFinishedEventImplCopyWithImpl<$Res>
             ? _value.isCTF
             : isCTF // ignore: cast_nullable_to_non_nullable
                   as bool,
+        winnerId: null == winnerId
+            ? _value.winnerId
+            : winnerId // ignore: cast_nullable_to_non_nullable
+                  as String,
+        currentUserSocketId: null == currentUserSocketId
+            ? _value.currentUserSocketId
+            : currentUserSocketId // ignore: cast_nullable_to_non_nullable
+                  as String,
+        statisticsPlayerName: null == statisticsPlayerName
+            ? _value.statisticsPlayerName
+            : statisticsPlayerName // ignore: cast_nullable_to_non_nullable
+                  as String,
       ),
     );
   }
@@ -1434,16 +1521,28 @@ class __$$GameFinishedEventImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$GameFinishedEventImpl implements GameFinishedEvent {
-  const _$GameFinishedEventImpl({required this.roomId, required this.isCTF});
+  const _$GameFinishedEventImpl({
+    required this.roomId,
+    required this.isCTF,
+    required this.winnerId,
+    required this.currentUserSocketId,
+    required this.statisticsPlayerName,
+  });
 
   @override
   final String roomId;
   @override
   final bool isCTF;
+  @override
+  final String winnerId;
+  @override
+  final String currentUserSocketId;
+  @override
+  final String statisticsPlayerName;
 
   @override
   String toString() {
-    return 'GameSessionExitAppEvent.gameFinished(roomId: $roomId, isCTF: $isCTF)';
+    return 'GameSessionExitAppEvent.gameFinished(roomId: $roomId, isCTF: $isCTF, winnerId: $winnerId, currentUserSocketId: $currentUserSocketId, statisticsPlayerName: $statisticsPlayerName)';
   }
 
   @override
@@ -1452,11 +1551,24 @@ class _$GameFinishedEventImpl implements GameFinishedEvent {
         (other.runtimeType == runtimeType &&
             other is _$GameFinishedEventImpl &&
             (identical(other.roomId, roomId) || other.roomId == roomId) &&
-            (identical(other.isCTF, isCTF) || other.isCTF == isCTF));
+            (identical(other.isCTF, isCTF) || other.isCTF == isCTF) &&
+            (identical(other.winnerId, winnerId) ||
+                other.winnerId == winnerId) &&
+            (identical(other.currentUserSocketId, currentUserSocketId) ||
+                other.currentUserSocketId == currentUserSocketId) &&
+            (identical(other.statisticsPlayerName, statisticsPlayerName) ||
+                other.statisticsPlayerName == statisticsPlayerName));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, roomId, isCTF);
+  int get hashCode => Object.hash(
+    runtimeType,
+    roomId,
+    isCTF,
+    winnerId,
+    currentUserSocketId,
+    statisticsPlayerName,
+  );
 
   /// Create a copy of GameSessionExitAppEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -1474,9 +1586,22 @@ class _$GameFinishedEventImpl implements GameFinishedEvent {
   TResult when<TResult extends Object?>({
     required TResult Function(PlayerLeaveReason reason) leaveRequested,
     required TResult Function(SessionEndReason reason) sessionTerminated,
-    required TResult Function(String roomId, bool isCTF) gameFinished,
+    required TResult Function(
+      String roomId,
+      bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
+    )
+    gameFinished,
   }) {
-    return gameFinished(roomId, isCTF);
+    return gameFinished(
+      roomId,
+      isCTF,
+      winnerId,
+      currentUserSocketId,
+      statisticsPlayerName,
+    );
   }
 
   @override
@@ -1484,9 +1609,22 @@ class _$GameFinishedEventImpl implements GameFinishedEvent {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(PlayerLeaveReason reason)? leaveRequested,
     TResult? Function(SessionEndReason reason)? sessionTerminated,
-    TResult? Function(String roomId, bool isCTF)? gameFinished,
+    TResult? Function(
+      String roomId,
+      bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
+    )?
+    gameFinished,
   }) {
-    return gameFinished?.call(roomId, isCTF);
+    return gameFinished?.call(
+      roomId,
+      isCTF,
+      winnerId,
+      currentUserSocketId,
+      statisticsPlayerName,
+    );
   }
 
   @override
@@ -1494,11 +1632,24 @@ class _$GameFinishedEventImpl implements GameFinishedEvent {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(PlayerLeaveReason reason)? leaveRequested,
     TResult Function(SessionEndReason reason)? sessionTerminated,
-    TResult Function(String roomId, bool isCTF)? gameFinished,
+    TResult Function(
+      String roomId,
+      bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
+    )?
+    gameFinished,
     required TResult orElse(),
   }) {
     if (gameFinished != null) {
-      return gameFinished(roomId, isCTF);
+      return gameFinished(
+        roomId,
+        isCTF,
+        winnerId,
+        currentUserSocketId,
+        statisticsPlayerName,
+      );
     }
     return orElse();
   }
@@ -1543,10 +1694,16 @@ abstract class GameFinishedEvent implements GameSessionExitAppEvent {
   const factory GameFinishedEvent({
     required final String roomId,
     required final bool isCTF,
+    required final String winnerId,
+    required final String currentUserSocketId,
+    required final String statisticsPlayerName,
   }) = _$GameFinishedEventImpl;
 
   String get roomId;
   bool get isCTF;
+  String get winnerId;
+  String get currentUserSocketId;
+  String get statisticsPlayerName;
 
   /// Create a copy of GameSessionExitAppEvent
   /// with the given fields replaced by the non-null parameter values.

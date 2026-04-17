@@ -79,6 +79,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           ),
           body: StatisticsContentWidget(
             viewModel: _viewModel.statisticsViewModel,
+            shareActionsViewModel: _viewModel.shareActionsViewModel,
           ),
         ),
       ),

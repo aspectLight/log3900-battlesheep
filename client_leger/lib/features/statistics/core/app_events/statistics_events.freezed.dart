@@ -19,12 +19,18 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$StatisticsEntryAppEvent {
   String get roomId => throw _privateConstructorUsedError;
   bool get isCTF => throw _privateConstructorUsedError;
+  String get winnerId => throw _privateConstructorUsedError;
+  String get currentUserSocketId => throw _privateConstructorUsedError;
+  String get statisticsPlayerName => throw _privateConstructorUsedError;
   GameRewardsInfo? get capturedRewards => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(
       String roomId,
       bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
       GameRewardsInfo? capturedRewards,
     )
     statisticsRequested,
@@ -34,6 +40,9 @@ mixin _$StatisticsEntryAppEvent {
     TResult? Function(
       String roomId,
       bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
       GameRewardsInfo? capturedRewards,
     )?
     statisticsRequested,
@@ -43,6 +52,9 @@ mixin _$StatisticsEntryAppEvent {
     TResult Function(
       String roomId,
       bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
       GameRewardsInfo? capturedRewards,
     )?
     statisticsRequested,
@@ -76,7 +88,14 @@ abstract class $StatisticsEntryAppEventCopyWith<$Res> {
     $Res Function(StatisticsEntryAppEvent) then,
   ) = _$StatisticsEntryAppEventCopyWithImpl<$Res, StatisticsEntryAppEvent>;
   @useResult
-  $Res call({String roomId, bool isCTF, GameRewardsInfo? capturedRewards});
+  $Res call({
+    String roomId,
+    bool isCTF,
+    String winnerId,
+    String currentUserSocketId,
+    String statisticsPlayerName,
+    GameRewardsInfo? capturedRewards,
+  });
 }
 
 /// @nodoc
@@ -99,6 +118,9 @@ class _$StatisticsEntryAppEventCopyWithImpl<
   $Res call({
     Object? roomId = null,
     Object? isCTF = null,
+    Object? winnerId = null,
+    Object? currentUserSocketId = null,
+    Object? statisticsPlayerName = null,
     Object? capturedRewards = freezed,
   }) {
     return _then(
@@ -111,6 +133,18 @@ class _$StatisticsEntryAppEventCopyWithImpl<
                 ? _value.isCTF
                 : isCTF // ignore: cast_nullable_to_non_nullable
                       as bool,
+            winnerId: null == winnerId
+                ? _value.winnerId
+                : winnerId // ignore: cast_nullable_to_non_nullable
+                      as String,
+            currentUserSocketId: null == currentUserSocketId
+                ? _value.currentUserSocketId
+                : currentUserSocketId // ignore: cast_nullable_to_non_nullable
+                      as String,
+            statisticsPlayerName: null == statisticsPlayerName
+                ? _value.statisticsPlayerName
+                : statisticsPlayerName // ignore: cast_nullable_to_non_nullable
+                      as String,
             capturedRewards: freezed == capturedRewards
                 ? _value.capturedRewards
                 : capturedRewards // ignore: cast_nullable_to_non_nullable
@@ -130,7 +164,14 @@ abstract class _$$StatisticsRequestedImplCopyWith<$Res>
   ) = __$$StatisticsRequestedImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String roomId, bool isCTF, GameRewardsInfo? capturedRewards});
+  $Res call({
+    String roomId,
+    bool isCTF,
+    String winnerId,
+    String currentUserSocketId,
+    String statisticsPlayerName,
+    GameRewardsInfo? capturedRewards,
+  });
 }
 
 /// @nodoc
@@ -150,6 +191,9 @@ class __$$StatisticsRequestedImplCopyWithImpl<$Res>
   $Res call({
     Object? roomId = null,
     Object? isCTF = null,
+    Object? winnerId = null,
+    Object? currentUserSocketId = null,
+    Object? statisticsPlayerName = null,
     Object? capturedRewards = freezed,
   }) {
     return _then(
@@ -162,6 +206,18 @@ class __$$StatisticsRequestedImplCopyWithImpl<$Res>
             ? _value.isCTF
             : isCTF // ignore: cast_nullable_to_non_nullable
                   as bool,
+        winnerId: null == winnerId
+            ? _value.winnerId
+            : winnerId // ignore: cast_nullable_to_non_nullable
+                  as String,
+        currentUserSocketId: null == currentUserSocketId
+            ? _value.currentUserSocketId
+            : currentUserSocketId // ignore: cast_nullable_to_non_nullable
+                  as String,
+        statisticsPlayerName: null == statisticsPlayerName
+            ? _value.statisticsPlayerName
+            : statisticsPlayerName // ignore: cast_nullable_to_non_nullable
+                  as String,
         capturedRewards: freezed == capturedRewards
             ? _value.capturedRewards
             : capturedRewards // ignore: cast_nullable_to_non_nullable
@@ -177,6 +233,9 @@ class _$StatisticsRequestedImpl implements StatisticsRequested {
   const _$StatisticsRequestedImpl({
     required this.roomId,
     required this.isCTF,
+    required this.winnerId,
+    required this.currentUserSocketId,
+    required this.statisticsPlayerName,
     this.capturedRewards,
   });
 
@@ -185,11 +244,17 @@ class _$StatisticsRequestedImpl implements StatisticsRequested {
   @override
   final bool isCTF;
   @override
+  final String winnerId;
+  @override
+  final String currentUserSocketId;
+  @override
+  final String statisticsPlayerName;
+  @override
   final GameRewardsInfo? capturedRewards;
 
   @override
   String toString() {
-    return 'StatisticsEntryAppEvent.statisticsRequested(roomId: $roomId, isCTF: $isCTF, capturedRewards: $capturedRewards)';
+    return 'StatisticsEntryAppEvent.statisticsRequested(roomId: $roomId, isCTF: $isCTF, winnerId: $winnerId, currentUserSocketId: $currentUserSocketId, statisticsPlayerName: $statisticsPlayerName, capturedRewards: $capturedRewards)';
   }
 
   @override
@@ -199,12 +264,26 @@ class _$StatisticsRequestedImpl implements StatisticsRequested {
             other is _$StatisticsRequestedImpl &&
             (identical(other.roomId, roomId) || other.roomId == roomId) &&
             (identical(other.isCTF, isCTF) || other.isCTF == isCTF) &&
+            (identical(other.winnerId, winnerId) ||
+                other.winnerId == winnerId) &&
+            (identical(other.currentUserSocketId, currentUserSocketId) ||
+                other.currentUserSocketId == currentUserSocketId) &&
+            (identical(other.statisticsPlayerName, statisticsPlayerName) ||
+                other.statisticsPlayerName == statisticsPlayerName) &&
             (identical(other.capturedRewards, capturedRewards) ||
                 other.capturedRewards == capturedRewards));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, roomId, isCTF, capturedRewards);
+  int get hashCode => Object.hash(
+    runtimeType,
+    roomId,
+    isCTF,
+    winnerId,
+    currentUserSocketId,
+    statisticsPlayerName,
+    capturedRewards,
+  );
 
   /// Create a copy of StatisticsEntryAppEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -223,11 +302,21 @@ class _$StatisticsRequestedImpl implements StatisticsRequested {
     required TResult Function(
       String roomId,
       bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
       GameRewardsInfo? capturedRewards,
     )
     statisticsRequested,
   }) {
-    return statisticsRequested(roomId, isCTF, capturedRewards);
+    return statisticsRequested(
+      roomId,
+      isCTF,
+      winnerId,
+      currentUserSocketId,
+      statisticsPlayerName,
+      capturedRewards,
+    );
   }
 
   @override
@@ -236,11 +325,21 @@ class _$StatisticsRequestedImpl implements StatisticsRequested {
     TResult? Function(
       String roomId,
       bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
       GameRewardsInfo? capturedRewards,
     )?
     statisticsRequested,
   }) {
-    return statisticsRequested?.call(roomId, isCTF, capturedRewards);
+    return statisticsRequested?.call(
+      roomId,
+      isCTF,
+      winnerId,
+      currentUserSocketId,
+      statisticsPlayerName,
+      capturedRewards,
+    );
   }
 
   @override
@@ -249,13 +348,23 @@ class _$StatisticsRequestedImpl implements StatisticsRequested {
     TResult Function(
       String roomId,
       bool isCTF,
+      String winnerId,
+      String currentUserSocketId,
+      String statisticsPlayerName,
       GameRewardsInfo? capturedRewards,
     )?
     statisticsRequested,
     required TResult orElse(),
   }) {
     if (statisticsRequested != null) {
-      return statisticsRequested(roomId, isCTF, capturedRewards);
+      return statisticsRequested(
+        roomId,
+        isCTF,
+        winnerId,
+        currentUserSocketId,
+        statisticsPlayerName,
+        capturedRewards,
+      );
     }
     return orElse();
   }
@@ -293,6 +402,9 @@ abstract class StatisticsRequested implements StatisticsEntryAppEvent {
   const factory StatisticsRequested({
     required final String roomId,
     required final bool isCTF,
+    required final String winnerId,
+    required final String currentUserSocketId,
+    required final String statisticsPlayerName,
     final GameRewardsInfo? capturedRewards,
   }) = _$StatisticsRequestedImpl;
 
@@ -300,6 +412,12 @@ abstract class StatisticsRequested implements StatisticsEntryAppEvent {
   String get roomId;
   @override
   bool get isCTF;
+  @override
+  String get winnerId;
+  @override
+  String get currentUserSocketId;
+  @override
+  String get statisticsPlayerName;
   @override
   GameRewardsInfo? get capturedRewards;
 
