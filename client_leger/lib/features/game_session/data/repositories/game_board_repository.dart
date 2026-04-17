@@ -103,7 +103,8 @@ class GameBoardRepository {
   }
 
   void setSelectedPath(List<GameBoardPosition> path) {
-    state.value = state.value.copyWith(selectedPathCoords: path);
+    final effective = path.isEmpty ? path : state.value.pathForMovement(path);
+    state.value = state.value.copyWith(selectedPathCoords: effective);
   }
 
   void setPendingItemPickup(Option<PendingItemPickup> pickup) {

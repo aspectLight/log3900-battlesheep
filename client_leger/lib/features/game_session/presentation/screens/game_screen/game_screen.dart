@@ -22,6 +22,7 @@ import '../../widgets/game_board/game_board_widget.dart';
 import '../../widgets/game_cell_detail/game_cell_detail_widget.dart';
 import '../../widgets/game_combat/game_combat_widget.dart';
 import '../../widgets/game_debug_mode_strip/game_debug_mode_strip.dart';
+import '../../widgets/game_debug_mode_strip/game_debug_mode_strip_view_model.dart';
 import '../../widgets/game_player_cards_hud/game_player_cards_hud_widget.dart';
 import '../../widgets/game_player_hud/game_player_hud_widget.dart';
 import '../../widgets/game_player_inventory/game_player_inventory_widget.dart';
@@ -254,11 +255,10 @@ class _MiddleSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (!isCombatMode)
-          const Padding(
-            padding: EdgeInsets.only(bottom: 4),
-            child: GameTimerWidget(),
-          ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: _TimerDebugBarRow(showTimer: !isCombatMode),
+        ),
         Expanded(
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -290,6 +290,66 @@ class _MiddleSection extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Turn countdown centered on the full middle column; with debug on, equal [Expanded]
+/// space left and right of the timer so the label stays at true center while the strip
+/// fills the right side.
+class _TimerDebugBarRow extends StatelessWidget {
+  const _TimerDebugBarRow({required this.showTimer});
+
+  final bool showTimer;
+
+  static const double _barHeight = 52;
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = GetIt.I<GameSessionScopeHolder>().scope;
+    if (scope == null) return const SizedBox.shrink();
+    final debugVm = scope.get<GameDebugModeStripViewModel>();
+    final isDebug = debugVm.isDebugMode.watch(context);
+    if (!showTimer && !isDebug) return const SizedBox.shrink();
+
+    if (!showTimer && isDebug) {
+      return const SizedBox(
+        height: _barHeight,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(child: GameDebugModeStrip()),
+          ],
+        ),
+      );
+    }
+
+    if (showTimer && !isDebug) {
+      return const SizedBox(
+        height: _barHeight,
+        child: Center(
+          child: GameTimerWidget(layout: GameTimerLayout.bar),
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: _barHeight,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Expanded(child: SizedBox()),
+          const Center(
+            child: GameTimerWidget(layout: GameTimerLayout.bar),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 14),
+              child: GameDebugModeStrip(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -349,7 +409,6 @@ class _RightSide extends StatelessWidget {
           // Let the player cards list take all available
           // vertical space given by the right panel.
           Expanded(child: GamePlayerCardsHudWidget()),
-          GameDebugModeStrip(),
         ],
       ),
     );
