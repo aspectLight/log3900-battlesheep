@@ -98,6 +98,7 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
             .except([socket.id, ...blockedSocketIds])
             .to(GENERAL_CHAT_ROOM)
             .emit(GeneralChatEvents.GeneralChatEmoji, chatEmoji);
+        socket.emit(GeneralChatEvents.GeneralChatEmoji, chatEmoji);
     }
 
     @SubscribeMessage(GeneralChatEvents.GetGeneralChatMessages)
@@ -293,7 +294,7 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
 
             const blockedSocketIds = await this.getBlockedSocketIds(data.username);
             this.server
-                .except([socket.id, ...blockedSocketIds])
+                .except(blockedSocketIds)
                 .to(`custom-channel-${data.channelId}`)
                 .emit(CustomChannelEvents.CustomChannelEmoji, {
                     channelId: data.channelId,
