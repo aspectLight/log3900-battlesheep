@@ -123,31 +123,6 @@ class _TutorialScreenState extends State<TutorialScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         children: [
-          const SizedBox(height: 8),
-          Container(
-            height: 280,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.asset(
-                step.image,
-                fit: BoxFit.contain,
-                errorBuilder: (_, _, _) => Center(
-                  child: Icon(
-                    Icons.image_not_supported_outlined,
-                    size: 80,
-                    color: Colors.white.withValues(alpha: 0.3),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 28),
           Text(
             getLocalizedString(context, step.titleKey),
             textAlign: TextAlign.center,
@@ -160,6 +135,33 @@ class _TutorialScreenState extends State<TutorialScreen> {
             ),
           ),
           const SizedBox(height: 16),
+          const SizedBox(height: 8),
+          Container(
+            height: 600,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.asset(
+                l10n.localeName == 'fr'
+                    ? '${step.image}.png'
+                    : '${step.image}_en.png',
+                fit: BoxFit.contain,
+                errorBuilder: (_, _, _) => Center(
+                  child: Icon(
+                    Icons.image_not_supported_outlined,
+                    size: 80,
+                    color: Colors.white.withValues(alpha: 0.3),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 28),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(

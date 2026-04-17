@@ -182,11 +182,7 @@ class _AvailableRoomsPanelState extends State<AvailableRoomsPanel> {
                     : context.interactionColors.text,
               ),
               _cell(accessibilityLabel),
-              _cell(
-                room.fourDigitCode,
-                fontFamily: 'monospace',
-                letterSpacing: 2,
-              ),
+              _cell(room.fourDigitCode, letterSpacing: 2),
               _priceCell(room, l10n),
             ],
           ),

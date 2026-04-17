@@ -229,11 +229,20 @@ class _ChannelDropdown extends StatelessWidget {
       final isPanelOpen = viewModel.showChannelsPanel.value;
       final String selectedChannel = activeId ?? 'general';
       final List<DropdownMenuItem<String>> options = [
-        DropdownMenuItem(value: 'general', child: Text(l10n.chatGeneralTab)),
+        DropdownMenuItem(
+          value: 'general',
+          child: Text(
+            l10n.chatGeneralTab,
+            style: const TextStyle(fontFamily: 'CustomFont'),
+          ),
+        ),
         ...joinedIds.map(
           (id) => DropdownMenuItem(
             value: id,
-            child: Text('#${viewModel.resolveChannelName(id)}'),
+            child: Text(
+              '#${viewModel.resolveChannelName(id)}',
+              style: const TextStyle(fontFamily: 'CustomFont'),
+            ),
           ),
         ),
       ];
@@ -756,10 +765,18 @@ class _StyledTextField extends StatelessWidget {
       maxLength: maxLength,
       onChanged: onChanged,
       onSubmitted: onSubmitted,
-      style: const TextStyle(color: Color(0xFFF0F0F0), fontSize: 13),
+      style: const TextStyle(
+        color: Color(0xFFF0F0F0),
+        fontSize: 13,
+        fontFamily: 'CustomFont',
+      ),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Color(0xFF666666), fontSize: 13),
+        hintStyle: const TextStyle(
+          color: Color(0xFF666666),
+          fontSize: 13,
+          fontFamily: 'CustomFont',
+        ),
         counterText: '',
         filled: true,
         fillColor: const Color(0x66000000),
