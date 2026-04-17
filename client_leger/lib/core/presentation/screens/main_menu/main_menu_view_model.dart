@@ -1,8 +1,5 @@
-import 'package:signals_flutter/signals_flutter.dart';
-
 import '../../../../features/authentication/core/app_events/auth_events.dart';
 import '../../../../features/friends/core/app_transition/friends_events.dart';
-import '../../../../features/friends/domain/interfaces/friends_repository.dart';
 import '../../../../features/game_history/core/app_events/game_history_events.dart';
 import '../../../../features/join_game_session/core/app_events/join_game_session_events.dart';
 import '../../../../features/logs_history/core/app_events/logs_history_events.dart';
@@ -15,26 +12,17 @@ import '../../../app_transition/app_transition_bus.dart';
 class MainMenuViewModel {
   MainMenuViewModel({
     required AppTransitionEventBus appTransitionEventBus,
-    required FriendsRepository friendsRepository,
     required TutorialCoordinator tutorialCoordinator,
   }) : _appTransitionEventBus = appTransitionEventBus,
-       _friendsRepository = friendsRepository,
        _tutorialCoordinator = tutorialCoordinator;
 
   final AppTransitionEventBus _appTransitionEventBus;
-  final FriendsRepository _friendsRepository;
   final TutorialCoordinator _tutorialCoordinator;
-  final pendingRequestCount = signal<int>(0);
 
   void dispose() {}
 
   Future<void> signOut() async {
     _appTransitionEventBus.fire(const AuthExitAppEvent.signOut());
-  }
-
-  Future<void> loadPendingRequests() async {
-    final requests = await _friendsRepository.loadPendingRequests();
-    pendingRequestCount.value = requests.length;
   }
 
   void joinGame() {

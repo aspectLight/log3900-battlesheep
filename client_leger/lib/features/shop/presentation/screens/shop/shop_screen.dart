@@ -6,13 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/enums/shop_item_type.dart';
 import '../../../../../core/notification/notification_intent.dart';
 import '../../../../../core/notification/notification_intent_sink.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
-import '../../../core/localisation/shop_localizations.dart';
 import '../../../../profile/core/exceptions/profile_failure.dart';
 import '../../../core/exceptions/shop_purchase_exception.dart';
+import '../../../core/localisation/shop_localizations.dart';
 import '../../../domain/models/shop_item_model.dart';
 import '../../../domain/state/shop_state.dart';
 import '../../widgets/shop_item_card/shop_item_card.dart';
@@ -103,7 +104,10 @@ class _ShopScreenState extends State<ShopScreen> {
     _viewModel.requestPurchase(item);
   }
 
-  Future<void> _onEquipToggle(ShopItemModel item, ShopLocalizations l10n) async {
+  Future<void> _onEquipToggle(
+    ShopItemModel item,
+    ShopLocalizations l10n,
+  ) async {
     try {
       final outcome = await _viewModel.toggleBannerEquip(item);
       if (!mounted) return;
@@ -112,9 +116,7 @@ class _ShopScreenState extends State<ShopScreen> {
         BannerEquipOutcome.equipped => l10n.shopEquipped,
         BannerEquipOutcome.unequipped => l10n.shopUnequipped,
       };
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(text)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
     } on ProfileFailure catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
@@ -222,13 +224,13 @@ class _ShopScreenState extends State<ShopScreen> {
     return Text(
       title,
       textAlign: TextAlign.start,
-      style: const TextStyle(
-        color: Color(0xFFE0D8C0),
+      style: TextStyle(
+        color: context.interactionColors.text,
         fontSize: 22,
         fontFamily: 'CustomFont',
         fontWeight: FontWeight.w600,
         letterSpacing: 1,
-        shadows: [
+        shadows: const [
           Shadow(offset: Offset(1, 1), blurRadius: 3, color: Colors.black87),
         ],
       ),

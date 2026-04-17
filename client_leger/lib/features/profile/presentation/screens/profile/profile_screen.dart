@@ -1,10 +1,10 @@
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:fpdart/fpdart.dart' show Option;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fpdart/fpdart.dart' show Option;
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:signals_flutter/signals_flutter.dart';
@@ -19,14 +19,14 @@ import '../../../../../core/localisation/core_localizations.dart';
 import '../../../../../core/modal/modal_coordinator.dart';
 import '../../../../../core/modal/modal_intent_sink.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
-import '../../../../shop/data/repositories/shop_repository.dart';
-import '../../../../shop/domain/state/shop_state.dart';
 import '../../../../authentication/core/constants/auth_constants.dart';
 import '../../../../authentication/core/enums/auth_validation_error.dart';
 import '../../../../authentication/core/extensions/auth_validation_error_ext.dart';
 import '../../../../authentication/core/helpers/email_validator.dart';
 import '../../../../authentication/core/helpers/username_validator.dart';
 import '../../../../authentication/core/localisation/auth_localizations.dart';
+import '../../../../shop/data/repositories/shop_repository.dart';
+import '../../../../shop/domain/state/shop_state.dart';
 import '../../../core/exceptions/profile_failure.dart';
 import '../../../core/extensions/profile_failure_ext.dart';
 import '../../../core/localisation/profile_localizations.dart';
@@ -428,8 +428,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 16),
         Text(
           l10n.profileAvatarLabel,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: context.interactionColors.text,
             fontSize: 16,
             fontWeight: FontWeight.bold,
             fontFamily: 'CustomFont',
@@ -942,8 +942,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Text(
             l10n.profileStatisticsTitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.interactionColors.text,
               fontSize: 18,
               fontWeight: FontWeight.w600,
               fontFamily: 'CustomFont',
@@ -972,8 +972,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 8),
           Text(
             l10n.profileThemeLabel,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.interactionColors.text,
               fontSize: 16,
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
@@ -984,8 +984,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 16),
           Text(
             l10n.profileLanguageLabel,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.interactionColors.text,
               fontSize: 16,
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
@@ -997,8 +997,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 16),
           Text(
             l10n.tutorial,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.interactionColors.text,
               fontSize: 16,
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
@@ -1046,8 +1046,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              color: Color.fromRGBO(255, 255, 255, 0.8),
+            style: TextStyle(
+              color: context.interactionColors.text,
               fontSize: 16,
               fontWeight: FontWeight.w500,
               fontFamily: 'CustomFont',
@@ -1249,8 +1249,8 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
         if (widget.label.isNotEmpty) ...[
           Text(
             widget.label,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.interactionColors.text,
               fontSize: 20,
               fontFamily: 'CustomFont',
               fontWeight: FontWeight.bold,

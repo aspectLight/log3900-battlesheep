@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/enums/shop_catalog_item_id.dart';
 import '../../../core/constants/shop_asset_paths.dart';
 import '../../../core/localisation/shop_localizations.dart';
@@ -200,8 +201,8 @@ class ShopCoinPrice extends StatelessWidget {
       children: [
         Text(
           '$price',
-          style: const TextStyle(
-            color: Color(0xFFF0C040),
+          style: TextStyle(
+            color: context.interactionColors.text,
             fontWeight: FontWeight.bold,
             fontSize: 16,
             fontFamily: 'CustomFont',

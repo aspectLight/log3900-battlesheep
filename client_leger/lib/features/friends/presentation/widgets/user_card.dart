@@ -54,30 +54,6 @@ class UserCard extends StatelessWidget {
                     fontSize: 15,
                   ),
                 ),
-                if (isOnline != null) ...[
-                  const SizedBox(width: 10),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 3,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isOnline!
-                          ? const Color(0x2632B464)
-                          : const Color(0x26888888),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Text(
-                      isOnline! ? l10n.online : l10n.offline,
-                      style: TextStyle(
-                        color: isOnline!
-                            ? const Color(0xFF32B464)
-                            : Colors.grey,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
               ],
             ),
           ),
