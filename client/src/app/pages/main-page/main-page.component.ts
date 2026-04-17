@@ -77,10 +77,12 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
         let username = this.authService.currentUser?.displayName || 'Utilisateur';
 
-        // Reconnect the socket only if it is not already connected, so that we cancel
-        // the server-side auto-logout timeout without invalidating any in-flight room/code
-        // context that was established with the current socket connection.
-        if (!this.socketService.socket?.connected) {
+        // Reconnect if the socket is not connected, OR if it is connected but was established
+        // before login (unauthenticated — happens in the Electron executable where the socket
+        // initialises at app startup before Firebase restores the user session).
+        // Skip reconnect if the socket is already authenticated to avoid invalidating any
+        // in-flight room/game-code context (e.g. navigating home from the shop then to game creator).
+        if (!this.socketService.isAuthenticatedSocket()) {
             await this.socketService.reconnect();
         }
 
