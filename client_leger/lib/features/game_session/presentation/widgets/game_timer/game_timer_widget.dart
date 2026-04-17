@@ -44,7 +44,7 @@ class _GameTimerWidgetState extends State<GameTimerWidget> {
     final l10n = GameSessionLocalizations.of(context)!;
     final f = context.featureColors;
     final text = Text(
-      '${l10n.gameTimerLabel}: $seconds',
+      l10n.gameTimerCurrentTurn(seconds),
       style: TextStyle(
         color: widget.layout == GameTimerLayout.bar
             ? f.textSpecialAlt

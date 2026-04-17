@@ -15,7 +15,7 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
   String get gameInventoryFullDiscardTitle => 'Inventaire plein';
 
   @override
-  String get gameTrapTitle => 'Piège';
+  String get gameTrapTitle => 'Vous êtes sur un piège!';
 
   @override
   String get gameTrapDescriptionCanAvoid =>
@@ -38,10 +38,12 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
   String get gamePlayersListVirtual => 'Virtuel';
 
   @override
-  String get gameTimerLabel => 'Tour en cours';
+  String gameTimerCurrentTurn(int seconds) {
+    return 'Tour en cours: $seconds';
+  }
 
   @override
-  String get gameDebugMode => 'La partie est en mode débogage';
+  String get gameDebugMode => 'Mode débogage activé';
 
   @override
   String get gameActionCancel => 'Annuler';
@@ -53,40 +55,40 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
   String get gameActionForwardTurn => 'Fin de tour';
 
   @override
-  String get gameCellDetailCost => 'Coût';
+  String get gameCellDetailCost => 'COST';
 
   @override
-  String get gameCellDetailDescription => 'Description';
+  String get gameCellDetailDescription => 'DESCRIPTION';
 
   @override
   String get gameCellDetailYou => 'Vous';
 
   @override
-  String combatYourTurn(Object countdown) {
+  String combatYourTurn(int countdown) {
     return 'À vous de jouer! Il vous reste: $countdown secondes';
   }
 
   @override
-  String combatYourTurnIn(Object countdown) {
+  String combatYourTurnIn(int countdown) {
     return 'C\'est votre tour dans: $countdown secondes';
   }
 
   @override
-  String combatFlightAttemptsLeft(Object count) {
+  String combatFlightAttemptsLeft(int count) {
     return '$count tentatives d\'évasion restantes';
   }
 
   @override
-  String get combatYourDefense => 'Votre défense';
+  String get combatYourDefense => 'VOTRE DÉFENSE';
 
   @override
-  String get combatYourAttack => 'Votre attaque';
+  String get combatYourAttack => 'VOTRE ATTAQUE';
 
   @override
-  String get combatEnemyAttack => 'Attaque adverse';
+  String get combatEnemyAttack => 'ATTAQUE ADVERSE';
 
   @override
-  String get combatEnemyDefense => 'Défense adverse';
+  String get combatEnemyDefense => 'DÉFENSE ADVERSE';
 
   @override
   String get combatFlee => 'Fuir !';
@@ -110,23 +112,23 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
   String get combatFlightAttemptFailure => 'Vous n\'avez pas réussi à fuir!';
 
   @override
-  String get combatBarbedWireTitle => 'Barbed wire';
+  String get combatBarbedWireTitle => 'Fil barbelé';
 
   @override
   String get combatBarbedWireBlockedMessage =>
-      'La fuite est empêché par l\'adversaire';
+      'La fuite est impossible pour l\'adversaire, seulement si vous êtes l\'instigateur du combat';
 
   @override
   String get combatNotificationVictory => 'Victoire!';
 
   @override
-  String get combatNotificationVictoryMessage => 'Vous avez gagné le combat !';
+  String get combatNotificationVictoryMessage => 'Vous avez gagné le combat!';
 
   @override
   String get combatNotificationDefeat => 'Défaite';
 
   @override
-  String combatNotificationDefeatMessage(Object winnerName) {
+  String combatNotificationDefeatMessage(String winnerName) {
     return '$winnerName a gagné le combat!';
   }
 
@@ -138,7 +140,7 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
   String get combatNotificationFlightSuccess => 'Vous avez réussi à fuir!';
 
   @override
-  String combatNotificationEnemyFled(Object enemyName) {
+  String combatNotificationEnemyFled(String enemyName) {
     return '$enemyName a réussi à fuir!';
   }
 
@@ -147,47 +149,55 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
 
   @override
   String combatStartedNotificationMessage(
-    Object attackerName,
-    Object defenderName,
+    String attackerName,
+    String defenderName,
   ) {
     return '$attackerName vs $defenderName';
   }
 
   @override
-  String get combatStatAttack => 'Attack';
+  String get combatStatAttack => 'Attaque';
 
   @override
-  String get combatStatDefense => 'Defense';
+  String get combatStatDefense => 'Défense';
 
   @override
-  String get combatStatSpeed => 'Speed';
+  String get combatStatSpeed => 'Rapidité';
 
   @override
-  String get combatStatHealth => 'Health';
+  String get combatStatHealth => 'Vie';
 
   @override
   String get notificationVictoryCtf =>
-      'Victoire! Ton équipe a capturé le drapeau !';
+      'Victoire ! Ton équipe a capturé le drapeau !';
 
   @override
   String get notificationVictoryClassic =>
-      'Victoire! Tu as gagné trois combats';
+      'Victoire ! Tu as gagné trois combats';
 
   @override
-  String notificationDefeatCtf(Object winnerTeamName) {
-    return 'Défaite! $winnerTeamName a capturé le drapeau !';
+  String notificationDefeatCtfKnown(String winnerTeamName) {
+    return 'Défaite ! L\'équipe $winnerTeamName a capturé le drapeau !';
   }
 
   @override
-  String notificationDefeatClassic(Object winnerName) {
-    return 'Défaite! $winnerName a gagné trois combats';
+  String get notificationDefeatCtfUnknown =>
+      'Défaite ! L\'équipe adverse a capturé le drapeau !';
+
+  @override
+  String notificationDefeatClassicKnown(String winnerName) {
+    return 'Défaite ! $winnerName a gagné trois combats';
   }
 
   @override
-  String get notificationGameAbandoned => 'Partie abandonnée';
+  String get notificationDefeatClassicUnknown =>
+      'Défaite ! Un joueur a gagné trois combats';
 
   @override
-  String get notificationGameCanceled => 'Partie annulée';
+  String get notificationGameAbandoned => 'Abandonnée';
+
+  @override
+  String get notificationGameCanceled => 'Partie annulée par manque de joueurs';
 
   @override
   String get notificationGameLeft => 'Vous avez quitté la partie!';
@@ -199,31 +209,31 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
   String get notificationDisconnectAutomatic => 'Déconnexion automatique';
 
   @override
-  String notificationTurnStart(Object playerName, Object seconds) {
-    return 'Tour de $playerName (${seconds}s)';
+  String notificationTurnStart(String playerName, int seconds) {
+    return 'Le tour de $playerName commence dans $seconds secondes !';
   }
 
   @override
-  String playerHudMovements(Object count) {
-    return '$count Déplacements';
+  String playerHudMovements(int count) {
+    return '$count déplacements';
   }
 
   @override
-  String playerHudActions(Object count) {
-    return '$count Actions';
+  String playerHudActions(int count) {
+    return '$count actions';
   }
 
   @override
-  String get playerHudStatsSection => 'Statistiques';
+  String get playerHudStatsSection => 'Stats';
 
   @override
-  String get playerHudDiceSection => 'Dés';
+  String get playerHudDiceSection => 'DÉS';
 
   @override
-  String get statHealth => 'Santé';
+  String get statHealth => 'Vie';
 
   @override
-  String get statSpeed => 'Vitesse';
+  String get statSpeed => 'Rapidité';
 
   @override
   String get statAttack => 'Attaque';
@@ -241,13 +251,13 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
   String get gameSessionInfoBoardSize => 'Taille du plateau';
 
   @override
-  String get gameSessionInfoContinue => 'Continuer';
+  String get gameSessionInfoContinue => 'continuer';
 
   @override
-  String get gameSessionInfoQuit => 'Quitter';
+  String get gameSessionInfoQuit => 'quitter';
 
   @override
-  String get toggleDebugMode => 'La partie est en mode débogage';
+  String get toggleDebugMode => 'Mode débogage activé';
 
   @override
   String get itemAdrenalineName => 'Adrénaline';
@@ -263,14 +273,14 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
       'Ajoute 2 points d\'attaque, enlève 1 point de rapidité';
 
   @override
-  String get itemPropagandaName => 'Propaganda';
+  String get itemPropagandaName => 'Propagande';
 
   @override
   String get itemPropagandaDesc =>
       'Ajoute 5 points d\'attaque et 5 points de défense si le joueur est à moins de 3 points de vie';
 
   @override
-  String get itemBarbedWireName => 'Barbed Wire';
+  String get itemBarbedWireName => 'Fil barbelé';
 
   @override
   String get itemBarbedWireDesc =>
@@ -284,14 +294,14 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
       'Permet de se déplacer vers n\'importe quelle case pour 1 point d\'action';
 
   @override
-  String get itemWaterproofBootsName => 'Waterproof Boots';
+  String get itemWaterproofBootsName => 'Bottes imperméables';
 
   @override
   String get itemWaterproofBootsDesc =>
       'Les déplacements vers une autre case coûtent 1 point de mouvement';
 
   @override
-  String get itemAirStrikeName => 'Air Strike';
+  String get itemAirStrikeName => 'Frappe aérienne';
 
   @override
   String get itemAirStrikeDesc => 'Permet d\'attaquer à distance';
@@ -301,26 +311,26 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
 
   @override
   String get itemTorchDesc =>
-      'Une torche enflammée qui améliore les capacités à la lumière';
+      'Ajoute 1 point de défense et 1 points d\'attaque lorsque sous la lumière d\'une torche';
 
   @override
   String get dropTorchButton => 'Déposer';
 
   @override
-  String get itemRandomName => 'Random';
+  String get itemRandomName => 'Objet aléatoire';
 
   @override
   String get itemRandomDesc =>
       'Un item aléatoire qui sera révélé en pleine partie';
 
   @override
-  String get itemFlagName => 'Flag';
+  String get itemFlagName => 'Drapeau';
 
   @override
   String get itemFlagDesc => 'Un drapeau à ramener à la base';
 
   @override
-  String get itemSpawnName => 'Spawn';
+  String get itemSpawnName => 'Point d\'apparition';
 
   @override
   String get itemSpawnDesc => 'Un feu de camp servant de base';
@@ -359,7 +369,7 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
   String get tileTeleportPadName => 'Téléporteur';
 
   @override
-  String get tileSnowDesc => 'Une tuile de neige basique';
+  String get tileSnowDesc => 'Une tuile de neige';
 
   @override
   String get tileTreeDesc => 'Un arbre qui ne peut pas être grimpé';
@@ -380,22 +390,22 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
   String get tileWallDesc => 'Un mur infranchissable';
 
   @override
-  String get tileCornerDesc => 'Un mur infranchissable';
+  String get tileCornerDesc => 'Un coin infranchissable';
 
   @override
-  String get tileIntersectionDesc => 'Un mur infranchissable';
+  String get tileIntersectionDesc => 'Une intersection infranchissable';
 
   @override
   String get tileTrapDesc => 'Un piège qui freine les déplacements';
 
   @override
-  String get tileTeleportPadDesc => 'Téléporte vers le téléporteur jumelé';
+  String get tileTeleportPadDesc => 'Un téléporteur vers un autre téléporteur';
 
   @override
-  String get unknownError => 'Une erreur inconnue est survenue';
+  String get unknownError => 'Une erreur est survenue. Veuillez réessayer.';
 
   @override
-  String get gameNotFound => 'Partie introuvable';
+  String get gameNotFound => 'Le jeu a été supprimé.';
 
   @override
   String get networkError => 'Problème de connexion réseau';
