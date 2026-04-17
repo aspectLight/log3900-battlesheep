@@ -6,8 +6,8 @@
     min-height: 90vh;
     height: 100%;
     width: 100%;
-    padding: clamp(0.5rem, 1.5vw, 2rem);
-    gap: clamp(0.5rem, 1.5vw, 3rem);
+    padding: clamp(0.5rem, 1.2vw, 1.5rem);
+    gap: clamp(0.5rem, 1.2vw, 2rem);
     box-sizing: border-box;
     overflow: hidden;
     position: relative;
@@ -20,8 +20,8 @@
 .left-side,
 .right-side {
     border-radius: 12px;
-    flex: 0 0 auto;
-    width: clamp(220px, 22vw, 300px);
+    flex: 0 1 auto;
+    width: clamp(210px, 22vw, 300px);
     padding: clamp(0.5rem, 1.5vw, 1.5rem);
     display: flex;
     flex-direction: column;
@@ -152,7 +152,7 @@
     align-items: center;
     justify-content: center;
     overflow: visible;
-    flex: 1 1 auto;
+    flex: 1 1 0%;
     min-width: 0;
     padding: clamp(0.5rem, 1.5vw, 1.5rem);
     gap: 10px;
@@ -289,7 +289,7 @@ app-chatbox {
     flex: 0 0 auto;
     width: 100%;
     min-height: 0;
-    max-height: clamp(160px, 40%, 280px);
+    max-height: clamp(300px, 55%, 460px);
     overflow: hidden;
     z-index: 1;
 }
@@ -304,6 +304,8 @@ app-chatbox {
 .right-side app-chatbox {
     flex: 1 1 auto;
     min-height: 0;
+    min-width: 0;
+    max-width: 100%;
     width: 100%;
     display: flex;
     justify-content: flex-end;

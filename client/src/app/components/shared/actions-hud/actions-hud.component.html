@@ -22,26 +22,22 @@
 
                     <div class="card-main">
                         <div class="name-row">
+                            @if (playerCard.isHost) {
+                                <img class="host-img" src="./assets/ui/host.png">
+                            }
                             <div class="card-name">
                                 {{ playerCard.player.name }}
                             </div>
-                            @if(playerCard.player.isVirtual) {
-                                <div class="virtual-badge">{{ 'player_card.virtual' | translate }}</div>
-                            }
-                        </div>
-                        <div class="card-meta">
                             @if (playerCard.isActive) {
                                 <p class="action-description">{{ 'player_card.playing' | translate }}</p>
                             }
+                        </div>
+                        <div class="card-meta">
                             <p class="action-wins">{{playerCard.player.fightsWon}}</p>
                         </div>
                     </div>
 
-                    <div class="card-right">
-                        @if (playerCard.isHost) {
-                            <img class="host-img" src="./assets/ui/host.png">
-                        }
-                    </div>
+
                 </div>
             </div>
         }
