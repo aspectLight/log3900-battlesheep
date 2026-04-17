@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/constants/ui_assets.dart';
 import '../../../../select_game_session/presentation/widgets/select_game_session/select_game_session_board_preview_widget.dart';
 import '../../../core/localisation/join_game_session_localizations.dart';
@@ -48,9 +49,9 @@ class _AvailableRoomsPanelState extends State<AvailableRoomsPanel> {
       return Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: const Color(0xFF2b2b2b),
+          color: context.interactionColors.primaryStrong,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFF7f1f1f)),
+          border: Border.all(color: context.interactionColors.outline),
         ),
         child: Column(
           children: [
@@ -65,8 +66,8 @@ class _AvailableRoomsPanelState extends State<AvailableRoomsPanel> {
                 padding: const EdgeInsets.all(20),
                 child: Text(
                   l10n.joinGameNoRooms,
-                  style: const TextStyle(
-                    color: Color(0xFFc0c0c0),
+                  style: TextStyle(
+                    color: context.interactionColors.text,
                     fontFamily: 'CustomFont',
                     fontSize: 16,
                   ),
@@ -83,9 +84,9 @@ class _AvailableRoomsPanelState extends State<AvailableRoomsPanel> {
   Widget _buildHeader(JoinGameSessionLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-      decoration: const BoxDecoration(
-        color: Color(0xFF3c3c3c),
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: context.interactionColors.primary,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(8),
           topRight: Radius.circular(8),
         ),
@@ -109,8 +110,8 @@ class _AvailableRoomsPanelState extends State<AvailableRoomsPanel> {
     child: Text(
       text,
       textAlign: TextAlign.center,
-      style: const TextStyle(
-        color: Color(0xFFe0d8c0),
+      style: TextStyle(
+        color: context.interactionColors.text,
         fontFamily: 'CustomFont',
         fontSize: 16,
       ),
@@ -151,7 +152,9 @@ class _AvailableRoomsPanelState extends State<AvailableRoomsPanel> {
                     height: 56,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: const Color(0xFF7F1F1F)),
+                      border: Border.all(
+                        color: context.interactionColors.outline,
+                      ),
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: room.boardSize > 0 && room.boardMatrix.isNotEmpty
@@ -176,7 +179,7 @@ class _AvailableRoomsPanelState extends State<AvailableRoomsPanel> {
                 room.dropInDropOut ? l10n.joinGameModeDropIn : '-',
                 color: room.dropInDropOut
                     ? const Color(0xFF4caf50)
-                    : const Color(0xFFf5e6e6),
+                    : context.interactionColors.text,
               ),
               _cell(accessibilityLabel),
               _cell(
@@ -194,7 +197,7 @@ class _AvailableRoomsPanelState extends State<AvailableRoomsPanel> {
 
   Widget _cell(
     String value, {
-    Color color = const Color(0xFFf5e6e6),
+    Color color = Colors.white,
     String fontFamily = 'CustomFont',
     double letterSpacing = 0,
   }) => Expanded(

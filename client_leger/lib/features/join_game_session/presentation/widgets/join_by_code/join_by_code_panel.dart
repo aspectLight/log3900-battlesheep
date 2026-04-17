@@ -45,27 +45,51 @@ class _JoinByCodePanelState extends State<JoinByCodePanel> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            l10n.joinGameSubtitle,
-            style: const TextStyle(
-              color: Colors.white,
-              fontFamily: 'CustomFont',
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: context.interactionColors.primary.withValues(alpha: 0.8),
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(color: context.interactionColors.outline),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      l10n.joinGameSubtitle,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'CustomFont',
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      height: 1,
+                      color: context.interactionColors.outline,
+                    ),
+                    const SizedBox(height: 20),
+
+                    Text(
+                      l10n.joinGameDescription,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.7),
+                        fontFamily: 'CustomFont',
+                        fontSize: 14,
+                        fontStyle: FontStyle.italic,
+                        height: 1.3,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          Text(
-            l10n.joinGameDescription,
-            style: const TextStyle(
-              color: Color(0xFFc0c0c0),
-              fontFamily: 'CustomFont',
-              fontSize: 14,
-              fontStyle: FontStyle.italic,
-              height: 1.3,
-            ),
-            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
           TextField(
@@ -76,7 +100,9 @@ class _JoinByCodePanelState extends State<JoinByCodePanel> {
             textAlign: TextAlign.center,
             decoration: InputDecoration(
               hintText: '0000',
-              hintStyle: const TextStyle(color: Color(0xFF888888)),
+              hintStyle: TextStyle(
+                color: context.interactionColors.text.withValues(alpha: 0.5),
+              ),
               counterText: '',
               filled: true,
               fillColor: const Color(0xFF2b2b2b),
@@ -103,8 +129,8 @@ class _JoinByCodePanelState extends State<JoinByCodePanel> {
                 vertical: 12,
               ),
             ),
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.interactionColors.text,
               fontFamily: 'CustomFont',
               fontSize: 20,
               letterSpacing: 8,
@@ -117,7 +143,7 @@ class _JoinByCodePanelState extends State<JoinByCodePanel> {
             child: OutlinedButton(
               onPressed: _viewModel.isJoining ? null : _onScanQrTap,
               style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.white,
+                backgroundColor: context.interactionColors.primary,
                 side: BorderSide(color: context.interactionColors.outline),
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 shape: RoundedRectangleBorder(
@@ -126,10 +152,11 @@ class _JoinByCodePanelState extends State<JoinByCodePanel> {
               ),
               child: Text(
                 l10n.joinGameScanQrButton,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'CustomFont',
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
+                  color: context.interactionColors.text,
                 ),
               ),
             ),
@@ -220,8 +247,9 @@ class _JoinByCodePanelState extends State<JoinByCodePanel> {
   }
 
   Future<void> _onScanQrTap() async {
-    final JoinGameSessionLocalizations l10n =
-        JoinGameSessionLocalizations.of(context)!;
+    final JoinGameSessionLocalizations l10n = JoinGameSessionLocalizations.of(
+      context,
+    )!;
     if (!JoinGameSessionScannerAvailability.isSupported) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.joinGameScanQrUnsupportedPlatform)),

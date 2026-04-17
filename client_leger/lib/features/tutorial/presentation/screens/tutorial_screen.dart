@@ -107,24 +107,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
               ),
             ),
           ),
-          GestureDetector(
-            onTap: () => Navigator.pop(context, true),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  l10n.quit,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontFamily: 'CustomFont',
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                const Icon(Icons.close, color: Colors.white70, size: 18),
-              ],
-            ),
-          ),
+          const SizedBox(width: 48), // Placeholder for alignment
         ],
       ),
     );

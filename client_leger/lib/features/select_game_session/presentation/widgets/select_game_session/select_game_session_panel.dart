@@ -149,11 +149,11 @@ class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
                           child: DecoratedBox(
                             decoration: BoxDecoration(
                               color: hasSelection
-                                  ? const Color(0x26550000)
+                                  ? context.interactionColors.primary
                                   : disabledBg,
                               border: Border.all(
                                 color: hasSelection
-                                    ? const Color(0x667F1F1F)
+                                    ? context.interactionColors.outline
                                     : disabledBorder,
                               ),
                               borderRadius: BorderRadius.circular(10),
@@ -177,8 +177,9 @@ class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
                                         Text(
                                           l10n.createGameAccessibilityLabel
                                               .toUpperCase(),
-                                          style: const TextStyle(
-                                            color: Color(0xFFC08080),
+                                          style: TextStyle(
+                                            color:
+                                                context.interactionColors.text,
                                             fontSize: 13,
                                             letterSpacing: 0.5,
                                             fontFamily: 'CustomFont',
@@ -200,7 +201,7 @@ class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
                                               Text(
                                                 l10n.createGameFriendsOnlyLabel,
                                                 style: const TextStyle(
-                                                  color: Color(0xFFFFF0F0),
+                                                  color: Colors.white,
                                                   fontSize: 17,
                                                   fontFamily: 'CustomFont',
                                                 ),
@@ -213,7 +214,7 @@ class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
                                     const SizedBox(width: 32),
                                     Container(
                                       width: 1,
-                                      color: const Color(0x667F1F1F),
+                                      color: context.interactionColors.outline,
                                     ),
                                     const SizedBox(width: 28),
                                     Column(
@@ -224,8 +225,9 @@ class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
                                         Text(
                                           l10n.createGameEntryFeeSectionLabel
                                               .toUpperCase(),
-                                          style: const TextStyle(
-                                            color: Color(0xFFC08080),
+                                          style: TextStyle(
+                                            color:
+                                                context.interactionColors.text,
                                             fontSize: 13,
                                             letterSpacing: 0.5,
                                             fontFamily: 'CustomFont',
@@ -249,12 +251,15 @@ class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
                                                 ],
                                                 style: TextStyle(
                                                   color: hasSelection
-                                                      ? const Color(0xFFFFF0F0)
-                                                      : const Color(
-                                                          0xFFFFF0F0,
-                                                        ).withValues(
-                                                          alpha: 0.38,
-                                                        ),
+                                                      ? context
+                                                            .interactionColors
+                                                            .text
+                                                      : context
+                                                            .interactionColors
+                                                            .text
+                                                            .withValues(
+                                                              alpha: 0.38,
+                                                            ),
                                                   fontFamily: 'CustomFont',
                                                   fontSize: 16,
                                                 ),
@@ -274,12 +279,14 @@ class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
                                                             BorderRadius.circular(
                                                               6,
                                                             ),
-                                                        borderSide:
-                                                            const BorderSide(
-                                                              color: Color(
-                                                                0xFF7F1F1F,
+                                                        borderSide: BorderSide(
+                                                          color: context
+                                                              .interactionColors
+                                                              .outline
+                                                              .withValues(
+                                                                alpha: 0.4,
                                                               ),
-                                                            ),
+                                                        ),
                                                       ),
                                                   focusedBorder:
                                                       OutlineInputBorder(
@@ -287,12 +294,11 @@ class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
                                                             BorderRadius.circular(
                                                               6,
                                                             ),
-                                                        borderSide:
-                                                            const BorderSide(
-                                                              color: Color(
-                                                                0xFFFF5A5A,
-                                                              ),
-                                                            ),
+                                                        borderSide: BorderSide(
+                                                          color: context
+                                                              .interactionColors
+                                                              .outline,
+                                                        ),
                                                       ),
                                                   disabledBorder:
                                                       OutlineInputBorder(
@@ -427,17 +433,19 @@ class _FriendsOnlyCheckBox extends StatelessWidget {
       height: 22,
       decoration: BoxDecoration(
         color: value
-            ? const Color(0xFF550000)
+            ? context.interactionColors.outline
             : Colors.black.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(5),
         border: Border.all(
-          color: value ? const Color(0xFFFF5A5A) : const Color(0xFF7F1F1F),
+          color: value
+              ? context.interactionColors.outline.withValues(alpha: 0.4)
+              : context.interactionColors.outline,
           width: 2,
         ),
       ),
       alignment: Alignment.center,
       child: value
-          ? const Icon(Icons.check, size: 14, color: Color(0xFFFFF0F0))
+          ? Icon(Icons.check, size: 14, color: context.interactionColors.text)
           : null,
     );
   }
