@@ -222,17 +222,6 @@
         app-board {
             filter: blur(2px);
         }
-
-        &::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: url('../../../../assets/combat/ak.gif');
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: 50%;
-            z-index: 1;
-        }
     }
 }
 
