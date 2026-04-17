@@ -283,13 +283,22 @@ class GameSessionCoordinator
     }
     notificationCoordinator.clearScopeEntries();
     switch (event) {
-      case GameFinishedEvent(:final roomId, :final isCTF):
+      case GameFinishedEvent(
+        :final roomId,
+        :final isCTF,
+        :final winnerId,
+        :final currentUserSocketId,
+        :final statisticsPlayerName,
+      ):
         final capturedRewards = getIt<GameRewardsHolder>().captured;
         LogService.d('[GameSessionCoord] onExitImpl: capturedRewards has ${capturedRewards.rewards.length} reward(s), entryFee=${capturedRewards.entryFee}, pool=${capturedRewards.pool}');
         appTransitionEventBus.fire(
           StatisticsEntryAppEvent.statisticsRequested(
             roomId: roomId,
             isCTF: isCTF,
+            winnerId: winnerId,
+            currentUserSocketId: currentUserSocketId,
+            statisticsPlayerName: statisticsPlayerName,
             capturedRewards: capturedRewards,
           ),
         );

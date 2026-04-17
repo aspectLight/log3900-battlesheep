@@ -66,4 +66,42 @@ class StatisticsLocalizationsEn extends StatisticsLocalizations {
 
   @override
   String get statisticsFlags => 'Number of different players who held the flag';
+
+  @override
+  String statisticsShareSocialBlurb(
+    String result,
+    int deaths,
+    int combatPct,
+    int tilePct,
+  ) =>
+      '🎮 Match result: $result!\n💀 Deaths: $deaths\n⚔️ Combats won: $combatPct%\n🗺️ Tiles visited: $tilePct%\n#EasternSolace #Jeux';
+
+  @override
+  String get statisticsShareResultNounWin => 'victory';
+
+  @override
+  String get statisticsShareResultNounLoss => 'defeat';
+
+  @override
+  String get statisticsShareX => 'Share on X';
+
+  @override
+  String get statisticsShareBluesky => 'Share on Bluesky';
+
+  @override
+  String get statisticsShareSectionTitle => 'Share my results';
+
+  @override
+  String get statisticsSharePublishX => 'Post on X';
+
+  @override
+  String get statisticsSharePublishBluesky => 'Post on Bluesky';
+
+  @override
+  String get statisticsShareXHint =>
+      'Sign in to X, then a draft with your stats opens — just post when ready.';
+
+  @override
+  String get statisticsShareBlueskyHint =>
+      'Opens Bluesky with a ready draft (300 characters max). Sign in if needed, then post.';
 }

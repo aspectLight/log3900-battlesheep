@@ -18,5 +18,23 @@
   "statisticsTurns": "Number of game turns",
   "statisticsTilesExplored": "Percentage of terrain tiles visited by at least one player",
   "statisticsDoorsToggled": "Percentage of doors toggled at least once",
-  "statisticsFlags": "Number of different players who held the flag"
+  "statisticsFlags": "Number of different players who held the flag",
+  "statisticsShareSocialBlurb": "🎮 Match result: {result}!\n💀 Deaths: {deaths}\n⚔️ Combats won: {combatPct}%\n🗺️ Tiles visited: {tilePct}%\n#EasternSolace #Jeux",
+  "@statisticsShareSocialBlurb": {
+    "placeholders": {
+      "result": {"type": "String"},
+      "deaths": {"type": "int"},
+      "combatPct": {"type": "int"},
+      "tilePct": {"type": "int"}
+    }
+  },
+  "statisticsShareResultNounWin": "victory",
+  "statisticsShareResultNounLoss": "defeat",
+  "statisticsShareX": "Share on X",
+  "statisticsShareBluesky": "Share on Bluesky",
+  "statisticsShareSectionTitle": "Share my results",
+  "statisticsSharePublishX": "Post on X",
+  "statisticsSharePublishBluesky": "Post on Bluesky",
+  "statisticsShareXHint": "Sign in to X, then a draft with your stats opens — just post when ready.",
+  "statisticsShareBlueskyHint": "Opens Bluesky with a ready draft (300 characters max). Sign in if needed, then post."
 }

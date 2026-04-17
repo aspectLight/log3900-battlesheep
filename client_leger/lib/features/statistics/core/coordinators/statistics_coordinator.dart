@@ -52,6 +52,9 @@ class StatisticsCoordinator
       initialData: entryData.initialData,
       initialRewards: _initialRewards,
       isCTF: entryData.isCTF,
+      winnerId: entryData.winnerId,
+      currentUserSocketId: entryData.currentUserSocketId,
+      statisticsPlayerName: entryData.statisticsPlayerName,
     );
     bootstrapStatisticsScope(scope);
   }
@@ -82,6 +85,9 @@ class StatisticsCoordinator
         roomId: event.roomId,
         initialData: dto.toEntity(),
         isCTF: event.isCTF,
+        winnerId: event.winnerId,
+        currentUserSocketId: event.currentUserSocketId,
+        statisticsPlayerName: event.statisticsPlayerName,
       );
     } finally {
       LogService.d('[StatsCoord] finally: disposing temp socket. _initialRewards has ${_initialRewards.rewards.length} reward(s)');

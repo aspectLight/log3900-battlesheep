@@ -12,15 +12,26 @@ import '../../../../../core/enums/item_type.dart';
 import '../../../domain/models/game_rewards_info.dart';
 import '../../../core/enums/player_stats_sort_field.dart';
 import '../../../domain/models/game_statistics.dart';
+import '../statistics_share_actions/statistics_share_actions_view_model.dart';
+import '../statistics_share_actions/statistics_share_actions_widget.dart';
 import 'statistics_content_view_model.dart';
 
 class StatisticsContentWidget extends StatelessWidget {
-  const StatisticsContentWidget({super.key, required this.viewModel});
+  const StatisticsContentWidget({
+    super.key,
+    required this.viewModel,
+    required this.shareActionsViewModel,
+  });
 
   final StatisticsContentViewModel viewModel;
+  final StatisticsShareActionsViewModel shareActionsViewModel;
 
   /// Minimum width used when laying out the global summary row before scaling to fit.
   static const double _globalStatsRowDesignWidth = 520;
+
+  static const double _rewardsAndShareCardWidth = 400;
+
+  static const double _rewardsShareGap = 8;
 
   String _formatPercentage(int part, int total) {
     if (total <= 0 || part <= 0) return '0';
@@ -56,10 +67,74 @@ class StatisticsContentWidget extends StatelessWidget {
                 _buildPlayerStatsTable(context, l10n, statistics, contentWidth),
                 const SizedBox(height: 24),
                 _buildGlobalStatsTable(context, l10n, statistics),
-                if (rewards.isNotEmpty) ...[
-                  const SizedBox(height: 24),
-                  _buildRewardsSection(context, l10n, rewards),
-                ],
+                Watch((context) {
+                  final hasShare =
+                      shareActionsViewModel.shareSnapshot.value != null;
+                  if (!hasShare && rewards.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+                  if (hasShare && rewards.isNotEmpty) {
+                    const pairWidth = _rewardsAndShareCardWidth +
+                        _rewardsShareGap +
+                        StatisticsShareActionsWidget.cardWidthAlongsideRewards;
+                    final Widget rewardsCard = SizedBox(
+                      width: _rewardsAndShareCardWidth,
+                      child: _buildRewardsSection(
+                        context,
+                        l10n,
+                        rewards,
+                        forSideBySide: true,
+                      ),
+                    );
+                    final Widget shareCard = SizedBox(
+                      width: StatisticsShareActionsWidget.cardWidthAlongsideRewards,
+                      child: StatisticsShareActionsWidget(
+                        viewModel: shareActionsViewModel,
+                        inRewardsRow: true,
+                      ),
+                    );
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 24),
+                      child: contentWidth >= pairWidth
+                          ? IntrinsicHeight(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  rewardsCard,
+                                  const SizedBox(width: _rewardsShareGap),
+                                  shareCard,
+                                ],
+                              ),
+                            )
+                          : Column(
+                              children: [
+                                rewardsCard,
+                                const SizedBox(height: 12),
+                                SizedBox(
+                                  width: _rewardsAndShareCardWidth,
+                                  child: StatisticsShareActionsWidget(
+                                    viewModel: shareActionsViewModel,
+                                  ),
+                                ),
+                              ],
+                            ),
+                    );
+                  }
+                  if (rewards.isNotEmpty) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 24),
+                        _buildRewardsSection(context, l10n, rewards),
+                      ],
+                    );
+                  }
+                  return StatisticsShareActionsWidget(
+                    viewModel: shareActionsViewModel,
+                  );
+                }),
               ],
             ),
           );
@@ -367,60 +442,67 @@ class StatisticsContentWidget extends StatelessWidget {
   Widget _buildRewardsSection(
     BuildContext context,
     StatisticsLocalizations l10n,
-    List<PlayerRewardInfo> rewards,
-  ) {
+    List<PlayerRewardInfo> rewards, {
+    bool forSideBySide = false,
+  }) {
     final f = context.featureColors;
     final goldBorder = f.goldAccent;
+    final Widget card = ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: _rewardsAndShareCardWidth),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [f.panel, f.panelInset],
+          ),
+          border: Border.all(color: goldBorder, width: 2),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: goldBorder.withValues(alpha: 0.15),
+              blurRadius: 20,
+              spreadRadius: 0,
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+        child: Column(
+          mainAxisSize:
+              forSideBySide ? MainAxisSize.max : MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              l10n.statisticsRewardsTitle.toUpperCase(),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: goldBorder,
+                fontFamily: 'CustomFont',
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2,
+              ),
+            ),
+            const SizedBox(height: 16),
+            for (var i = 0; i < rewards.length; i++) ...[
+              if (i > 0) const SizedBox(height: 10),
+              _StatisticsRewardEntry(
+                reward: rewards[i],
+                avatarPath: _avatarPathFor(rewards[i].avatarName),
+              ),
+            ],
+            if (forSideBySide) const Spacer(),
+          ],
+        ),
+      ),
+    );
+    if (forSideBySide) {
+      return card;
+    }
     return Center(
       child: Padding(
         padding: const EdgeInsets.only(top: 20),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [f.panel, f.panelInset],
-              ),
-              border: Border.all(color: goldBorder, width: 2),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: goldBorder.withValues(alpha: 0.15),
-                  blurRadius: 20,
-                  spreadRadius: 0,
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  l10n.statisticsRewardsTitle.toUpperCase(),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: goldBorder,
-                    fontFamily: 'CustomFont',
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                for (var i = 0; i < rewards.length; i++) ...[
-                  if (i > 0) const SizedBox(height: 10),
-                  _StatisticsRewardEntry(
-                    reward: rewards[i],
-                    avatarPath: _avatarPathFor(rewards[i].avatarName),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
+        child: card,
       ),
     );
   }
