@@ -118,7 +118,9 @@ export class ChatboxComponent implements OnInit, OnChanges, AfterViewInit, OnDes
         if (entry) {
             if (entry.deleted) return null;
             const absoluteUrl = entry.avatarUrl ? this.toAbsolute(entry.avatarUrl) : null;
-            return this.resolveAvatar(entry.avatarId, absoluteUrl);
+            const fromRegistry = this.resolveAvatar(entry.avatarId, absoluteUrl);
+            if (fromRegistry) return fromRegistry;
+            return this.resolveAvatar(msg.avatarId, msg.avatarUrl);
         }
         this.avatarRegistry.ensureLoaded([name]);
         return this.resolveAvatar(msg.avatarId, msg.avatarUrl);

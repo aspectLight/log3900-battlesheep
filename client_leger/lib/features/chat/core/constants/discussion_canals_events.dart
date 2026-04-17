@@ -13,6 +13,8 @@ abstract final class DiscussionCanalsSocketEvents {
   static const String customChannelJoined = 'customChannelJoined';
   static const String customChannelLeft = 'customChannelLeft';
   static const String customChannelMessage = 'customChannelMessage';
+  static const String sendEmojiToCustomChannel = 'sendEmojiToCustomChannel';
+  static const String customChannelEmoji = 'customChannelEmoji';
   static const String customChannelMessagesResponse =
       'customChannelMessagesResponse';
   static const String userChannelsRestored = 'userChannelsRestored';

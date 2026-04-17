@@ -17,6 +17,7 @@ void registerChatViewModels(
     () => SlidingChatBoxViewModel(
       canalsRepository: rootGetIt<DiscussionCanalsRepository>(),
       avatarRegistry: rootGetIt<ChatAvatarRegistry>(),
+      panelStateRepository: scope.get<ChatPanelStateRepository>(),
     ),
   );
   scope.registerFactory<ChatPanelContentViewModel>(

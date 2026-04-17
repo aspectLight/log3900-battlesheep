@@ -52,6 +52,7 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   StreamSubscription<Object?>? _joinedSub;
   StreamSubscription<Object?>? _leftSub;
   StreamSubscription<Object?>? _messageSub;
+  StreamSubscription<Object?>? _emojiSub;
   StreamSubscription<Object?>? _messagesResponseSub;
   StreamSubscription<Object?>? _restoredSub;
 
@@ -96,6 +97,9 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
     _messageSub = _socketService
         .on<Object?>(DiscussionCanalsSocketEvents.customChannelMessage)
         .listen(_onChannelMessage);
+    _emojiSub = _socketService
+        .on<Object?>(DiscussionCanalsSocketEvents.customChannelEmoji)
+        .listen(_onChannelEmoji);
     _messagesResponseSub = _socketService
         .on<Object?>(DiscussionCanalsSocketEvents.customChannelMessagesResponse)
         .listen(_onMessagesResponse);
@@ -176,6 +180,27 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
     final msgMap = _tryJsonMap(msgRaw);
     if (msgMap == null) return;
     final msg = _parseMessage(msgMap);
+    _messagesByChannel[channelId] = [
+      ...(_messagesByChannel[channelId] ?? []),
+      msg,
+    ];
+    _messagesUpdatedController.add(
+      MessagesUpdatedEvent(
+        channelId: channelId,
+        messages: _messagesByChannel[channelId]!,
+      ),
+    );
+  }
+
+  void _onChannelEmoji(Object? raw) {
+    final m = _tryJsonMap(raw);
+    if (m == null) return;
+    final channelId = m['channelId'] as String?;
+    if (channelId == null) return;
+    final emojiRaw = m['emoji'];
+    final emojiMap = _tryJsonMap(emojiRaw);
+    if (emojiMap == null) return;
+    final msg = _parseMessage(emojiMap);
     _messagesByChannel[channelId] = [
       ...(_messagesByChannel[channelId] ?? []),
       msg,
@@ -301,6 +326,12 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   }
 
   @override
+  void sendEmoji(String channelId, String emoji) => _socketService.emit(
+    DiscussionCanalsSocketEvents.sendEmojiToCustomChannel,
+    {'channelId': channelId, 'username': _username, 'emoji': emoji},
+  );
+
+  @override
   List<ChannelMessage> getMessages(String channelId) =>
       _messagesByChannel[channelId] ?? [];
 
@@ -315,6 +346,7 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
     unawaited(_joinedSub?.cancel());
     unawaited(_leftSub?.cancel());
     unawaited(_messageSub?.cancel());
+    unawaited(_emojiSub?.cancel());
     unawaited(_messagesResponseSub?.cancel());
     unawaited(_restoredSub?.cancel());
   }

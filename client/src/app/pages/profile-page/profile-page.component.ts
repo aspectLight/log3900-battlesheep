@@ -223,6 +223,7 @@ export class ProfilePageComponent implements OnInit {
         this.showSuccessMessage = false;
 
         const formValues = this.form.getRawValue();
+        const previousUsername = this.profile.username;
 
         const updatePayload = this.profileService.buildUpdatePayload(this.profile, formValues);
         const hasProfileChanges = Object.keys(updatePayload).length > 0;
@@ -256,7 +257,7 @@ export class ProfilePageComponent implements OnInit {
                 }
             }
 
-            this.syncChatAvatarFromProfile();
+            this.syncChatAvatarFromProfile(previousUsername);
 
             this.showSuccessMessage = true;
             setTimeout(() => {
@@ -358,16 +359,23 @@ export class ProfilePageComponent implements OnInit {
         this.isDeleting = false;
     }
 
-    private syncChatAvatarFromProfile(): void {
+    private syncChatAvatarFromProfile(previousUsername?: string): void {
         if (!this.profile) return;
+        const username = this.profile.username;
         const avatarId = this.profile.avatarId ?? null;
         const avatarUrl = this.profile.avatarUrl ? `${environment.serverUrl}${this.profile.avatarUrl}` : null;
+        this.chatService.username = username;
+        this.chatService.playerName = username;
         this.chatService.avatarId = avatarId;
         this.chatService.avatarUrl = avatarUrl;
+        this.customChannelService.setUsername(username);
         this.customChannelService.avatarId = avatarId;
         this.customChannelService.avatarUrl = avatarUrl;
-        if (this.profile.username) {
-            this.avatarRegistry.setLocal(this.profile.username, { avatarId, avatarUrl });
+        if (username) {
+            this.avatarRegistry.setLocal(username, { avatarId, avatarUrl });
+            if (previousUsername && previousUsername !== username) {
+                this.avatarRegistry.setLocal(previousUsername, { avatarId, avatarUrl });
+            }
         }
     }
 

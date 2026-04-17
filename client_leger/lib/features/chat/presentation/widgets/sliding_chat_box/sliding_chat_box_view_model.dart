@@ -5,13 +5,16 @@ import 'package:signals_flutter/signals_flutter.dart';
 import '../../../../../core/chat/chat_avatar_registry.dart';
 import '../../../data/models/channel_info.dart';
 import '../../../data/models/channel_message.dart';
+import '../../../data/repositories/chat_panel_state_repository.dart';
 import '../../../data/repositories/discussion_canals_repository.dart';
 
 class SlidingChatBoxViewModel {
   SlidingChatBoxViewModel({
     required DiscussionCanalsRepository canalsRepository,
+    required ChatPanelStateRepository panelStateRepository,
     required ChatAvatarRegistry avatarRegistry,
   }) : _canalsRepository = canalsRepository,
+       _panelStateRepository = panelStateRepository,
        _avatarRegistry = avatarRegistry {
     _joinedSub = canalsRepository.joinedChannelsUpdated.listen((ids) {
       joinedChannelIds.value = ids;
@@ -39,6 +42,7 @@ class SlidingChatBoxViewModel {
   }
 
   final DiscussionCanalsRepository _canalsRepository;
+  final ChatPanelStateRepository _panelStateRepository;
   final ChatAvatarRegistry _avatarRegistry;
 
   StreamSubscription<List<String>>? _joinedSub;
@@ -95,6 +99,7 @@ class SlidingChatBoxViewModel {
 
   void setActiveChannel(String? channelId) {
     activeChannelId.value = channelId;
+    _panelStateRepository.setActiveCustomChannelId(channelId);
     if (channelId != null) {
       activeChannelMessages.value = _canalsRepository.getMessages(channelId);
     }
@@ -104,6 +109,12 @@ class SlidingChatBoxViewModel {
     final id = activeChannelId.value;
     if (id == null || content.trim().isEmpty) return;
     _canalsRepository.sendMessage(id, content);
+  }
+
+  void sendChannelEmoji(String emoji) {
+    final id = activeChannelId.value;
+    if (id == null) return;
+    _canalsRepository.sendEmoji(id, emoji);
   }
 
   String resolveChannelName(String channelId) {
