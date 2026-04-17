@@ -1,11 +1,11 @@
 import 'dart:async';
 
+import '../../../../core/services/socket_service.dart';
+import '../../domain/commands/game_debug_commands.dart';
+import '../../domain/events/game_debug_events.dart';
 import '../models/dto/game_debug_dto.dart';
 import '../models/events/game_debug_socket_events.dart';
 import '../models/extensions/game_debug_dto_extensions.dart';
-import '../../domain/commands/game_debug_commands.dart';
-import '../../domain/events/game_debug_events.dart';
-import '../../../../core/services/socket_service.dart';
 
 class GameDebugSocket {
   final SocketService _socketService;

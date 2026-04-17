@@ -2,10 +2,10 @@ import 'package:fpdart/fpdart.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../domain/commands/game_door_commands.dart';
+import '../../domain/events/game_environment_events.dart';
 import '../../domain/events/game_events.dart';
 import '../../domain/events/game_item_events.dart';
 import '../../domain/events/game_movement_events.dart';
-import '../../domain/events/game_environment_events.dart';
 import '../../domain/models/game_board_position.dart';
 import '../../domain/models/game_item.dart';
 import '../../domain/state/game_board_state.dart';

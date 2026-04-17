@@ -1,9 +1,9 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../../core/enums/item_type.dart';
-import '../../core/extensions/tile_type_ext.dart';
 import '../../core/enums/tile_orientation.dart';
+import '../../core/extensions/tile_type_ext.dart';
 import '../models/game_board_position.dart';
 import '../models/game_item.dart';
 import '../models/tile.dart';

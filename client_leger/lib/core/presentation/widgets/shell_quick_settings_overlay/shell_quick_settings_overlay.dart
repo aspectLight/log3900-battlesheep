@@ -53,6 +53,8 @@ class _ShellQuickSettingsOverlayState extends State<ShellQuickSettingsOverlay> {
     fontSize: 15,
     fontWeight: FontWeight.bold,
     fontFamily: 'CustomFont',
+    decoration: TextDecoration.none,
+    decorationColor: Color(0x00000000),
   );
 
   static const _hiddenRoutes = <String>{GameRoute.name, StatisticsRoute.name};
@@ -283,6 +285,8 @@ class _ShellQuickSettingsOverlayState extends State<ShellQuickSettingsOverlay> {
       fontFamily: 'CustomFont',
       fontWeight: FontWeight.bold,
       shadows: titleShadows,
+      decoration: TextDecoration.none,
+      decorationColor: Color(0x00000000),
     );
     const homeLinkStyle = TextStyle(
       color: Colors.white,
@@ -290,6 +294,8 @@ class _ShellQuickSettingsOverlayState extends State<ShellQuickSettingsOverlay> {
       fontSize: 16,
       fontWeight: FontWeight.w600,
       shadows: titleShadows,
+      decoration: TextDecoration.none,
+      decorationColor: Color(0x00000000),
     );
 
     return Watch((context) {
@@ -317,7 +323,9 @@ class _ShellQuickSettingsOverlayState extends State<ShellQuickSettingsOverlay> {
               bottom: false,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(4, 6, 8, 8),
-                child: Stack(
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: Stack(
                   clipBehavior: Clip.none,
                   children: [
                     const SizedBox(width: double.infinity, height: 50),
@@ -440,6 +448,7 @@ class _ShellQuickSettingsOverlayState extends State<ShellQuickSettingsOverlay> {
                       ),
                   ],
                 ),
+                ),
               ),
             ),
           ),
@@ -513,6 +522,8 @@ class _ShellQuickSettingsOverlayState extends State<ShellQuickSettingsOverlay> {
               fontSize: 16,
               color: scheme.onSurface,
               fontFamily: 'CustomFont',
+              decoration: TextDecoration.none,
+              decorationColor: const Color(0x00000000),
             ),
           ),
         ),
