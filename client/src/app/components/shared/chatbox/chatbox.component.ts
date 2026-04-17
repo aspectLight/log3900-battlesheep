@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, HostBinding, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
@@ -29,11 +29,6 @@ export class ChatboxComponent implements OnInit, OnChanges, AfterViewInit, OnDes
 
     isCollapsed: boolean = false;
     newMessage: string = '';
-
-    @HostBinding('class.collapsed')
-    get isHostCollapsed(): boolean {
-        return this.isCollapsed;
-    }
 
     /** null = général, string = channelId du canal custom/partie actif */
     activeChannelId: string | null = null;
@@ -94,7 +89,7 @@ export class ChatboxComponent implements OnInit, OnChanges, AfterViewInit, OnDes
     }
 
     get cp_username(): string {
-        return this.customChannelService.username ?? this.authService.currentUser?.displayName ?? 'Utilisateur';
+        return this.authService.currentUser?.displayName ?? 'Utilisateur';
     }
 
     private toAbsolute(path: string): string {
@@ -103,8 +98,7 @@ export class ChatboxComponent implements OnInit, OnChanges, AfterViewInit, OnDes
         return `${environment.serverUrl}${path}`;
     }
 
-    resolveAvatar(avatarId?: string | null, avatarUrl?: string | null, name?: string | null): string | null {
-        if (name === '[supprimé]') return './assets/avatars/account-creation/compte-supprimer.png';
+    resolveAvatar(avatarId?: string | null, avatarUrl?: string | null): string | null {
         if (avatarUrl) return avatarUrl;
         if (!avatarId) return null;
         const avatar = ACCOUNT_CREATION_AVATARS.find((a) => a.id === avatarId);
@@ -119,9 +113,7 @@ export class ChatboxComponent implements OnInit, OnChanges, AfterViewInit, OnDes
         if (entry) {
             if (entry.deleted) return null;
             const absoluteUrl = entry.avatarUrl ? this.toAbsolute(entry.avatarUrl) : null;
-            const fromRegistry = this.resolveAvatar(entry.avatarId, absoluteUrl);
-            if (fromRegistry) return fromRegistry;
-            return this.resolveAvatar(msg.avatarId, msg.avatarUrl);
+            return this.resolveAvatar(entry.avatarId, absoluteUrl);
         }
         this.avatarRegistry.ensureLoaded([name]);
         return this.resolveAvatar(msg.avatarId, msg.avatarUrl);

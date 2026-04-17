@@ -51,6 +51,7 @@ class _SlidingChatBoxState extends State<SlidingChatBox> {
   }
 
   void _onAccelerometerEvent(AccelerometerEvent event) {
+    if (!widget.viewModel.isExpanded.value) return;
     final now = DateTime.now();
     if (_lastShakeTime != null &&
         now.difference(_lastShakeTime!).inMilliseconds <
