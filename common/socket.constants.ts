@@ -35,6 +35,7 @@ export enum WaitingRoomEvents {
 
     GetAvailableRooms = 'getAvailableRooms',
     AvailableRoomsResponse = 'availableRoomsResponse',
+    AvailableRoomsChanged = 'availableRoomsChanged',
 
     ToggleDropInDropOut = 'toggleDropInDropOut',
     DropInDropOutToggled = 'dropInDropOutToggled',
@@ -66,6 +67,7 @@ export enum GameRoomEvents {
     StartTurn = 'startTurn',
     TurnStarting = 'turnStarting',
     EndTurn = 'endTurn',
+    ResumeTurn = 'resumeTurn',
     UpdateCountdown = 'updateCountdown',
 
     UpdateStartingCountdown = 'updateStartingCountdown',
@@ -136,6 +138,8 @@ export enum GeneralChatEvents {
     GetGeneralChatMessages = 'getGeneralChatMessages',
     GetGeneralChatMessagesResponse = 'getGeneralChatMessagesResponse',
     GeneralChatError = 'generalChatError',
+    AvatarUpdated = 'avatarUpdated',
+    UsernameUpdated = 'usernameUpdated',
 }
 
 export enum CustomChannelEvents {

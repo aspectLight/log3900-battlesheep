@@ -5,6 +5,7 @@ class ChannelMessage {
   final String time;
   final String? avatarId;
   final String? avatarUrl;
+  final int? avatarDisplayNonce;
 
   const ChannelMessage({
     required this.channelId,
@@ -13,5 +14,6 @@ class ChannelMessage {
     required this.time,
     this.avatarId,
     this.avatarUrl,
+    this.avatarDisplayNonce,
   });
 }

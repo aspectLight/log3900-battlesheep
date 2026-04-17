@@ -11,12 +11,13 @@ import { PaintService } from '@app/services/editor/paint.service';
 import { TeleportService } from '@app/services/editor/teleport.service';
 import { MovementSocketService } from '@app/services/communication/socket-handlers/movement-socket.service';
 import { Subscription } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-board',
     templateUrl: './board.component.html',
     styleUrls: ['./board.component.scss'],
-    imports: [PlayerComponent],
+    imports: [PlayerComponent, TranslateModule],
 })
 
 /*
@@ -106,6 +107,7 @@ export class BoardComponent implements OnInit, OnDestroy {
                     return;
                 } else {
                     if (!this.isSelectionActive) return;
+                    if (!this.gameManagerService.isPlayerTurn) return;
                     this.gameManagerService.setPathFromCoord({ x: cell.x, y: cell.y });
                     this.movePlayerFromPath();
                 }

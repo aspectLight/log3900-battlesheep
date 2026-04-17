@@ -1,28 +1,47 @@
 <div class="container">
     <div class="cards-container">
         @for (playerCard of playerCardList; track playerCard.player.id; let idx = $index) {
-            <div class="card" (click)="toggleCard(idx)" [class.active]="playerCard.isActive" [class.isDisconnected]="playerCard.isDisconnected" [class.virtual-player]="playerCard.player.isVirtual" [attr.data-team]="playerCard.playerTeam">
+            <div
+                class="card"
+                (click)="toggleCard(idx)"
+                [class.active]="playerCard.isActive"
+                [class.isDisconnected]="playerCard.isDisconnected"
+                [class.virtual-player]="playerCard.player.isVirtual"
+                [attr.data-team]="playerCard.playerTeam"
+            >
                 <div class="card-content">
-                    <p class="action-wins"> {{playerCard.player.fightsWon}} </p>
-                    @if (playerCard.isActive) {
-                        <p class="action-description">{{ 'player_card.playing' | translate }}</p>
-                    }
-                    @if (playerCard.isHost) {
-                        <img class="host-img" src="./assets/ui/host.png">
-                    }
-                    @if(playerCard.player.isVirtual) {
-                        <div class="virtual-badge">{{ 'player_card.virtual' | translate }}</div>
-                    }
-                    <div class="player-circle" [ngStyle]="{'background-color': playerCard.playerColor}"></div>
-                    @if (playerCard.hasFlag) {
-                        <img src="/assets/items/flag.png" [alt]="'player_card.flag' | translate" class="flag-icon">
-                    }
-                    <div class="card-name">
-                        {{ playerCard.player.name }}
+                    <div class="card-left">
+                        <div class="card-image">
+                            <img [src]="playerCard.player.avatar?.avatar" alt="Card Image">
+                        </div>
+                        <div class="player-circle" [ngStyle]="{'background-color': playerCard.playerColor}"></div>
+                        @if (playerCard.hasFlag) {
+                            <img src="./assets/items/flag.png" [alt]="'player_card.flag' | translate" class="flag-icon">
+                        }
                     </div>
-                    <div class="card-image">
-                        <img [src]="playerCard.player.avatar?.avatar" alt="Card Image">
-                    </div>     
+
+                    <div class="card-main">
+                        <div class="name-row">
+                            <div class="card-name">
+                                {{ playerCard.player.name }}
+                            </div>
+                            @if(playerCard.player.isVirtual) {
+                                <div class="virtual-badge">{{ 'player_card.virtual' | translate }}</div>
+                            }
+                        </div>
+                        <div class="card-meta">
+                            @if (playerCard.isActive) {
+                                <p class="action-description">{{ 'player_card.playing' | translate }}</p>
+                            }
+                            <p class="action-wins">{{playerCard.player.fightsWon}}</p>
+                        </div>
+                    </div>
+
+                    <div class="card-right">
+                        @if (playerCard.isHost) {
+                            <img class="host-img" src="./assets/ui/host.png">
+                        }
+                    </div>
                 </div>
             </div>
         }

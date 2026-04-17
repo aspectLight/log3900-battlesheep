@@ -88,6 +88,7 @@ export class WaitingRoomManagementHandler {
                 this.logger.error(`Erreur création canal de partie ${data.roomId}: ${channelError.message}`);
             }
 
+            this.notifyAvailableRoomsChanged(server);
             return { success: true };
         } catch (error) {
             this.logger.error(`Erreur création room: ${error.message}`);
@@ -98,7 +99,7 @@ export class WaitingRoomManagementHandler {
     /**
      * Handles player joining a room
      */
-    async handleJoinRoom(roomId: string, socket: Socket): Promise<void> {
+    async handleJoinRoom(roomId: string, socket: Socket, server: Server): Promise<void> {
         try {
             const room = this.waitingRoomService.findRoomById(roomId);
             if (!room) throw new Error("La salle n'existe pas");
@@ -142,6 +143,7 @@ export class WaitingRoomManagementHandler {
             }
 
             await this.completeJoinRoom(roomId, socket);
+            this.notifyAvailableRoomsChanged(server);
         } catch (error) {
             socket.emit(WaitingRoomEvents.JoinRoomResponse, { success: false, error: error.message });
         }
@@ -150,7 +152,7 @@ export class WaitingRoomManagementHandler {
     /**
      * Handles the user's choice when a blocked user is in the room
      */
-    async handleBlockedUserRoomChoice(socket: Socket, data: { choice: 'enter' | 'cancel' }): Promise<void> {
+    async handleBlockedUserRoomChoice(socket: Socket, data: { choice: 'enter' | 'cancel' }, server: Server): Promise<void> {
         const pending = this.pendingBlockChoices.get(socket.id);
         this.pendingBlockChoices.delete(socket.id);
 
@@ -162,6 +164,7 @@ export class WaitingRoomManagementHandler {
         if (data.choice === 'enter') {
             try {
                 await this.completeJoinRoom(pending.roomId, socket);
+                this.notifyAvailableRoomsChanged(server);
             } catch (error) {
                 socket.emit(WaitingRoomEvents.JoinRoomResponse, { success: false, error: error.message });
             }
@@ -279,6 +282,7 @@ export class WaitingRoomManagementHandler {
                 socket.leave(`custom-channel-${roomId}`);
                 socket.emit(CustomChannelEvents.CustomChannelLeft, { channelId: roomId });
             }
+            this.notifyAvailableRoomsChanged(server);
         } catch (error) {
             socket.emit(WaitingRoomEvents.LeaveRoomResponse, { success: false, error: error.message });
         }
@@ -291,6 +295,7 @@ export class WaitingRoomManagementHandler {
         try {
             this.logger.log('toggle lock from gateway', roomId, socket.id);
             const isLocked = this.waitingRoomService.toggleLockRoom(roomId, socket.id);
+            this.notifyAvailableRoomsChanged(server);
 
             if (isLocked) {
                 server.to(roomId).emit(WaitingRoomEvents.WaitingRoomLocked);
@@ -310,6 +315,7 @@ export class WaitingRoomManagementHandler {
     handleToggleDropInDropOut(roomId: string, socket: Socket, server: Server): void {
         try {
             const isEnabled = this.waitingRoomService.toggleDropInDropOut(roomId, socket.id);
+            this.notifyAvailableRoomsChanged(server);
             server.to(roomId).emit(WaitingRoomEvents.DropInDropOutToggled, { dropInDropOut: isEnabled });
             this.logger.log(`Salle ${roomId} drop-in/drop-out ${isEnabled ? 'activé' : 'désactivé'} par ${socket.id}`);
         } catch (error) {
@@ -331,6 +337,7 @@ export class WaitingRoomManagementHandler {
                     const entryFee = room.entryFee ?? 0;
                     const paidUids = [...(room.paidPlayerFirebaseUids ?? [])];
                     const isRoomDeleted = this.waitingRoomService.leaveRoom(room.roomId, socket.id);
+                    this.notifyAvailableRoomsChanged(server);
 
                     // Refund on disconnect
                     if (entryFee > 0) {
@@ -522,5 +529,9 @@ export class WaitingRoomManagementHandler {
             }
         }
         return usernames;
+    }
+
+    private notifyAvailableRoomsChanged(server: Server): void {
+        server.emit(WaitingRoomEvents.AvailableRoomsChanged);
     }
 }

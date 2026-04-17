@@ -61,7 +61,12 @@
                     <div class="tile-card">
                         <div class="magnifying-glass-column">
                             <div class="tile-image-container">
-                                <img class="tile-image" [src]="selectedCell.tile.imagePath" alt="Tile Image" />
+                                <img
+                                    class="tile-image"
+                                    [class.tile-image-teleport]="selectedCell.tile.type === 'teleportPad'"
+                                    [src]="selectedCell.tile.imagePath"
+                                    alt="Tile Image"
+                                />
                                 <div class="tile-overlay"></div>
                             </div>
                             <div class="tile-handle"></div>

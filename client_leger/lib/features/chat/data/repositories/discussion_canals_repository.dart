@@ -24,6 +24,7 @@ abstract interface class DiscussionCanalsRepository {
   void joinChannel(String channelId);
   void leaveChannel(String channelId);
   void sendMessage(String channelId, String content);
+  void sendEmoji(String channelId, String emoji);
   List<ChannelMessage> getMessages(String channelId);
   bool isJoined(String channelId);
 }

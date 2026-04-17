@@ -6,6 +6,7 @@ import { LOADING_SCREEN_DELAY } from '@app/constants/routes.constants';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 
 const ROUTES_WITHOUT_GENERAL_CHAT = ['/login', '/register', '/auth-landing', '/game'];
+const ROUTES_WITH_COLLAPSED_GENERAL_CHAT = ['/create-player'];
 
 @Component({
     selector: 'app-root',
@@ -16,6 +17,7 @@ const ROUTES_WITHOUT_GENERAL_CHAT = ['/login', '/register', '/auth-landing', '/g
 export class AppComponent {
     isLoading = false;
     showGeneralChat = false;
+    collapseGeneralChat = false;
 
     constructor(
         private router: Router,
@@ -27,6 +29,9 @@ export class AppComponent {
                     this.isLoading = false;
                 }, LOADING_SCREEN_DELAY);
                 this.showGeneralChat = !ROUTES_WITHOUT_GENERAL_CHAT.some((r) => event.urlAfterRedirects.startsWith(r));
+                this.collapseGeneralChat = ROUTES_WITH_COLLAPSED_GENERAL_CHAT.some((r) =>
+                    event.urlAfterRedirects.startsWith(r),
+                );
             }
             if (event instanceof NavigationStart) {
                 this.isLoading = true;

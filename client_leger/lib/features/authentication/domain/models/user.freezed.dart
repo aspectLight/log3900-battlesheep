@@ -18,6 +18,7 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$UserModel {
   String get uid => throw _privateConstructorUsedError;
+  String? get firebaseUid => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
   String get username => throw _privateConstructorUsedError;
   String get avatarId => throw _privateConstructorUsedError;
@@ -37,6 +38,7 @@ abstract class $UserModelCopyWith<$Res> {
   @useResult
   $Res call({
     String uid,
+    String? firebaseUid,
     String email,
     String username,
     String avatarId,
@@ -60,6 +62,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
   @override
   $Res call({
     Object? uid = null,
+    Object? firebaseUid = freezed,
     Object? email = null,
     Object? username = null,
     Object? avatarId = null,
@@ -71,6 +74,10 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.uid
                 : uid // ignore: cast_nullable_to_non_nullable
                       as String,
+            firebaseUid: freezed == firebaseUid
+                ? _value.firebaseUid
+                : firebaseUid // ignore: cast_nullable_to_non_nullable
+                      as String?,
             email: null == email
                 ? _value.email
                 : email // ignore: cast_nullable_to_non_nullable
@@ -104,6 +111,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
   @useResult
   $Res call({
     String uid,
+    String? firebaseUid,
     String email,
     String username,
     String avatarId,
@@ -126,6 +134,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? uid = null,
+    Object? firebaseUid = freezed,
     Object? email = null,
     Object? username = null,
     Object? avatarId = null,
@@ -137,6 +146,10 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.uid
             : uid // ignore: cast_nullable_to_non_nullable
                   as String,
+        firebaseUid: freezed == firebaseUid
+            ? _value.firebaseUid
+            : firebaseUid // ignore: cast_nullable_to_non_nullable
+                  as String?,
         email: null == email
             ? _value.email
             : email // ignore: cast_nullable_to_non_nullable
@@ -163,6 +176,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
 class _$UserModelImpl implements _UserModel {
   const _$UserModelImpl({
     required this.uid,
+    this.firebaseUid,
     required this.email,
     required this.username,
     required this.avatarId,
@@ -171,6 +185,8 @@ class _$UserModelImpl implements _UserModel {
 
   @override
   final String uid;
+  @override
+  final String? firebaseUid;
   @override
   final String email;
   @override
@@ -182,7 +198,7 @@ class _$UserModelImpl implements _UserModel {
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, username: $username, avatarId: $avatarId, avatarUrl: $avatarUrl)';
+    return 'UserModel(uid: $uid, firebaseUid: $firebaseUid, email: $email, username: $username, avatarId: $avatarId, avatarUrl: $avatarUrl)';
   }
 
   @override
@@ -191,6 +207,8 @@ class _$UserModelImpl implements _UserModel {
         (other.runtimeType == runtimeType &&
             other is _$UserModelImpl &&
             (identical(other.uid, uid) || other.uid == uid) &&
+            (identical(other.firebaseUid, firebaseUid) ||
+                other.firebaseUid == firebaseUid) &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.username, username) ||
                 other.username == username) &&
@@ -201,8 +219,15 @@ class _$UserModelImpl implements _UserModel {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, uid, email, username, avatarId, avatarUrl);
+  int get hashCode => Object.hash(
+    runtimeType,
+    uid,
+    firebaseUid,
+    email,
+    username,
+    avatarId,
+    avatarUrl,
+  );
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -216,6 +241,7 @@ class _$UserModelImpl implements _UserModel {
 abstract class _UserModel implements UserModel {
   const factory _UserModel({
     required final String uid,
+    final String? firebaseUid,
     required final String email,
     required final String username,
     required final String avatarId,
@@ -224,6 +250,8 @@ abstract class _UserModel implements UserModel {
 
   @override
   String get uid;
+  @override
+  String? get firebaseUid;
   @override
   String get email;
   @override

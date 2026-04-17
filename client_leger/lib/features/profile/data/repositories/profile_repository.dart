@@ -1,6 +1,8 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../core/chat/chat_avatar_registry.dart';
+import '../../../../core/chat/chat_outgoing_avatars.dart';
 import '../../core/exceptions/profile_failure.dart';
 import '../../domain/commands/profile_commands.dart';
 import '../../domain/models/profile_model.dart';
@@ -11,11 +13,18 @@ import '../models/dto/profile_statistics_dto.dart';
 import '../services/http_profile_service.dart';
 
 class ProfileRepository {
-  ProfileRepository({required HttpProfileService httpProfileService})
-    : _httpProfileService = httpProfileService,
-      state = signal<ProfileState>(const ProfileState.idle());
+  ProfileRepository({
+    required HttpProfileService httpProfileService,
+    required ChatOutgoingAvatars chatOutgoingAvatars,
+    required ChatAvatarRegistry chatAvatarRegistry,
+  }) : _httpProfileService = httpProfileService,
+       _chatOutgoingAvatars = chatOutgoingAvatars,
+       _chatAvatarRegistry = chatAvatarRegistry,
+       state = signal<ProfileState>(const ProfileState.idle());
 
   final HttpProfileService _httpProfileService;
+  final ChatOutgoingAvatars _chatOutgoingAvatars;
+  final ChatAvatarRegistry _chatAvatarRegistry;
 
   final Signal<ProfileState> state;
 
@@ -33,6 +42,7 @@ class ProfileRepository {
                     .fetchProfileStatistics();
                 final profile = ProfileModel(
                   id: profileDto.id,
+                  firebaseUid: profileDto.firebaseUid,
                   username: profileDto.username,
                   email: profileDto.email,
                   avatarId: profileDto.avatarId,
@@ -55,10 +65,22 @@ class ProfileRepository {
             .run();
     result.match(
       (failure) => state.value = ProfileState.error(failure),
-      (tuple) => state.value = ProfileState.loaded(
-        profile: tuple.$1,
-        statistics: tuple.$2,
-      ),
+      (tuple) {
+        final profile = tuple.$1;
+        _chatOutgoingAvatars.setFromAvatarFields(
+          avatarId: profile.avatarId,
+          avatarRelativeUrl: profile.avatarUrl,
+        );
+        _chatAvatarRegistry.setLocal(
+          profile.username,
+          avatarId: profile.avatarId,
+          avatarRelativeUrl: profile.avatarUrl,
+        );
+        state.value = ProfileState.loaded(
+          profile: profile,
+          statistics: tuple.$2,
+        );
+      },
     );
   }
 
@@ -104,6 +126,7 @@ class ProfileRepository {
         );
         final model = ProfileModel(
           id: updatedDto.id,
+          firebaseUid: updatedDto.firebaseUid,
           username: updatedDto.username,
           email: updatedDto.email,
           avatarId: updatedDto.avatarId,
@@ -118,6 +141,15 @@ class ProfileRepository {
             statistics: loaded.statistics,
           );
         }
+        _chatOutgoingAvatars.setFromAvatarFields(
+          avatarId: model.avatarId,
+          avatarRelativeUrl: model.avatarUrl,
+        );
+        _chatAvatarRegistry.setLocal(
+          model.username,
+          avatarId: model.avatarId,
+          avatarRelativeUrl: model.avatarUrl,
+        );
         return model;
       },
       (error, _) =>
@@ -144,6 +176,7 @@ class ProfileRepository {
         final dto = await _httpProfileService.uploadAvatar(filePath);
         final model = ProfileModel(
           id: dto.id,
+          firebaseUid: dto.firebaseUid,
           username: dto.username,
           email: dto.email,
           avatarId: dto.avatarId,
@@ -158,6 +191,15 @@ class ProfileRepository {
             statistics: loaded.statistics,
           );
         }
+        _chatOutgoingAvatars.setFromAvatarFields(
+          avatarId: model.avatarId,
+          avatarRelativeUrl: model.avatarUrl,
+        );
+        _chatAvatarRegistry.setLocal(
+          model.username,
+          avatarId: model.avatarId,
+          avatarRelativeUrl: model.avatarUrl,
+        );
         return model;
       },
       (error, _) =>

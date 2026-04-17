@@ -4,11 +4,17 @@ import 'ui_assets.dart';
 class AuthAvatarAssets {
   static const String _base = 'assets/images/auth_avatars';
 
-  static String assetPathForAvatarId(String avatarId) {
+  /// Known account-creation preset only; `null` if [avatarId] is not one of them.
+  static String? tryAssetPathForAvatarId(String avatarId) {
     for (final a in AuthAvatar.values) {
       if (a.id == avatarId) return assetPath(a);
     }
-    return UiAssets.characterCreationEmptyPortrait;
+    return null;
+  }
+
+  static String assetPathForAvatarId(String avatarId) {
+    return tryAssetPathForAvatarId(avatarId) ??
+        UiAssets.characterCreationEmptyPortrait;
   }
 
   static String assetPath(AuthAvatar avatar) => switch (avatar) {

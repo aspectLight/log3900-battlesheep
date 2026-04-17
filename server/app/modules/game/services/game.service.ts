@@ -89,14 +89,14 @@ export class GameService {
         return result.deletedCount;
     }
 
-    async duplicateGame(gameId: string, owner: string): Promise<void> {
+    async duplicateGame(gameId: string, owner: string, language = 'fr'): Promise<void> {
         const game = await this.getGameById(gameId);
 
         if (game.privacy !== 'public') {
             throw new ForbiddenException('Seuls les jeux publics peuvent être dupliqués');
         }
 
-        const newName = await this.generateUniqueCopyName(game.name);
+        const newName = await this.generateUniqueCopyName(game.name, language);
 
         const duplicatedGame = {
             name: newName,
@@ -111,17 +111,26 @@ export class GameService {
         await this.gameModel.create(duplicatedGame);
     }
 
-    private async generateUniqueCopyName(originalName: string): Promise<string> {
-        const baseName = `${originalName}_copie`;
-        let candidate = baseName;
-        let suffix = 1;
+    private async generateUniqueCopyName(originalName: string, language: string): Promise<string> {
+        const copySuffix = language.toLowerCase() === 'en' ? 'copy' : 'copie';
+        const escapedOriginalName = this.escapeRegex(originalName);
+        const copyNamePattern = new RegExp(`^${escapedOriginalName}_(?:copy|copie)(\\d+)?$`);
+        const existingCopyNames = await this.gameModel.find({ name: { $regex: copyNamePattern } }).exec();
 
-        while (await this.gameModel.findOne({ name: candidate }).exec()) {
-            candidate = `${baseName}${suffix}`;
-            suffix++;
+        let maxSuffix = -1;
+        for (const existingGame of existingCopyNames) {
+            const match = existingGame.name.match(copyNamePattern);
+            if (!match) continue;
+            const numericSuffix = match[1] ? Number.parseInt(match[1], 10) : 0;
+            maxSuffix = Math.max(maxSuffix, numericSuffix);
         }
 
-        return candidate;
+        const nextSuffix = maxSuffix + 1;
+        return nextSuffix === 0 ? `${originalName}_${copySuffix}` : `${originalName}_${copySuffix}${nextSuffix}`;
+    }
+
+    private escapeRegex(value: string): string {
+        return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
     private async verifyDuplicateName(gameName: string) {

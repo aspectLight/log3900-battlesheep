@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
@@ -103,9 +104,21 @@ class _ChatPanelContentState extends State<ChatPanelContent>
         event.y.abs() < ChatConstants.shakeDeadZone;
     if (isVerticalShake) {
       _lastShakeTime = now;
+      if (kDebugMode) {
+        debugPrint(
+          '[ChatShake] vertical → resend last message '
+          '(x=${event.x.toStringAsFixed(1)} y=${event.y.toStringAsFixed(1)})',
+        );
+      }
       chatEventBus.fire(const ChatVerticalShakeDetected());
     } else if (isHorizontalShake) {
       _lastShakeTime = now;
+      if (kDebugMode) {
+        debugPrint(
+          '[ChatShake] horizontal → send selected emoji '
+          '(x=${event.x.toStringAsFixed(1)} y=${event.y.toStringAsFixed(1)})',
+        );
+      }
       chatEventBus.fire(const ChatHorizontalShakeDetected());
     }
   }
@@ -415,6 +428,7 @@ class _ChatLine extends StatelessWidget {
                     displayName: message.name,
                     avatarId: message.avatarId,
                     avatarUrl: message.avatarUrl,
+                    avatarDisplayNonce: message.avatarDisplayNonce,
                     size: 18,
                   ),
                 ),

@@ -1,10 +1,10 @@
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:fpdart/fpdart.dart' show Option;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fpdart/fpdart.dart' show Option;
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:signals_flutter/signals_flutter.dart';
@@ -19,14 +19,14 @@ import '../../../../../core/localisation/core_localizations.dart';
 import '../../../../../core/modal/modal_coordinator.dart';
 import '../../../../../core/modal/modal_intent_sink.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
-import '../../../../shop/data/repositories/shop_repository.dart';
-import '../../../../shop/domain/state/shop_state.dart';
 import '../../../../authentication/core/constants/auth_constants.dart';
 import '../../../../authentication/core/enums/auth_validation_error.dart';
 import '../../../../authentication/core/extensions/auth_validation_error_ext.dart';
 import '../../../../authentication/core/helpers/email_validator.dart';
 import '../../../../authentication/core/helpers/username_validator.dart';
 import '../../../../authentication/core/localisation/auth_localizations.dart';
+import '../../../../shop/data/repositories/shop_repository.dart';
+import '../../../../shop/domain/state/shop_state.dart';
 import '../../../core/exceptions/profile_failure.dart';
 import '../../../core/extensions/profile_failure_ext.dart';
 import '../../../core/localisation/profile_localizations.dart';
@@ -50,7 +50,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   static const Set<String> _allowedAvatarExtensions = {'jpg', 'jpeg', 'png'};
 
   late final ProfileViewModel _viewModel;
-  late final ShopRepository _shopRepository;
   late final ModalIntentSink _modalIntentSink;
   late final ModalCoordinator _modalCoordinator;
   final _usernameController = TextEditingController();
@@ -63,6 +62,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int _avatarRefreshEpoch = DateTime.now().millisecondsSinceEpoch;
 
   bool get _supportsCameraCapture => Platform.isAndroid || Platform.isIOS;
+
+  ShopRepository get _shopRepository => GetIt.I<ShopRepository>();
 
   ButtonStyle _uploadButtonStyle() {
     return OutlinedButton.styleFrom(
@@ -83,7 +84,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     _viewModel = GetIt.I<ProfileViewModel>();
-    _shopRepository = GetIt.I<ShopRepository>();
     _modalIntentSink = GetIt.I<ModalIntentSink>();
     _modalCoordinator = GetIt.I<ModalCoordinator>();
     unawaited(_init());
@@ -109,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (state is ProfileStateLoaded) {
       _usernameController.text = state.profile.username;
       _emailController.text = state.profile.email;
-      _viewModel.setSelectedAvatarId(state.profile.avatarId);
+      _viewModel.syncSelectedAvatarIdFromProfile(state.profile.avatarId);
       _viewModel.syncPreferencesFromProfile(state.profile);
       _avatarFileError = null;
       _hasAttemptedSave = false;
@@ -125,7 +125,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
     try {
-      final picked = await _imagePicker.pickImage(source: source);
+      final picked = await _imagePicker.pickImage(
+        source: source,
+        preferredCameraDevice: CameraDevice.front,
+      );
       if (picked == null) return;
       final error = await _validateAvatarFile(picked, l10n);
       if (error != null) {
@@ -395,6 +398,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String selectedAvatarId,
     ShopState shopState,
   ) {
+    final pendingPath = _viewModel.avatarPreviewPath.value;
+    final hasPending = pendingPath != null && pendingPath.isNotEmpty;
+    final hasRemote =
+        (profile.avatarUrl?.trim().isNotEmpty ?? false) && !hasPending;
+    final uploadedAvatarSelected =
+        hasPending || (hasRemote && selectedAvatarId == profile.avatarId);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -418,20 +428,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 16),
         Text(
           l10n.profileAvatarLabel,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: context.interactionColors.text,
             fontSize: 16,
             fontWeight: FontWeight.bold,
             fontFamily: 'CustomFont',
           ),
         ),
         const SizedBox(height: 8),
-        _buildAvatarGrid(selectedAvatarId, shopState),
+        _buildAvatarGrid(
+          selectedAvatarId,
+          shopState,
+          suppressGridSelection: uploadedAvatarSelected,
+        ),
         const SizedBox(height: 20),
         _buildAvatarUploadRow(
           l10n,
           profile,
           isSaving || isDeleting || isUploading,
+          isSelected: uploadedAvatarSelected,
         ),
         const SizedBox(height: 24),
         Column(
@@ -503,8 +518,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildAvatarUploadRow(
     ProfileLocalizations l10n,
     ProfileModel profile,
-    bool disabled,
-  ) {
+    bool disabled, {
+    required bool isSelected,
+  }) {
     final pendingPath = _viewModel.avatarPreviewPath.value;
     final hasPending = pendingPath != null && pendingPath.isNotEmpty;
     final hasRemote =
@@ -536,7 +552,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: 56,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFF444444)),
+                border: Border.all(
+                  color: isSelected
+                      ? context.interactionColors.outline
+                      : const Color(0xFF444444),
+                  width: 2,
+                ),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.65),
+                          blurRadius: 8,
+                          spreadRadius: 2,
+                        ),
+                      ]
+                    : null,
               ),
               clipBehavior: Clip.antiAlias,
               child: hasPending
@@ -697,8 +729,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildLanguageSelector(String selectedLanguage) {
-    final languages = [('fr', 'French'), ('en', 'English')];
+  Widget _buildLanguageSelector(
+    String selectedLanguage,
+    ProfileLocalizations l10n,
+  ) {
+    final languages = [
+      ('fr', l10n.languageNameFr),
+      ('en', l10n.languageNameEn),
+    ];
     return Row(
       children: languages.map((l) {
         final isSelected = selectedLanguage == l.$1;
@@ -766,7 +804,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return fallback;
   }
 
-  Widget _buildAvatarGrid(String selectedAvatarId, ShopState shopState) {
+  Widget _buildAvatarGrid(
+    String selectedAvatarId,
+    ShopState shopState, {
+    bool suppressGridSelection = false,
+  }) {
     final scheme = Theme.of(context).colorScheme;
     final outline = context.interactionColors.outline;
     const avatars = AuthAvatar.values;
@@ -778,7 +820,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Row(
           children: rowAvatars.map((AuthAvatar avatar) {
             final id = avatar.id;
-            final isSelected = selectedAvatarId == id;
+            final isSelected = !suppressGridSelection && selectedAvatarId == id;
             final locked = _isProfileAvatarLocked(avatar, shopState);
             final price = _exclusiveAvatarPrice(avatar, shopState);
             return Expanded(
@@ -900,8 +942,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Text(
             l10n.profileStatisticsTitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.interactionColors.text,
               fontSize: 18,
               fontWeight: FontWeight.w600,
               fontFamily: 'CustomFont',
@@ -930,26 +972,62 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 8),
           Text(
             l10n.profileThemeLabel,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.interactionColors.text,
               fontSize: 16,
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
             ),
+            textAlign: TextAlign.center,
           ),
           _buildThemeSelector(selectedThemeId, l10n),
           const SizedBox(height: 16),
           Text(
             l10n.profileLanguageLabel,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.interactionColors.text,
               fontSize: 16,
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
             ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
-          _buildLanguageSelector(selectedLanguage),
+          _buildLanguageSelector(selectedLanguage, l10n),
+          const SizedBox(height: 16),
+          Text(
+            l10n.tutorial,
+            style: TextStyle(
+              color: context.interactionColors.text,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'CustomFont',
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          ElevatedButton(
+            onPressed: _viewModel.openTutorial,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: context.interactionColors.primary,
+              shadowColor: Colors.transparent,
+              side: BorderSide(
+                color: context.interactionColors.outline,
+                width: 2,
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              textStyle: const TextStyle(
+                fontSize: 16,
+                fontFamily: 'CustomFont',
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(l10n.continueTutorial),
+          ),
         ],
       ),
     );
@@ -968,8 +1046,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              color: Color.fromRGBO(255, 255, 255, 0.8),
+            style: TextStyle(
+              color: context.interactionColors.text,
               fontSize: 16,
               fontWeight: FontWeight.w500,
               fontFamily: 'CustomFont',
@@ -1171,8 +1249,8 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
         if (widget.label.isNotEmpty) ...[
           Text(
             widget.label,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.interactionColors.text,
               fontSize: 20,
               fontFamily: 'CustomFont',
               fontWeight: FontWeight.bold,

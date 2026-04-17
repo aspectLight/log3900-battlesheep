@@ -1,15 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostBinding, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
 import { AuthService } from '@app/services/communication/auth.service';
+import { AvatarRegistryService } from '@app/services/communication/avatar-registry.service';
 import { ChatService } from '@app/services/communication/chat.service';
 import { ChannelInfo, ChannelMessage, CustomChannelService } from '@app/services/communication/custom-channel.service';
 import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';
 import { isReservedGameChannelName, isReservedGeneralChannelName } from '@common/channel-name.utils';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 const MAX_MESSAGE_LENGTH = 200;
 
@@ -19,13 +21,19 @@ const MAX_MESSAGE_LENGTH = 200;
     templateUrl: './chatbox.component.html',
     styleUrl: './chatbox.component.scss',
 })
-export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ChatboxComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
     @Input() roomType: 'GeneralChat' | 'WaitingRoom' | 'GameRoom' | 'EndRoom' = 'GeneralChat';
+    @Input() collapseOnLoad: boolean = false;
     @ViewChild('chatboxMessages') private messagesContainer!: ElementRef<HTMLDivElement>;
     @ViewChild('messageInput') private messageInput!: ElementRef<HTMLInputElement>;
 
     isCollapsed: boolean = false;
     newMessage: string = '';
+
+    @HostBinding('class.collapsed')
+    get isHostCollapsed(): boolean {
+        return this.isCollapsed;
+    }
 
     /** null = général, string = channelId du canal custom/partie actif */
     activeChannelId: string | null = null;
@@ -61,6 +69,7 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
         private waitingRoomService: WaitingRoomService,
         private authService: AuthService,
         private translate: TranslateService,
+        private avatarRegistry: AvatarRegistryService,
     ) {
         this.scrollToBottom();
     }
@@ -85,14 +94,44 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     get cp_username(): string {
-        return this.authService.currentUser?.displayName ?? 'Utilisateur';
+        return this.customChannelService.username ?? this.authService.currentUser?.displayName ?? 'Utilisateur';
     }
 
-    resolveAvatar(avatarId?: string | null, avatarUrl?: string | null): string | null {
+    private toAbsolute(path: string): string {
+        if (/^https?:\/\//i.test(path)) return path;
+        return `${environment.serverUrl}${path}`;
+    }
+
+    resolveAvatar(avatarId?: string | null, avatarUrl?: string | null, name?: string | null): string | null {
+        if (name === '[supprimé]') return './assets/avatars/account-creation/compte-supprimer.png';
         if (avatarUrl) return avatarUrl;
         if (!avatarId) return null;
         const avatar = ACCOUNT_CREATION_AVATARS.find((a) => a.id === avatarId);
         return avatar ? avatar.image : null;
+    }
+
+    getAvatarFor(msg: { name?: string | null; avatarId?: string | null; avatarUrl?: string | null }): string | null {
+        const name = msg?.name;
+        if (!name) return null;
+        const state = this.avatarRegistry.registrySignal();
+        const entry = state[name];
+        if (entry) {
+            if (entry.deleted) return null;
+            const absoluteUrl = entry.avatarUrl ? this.toAbsolute(entry.avatarUrl) : null;
+            const fromRegistry = this.resolveAvatar(entry.avatarId, absoluteUrl);
+            if (fromRegistry) return fromRegistry;
+            return this.resolveAvatar(msg.avatarId, msg.avatarUrl);
+        }
+        this.avatarRegistry.ensureLoaded([name]);
+        return this.resolveAvatar(msg.avatarId, msg.avatarUrl);
+    }
+
+    onAvatarImgError(msg: { avatarId?: string | null; avatarUrl?: string | null }): void {
+        // Le avatarUrl stocké pointe sur /auth/avatar/:uid ; si l'utilisateur a depuis
+        // basculé vers un avatar prédéfini, l'endpoint 400 → on bascule sur l'avatarId.
+        if (msg.avatarUrl) {
+            msg.avatarUrl = null;
+        }
     }
 
     ngOnInit() {
@@ -200,6 +239,12 @@ export class ChatboxComponent implements OnInit, AfterViewInit, OnDestroy {
             }),
         );
         // ─────────────────────────────────────────────────────────────
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['collapseOnLoad']?.currentValue) {
+            this.isCollapsed = true;
+        }
     }
 
     ngAfterViewInit() {

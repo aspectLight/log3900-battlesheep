@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../config/env_config.dart';
 import '../../../constants/auth_avatar_assets.dart';
+import '../../../constants/avatar_assets.dart';
 
 class ProfileAvatarThumb extends StatelessWidget {
   const ProfileAvatarThumb({
@@ -9,6 +10,7 @@ class ProfileAvatarThumb extends StatelessWidget {
     super.key,
     this.avatarId,
     this.avatarUrl,
+    this.avatarDisplayNonce,
     this.size = 24,
     this.borderColor,
     this.backgroundColor = const Color(0xFF4a3010),
@@ -18,6 +20,7 @@ class ProfileAvatarThumb extends StatelessWidget {
   final String displayName;
   final String? avatarId;
   final String? avatarUrl;
+  final int? avatarDisplayNonce;
   final double size;
   final Color? borderColor;
   final Color backgroundColor;
@@ -35,10 +38,14 @@ class ProfileAvatarThumb extends StatelessWidget {
     final normalizedUrl = avatarUrl?.trim() ?? '';
     final resolvedNetworkUrl = normalizedUrl.isEmpty
         ? ''
-        : EnvConfig.resolveAvatarUrl(normalizedUrl);
-    final resolvedAsset = normalizedId.isEmpty
+        : EnvConfig.resolveAvatarUrl(
+            normalizedUrl,
+            cacheBust: avatarDisplayNonce,
+          );
+    final String? resolvedAsset = normalizedId.isEmpty
         ? null
-        : AuthAvatarAssets.assetPathForAvatarId(normalizedId);
+        : (AvatarAssets.tryMiniaturePathForProfileId(normalizedId) ??
+            AuthAvatarAssets.tryAssetPathForAvatarId(normalizedId));
     final hasNetwork = resolvedNetworkUrl.isNotEmpty;
     final hasAsset = resolvedAsset != null && resolvedAsset.isNotEmpty;
     final border = borderColor;
@@ -55,6 +62,9 @@ class ProfileAvatarThumb extends StatelessWidget {
           ? Image.network(
               resolvedNetworkUrl,
               fit: BoxFit.cover,
+              key: ValueKey<String>(
+                '$resolvedNetworkUrl|${avatarDisplayNonce ?? 0}',
+              ),
               errorBuilder: (_, _, _) => _fallback(hasAsset, resolvedAsset),
             )
           : _fallback(hasAsset, resolvedAsset),
@@ -65,6 +75,9 @@ class ProfileAvatarThumb extends StatelessWidget {
     if (hasAsset) {
       return Image.asset(
         resolvedAsset!,
+        key: ValueKey<String>(
+          '$resolvedAsset|${avatarDisplayNonce ?? 0}',
+        ),
         fit: BoxFit.cover,
         errorBuilder: (_, _, _) => _initial(),
       );

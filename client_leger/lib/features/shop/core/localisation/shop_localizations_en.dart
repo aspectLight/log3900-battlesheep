@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'shop_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -45,6 +46,10 @@ class ShopLocalizationsEn extends ShopLocalizations {
   String get shopUnequipped => 'Cosmetic unequipped.';
 
   @override
+  String get shopBannerPreferenceUpdateFailed =>
+      'Could not update your banner preference. Please try again.';
+
+  @override
   String get shopPurchaseFailedTitle => 'Purchase failed';
 
   @override
@@ -80,4 +85,19 @@ class ShopLocalizationsEn extends ShopLocalizations {
 
   @override
   String get shopBannerPreviewDefense => 'Defense';
+
+  @override
+  String get bannerGold => 'Golden Banner';
+
+  @override
+  String get bannerShadow => 'Shadow Banner';
+
+  @override
+  String get bannerFlame => 'Flame Banner';
+
+  @override
+  String get bannerIce => 'Icy Banner';
+
+  @override
+  String get bannerNeon => 'Neon Banner';
 }

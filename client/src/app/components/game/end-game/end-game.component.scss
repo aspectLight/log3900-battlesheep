@@ -8,10 +8,6 @@
     overflow: hidden;
 }
 
-img {
-    width: 15px;
-}
-
 .return-button {
     position: absolute;
     left: 10px;
@@ -19,16 +15,27 @@ img {
     align-items: center;
     gap: 15px;
     cursor: pointer;
+    background: none;
+    border: none;
     transition: all 0.3s ease;
 }
 
 .return-button:hover {
-    color: var(--theme-bg-button);
-    transform: scale(1.05);
+    color: var(--theme-text-hover);
 }
 
 .return-button:active {
-    transform: scale(0.95);
+    color: var(--theme-text-hover-active);
+}
+
+.return-button img {
+    width: 15px;
+    max-width: 15px;
+    filter: brightness(0) invert(1);
+}
+
+.stats-header img {
+    width: 15px;
 }
 
 .end-game {
@@ -249,4 +256,99 @@ li span {
     width: 24px !important;
     height: 24px;
     margin-bottom: 5px;
+}
+
+/* ── Layout côte à côte : récompenses + partage ── */
+.bottom-row {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.bottom-row .rewards-section {
+    margin: 0;
+    flex: 0 0 400px;
+    width: 400px;
+}
+
+/* ── Section partage (même style que rewards-section) ── */
+.share-section {
+    flex: 0 0 400px;
+    width: 400px;
+    margin: 0;
+    background: linear-gradient(135deg, #2b2b2b 0%, #1a1a2e 100%);
+    border: 2px solid #c9a84c;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 0 20px rgba(201, 168, 76, 0.15);
+}
+
+.share-title {
+    text-align: center;
+    color: #c9a84c;
+    font-size: 22px;
+    margin: 0 0 16px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.share-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.share-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 18px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+    width: 100%;
+    text-align: left;
+}
+
+.share-entry:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+.share-entry:active {
+    transform: scale(0.98);
+}
+
+.share-entry__label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #e0d8c0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.share-entry__icon {
+    width: 18px !important;
+    height: 18px;
+    flex-shrink: 0;
+    color: #e0d8c0;
+}
+
+.share-entry__icon--bluesky {
+    color: #0085ff;
+}
+
+.share-entry__hint {
+    font-size: 12px;
+    color: #8a7a60;
+    max-width: 150px;
+    text-align: right;
+    line-height: 1.4;
 }

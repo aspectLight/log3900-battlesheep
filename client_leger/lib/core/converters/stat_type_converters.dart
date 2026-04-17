@@ -6,8 +6,13 @@ class StatTypeConverter implements JsonConverter<StatType, String> {
   const StatTypeConverter();
 
   @override
-  StatType fromJson(String json) =>
-      StatType.values.firstWhere((e) => e.name == json);
+  StatType fromJson(String json) {
+    final lower = json.toLowerCase();
+    for (final e in StatType.values) {
+      if (e.name == lower) return e;
+    }
+    return StatType.values.first;
+  }
 
   @override
   String toJson(StatType object) => object.name;
@@ -23,8 +28,10 @@ class StatTypeMapConverter
     final result = <StatType, int>{};
     for (final type in StatType.values) {
       final obj = json[type.name];
-      if (obj is Map<String, dynamic>) {
-        result[type] = obj['value'] as int;
+      if (obj is Map) {
+        final m = Map<String, dynamic>.from(obj);
+        final v = m['value'];
+        result[type] = v is int ? v : (v is num ? v.toInt() : 0);
       }
     }
     return result;

@@ -35,3 +35,5 @@ class GoToProfile extends NavigationCommand {}
 class GoToShop extends NavigationCommand {}
 
 class GoToFriends extends NavigationCommand {}
+
+class GoToTutorial extends NavigationCommand {}

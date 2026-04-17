@@ -17,5 +17,8 @@
   "creatorBadge": "You",
   "leaveChannel": "Leave",
   "joinChannel": "Join",
-  "deleteChannel": "Delete"
+  "deleteChannel": "Delete",
+  "confirmDeleteChannel": "Do you really want to delete this channel?",
+  "yes": "Yes",
+  "no": "No"
 }

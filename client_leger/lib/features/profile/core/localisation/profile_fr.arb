@@ -36,13 +36,15 @@
   "profileAverageTime": "Temps moyen par partie",
   "profileThemeLabel": "Thème",
   "profileLanguageLabel": "Langue",
-  "themeNameDefault": "Par défaut",
-  "themeNameFrost": "Givre",
-  "themeNameVillage": "Village",
+  "themeNameDefault": "Classique",
+  "themeNameFrost": "Froid Sibérien",
+  "themeNameVillage": "Village Abandonné",
   "profileDeleteAccount": "Supprimer le compte",
   "profileDeleteConfirmTitle": "Supprimer le compte ?",
   "profileDeleteConfirmBody": "Cette action est permanente. Votre compte et vos données seront supprimés.",
   "profileCancel": "Annuler",
   "profileConfirmDelete": "Supprimer",
-  "profileDeleting": "Suppression..."
+  "profileDeleting": "Suppression...",
+  "tutorial": "Tutoriel",
+  "continueTutorial": "Continuer"
 }

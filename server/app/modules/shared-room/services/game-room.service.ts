@@ -55,6 +55,7 @@ export class GameRoomService {
             startTime: new Date(),
             entryFee: (waitingRoom as any).entryFee ?? 0,
             paidPlayerFirebaseUids: [...((waitingRoom as any).paidPlayerFirebaseUids ?? [])],
+            actionPointsPerTurn: 1,
         };
         for (const player of newRoom.players) {
             newRoom.playersStats.push({
@@ -74,6 +75,7 @@ export class GameRoomService {
         newRoom.players = this.assignColor(newRoom.players);
 
         const gameInfo = await this.gameService.getGameById(waitingRoom.gameId);
+        newRoom.actionPointsPerTurn = gameInfo.actionPoints ?? 1;
         if (gameInfo.mode === 'ctf') {
             newRoom.players = this.assignTeam(newRoom.players);
         }
@@ -152,6 +154,7 @@ export class GameRoomService {
 
         for (const player of room.players) {
             player.movementPoints = player.stats['speed'].value;
+            player.actionPoints = room.actionPointsPerTurn;
         }
 
         let countdown = TURN_BREAK;
@@ -268,9 +271,17 @@ export class GameRoomService {
         if (!room) throw new Error(ErrorMessages.GameDoesNotExist);
 
         const playerTurn = room.players[0];
+        const hasMovementPoints = (playerTurn.movementPoints ?? 0) >= 1;
+        const hasActionPoints = (playerTurn.actionPoints ?? 0) >= 1;
 
-        if (playerTurn.movementPoints >= 1) {
-            let countdown = room.timeRemaining;
+        if (hasMovementPoints || hasActionPoints) {
+            // Notify all clients that the attacker's turn is resuming with remaining time
+            this.server.to(roomId).emit(GameRoomEvents.ResumeTurn, {
+                playerId: playerTurn.id,
+                timeRemaining: room.timeRemaining,
+            });
+
+            let countdown = room.timeRemaining ?? 0;
             room.turnTimer = setInterval(() => {
                 countdown--;
                 room.timeRemaining = countdown;
@@ -323,35 +334,33 @@ export class GameRoomService {
         const abandonedEntry = player.firebaseUid ? room.abandonedPlayers.find((ap) => ap.firebaseUid === player.firebaseUid) : null;
 
         if (abandonedEntry) {
-            // Returning player: restore their original config with full HP and empty inventory
-            const restoredPlayer = {
-                ...abandonedEntry.player,
-                id: socketId,
-                inventory: [],
-                fightsWon: abandonedEntry.stats?.victories ?? 0,
-            };
-            if (restoredPlayer.stats?.['life']) {
-                restoredPlayer.stats = {
-                    ...restoredPlayer.stats,
-                    life: { ...restoredPlayer.stats['life'], value: restoredPlayer.stats['life'].maxValue },
-                };
-            }
-            room.players.push(restoredPlayer);
+            // Returning player: use their new character/bonuses from character creation,
+            // but preserve their original color, team, and previous stats.
+            const usedColors = room.players.map((p) => p.color);
+            const allColors = ['yellow', 'blue', 'green', 'pink', 'purple', 'red'];
+            const originalColor = abandonedEntry.player.color;
+            player.id = socketId;
+            player.color = !usedColors.includes(originalColor) ? originalColor : (allColors.find((c) => !usedColors.includes(c)) ?? allColors[0]);
+            player.team = abandonedEntry.player.team;
+            player.inventory = [];
+            player.fightsWon = abandonedEntry.stats?.victories ?? 0;
+            room.players.push(player);
 
-            // Restore stats
+            // Restore previous stats (update name to match newly chosen character)
             if (abandonedEntry.stats) {
-                const existingStatsIndex = room.playersStats?.findIndex((s) => s.name === restoredPlayer.name);
+                const restoredStats = { ...abandonedEntry.stats, name: player.name };
+                const existingStatsIndex = room.playersStats?.findIndex((s) => s.name === abandonedEntry.player.name);
                 if (existingStatsIndex >= 0) {
-                    room.playersStats[existingStatsIndex] = { ...abandonedEntry.stats };
+                    room.playersStats[existingStatsIndex] = restoredStats;
                 } else {
-                    room.playersStats?.push({ ...abandonedEntry.stats });
+                    room.playersStats?.push(restoredStats);
                 }
             }
 
             // Remove from abandoned list
             room.abandonedPlayers = room.abandonedPlayers.filter((ap) => ap.firebaseUid !== player.firebaseUid);
 
-            return { player: restoredPlayer, isReturning: true, restoredStats: abandonedEntry.stats };
+            return { player, isReturning: true, restoredStats: abandonedEntry.stats };
         } else {
             // New player: assign color and add fresh stats
             const usedColors = room.players.map((p) => p.color);
@@ -430,7 +439,9 @@ export class GameRoomService {
     removeItemFromInventory(roomId: string, playerId: string, item: Item): Player {
         if (!playerId) return null;
         const room = this.findRoomById(roomId);
+        if (!room) return null;
         const player: Player = room.players.find((p) => p.id === playerId);
+        if (!player) return null;
         const index = player.inventory.findIndex((i) => i.type === item.type);
         if (index >= 0) {
             player.inventory.splice(index, 1);

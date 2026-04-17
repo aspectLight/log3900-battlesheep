@@ -257,6 +257,8 @@ class _ChannelTab extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        alignment: Alignment.center,
+        constraints: const BoxConstraints(minHeight: 40),
         margin: const EdgeInsets.only(right: 4),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
@@ -318,32 +320,50 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
     return all.where((c) => c.name.toLowerCase().contains(term)).toList();
   }
 
-  Future<void> _requestDelete(String channelId) async {
+  Future<void> _requestDelete(String channelId, ChatLocalizations l10n) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF2b2b2b),
-        title: const Text(
-          'Supprimer le canal',
-          style: TextStyle(color: Colors.white, fontFamily: 'CustomFont'),
+        backgroundColor: Colors.white,
+        title: Text(
+          l10n.confirmDeleteChannel,
+          style: TextStyle(
+            color: context.interactionColors.primary,
+            fontFamily: 'CustomFont',
+          ),
         ),
-        content: const Text(
-          'Voulez-vous vraiment supprimer ce canal ?',
-          style: TextStyle(color: Color(0xFFe0d8c0)),
-        ),
+        actionsAlignment: MainAxisAlignment.center,
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text(
-              'Non',
-              style: TextStyle(color: Color(0xFFffb347)),
+            style: TextButton.styleFrom(
+              backgroundColor: context.interactionColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            child: Text(
+              l10n.no,
+              style: const TextStyle(
+                color: Colors.white,
+                fontFamily: 'CustomFont',
+              ),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'Oui',
-              style: TextStyle(color: Color(0xFFff6b6b)),
+            style: TextButton.styleFrom(
+              backgroundColor: context.interactionColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            child: Text(
+              l10n.yes,
+              style: const TextStyle(
+                color: Colors.white,
+                fontFamily: 'CustomFont',
+              ),
             ),
           ),
         ],
@@ -401,9 +421,9 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            l10n.discussionCanals,
-            style: const TextStyle(
-              color: Color(0xFFFFFFFF),
+            l10n.discussionCanals.toUpperCase(),
+            style: TextStyle(
+              color: context.interactionColors.text,
               fontSize: 18,
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
@@ -467,8 +487,8 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
         children: [
           Text(
             l10n.createChannel,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.interactionColors.text,
               fontSize: 12,
               fontFamily: 'CustomFont',
               fontWeight: FontWeight.bold,
@@ -491,6 +511,7 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
                 label: l10n.create,
                 textColor: Colors.white,
                 backgroundColor: context.interactionColors.primary,
+                borderColor: context.interactionColors.outline,
                 onPressed: _submitCreate,
               ),
             ],
@@ -507,33 +528,41 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
     bool isLoading,
     ChatLocalizations l10n,
   ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.availableChannels,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontFamily: 'CustomFont',
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1,
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: context.interactionColors.primary,
+        border: Border.all(color: context.interactionColors.outline),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.availableChannels,
+            style: TextStyle(
+              color: context.interactionColors.text,
+              fontSize: 12,
+              fontFamily: 'CustomFont',
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        _StyledTextField(
-          controller: _searchController,
-          hint: l10n.searchChannelsHint,
-          onChanged: (v) => setState(() => _filterTerm = v),
-        ),
-        const SizedBox(height: 8),
-        if (isLoading)
-          _buildStateBox(l10n.loadingChannels)
-        else if (filtered.isEmpty)
-          _buildStateBox(l10n.noChannelsFound)
-        else
-          _buildChannelTable(filtered, l10n),
-      ],
+          const SizedBox(height: 8),
+          _StyledTextField(
+            controller: _searchController,
+            hint: l10n.searchChannelsHint,
+            onChanged: (v) => setState(() => _filterTerm = v),
+          ),
+          const SizedBox(height: 8),
+          if (isLoading)
+            _buildStateBox(l10n.loadingChannels)
+          else if (filtered.isEmpty)
+            _buildStateBox(l10n.noChannelsFound)
+          else
+            _buildChannelTable(filtered, l10n),
+        ],
+      ),
     );
   }
 
@@ -546,13 +575,13 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
         // Table header
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          decoration: const BoxDecoration(
-            color: Color(0xFF3c3c3c),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(6)),
+          decoration: BoxDecoration(
+            color: context.interactionColors.outline,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
             border: Border(
-              left: BorderSide(color: Color(0xFF3a3a3a)),
-              right: BorderSide(color: Color(0xFF3a3a3a)),
-              top: BorderSide(color: Color(0xFF3a3a3a)),
+              left: BorderSide(color: context.interactionColors.outline),
+              right: BorderSide(color: context.interactionColors.outline),
+              top: BorderSide(color: context.interactionColors.outline),
             ),
           ),
           child: Row(
@@ -591,14 +620,14 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF2b2b2b),
+        color: context.interactionColors.primary,
         border: Border(
           left: BorderSide(
-            color: creator ? const Color(0xFF8b0000) : const Color(0xFF3a3a3a),
+            color: context.interactionColors.outline,
             width: creator ? 3 : 1,
           ),
-          right: const BorderSide(color: Color(0xFF3a3a3a)),
-          bottom: const BorderSide(color: Color(0xFF3a3a3a)),
+          right: BorderSide(color: context.interactionColors.outline),
+          bottom: BorderSide(color: context.interactionColors.outline),
         ),
         borderRadius: isLast
             ? const BorderRadius.vertical(bottom: Radius.circular(6))
@@ -639,8 +668,9 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
                     child: Text(
                       l10n.creatorBadge,
                       style: const TextStyle(
-                        color: Color(0xFFff9090),
+                        color: Colors.white,
                         fontSize: 10,
+                        fontFamily: 'CustomFont',
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -654,7 +684,11 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
             flex: 2,
             child: Text(
               channel.creator,
-              style: const TextStyle(color: Color(0xFFb0b0b0), fontSize: 12),
+              style: const TextStyle(
+                color: Color(0xFFb0b0b0),
+                fontSize: 12,
+                fontFamily: 'CustomFont',
+              ),
             ),
           ),
           // Action buttons
@@ -681,9 +715,10 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
                   const SizedBox(width: 4),
                   _PanelButton(
                     label: l10n.deleteChannel,
-                    textColor: const Color(0xFFff6b6b),
+                    textColor: Colors.white,
                     borderColor: const Color(0xFF7f1f1f),
-                    onPressed: () => _requestDelete(channel.id),
+                    backgroundColor: const Color(0xFF7f1f1f),
+                    onPressed: () => _requestDelete(channel.id, l10n),
                   ),
                 ],
               ],
@@ -783,10 +818,14 @@ class _PanelButton extends StatelessWidget {
             ? BorderSide(color: borderColor!)
             : BorderSide.none,
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        minimumSize: Size.zero,
+        minimumSize: const Size(60, 35),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-        textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+        textStyle: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          fontFamily: 'CustomFont',
+        ),
       ),
       child: Text(label, style: TextStyle(color: textColor)),
     );
@@ -804,8 +843,8 @@ class _TableHeaderCell extends StatelessWidget {
     return Text(
       text,
       textAlign: align,
-      style: const TextStyle(
-        color: Colors.white,
+      style: TextStyle(
+        color: context.interactionColors.text,
         fontFamily: 'CustomFont',
         fontWeight: FontWeight.bold,
         letterSpacing: 1,
@@ -863,7 +902,7 @@ class _ChannelChatPanelState extends State<_ChannelChatPanel> {
         children: [
           Expanded(
             child: Watch((context) {
-              final messages = widget.viewModel.activeChannelMessages.value;
+              final messages = widget.viewModel.displayChannelMessages.value;
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (_scrollController.hasClients) {
                   _scrollController.jumpTo(
@@ -937,6 +976,7 @@ class _ChannelChatPanelState extends State<_ChannelChatPanel> {
                                   displayName: msg.senderName,
                                   avatarId: msg.avatarId,
                                   avatarUrl: msg.avatarUrl,
+                                  avatarDisplayNonce: msg.avatarDisplayNonce,
                                   size: 18,
                                 ),
                               ),

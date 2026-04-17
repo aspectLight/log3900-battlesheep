@@ -33,6 +33,7 @@ export class WaitingRoomGameHandler {
 
             this.waitingRoomService.deleteRoom(roomId);
             server.to(gameRoom.roomId).emit(GameRoomEvents.GameRoomCreated, gameRoom);
+            server.emit(WaitingRoomEvents.AvailableRoomsChanged);
             this.logger.log(`Lancement de la partie liée à la salle ${roomId}`);
 
             return { success: true };
@@ -42,6 +43,7 @@ export class WaitingRoomGameHandler {
             if (error instanceof NotFoundException) {
                 this.waitingRoomService.deleteRoom(roomId);
                 server.to(roomId).emit(WaitingRoomEvents.RoomCanceled);
+                server.emit(WaitingRoomEvents.AvailableRoomsChanged);
                 this.logger.log(`Salle ${roomId} dissoute car le jeu a été supprimé`);
             }
 

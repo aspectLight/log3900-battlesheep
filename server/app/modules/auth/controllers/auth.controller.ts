@@ -12,9 +12,11 @@ import {
     Get,
     HttpCode,
     HttpStatus,
+    NotFoundException,
     Param,
     Patch,
     Post,
+    Query,
     Res,
     UploadedFile,
     UseGuards,
@@ -101,6 +103,7 @@ export class AuthController {
     getProfile(@CurrentUser() user: UserDocument) {
         return {
             id: user._id,
+            firebaseUid: user.firebaseUid,
             email: user.email,
             username: user.username,
             avatarId: user.avatarId,
@@ -115,11 +118,24 @@ export class AuthController {
     @Patch('profile')
     @UseGuards(AuthGuard)
     async updateProfile(@CurrentUser('firebaseUid') uid: string, @Body() updateDto: UpdateUserDto) {
+        const previous = await this.authService.getUserByUid(uid);
+        const oldUsername = previous.username;
         const user = await this.authService.updateUser(uid, updateDto);
+        if (updateDto.avatarId) {
+            this.generalChatGateway.broadcastAvatarUpdate({
+                username: user.username,
+                avatarId: user.avatarId ?? null,
+                avatarUrl: user.avatarUrl ?? null,
+            });
+        }
+        if (user.username !== oldUsername) {
+            await this.generalChatGateway.handleUsernameUpdate(oldUsername, user.username);
+        }
         return {
             message: 'Profil mis à jour',
             user: {
                 id: user._id,
+                firebaseUid: user.firebaseUid,
                 username: user.username,
                 email: user.email,
                 avatarId: user.avatarId,
@@ -206,31 +222,50 @@ export class AuthController {
         }
 
         const user = await this.authService.updateAvatarFromFile(uid, file);
+        this.generalChatGateway.broadcastAvatarUpdate({
+            username: user.username,
+            avatarId: user.avatarId ?? null,
+            avatarUrl: user.avatarUrl ?? null,
+        });
 
         return {
             message: 'Avatar mis à jour',
             user: {
                 id: user._id,
+                firebaseUid: user.firebaseUid,
                 email: user.email,
                 username: user.username,
                 avatarId: user.avatarId,
                 avatarUrl: user.avatarUrl,
+                theme: user.theme ?? 'default',
+                language: user.language ?? 'fr',
                 preferences: user.preferences,
             },
         };
     }
 
+    // POST /auth/avatars/batch
+    @Post('avatars/batch')
+    @HttpCode(HttpStatus.OK)
+    async getAvatarsBatch(@Body() body: { usernames: string[] }) {
+        return this.authService.getAvatarsForUsernames(body?.usernames ?? []);
+    }
+
     // GET /auth/avatar/:uid
     @Get('avatar/:uid')
-    async getAvatar(@Param('uid') uid: string, @Res() res: Response) {
+    async getAvatar(@Param('uid') uid: string, @Query('v') requestedVersion: string | undefined, @Res() res: Response) {
         const user = await this.authService.getUserByUid(uid);
 
         if (!user.avatarImageBuffer || !user.avatarImageMimeType) {
-            throw new BadRequestException('Avatar introuvable pour cet utilisateur');
+            throw new NotFoundException('Avatar introuvable pour cet utilisateur');
+        }
+
+        if (requestedVersion && user.avatarVersion && requestedVersion !== user.avatarVersion) {
+            throw new NotFoundException('Version d’avatar obsolète');
         }
 
         res.setHeader('Content-Type', user.avatarImageMimeType);
-        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Cache-Control', requestedVersion ? 'public, max-age=31536000, immutable' : 'no-cache');
         return res.send(user.avatarImageBuffer);
     }
 }

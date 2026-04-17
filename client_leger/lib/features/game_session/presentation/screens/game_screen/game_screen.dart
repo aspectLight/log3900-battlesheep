@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_feature_colors.dart';
 import '../../../../../core/app_transition/app_transition_bus.dart';
 import '../../../../../core/constants/ui_assets.dart';
 import '../../../../../core/modal/modal_intent_sink.dart';
@@ -60,8 +61,6 @@ class _GameScreenState extends State<GameScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     final isCombatMode = viewModel.isCombatMode.watch(context);
-    final screenHeight = MediaQuery.sizeOf(context).height;
-    final boardSize = (screenHeight * 0.8).clamp(0.0, double.infinity);
     final padding = _clamp(16, MediaQuery.sizeOf(context).width * 0.02, 32);
     final appTransitionEventBus = GetIt.I<AppTransitionEventBus>();
     final actionsRepository = GetIt.I<GameActionsRepository>();
@@ -85,28 +84,20 @@ class _GameScreenState extends State<GameScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         body: Padding(
           padding: EdgeInsets.all(padding),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Expanded(flex: 2, child: _LeftSide(isCombatMode: isCombatMode)),
+              const SizedBox(width: 20),
               Expanded(
-                child: _LeftSide(
-                  isCombatMode: isCombatMode,
-                  boardSize: boardSize,
-                ),
+                flex: 4,
+                child: _MiddleSection(isCombatMode: isCombatMode),
               ),
-              const SizedBox(width: 24),
-              Expanded(
-                flex: 2,
-                child: _MiddleSection(
-                  isCombatMode: isCombatMode,
-                  boardSize: boardSize,
-                ),
-              ),
-              const SizedBox(width: 24),
-              const Expanded(child: _RightSide()),
+              const SizedBox(width: 20),
+              const Expanded(flex: 2, child: _RightSide()),
             ],
           ),
         ),
@@ -122,10 +113,15 @@ class _GameScreenState extends State<GameScreen> {
 }
 
 class _LeftSide extends StatelessWidget {
-  const _LeftSide({required this.isCombatMode, required this.boardSize});
+  const _LeftSide({required this.isCombatMode});
 
   final bool isCombatMode;
-  final double boardSize;
+
+  /// Matches `ItemCardWidget` max height when torch drop button is shown (196).
+  static const double _inventoryRowHeight = 196;
+
+  /// Square cell preview uses this fraction of column width (centered above actions).
+  static const double _cellDetailSizeFactor = 0.86 * 0.8;
 
   @override
   Widget build(BuildContext context) {
@@ -133,71 +129,85 @@ class _LeftSide extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       child: Stack(
         children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 44),
-              SizedBox(
-                height: 320,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+          Positioned.fill(
+            child: LayoutBuilder(
+              builder: (context, columnConstraints) {
+                final combatActionsPanelHeight =
+                    (columnConstraints.maxHeight * 0.22).clamp(220.0, 320.0);
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    const SizedBox(height: 44),
                     if (!isCombatMode)
-                      const Expanded(child: GameCellDetailWidget()),
-                    const GameActionsWidget(),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              if (isCombatMode)
-                Expanded(
-                  flex: 3,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final squareSize =
-                          constraints.maxWidth < constraints.maxHeight
-                          ? constraints.maxWidth
-                          : constraints.maxHeight;
-                      final size = squareSize < boardSize
-                          ? squareSize
-                          : boardSize;
-                      return Center(
-                        child: _BoardContainer(
-                          size: size,
-                          isCombatBlurred: true,
-                          child: const GameBoardWidget(),
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final side =
+                              constraints.maxWidth * _cellDetailSizeFactor;
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Align(
+                                alignment: Alignment.topCenter,
+                                child: SizedBox(
+                                  width: side,
+                                  height: side,
+                                  child: const GameCellDetailWidget(),
+                                ),
+                              ),
+                              const GameActionsWidget(),
+                            ],
+                          );
+                        },
+                      )
+                    else
+                      SizedBox(
+                        height: combatActionsPanelHeight,
+                        child: const Align(
+                          alignment: Alignment.bottomCenter,
+                          child: GameActionsWidget(),
                         ),
-                      );
-                    },
-                  ),
-                )
-              else
-                const Expanded(
-                  flex: 3,
-                  child: Center(
-                    child: AspectRatio(
-                      aspectRatio: 1,
-                      child: GameCombatWidget(),
+                      ),
+                    const SizedBox(height: 8),
+                    if (isCombatMode)
+                      Expanded(
+                        flex: 2,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final squareSize =
+                                constraints.maxWidth < constraints.maxHeight
+                                ? constraints.maxWidth
+                                : constraints.maxHeight;
+                            final size = squareSize;
+                            return Center(
+                              child: _BoardContainer(
+                                size: size,
+                                isCombatBlurred: true,
+                                child: const GameBoardWidget(),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    const Expanded(flex: 8, child: GamePlayerHudWidget()),
+                    const SizedBox(
+                      height: _inventoryRowHeight,
+                      child: Center(child: GamePlayerInventoryWidget()),
                     ),
-                  ),
-                ),
-              const SizedBox(height: 8),
-              Expanded(
-                flex: 2,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 220),
-                  child: const GamePlayerHudWidget(),
-                ),
-              ),
-            ],
+                  ],
+                );
+              },
+            ),
           ),
           Positioned(
             top: 0,
             left: 0,
-            child: _GameInfoGearButton(
-              onTap: () => _showGameInfoModal(context),
+            right: 0,
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: _GameInfoGearButton(
+                onTap: () => _showGameInfoModal(context),
+              ),
             ),
           ),
         ],
@@ -235,19 +245,18 @@ class _GameInfoGearButton extends StatelessWidget {
 }
 
 class _MiddleSection extends StatelessWidget {
-  const _MiddleSection({required this.isCombatMode, required this.boardSize});
+  const _MiddleSection({required this.isCombatMode});
 
   final bool isCombatMode;
-  final double boardSize;
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (!isCombatMode)
           const Padding(
-            padding: EdgeInsets.only(bottom: 10),
+            padding: EdgeInsets.only(bottom: 4),
             child: GameTimerWidget(),
           ),
         Expanded(
@@ -256,37 +265,30 @@ class _MiddleSection extends StatelessWidget {
               final squareSize = constraints.maxWidth < constraints.maxHeight
                   ? constraints.maxWidth
                   : constraints.maxHeight;
-              final size = squareSize < boardSize ? squareSize : boardSize;
-              return Center(
-                child: isCombatMode
-                    ? SizedBox(
-                        width: size,
-                        height: size,
-                        child: const GameCombatWidget(),
-                      )
-                    : _BoardContainer(
-                        size: size,
-                        isCombatBlurred: false,
-                        child: const GameBoardWidget(),
-                      ),
+              final size = squareSize;
+              final child = isCombatMode
+                  ? SizedBox(
+                      width: size,
+                      height: size,
+                      child: const GameCombatWidget(),
+                    )
+                  : _BoardContainer(
+                      size: size,
+                      isCombatBlurred: false,
+                      child: const GameBoardWidget(),
+                    );
+              return Align(
+                alignment: isCombatMode
+                    ? Alignment.center
+                    : Alignment.topCenter,
+                child: Padding(
+                  padding: EdgeInsets.only(top: isCombatMode ? 0 : 2),
+                  child: child,
+                ),
               );
             },
           ),
         ),
-        const SizedBox(height: 8),
-        if (!isCombatMode)
-          SizedBox(
-            // Reserve full card height but push the inventory
-            // further DOWN so only a slimmer strip is visible.
-            height: 200,
-            child: Transform.translate(
-              offset: const Offset(0, 130),
-              child: const Align(
-                alignment: Alignment.topCenter,
-                child: GamePlayerInventoryWidget(),
-              ),
-            ),
-          ),
       ],
     );
   }
@@ -308,9 +310,9 @@ class _BoardContainer extends StatelessWidget {
     Widget content = Container(
       width: size,
       height: size,
-      decoration: const BoxDecoration(
-        color: Color(0xFF2B2B2B),
-        borderRadius: BorderRadius.all(Radius.circular(12)),
+      decoration: BoxDecoration(
+        color: context.featureColors.panel,
+        borderRadius: const BorderRadius.all(Radius.circular(12)),
       ),
       clipBehavior: Clip.antiAlias,
       child: child,
@@ -333,11 +335,12 @@ class _RightSide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final f = context.featureColors;
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF2A0E0E),
+        color: f.gameFrameBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF8B5E34), width: 4),
+        border: Border.all(color: f.gameFrameBorder, width: 4),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       child: const Column(

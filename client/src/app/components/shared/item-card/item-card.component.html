@@ -1,6 +1,6 @@
 @if (item) {
     <div class="card">
-        <div class="corner letter">{{ item.name[0] }}</div>
+        <div class="corner letter">{{ itemDisplayInitial }}</div>
         <!-- Corner decorations - all four corners now -->
         <div class="corner-decoration top-left"></div>
         <div class="corner-decoration top-right"></div>
@@ -25,7 +25,7 @@
 
         <div class="card-wrapper">
             <img class="suit" [src]="item.imagePath" alt="Image de la carte" />
-            <div class="card-name">{{ item.name }}</div>
+            <div class="card-name">{{ itemDisplayName }}</div>
             <div class="card-description">{{ 'toolbox.item_' + item.type | translate }}</div>
             @if (showDropButton) {
                 <button class="drop-button" [disabled]="!dropEnabled" (click)="onDropClick($event)">
@@ -33,6 +33,6 @@
                 </button>
             }
         </div>
-        <div class="corner letter-reversed">{{ item.name[0] }}</div>
+        <div class="corner letter-reversed">{{ itemDisplayInitial }}</div>
     </div>
 }

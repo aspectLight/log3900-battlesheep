@@ -35,6 +35,7 @@ export class GameManagerService {
     illuminatedCells: Set<string> = new Set();
 
     isGameCanceled: boolean = false;
+    gameCanceledMessageKey: string = 'main.game_canceled';
     isGameFinished: boolean = false;
     isGameLoaded: boolean = false;
     gameCountdown: Subject<number> = new Subject<number>();
@@ -121,6 +122,7 @@ export class GameManagerService {
 
     resetManager() {
         this.isGameCanceled = false;
+        this.gameCanceledMessageKey = 'main.game_canceled';
         this.isGameFinished = false;
         this.isGameLoaded = false;
         this.disconnectedPlayer = [];
@@ -130,6 +132,7 @@ export class GameManagerService {
 
     cancelGame() {
         this.isGameCanceled = true;
+        this.gameCanceledMessageKey = 'main.game_left';
         const startDate = this.historyStartDateIso;
         if (startDate) {
             this.historyService.abandonGameHistory(startDate).catch((e) => console.warn('abandonGameHistory failed', e));
@@ -338,10 +341,12 @@ export class GameManagerService {
         }
     }
 
-    updateScore(playerId: string): number {
+    updateScore(playerId: string, fightsWon?: number): number {
         const foundPlayer = this.room.players.find((p) => p.id === playerId);
         if (!foundPlayer) return 0;
-        foundPlayer.fightsWon++;
+        if (fightsWon !== undefined) {
+            foundPlayer.fightsWon = fightsWon;
+        }
         return foundPlayer.fightsWon;
     }
 
@@ -410,7 +415,7 @@ export class GameManagerService {
         this.illuminatedCells = new Set(illuminatedCells);
 
         // Update player stats from server data if provided
-        if (players) {
+        if (players && this.board) {
             for (const serverPlayer of players) {
                 const boardPlayer = this.board.getPlayerById(serverPlayer.id);
                 if (boardPlayer && serverPlayer.stats) {
@@ -498,7 +503,8 @@ export class GameManagerService {
         if (coords.x < 0 || coords.y < 0 || coords.x >= this.board.matrix.length || coords.y >= this.board.matrix[0].length) {
             return;
         }
-        this.board.matrix[coords.x][coords.y].addItem(item);
+        const fullItem = ITEM_TYPES[item.type] ? new Item(item.type) : item;
+        this.board.matrix[coords.x][coords.y].addItem(fullItem);
     }
 
     combatLost(loserId: string): void {
@@ -550,7 +556,15 @@ export class GameManagerService {
     collectItem(playerId: string, item: Item, position: Coords, inventoryFull: boolean): void {
         // Remove the item from the board cell — the server has already removed it
         const cell = this.board.getCell(position.x, position.y);
-        if (cell?.item) {
+
+        // Resolve 'random' type: use the board cell's resolved type (set by addPlayersToBoard).
+        // In some scenarios (reconnect, VP timing) the cell retains type 'random' and that
+        // unresolved type propagates through the server broadcast back to the client.
+        // The board cell holds the visually-correct resolved type, so use it as ground truth.
+        const resolvedType =
+            item.type === 'random' && cell?.item && cell.item.type !== 'random' ? cell.item.type : item.type;
+
+        if (cell?.item && (cell.item.type === item.type || item.type === 'random')) {
             cell.removeItem();
         }
 
@@ -561,13 +575,21 @@ export class GameManagerService {
         // Item instance with name, description, imagePath from ITEM_TYPES.
         let fullItem: Item;
         try {
-            fullItem = new Item(item.type);
+            fullItem = new Item(resolvedType);
         } catch {
             return; // Unknown item type : ignore
         }
 
         if (inventoryFull) {
             if (playerId === this.mainPlayerId) {
+                // Defensive: if the client has an empty inventory slot the server may be
+                // out of sync (e.g. a prior torch drop failed server-side). Trust the
+                // client state and add the item directly instead of showing a popup.
+                const hasEmptySlot = player.inventory[0] === null || player.inventory[1] === null;
+                if (hasEmptySlot) {
+                    player.addItem(fullItem);
+                    return;
+                }
                 player.replaceItem(fullItem, position);
             }
             return;
@@ -599,6 +621,7 @@ export class GameManagerService {
 
     endCanceledGame() {
         this.isGameCanceled = true;
+        this.gameCanceledMessageKey = 'main.game_canceled';
         const startDate = this.historyStartDateIso;
 
         if (startDate) {

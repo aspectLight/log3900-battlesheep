@@ -3,6 +3,8 @@ import { TileType } from '@app/modules/game/interfaces/tile';
 import { GameMovementService } from '@app/modules/movement/services/game-movement.service';
 import { MovementAlgorithmsService } from '@app/modules/movement/services/movement-algorithms.service';
 import { MIN_TURN_DELAY, MAX_TURN_DELAY } from '@app/modules/shared-room/constants/game-room.constants';
+import { Coords } from '@app/modules/movement/interfaces/coords';
+import { GameRoom } from '@app/modules/shared-room/interfaces/game-room';
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
 import { Player } from '@app/shared/interfaces/player';
 import { GameMovementVPService } from '@app/modules/virtual-players/services/game-movement-vp.service';
@@ -40,11 +42,17 @@ export class VirtualPlayerHandler {
                         // Guard: if the board was removed (e.g. game ended / user left), bail out silently
                         if (!this.gameMovementService.getBoardForGame(data.roomId)) return;
 
+                        // Guard: if it's no longer this player's turn, bail out
+                        if (!this.gameRoomService.isPlayerTurn(data.roomId, data.playerId)) return;
+
                         const originalMovementPoints = player.movementPoints;
                         const originalPosition = { ...player.position };
 
                         const movement = this.gameMovementVPService.determineVPMovement(data.roomId, player, room.players, data.isCTF);
-                        if (!movement) return;
+                        if (!movement) {
+                            this.gameRoomService.endTurn(data.roomId);
+                            return;
+                        }
                         const neighborPlayer = this.movementAlgorithms.findNeighborPlayer(data.roomId, player);
 
                         if (movement.path.length <= 1) {
@@ -79,6 +87,8 @@ export class VirtualPlayerHandler {
                             // Now move properly to the trap tile — this deducts only the cost up to the trap
                             const correctedMP = this.gameMovementService.movePlayer(data.roomId, data.playerId, room.players, trapCoord);
 
+                            this.updateVisitedTiles(room, player, truncatedPath);
+
                             server.to(data.roomId).emit(GameRoomEvents.VirtualPlayerMoved, {
                                 path: truncatedPath,
                                 remainingMovementPoints: correctedMP,
@@ -92,6 +102,7 @@ export class VirtualPlayerHandler {
 
                         // No mid-path trap — check destination for trap
                         if (neighborPlayer && this.gameRoomService.isOpponent(player, neighborPlayer, data.isCTF)) {
+                            this.updateVisitedTiles(room, player, movement.path);
                             return server.to(data.roomId).emit(GameRoomEvents.VirtualPlayerMoved, {
                                 ...movement,
                                 playerId: data.playerId,
@@ -101,12 +112,14 @@ export class VirtualPlayerHandler {
                             // Check if destination itself is a trap
                             const destination = this.gameMovementService.extractCoord(movement.path[movement.path.length - 1]);
                             if (this.trapHandler.isTrapTile(data.roomId, destination.x, destination.y)) {
+                                this.updateVisitedTiles(room, player, movement.path);
                                 server.to(data.roomId).emit(GameRoomEvents.VirtualPlayerMoved, { ...movement, playerId: data.playerId });
                                 this.trapHandler.resolveForVirtualPlayer(data.roomId, data.playerId, server, player.profile);
                             } else {
                                 // Include teleport destination in the event so the client can
                                 // teleport AFTER the movement animation completes (avoids desync).
                                 const teleportDestination = this.getTeleportDestinationForVP(data.roomId, data.playerId, room.players);
+                                this.updateVisitedTiles(room, player, movement.path);
                                 server.to(data.roomId).emit(GameRoomEvents.VirtualPlayerMoved, {
                                     ...movement,
                                     playerId: data.playerId,
@@ -150,5 +163,15 @@ export class VirtualPlayerHandler {
         if (!partnerPad) return null;
 
         return { x: partnerPad.x, y: partnerPad.y };
+    }
+
+    private updateVisitedTiles(room: GameRoom, player: Player, path: (Coords | { coord: Coords; cost: number })[]): void {
+        const playerStats = room.playersStats?.find((s) => s.name === player.name);
+        if (!playerStats) return;
+        for (const element of path) {
+            const coord = this.gameMovementService.extractCoord(element);
+            const alreadyVisited = playerStats.tilesVisited.some((tile) => tile.x === coord.x && tile.y === coord.y);
+            if (!alreadyVisited) playerStats.tilesVisited.push(coord);
+        }
     }
 }

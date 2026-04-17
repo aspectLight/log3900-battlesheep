@@ -21,11 +21,20 @@ class EnvConfig {
   static String resolveAvatarUrl(String rawAvatarUrl, {int? cacheBust}) {
     final trimmed = rawAvatarUrl.trim();
     if (trimmed.isEmpty) return '';
+    if (trimmed.startsWith('data:')) return trimmed;
     final absolute =
         trimmed.startsWith('http://') || trimmed.startsWith('https://');
     final base = absolute ? trimmed : '$baseUrl$trimmed';
     if (cacheBust == null) return base;
     final separator = base.contains('?') ? '&' : '?';
     return '$base${separator}t=$cacheBust';
+  }
+
+  /// Angular chat attaches `${environment.serverUrl}${profile.avatarUrl}` on send.
+  static String? absoluteProfileAvatarUrlForChatSocket(String? relativeOrAbsolute) {
+    final t = relativeOrAbsolute?.trim();
+    if (t == null || t.isEmpty) return null;
+    final full = resolveAvatarUrl(t);
+    return full.isEmpty ? null : full;
   }
 }

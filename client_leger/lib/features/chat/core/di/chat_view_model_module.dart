@@ -1,5 +1,7 @@
 import 'package:get_it/get_it.dart';
 
+import '../../../../core/chat/chat_avatar_registry.dart';
+import '../../../../core/chat/chat_outgoing_avatars.dart';
 import '../../data/repositories/chat_panel_state_repository.dart';
 import '../../data/repositories/chat_repository.dart';
 import '../../data/repositories/discussion_canals_repository.dart';
@@ -14,12 +16,16 @@ void registerChatViewModels(
   scope.registerLazySingleton<SlidingChatBoxViewModel>(
     () => SlidingChatBoxViewModel(
       canalsRepository: rootGetIt<DiscussionCanalsRepository>(),
+      avatarRegistry: rootGetIt<ChatAvatarRegistry>(),
+      panelStateRepository: scope.get<ChatPanelStateRepository>(),
     ),
   );
   scope.registerFactory<ChatPanelContentViewModel>(
     () => ChatPanelContentViewModel(
       repository: scope.get<ChatRepository>(),
       panelStateRepository: scope.get<ChatPanelStateRepository>(),
+      outgoingAvatars: rootGetIt<ChatOutgoingAvatars>(),
+      avatarRegistry: rootGetIt<ChatAvatarRegistry>(),
       currentUsername: username,
     ),
   );

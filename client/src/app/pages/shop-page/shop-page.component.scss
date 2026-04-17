@@ -8,69 +8,6 @@
     overflow-y: auto;
     overflow-x: hidden;
     color: var(--theme-text-primary);
-    background:
-        linear-gradient(180deg, var(--theme-bg-overlay-dark) 0%, var(--theme-bg-overlay-medium) 100%),
-        var(--theme-bg-chat);
-}
-
-.header {
-    position: relative;
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-    padding: 10px 0;
-
-    h1 {
-        letter-spacing: 2px;
-        color: var(--theme-text-special-alt);
-        text-shadow: 2px 2px 4px var(--theme-shadow-strong);
-    }
-
-    .return-button {
-        position: absolute;
-        left: 10px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        cursor: pointer;
-        color: var(--theme-text-secondary);
-        background: transparent;
-        border: none;
-
-        img {
-            width: 15px;
-        }
-
-        &:hover {
-            color: var(--theme-text-hover);
-        }
-
-        &:active {
-            color: var(--theme-text-hover-active);
-        }
-    }
-
-    .balance {
-        position: absolute;
-        right: 20px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--theme-game-gold);
-        font-weight: bold;
-        font-size: 1.25rem;
-        background: var(--theme-bg-chat);
-        padding: 8px 16px;
-        border-radius: 20px;
-        border: 2px solid var(--theme-game-border);
-        box-shadow: 0 4px 10px var(--theme-shadow-strong);
-
-        .coin-icon {
-            width: 26px;
-            height: 26px;
-        }
-    }
 }
 
 .shop-container {

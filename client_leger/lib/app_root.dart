@@ -5,6 +5,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 import 'core/app_transition/app_initialization.dart';
 import 'core/app_transition/app_transition_bus.dart';
 import 'core/appearance/app_appearance_service.dart';
+import 'core/appearance/app_feature_colors.dart';
 import 'core/appearance/app_interaction_colors.dart';
 import 'core/appearance/app_visual_theme.dart';
 import 'core/di/injection_container.dart';
@@ -23,6 +24,7 @@ import 'features/profile/core/localisation/profile_localizations.dart';
 import 'features/shop/core/localisation/shop_localizations.dart';
 import 'features/select_game_session/core/localisation/select_game_session_localizations.dart';
 import 'features/statistics/core/localisation/statistics_localizations.dart';
+import 'features/tutorial/core/localisation/tutorial_localizations.dart';
 import 'features/waiting_room/core/localisation/waiting_room_localizations.dart';
 import 'routing/app_router.dart';
 import 'routing/app_router_observer.dart';
@@ -66,12 +68,14 @@ ThemeData _appMaterialTheme(AppVisualTheme visual) {
       interaction = AppInteractionColors.villagePalette;
   }
 
+  final featureColors = AppFeatureColors.fromVisualTheme(visual);
+
   return ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
     colorScheme: scheme,
     scaffoldBackgroundColor: Colors.black,
-    extensions: <ThemeExtension<dynamic>>[interaction],
+    extensions: <ThemeExtension<dynamic>>[interaction, featureColors],
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.resolveWith((states) {
@@ -186,6 +190,7 @@ class _AppRootState extends State<AppRoot> with WidgetsBindingObserver {
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
+          TutorialLocalizations.delegate,
         ],
         supportedLocales: CoreLocalizations.supportedLocales,
         builder: (context, child) {

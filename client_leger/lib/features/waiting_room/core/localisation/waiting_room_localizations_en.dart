@@ -105,6 +105,10 @@ class WaitingRoomLocalizationsEn extends WaitingRoomLocalizations {
   String get waitingRoomCharacterAlreadyReserved => 'Character already taken';
 
   @override
+  String get waitingRoomPlayerAlreadyInRoom =>
+      'This player is already in the room';
+
+  @override
   String get waitingRoomPlayerKicked => 'You have been kicked';
 
   @override

@@ -4,6 +4,9 @@ import '../../domain/models/chat_message.dart';
 ChatMessageUi toChatMessageUi(
   ChatMessage entity, {
   required String currentUsername,
+  String? displayAvatarId,
+  String? displayAvatarUrl,
+  int? avatarDisplayNonce,
 }) {
   return ChatMessageUi(
     type: entity.type,
@@ -11,7 +14,8 @@ ChatMessageUi toChatMessageUi(
     content: entity.content,
     time: entity.time,
     isMe: entity.name == currentUsername,
-    avatarId: entity.avatarId,
-    avatarUrl: entity.avatarUrl,
+    avatarId: displayAvatarId ?? entity.avatarId,
+    avatarUrl: displayAvatarUrl ?? entity.avatarUrl,
+    avatarDisplayNonce: avatarDisplayNonce,
   );
 }

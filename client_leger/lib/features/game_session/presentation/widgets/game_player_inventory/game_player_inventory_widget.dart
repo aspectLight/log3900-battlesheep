@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/enums/item_type.dart';
 import '../../../../../core/helpers/functional_programming.dart';
 import '../../ui_models/components/game_player_inventory_slot_ui.dart';
 import '../item_card/item_card_widget.dart';
@@ -43,66 +43,38 @@ class _GamePlayerInventoryWidgetState extends State<GamePlayerInventoryWidget> {
         children: slots
             .asMap()
             .entries
-            .map((entry) => _InventorySlot(slot: entry.value))
+            .map(
+              (entry) =>
+                  _InventorySlot(slot: entry.value, viewModel: _viewModel),
+            )
             .toList(),
       ),
     );
   }
 }
 
-class _InventorySlot extends StatefulWidget {
+class _InventorySlot extends StatelessWidget {
   final GamePlayerInventorySlotUi slot;
+  final GamePlayerInventoryViewModel viewModel;
 
-  const _InventorySlot({required this.slot});
-
-  @override
-  State<_InventorySlot> createState() => _InventorySlotState();
-}
-
-class _InventorySlotState extends State<_InventorySlot> {
-  bool _isHovered = false;
+  const _InventorySlot({required this.slot, required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
-    final child = widget.slot.item.when(
+    final canDropTorch = viewModel.canDropTorch.watch(context);
+    final child = slot.item.when(
       none: () => const _EmptySlotPlaceholder(),
-      some: (item) => ItemCardWidget(item: item),
+      some: (item) => ItemCardWidget(
+        item: item,
+        showDropButton: item.type == ItemType.torch,
+        dropEnabled: canDropTorch,
+        onDropPressed: viewModel.dropTorch,
+      ),
     );
-    final hasItem = widget.slot.item.isSome();
-    final isDesktop =
-        kIsWeb ||
-        {
-          TargetPlatform.windows,
-          TargetPlatform.linux,
-          TargetPlatform.macOS,
-        }.contains(defaultTargetPlatform);
-
-    // Fine‑tuned lift so the card is readable
-    // and sits slightly lower than before.
-    final yOffset = _isHovered && hasItem ? -95.0 : 0.0;
-
-    Widget content = AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-      transform: Matrix4.translationValues(0, yOffset, 0),
-      margin: const EdgeInsets.symmetric(horizontal: 6),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 3),
       child: child,
     );
-
-    if (isDesktop) {
-      content = MouseRegion(
-        onEnter: (_) => setState(() => _isHovered = true),
-        onExit: (_) => setState(() => _isHovered = false),
-        child: content,
-      );
-    } else {
-      content = GestureDetector(
-        onTap: hasItem ? () => setState(() => _isHovered = !_isHovered) : null,
-        child: content,
-      );
-    }
-
-    return content;
   }
 }
 

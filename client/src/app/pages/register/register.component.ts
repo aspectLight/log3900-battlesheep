@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { bannedUsernameValidator } from '@app/validators/username.validators';
 import { Router, RouterLink } from '@angular/router';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
@@ -8,7 +9,8 @@ import { EXCLUSIVE_AVATAR_IDS } from '@common/shop.constants';
 import { CameraCaptureService } from '@app/services/communication/camera-capture.service';
 import { AuthService } from '@app/services/communication/auth.service';
 import { ProfileService } from '@app/services/communication/profile.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { LanguageService, LanguageType } from '@app/services/state/language.service';
 
 const passwordContainsLetter: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     return /[a-zA-Z]/.test(control.value) ? null : { noLetter: true };
@@ -46,7 +48,7 @@ export class RegisterPageComponent {
     showConfirmPassword = false;
     showAvatarMenu = false;
 
-    avatars = ACCOUNT_CREATION_AVATARS;
+    avatars = ACCOUNT_CREATION_AVATARS.filter(a => !EXCLUSIVE_AVATAR_IDS.includes(a.id));
 
     selectedAvatarFile: File | null = null;
     avatarFileError: string | null = null;
@@ -54,7 +56,7 @@ export class RegisterPageComponent {
 
     form = this.fb.nonNullable.group(
         {
-            username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(15), Validators.pattern(/^[a-zA-Z0-9]+$/)]],
+            username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(15), Validators.pattern(/^[a-zA-Z0-9]+$/), bannedUsernameValidator]],
             email: ['', [Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
             password: ['', [Validators.required, Validators.minLength(8), passwordContainsLetter, passwordContainsDigit, passwordNoSpaces]],
             confirmPassword: ['', [Validators.required]],
@@ -69,7 +71,13 @@ export class RegisterPageComponent {
         private profileService: ProfileService,
         private router: Router,
         public camera: CameraCaptureService,
+        public languageService: LanguageService,
+        private translate: TranslateService,
     ) {}
+
+    setLanguage(lang: LanguageType) {
+        this.languageService.setLanguage(lang);
+    }
 
     get selectedAvatarId(): string {
         return this.form.controls.avatarId.value ?? '';
@@ -222,8 +230,13 @@ export class RegisterPageComponent {
             console.log('Session créée:', res.sessionId, res.user);
         } catch (e: unknown) {
             if (e instanceof HttpErrorResponse) {
-                const backendMessage = typeof e.error?.message === 'string' ? e.error.message : typeof e.message === 'string' ? e.message : null;
-                this.errorMessage = backendMessage ?? `Erreur serveur (${e.status})`;
+                const rawMessage = typeof e.error?.message === 'string' ? e.error.message : typeof e.message === 'string' ? e.message : null;
+                if (rawMessage) {
+                    const translated = this.translate.instant(rawMessage);
+                    this.errorMessage = translated !== rawMessage ? translated : rawMessage;
+                } else {
+                    this.errorMessage = `Erreur serveur (${e.status})`;
+                }
             } else {
                 this.errorMessage = "Erreur lors de l'inscription.";
             }

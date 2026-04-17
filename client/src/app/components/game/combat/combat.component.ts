@@ -146,7 +146,11 @@ export class CombatComponent implements OnInit, OnDestroy {
     }
 
     getEnemyStat(stat: string) {
-        return this.combatService.getEnemy()?.stats[stat as BonusType].value;
+        const statValue = this.combatService.getEnemy()?.stats[stat as BonusType].value;
+        if (stat === BonusType.Health && typeof statValue === 'number') {
+            return Math.max(0, statValue);
+        }
+        return statValue;
     }
 
     toggleAction(): void {

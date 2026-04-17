@@ -22,7 +22,10 @@
     "password_digit": "Le mot de passe doit contenir au moins un chiffre",
     "password_spaces": "Le mot de passe ne doit pas contenir d'espace",
     "password_mismatch": "Les mots de passe ne correspondent pas",
-    "avatar_required": "Sélectionnez un avatar"
+    "avatar_required": "Sélectionnez un avatar",
+    "username_banned": "Ce nom d'utilisateur est réservé et ne peut pas être utilisé",
+    "username_profanity": "Ce nom d'utilisateur contient des mots non autorisés",
+    "username_taken": "Ce nom d'utilisateur est déjà utilisé"
   },
   "auth": {
     "login": "Se connecter",
@@ -59,6 +62,7 @@
     "games_history": "Historique des parties",
     "login_history": "Historique de connexion",
     "logout": "Se déconnecter",
+    "game_left": "Vous avez quitté la partie!",
     "game_canceled": "Partie annulée par manque de joueurs",
     "game_finished": "Partie terminée, limite de 3 victoires atteintes par un personnage"
   },
@@ -96,6 +100,10 @@
     "new_avatar": "Nouvel avatar",
     "current_avatar": "Avatar actuel",
     "camera_error": "Erreur de caméra",
+    "camera_error_not_supported": "Votre navigateur ne supporte pas l'accès à la caméra.",
+    "camera_error_not_allowed": "Accès à la caméra refusé. Veuillez autoriser l'accès dans les paramètres de votre navigateur.",
+    "camera_error_not_found": "Aucune caméra détectée sur votre appareil.",
+    "camera_error_generic": "Impossible d'accéder à la caméra. Veuillez réessayer.",
     "close": "Fermer",
     "camera_title": "Capturer un selfie",
     "camera_loading": "Initialisation de la caméra...",
@@ -104,6 +112,7 @@
     "error_file_type": "Fichier de type \"{{ ext }}\" non autorisé. Formats permis : JPG, JPEG, PNG (taille maximale 2 MB).",
     "error_file_size": "Fichier trop volumineux ({{ size }} MB). Taille maximale autorisée : 2 MB.",
     "no_changes": "Aucune modification détectée",
+    "available_in_shop": "Disponible en boutique (500 pièces)",
     "errors": {
       "load_profile": "Erreur lors du chargement du profil",
       "update_profile": "Erreur lors de la sauvegarde des changements du profil",
@@ -211,6 +220,8 @@
     "back": "Quitter la partie",
     "title": "Salle d'attente",
     "code": "Code de la partie :",
+    "balance": "Solde",
+    "entry_fee": "Prix d'entrée",
     "drop_in": "Drop-in/Drop-out",
     "lock": "Verrouiller la salle",
     "unlock": "Déverrouiller la salle",
@@ -303,11 +314,15 @@
     "mode": "Mode",
     "accessibility": "Accessibilité",
     "code": "Code",
+    "price": "Prix",
     "no_rooms": "Aucune partie disponible",
     "status_waiting": "En attente",
     "status_playing": "En cours",
     "status_full": "Complète",
-    "status_open": "Ouverte"
+    "status_open": "Ouverte",
+    "accessibility_friends_only": "Amis seulement",
+    "accessibility_drop_in": "Drop-in",
+    "free": "Gratuit"
   },
   "game_list": {
     "preview": "Prévisualisation",
@@ -357,7 +372,8 @@
     "actions_points": "Nombre de points d'actions",
     "privacy": "Confidentialité",
     "cancel": "Annuler",
-    "create": "Créer"
+    "create": "Créer",
+    "game_private": "Ce jeu est maintenant privé et vous n'en êtes pas le propriétaire."
   },
   "toolbox": {
     "tiles": "TUILES",
@@ -369,6 +385,7 @@
     "left_click_desc": "pour effacer",
     "items_to_place": "Items à placer",
     "spawns_to_place": "Point de départs à placer",
+    "flag_to_place": "Drapeau à placer",
     "hold_right": "Maintenir clic droit",
     "hold_right_desc": "pour sélectionner",
     "release": "Relâcher",
@@ -387,7 +404,9 @@
     "tile_water": "Une tuile d'eau",
     "tile_door": "Une porte qui peut être ouverte ou fermée",
     "tile_wall": "Un mur infranchissable",
+    "tile_teleportPad": "Un téléporteur vers un autre téléporteur",
     "item_adrenaline": "Ajoute 2 points de vie",
+    "item_torch": "Ajoute 1 point de défense et 1 points d'attaque lorsque sous la lumière d'une torche",
     "item_vodka": "Ajoute 2 points d'attaque, enlève 1 point de rapidité",
     "item_propaganda": "Ajoute 5 points d'attaque et 5 points de défense si le joueur est à moins de 3 points de vie",
     "item_barbedWire": "La fuite est impossible pour l'adversaire, seulement si vous êtes l'instigateur du combat",
@@ -398,11 +417,25 @@
     "item_flag": "Un drapeau à ramener à la base",
     "item_spawnPoint": "Un feu de camp servant de base"
   },
+  "items_names": {
+    "adrenaline": "Adrénaline",
+    "torch": "Torche",
+    "vodka": "Vodka",
+    "propaganda": "Propagande",
+    "barbedWire": "Fil barbelé",
+    "camouflage": "Camouflage",
+    "waterproofBoots": "Bottes imperméables",
+    "airStrike": "Frappe aérienne",
+    "random": "Objet aléatoire",
+    "flag": "Drapeau",
+    "spawnPoint": "Point d'apparition"
+  },
   "tiles_names": {
     "tree": "Arbre",
     "stone": "Pierre",
     "trap": "Piège",
     "ice": "Glace",
+    "teleportPad": "Téléporteur",
     "water": "Eau",
     "snow": "Neige",
     "door": "Porte",
@@ -427,7 +460,7 @@
     "error_accessibility": "Toutes les tuiles de terrain doivent être accessibles.",
     "error_no_terrain": "Aucune tuile de terrain n'a été trouvée.",
     "error_flag": "Le jeu doit contenir un drapeau.",
-    "error_spawn_points": "Il doit y avoir entre {{min}} et {{max}} points de départ.",
+    "error_spawn_points": "Il doit y avoir exactement {{count}} points de départ.",
     "error_items": "Il doit y avoir {{count}} items.",
     "error_door_edge": "La porte à ({{x}}, {{y}}) est sur le bord du plateau.",
     "error_door_walls": "La porte à ({{x}}, {{y}}) n'est pas entourée par des murs sur le même axe.",
@@ -451,7 +484,8 @@
     "game_channel": "Canal de partie {{id}}",
     "send": "Envoyer",
     "placeholder_general": "Écrire un message...",
-    "placeholder_channel": "Écrire dans {{ name }}..."
+    "placeholder_channel": "Écrire dans {{ name }}...",
+    "deleted_user": "[supprimé]"
   },
   "bonus": {
     "title": "Stats",
@@ -500,6 +534,7 @@
   },
   "end_game": {
     "title": "Statistiques",
+    "rewards": "Récompenses",
     "players": "Joueurs",
     "combats": "Nombre de combats",
     "evasions": "Nombre d'évasions",
@@ -513,7 +548,21 @@
     "turns": "Nombre de tours de jeu",
     "tiles_global": "Pourcentage des tuiles de terrain visitées par au moins un joueur",
     "doors": "Pourcentage des portes ayant été manipulées au moins une fois",
-    "flag_players": "Nombre de joueurs différents ayant détenu le drapeau"
+    "flag_players": "Nombre de joueurs différents ayant détenu le drapeau",
+    "share": {
+      "title": "Partager mes résultats",
+      "subtitle": "Partagez vos statistiques de partie sur les réseaux sociaux",
+      "copy": "Copier le texte",
+      "copied": "Copié !",
+      "share_x": "Publier sur X",
+      "share_bluesky": "Partager sur Bluesky",
+      "hint_x": "Votre tweet sera pré-rempli. Connectez-vous à X si ce n'est pas déjà fait.",
+      "hint_bluesky": "Votre publication sera pré-rempli. Connectez-vous à Bluesky si ce n'est pas déjà fait.",
+      "clipboard_notice": "✓ Texte copié !",
+      "victory": "Victoire",
+      "defeat": "Défaite",
+      "text": "🎮 Résultat de partie : {{ result }} !\n💀 Morts : {{ deaths }}\n⚔️ Combats gagnés : {{ combatPct }}%\n🗺️ Cases visitées : {{ tilePct }}%\n#EasternSolace #Jeux"
+    }
   },
   "player_card": {
     "playing": "Joue...",
@@ -521,7 +570,9 @@
     "flag": "Drapeau"
   },
   "player_hud": {
-    "dice": "DÉS"
+    "dice": "DÉS",
+    "movements": "déplacements",
+    "actions": "actions"
   },
   "game_info": {
     "continue": "continuer",
@@ -540,7 +591,10 @@
   "game_configurator": {
     "mode_desc_classic": "Gagnez 3 combats pour être déclaré vainqueur et mettre fin à la partie.",
     "mode_desc_ctf": "Capturez le drapeau adverse et ramenez-le à votre point de départ pour gagner la partie.",
-    "actions_desc": "Nombre de points d'actions alloués à chaque joueur à chaque tour"
+    "actions_desc": "Nombre de points d'actions alloués à chaque joueur à chaque tour",
+    "privacy_desc_public": "Peut être modifié, supprimé et utilisé pour créer une partie par n'importe quel utilisateur. Le propriétaire est toujours le créateur original.",
+    "privacy_desc_private": "Ne peut être modifié, supprimé ou utilisé pour créer une partie que par son propriétaire. Une partie utilisant ce jeu est joignable par les autres utilisateurs.",
+    "privacy_desc_protected": "Ne peut être modifié ou supprimé que par son propriétaire. Peut être utilisé par n'importe quel utilisateur pour créer une partie."
   },
   "game_result": {
     "win_classic": "Victoire ! Tu as gagné trois combats",

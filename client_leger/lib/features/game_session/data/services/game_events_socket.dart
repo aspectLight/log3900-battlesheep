@@ -48,8 +48,10 @@ class GameEventsSocket {
     }
   }
 
+  /// playerSpawned is omitted: PlayerSpawnCatchupSideEffect also listens;
+  /// calling off(playerSpawned) on dispose would close the shared SocketService
+  /// stream and break catch-up after the first game session.
   static const List<String> _ownedEvents = [
-    GameEventsSocketEvents.playerSpawned,
     GameEventsSocketEvents.playerJoinedGame,
     GameEventsSocketEvents.turnStarting,
     GameEventsSocketEvents.updateCountdown,
@@ -114,8 +116,12 @@ class GameEventsSocket {
             if (raw is! List<dynamic>) return;
             final dto = PlayerSpawnedDto(
               players: raw
-                  .whereType<Map<String, dynamic>>()
-                  .map(SpawnedPlayerDto.fromPlayerSpawnedPayload)
+                  .whereType<Map>()
+                  .map(
+                    (e) => SpawnedPlayerDto.fromPlayerSpawnedPayload(
+                      Map<String, dynamic>.from(e),
+                    ),
+                  )
                   .toList(),
             );
             _playerJoinedGameController.add(dto.toEntity());
@@ -145,15 +151,25 @@ class GameEventsSocket {
               UpdateStartingCountdownDto(countdown: v).toEntity(),
             );
           }),
-      _socketService.on<String>(GameEventsSocketEvents.updateScore).listen((
+      _socketService.on<Object?>(GameEventsSocketEvents.updateScore).listen((
         data,
       ) {
-        _updateScoreController.add(UpdateScoreDto.fromObject(data).toEntity());
+        try {
+          _updateScoreController.add(
+            UpdateScoreDto.fromObject(data).toEntity(),
+          );
+        } on FormatException {
+          return;
+        }
       }),
-      _socketService.on<String>(GameEventsSocketEvents.finishGame).listen((
+      _socketService.on<Object?>(GameEventsSocketEvents.finishGame).listen((
         data,
       ) {
-        _finishGameController.add(FinishGameDto.fromObject(data).toEntity());
+        try {
+          _finishGameController.add(FinishGameDto.fromObject(data).toEntity());
+        } on FormatException {
+          return;
+        }
       }),
       _socketService
           .on<Map<String, dynamic>>(GameEventsSocketEvents.gameCanceled)
@@ -169,13 +185,17 @@ class GameEventsSocket {
           GameAbandonedDto.fromObject(data).toEntity(),
         );
       }),
-      _socketService.on<String>(GameEventsSocketEvents.playerAbandoned).listen((
-        data,
-      ) {
-        _playerAbandonedController.add(
-          PlayerAbandonedDto.fromObject(data).toEntity(),
-        );
-      }),
+      _socketService.on<Object?>(GameEventsSocketEvents.playerAbandoned).listen(
+        (data) {
+          try {
+            _playerAbandonedController.add(
+              PlayerAbandonedDto.fromObject(data).toEntity(),
+            );
+          } on FormatException {
+            return;
+          }
+        },
+      ),
       _socketService
           .on<Map<String, dynamic>>(GameEventsSocketEvents.organizatorChanged)
           .listen((data) {

@@ -7,7 +7,7 @@ import { SIZE_LIMITS } from '@app/modules/shared-room/constants/waiting-room.con
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
 import { BlockService } from '@app/modules/social/services/block.service';
 import { Player } from '@app/shared/interfaces/player';
-import { CurrencyEvents, CustomChannelEvents, GameRoomEvents } from '@common/socket.constants';
+import { CurrencyEvents, CustomChannelEvents, GameRoomEvents, WaitingRoomEvents } from '@common/socket.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 
@@ -92,27 +92,19 @@ export class PlayerConnectionHandler {
                 return { success: false, error: "Le drop-in n'est pas activé pour cette partie" };
             }
 
-            // Returning player identified only by firebaseUid (no character creation)
-            if (data.firebaseUid && !data.player) {
-                const abandonedEntry = room.abandonedPlayers.find((ap) => ap.firebaseUid === data.firebaseUid);
-                if (!abandonedEntry) {
-                    return { success: false, error: 'Player not found in abandoned players list' };
-                }
-                data.player = { ...abandonedEntry.player, firebaseUid: data.firebaseUid };
-            }
-
             if (!data.player) {
                 return { success: false, error: 'Missing player data' };
             }
 
             // Drop-in fee: charge only if this uid has not yet paid (first join)
-            if (room.entryFee > 0 && data.firebaseUid && !room.paidPlayerFirebaseUids.includes(data.firebaseUid)) {
-                const balance = await this.authService.getVirtualCurrency(data.firebaseUid);
+            const uid = data.firebaseUid ?? data.player?.firebaseUid;
+            if (room.entryFee > 0 && uid && !room.paidPlayerFirebaseUids.includes(uid)) {
+                const balance = await this.authService.getVirtualCurrency(uid);
                 if (balance < room.entryFee) {
                     return { success: false, error: 'Solde insuffisant pour rejoindre cette partie' };
                 }
-                const newBalance = await this.authService.updateVirtualCurrency(data.firebaseUid, -room.entryFee);
-                room.paidPlayerFirebaseUids.push(data.firebaseUid);
+                const newBalance = await this.authService.updateVirtualCurrency(uid, -room.entryFee);
+                room.paidPlayerFirebaseUids.push(uid);
                 socket.emit(CurrencyEvents.VirtualCurrencyUpdated, { balance: newBalance });
             }
 
@@ -175,6 +167,7 @@ export class PlayerConnectionHandler {
             });
 
             this.logger.log(`Joueur ${socket.id} a rejoint la partie ${data.roomId} (${result.isReturning ? 'retour' : 'nouveau'})`);
+            server.emit(WaitingRoomEvents.AvailableRoomsChanged);
 
             return { success: true };
         } catch (error) {
@@ -215,6 +208,10 @@ export class PlayerConnectionHandler {
      */
     private async handlePlayerAbandonment(roomId: string, playerId: string, server: Server): Promise<boolean> {
         const room = this.gameRoomService.findRoomById(roomId);
+        if (!room) {
+            return false;
+        }
+
         const combatRooms = this.gameCombatService.findCombatsByPlayerId(playerId);
         if (combatRooms && combatRooms.length > 0) {
             combatRooms.forEach((combat) => this.gameCombatService.endCombat(combat.combatRoomId, false));
@@ -222,6 +219,40 @@ export class PlayerConnectionHandler {
 
         this.gameRoomService.dropItemsWhenDisconnected(roomId, playerId);
         this.gameMovementService.removePlayerFromBoard(roomId, playerId);
+
+        if (room.isFinished) {
+            const wasHost = room.hostId === playerId;
+            const wasInPlayers = room.players.some((p) => p.id === playerId);
+            room.players = room.players.filter((p) => p.id !== playerId);
+
+            if (wasHost && room.players.length > 0) {
+                const nextHost = room.players.find((p) => !p.isVirtual) ?? room.players[0];
+                room.hostId = nextHost.id;
+                server.to(roomId).emit(GameRoomEvents.OrganizatorChanged, {
+                    roomId,
+                    newhostId: room.hostId,
+                });
+            }
+
+            const isRoomDeleted = room.players.length === 0;
+            if (isRoomDeleted) {
+                this.gameRoomService.deleteRoomById(roomId);
+                this.gameMovementService.removeBoard(roomId);
+
+                const channelId = roomId.startsWith('game_') ? roomId.slice(5) : roomId;
+                try {
+                    server.to(`custom-channel-${channelId}`).emit(CustomChannelEvents.CustomChannelDeleted, { channelId });
+                    await this.customChannelService.deleteGameChannel(channelId);
+                } catch (channelError) {
+                    this.logger.error(`Erreur suppression canal de partie ${channelId}: ${channelError.message}`);
+                }
+            } else if (wasInPlayers) {
+                server.to(roomId).emit(GameRoomEvents.PlayerAbandoned, playerId);
+            }
+
+            server.emit(WaitingRoomEvents.AvailableRoomsChanged);
+            return isRoomDeleted;
+        }
 
         if (this.gameRoomService.isHost(roomId, playerId)) {
             server.to(roomId).emit(GameRoomEvents.DebugModeDisabled);
@@ -262,9 +293,19 @@ export class PlayerConnectionHandler {
             this.gameMovementService.removeBoard(roomId);
             server.to(roomId).emit(GameRoomEvents.GameCanceled, { playerId });
         } else {
-            server.to(roomId).emit(GameRoomEvents.PlayerAbandoned, playerId);
+            // Check if only virtual players remain — if so, cancel the game
+            const currentRoom = this.gameRoomService.findRoomById(roomId);
+            const onlyVirtualsRemain = currentRoom?.players.every((p) => p.isVirtual) ?? false;
+            if (onlyVirtualsRemain) {
+                this.gameRoomService.deleteRoomById(roomId);
+                this.gameMovementService.removeBoard(roomId);
+                server.to(roomId).emit(GameRoomEvents.GameCanceled, { playerId });
+            } else {
+                server.to(roomId).emit(GameRoomEvents.PlayerAbandoned, playerId);
+            }
         }
 
+        server.emit(WaitingRoomEvents.AvailableRoomsChanged);
         return isRoomDeleted;
     }
 }

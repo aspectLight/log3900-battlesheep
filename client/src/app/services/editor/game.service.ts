@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
 import { Board } from '@app/classes/board/board';
 import { Game } from '@app/classes/game/game';
+import { ProfileService } from '@app/services/communication/profile.service';
 import { SessionService } from '@app/services/state/session.service';
 import { API_ENDPOINTS } from '@common/api-endpoints.constants';
 import { Observable, from, switchMap } from 'rxjs';
@@ -31,6 +32,7 @@ export class GameService {
         private itemService: ItemService,
         private auth: Auth,
         private session: SessionService,
+        private profileService: ProfileService,
     ) {
         const savedData = this.getSavedGameData();
 
@@ -81,10 +83,16 @@ export class GameService {
         this.game.mode = mode;
         this.game.board.size = boardSize;
         this.game.privacy = privacy;
-
         this.game.actionPoints = actionPoints;
-        this.itemService.setItemCountFromBoard(this.game.board);
 
+        if (this.tempGame) {
+            this.tempGame.mode = mode;
+            this.tempGame.board.size = boardSize;
+            this.tempGame.privacy = privacy;
+            this.tempGame.actionPoints = actionPoints;
+        }
+
+        this.itemService.setItemCountFromBoard(this.game.board);
         this.saveGameToLocalStorage();
     }
 
@@ -99,7 +107,7 @@ export class GameService {
 
     setGame(gameData: Game) {
         this.game = new Game(gameData);
-        this.setGameSettings(this.game.mode, this.game.board.size, this.game.privacy);
+        this.setGameSettings(this.game.mode, this.game.board.size, this.game.privacy, this.game.actionPoints);
         this.isGameBeingModified = true;
 
         this.tempGame = new Game(gameData);
@@ -124,10 +132,11 @@ export class GameService {
     // tap() exécute un effet secondaire (nettoyage du localStorage) sans modifier la valeur émise.
     // L'Observable retourné n'est exécuté que lorsqu'un composant s'y abonne via .subscribe().
     saveNewGame(): Observable<void> {
-        return from(this.getAuthHeaders()).pipe(
-            switchMap((headers) =>
-                this.http.post<void>(this.baseUrl + API_ENDPOINTS.games, this.game, { headers }),
-            ),
+        return from(Promise.all([this.getAuthHeaders(), this.profileService.getProfile()])).pipe(
+            switchMap(([headers, profile]) => {
+                this.game.owner = profile.username;
+                return this.http.post<void>(this.baseUrl + API_ENDPOINTS.games, this.game, { headers });
+            }),
             tap(() => {
                 localStorage.removeItem('savedGame');
                 this.isGameBeingModified = false;

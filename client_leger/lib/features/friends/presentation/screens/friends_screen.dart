@@ -15,7 +15,6 @@ import '../widgets/user_card.dart';
 import 'friends_view_model.dart';
 
 const _kBorder = Color(0xFF3a3a3a);
-const _kHeaderText = Color(0xFFe0d8c0);
 const _kStateBg = Color(0x40000000);
 const _kAccept = Color(0xFF145214);
 const _kBlock = Color(0xFFffb347);
@@ -122,6 +121,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
     final list = _viewModel.friends.value;
     if (list.isEmpty) return _buildState(l10n.noFriends);
     return ListView.builder(
+      padding: EdgeInsets.zero,
       itemCount: list.length,
       itemBuilder: (_, i) {
         final f = list[i];
@@ -152,6 +152,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
     final sent = _viewModel.sentRequests.value;
     if (pending.isEmpty && sent.isEmpty) return _buildState(l10n.noRequests);
     return ListView(
+      padding: EdgeInsets.zero,
       children: [
         if (pending.isNotEmpty) ...[
           _buildSectionTitle(l10n.receivedRequests),
@@ -229,6 +230,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
         else
           Expanded(
             child: ListView.builder(
+              padding: EdgeInsets.zero,
               itemCount: results.length,
               itemBuilder: (_, i) {
                 final u = results[i];
@@ -285,6 +287,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
     final list = _viewModel.blockedUsers.value;
     if (list.isEmpty) return _buildState(l10n.noBlockedUsers);
     return ListView.builder(
+      padding: EdgeInsets.zero,
       itemCount: list.length,
       itemBuilder: (_, i) => UserCard(
         username: list[i],
@@ -313,8 +316,8 @@ class _FriendsScreenState extends State<FriendsScreen> {
       child: Text(
         text,
         textAlign: TextAlign.center,
-        style: const TextStyle(
-          color: _kHeaderText,
+        style: TextStyle(
+          color: context.interactionColors.text,
           fontFamily: 'CustomFont',
           fontSize: 16,
         ),
@@ -327,8 +330,8 @@ class _FriendsScreenState extends State<FriendsScreen> {
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Text(
         text,
-        style: const TextStyle(
-          color: _kHeaderText,
+        style: TextStyle(
+          color: context.interactionColors.text,
           fontFamily: 'CustomFont',
           fontSize: 16,
           fontWeight: FontWeight.bold,

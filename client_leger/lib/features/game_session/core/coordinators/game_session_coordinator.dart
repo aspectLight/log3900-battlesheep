@@ -26,10 +26,13 @@ import '../../data/repositories/game_board_repository.dart';
 import '../../data/repositories/game_inventory_repository.dart';
 import '../../data/repositories/game_metadata_repository.dart';
 import '../../data/repositories/game_player_repository.dart';
+import '../../data/repositories/game_rewards_holder.dart';
+import '../../../../core/services/log_service.dart';
 import '../../data/repositories/game_turn_repository.dart';
 import '../../data/services/game_service.dart';
 import '../../domain/events/game_events.dart';
 import '../../domain/models/game.dart';
+import '../../domain/services/game_start_board_items_resolver.dart';
 import '../../domain/state/game_board_state.dart';
 
 class GameSessionCoordinator
@@ -130,7 +133,24 @@ class GameSessionCoordinator
     if (scope == null) return;
     if (scope.isRegistered<GameSessionData>()) return;
     scope.registerLazySingleton<GameSessionData>(() => data);
-    final game = await gameService.getGame(data.gameId);
+    final fetchedGame = await gameService.getGame(data.gameId);
+    final resolvedItems = resolveRandomBoardItems(
+      items: fetchedGame.initialItems,
+      board: fetchedGame.board,
+      roomId: data.roomId,
+    );
+    final game = Game(
+      id: fetchedGame.id,
+      name: fetchedGame.name,
+      description: fetchedGame.description,
+      mode: fetchedGame.mode,
+      board: fetchedGame.board,
+      initialItems: resolvedItems,
+      privacy: fetchedGame.privacy,
+      owner: fetchedGame.owner,
+      actionPoints: fetchedGame.actionPoints,
+      modificationDate: fetchedGame.modificationDate,
+    );
     scope.registerLazySingleton<Game>(() => game);
     scope.registerLazySingleton<Board>(() => game.board);
     final dropInSync = getIt<DropInJoinSyncHolder>();
@@ -264,10 +284,13 @@ class GameSessionCoordinator
     notificationCoordinator.clearScopeEntries();
     switch (event) {
       case GameFinishedEvent(:final roomId, :final isCTF):
+        final capturedRewards = getIt<GameRewardsHolder>().captured;
+        LogService.d('[GameSessionCoord] onExitImpl: capturedRewards has ${capturedRewards.rewards.length} reward(s), entryFee=${capturedRewards.entryFee}, pool=${capturedRewards.pool}');
         appTransitionEventBus.fire(
           StatisticsEntryAppEvent.statisticsRequested(
             roomId: roomId,
             isCTF: isCTF,
+            capturedRewards: capturedRewards,
           ),
         );
       case LeaveGameSessionRequestedCommand():

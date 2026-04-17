@@ -16,6 +16,7 @@ import '../../data/projections/game_turn_events_projection.dart';
 import '../../data/side_effects/game_debug_shake_side_effect.dart';
 import '../../data/side_effects/game_finish_notification_side_effect.dart';
 import '../../data/side_effects/game_session_play_game_side_effect.dart';
+import '../../data/side_effects/player_spawn_catchup_side_effect.dart';
 import '../../data/side_effects/game_item_dropped_disconnected_side_effect.dart';
 import '../../data/side_effects/game_movement_side_effect.dart';
 import '../../data/side_effects/game_pending_item_pickup_side_effect.dart';
@@ -28,11 +29,12 @@ import '../../data/side_effects/game_turn_auto_selection_side_effect.dart';
 import '../../data/side_effects/game_trap_flow_side_effect.dart';
 import '../../data/side_effects/game_turn_end_item_cleanup_side_effect.dart';
 import '../../data/side_effects/game_turn_side_effect.dart';
-import '../../data/side_effects/game_combat_started_notification_side_effect.dart';
 import '../../data/side_effects/game_turn_start_notification_side_effect.dart';
 import '../../data/side_effects/game_virtual_player_move_side_effect.dart';
 import '../../data/side_effects/game_virtual_player_turn_side_effect.dart';
 import '../../data/side_effects/game_win_condition_side_effect.dart';
+import '../../data/side_effects/game_rewards_capture_side_effect.dart';
+import '../../data/repositories/game_rewards_holder.dart';
 import '../context/drop_in_join_sync_holder.dart';
 import '../context/game_history_record_holder.dart';
 import '../context/game_session_scope_holder.dart';
@@ -54,12 +56,28 @@ class _GameSessionScopeBootstrapped {
 
 void registerGameSessionRoot(GetIt getIt) {
   getIt.registerLazySingleton<DropInJoinSyncHolder>(DropInJoinSyncHolder.new);
+  getIt.registerLazySingleton<PlayerSpawnCatchupSideEffect>(
+    () => PlayerSpawnCatchupSideEffect(
+      socketService: getIt(),
+      dropInJoinSyncHolder: getIt(),
+    ),
+  );
+  getIt<PlayerSpawnCatchupSideEffect>();
   getIt.registerLazySingleton<GameSessionScopeHolder>(
     GameSessionScopeHolder.new,
   );
+  getIt.registerLazySingleton<GameRewardsHolder>(GameRewardsHolder.new);
   registerGameRootServices(getIt);
   registerGameReducers(getIt);
   registerGameSessionEventBus(getIt);
+  getIt.registerLazySingleton<GameRewardsCaptureSideEffect>(
+    () => GameRewardsCaptureSideEffect(
+      socketService: getIt(),
+      gameSessionEventBus: getIt(),
+      gameRewardsHolder: getIt(),
+    ),
+  );
+  getIt.get<GameRewardsCaptureSideEffect>();
   registerGameSessionCoordinator(getIt);
   se.registerGameSessionEventSideEffect(getIt);
   vm.registerGameSessionRootViewModels(getIt);
@@ -130,7 +148,6 @@ void bootstrapGameSessionScope(
   scope.get<GameReachableCellsOverlaySideEffect>();
   scope.get<GamePlayerAbandonedBoardSideEffect>();
   scope.get<GameTurnStartNotificationSideEffect>();
-  scope.get<GameCombatStartedNotificationSideEffect>();
   scope.get<GameVirtualPlayerTurnSideEffect>();
   scope.get<GameTurnSideEffect>();
   scope.get<GameTurnAutoForwardSideEffect>();

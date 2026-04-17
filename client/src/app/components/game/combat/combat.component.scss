@@ -459,9 +459,10 @@ button.barbed-wire::before {
   align-items: center;
   height: 100%;
   width: 100%;
-  padding: 10px;
+  padding: clamp(6px, 1.2vw, 12px);
   position: absolute;
   border-radius: 5px;
+  overflow: hidden;
 }
 
 .cell {
@@ -597,21 +598,25 @@ button.barbed-wire::before {
   align-items: center;
   height: 100%;
   width: 100%;
-  padding: 10px;
+  padding: clamp(6px, 1.2vw, 12px);
   position: absolute;
+  overflow: hidden;
 }
 
 .tile-card {
-  width: 85%;
-  max-width: 450px;
+  width: 92%;
+  max-width: 500px;
   background: transparent;
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 10px;
   position: relative;
-  padding: 15px;
+  padding: 12px;
   border-radius: 8px;
   box-shadow: none;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 /* Left column - Magnifying glass */
@@ -627,19 +632,21 @@ button.barbed-wire::before {
 /* Right column - Info */
 .info-column {
   flex: 1;
-  padding-left: 15px;
+  min-width: 0;
+  padding-left: 6px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  max-width: 250px;
+  max-width: none;
+  max-height: 100%;
 }
 
 /* Lens */
 .tile-image-container {
   position: relative;
-  width: 130px;
-  height: 130px;
+  width: 108px;
+  height: 108px;
   border-radius: 50%;
   border: 8px solid var(--theme-border-secondary);
   box-shadow: 
@@ -655,9 +662,16 @@ button.barbed-wire::before {
 .tile-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
+  padding: 10%;
+  box-sizing: border-box;
   z-index: 1;
   position: relative;
+}
+
+.tile-image-teleport {
+  padding: 16%;
 }
 
 /* Overlay styles */
@@ -715,23 +729,25 @@ button.barbed-wire::before {
 .tile-header {
   text-align: center;
   width: 100%;
-  margin: 0 0 15px 0;
+  margin: 0 0 8px 0;
 }
 
 .tile-type {
   color: var(--theme-text-secondary);
-  font-size: 1.6rem;
+  font-size: clamp(0.9rem, 1.8vw, 1.15rem);
   font-weight: bold;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   text-shadow: 0 1px 2px var(--theme-shadow-strong);
+  overflow-wrap: anywhere;
+  text-align: left;
 }
 
 /* Movement Cost Section */
 .modifier-section {
   width: 100%;
-  margin-top: 10px;
-  margin-bottom: 5px;
+  margin-top: 4px;
+  margin-bottom: 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -740,7 +756,7 @@ button.barbed-wire::before {
 .modifier-label {
   position: relative;
   text-align: center;
-  margin: 8px 0;
+  margin: 4px 0;
   width: 100%;
   
   &::before {
@@ -759,7 +775,7 @@ button.barbed-wire::before {
   position: relative;
   background: var(--theme-bg-card-dark);
   color: var(--theme-text-muted);
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   padding: 0 8px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -773,9 +789,9 @@ button.barbed-wire::before {
   color: var(--theme-game-text-red);
   font-weight: bold;
   padding: 0;
-  font-size: 0.9rem;
+  font-size: 0.78rem;
   display: inline-block;
-  margin-top: 5px;
+  margin-top: 2px;
   border-radius: 0;
   width: auto;
   min-width: 0;
@@ -785,8 +801,8 @@ button.barbed-wire::before {
 /* Description Section */
 .description-section {
   width: 100%;
-  margin-top: 10px;
-  margin-bottom: 5px;
+  margin-top: 4px;
+  margin-bottom: 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -795,7 +811,7 @@ button.barbed-wire::before {
 .description-label {
   position: relative;
   text-align: center;
-  margin: 8px 0;
+  margin: 4px 0;
   width: 100%;
   
   &::before {
@@ -814,7 +830,7 @@ button.barbed-wire::before {
   position: relative;
   background: var(--theme-bg-card-dark);
   color: var(--theme-text-muted);
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   padding: 0 8px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -828,16 +844,76 @@ button.barbed-wire::before {
   padding: 0;
   background: transparent;
   color: var(--theme-text-muted);
-  font-size: 0.95rem;
-  line-height: 1.4;
+  font-size: clamp(0.66rem, 1.05vw, 0.8rem);
+  line-height: 1.18;
   border: none;
   box-shadow: none;
-  margin-top: 8px;
-  text-align: center;
+  margin-top: 6px;
+  text-align: left;
   z-index: 3;
+  max-height: none;
+  overflow: visible;
 
   p {
     margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 760px), (max-height: 760px) {
+  .tile-card {
+    width: 96%;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .info-column {
+    width: 100%;
+    padding-left: 0;
+  }
+
+  .tile-header,
+  .tile-description,
+  .tile-type {
+    text-align: center;
+  }
+
+  .tile-handle {
+    display: none !important;
+  }
+
+  .tile-image-container {
+    width: 92px;
+    height: 92px;
+    border-width: 6px;
+  }
+}
+
+@media (max-height: 820px) {
+  .tile-card {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .tile-image-container {
+    width: 96px;
+    height: 96px;
+    border-width: 6px;
+  }
+
+  .tile-handle {
+    display: none !important;
+  }
+
+  .tile-type {
+    font-size: clamp(0.92rem, 1.7vw, 1.15rem);
+  }
+
+  .modifier-label-text,
+  .description-label-text {
+    font-size: 0.72rem;
   }
 }
 

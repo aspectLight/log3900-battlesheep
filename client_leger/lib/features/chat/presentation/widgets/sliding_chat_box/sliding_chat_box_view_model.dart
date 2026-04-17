@@ -2,14 +2,20 @@ import 'dart:async';
 
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/chat/chat_avatar_registry.dart';
 import '../../../data/models/channel_info.dart';
 import '../../../data/models/channel_message.dart';
+import '../../../data/repositories/chat_panel_state_repository.dart';
 import '../../../data/repositories/discussion_canals_repository.dart';
 
 class SlidingChatBoxViewModel {
   SlidingChatBoxViewModel({
     required DiscussionCanalsRepository canalsRepository,
-  }) : _canalsRepository = canalsRepository {
+    required ChatPanelStateRepository panelStateRepository,
+    required ChatAvatarRegistry avatarRegistry,
+  }) : _canalsRepository = canalsRepository,
+       _panelStateRepository = panelStateRepository,
+       _avatarRegistry = avatarRegistry {
     _joinedSub = canalsRepository.joinedChannelsUpdated.listen((ids) {
       joinedChannelIds.value = ids;
       if (activeChannelId.value != null &&
@@ -36,6 +42,8 @@ class SlidingChatBoxViewModel {
   }
 
   final DiscussionCanalsRepository _canalsRepository;
+  final ChatPanelStateRepository _panelStateRepository;
+  final ChatAvatarRegistry _avatarRegistry;
 
   StreamSubscription<List<String>>? _joinedSub;
   StreamSubscription<MessagesUpdatedEvent>? _messagesSub;
@@ -50,6 +58,31 @@ class SlidingChatBoxViewModel {
   final Signal<String?> activeChannelId = signal(null);
   final Signal<List<ChannelMessage>> activeChannelMessages = signal([]);
   final Signal<Map<String, String>> channelNames = signal({});
+
+  late final ReadonlySignal<List<ChannelMessage>> displayChannelMessages =
+      computed(() {
+        _avatarRegistry.entries.value;
+        final rawList = activeChannelMessages.value;
+        _avatarRegistry.ensureLoaded(rawList.map((m) => m.senderName));
+        return rawList
+            .map((m) {
+              final r = _avatarRegistry.resolveForAuthor(
+                m.senderName,
+                messageAvatarId: m.avatarId,
+                messageAvatarUrl: m.avatarUrl,
+              );
+              return ChannelMessage(
+                channelId: m.channelId,
+                senderName: m.senderName,
+                content: m.content,
+                time: m.time,
+                avatarId: r.avatarId,
+                avatarUrl: r.avatarUrl,
+                avatarDisplayNonce: r.avatarDisplayNonce,
+              );
+            })
+            .toList();
+      });
 
   // ── Channels panel ──────────────────────────────────────────────
   final Signal<bool> showChannelsPanel = signal(false);
@@ -66,6 +99,7 @@ class SlidingChatBoxViewModel {
 
   void setActiveChannel(String? channelId) {
     activeChannelId.value = channelId;
+    _panelStateRepository.setActiveCustomChannelId(channelId);
     if (channelId != null) {
       activeChannelMessages.value = _canalsRepository.getMessages(channelId);
     }
@@ -75,6 +109,12 @@ class SlidingChatBoxViewModel {
     final id = activeChannelId.value;
     if (id == null || content.trim().isEmpty) return;
     _canalsRepository.sendMessage(id, content);
+  }
+
+  void sendChannelEmoji(String emoji) {
+    final id = activeChannelId.value;
+    if (id == null) return;
+    _canalsRepository.sendEmoji(id, emoji);
   }
 
   String resolveChannelName(String channelId) {

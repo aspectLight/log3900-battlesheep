@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'chat_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -61,4 +62,14 @@ class ChatLocalizationsFr extends ChatLocalizations {
 
   @override
   String get deleteChannel => 'Supprimer';
+
+  @override
+  String get confirmDeleteChannel =>
+      'Voulez-vous vraiment supprimer ce canal ?';
+
+  @override
+  String get yes => 'Oui';
+
+  @override
+  String get no => 'Non';
 }

@@ -1,7 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Player } from '@app/classes/entity/player';
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
+import { AVATAR_TYPES } from '@app/constants/player.constants';
 import { TranslateModule } from '@ngx-translate/core';
+import { environment } from 'src/environments/environment';
+
 @Component({
     selector: 'app-player-card',
     imports: [TranslateModule],
@@ -23,7 +26,15 @@ export class PlayerCardComponent implements OnInit {
 
     ngOnInit() {
         if (this.player && this.player.avatar) {
-            this.avatar = this.player.avatar.avatarFull;
+            const raw = this.player.avatar as any;
+            if (typeof raw === 'string') {
+                this.avatar = AVATAR_TYPES[raw]?.avatarFull ?? AVATAR_TYPES[raw.toLowerCase()]?.avatarFull ?? '';
+            } else {
+                this.avatar =
+                    raw.avatarFull ??
+                    AVATAR_TYPES[raw.name?.toLowerCase()]?.avatarFull ??
+                    '';
+            }
         }
 
         if (this.player && this.player.isVirtual) {
@@ -34,7 +45,10 @@ export class PlayerCardComponent implements OnInit {
     }
 
     private resolveProfileAvatar(): string | null {
-        if (this.player.profileAvatarUrl) return this.player.profileAvatarUrl;
+        if (this.player.profileAvatarUrl) {
+            const url = this.player.profileAvatarUrl;
+            return url.startsWith('http://') || url.startsWith('https://') ? url : `${environment.serverUrl}${url}`;
+        }
         if (!this.player.profileAvatarId) return null;
         const avatar = ACCOUNT_CREATION_AVATARS.find((a) => a.id === this.player.profileAvatarId);
         return avatar ? avatar.image : null;

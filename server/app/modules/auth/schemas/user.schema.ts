@@ -70,6 +70,9 @@ export class User {
     @Prop()
     avatarImageMimeType?: string;
 
+    @Prop()
+    avatarVersion?: string;
+
     @Prop({ default: 'default', enum: ['default', 'frost', 'village'] })
     theme: string;
 

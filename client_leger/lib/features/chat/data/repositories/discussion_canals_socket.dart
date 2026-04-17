@@ -1,6 +1,10 @@
 import 'dart:async';
 
-import '../../../../../core/services/socket_service.dart';
+import 'package:fpdart/fpdart.dart';
+
+import '../../../../core/config/env_config.dart';
+import '../../../../core/services/socket_service.dart';
+import '../../../authentication/core/interfaces/auth_repository.dart';
 import '../../core/constants/discussion_canals_events.dart';
 import '../models/channel_info.dart';
 import '../models/channel_message.dart';
@@ -15,8 +19,10 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   DiscussionCanalsSocket({
     required SocketService socketService,
     required String username,
+    required AuthRepository authRepository,
   }) : _socketService = socketService,
-       _username = username {
+       _username = username,
+       _authRepository = authRepository {
     if (socketService.isConnected) _setupListeners();
     _connectionSub = socketService.connectionStream.listen((connected) {
       if (connected) _setupListeners();
@@ -25,6 +31,7 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
 
   final SocketService _socketService;
   final String _username;
+  final AuthRepository _authRepository;
 
   final _channelsController = StreamController<List<ChannelInfo>>.broadcast();
   final _channelCreatedController = StreamController<String>.broadcast();
@@ -45,6 +52,7 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   StreamSubscription<Object?>? _joinedSub;
   StreamSubscription<Object?>? _leftSub;
   StreamSubscription<Object?>? _messageSub;
+  StreamSubscription<Object?>? _emojiSub;
   StreamSubscription<Object?>? _messagesResponseSub;
   StreamSubscription<Object?>? _restoredSub;
 
@@ -89,6 +97,9 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
     _messageSub = _socketService
         .on<Object?>(DiscussionCanalsSocketEvents.customChannelMessage)
         .listen(_onChannelMessage);
+    _emojiSub = _socketService
+        .on<Object?>(DiscussionCanalsSocketEvents.customChannelEmoji)
+        .listen(_onChannelEmoji);
     _messagesResponseSub = _socketService
         .on<Object?>(DiscussionCanalsSocketEvents.customChannelMessagesResponse)
         .listen(_onMessagesResponse);
@@ -181,6 +192,27 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
     );
   }
 
+  void _onChannelEmoji(Object? raw) {
+    final m = _tryJsonMap(raw);
+    if (m == null) return;
+    final channelId = m['channelId'] as String?;
+    if (channelId == null) return;
+    final emojiRaw = m['emoji'];
+    final emojiMap = _tryJsonMap(emojiRaw);
+    if (emojiMap == null) return;
+    final msg = _parseMessage(emojiMap);
+    _messagesByChannel[channelId] = [
+      ...(_messagesByChannel[channelId] ?? []),
+      msg,
+    ];
+    _messagesUpdatedController.add(
+      MessagesUpdatedEvent(
+        channelId: channelId,
+        messages: _messagesByChannel[channelId]!,
+      ),
+    );
+  }
+
   void _onMessagesResponse(Object? raw) {
     final m = _tryJsonMap(raw);
     if (m == null) return;
@@ -256,9 +288,47 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   );
 
   @override
-  void sendMessage(String channelId, String content) => _socketService.emit(
-    DiscussionCanalsSocketEvents.sendMessageToCustomChannel,
-    {'channelId': channelId, 'username': _username, 'message': content},
+  void sendMessage(String channelId, String content) {
+    unawaited(_sendMessageWithProfileAvatars(channelId, content));
+  }
+
+  Future<void> _sendMessageWithProfileAvatars(
+    String channelId,
+    String content,
+  ) async {
+    String? avatarId;
+    String? avatarUrl;
+    final userResult = await _authRepository.getCurrentUser().run();
+    if (userResult case Right(value: final opt)) {
+      opt.match(() {}, (user) {
+        avatarId = user.avatarId;
+        avatarUrl = user.avatarUrl;
+      });
+    }
+    final absoluteAvatarUrl = EnvConfig.absoluteProfileAvatarUrlForChatSocket(
+      avatarUrl,
+    );
+    final payload = <String, dynamic>{
+      'channelId': channelId,
+      'username': _username,
+      'message': content,
+    };
+    if (avatarId != null) {
+      payload['avatarId'] = avatarId;
+    }
+    if (absoluteAvatarUrl != null && absoluteAvatarUrl.isNotEmpty) {
+      payload['avatarUrl'] = absoluteAvatarUrl;
+    }
+    _socketService.emit(
+      DiscussionCanalsSocketEvents.sendMessageToCustomChannel,
+      payload,
+    );
+  }
+
+  @override
+  void sendEmoji(String channelId, String emoji) => _socketService.emit(
+    DiscussionCanalsSocketEvents.sendEmojiToCustomChannel,
+    {'channelId': channelId, 'username': _username, 'emoji': emoji},
   );
 
   @override
@@ -276,6 +346,7 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
     unawaited(_joinedSub?.cancel());
     unawaited(_leftSub?.cancel());
     unawaited(_messageSub?.cancel());
+    unawaited(_emojiSub?.cancel());
     unawaited(_messagesResponseSub?.cancel());
     unawaited(_restoredSub?.cancel());
   }

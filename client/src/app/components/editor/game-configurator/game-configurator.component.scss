@@ -1,11 +1,18 @@
 .game-creation-container {
-    display:flex;
+    display: flex;
     flex-direction: column;
-    gap: 50px;
-    max-width: 500px;
+    gap: 30px;
+    max-width: 860px;
     margin: auto;
     padding: 20px;
     text-align: center;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px 40px;
+    align-items: start;
 }
 
 h2 {
@@ -15,7 +22,8 @@ h2 {
 
 .mode-selection-buttons,
 .size-selection-buttons,
-.actions-selection-buttons {
+.actions-selection-buttons,
+.privacy-selection-buttons {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
@@ -62,15 +70,62 @@ input[type='radio'] {
     margin-top: 20px;
 }
 
-button {
-    width: 18%;
+.page-header {
+    position: relative;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 20px;
 }
 
-button:hover {
+.return-button {
+    position: absolute;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: none;
+    border: none;
     cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.return-button:hover {
     color: var(--theme-text-hover);
 }
 
-button:active {
+.return-button:active {
     color: var(--theme-text-hover-active);
+}
+
+.return-button img {
+    width: 15px;
+    max-width: 15px;
+    filter: brightness(0) invert(1);
+}
+
+.create-btn {
+    background-color: var(--theme-bg-button);
+    color: var(--theme-text-special-alt);
+    padding: 12px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid var(--theme-border-button);
+    font-weight: 500;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px var(--theme-shadow-button);
+    min-width: 120px;
+    letter-spacing: 0.5px;
+}
+
+.create-btn:hover {
+    background-color: var(--theme-bg-button-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px var(--theme-shadow-button-hover);
+}
+
+.create-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px var(--theme-shadow-button);
 }

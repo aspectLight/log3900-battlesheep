@@ -170,6 +170,9 @@ abstract class ShopLocalizations {
   /// **'Cosmetic unequipped.'**
   String get shopUnequipped;
 
+  /// Shown when updating the equipped banner preference fails unexpectedly.
+  String get shopBannerPreferenceUpdateFailed;
+
   /// No description provided for @shopPurchaseFailedTitle.
   ///
   /// In en, this message translates to:
@@ -235,6 +238,16 @@ abstract class ShopLocalizations {
   /// In en, this message translates to:
   /// **'Defense'**
   String get shopBannerPreviewDefense;
+
+  String get bannerGold;
+
+  String get bannerShadow;
+
+  String get bannerFlame;
+
+  String get bannerIce;
+
+  String get bannerNeon;
 }
 
 class _ShopLocalizationsDelegate

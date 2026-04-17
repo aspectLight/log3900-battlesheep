@@ -116,6 +116,13 @@ export class CombatService {
             } else {
                 this.flightFailure();
             }
+            return;
+        }
+
+        if (result.isSuccess) {
+            this.wasFlightEnd = true;
+            this.combatState = CombatState.Lost;
+            this.combatStateChange.next(CombatState.Lost);
         }
     }
 

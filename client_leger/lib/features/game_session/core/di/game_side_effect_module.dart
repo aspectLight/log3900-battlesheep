@@ -16,7 +16,6 @@ import '../../data/repositories/game_player_repository.dart';
 import '../../data/repositories/game_turn_repository.dart';
 import '../../data/services/game_events_socket.dart';
 import '../../data/side_effects/game_combat_side_effect.dart';
-import '../../data/side_effects/game_combat_started_notification_side_effect.dart';
 import '../../data/side_effects/game_debug_shake_side_effect.dart';
 import '../../data/side_effects/game_finish_notification_side_effect.dart';
 import '../../data/side_effects/game_item_dropped_disconnected_side_effect.dart';
@@ -106,15 +105,6 @@ void registerGameSideEffects(
       movementRepository: scope.get<GamePlayerMovementRepository>(),
       metadataRepository: scope.get<GameMetadataRepository>(),
       gameSessionEventBus: scope.get<GameSessionEventBus>(),
-      notificationIntentSink: scope.get<NotificationCoordinator>(),
-    ),
-    dispose: (se) => se.dispose(),
-  );
-  scope.registerSingleton<GameCombatStartedNotificationSideEffect>(
-    GameCombatStartedNotificationSideEffect(
-      gameSessionEventBus: scope.get<GameSessionEventBus>(),
-      playerRepository: scope.get<GamePlayerRepository>(),
-      notificationIntentSink: scope.get<NotificationCoordinator>(),
     ),
     dispose: (se) => se.dispose(),
   );
