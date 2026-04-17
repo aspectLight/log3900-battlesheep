@@ -21,6 +21,7 @@ class EnvConfig {
   static String resolveAvatarUrl(String rawAvatarUrl, {int? cacheBust}) {
     final trimmed = rawAvatarUrl.trim();
     if (trimmed.isEmpty) return '';
+    if (trimmed.startsWith('data:')) return trimmed;
     final absolute =
         trimmed.startsWith('http://') || trimmed.startsWith('https://');
     final base = absolute ? trimmed : '$baseUrl$trimmed';

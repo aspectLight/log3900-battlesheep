@@ -49,13 +49,13 @@ class GameBoardStateReducer {
       if (!board.isInBounds(pos.x, pos.y)) continue;
       nextPositions[player.id] = pos;
     }
-    final occupiedSpawnPositions = Set<GameBoardPosition>.from(
-      nextPositions.values,
+    final assignedSpawnPositions = Set<GameBoardPosition>.from(
+      event.players.map((p) => p.spawnPoint),
     );
     final nextItems = Map<GameBoardPosition, GameItem>.from(previous.items);
     for (final entry in previous.items.entries) {
       if (entry.value.type == ItemType.spawnPoint &&
-          !occupiedSpawnPositions.contains(entry.key)) {
+          !assignedSpawnPositions.contains(entry.key)) {
         nextItems.remove(entry.key);
       }
     }

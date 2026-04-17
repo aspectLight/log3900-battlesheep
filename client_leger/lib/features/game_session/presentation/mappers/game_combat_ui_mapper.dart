@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 
-import '../../../../core/constants/avatar_assets.dart';
-import '../../../../core/enums/avatar.dart';
+import '../../../../core/constants/character_assets.dart';
+import '../../../../core/enums/character.dart';
 import '../../../../core/enums/item_type.dart';
 import '../../core/enums/stat_type.dart';
 import '../../../../core/helpers/functional_programming.dart';
@@ -133,12 +133,14 @@ GameCombatEndOverlay _buildEndOverlay(
 }
 
 GameCombatEnemyInfoUi _buildEnemyInfo(GamePlayer enemy) {
-  final avatar = Avatar.values.byName(enemy.characterType.name);
+  final character = Character.values.byName(enemy.characterType.name);
   final d6 = enemy.diceChoice;
   return GameCombatEnemyInfoUi(
     id: enemy.id,
     name: enemy.name,
-    avatarPath: Option.of(AvatarAssets.avatarPath(avatar)),
+    avatarPath: Option.of(
+      CharacterAssets.characterAvatarFullPath(character),
+    ),
     stats: enemy.stats,
     d6DiceChoice: d6,
     d4DiceChoice: d6 == StatType.attack ? StatType.defense : StatType.attack,
