@@ -81,6 +81,13 @@ export class RoomSocketService implements ISocketService {
         this.socket = this.socketService.socket;
     }
 
+    resetRoomState(): void {
+        this.roomLockedSubject.next(false);
+        this.roomExistsSubject.next(true);
+        this.isKickedSubject.next(false);
+        this.reservedAvatarsSubject.next([]);
+    }
+
     getId(): string | undefined {
         return this.socket.id;
     }
