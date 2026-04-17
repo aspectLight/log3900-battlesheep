@@ -83,8 +83,8 @@ GameCellDetailUiState toGameCellDetailUiState(
     return GameCellDetailPlayer(
       GameCellDetailPlayerInfo(
         name: c.name,
-        avatarPath: Option.of(c.imagePath),
-        avatarFullPath: Option.of(c.avatarFullPath),
+        avatarPath: Option.of(c.avatarFullPath),
+        avatarFullPath: const Option.none(),
         isCurrentPlayer: isCurrentPlayer,
       ),
     );

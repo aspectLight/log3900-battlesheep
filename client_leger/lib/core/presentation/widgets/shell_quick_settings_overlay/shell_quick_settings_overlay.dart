@@ -8,6 +8,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 import '../../../../features/shop/data/repositories/shop_repository.dart';
 import '../../../../features/shop/domain/state/shop_state.dart';
 import '../../../../features/authentication/core/interfaces/auth_repository.dart';
+import '../../../connected_scope/session_scope_manager.dart';
 import '../../../../routing/app_navigator.dart';
 import '../../../../routing/app_router.dart';
 import '../../../../routing/navigation_command.dart';
@@ -38,13 +39,15 @@ class _ShellQuickSettingsOverlayState extends State<ShellQuickSettingsOverlay> {
   late final MainMenuViewModel _menuViewModel;
   late final AuthRepository _authRepository;
   late final AppNavigator _appNavigator;
-  late final ShopRepository _shopRepository;
   late final ShellChromeBackHandler _shellBack;
   StreamSubscription? _authSubscription;
   StackRouter? _shellListenerTarget;
   bool _open = false;
   String _currentAvatarId = '';
   String? _currentAvatarUrl;
+  String? _lastAuthAccountKey;
+
+  ShopRepository get _shopRepository => GetIt.I<ShopRepository>();
 
   static const _balanceTextStyle = TextStyle(
     color: Color(0xFFF0C040),
@@ -67,14 +70,27 @@ class _ShellQuickSettingsOverlayState extends State<ShellQuickSettingsOverlay> {
     _menuViewModel = GetIt.I<MainMenuViewModel>();
     _authRepository = GetIt.I<AuthRepository>();
     _appNavigator = GetIt.I<AppNavigator>();
-    _shopRepository = GetIt.I<ShopRepository>();
     _shellBack = GetIt.I<ShellChromeBackHandler>();
-    _shopRepository.refreshBalance();
+    _refreshScopedShopBalanceIfReady();
     _authSubscription = _authRepository.authStateChanges.listen((userOption) {
+      final accountKey = userOption.fold<String?>(() => null, (u) {
+        final f = u.firebaseUid?.trim();
+        if (f != null && f.isNotEmpty) return f;
+        final id = u.uid.trim();
+        if (id.isNotEmpty) return id;
+        return null;
+      });
+      final accountChanged = accountKey != _lastAuthAccountKey;
+      if (accountChanged) {
+        _lastAuthAccountKey = accountKey;
+        _refreshScopedShopBalanceIfReady();
+      }
       final avatarId = userOption.match(() => '', (u) => u.avatarId);
       final avatarUrl = userOption.match(() => null, (u) => u.avatarUrl);
-      if (!mounted ||
-          (avatarId == _currentAvatarId && avatarUrl == _currentAvatarUrl)) {
+      if (!mounted) return;
+      if (!accountChanged &&
+          avatarId == _currentAvatarId &&
+          avatarUrl == _currentAvatarUrl) {
         return;
       }
       setState(() {
@@ -85,6 +101,12 @@ class _ShellQuickSettingsOverlayState extends State<ShellQuickSettingsOverlay> {
     unawaited(_loadInitialAvatar());
     _appRouter.addListener(_onAppRouterChanged);
     _syncShellListener();
+  }
+
+  void _refreshScopedShopBalanceIfReady() {
+    final scope = GetIt.I<SessionScopeManager>().currentScope;
+    if (scope == null || !scope.isRegistered<ShopRepository>()) return;
+    scope.get<ShopRepository>().refreshBalance();
   }
 
   @override

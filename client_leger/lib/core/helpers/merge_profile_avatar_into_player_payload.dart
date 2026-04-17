@@ -1,5 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 
+import '../config/env_config.dart';
+import 'preset_profile_avatar_data_url.dart';
 import '../../features/authentication/core/interfaces/auth_repository.dart';
 
 Future<void> mergeProfileAvatarFieldsFromAuth(
@@ -9,14 +11,27 @@ Future<void> mergeProfileAvatarFieldsFromAuth(
   final currentUserResult = await auth.getCurrentUser().run();
   if (currentUserResult case Left()) return;
   if (currentUserResult case Right(value: final userOption)) {
-    userOption.match(() {}, (user) {
-      playerPayload['profileAvatarId'] = user.avatarId;
-      final url = user.avatarUrl?.trim();
-      if (url != null && url.isNotEmpty) {
-        playerPayload['profileAvatarUrl'] = url;
-      } else {
-        playerPayload.remove('profileAvatarUrl');
+    final user = userOption.match(() => null, (u) => u);
+    if (user == null) return;
+
+    playerPayload['profileAvatarId'] = user.avatarId;
+    final url = user.avatarUrl?.trim();
+    if (url != null && url.isNotEmpty) {
+      final absolute = url.startsWith('http://') ||
+              url.startsWith('https://') ||
+              url.startsWith('data:')
+          ? url
+          : EnvConfig.resolveAvatarUrl(url);
+      playerPayload['profileAvatarUrl'] =
+          absolute.isNotEmpty ? absolute : url;
+    } else {
+      playerPayload.remove('profileAvatarUrl');
+      // Preset-only profile: embed bundled image so web clients can use
+      // [profileAvatarUrl] in <img src> without shop/account-creation lookups.
+      final dataUrl = await presetProfileAvatarDataUrlForId(user.avatarId);
+      if (dataUrl != null) {
+        playerPayload['profileAvatarUrl'] = dataUrl;
       }
-    });
+    }
   }
 }

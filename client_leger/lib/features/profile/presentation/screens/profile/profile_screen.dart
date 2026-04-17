@@ -50,7 +50,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   static const Set<String> _allowedAvatarExtensions = {'jpg', 'jpeg', 'png'};
 
   late final ProfileViewModel _viewModel;
-  late final ShopRepository _shopRepository;
   late final ModalIntentSink _modalIntentSink;
   late final ModalCoordinator _modalCoordinator;
   final _usernameController = TextEditingController();
@@ -63,6 +62,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int _avatarRefreshEpoch = DateTime.now().millisecondsSinceEpoch;
 
   bool get _supportsCameraCapture => Platform.isAndroid || Platform.isIOS;
+
+  ShopRepository get _shopRepository => GetIt.I<ShopRepository>();
 
   ButtonStyle _uploadButtonStyle() {
     return OutlinedButton.styleFrom(
@@ -83,7 +84,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     _viewModel = GetIt.I<ProfileViewModel>();
-    _shopRepository = GetIt.I<ShopRepository>();
     _modalIntentSink = GetIt.I<ModalIntentSink>();
     _modalCoordinator = GetIt.I<ModalCoordinator>();
     unawaited(_init());
