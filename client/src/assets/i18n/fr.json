@@ -496,7 +496,11 @@
     "health": "Vie",
     "speed": "Rapidité",
     "attack": "Attaque",
-    "defense": "Défense"
+    "defense": "Défense",
+    "healthDesc": "Représente les points de vie du personnage. S'il tombe à zéro, le joueur est battu",
+    "speedDesc": "Détermine l'ordre de passage du personnage en combat et le nombre de points de mouvement par tour",
+    "attackDesc": "Détermine les dégâts infligés par le personnage aux adversaires.",
+    "defenseDesc": "Représente la capacité du personnage à bloquer les dégâts des attaques ennemies."
   },
   "characters": {
     "title": "Personnages"

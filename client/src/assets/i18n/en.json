@@ -496,7 +496,11 @@
     "health": "Health",
     "speed": "Speed",
     "attack": "Attack",
-    "defense": "Defense"
+    "defense": "Defense",
+    "healthDesc": "Represents the character's health points. If it drops to zero, the player is defeated.",
+    "speedDesc": "Determines the character's turn order in combat and the number of movement points per turn.",
+    "attackDesc": "Determines the damage dealt by the character to opponents.",
+    "defenseDesc": "Represents the character's ability to block damage from enemy attacks."
   },
   "characters": {
     "title": "Characters"
