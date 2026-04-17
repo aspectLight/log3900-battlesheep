@@ -10,7 +10,7 @@ class NotificationShell extends StatelessWidget {
     return ColoredBox(
       color: Colors.black.withValues(alpha: 0.7),
       child: Center(
-        child: Container(
+          child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
           decoration: BoxDecoration(
             color: const Color.fromRGBO(0, 0, 0, 0.8),
@@ -23,7 +23,10 @@ class NotificationShell extends StatelessWidget {
               ),
             ],
           ),
-          child: child,
+          child: Material(
+            type: MaterialType.transparency,
+            child: child,
+          ),
         ),
       ),
     );
