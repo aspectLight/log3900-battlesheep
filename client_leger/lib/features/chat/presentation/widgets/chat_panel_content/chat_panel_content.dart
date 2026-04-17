@@ -1,30 +1,21 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:sensors_plus/sensors_plus.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/presentation/widgets/profile_avatar_thumb/profile_avatar_thumb.dart';
 import '../../../core/constants/chat_constants.dart';
-import '../../../core/event_bus/chat_event_bus.dart';
 import '../../../core/localisation/chat_localizations.dart';
 import '../../ui_models/chat_message_ui.dart';
 import 'chat_panel_content_view_model.dart';
 
 class ChatPanelContent extends StatefulWidget {
-  const ChatPanelContent({
-    super.key,
-    required this.viewModel,
-    required this.chatEventBus,
-  });
+  const ChatPanelContent({super.key, required this.viewModel});
 
   final ChatPanelContentViewModel viewModel;
-  final ChatEventBus chatEventBus;
 
   @override
   State<ChatPanelContent> createState() => _ChatPanelContentState();
@@ -37,9 +28,6 @@ class _ChatPanelContentState extends State<ChatPanelContent>
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
 
-  StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
-  DateTime? _lastShakeTime;
-
   double _previousKeyboardHeight = 0;
   bool _wasAtBottom = true;
   int _previousMessagesLength = 0;
@@ -50,7 +38,6 @@ class _ChatPanelContentState extends State<ChatPanelContent>
     super.initState();
     _viewModel = widget.viewModel;
     WidgetsBinding.instance.addObserver(this);
-    _setupShakeDetection();
     _scrollController.addListener(_onScroll);
   }
 
@@ -76,51 +63,6 @@ class _ChatPanelContentState extends State<ChatPanelContent>
     }
 
     _previousKeyboardHeight = currentKeyboardHeight;
-  }
-
-  void _setupShakeDetection() {
-    if (!Platform.isAndroid && !Platform.isIOS) return;
-    final chatEventBus = widget.chatEventBus;
-    _accelerometerSubscription = accelerometerEventStream().listen(
-      (event) => _onAccelerometerEvent(event, chatEventBus),
-    );
-  }
-
-  void _onAccelerometerEvent(
-    AccelerometerEvent event,
-    ChatEventBus chatEventBus,
-  ) {
-    final now = DateTime.now();
-    if (_lastShakeTime != null &&
-        now.difference(_lastShakeTime!).inMilliseconds <
-            ChatConstants.shakeCooldownMs) {
-      return;
-    }
-    final isVerticalShake =
-        event.y.abs() > ChatConstants.shakeThresholdVertical &&
-        event.x.abs() < ChatConstants.shakeDeadZone;
-    final isHorizontalShake =
-        event.x.abs() > ChatConstants.shakeThresholdHorizontal &&
-        event.y.abs() < ChatConstants.shakeDeadZone;
-    if (isVerticalShake) {
-      _lastShakeTime = now;
-      if (kDebugMode) {
-        debugPrint(
-          '[ChatShake] vertical → resend last message '
-          '(x=${event.x.toStringAsFixed(1)} y=${event.y.toStringAsFixed(1)})',
-        );
-      }
-      chatEventBus.fire(const ChatVerticalShakeDetected());
-    } else if (isHorizontalShake) {
-      _lastShakeTime = now;
-      if (kDebugMode) {
-        debugPrint(
-          '[ChatShake] horizontal → send selected emoji '
-          '(x=${event.x.toStringAsFixed(1)} y=${event.y.toStringAsFixed(1)})',
-        );
-      }
-      chatEventBus.fire(const ChatHorizontalShakeDetected());
-    }
   }
 
   void _onSendMessage() {
@@ -186,7 +128,6 @@ class _ChatPanelContentState extends State<ChatPanelContent>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _scrollController.removeListener(_onScroll);
-    unawaited(_accelerometerSubscription?.cancel());
     _messageController.dispose();
     _scrollController.dispose();
     _focusNode.dispose();
