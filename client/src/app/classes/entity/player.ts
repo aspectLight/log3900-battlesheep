@@ -87,14 +87,14 @@ export class Player extends Entity {
 
         player.id = obj.id;
         player.name = obj.name;
-        player.avatar = obj.avatar;
+        player.avatar = typeof obj.avatar === 'string' ? (AVATAR_TYPES[obj.avatar] ?? null) : obj.avatar;
         player.actionPoints = obj.actionPoints;
         player.movementPoints = obj.movementPoints;
         player.bonusChoice = obj.bonusChoice;
         player.d6Choice = obj.d6Choice;
         player.d4Choice = obj.d4Choice;
-        player.orientation = obj.orientation;
-        player.animationState = obj.animationState;
+        player.orientation = obj.orientation ?? 'down';
+        player.animationState = obj.animationState ?? 'idle';
         player.color = obj.color;
         if (obj.spawnPoint) {
             player.spawnPoint = obj.spawnPoint;
