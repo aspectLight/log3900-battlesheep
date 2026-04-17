@@ -22,6 +22,7 @@ class _JoinQrScannerDialogState extends State<JoinQrScannerDialog> {
     super.initState();
     _controller = MobileScannerController(
       formats: const <BarcodeFormat>[BarcodeFormat.qrCode],
+      cameraResolution: const Size(1920, 1080),
     );
   }
 
@@ -53,8 +54,9 @@ class _JoinQrScannerDialogState extends State<JoinQrScannerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final JoinGameSessionLocalizations l10n =
-        JoinGameSessionLocalizations.of(context)!;
+    final JoinGameSessionLocalizations l10n = JoinGameSessionLocalizations.of(
+      context,
+    )!;
     return Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       backgroundColor: Colors.black,
@@ -65,7 +67,11 @@ class _JoinQrScannerDialogState extends State<JoinQrScannerDialog> {
           child: Stack(
             fit: StackFit.expand,
             children: <Widget>[
-              MobileScanner(controller: _controller, onDetect: _onDetect),
+              MobileScanner(
+                controller: _controller,
+                onDetect: _onDetect,
+                tapToFocus: true,
+              ),
               Positioned(
                 left: 0,
                 right: 0,
