@@ -32,8 +32,7 @@ class TutorialLocalizationsEn extends TutorialLocalizations {
   String get friendsTitle => 'Friends';
 
   @override
-  String get friendsDesc =>
-      'Add friends, block enemies, manage requests, and see who is online.';
+  String get friendsDesc => 'Add friends, block enemies and manage requests.';
 
   @override
   String get chatTitle => 'Chat';

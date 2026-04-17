@@ -33,7 +33,7 @@ class TutorialLocalizationsFr extends TutorialLocalizations {
 
   @override
   String get friendsDesc =>
-      'Ajoutez des amis, bloquez vos ennemis, gérez vos demandes et voyez qui est en ligne.';
+      'Ajoutez des amis, bloquez vos ennemis et gérez vos demandes';
 
   @override
   String get chatTitle => 'Chat';

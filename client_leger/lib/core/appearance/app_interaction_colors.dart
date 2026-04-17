@@ -37,7 +37,7 @@ class AppInteractionColors extends ThemeExtension<AppInteractionColors> {
     danger: Color(0xFF8B0000),
     dangerBorder: Color(0xFFDC3545),
     focus: Color(0xFF4A9CC4),
-    text: Color(0xFFd0eaf8),
+    text: Color.fromARGB(255, 117, 131, 139),
   );
 
   static const AppInteractionColors villagePalette = AppInteractionColors(
