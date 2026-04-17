@@ -9,4 +9,5 @@ export interface Room {
     isDebugging: boolean;
     dropInDropOut?: boolean;
     entryFee?: number;
+    friendsOnly?: boolean;
 }
