@@ -47,7 +47,7 @@ export class PlayerCardComponent implements OnInit {
     private resolveProfileAvatar(): string | null {
         if (this.player.profileAvatarUrl) {
             const url = this.player.profileAvatarUrl;
-            return url.startsWith('http://') || url.startsWith('https://') ? url : `${environment.baseUrl}${url}`;
+            return url.startsWith('http://') || url.startsWith('https://') ? url : `${environment.serverUrl}${url}`;
         }
         if (!this.player.profileAvatarId) return null;
         const avatar = ACCOUNT_CREATION_AVATARS.find((a) => a.id === this.player.profileAvatarId);
