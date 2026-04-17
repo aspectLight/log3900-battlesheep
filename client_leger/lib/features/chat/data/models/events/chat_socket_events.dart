@@ -12,4 +12,5 @@ abstract class GeneralChatEvents {
   static const String generalChatEmoji = 'generalChatEmoji';
 
   static const String avatarUpdated = 'avatarUpdated';
+  static const String usernameUpdated = 'usernameUpdated';
 }

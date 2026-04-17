@@ -611,6 +611,8 @@
     "join_impossible": "Impossible de rejoindre la partie.",
     "max_player_limit": "Le nombre maximum de joueurs a été atteint, impossible de déverrouiller la salle.",
     "room_not_found": "La salle n'existe pas.",
-    "room_locked": "La salle est verrouillée."
-  }
+    "room_locked": "La salle est verrouillée.",
+        "avatar_already_used": "Ce personnage est déjà utilisé par un autre joueur.",
+        "game_started_left_out_character_creation": "La partie a commencé sans vous. Retour au menu principal."
+    }
 }

@@ -14,6 +14,7 @@ import '../../../../core/app_transition/auto_scope_coordinator.dart';
 import '../../../../core/app_transition/app_transition_bus.dart';
 import '../../../../core/connected_scope/session_scope_manager.dart';
 import '../../../../core/notification/notification_coordinator.dart';
+import '../../../../core/notification/notification_intent.dart';
 import '../../../../routing/app_navigator.dart';
 import '../../../../routing/navigation_command.dart';
 import '../../../game_history/data/repositories/game_history_repository.dart';
@@ -280,6 +281,12 @@ class GameSessionCoordinator
             await _gameHistoryRepository.abandonGameHistory(startDate);
           }
       }
+    }
+    if (event is LeaveGameSessionRequestedCommand &&
+        event.reason == PlayerLeaveReason.abandoned) {
+      notificationCoordinator.addIntent(
+        const GameCanceledNotificationIntent(isSelfLeave: true),
+      );
     }
     notificationCoordinator.clearScopeEntries();
     switch (event) {

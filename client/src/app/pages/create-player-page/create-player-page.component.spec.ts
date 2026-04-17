@@ -23,12 +23,16 @@ describe('CreatePlayerPageComponent', () => {
 
     let roomLockedSubject: Subject<boolean>;
     let reservedAvatarsSubject: Subject<{ reservorId: string; chosenAvatar: string }[]>;
+    let avatarReservationFailedSubject: Subject<{ error: string }>;
+    let characterCreationGameStartedLeftOutSubject: Subject<void>;
 
     beforeEach(async () => {
         roomLockedSubject = new Subject<boolean>();
         reservedAvatarsSubject = new Subject<{ reservorId: string; chosenAvatar: string }[]>();
+        avatarReservationFailedSubject = new Subject<{ error: string }>();
+        characterCreationGameStartedLeftOutSubject = new Subject<void>();
 
-        mockPlayerCreationService = jasmine.createSpyObj('PlayerCreationService', ['createPlayer'], ['selectedCharacter', 'selectedBonus']);
+        mockPlayerCreationService = jasmine.createSpyObj('PlayerCreationService', ['createPlayer', 'clearAvatar'], ['selectedCharacter', 'selectedBonus']);
         mockGameCreationService = jasmine.createSpyObj('GameCreationService', [], ['isHost', 'gameCode', 'selectedGame']);
         mockSocketService = jasmine.createSpyObj(
             'RoomSocketService',
@@ -38,6 +42,7 @@ describe('CreatePlayerPageComponent', () => {
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
         mockSocketService.getId.and.returnValue('1');
+        mockSocketService.reserveAvatar.and.returnValue(Promise.resolve());
 
         Object.defineProperty(mockGameCreationService, 'isHost', { get: () => true });
         Object.defineProperty(mockGameCreationService, 'gameCode', { get: () => 'testCode' });
@@ -45,6 +50,12 @@ describe('CreatePlayerPageComponent', () => {
 
         Object.defineProperty(mockSocketService, 'roomLocked$', { get: () => roomLockedSubject.asObservable() });
         Object.defineProperty(mockSocketService, 'reservedAvatars$', { get: () => reservedAvatarsSubject.asObservable() });
+        Object.defineProperty(mockSocketService, 'avatarReservationFailed$', {
+            get: () => avatarReservationFailedSubject.asObservable(),
+        });
+        Object.defineProperty(mockSocketService, 'characterCreationGameStartedLeftOut$', {
+            get: () => characterCreationGameStartedLeftOutSubject.asObservable(),
+        });
 
         Object.defineProperty(mockPlayerCreationService, 'selectedCharacter', {
             get: () => ({
@@ -100,15 +111,15 @@ describe('CreatePlayerPageComponent', () => {
         expect(component.reservedAvatars).toEqual(avatars);
     });
 
-    it('onCharacterSelected should update selectedCharacter and call reserveAvatar', () => {
+    it('onCharacterSelected should update selectedCharacter and call reserveAvatar', async () => {
         const chosenAvatar = { name: '', id: 1 };
         const expectedCharacter = {
             character: { name: '', id: 1, avatar: '', avatarFull: '' },
             bonus: { life: DEFAULT_STATS_VALUE, speed: DEFAULT_STATS_VALUE, defense: DEFAULT_STATS_VALUE, attack: DEFAULT_STATS_VALUE },
         };
-        component.onCharacterSelected(chosenAvatar);
+        await component.onCharacterSelected(chosenAvatar);
         expect(mockPlayerCreationService.selectedCharacter).toEqual(expectedCharacter);
-        expect(mockSocketService.reserveAvatar).toHaveBeenCalledWith('testCode', chosenAvatar.name, chosenAvatar.id.toString());
+        expect(mockSocketService.reserveAvatar).toHaveBeenCalledWith('testCode', chosenAvatar.name, '1');
     });
 
     it('onBonusSelected should update selectedBonus', () => {

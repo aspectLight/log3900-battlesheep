@@ -130,6 +130,8 @@ class AuthRepositoryImpl extends AuthRepository {
               email: command.email,
               password: command.password,
               avatarId: command.avatarId,
+              language: command.language,
+              theme: command.theme,
             )
             .run();
         switch (signUpResult) {

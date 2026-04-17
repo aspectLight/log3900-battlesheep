@@ -22,7 +22,7 @@ void registerWaitingRoomScopeViewModels(GetIt scope, GetIt rootGetIt) {
       toggleDropInDropOutUseCase: scope.get<ToggleDropInDropOutUseCase>(),
       kickPlayerUseCase: scope.get<KickPlayerUseCase>(),
       startWaitingRoomGameUseCase: scope.get<StartWaitingRoomGameUseCase>(),
-      shopRepository: rootGetIt.get<ShopRepository>(),
+      shopRepository: scope.get<ShopRepository>(),
     ),
   );
 }

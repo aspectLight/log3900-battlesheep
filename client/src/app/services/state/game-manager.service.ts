@@ -96,10 +96,11 @@ export class GameManagerService {
     }
 
     get isCTF(): boolean {
-        return this.game.isCTF;
+        return this.game?.isCTF ?? false;
     }
 
     get mainPlayer(): Player | null {
+        if (!this.board) return null;
         return this.board.getPlayerById(this.mainPlayerId);
     }
 
@@ -287,7 +288,8 @@ export class GameManagerService {
         return this.room.players;
     }
 
-    getMainPlayer() {
+    getMainPlayer(): Player | null {
+        if (!this.board) return null;
         return this.board.getPlayerById(this.mainPlayerId);
     }
 
@@ -311,6 +313,7 @@ export class GameManagerService {
     }
 
     getPlayerById(playerId: string): Player | null {
+        if (!this.board) return null;
         return this.board.getPlayerById(playerId);
     }
 

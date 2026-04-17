@@ -30,6 +30,10 @@ export class RoomSocketService implements ISocketService {
     isKicked$: Observable<boolean>;
     reservedAvatars$: Observable<Reservation[]>;
     availableRoomsChanged$: Observable<void>;
+    /** Server push when `reserveAvatar` fails (same payload as ACK error); use for notifications. */
+    avatarReservationFailed$: Observable<{ error: string }>;
+    /** Waiting room transitioned to game but this socket is not in `gameRoom.players` (e.g. still on character creation). */
+    characterCreationGameStartedLeftOut$: Observable<void>;
     socket: Socket;
     private room: Room;
     private roomLockedSubject = new BehaviorSubject<boolean>(false);
@@ -37,6 +41,8 @@ export class RoomSocketService implements ISocketService {
     private isKickedSubject = new BehaviorSubject<boolean>(false);
     private reservedAvatarsSubject = new BehaviorSubject<Reservation[]>([]);
     private availableRoomsChangedSubject = new Subject<void>();
+    private readonly avatarReservationFailedSubject = new Subject<{ error: string }>();
+    private readonly characterCreationGameStartedLeftOutSubject = new Subject<void>();
 
     constructor(
         private socketService: SocketService,
@@ -61,6 +67,8 @@ export class RoomSocketService implements ISocketService {
         this.isKicked$ = this.isKickedSubject.asObservable();
         this.reservedAvatars$ = this.reservedAvatarsSubject.asObservable();
         this.availableRoomsChanged$ = this.availableRoomsChangedSubject.asObservable();
+        this.avatarReservationFailed$ = this.avatarReservationFailedSubject.asObservable();
+        this.characterCreationGameStartedLeftOut$ = this.characterCreationGameStartedLeftOutSubject.asObservable();
 
         this.waitingPlayerService.room$.subscribe((room) => {
             this.room = room;
@@ -257,7 +265,13 @@ export class RoomSocketService implements ISocketService {
             this.socketService.navigateToHome();
         });
 
-        this.socket.on(GameRoomEvents.GameRoomCreated, (gameRoom) => {
+        this.socket.on(GameRoomEvents.GameRoomCreated, (gameRoom: Room) => {
+            const socketId = this.socket.id;
+            const inRoster = !!(socketId && gameRoom.players?.some((p) => p.id === socketId));
+            if (!inRoster) {
+                this.characterCreationGameStartedLeftOutSubject.next();
+                return;
+            }
             this.waitingPlayerService.resetRoom();
             this.gameManagerService.resetManager();
             this.gameRoomService.updateRoom(gameRoom);
@@ -269,6 +283,13 @@ export class RoomSocketService implements ISocketService {
 
         this.socket.on(WaitingRoomEvents.UpdateAvatarReserved, (data) => {
             this.reservedAvatarsSubject.next(data.reservedAvatars);
+        });
+
+        this.socket.on(WaitingRoomEvents.AvatarReservationFailed, (data: { error?: string }) => {
+            const error = data && typeof data.error === 'string' ? data.error : '';
+            if (error.length > 0) {
+                this.avatarReservationFailedSubject.next({ error });
+            }
         });
 
         this.socket.on(WaitingRoomEvents.PlayerLeft, (playerId) => {

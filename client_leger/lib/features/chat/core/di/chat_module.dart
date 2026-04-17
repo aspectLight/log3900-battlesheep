@@ -59,8 +59,8 @@ void registerChatScope(
     ChatSocket(socketService: rootGetIt<SocketService>()),
     dispose: (socket) => socket.dispose(),
   );
-  registerChatRepositories(scope, rootGetIt);
-  registerChatViewModels(scope, rootGetIt, username: username);
+  registerChatRepositories(scope, rootGetIt, username: username);
+  registerChatViewModels(scope, rootGetIt);
   registerChatProjection(scope, rootGetIt);
   registerChatSideEffects(scope, rootGetIt, username: username);
 }

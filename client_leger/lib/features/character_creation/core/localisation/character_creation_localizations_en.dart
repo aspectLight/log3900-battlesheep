@@ -71,5 +71,9 @@ class CharacterCreationLocalizationsEn extends CharacterCreationLocalizations {
       'The selected game is hidden or deleted.';
 
   @override
+  String get gameStartedWhileCreating =>
+      'The game has started without you. You will return to the main menu.';
+
+  @override
   String get reserveCharacterFailed => 'Could not reserve character.';
 }

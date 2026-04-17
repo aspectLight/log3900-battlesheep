@@ -36,6 +36,8 @@
   "profileAverageTime": "Temps moyen par partie",
   "profileThemeLabel": "Thème visuel",
   "profileLanguageLabel": "Langue",
+  "languageNameFr": "Français",
+  "languageNameEn": "Anglais",
   "themeNameDefault": "Classique",
   "themeNameFrost": "Froid Sibérien",
   "themeNameVillage": "Village Abandonné",

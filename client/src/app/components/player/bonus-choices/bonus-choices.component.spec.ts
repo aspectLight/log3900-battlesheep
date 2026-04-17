@@ -21,9 +21,9 @@ describe('BonusChoicesComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should initialize with default values', () => {
-        expect(component.attackDice).toBeNull();
-        expect(component.defenseDice).toBeNull();
+    it('should initialize with attack D4 and defense D6 like the mobile client', () => {
+        expect(component.attackDice).toBe(BonusValue.DEFAULT);
+        expect(component.defenseDice).toBe(BonusValue.BOOSTED);
         expect(component.selectedBonus).toBeNull();
     });
 

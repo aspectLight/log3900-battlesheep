@@ -3,7 +3,7 @@ import 'package:get_it/get_it.dart';
 import '../../../../../core/app_transition/app_transition_bus.dart';
 import '../../../../../core/connected_scope/session_scope_manager.dart';
 import '../../../../../core/notification/notification_intent.dart';
-import '../../../shop/data/repositories/shop_repository.dart';
+import '../../../shop/data/scoped_shop_access.dart';
 import '../../domain/use_cases/join_by_code_use_case.dart';
 import '../../domain/use_cases/get_available_rooms_use_case.dart';
 import '../event_bus/join_game_session_event_bus.dart';
@@ -45,7 +45,7 @@ void registerJoinGameSessionViewModels(GetIt getIt) {
       socketId: socketId,
       appTransitionEventBus: getIt<AppTransitionEventBus>(),
       joinGameSessionEventBus: getIt<JoinGameSessionEventBus>(),
-      shopRepository: getIt<ShopRepository>(),
+      shopRepository: scopedShopRepositoryOrNull(getIt)!,
     );
   });
 }

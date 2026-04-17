@@ -1,3 +1,4 @@
+import '../../core/extensions/tile_type_ext.dart';
 import '../commands/game_movement_commands.dart';
 import '../models/game_board_position.dart';
 import '../../data/repositories/game_board_repository.dart';
@@ -50,6 +51,11 @@ class DebugTeleportPlayerUseCase {
     final boardState = _boardRepository.state.value;
     final board = boardState.board;
     if (!board.isInBounds(x, y)) return false;
-    return board.matrix[x][y].isEmpty(boardState);
+    final cell = board.matrix[x][y];
+    final hasPlayer = boardState.playerPositions.values.any(
+      (p) => p.x == x && p.y == y,
+    );
+    // Match Angular `isCellFree` / server teleport: items do not block; server picks them up.
+    return !hasPlayer && cell.tile.isReachableForMovement;
   }
 }

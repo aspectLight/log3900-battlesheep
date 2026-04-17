@@ -172,6 +172,8 @@ mixin _$SignUpCommand {
   String get email => throw _privateConstructorUsedError;
   String get password => throw _privateConstructorUsedError;
   String get avatarId => throw _privateConstructorUsedError;
+  String? get language => throw _privateConstructorUsedError;
+  String? get theme => throw _privateConstructorUsedError;
 
   /// Create a copy of SignUpCommand
   /// with the given fields replaced by the non-null parameter values.
@@ -187,7 +189,14 @@ abstract class $SignUpCommandCopyWith<$Res> {
     $Res Function(SignUpCommand) then,
   ) = _$SignUpCommandCopyWithImpl<$Res, SignUpCommand>;
   @useResult
-  $Res call({String username, String email, String password, String avatarId});
+  $Res call({
+    String username,
+    String email,
+    String password,
+    String avatarId,
+    String? language,
+    String? theme,
+  });
 }
 
 /// @nodoc
@@ -209,6 +218,8 @@ class _$SignUpCommandCopyWithImpl<$Res, $Val extends SignUpCommand>
     Object? email = null,
     Object? password = null,
     Object? avatarId = null,
+    Object? language = freezed,
+    Object? theme = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -228,6 +239,14 @@ class _$SignUpCommandCopyWithImpl<$Res, $Val extends SignUpCommand>
                 ? _value.avatarId
                 : avatarId // ignore: cast_nullable_to_non_nullable
                       as String,
+            language: freezed == language
+                ? _value.language
+                : language // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            theme: freezed == theme
+                ? _value.theme
+                : theme // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -243,7 +262,14 @@ abstract class _$$SignUpCommandImplCopyWith<$Res>
   ) = __$$SignUpCommandImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String username, String email, String password, String avatarId});
+  $Res call({
+    String username,
+    String email,
+    String password,
+    String avatarId,
+    String? language,
+    String? theme,
+  });
 }
 
 /// @nodoc
@@ -264,6 +290,8 @@ class __$$SignUpCommandImplCopyWithImpl<$Res>
     Object? email = null,
     Object? password = null,
     Object? avatarId = null,
+    Object? language = freezed,
+    Object? theme = freezed,
   }) {
     return _then(
       _$SignUpCommandImpl(
@@ -283,6 +311,14 @@ class __$$SignUpCommandImplCopyWithImpl<$Res>
             ? _value.avatarId
             : avatarId // ignore: cast_nullable_to_non_nullable
                   as String,
+        language: freezed == language
+            ? _value.language
+            : language // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        theme: freezed == theme
+            ? _value.theme
+            : theme // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -296,6 +332,8 @@ class _$SignUpCommandImpl implements _SignUpCommand {
     required this.email,
     required this.password,
     required this.avatarId,
+    this.language,
+    this.theme,
   });
 
   @override
@@ -306,10 +344,14 @@ class _$SignUpCommandImpl implements _SignUpCommand {
   final String password;
   @override
   final String avatarId;
+  @override
+  final String? language;
+  @override
+  final String? theme;
 
   @override
   String toString() {
-    return 'SignUpCommand(username: $username, email: $email, password: $password, avatarId: $avatarId)';
+    return 'SignUpCommand(username: $username, email: $email, password: $password, avatarId: $avatarId, language: $language, theme: $theme)';
   }
 
   @override
@@ -323,12 +365,22 @@ class _$SignUpCommandImpl implements _SignUpCommand {
             (identical(other.password, password) ||
                 other.password == password) &&
             (identical(other.avatarId, avatarId) ||
-                other.avatarId == avatarId));
+                other.avatarId == avatarId) &&
+            (identical(other.language, language) ||
+                other.language == language) &&
+            (identical(other.theme, theme) || other.theme == theme));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, username, email, password, avatarId);
+  int get hashCode => Object.hash(
+    runtimeType,
+    username,
+    email,
+    password,
+    avatarId,
+    language,
+    theme,
+  );
 
   /// Create a copy of SignUpCommand
   /// with the given fields replaced by the non-null parameter values.
@@ -345,6 +397,8 @@ abstract class _SignUpCommand implements SignUpCommand {
     required final String email,
     required final String password,
     required final String avatarId,
+    final String? language,
+    final String? theme,
   }) = _$SignUpCommandImpl;
 
   @override
@@ -355,6 +409,10 @@ abstract class _SignUpCommand implements SignUpCommand {
   String get password;
   @override
   String get avatarId;
+  @override
+  String? get language;
+  @override
+  String? get theme;
 
   /// Create a copy of SignUpCommand
   /// with the given fields replaced by the non-null parameter values.

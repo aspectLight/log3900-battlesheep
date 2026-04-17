@@ -62,7 +62,13 @@ class GameCanceledNotificationIntent extends NotificationIntent {
 
   final void Function()? onComplete;
 
-  const GameCanceledNotificationIntent({this.onComplete});
+  /// When true, the local user chose to leave (matches web `main.game_left`).
+  final bool isSelfLeave;
+
+  const GameCanceledNotificationIntent({
+    this.onComplete,
+    this.isSelfLeave = false,
+  });
 }
 
 class InventoryFullDiscardIntent extends NotificationIntent {
@@ -108,6 +114,13 @@ class CharacterCreationReserveFailedNotificationIntent
 
 class CharacterCreationRoomLockedNotificationIntent extends NotificationIntent {
   const CharacterCreationRoomLockedNotificationIntent({this.onDismissAction});
+
+  @override
+  final void Function()? onDismissAction;
+}
+
+class CharacterCreationGameStartedNotificationIntent extends NotificationIntent {
+  const CharacterCreationGameStartedNotificationIntent({this.onDismissAction});
 
   @override
   final void Function()? onDismissAction;

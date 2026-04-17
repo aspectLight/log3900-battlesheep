@@ -8,7 +8,11 @@ import '../../data/repositories/chat_panel_state_repository.dart';
 import '../../data/repositories/chat_repository.dart';
 import '../../data/services/chat_socket.dart';
 
-void registerChatRepositories(GetIt scope, GetIt rootGetIt) {
+void registerChatRepositories(
+  GetIt scope,
+  GetIt rootGetIt, {
+  required String username,
+}) {
   scope.registerLazySingleton<EventBus>(EventBus.new);
   scope.registerLazySingleton<ChatEventBus>(
     () => ChatEventBus(scope.get<EventBus>()),
@@ -21,6 +25,7 @@ void registerChatRepositories(GetIt scope, GetIt rootGetIt) {
       chatSocket: scope.get<ChatSocket>(),
       reducer: rootGetIt.get<ChatStateReducer>(),
       authRepository: rootGetIt<AuthRepository>(),
+      initialGeneralChatUsername: username,
     ),
   );
 }

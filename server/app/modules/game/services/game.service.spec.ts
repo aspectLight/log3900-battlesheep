@@ -27,8 +27,9 @@ describe('GameService', () => {
                         findOne: jest.fn().mockReturnValue({ exec: jest.fn() }),
                         find: jest.fn().mockReturnValue({ exec: jest.fn() }),
                         findById: jest.fn().mockReturnValue({ exec: jest.fn() }),
-                        findByIdAndUpdate: jest.fn().mockReturnValue({ exec: jest.fn() }),
-                        findByIdAndDelete: jest.fn().mockReturnValue({ exec: jest.fn() }),
+                        findOneAndUpdate: jest.fn().mockReturnValue({ exec: jest.fn() }),
+                        updateMany: jest.fn().mockReturnValue({ exec: jest.fn() }),
+                        deleteMany: jest.fn().mockReturnValue({ exec: jest.fn() }),
                         create: jest.fn(),
                     },
                 },
@@ -56,10 +57,11 @@ describe('GameService', () => {
         await expect(service.createGame({ name: 'Existing Game' } as Game)).rejects.toThrow(new ConflictException(ErrorMessages.GameAlreadyExists));
     });
 
-    it('getAllGames() should return all games', async () => {
+    it('getAllGames() should return all active games', async () => {
         (gameModel.find as jest.Mock).mockReturnValue({ exec: jest.fn().mockResolvedValue([{ _id: validMongoId }] as Game[]) });
 
         await expect(service.getAllGames()).resolves.toEqual([{ _id: validMongoId }]);
+        expect(gameModel.find).toHaveBeenCalledWith({ deletedAt: null });
     });
 
     it('getAllGames() should throw 404 if no games exist', async () => {
@@ -68,24 +70,32 @@ describe('GameService', () => {
         await expect(service.getAllGames()).rejects.toThrow(NotFoundException);
     });
 
-    it('getGameById() should return a game with a valid id', async () => {
-        (gameModel.findById as jest.Mock).mockReturnValue({ exec: jest.fn().mockResolvedValue({ _id: validMongoId } as Game) });
+    it('getGameById() should return an active game with a valid id', async () => {
+        (gameModel.findOne as jest.Mock).mockReturnValue({ exec: jest.fn().mockResolvedValue({ _id: validMongoId } as Game) });
 
         await expect(service.getGameById(validMongoId)).resolves.toEqual({ _id: validMongoId });
+        expect(gameModel.findOne).toHaveBeenCalledWith({ _id: validMongoId, deletedAt: null });
+    });
+
+    it('getGameBlueprintById() should return a soft-deleted game until purged', async () => {
+        const softDeleted = { _id: validMongoId, deletedAt: new Date() } as Game;
+        (gameModel.findById as jest.Mock).mockReturnValue({ exec: jest.fn().mockResolvedValue(softDeleted) });
+
+        await expect(service.getGameBlueprintById(validMongoId)).resolves.toEqual(softDeleted);
     });
 
     it('getGameById() should throw 400 if the id format is invalid', async () => {
         await expect(service.getGameById('invalidId')).rejects.toThrow(new BadRequestException(ErrorMessages.InvalidIdFormat));
     });
 
-    it('getGameById() should throw 404 if game does not exist', async () => {
-        (gameModel.findById as jest.Mock).mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
+    it('getGameById() should throw 404 if game does not exist or is soft-deleted', async () => {
+        (gameModel.findOne as jest.Mock).mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
 
         await expect(service.getGameById(validMongoId)).rejects.toThrow(new NotFoundException(ErrorMessages.GameDoesNotExist));
     });
 
     it('updateGame() should update a game', async () => {
-        (gameModel.findByIdAndUpdate as jest.Mock).mockReturnValue({
+        (gameModel.findOneAndUpdate as jest.Mock).mockReturnValue({
             exec: jest.fn().mockResolvedValue({ _id: validMongoId, name: 'updatedName' } as Game),
         });
 
@@ -106,15 +116,15 @@ describe('GameService', () => {
     });
 
     it('updateGame() should throw 404 if the game does not exist', async () => {
-        (gameModel.findByIdAndUpdate as jest.Mock).mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
+        (gameModel.findOneAndUpdate as jest.Mock).mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
 
         await expect(service.updateGame(validMongoId, { name: 'updatedName' })).rejects.toThrow(
             new NotFoundException(ErrorMessages.GameDoesNotExist),
         );
     });
 
-    it('deleteGame() should delete a game', async () => {
-        (gameModel.findByIdAndDelete as jest.Mock).mockReturnValue({
+    it('deleteGame() should soft-delete a game', async () => {
+        (gameModel.findOneAndUpdate as jest.Mock).mockReturnValue({
             exec: jest.fn().mockResolvedValue({ _id: validMongoId } as Game),
         });
 
@@ -126,7 +136,7 @@ describe('GameService', () => {
     });
 
     it('deleteGame() should throw 404 if the game does not exist', async () => {
-        (gameModel.findByIdAndDelete as jest.Mock).mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
+        (gameModel.findOneAndUpdate as jest.Mock).mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
 
         await expect(service.deleteGame(validMongoId)).rejects.toThrow(new NotFoundException(ErrorMessages.GameDoesNotExist));
     });
@@ -138,7 +148,7 @@ describe('GameService', () => {
         const updates: Partial<Game> = { board: mockBoard };
         const expectedGame = { _id: validMongoId, ...updates, modificationDate: mockDate };
 
-        (gameModel.findByIdAndUpdate as jest.Mock).mockReturnValue({
+        (gameModel.findOneAndUpdate as jest.Mock).mockReturnValue({
             exec: jest.fn().mockResolvedValue(expectedGame),
         });
 

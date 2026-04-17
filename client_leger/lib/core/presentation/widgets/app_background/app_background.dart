@@ -43,6 +43,7 @@ class _AppBackgroundState extends State<AppBackground>
     return Watch((context) {
       final visual = getIt<AppAppearanceService>().visualTheme.value;
       final isDefault = visual == AppVisualTheme.defaultTheme;
+      final size = MediaQuery.sizeOf(context);
 
       return Scaffold(
         backgroundColor: Colors.black,
@@ -50,58 +51,69 @@ class _AppBackgroundState extends State<AppBackground>
           children: [
             ClipRect(
               child: SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: isDefault
-                    ? AnimatedBuilder(
-                        animation: _controller,
-                        builder: (context, child) {
-                          return Transform.translate(
-                            offset: Offset(
-                              -MediaQuery.of(context).size.width *
-                                  _controller.value,
-                              0,
-                            ),
-                            child: OverflowBox(
-                              alignment: Alignment.topLeft,
-                              maxWidth: double.infinity,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Image.asset(
-                                    backgroundAssetForVisualTheme(visual),
-                                    width: MediaQuery.of(context).size.width,
-                                    height: MediaQuery.of(context).size.height,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  Image.asset(
-                                    backgroundAssetForVisualTheme(visual),
-                                    width: MediaQuery.of(context).size.width,
-                                    height: MediaQuery.of(context).size.height,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ],
+                width: size.width,
+                height: size.height,
+                child: RepaintBoundary(
+                  child: isDefault
+                      ? AnimatedBuilder(
+                          animation: _controller,
+                          builder: (context, child) {
+                            return Transform.translate(
+                              offset: Offset(
+                                -size.width * _controller.value,
+                                0,
                               ),
-                            ),
-                          );
-                        },
-                      )
-                    : ImageFiltered(
-                        imageFilter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-                        child: Image.asset(
-                          backgroundAssetForVisualTheme(visual),
-                          width: double.infinity,
-                          height: double.infinity,
-                          fit: BoxFit.cover,
+                              child: OverflowBox(
+                                alignment: Alignment.topLeft,
+                                maxWidth: double.infinity,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Image.asset(
+                                      backgroundAssetForVisualTheme(visual),
+                                      width: size.width,
+                                      height: size.height,
+                                      fit: BoxFit.cover,
+                                      filterQuality: FilterQuality.medium,
+                                      gaplessPlayback: true,
+                                    ),
+                                    Image.asset(
+                                      backgroundAssetForVisualTheme(visual),
+                                      width: size.width,
+                                      height: size.height,
+                                      fit: BoxFit.cover,
+                                      filterQuality: FilterQuality.medium,
+                                      gaplessPlayback: true,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        )
+                      : ImageFiltered(
+                          imageFilter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+                          child: Image.asset(
+                            backgroundAssetForVisualTheme(visual),
+                            width: double.infinity,
+                            height: double.infinity,
+                            fit: BoxFit.cover,
+                            filterQuality: FilterQuality.medium,
+                            gaplessPlayback: true,
+                          ),
                         ),
-                      ),
+                ),
               ),
             ),
             Positioned.fill(
-              child: Image.asset(
-                UiAssets.snow,
-                fit: BoxFit.cover,
-                opacity: const AlwaysStoppedAnimation(0.5),
+              child: RepaintBoundary(
+                child: Image.asset(
+                  UiAssets.snow,
+                  fit: BoxFit.cover,
+                  opacity: const AlwaysStoppedAnimation(0.5),
+                  filterQuality: FilterQuality.low,
+                  gaplessPlayback: true,
+                ),
               ),
             ),
             widget.child,

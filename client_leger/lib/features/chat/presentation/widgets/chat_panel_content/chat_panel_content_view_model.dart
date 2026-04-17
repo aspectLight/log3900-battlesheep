@@ -16,7 +16,6 @@ class ChatPanelContentViewModel {
     required ChatPanelStateRepository panelStateRepository,
     required ChatOutgoingAvatars outgoingAvatars,
     required ChatAvatarRegistry avatarRegistry,
-    required this.currentUsername,
   }) : _repository = repository,
        _panelStateRepository = panelStateRepository,
        _outgoingAvatars = outgoingAvatars,
@@ -26,7 +25,6 @@ class ChatPanelContentViewModel {
   final ChatPanelStateRepository _panelStateRepository;
   final ChatOutgoingAvatars _outgoingAvatars;
   final ChatAvatarRegistry _avatarRegistry;
-  final String currentUsername;
 
   late final lastSentMessage = computed<Option<String>>(
     () => _panelStateRepository.lastSentMessage.value,
@@ -39,6 +37,7 @@ class ChatPanelContentViewModel {
 
   late final uiMessages = computed(() {
     _avatarRegistry.entries.value;
+    final localUser = _repository.generalChatLocalUsername.value;
     final chatState = _repository.state.value;
     _avatarRegistry.ensureLoaded(chatState.messages.map((e) => e.name));
     return chatState.messages
@@ -50,7 +49,7 @@ class ChatPanelContentViewModel {
           );
           return toChatMessageUi(
             e,
-            currentUsername: currentUsername,
+            currentUsername: localUser,
             displayAvatarId: resolved.avatarId,
             displayAvatarUrl: resolved.avatarUrl,
             avatarDisplayNonce: resolved.avatarDisplayNonce,
@@ -62,7 +61,7 @@ class ChatPanelContentViewModel {
   void sendMessage(String content) {
     if (content.trim().isEmpty) return;
     final command = SendChatMessageCommand(
-      username: currentUsername,
+      username: _repository.generalChatLocalUsername.value,
       content: content,
       avatarId: _outgoingAvatars.avatarId,
       avatarUrl: _outgoingAvatars.avatarUrlForSocket,
@@ -73,7 +72,7 @@ class ChatPanelContentViewModel {
 
   void sendEmoji(String emoji) {
     final command = SendChatEmojiCommand(
-      username: currentUsername,
+      username: _repository.generalChatLocalUsername.value,
       emoji: emoji,
     );
     _repository.sendEmoji(command);

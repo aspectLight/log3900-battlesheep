@@ -11,6 +11,7 @@ import '../../../../features/join_game_session/core/localisation/join_game_sessi
 import '../../../../features/profile/core/localisation/profile_localizations.dart';
 import '../../../../features/select_game_session/core/localisation/select_game_session_localizations.dart';
 import '../../../../features/shop/data/repositories/shop_repository.dart';
+import '../../../../features/shop/data/scoped_shop_access.dart';
 import '../../../../features/shop/domain/state/shop_state.dart';
 import '../../../../features/waiting_room/core/localisation/waiting_room_localizations.dart';
 import '../../../../routing/app_navigator.dart';
@@ -46,8 +47,6 @@ class _ShellQuickSettingsOverlayState extends State<ShellQuickSettingsOverlay> {
   String _currentAvatarId = '';
   String? _currentAvatarUrl;
   String? _lastAuthAccountKey;
-
-  ShopRepository get _shopRepository => GetIt.I<ShopRepository>();
 
   static const _balanceTextStyle = TextStyle(
     color: Color(0xFFF0C040),
@@ -300,9 +299,11 @@ class _ShellQuickSettingsOverlayState extends State<ShellQuickSettingsOverlay> {
       final avatarUrl = (_currentAvatarUrl?.trim().isNotEmpty ?? false)
           ? EnvConfig.resolveAvatarUrl(_currentAvatarUrl!)
           : null;
-      final balance = switch (_shopRepository.state.value) {
+      final shopRepo = scopedShopRepositoryOrNull(GetIt.I);
+      final balance = switch (shopRepo?.state.value) {
         ShopStateLoaded(:final balance) => balance,
         ShopStateLoading() => 0,
+        null => 0,
       };
 
       return Stack(

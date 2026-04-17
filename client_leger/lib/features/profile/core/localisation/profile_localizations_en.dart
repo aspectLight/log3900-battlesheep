@@ -1,6 +1,5 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'profile_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -126,6 +125,12 @@ class ProfileLocalizationsEn extends ProfileLocalizations {
   String get profileLanguageLabel => 'Language';
 
   @override
+  String get languageNameFr => 'French';
+
+  @override
+  String get languageNameEn => 'English';
+
+  @override
   String get themeNameDefault => 'Classic';
 
   @override
@@ -149,12 +154,6 @@ class ProfileLocalizationsEn extends ProfileLocalizations {
 
   @override
   String get profileConfirmDelete => 'Delete';
-
-  @override
-  String get languageNameFr => 'French';
-
-  @override
-  String get languageNameEn => 'English';
 
   @override
   String get profileDeleting => 'Deleting...';

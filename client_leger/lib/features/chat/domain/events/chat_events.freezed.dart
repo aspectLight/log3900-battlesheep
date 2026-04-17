@@ -313,3 +313,167 @@ abstract class _ChatHistorySetEvent implements ChatHistorySetEvent {
   _$$ChatHistorySetEventImplCopyWith<_$ChatHistorySetEventImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
+
+/// @nodoc
+mixin _$ChatUsernameUpdatedEvent {
+  String get oldUsername => throw _privateConstructorUsedError;
+  String get newUsername => throw _privateConstructorUsedError;
+
+  /// Create a copy of ChatUsernameUpdatedEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $ChatUsernameUpdatedEventCopyWith<ChatUsernameUpdatedEvent> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ChatUsernameUpdatedEventCopyWith<$Res> {
+  factory $ChatUsernameUpdatedEventCopyWith(
+    ChatUsernameUpdatedEvent value,
+    $Res Function(ChatUsernameUpdatedEvent) then,
+  ) = _$ChatUsernameUpdatedEventCopyWithImpl<$Res, ChatUsernameUpdatedEvent>;
+  @useResult
+  $Res call({String oldUsername, String newUsername});
+}
+
+/// @nodoc
+class _$ChatUsernameUpdatedEventCopyWithImpl<
+  $Res,
+  $Val extends ChatUsernameUpdatedEvent
+>
+    implements $ChatUsernameUpdatedEventCopyWith<$Res> {
+  _$ChatUsernameUpdatedEventCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of ChatUsernameUpdatedEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? oldUsername = null, Object? newUsername = null}) {
+    return _then(
+      _value.copyWith(
+            oldUsername: null == oldUsername
+                ? _value.oldUsername
+                : oldUsername // ignore: cast_nullable_to_non_nullable
+                      as String,
+            newUsername: null == newUsername
+                ? _value.newUsername
+                : newUsername // ignore: cast_nullable_to_non_nullable
+                      as String,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$ChatUsernameUpdatedEventImplCopyWith<$Res>
+    implements $ChatUsernameUpdatedEventCopyWith<$Res> {
+  factory _$$ChatUsernameUpdatedEventImplCopyWith(
+    _$ChatUsernameUpdatedEventImpl value,
+    $Res Function(_$ChatUsernameUpdatedEventImpl) then,
+  ) = __$$ChatUsernameUpdatedEventImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String oldUsername, String newUsername});
+}
+
+/// @nodoc
+class __$$ChatUsernameUpdatedEventImplCopyWithImpl<$Res>
+    extends
+        _$ChatUsernameUpdatedEventCopyWithImpl<
+          $Res,
+          _$ChatUsernameUpdatedEventImpl
+        >
+    implements _$$ChatUsernameUpdatedEventImplCopyWith<$Res> {
+  __$$ChatUsernameUpdatedEventImplCopyWithImpl(
+    _$ChatUsernameUpdatedEventImpl _value,
+    $Res Function(_$ChatUsernameUpdatedEventImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of ChatUsernameUpdatedEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? oldUsername = null, Object? newUsername = null}) {
+    return _then(
+      _$ChatUsernameUpdatedEventImpl(
+        oldUsername: null == oldUsername
+            ? _value.oldUsername
+            : oldUsername // ignore: cast_nullable_to_non_nullable
+                  as String,
+        newUsername: null == newUsername
+            ? _value.newUsername
+            : newUsername // ignore: cast_nullable_to_non_nullable
+                  as String,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+class _$ChatUsernameUpdatedEventImpl implements _ChatUsernameUpdatedEvent {
+  const _$ChatUsernameUpdatedEventImpl({
+    required this.oldUsername,
+    required this.newUsername,
+  });
+
+  @override
+  final String oldUsername;
+  @override
+  final String newUsername;
+
+  @override
+  String toString() {
+    return 'ChatUsernameUpdatedEvent(oldUsername: $oldUsername, newUsername: $newUsername)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ChatUsernameUpdatedEventImpl &&
+            (identical(other.oldUsername, oldUsername) ||
+                other.oldUsername == oldUsername) &&
+            (identical(other.newUsername, newUsername) ||
+                other.newUsername == newUsername));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, oldUsername, newUsername);
+
+  /// Create a copy of ChatUsernameUpdatedEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ChatUsernameUpdatedEventImplCopyWith<_$ChatUsernameUpdatedEventImpl>
+  get copyWith =>
+      __$$ChatUsernameUpdatedEventImplCopyWithImpl<
+        _$ChatUsernameUpdatedEventImpl
+      >(this, _$identity);
+}
+
+abstract class _ChatUsernameUpdatedEvent implements ChatUsernameUpdatedEvent {
+  const factory _ChatUsernameUpdatedEvent({
+    required final String oldUsername,
+    required final String newUsername,
+  }) = _$ChatUsernameUpdatedEventImpl;
+
+  @override
+  String get oldUsername;
+  @override
+  String get newUsername;
+
+  /// Create a copy of ChatUsernameUpdatedEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ChatUsernameUpdatedEventImplCopyWith<_$ChatUsernameUpdatedEventImpl>
+  get copyWith => throw _privateConstructorUsedError;
+}

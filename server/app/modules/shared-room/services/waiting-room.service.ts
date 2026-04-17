@@ -82,7 +82,14 @@ export class WaitingRoomService {
     reserveCharacter(roomId: string, playerId: string, chosenAvatar: string) {
         const room = this.findRoomById(roomId);
         if (!room) throw new Error(ErrorMessages.RoomDoesNotExist);
-        room.reservedAvatars = room.reservedAvatars
+        const normalizedChosen = chosenAvatar.toLowerCase();
+        const reservations = room.reservedAvatars ?? [];
+        const otherReservations = reservations.filter((avatar) => avatar.reservorId !== playerId);
+        const taken = otherReservations.some((a) => a.chosenAvatar.toLowerCase() === normalizedChosen);
+        if (taken) {
+            throw new Error(ErrorMessages.AvatarAlreadyInUse);
+        }
+        room.reservedAvatars = reservations
             .filter((avatar) => avatar.reservorId !== playerId)
             .concat([{ reservorId: playerId, chosenAvatar }]);
     }

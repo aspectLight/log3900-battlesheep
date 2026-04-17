@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:signals_flutter/signals_flutter.dart';
@@ -8,6 +10,7 @@ import 'core/appearance/app_appearance_service.dart';
 import 'core/appearance/app_feature_colors.dart';
 import 'core/appearance/app_interaction_colors.dart';
 import 'core/appearance/app_visual_theme.dart';
+import 'core/constants/ui_assets.dart';
 import 'core/di/injection_container.dart';
 import 'core/localisation/core_localizations.dart';
 import 'core/modal/modal_overlay.dart';
@@ -122,6 +125,8 @@ class _AppRootState extends State<AppRoot> with WidgetsBindingObserver {
   late final AppTransitionEventBus _appTransitionEventBus;
   late final AppInitialization _appInitialization;
   late final LoadingOverlayViewModel _loadingOverlayViewModel;
+  bool _scheduledNavAssetPrecache = false;
+  bool _syncedGuestLocaleAfterFirstReadyFrame = false;
 
   @override
   void initState() {
@@ -137,6 +142,29 @@ class _AppRootState extends State<AppRoot> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  Future<void> _precacheNavTransitionAssets(BuildContext context) async {
+    for (final theme in AppVisualTheme.values) {
+      if (!context.mounted) return;
+      await precacheImage(
+        AssetImage(backgroundAssetForVisualTheme(theme)),
+        context,
+      );
+    }
+    if (!context.mounted) return;
+    await precacheImage(const AssetImage(UiAssets.snow), context);
+    if (!context.mounted) return;
+    await precacheImage(const AssetImage(UiAssets.loading), context);
+  }
+
+  void _scheduleNavAssetPrecacheOnce() {
+    if (_scheduledNavAssetPrecache) return;
+    _scheduledNavAssetPrecache = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(_precacheNavTransitionAssets(context));
+    });
   }
 
   @override
@@ -155,8 +183,19 @@ class _AppRootState extends State<AppRoot> with WidgetsBindingObserver {
 
       if (!isReady) {
         return const MaterialApp(
+          debugShowCheckedModeBanner: false,
+          showPerformanceOverlay: false,
+          debugShowMaterialGrid: false,
           home: Scaffold(body: Center(child: CircularProgressIndicator())),
         );
+      }
+
+      if (!_syncedGuestLocaleAfterFirstReadyFrame) {
+        _syncedGuestLocaleAfterFirstReadyFrame = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          getIt<AppAppearanceService>().syncGuestLocaleFromPlatformIfNoExplicitChoice();
+        });
       }
 
       final appearance = getIt<AppAppearanceService>();
@@ -166,6 +205,8 @@ class _AppRootState extends State<AppRoot> with WidgetsBindingObserver {
       return MaterialApp.router(
         title: 'Eastern Solace',
         debugShowCheckedModeBanner: false,
+        showPerformanceOverlay: false,
+        debugShowMaterialGrid: false,
         locale: appearance.locale.value,
         theme: _appMaterialTheme(appearance.visualTheme.value),
         routerConfig: _appRouter.config(
@@ -194,16 +235,40 @@ class _AppRootState extends State<AppRoot> with WidgetsBindingObserver {
         ],
         supportedLocales: CoreLocalizations.supportedLocales,
         builder: (context, child) {
+          _scheduleNavAssetPrecacheOnce();
           return Watch((context) {
             final isNavigating = _loadingOverlayViewModel.isNavigating.value;
 
+            // While navigating: only [LoadingOverlay] paints (parallax + spinner).
+            // Route is [Offstage] so no page UI is shown. Do not disable [TickerMode]
+            // on the router during overlay: that pauses the route fade; when the
+            // overlay hides the transition restarts and the previous route flashes.
+            // Notification/modal stay in the tree with [Offstage] to avoid jank.
             return Stack(
+              fit: StackFit.expand,
               children: [
-                child ?? const SizedBox.shrink(),
+                Offstage(
+                  offstage: isNavigating,
+                  child: child ?? const SizedBox.shrink(),
+                ),
+                Positioned.fill(
+                  child: Offstage(
+                    offstage: isNavigating,
+                    child: const NotificationOverlay(),
+                  ),
+                ),
+                Positioned.fill(
+                  child: Offstage(
+                    offstage: isNavigating,
+                    child: const ModalOverlay(),
+                  ),
+                ),
                 if (isNavigating)
-                  const Positioned.fill(child: LoadingOverlay()),
-                const Positioned.fill(child: NotificationOverlay()),
-                const Positioned.fill(child: ModalOverlay()),
+                  const Positioned.fill(
+                    child: RepaintBoundary(
+                      child: LoadingOverlay(),
+                    ),
+                  ),
               ],
             );
           });

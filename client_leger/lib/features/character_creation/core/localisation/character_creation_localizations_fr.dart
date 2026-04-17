@@ -72,5 +72,9 @@ class CharacterCreationLocalizationsFr extends CharacterCreationLocalizations {
       'Le jeu sélectionné est caché ou supprimé.';
 
   @override
+  String get gameStartedWhileCreating =>
+      'La partie a commencé sans vous. Retour au menu principal.';
+
+  @override
   String get reserveCharacterFailed => 'Impossible de réserver le personnage.';
 }

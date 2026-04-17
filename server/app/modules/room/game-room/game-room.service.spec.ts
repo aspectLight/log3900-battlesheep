@@ -86,7 +86,7 @@ describe('GameRoomService', () => {
                 messages: [],
                 journalEntries: [],
             };
-            gameService.getGameById.returns(Promise.resolve({ mode: 'ctf' } as Game));
+            gameService.getGameBlueprintById.returns(Promise.resolve({ mode: 'ctf' } as Game));
             (service as any).assignTurnOrder = stub().returns(waitingRoom.players);
             (service as any).assignColor = stub().returns(waitingRoom.players);
             (service as any).assignTeam = stub().returns(waitingRoom.players);

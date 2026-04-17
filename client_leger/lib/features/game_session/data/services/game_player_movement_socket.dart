@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../../../../core/services/log_service.dart';
 import '../../../../core/services/socket_service.dart';
 import '../../domain/commands/game_movement_commands.dart';
 import '../../domain/events/game_environment_events.dart';
@@ -104,11 +105,16 @@ class GamePlayerMovementSocket {
     );
   }
 
-  void playerTeleported(PlayerTeleportedCommand command) {
-    _socketService.emit(
+  Future<void> playerTeleported(PlayerTeleportedCommand command) async {
+    final response = await _socketService.emitWithAck<Object?>(
       GamePlayerMovementSocketEvents.playerTeleported,
       command.toDto().toJson(),
     );
+    if (response is! Map) return;
+    final success = response['success'] as bool? ?? false;
+    if (success) return;
+    final err = response['error']?.toString() ?? 'unknown';
+    LogService.w('playerTeleported rejected: $err');
   }
 
   void synchronizeMovement(SynchronizeMovementCommand command) {

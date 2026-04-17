@@ -23,3 +23,7 @@ class CharacterCreationReserveFailedEvent {
 class CharacterCreationRoomLockedEvent {
   const CharacterCreationRoomLockedEvent();
 }
+
+class CharacterCreationGameStartedEvent {
+  const CharacterCreationGameStartedEvent();
+}

@@ -19,5 +19,6 @@
   "statDefenseDescription": "Represents the ability to block damage from enemy attacks.",
   "characterCreationValidationMessage": "Veillez à choisir un personnage et les 2 bonus.",
   "selectedGameHiddenOrDeleted": "The selected game is hidden or deleted.",
+  "gameStartedWhileCreating": "The game has started without you. You will return to the main menu.",
   "reserveCharacterFailed": "Could not reserve character."
 }

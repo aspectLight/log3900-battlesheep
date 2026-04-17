@@ -416,6 +416,18 @@ abstract class GameSessionLocalizations {
   /// **'Game canceled'**
   String get notificationGameCanceled;
 
+  /// No description provided for @notificationGameLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'You left the game!'**
+  String get notificationGameLeft;
+
+  /// No description provided for @gameSessionPopupUnderstood.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get gameSessionPopupUnderstood;
+
   /// No description provided for @notificationDisconnectAutomatic.
   ///
   /// In en, this message translates to:

@@ -316,7 +316,7 @@ export class GameMovementService {
     }
 
     private async loadBoard(roomId: string, gameId: string): Promise<Board | null> {
-        const game = await this.gameService.getGameById(gameId);
+        const game = await this.gameService.getGameBlueprintById(gameId);
         if (game && game.board) {
             // Deep copy so each game gets its own independent board
             const boardCopy: Board = JSON.parse(JSON.stringify(game.board));

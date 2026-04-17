@@ -18,6 +18,7 @@
   "shopPurchaseFailedItemNotFound": "This item is not available in the shop.",
   "shopPurchaseFailedNotAuthenticated": "You must be signed in to make a purchase.",
   "shopPurchaseFailedUnknown": "Your purchase could not be completed. Please try again.",
+  "shopBannerPreferenceUpdateFailed": "Could not update banner preference. Please try again.",
   "shopBannerPreviewPlayer": "Player",
   "shopBannerPreviewHp": "HP",
   "shopBannerPreviewSpeed": "Speed",

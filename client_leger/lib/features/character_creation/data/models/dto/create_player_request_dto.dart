@@ -4,7 +4,7 @@ import 'player_payload_dto.dart';
 
 part 'create_player_request_dto.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class CreatePlayerRequestDto {
   final String roomId;
   final PlayerPayloadDto player;

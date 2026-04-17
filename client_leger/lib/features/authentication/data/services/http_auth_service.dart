@@ -83,6 +83,8 @@ class HttpAuthService {
     required String email,
     required String password,
     required String avatarId,
+    String? language,
+    String? theme,
   }) => TaskEither.tryCatch(() async {
     LogService.d('Trying to sign up');
 
@@ -93,6 +95,8 @@ class HttpAuthService {
         email: email,
         password: password,
         avatarId: avatarId,
+        language: language,
+        theme: theme,
       ).toJson(),
     );
 

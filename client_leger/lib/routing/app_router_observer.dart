@@ -27,7 +27,6 @@ class AppRouterObserver extends AutoRouteObserver {
   }
 
   void _handleNavigation() {
-    loadingOverlayViewModel.startNavigation();
-    loadingOverlayViewModel.stopNavigation();
+    loadingOverlayViewModel.notifyRouteTransition();
   }
 }

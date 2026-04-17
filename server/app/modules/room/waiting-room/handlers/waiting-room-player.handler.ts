@@ -2,6 +2,7 @@ import { AuthService } from '@app/modules/auth/services/auth.service';
 import { GameRoomService } from '@app/modules/shared-room/services/game-room.service';
 import { WaitingRoomService } from '@app/modules/shared-room/services/waiting-room.service';
 import { Player } from '@app/shared/interfaces/player';
+import { ErrorMessages } from '@common/error-messages.constants';
 import { CurrencyEvents, WaitingRoomEvents } from '@common/socket.constants';
 import { EXCLUSIVE_CHARACTER_IDS } from '@common/shop.constants';
 import { Injectable, Logger } from '@nestjs/common';
@@ -13,6 +14,8 @@ import { Server, Socket } from 'socket.io';
 @Injectable()
 export class WaitingRoomPlayerHandler {
     private readonly logger = new Logger(WaitingRoomPlayerHandler.name);
+    /** Serializes avatar reservations per room so concurrent handlers cannot race after `await` (e.g. auth). */
+    private readonly avatarReserveTailByRoom = new Map<string, Promise<unknown>>();
 
     constructor(
         private readonly waitingRoomService: WaitingRoomService,
@@ -63,33 +66,51 @@ export class WaitingRoomPlayerHandler {
         socket: Socket,
         server: Server,
     ): Promise<{ success: boolean; error?: string }> {
+        const exclusiveShopError = 'Ce personnage est exclusif et doit être acheté en boutique.';
+
         try {
             const characterKey = data.chosenAvatar.toLowerCase();
             if (!data.isVirtual && EXCLUSIVE_CHARACTER_IDS.includes(characterKey)) {
                 const token = (socket.handshake.auth as { token?: string }).token;
                 if (!token) {
-                    return { success: false, error: 'Ce personnage est exclusif et doit être acheté en boutique.' };
+                    return { success: false, error: exclusiveShopError };
                 }
                 const decoded = await this.authService.verifyToken(token);
                 const purchasedItems = await this.authService.getPurchasedItems(decoded.uid);
                 if (!purchasedItems.includes(characterKey)) {
-                    return { success: false, error: 'Ce personnage est exclusif et doit être acheté en boutique.' };
+                    return { success: false, error: exclusiveShopError };
                 }
             }
 
-            this.waitingRoomService.reserveCharacter(data.roomId, data.playerId, data.chosenAvatar);
-            const room = this.waitingRoomService.findRoomById(data.roomId);
+            return await this.runAvatarReserveForRoom(data.roomId, async () => {
+                this.waitingRoomService.reserveCharacter(data.roomId, data.playerId, data.chosenAvatar);
+                const room = this.waitingRoomService.findRoomById(data.roomId);
 
-            if (room) {
-                server.to(data.roomId).emit(WaitingRoomEvents.UpdateAvatarReserved, { reservedAvatars: room.reservedAvatars });
-                this.logger.log(`Joueur ${socket.id} a réservé l'avatar ${data.chosenAvatar}`);
-            }
+                if (room) {
+                    server.to(data.roomId).emit(WaitingRoomEvents.UpdateAvatarReserved, { reservedAvatars: room.reservedAvatars });
+                    this.logger.log(`Joueur ${socket.id} a réservé l'avatar ${data.chosenAvatar}`);
+                }
 
-            return { success: true };
+                return { success: true };
+            });
         } catch (error) {
-            this.logger.error(`Erreur réservation avatar: ${error.message}`);
-            return { success: false, error: error.message };
+            const message = error instanceof Error ? error.message : String(error);
+            this.logger.error(`Erreur réservation avatar: ${message}`);
+            if (message === ErrorMessages.AvatarAlreadyInUse) {
+                socket.emit(WaitingRoomEvents.AvatarReservationFailed, { error: message });
+            }
+            return { success: false, error: message };
         }
+    }
+
+    /**
+     * Runs one reservation at a time per `roomId` so check + update + broadcast are not interleaved.
+     */
+    private runAvatarReserveForRoom<T>(roomId: string, task: () => Promise<T>): Promise<T> {
+        const previous = this.avatarReserveTailByRoom.get(roomId) ?? Promise.resolve();
+        const run = previous.then(() => task());
+        this.avatarReserveTailByRoom.set(roomId, run.then(() => undefined, () => undefined));
+        return run;
     }
 
     /**
