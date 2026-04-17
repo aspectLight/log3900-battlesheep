@@ -18,14 +18,17 @@ class ChatRepository {
   final AuthRepository _authRepository;
 
   final Signal<ChatState> state = signal(ChatState.initial());
+  final Signal<String> generalChatLocalUsername;
 
   ChatRepository({
     required ChatSocket chatSocket,
     required ChatStateReducer reducer,
     required AuthRepository authRepository,
+    required String initialGeneralChatUsername,
   }) : _chatSocket = chatSocket,
        _reducer = reducer,
-       _authRepository = authRepository;
+       _authRepository = authRepository,
+       generalChatLocalUsername = signal(initialGeneralChatUsername.trim());
 
   void loadMessages() {
     _chatSocket.loadMessages();
@@ -65,5 +68,23 @@ class ChatRepository {
 
   void applyHistorySet(List<ChatMessage> messages) {
     state.value = _reducer.reduce(state.value, ChatHistorySetEvent(messages));
+  }
+
+  void applyUsernameUpdated(ChatUsernameUpdatedPayload payload) {
+    final oldName = payload.oldUsername;
+    final newName = payload.newUsername;
+    if (oldName.isEmpty ||
+        newName.isEmpty ||
+        oldName == newName) {
+      return;
+    }
+    state.value = _reducer.reduce(
+      state.value,
+      ChatUsernameUpdatedEvent(oldUsername: oldName, newUsername: newName),
+    );
+    if (generalChatLocalUsername.value == oldName) {
+      generalChatLocalUsername.value = newName;
+      _chatSocket.setJoinUsername(newName);
+    }
   }
 }

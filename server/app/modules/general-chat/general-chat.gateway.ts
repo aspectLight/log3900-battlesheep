@@ -293,13 +293,10 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
             await this.customChannelService.addMessage(data.channelId, chatEmoji);
 
             const blockedSocketIds = await this.getBlockedSocketIds(data.username);
-            this.server
-                .except(blockedSocketIds)
-                .to(`custom-channel-${data.channelId}`)
-                .emit(CustomChannelEvents.CustomChannelEmoji, {
-                    channelId: data.channelId,
-                    emoji: chatEmoji,
-                });
+            this.server.except(blockedSocketIds).to(`custom-channel-${data.channelId}`).emit(CustomChannelEvents.CustomChannelEmoji, {
+                channelId: data.channelId,
+                emoji: chatEmoji,
+            });
         } catch (error) {
             socket.emit(CustomChannelEvents.CustomChannelError, { message: this.getFriendlyError(error) });
         }

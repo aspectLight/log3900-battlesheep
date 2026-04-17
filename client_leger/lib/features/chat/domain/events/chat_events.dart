@@ -15,3 +15,11 @@ class ChatHistorySetEvent with _$ChatHistorySetEvent {
   const factory ChatHistorySetEvent(List<ChatMessage> messages) =
       _ChatHistorySetEvent;
 }
+
+@freezed
+class ChatUsernameUpdatedEvent with _$ChatUsernameUpdatedEvent {
+  const factory ChatUsernameUpdatedEvent({
+    required String oldUsername,
+    required String newUsername,
+  }) = _ChatUsernameUpdatedEvent;
+}

@@ -10,9 +10,8 @@ import '../../presentation/widgets/sliding_chat_box/sliding_chat_box_view_model.
 
 void registerChatViewModels(
   GetIt scope,
-  GetIt rootGetIt, {
-  required String username,
-}) {
+  GetIt rootGetIt,
+) {
   scope.registerLazySingleton<SlidingChatBoxViewModel>(
     () => SlidingChatBoxViewModel(
       canalsRepository: rootGetIt<DiscussionCanalsRepository>(),
@@ -26,7 +25,6 @@ void registerChatViewModels(
       panelStateRepository: scope.get<ChatPanelStateRepository>(),
       outgoingAvatars: rootGetIt<ChatOutgoingAvatars>(),
       avatarRegistry: rootGetIt<ChatAvatarRegistry>(),
-      currentUsername: username,
     ),
   );
 }
