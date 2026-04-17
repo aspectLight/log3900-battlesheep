@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../config/env_config.dart';
 import '../../../constants/auth_avatar_assets.dart';
+import '../../../constants/avatar_assets.dart';
 
 class ProfileAvatarThumb extends StatelessWidget {
   const ProfileAvatarThumb({
@@ -41,9 +42,10 @@ class ProfileAvatarThumb extends StatelessWidget {
             normalizedUrl,
             cacheBust: avatarDisplayNonce,
           );
-    final resolvedAsset = normalizedId.isEmpty
+    final String? resolvedAsset = normalizedId.isEmpty
         ? null
-        : AuthAvatarAssets.assetPathForAvatarId(normalizedId);
+        : (AvatarAssets.tryMiniaturePathForProfileId(normalizedId) ??
+            AuthAvatarAssets.tryAssetPathForAvatarId(normalizedId));
     final hasNetwork = resolvedNetworkUrl.isNotEmpty;
     final hasAsset = resolvedAsset != null && resolvedAsset.isNotEmpty;
     final border = borderColor;

@@ -32,6 +32,7 @@ import '../../data/repositories/game_turn_repository.dart';
 import '../../data/services/game_service.dart';
 import '../../domain/events/game_events.dart';
 import '../../domain/models/game.dart';
+import '../../domain/services/game_start_board_items_resolver.dart';
 import '../../domain/state/game_board_state.dart';
 
 class GameSessionCoordinator
@@ -132,7 +133,24 @@ class GameSessionCoordinator
     if (scope == null) return;
     if (scope.isRegistered<GameSessionData>()) return;
     scope.registerLazySingleton<GameSessionData>(() => data);
-    final game = await gameService.getGame(data.gameId);
+    final fetchedGame = await gameService.getGame(data.gameId);
+    final resolvedItems = resolveRandomBoardItems(
+      items: fetchedGame.initialItems,
+      board: fetchedGame.board,
+      roomId: data.roomId,
+    );
+    final game = Game(
+      id: fetchedGame.id,
+      name: fetchedGame.name,
+      description: fetchedGame.description,
+      mode: fetchedGame.mode,
+      board: fetchedGame.board,
+      initialItems: resolvedItems,
+      privacy: fetchedGame.privacy,
+      owner: fetchedGame.owner,
+      actionPoints: fetchedGame.actionPoints,
+      modificationDate: fetchedGame.modificationDate,
+    );
     scope.registerLazySingleton<Game>(() => game);
     scope.registerLazySingleton<Board>(() => game.board);
     final dropInSync = getIt<DropInJoinSyncHolder>();
