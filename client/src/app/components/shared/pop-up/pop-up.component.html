@@ -15,7 +15,7 @@
         <div class="item-options">
             @for (item of items; track item) {
             <button (click)="onSelect(item)">
-                {{ item.name }}
+                {{ ('items_names.' + item.type) | translate }}
             </button>
             }
         </div>

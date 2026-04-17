@@ -26,16 +26,31 @@ export class AvatarRegistryService {
     readonly registrySignal = this.registry.asReadonly();
 
     setupListeners(): void {
-        this.socketService.on<{ username: string; avatarId: string | null; avatarUrl: string | null }>(GeneralChatEvents.AvatarUpdated, (payload) => {
-            if (!payload?.username) return;
-            this.registry.update((current) => ({
-                ...current,
-                [payload.username]: {
-                    avatarId: payload.avatarId ?? null,
-                    avatarUrl: payload.avatarUrl ?? null,
-                    deleted: false,
-                },
-            }));
+        this.socketService.on<{ username: string; avatarId: string | null; avatarUrl: string | null }>(
+            GeneralChatEvents.AvatarUpdated,
+            (payload) => {
+                if (!payload?.username) return;
+                this.registry.update((current) => ({
+                    ...current,
+                    [payload.username]: {
+                        avatarId: payload.avatarId ?? null,
+                        avatarUrl: payload.avatarUrl ?? null,
+                        deleted: false,
+                    },
+                }));
+            },
+        );
+
+        this.socketService.on<{ oldUsername: string; newUsername: string }>(GeneralChatEvents.UsernameUpdated, (payload) => {
+            if (!payload?.oldUsername || !payload?.newUsername || payload.oldUsername === payload.newUsername) return;
+            this.registry.update((current) => {
+                const entry = current[payload.oldUsername];
+                if (!entry) return current;
+                const next = { ...current };
+                next[payload.newUsername] = entry;
+                delete next[payload.oldUsername];
+                return next;
+            });
         });
     }
 

@@ -75,7 +75,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
             this.refreshAvatarFromProfile(profile.avatarId ?? null, profile.avatarUrl ?? null);
         });
 
-        const username = this.authService.currentUser?.displayName || 'Utilisateur';
+        let username = this.authService.currentUser?.displayName || 'Utilisateur';
 
         // Reconnect the socket immediately so the server can cancel the auto-logout timeout
         // before it fires. The profile fetch below can take a moment and must not delay this.
@@ -86,6 +86,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
         let avatarUrl: string | null = null;
         try {
             const profile = await this.profileService.getProfile();
+            username = profile.username || username;
             avatarId = profile.avatarId ?? null;
             avatarUrl = profile.avatarUrl ? `${environment.serverUrl}${profile.avatarUrl}` : null;
             this.refreshAvatarFromProfile(avatarId, profile.avatarUrl ?? null);
@@ -98,6 +99,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
         this.socialService.setupListeners();
         this.currencyService.setupListeners();
         this.avatarRegistry.setupListeners();
+        this.customChannelService.setUsername(username);
         this.chatService.joinGeneralChat(username, avatarId, avatarUrl);
         this.customChannelService.avatarId = avatarId;
         this.customChannelService.avatarUrl = avatarUrl;

@@ -439,7 +439,9 @@ export class GameRoomService {
     removeItemFromInventory(roomId: string, playerId: string, item: Item): Player {
         if (!playerId) return null;
         const room = this.findRoomById(roomId);
+        if (!room) return null;
         const player: Player = room.players.find((p) => p.id === playerId);
+        if (!player) return null;
         const index = player.inventory.findIndex((i) => i.type === item.type);
         if (index >= 0) {
             player.inventory.splice(index, 1);

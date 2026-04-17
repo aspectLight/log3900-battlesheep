@@ -38,9 +38,9 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 })
 export class GamePlayComponent implements OnInit {
     isGameLoaded: boolean = false;
-    turnCountdown: number;
-    gameCountdown: number;
-    combatCountdown: number;
+    turnCountdown?: number;
+    gameCountdown?: number;
+    combatCountdown?: number;
     isTurnToFight: boolean;
     showError: boolean;
     debugMode: boolean = false;

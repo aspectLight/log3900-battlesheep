@@ -126,12 +126,12 @@
                     <span class="msg-time">{{ msg.time }}</span>
                     <span class="msg-avatar-wrap">
                         @if (getAvatarFor(msg); as avatarSrc) {
-                            <img class="msg-avatar" [src]="avatarSrc" [alt]="msg.name ?? ''" (error)="onAvatarImgError(msg)" />
+                            <img class="msg-avatar" [class.msg-avatar--deleted]="msg.name === '[supprimé]'" [src]="avatarSrc" [alt]="msg.name === '[supprimé]' ? ('chatbox.deleted_user' | translate) : (msg.name ?? '')" (error)="onAvatarImgError(msg)" />
                         } @else {
-                            <span class="msg-avatar-placeholder">{{ (msg.name ?? '?')[0].toUpperCase() }}</span>
+                            <span class="msg-avatar-placeholder">{{ (msg.name === '[supprimé]' ? ('chatbox.deleted_user' | translate) : (msg.name ?? '?'))[0].toUpperCase() }}</span>
                         }
                     </span>
-                    <span class="msg-author">{{ msg.name }}</span>
+                    <span class="msg-author">{{ msg.name === '[supprimé]' ? ('chatbox.deleted_user' | translate) : msg.name }}</span>
                     <span class="msg-content">{{ msg.content }}</span>
                 </div>
             }
@@ -146,7 +146,7 @@
                 [(ngModel)]="newMessage"
                 (keydown.enter)="sendMessage()"
             />
-            <button (click)="sendMessage()" class="square-button">{{ 'chatbox.send' | translate }}</button>
+            <button (click)="sendMessage()" class="square-button" [disabled]="!newMessage.trim()">{{ 'chatbox.send' | translate }}</button>
         </div>
     </div>
 </div>

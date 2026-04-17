@@ -2,7 +2,7 @@
 import { AuthService } from '@app/services/communication/auth.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { SocialService } from '@app/services/communication/social.service';
-import { CustomChannelEvents } from '@common/socket.constants';
+import { CustomChannelEvents, GeneralChatEvents } from '@common/socket.constants';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 
@@ -42,6 +42,8 @@ export class CustomChannelService {
     private joinedChannelNames = new Map<string, string>(); // channelId → display name
     private gameChannelIds = new Set<string>(); // canaux éphémères de partie (exclus du dropdown)
     private messagesByChannel: Record<string, ChannelMessage[]> = {};
+    private explicitUsername: string | null = null;
+    private usernameOverride: string | null = null;
 
     constructor(
         private socketService: SocketService,
@@ -51,7 +53,12 @@ export class CustomChannelService {
     ) {}
 
     get username(): string {
-        return this.authService.currentUser?.displayName as string;
+        return this.usernameOverride ?? this.explicitUsername ?? (this.authService.currentUser?.displayName as string);
+    }
+
+    setUsername(username: string | null | undefined): void {
+        const normalized = username?.trim();
+        this.explicitUsername = normalized ? normalized : null;
     }
 
     resetState(): void {
@@ -63,6 +70,8 @@ export class CustomChannelService {
         this.joinedChannelNames.clear();
         this.gameChannelIds.clear();
         this.messagesByChannel = {};
+        this.explicitUsername = null;
+        this.usernameOverride = null;
 
         this.channelsUpdated$.next([]);
         this.joinedChannels$.next([]);
@@ -148,6 +157,41 @@ export class CustomChannelService {
 
         socket.on(CustomChannelEvents.CustomChannelEmoji, (payload: { channelId: string; emoji: ChannelMessage }) => {
             this.appendIncomingMessage(payload.channelId, payload.emoji);
+        });
+
+        socket.on(GeneralChatEvents.UsernameUpdated, (payload: { oldUsername: string; newUsername: string }) => {
+            if (!payload?.oldUsername || !payload?.newUsername || payload.oldUsername === payload.newUsername) return;
+
+            for (const channelId of Object.keys(this.messagesByChannel)) {
+                const msgs = this.messagesByChannel[channelId];
+                let changed = false;
+                for (const msg of msgs) {
+                    if (msg.name === payload.oldUsername) {
+                        msg.name = payload.newUsername;
+                        changed = true;
+                    }
+                }
+                if (changed) {
+                    this.messagesByChannel[channelId] = [...msgs];
+                    this.messagesUpdated$.next({ channelId, messages: this.messagesByChannel[channelId] });
+                }
+            }
+
+            let channelsChanged = false;
+            this.channels = this.channels.map((c) => {
+                if (c.creator === payload.oldUsername) {
+                    channelsChanged = true;
+                    return { ...c, creator: payload.newUsername };
+                }
+                return c;
+            });
+            if (channelsChanged) {
+                this.channelsUpdated$.next(this.channels);
+            }
+
+            if (this.username === payload.oldUsername) {
+                this.usernameOverride = payload.newUsername;
+            }
         });
 
         // Restauration des canaux à la (re)connexion : le serveur envoie automatiquement
@@ -280,5 +324,3 @@ export class CustomChannelService {
         return null;
     }
 }
-
-

@@ -54,13 +54,13 @@ export class GameListService {
         this.gameService.setGame(game);
     }
 
-    async fetchGameById(id: string): Promise<boolean> {
+    async fetchGameById(id: string): Promise<Game | null> {
         try {
             const headers = await this.getAuthHeaders();
-            await firstValueFrom(this.http.get<Game>(environment.serverUrl + API_ENDPOINTS.games + id, { headers }));
-            return false;
+            const game = await firstValueFrom(this.http.get<Game>(environment.serverUrl + API_ENDPOINTS.games + id, { headers }));
+            return new Game(game);
         } catch (error) {
-            return true;
+            return null;
         }
     }
 

@@ -16,7 +16,12 @@
           @if(cell.item) {
             <div class="overlay"></div>
             <img class="tile-image" [src]="cell.tile.imagePath" [alt]="cell.tile.type" draggable="false" />
-            <img class="item" [src]="cell.item.imagePath" [alt]="cell.item.name" [title]="cell.item.description" />
+            <img
+              class="item"
+              [src]="cell.item.imagePath"
+              [alt]="('items_names.' + cell.item.type) | translate"
+              [title]="('toolbox.item_' + cell.item.type) | translate"
+            />
           } @else {
             <img class="tile-image" [src]="cell.tile.imagePath" [alt]="cell.tile.type" draggable="false" />
           }

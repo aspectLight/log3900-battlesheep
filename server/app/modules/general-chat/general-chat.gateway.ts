@@ -364,6 +364,26 @@ export class GeneralChatGateway implements OnGatewayConnection, OnGatewayDisconn
         this.server.emit(GeneralChatEvents.AvatarUpdated, payload);
     }
 
+    async handleUsernameUpdate(oldUsername: string, newUsername: string): Promise<void> {
+        await this.generalChatService.replaceUsername(oldUsername, newUsername);
+        await this.customChannelService.renameUser(oldUsername, newUsername);
+
+        for (const [socketId, username] of this.socketIdToUsername.entries()) {
+            if (username === oldUsername) {
+                this.socketIdToUsername.set(socketId, newUsername);
+            }
+        }
+
+        const pendingTimeout = this.disconnectionTimeouts.get(oldUsername);
+        if (pendingTimeout) {
+            this.disconnectionTimeouts.delete(oldUsername);
+            this.disconnectionTimeouts.set(newUsername, pendingTimeout);
+        }
+
+        this.server.emit(GeneralChatEvents.UsernameUpdated, { oldUsername, newUsername });
+        this.logger.log(`Utilisateur renommé: ${oldUsername} → ${newUsername}`);
+    }
+
     async forceDisconnectUser(username: string): Promise<void> {
         // Cancel any pending disconnection timeout
         const existingTimeout = this.disconnectionTimeouts.get(username);

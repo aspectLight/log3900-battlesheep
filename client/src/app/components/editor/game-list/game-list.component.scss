@@ -255,6 +255,7 @@ li span {
     align-items: center;
     justify-content: center;
     margin: 0;
+    padding: 0 10px;
     font-size: 18px;
     font-weight: 500;
     white-space: normal;
@@ -265,6 +266,9 @@ li span {
 
 li.header span {
     color: var(--theme-text-special);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 
 li.selected span {

@@ -118,6 +118,8 @@ export class AuthController {
     @Patch('profile')
     @UseGuards(AuthGuard)
     async updateProfile(@CurrentUser('firebaseUid') uid: string, @Body() updateDto: UpdateUserDto) {
+        const previous = await this.authService.getUserByUid(uid);
+        const oldUsername = previous.username;
         const user = await this.authService.updateUser(uid, updateDto);
         if (updateDto.avatarId) {
             this.generalChatGateway.broadcastAvatarUpdate({
@@ -125,6 +127,9 @@ export class AuthController {
                 avatarId: user.avatarId ?? null,
                 avatarUrl: user.avatarUrl ?? null,
             });
+        }
+        if (user.username !== oldUsername) {
+            await this.generalChatGateway.handleUsernameUpdate(oldUsername, user.username);
         }
         return {
             message: 'Profil mis à jour',

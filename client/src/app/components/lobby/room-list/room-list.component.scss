@@ -75,6 +75,9 @@ li span {
 
 li.header span {
     color: var(--theme-text-special);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 
 li.selected span {

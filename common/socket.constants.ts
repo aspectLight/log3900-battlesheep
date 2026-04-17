@@ -139,6 +139,7 @@ export enum GeneralChatEvents {
     GetGeneralChatMessagesResponse = 'getGeneralChatMessagesResponse',
     GeneralChatError = 'generalChatError',
     AvatarUpdated = 'avatarUpdated',
+    UsernameUpdated = 'usernameUpdated',
 }
 
 export enum CustomChannelEvents {
