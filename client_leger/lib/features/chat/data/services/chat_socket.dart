@@ -9,21 +9,49 @@ import '../models/events/chat_socket_events.dart';
 import '../models/extensions/send_chat_emoji_command_to_dto_extensions.dart';
 import '../models/extensions/send_chat_message_command_to_dto_extensions.dart';
 
+Map<String, dynamic>? _tryJsonMap(Object? raw) {
+  if (raw is Map<String, dynamic>) return raw;
+  if (raw is Map) return Map<String, dynamic>.from(raw);
+  return null;
+}
+
+/// Payload for the `usernameUpdated` socket event (rename and deleted-account placeholder).
+class ChatUsernameUpdatedPayload {
+  const ChatUsernameUpdatedPayload({
+    required this.oldUsername,
+    required this.newUsername,
+  });
+
+  final String oldUsername;
+  final String newUsername;
+}
+
 class ChatSocket {
   final SocketService _socketService;
 
   final _messageController = StreamController<ChatMessage>.broadcast();
   final _historyController = StreamController<List<ChatMessage>>.broadcast();
+  final _usernameUpdatedController =
+      StreamController<ChatUsernameUpdatedPayload>.broadcast();
+
+  String? _joinUsername;
 
   StreamSubscription<bool>? _connectionSub;
   StreamSubscription<ChatMessageDto>? _messageSub;
   StreamSubscription<ChatMessageDto>? _emojiSub;
   StreamSubscription<List<ChatMessageDto>>? _historySub;
+  StreamSubscription<Object?>? _usernameUpdatedSub;
 
   ChatSocket({required SocketService socketService})
     : _socketService = socketService {
     _connectionSub = _socketService.connectionStream.listen((connected) {
-      if (connected) _setupChatListeners();
+      if (connected) {
+        _setupChatListeners();
+        final u = _joinUsername;
+        if (u != null && u.isNotEmpty) {
+          _socketService.emit(GeneralChatEvents.joinGeneralChat, u);
+        }
+      }
     });
     if (_socketService.isConnected) {
       _setupChatListeners();
@@ -38,10 +66,14 @@ class ChatSocket {
 
   Stream<List<ChatMessage>> get historyStream => _historyController.stream;
 
+  Stream<ChatUsernameUpdatedPayload> get usernameUpdatedStream =>
+      _usernameUpdatedController.stream;
+
   void _setupChatListeners() {
     unawaited(_messageSub?.cancel());
     unawaited(_emojiSub?.cancel());
     unawaited(_historySub?.cancel());
+    unawaited(_usernameUpdatedSub?.cancel());
     _messageSub = _socketService
         .on<Object?>(GeneralChatEvents.generalChatMessage)
         .map(ChatMessageDto.fromSocketPayload)
@@ -54,6 +86,9 @@ class ChatSocket {
         .on<Object?>(GeneralChatEvents.getGeneralChatMessagesResponse)
         .map(ChatMessageDto.listFromSocketPayload)
         .listen(_forwardHistoryToStream);
+    _usernameUpdatedSub = _socketService
+        .on<Object?>(GeneralChatEvents.usernameUpdated)
+        .listen(_forwardUsernameUpdated);
   }
 
   void _forwardMessageToStream(ChatMessageDto dto) {
@@ -64,8 +99,41 @@ class ChatSocket {
     _historyController.add(dtos.map((d) => d.toModel()).toList());
   }
 
+  void _forwardUsernameUpdated(Object? raw) {
+    final m = _tryJsonMap(raw);
+    if (m == null) return;
+    final oldName = m['oldUsername'] as String?;
+    final newName = m['newUsername'] as String?;
+    if (oldName == null ||
+        newName == null ||
+        oldName.isEmpty ||
+        newName.isEmpty ||
+        oldName == newName) {
+      return;
+    }
+    _usernameUpdatedController.add(
+      ChatUsernameUpdatedPayload(
+        oldUsername: oldName,
+        newUsername: newName,
+      ),
+    );
+  }
+
   void join(String username) {
-    _socketService.emit(GeneralChatEvents.joinGeneralChat, username);
+    final trimmed = username.trim();
+    if (trimmed.isEmpty) return;
+    _joinUsername = trimmed;
+    _socketService.emit(GeneralChatEvents.joinGeneralChat, trimmed);
+  }
+
+  /// After a rename (local or broadcast), keep reconnect/join aligned with the Angular client.
+  void setJoinUsername(String username) {
+    final trimmed = username.trim();
+    if (trimmed.isEmpty) return;
+    _joinUsername = trimmed;
+    if (_socketService.isConnected) {
+      _socketService.emit(GeneralChatEvents.joinGeneralChat, trimmed);
+    }
   }
 
   void loadMessages() {
@@ -93,7 +161,9 @@ class ChatSocket {
     await _messageSub?.cancel();
     await _emojiSub?.cancel();
     await _historySub?.cancel();
+    await _usernameUpdatedSub?.cancel();
     await _messageController.close();
     await _historyController.close();
+    await _usernameUpdatedController.close();
   }
 }

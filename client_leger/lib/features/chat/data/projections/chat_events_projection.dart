@@ -18,5 +18,6 @@ class ChatEventsProjection implements EventProjection {
   List<StreamSubscription> subscribe() => [
     _chatSocket.messageStream.listen(_chatRepository.applyMessageAdded),
     _chatSocket.historyStream.listen(_chatRepository.applyHistorySet),
+    _chatSocket.usernameUpdatedStream.listen(_chatRepository.applyUsernameUpdated),
   ];
 }

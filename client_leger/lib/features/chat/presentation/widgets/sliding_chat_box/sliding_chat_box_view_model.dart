@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:fpdart/fpdart.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/chat/chat_avatar_registry.dart';
@@ -108,6 +109,7 @@ class SlidingChatBoxViewModel {
   void sendChannelMessage(String content) {
     final id = activeChannelId.value;
     if (id == null || content.trim().isEmpty) return;
+    _panelStateRepository.setLastSentMessage(Option.of(content));
     _canalsRepository.sendMessage(id, content);
   }
 

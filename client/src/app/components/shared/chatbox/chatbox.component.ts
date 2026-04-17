@@ -99,6 +99,7 @@ export class ChatboxComponent implements OnInit, OnChanges, AfterViewInit, OnDes
 
     private toAbsolute(path: string): string {
         if (/^https?:\/\//i.test(path)) return path;
+        if (path.startsWith('data:')) return path;
         return `${environment.serverUrl}${path}`;
     }
 

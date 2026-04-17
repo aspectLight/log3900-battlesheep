@@ -8,6 +8,7 @@ import '../../../authentication/core/interfaces/auth_repository.dart';
 import '../../core/constants/discussion_canals_events.dart';
 import '../models/channel_info.dart';
 import '../models/channel_message.dart';
+import '../models/events/chat_socket_events.dart';
 import 'discussion_canals_repository.dart';
 
 Map<String, dynamic>? _tryJsonMap(Object? raw) {
@@ -21,7 +22,7 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
     required String username,
     required AuthRepository authRepository,
   }) : _socketService = socketService,
-       _username = username,
+       _sessionUsername = username.trim(),
        _authRepository = authRepository {
     if (socketService.isConnected) _setupListeners();
     _connectionSub = socketService.connectionStream.listen((connected) {
@@ -30,8 +31,11 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   }
 
   final SocketService _socketService;
-  final String _username;
+  final String _sessionUsername;
+  String? _usernameOverride;
   final AuthRepository _authRepository;
+
+  List<ChannelInfo> _latestChannels = [];
 
   final _channelsController = StreamController<List<ChannelInfo>>.broadcast();
   final _channelCreatedController = StreamController<String>.broadcast();
@@ -55,9 +59,10 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   StreamSubscription<Object?>? _emojiSub;
   StreamSubscription<Object?>? _messagesResponseSub;
   StreamSubscription<Object?>? _restoredSub;
+  StreamSubscription<Object?>? _usernameUpdatedSub;
 
   @override
-  String get currentUsername => _username;
+  String get currentUsername => _usernameOverride ?? _sessionUsername;
 
   @override
   Stream<List<ChannelInfo>> get channelsUpdated => _channelsController.stream;
@@ -106,6 +111,9 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
     _restoredSub = _socketService
         .on<Object?>(DiscussionCanalsSocketEvents.userChannelsRestored)
         .listen(_onUserChannelsRestored);
+    _usernameUpdatedSub = _socketService
+        .on<Object?>(GeneralChatEvents.usernameUpdated)
+        .listen(_onUsernameUpdated);
   }
 
   void _onChannelsList(Object? raw) {
@@ -123,7 +131,74 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
         ),
       );
     }
+    _latestChannels = channels;
     _channelsController.add(channels);
+  }
+
+  void _onUsernameUpdated(Object? raw) {
+    final m = _tryJsonMap(raw);
+    if (m == null) return;
+    final oldName = m['oldUsername'] as String?;
+    final newName = m['newUsername'] as String?;
+    if (oldName == null ||
+        newName == null ||
+        oldName.isEmpty ||
+        newName.isEmpty ||
+        oldName == newName) {
+      return;
+    }
+
+    final selfUsername = _usernameOverride ?? _sessionUsername;
+
+    for (final channelId in _messagesByChannel.keys.toList()) {
+      final msgs = _messagesByChannel[channelId]!;
+      var changed = false;
+      final updated = msgs.map((msg) {
+        if (msg.senderName == oldName) {
+          changed = true;
+          return ChannelMessage(
+            channelId: msg.channelId,
+            senderName: newName,
+            content: msg.content,
+            time: msg.time,
+            avatarId: msg.avatarId,
+            avatarUrl: msg.avatarUrl,
+            avatarDisplayNonce: msg.avatarDisplayNonce,
+          );
+        }
+        return msg;
+      }).toList();
+      if (changed) {
+        _messagesByChannel[channelId] = updated;
+        _messagesUpdatedController.add(
+          MessagesUpdatedEvent(channelId: channelId, messages: updated),
+        );
+      }
+    }
+
+    if (_latestChannels.isNotEmpty) {
+      var channelsChanged = false;
+      final nextChannels = _latestChannels.map((c) {
+        if (c.creator == oldName) {
+          channelsChanged = true;
+          return ChannelInfo(
+            id: c.id,
+            name: c.name,
+            creator: newName,
+            memberCount: c.memberCount,
+          );
+        }
+        return c;
+      }).toList();
+      if (channelsChanged) {
+        _latestChannels = nextChannels;
+        _channelsController.add(nextChannels);
+      }
+    }
+
+    if (selfUsername == oldName) {
+      _usernameOverride = newName;
+    }
   }
 
   void _onChannelCreated(Object? raw) {
@@ -266,25 +341,25 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   @override
   void createChannel(String name) => _socketService.emit(
     DiscussionCanalsSocketEvents.createCustomChannel,
-    {'channelName': name, 'username': _username},
+    {'channelName': name, 'username': currentUsername},
   );
 
   @override
   void deleteChannel(String channelId) => _socketService.emit(
     DiscussionCanalsSocketEvents.deleteCustomChannel,
-    {'channelId': channelId, 'username': _username},
+    {'channelId': channelId, 'username': currentUsername},
   );
 
   @override
   void joinChannel(String channelId) => _socketService.emit(
     DiscussionCanalsSocketEvents.joinCustomChannel,
-    {'channelId': channelId, 'username': _username},
+    {'channelId': channelId, 'username': currentUsername},
   );
 
   @override
   void leaveChannel(String channelId) => _socketService.emit(
     DiscussionCanalsSocketEvents.leaveCustomChannel,
-    {'channelId': channelId, 'username': _username},
+    {'channelId': channelId, 'username': currentUsername},
   );
 
   @override
@@ -310,7 +385,7 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
     );
     final payload = <String, dynamic>{
       'channelId': channelId,
-      'username': _username,
+      'username': currentUsername,
       'message': content,
     };
     if (avatarId != null) {
@@ -328,7 +403,7 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
   @override
   void sendEmoji(String channelId, String emoji) => _socketService.emit(
     DiscussionCanalsSocketEvents.sendEmojiToCustomChannel,
-    {'channelId': channelId, 'username': _username, 'emoji': emoji},
+    {'channelId': channelId, 'username': currentUsername, 'emoji': emoji},
   );
 
   @override
@@ -349,6 +424,7 @@ class DiscussionCanalsSocket implements DiscussionCanalsRepository {
     unawaited(_emojiSub?.cancel());
     unawaited(_messagesResponseSub?.cancel());
     unawaited(_restoredSub?.cancel());
+    unawaited(_usernameUpdatedSub?.cancel());
   }
 
   Future<void> dispose() async {

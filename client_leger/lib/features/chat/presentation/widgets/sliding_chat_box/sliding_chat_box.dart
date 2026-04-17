@@ -1,5 +1,10 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/appearance/app_interaction_colors.dart';
@@ -29,6 +34,62 @@ class SlidingChatBox extends StatefulWidget {
 }
 
 class _SlidingChatBoxState extends State<SlidingChatBox> {
+  StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
+  DateTime? _lastShakeTime;
+
+  @override
+  void initState() {
+    super.initState();
+    _setupShakeDetection();
+  }
+
+  void _setupShakeDetection() {
+    if (!Platform.isAndroid && !Platform.isIOS) return;
+    _accelerometerSubscription = accelerometerEventStream().listen(
+      _onAccelerometerEvent,
+    );
+  }
+
+  void _onAccelerometerEvent(AccelerometerEvent event) {
+    final now = DateTime.now();
+    if (_lastShakeTime != null &&
+        now.difference(_lastShakeTime!).inMilliseconds <
+            ChatConstants.shakeCooldownMs) {
+      return;
+    }
+    final isVerticalShake =
+        event.y.abs() > ChatConstants.shakeThresholdVertical &&
+        event.x.abs() < ChatConstants.shakeDeadZone;
+    final isHorizontalShake =
+        event.x.abs() > ChatConstants.shakeThresholdHorizontal &&
+        event.y.abs() < ChatConstants.shakeDeadZone;
+    if (isVerticalShake) {
+      _lastShakeTime = now;
+      if (kDebugMode) {
+        debugPrint(
+          '[ChatShake] vertical → resend last message '
+          '(x=${event.x.toStringAsFixed(1)} y=${event.y.toStringAsFixed(1)})',
+        );
+      }
+      widget.chatEventBus.fire(const ChatVerticalShakeDetected());
+    } else if (isHorizontalShake) {
+      _lastShakeTime = now;
+      if (kDebugMode) {
+        debugPrint(
+          '[ChatShake] horizontal → send selected emoji '
+          '(x=${event.x.toStringAsFixed(1)} y=${event.y.toStringAsFixed(1)})',
+        );
+      }
+      widget.chatEventBus.fire(const ChatHorizontalShakeDetected());
+    }
+  }
+
+  @override
+  void dispose() {
+    unawaited(_accelerometerSubscription?.cancel());
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isExpanded = widget.viewModel.isExpanded.watch(context);
@@ -110,7 +171,6 @@ class _SlidingChatBoxState extends State<SlidingChatBox> {
                       if (activeId == null) {
                         return ChatPanelContent(
                           viewModel: widget.chatPanelContentViewModel,
-                          chatEventBus: widget.chatEventBus,
                         );
                       }
                       return _ChannelChatPanel(

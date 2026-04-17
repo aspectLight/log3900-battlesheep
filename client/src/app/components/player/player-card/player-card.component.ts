@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Player } from '@app/classes/entity/player';
 import { ACCOUNT_CREATION_AVATARS } from '@app/constants/profile.constants';
 import { AVATAR_TYPES } from '@app/constants/player.constants';
@@ -11,7 +11,7 @@ import { environment } from 'src/environments/environment';
     templateUrl: './player-card.component.html',
     styleUrls: ['./player-card.component.scss'],
 })
-export class PlayerCardComponent implements OnInit {
+export class PlayerCardComponent implements OnInit, OnChanges {
     @Output() banEvent = new EventEmitter<Player>();
     @Input() player!: Player;
     @Input() isHost: boolean = false;
@@ -25,6 +25,16 @@ export class PlayerCardComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.applyPlayerInputs();
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['player'] && this.player) {
+            this.applyPlayerInputs();
+        }
+    }
+
+    private applyPlayerInputs(): void {
         if (this.player && this.player.avatar) {
             const raw = this.player.avatar as any;
             if (typeof raw === 'string') {
@@ -35,19 +45,22 @@ export class PlayerCardComponent implements OnInit {
                     AVATAR_TYPES[raw.name?.toLowerCase()]?.avatarFull ??
                     '';
             }
+        } else {
+            this.avatar = '';
         }
 
-        if (this.player && this.player.isVirtual) {
-            this.isVirtualPlayer = true;
-        }
-
+        this.isVirtualPlayer = !!(this.player && this.player.isVirtual);
         this.profileAvatar = this.resolveProfileAvatar();
     }
 
     private resolveProfileAvatar(): string | null {
         if (this.player.profileAvatarUrl) {
             const url = this.player.profileAvatarUrl;
-            return url.startsWith('http://') || url.startsWith('https://') ? url : `${environment.serverUrl}${url}`;
+            const isAbsolute =
+                url.startsWith('http://') ||
+                url.startsWith('https://') ||
+                url.startsWith('data:');
+            return isAbsolute ? url : `${environment.serverUrl}${url}`;
         }
         if (!this.player.profileAvatarId) return null;
         const avatar = ACCOUNT_CREATION_AVATARS.find((a) => a.id === this.player.profileAvatarId);
