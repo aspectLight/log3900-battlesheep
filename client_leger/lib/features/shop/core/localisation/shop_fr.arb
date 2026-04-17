@@ -18,6 +18,7 @@
   "shopPurchaseFailedItemNotFound": "Cet article est introuvable dans la boutique.",
   "shopPurchaseFailedNotAuthenticated": "Vous devez être connecté pour effectuer un achat.",
   "shopPurchaseFailedUnknown": "Votre achat n'a pas pu être effectué. Veuillez réessayer.",
+  "shopBannerPreferenceUpdateFailed": "Impossible de mettre à jour la préférence de bannière. Veuillez réessayer.",
   "shopBannerPreviewPlayer": "Joueur",
   "shopBannerPreviewHp": "Vie",
   "shopBannerPreviewSpeed": "Rapidité",

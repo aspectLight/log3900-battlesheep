@@ -11,6 +11,7 @@ export enum WaitingRoomEvents {
     RoomExistsResponse = 'roomExistsResponse',
     GetReservedAvatars = 'getReservedAvatars',
     UpdateAvatarReserved = 'updateAvatarReserved',
+    AvatarReservationFailed = 'avatarReservationFailed',
     ReserveAvatar = 'reserveAvatar',
     JoinWaitingRoom = 'joinWaitingRoom',
     JoinRoomResponse = 'joinRoomResponse',

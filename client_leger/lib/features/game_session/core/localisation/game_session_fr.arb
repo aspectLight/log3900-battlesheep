@@ -52,6 +52,8 @@
   "notificationDefeatClassic": "Défaite! {winnerName} a gagné trois combats",
   "notificationGameAbandoned": "Partie abandonnée",
   "notificationGameCanceled": "Partie annulée",
+  "notificationGameLeft": "Vous avez quitté la partie!",
+  "gameSessionPopupUnderstood": "Compris",
   "notificationDisconnectAutomatic": "Déconnexion automatique",
   "notificationTurnStart": "Tour de {playerName} ({seconds}s)",
   "playerHudMovements": "{count} Déplacements",

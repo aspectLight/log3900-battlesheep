@@ -119,7 +119,7 @@ export class PlayerConnectionHandler {
                 }
             }
 
-            const game = await this.gameService.getGameById(room.gameId);
+            const game = await this.gameService.getGameBlueprintById(room.gameId);
             const maxPlayers = SIZE_LIMITS[game.board.size] || 2;
 
             const result = this.gameRoomService.addPlayerToGame(data.roomId, data.player, socket.id, maxPlayers);

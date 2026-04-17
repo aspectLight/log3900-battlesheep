@@ -26,7 +26,7 @@ void registerCharacterCreationScopeViewModels(
       reserveCharacterUseCase: scope.get<ReserveCharacterUseCase>(),
       repository: scope.get<CharacterCreationRepository>(),
       profileService: rootGetIt.get<HttpProfileService>(),
-      shopRepository: rootGetIt.get<ShopRepository>(),
+      shopRepository: scope.get<ShopRepository>(),
       notificationIntentSink: rootGetIt.get<NotificationIntentSink>(),
       eventBus: rootGetIt.get<CharacterCreationEventBus>(),
       appTransitionEventBus: rootGetIt.get<AppTransitionEventBus>(),

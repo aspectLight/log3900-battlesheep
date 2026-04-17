@@ -44,6 +44,7 @@ export const enum ErrorMessages {
     CombatDoesNotExist = "Le combat n'existe pas",
     RoomNotLocked = "La salle n'est pas verrouillée",
     SocketIdNotDefined = 'Socket ID non défini !',
+    AvatarAlreadyInUse = "Ce personnage est déjà utilisé par un autre joueur.",
     RoomLockedAddPlayer = "La salle est verrouillée, impossible d'ajouter un joueur virtuel.",
     MaxPlayerLimitReached = 'Le nombre maximum de joueurs a été atteint, impossible de déverouiller la salle.',
     NotPlayerTurn = "Ce n'est pas le tour de ce joueur",

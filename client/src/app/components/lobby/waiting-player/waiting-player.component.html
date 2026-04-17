@@ -1,5 +1,5 @@
 @if (showError) {
-<app-pop-up [isError]="true" popUpMessage="{{ errorMessage }}" [showSecondButton]="false" (confirm)="router.navigate([routes.home])"> </app-pop-up>
+<app-pop-up [isError]="true" popUpMessage="{{ errorMessage }}" [showSecondButton]="false" (confirm)="onShowErrorConfirm()"> </app-pop-up>
 } @if (showMessage) {
 <app-pop-up popUpMessage="{{ errorMessage }}" [showSecondButton]="false" (confirm)="onCancel()"> </app-pop-up>
 } @if (showErrorFromService) {

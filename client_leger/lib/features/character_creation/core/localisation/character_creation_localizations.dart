@@ -215,6 +215,12 @@ abstract class CharacterCreationLocalizations {
   /// **'The selected game is hidden or deleted.'**
   String get selectedGameHiddenOrDeleted;
 
+  /// No description provided for @gameStartedWhileCreating.
+  ///
+  /// In en, this message translates to:
+  /// **'The game has started without you. You will return to the main menu.'**
+  String get gameStartedWhileCreating;
+
   /// No description provided for @reserveCharacterFailed.
   ///
   /// In en, this message translates to:

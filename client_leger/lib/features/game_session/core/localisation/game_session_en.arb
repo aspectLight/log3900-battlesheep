@@ -52,6 +52,8 @@
   "notificationDefeatClassic": "Defeat! {winnerName} won three combats",
   "notificationGameAbandoned": "Game abandoned",
   "notificationGameCanceled": "Game canceled",
+  "notificationGameLeft": "You left the game!",
+  "gameSessionPopupUnderstood": "Got it",
   "notificationDisconnectAutomatic": "Automatic disconnect",
   "notificationTurnStart": "{playerName}'s turn ({seconds}s)",
   "playerHudMovements": "{count} Movements",

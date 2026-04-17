@@ -70,6 +70,8 @@ class WaitingRoomSocket {
       ReplayLatestBroadcastController<List<ReservationModel>>();
   final _waitingRoomErrorController =
       StreamController<WaitingRoomFailure>.broadcast();
+  final _avatarReservationFailedController =
+      StreamController<WaitingRoomFailure>.broadcast();
   final _gameRoomCreatedController =
       StreamController<GameRoomCreatedPayloadDto>.broadcast();
 
@@ -87,6 +89,7 @@ class WaitingRoomSocket {
     WaitingRoomSocketEvents.inbound.playerCreated,
     WaitingRoomSocketEvents.inbound.playerKicked,
     WaitingRoomSocketEvents.inbound.updateAvatarReserved,
+    WaitingRoomSocketEvents.inbound.avatarReservationFailed,
     WaitingRoomSocketEvents.inbound.waitingRoomError,
     WaitingRoomSocketEvents.inbound.gameRoomCreated,
   ];
@@ -109,6 +112,18 @@ class WaitingRoomSocket {
       _updateCharacterReservedController.stream;
   Stream<WaitingRoomFailure> get waitingRoomErrorStream =>
       _waitingRoomErrorController.stream;
+  Stream<WaitingRoomFailure> get avatarReservationFailedStream =>
+      _avatarReservationFailedController.stream;
+
+  WaitingRoomFailure _mapAvatarReservationFailedPayload(Object? data) {
+    if (data is Map) {
+      final err = data['error'];
+      if (err is String) {
+        return err.toWaitingRoomFailure();
+      }
+    }
+    return const UnknownWaitingRoomFailure('Unknown reserve error');
+  }
 
   Future<void> _setupListeners() async {
     await _cancelEventListeners();
@@ -166,6 +181,14 @@ class WaitingRoomSocket {
                 Map<String, dynamic>.from(data),
               ).reservedCharacters.map((d) => d.toModel()).toList(),
             );
+          }),
+      _socketService
+          .on<Object?>(WaitingRoomSocketEvents.inbound.avatarReservationFailed)
+          .listen((data) {
+            final failure = _mapAvatarReservationFailedPayload(data);
+            if (!_avatarReservationFailedController.isClosed) {
+              _avatarReservationFailedController.add(failure);
+            }
           }),
       subscribeSocketEvent<Object?>(
         _socketService,
@@ -331,6 +354,7 @@ class WaitingRoomSocket {
     await _playerKickedController.close();
     await _updateCharacterReservedController.close();
     await _waitingRoomErrorController.close();
+    await _avatarReservationFailedController.close();
     await _gameRoomCreatedController.close();
   }
 }

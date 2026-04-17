@@ -611,6 +611,8 @@
         "join_impossible": "Unable to join the game.",
         "max_player_limit": "Maximum number of players reached, unable to unlock the room.",
         "room_not_found": "The room does not exist.",
-        "room_locked": "The room is locked."
+        "room_locked": "The room is locked.",
+        "avatar_already_used": "This character is already taken by another player.",
+        "game_started_left_out_character_creation": "The game has started without you. You will return to the main menu."
     }
 }

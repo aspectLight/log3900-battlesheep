@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/scheduler.dart';
 
+import '../core/presentation/widgets/loading_overlay/loading_overlay_view_model.dart';
 import 'app_navigator.dart';
 import 'app_router.dart';
 import 'navigation_command.dart';
@@ -12,11 +14,14 @@ class AppNavigationHandler extends AppNavigator {
   AppNavigationHandler({
     required AppRouter appRouter,
     required RouteToNavigationStateMapper mapper,
+    required LoadingOverlayViewModel loadingOverlayViewModel,
   }) : _appRouter = appRouter,
-       _mapper = mapper;
+       _mapper = mapper,
+       _loadingOverlayViewModel = loadingOverlayViewModel;
 
   final AppRouter _appRouter;
   final RouteToNavigationStateMapper _mapper;
+  final LoadingOverlayViewModel _loadingOverlayViewModel;
 
   @override
   void request(NavigationCommand command) {
@@ -74,27 +79,42 @@ class AppNavigationHandler extends AppNavigator {
     }
   }
 
+  /// Arms the loading overlay synchronously, then runs [navigate] after the next
+  /// frame so the overlay paints before route transition (avoids a flash of the
+  /// current page during [TransitionsBuilders.fadeIn]).
+  void _armOverlayThenNavigate(void Function() navigate) {
+    _loadingOverlayViewModel.notifyRouteTransition();
+    SchedulerBinding.instance.addPostFrameCallback((_) => navigate());
+  }
+
   void _pushAuthenticated(PageRouteInfo route) {
-    final shellRouter = _appRouter.innerRouterOf<StackRouter>(
-      AuthenticatedShellRoute.name,
-    );
-    if (shellRouter != null) {
-      unawaited(shellRouter.push(route));
-    } else {
-      unawaited(_appRouter.push(AuthenticatedShellRoute(children: [route])));
-    }
+    _armOverlayThenNavigate(() {
+      final shellRouter = _appRouter.innerRouterOf<StackRouter>(
+        AuthenticatedShellRoute.name,
+      );
+      if (shellRouter != null) {
+        unawaited(shellRouter.push(route));
+      } else {
+        unawaited(_appRouter.push(AuthenticatedShellRoute(children: [route])));
+      }
+    });
   }
 
   void _apply(StackTransition transition, List<PageRouteInfo> routes) {
-    switch (transition) {
-      case StackTransition.push:
-        unawaited(_appRouter.push(routes.first));
-      case StackTransition.replace:
-        unawaited(_appRouter.replace(routes.first));
-      case StackTransition.replaceAll:
-        unawaited(_appRouter.replaceAll(routes));
-      case StackTransition.popUntil:
-        break;
+    if (transition == StackTransition.popUntil) {
+      return;
     }
+    _armOverlayThenNavigate(() {
+      switch (transition) {
+        case StackTransition.push:
+          unawaited(_appRouter.push(routes.first));
+        case StackTransition.replace:
+          unawaited(_appRouter.replace(routes.first));
+        case StackTransition.replaceAll:
+          unawaited(_appRouter.replaceAll(routes));
+        case StackTransition.popUntil:
+          break;
+      }
+    });
   }
 }

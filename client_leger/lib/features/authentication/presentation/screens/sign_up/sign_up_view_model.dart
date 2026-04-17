@@ -3,6 +3,8 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../core/app_events/auth_events.dart';
 import '../../../core/enums/auth_validation_error.dart';
+import '../../../../../core/appearance/app_appearance_service.dart';
+import '../../../../../core/appearance/app_visual_theme.dart';
 import '../../../../../core/enums/auth_avatar.dart';
 import '../../../../../core/app_transition/app_transition_bus.dart';
 import '../../../core/helpers/email_validator.dart';
@@ -21,16 +23,19 @@ class SignUpViewModel {
   final AppTransitionEventBus _appTransitionEventBus;
   final HttpProfileService _profileService;
   final AuthRepository _authRepository;
+  final AppAppearanceService _appearance;
 
   SignUpViewModel({
     required SignUpUseCase signUpUseCase,
     required AppTransitionEventBus appTransitionEventBus,
     required HttpProfileService profileService,
     required AuthRepository authRepository,
+    required AppAppearanceService appearance,
   }) : _signUpUseCase = signUpUseCase,
        _appTransitionEventBus = appTransitionEventBus,
        _profileService = profileService,
-       _authRepository = authRepository;
+       _authRepository = authRepository,
+       _appearance = appearance;
 
   final formState = signal<SignUpFormUiState>(SignUpFormUiState.initial());
   final authState = signal<AuthState>(const AuthState.initial());
@@ -157,6 +162,8 @@ class SignUpViewModel {
             email: state.email,
             password: state.password,
             avatarId: avatarId,
+            language: _appearance.effectiveLanguageCodeForApi(),
+            theme: appVisualThemeToId(_appearance.visualTheme.value),
           ),
         )
         .run();

@@ -73,8 +73,9 @@ class StatisticsLocalizationsEn extends StatisticsLocalizations {
     int deaths,
     int combatPct,
     int tilePct,
-  ) =>
-      '🎮 Match result: $result!\n💀 Deaths: $deaths\n⚔️ Combats won: $combatPct%\n🗺️ Tiles visited: $tilePct%\n#EasternSolace #Jeux';
+  ) {
+    return '🎮 Match result: $result!\n💀 Deaths: $deaths\n⚔️ Combats won: $combatPct%\n🗺️ Tiles visited: $tilePct%\n#EasternSolace #Jeux';
+  }
 
   @override
   String get statisticsShareResultNounWin => 'victory';

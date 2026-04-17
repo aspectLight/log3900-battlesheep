@@ -41,7 +41,8 @@ export class WaitingRoomManagementHandler {
         server: Server,
     ): Promise<{ success: boolean; error?: string }> {
         try {
-            const game = await this.gameService.getGameById(data.gameId);
+            // Use blueprint (includes soft-deleted) so host can finish waiting-room setup after the map was deleted.
+            const game = await this.gameService.getGameBlueprintById(data.gameId);
             if (game.privacy === 'private' && game.owner !== data.host.name) {
                 return { success: false, error: 'Seul le propriétaire peut créer une partie avec un jeu privé' };
             }
@@ -404,7 +405,7 @@ export class WaitingRoomManagementHandler {
 
             for (const room of waitingRooms) {
                 try {
-                    const game = await this.gameService.getGameById(room.gameId);
+                    const game = await this.gameService.getGameBlueprintById(room.gameId);
                     const maxPlayers = SIZE_LIMITS[game.board.size] || 2;
 
                     // Filter: don't show rooms where a player has blocked the requester
@@ -448,7 +449,7 @@ export class WaitingRoomManagementHandler {
 
             for (const room of gameRooms) {
                 try {
-                    const game = await this.gameService.getGameById(room.gameId);
+                    const game = await this.gameService.getGameBlueprintById(room.gameId);
                     const maxPlayers = SIZE_LIMITS[game.board.size] || 2;
 
                     // Filter: don't show rooms where a player has blocked the requester

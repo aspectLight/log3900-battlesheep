@@ -36,6 +36,8 @@
   "profileAverageTime": "Average time per game",
   "profileThemeLabel": "Theme",
   "profileLanguageLabel": "Language",
+  "languageNameFr": "French",
+  "languageNameEn": "English",
   "themeNameDefault": "Classic",
   "themeNameFrost": "Siberian Cold",
   "themeNameVillage": "Abandonned Village",
@@ -46,5 +48,5 @@
   "profileConfirmDelete": "Delete",
   "profileDeleting": "Deleting...",
   "tutorial": "Tutorial",
-  "continueTutorial: "Continue"
+  "continueTutorial": "Continue"
 }

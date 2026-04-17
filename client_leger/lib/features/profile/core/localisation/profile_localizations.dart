@@ -317,22 +317,34 @@ abstract class ProfileLocalizations {
   /// **'Language'**
   String get profileLanguageLabel;
 
+  /// No description provided for @languageNameFr.
+  ///
+  /// In en, this message translates to:
+  /// **'French'**
+  String get languageNameFr;
+
+  /// No description provided for @languageNameEn.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get languageNameEn;
+
   /// No description provided for @themeNameDefault.
   ///
   /// In en, this message translates to:
-  /// **'Default'**
+  /// **'Classic'**
   String get themeNameDefault;
 
   /// No description provided for @themeNameFrost.
   ///
   /// In en, this message translates to:
-  /// **'Frost'**
+  /// **'Siberian Cold'**
   String get themeNameFrost;
 
   /// No description provided for @themeNameVillage.
   ///
   /// In en, this message translates to:
-  /// **'Village'**
+  /// **'Abandonned Village'**
   String get themeNameVillage;
 
   /// No description provided for @profileDeleteAccount.
@@ -340,10 +352,6 @@ abstract class ProfileLocalizations {
   /// In en, this message translates to:
   /// **'Delete account'**
   String get profileDeleteAccount;
-
-  String get languageNameFr;
-
-  String get languageNameEn;
 
   /// No description provided for @profileDeleteConfirmTitle.
   ///
@@ -375,8 +383,16 @@ abstract class ProfileLocalizations {
   /// **'Deleting...'**
   String get profileDeleting;
 
+  /// No description provided for @tutorial.
+  ///
+  /// In en, this message translates to:
+  /// **'Tutorial'**
   String get tutorial;
 
+  /// No description provided for @continueTutorial.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
   String get continueTutorial;
 }
 

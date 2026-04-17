@@ -184,7 +184,7 @@ export class GameLifecycleHandler {
 
     private async updatePlayerStatistics(room: GameRoom, winnerId: string, playtimeSeconds: number): Promise<void> {
         try {
-            const game = await this.gameService.getGameById(room.gameId);
+            const game = await this.gameService.getGameBlueprintById(room.gameId);
             const gameMode: 'Classique' | 'CTF' = game.mode === 'ctf' ? 'CTF' : 'Classique';
             const winnerIds = this.getWinnerIds(room, winnerId);
 

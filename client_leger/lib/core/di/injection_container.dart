@@ -38,6 +38,7 @@ import '../connected_scope/session_scope_manager.dart';
 import '../presentation/shell/shell_chrome_back_handler.dart';
 import '../modal/modal_module.dart';
 import '../notification/notification_module.dart';
+import '../presentation/widgets/loading_overlay/loading_overlay_view_model.dart';
 import 'app_event_handler_module.dart';
 import 'appearance_sync_module.dart';
 import 'service_module.dart';
@@ -70,10 +71,14 @@ Future<void> setupDependencies() async {
   getIt.registerLazySingleton<AppRouter>(
     () => AppRouter(authGuard: getIt<AuthGuard>()),
   );
+  getIt.registerLazySingleton<LoadingOverlayViewModel>(
+    LoadingOverlayViewModel.new,
+  );
   getIt.registerLazySingleton<AppNavigator>(
     () => AppNavigationHandler(
       appRouter: getIt<AppRouter>(),
       mapper: getIt<RouteToNavigationStateMapper>(),
+      loadingOverlayViewModel: getIt<LoadingOverlayViewModel>(),
     ),
   );
   getIt.registerLazySingleton<ShellChromeBackHandler>(

@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Player } from '@app/classes/entity/player';
 import { BonusChoicesComponent } from '@app/components/player/bonus-choices/bonus-choices.component';
 import { CharacterGridComponent } from '@app/components/player/character-grid/character-grid.component';
 import { PopUpComponent } from '@app/components/shared/pop-up/pop-up.component';
 import { BonusType, STAT_WITH_BONUS } from '@app/constants/bonus.constants';
-import { DEFAULT_STATS_VALUE } from '@app/constants/player.constants';
+import { D4_VALUE, D6_VALUE, DEFAULT_STATS_VALUE } from '@app/constants/player.constants';
 import { ROUTES } from '@app/constants/routes.constants';
 import { Bonus } from '@app/interfaces/character.interface';
 import { Reservation } from '@app/interfaces/reservation.interface';
@@ -15,7 +15,9 @@ import { VirtualCurrencyService } from '@app/services/currency/virtual-currency.
 import { GameCreationService } from '@app/services/lobby/game-creation.service';
 import { PlayerCreationService } from '@app/services/lobby/player-creation.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ErrorMessages } from '@common/error-messages.constants';
 import { environment } from 'src/environments/environment';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-create-player-page',
@@ -23,16 +25,22 @@ import { environment } from 'src/environments/environment';
     styleUrls: ['./create-player-page.component.scss'],
     imports: [CharacterGridComponent, BonusChoicesComponent, PopUpComponent, RouterLink, TranslateModule],
 })
-export class CreatePlayerPageComponent implements OnInit {
+export class CreatePlayerPageComponent implements OnInit, OnDestroy {
     showError: boolean;
     errorMessage: string;
     validCharacter: boolean = true;
 
     reservedAvatars: Reservation[] = [];
+    characterGridResetNonce = 0;
 
     gameModified: boolean = false;
     isHost: boolean = false;
     isCreateButtonEnabled: boolean = false;
+
+    /** When true, closing the error popup returns to home (room locked / game started without this player). */
+    private dismissErrorNavigatesHome = false;
+
+    private readonly subscriptions = new Subscription();
 
     constructor(
         public playerCreationService: PlayerCreationService,
@@ -55,41 +63,102 @@ export class CreatePlayerPageComponent implements OnInit {
     }
 
     get previewPlayer(): Player {
-        if (!this.selectedCharacter.character.name) {
-            return new Player();
+        const { character, bonus } = this.playerCreationService.selectedCharacter;
+        const p = character.name
+            ? new Player(
+                  character.name,
+                  character.name.toLowerCase(),
+                  bonus.life === STAT_WITH_BONUS ? BonusType.Health : BonusType.Speed,
+                  bonus.defense === STAT_WITH_BONUS ? BonusType.Defense : BonusType.Attack,
+              )
+            : new Player();
+        if (!character.name) {
+            p.stats[BonusType.Health].value = bonus.life;
+            p.stats[BonusType.Speed].value = bonus.speed;
         }
-        const player = new Player(
-            this.selectedCharacter.character.name,
-            this.selectedCharacter.character.name.toLowerCase(),
-            this.selectedCharacter.bonus.life === STAT_WITH_BONUS ? BonusType.Health : BonusType.Speed,
-            this.selectedCharacter.bonus.defense === STAT_WITH_BONUS ? BonusType.Defense : BonusType.Attack,
-        );
-        return player;
+        p.stats[BonusType.Attack].value = bonus.attack ?? D4_VALUE;
+        p.stats[BonusType.Defense].value = bonus.defense ?? D6_VALUE;
+        return p;
     }
 
     ngOnInit() {
         this.playerCreationService.reset();
         this.updateCreateButtonState();
-        this.socketService.roomLocked$.subscribe((locked) => {
-            if (locked) {
-                this.errorMessage = this.translate.instant('errors.game_deleted_or_locked');
+        this.subscriptions.add(
+            this.socketService.roomLocked$.subscribe((locked) => {
+                if (locked) {
+                    this.dismissErrorNavigatesHome = true;
+                    this.errorMessage = this.translate.instant('errors.game_deleted_or_locked');
+                    this.showError = true;
+                }
+            }),
+        );
+        this.subscriptions.add(
+            this.socketService.characterCreationGameStartedLeftOut$.subscribe(() => {
+                this.dismissErrorNavigatesHome = true;
+                this.errorMessage = this.translate.instant('errors.game_started_left_out_character_creation');
                 this.showError = true;
-            }
-        });
-        this.socketService.reservedAvatars$.subscribe((avatars) => {
-            this.reservedAvatars = avatars;
-        });
+            }),
+        );
+        this.subscriptions.add(
+            this.socketService.reservedAvatars$.subscribe((avatars) => {
+                this.reservedAvatars = avatars;
+            }),
+        );
+        this.subscriptions.add(
+            this.socketService.avatarReservationFailed$.subscribe((payload) => {
+                if (payload.error !== ErrorMessages.AvatarAlreadyInUse) {
+                    return;
+                }
+                this.playerCreationService.clearAvatar();
+                this.characterGridResetNonce++;
+                this.errorMessage = this.translate.instant('errors.avatar_already_used');
+                this.showError = true;
+                this.updateCreateButtonState();
+            }),
+        );
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     getId(): string {
         return this.socketService.getId() || '';
     }
 
-    onCharacterSelected(chosenAvatar: { name: string; id: number }): void {
+    async onCharacterSelected(chosenAvatar: { name: string; id: number }): Promise<void> {
         this.playerCreationService.selectedCharacter = chosenAvatar;
-        this.socketService.reserveAvatar(this.gameCreationService.gameCode, chosenAvatar.name, this.getId());
-        this.validCharacter = true;
-        this.updateCreateButtonState();
+        try {
+            await this.socketService.reserveAvatar(this.gameCreationService.gameCode, chosenAvatar.name, this.getId());
+            this.validCharacter = true;
+            this.updateCreateButtonState();
+        } catch (error) {
+            this.playerCreationService.clearAvatar();
+            this.characterGridResetNonce++;
+            // Duplicate character: server emits `AvatarReservationFailed` only for that case.
+            if (error instanceof Error && error.message === ErrorMessages.AvatarAlreadyInUse) {
+                this.updateCreateButtonState();
+                return;
+            }
+            if (error instanceof Error) {
+                this.errorMessage = error.message;
+                this.showError = true;
+            } else {
+                this.errorMessage = this.translate.instant('errors.generic');
+                this.showError = true;
+            }
+            this.updateCreateButtonState();
+        }
+    }
+
+    onCreatePlayerErrorDismiss(): void {
+        this.showError = false;
+        this.errorMessage = '';
+        if (this.dismissErrorNavigatesHome) {
+            this.dismissErrorNavigatesHome = false;
+            this.router.navigate([ROUTES.home]);
+        }
     }
 
     onBonusSelected(chosenBonus: Bonus): void {
@@ -123,8 +192,17 @@ export class CreatePlayerPageComponent implements OnInit {
                     // On success, joinGameRoom callback handles the redirect via gameManagerService
                 });
             } else if (this.isHost) {
-                this.socketService.createRoom(this.gameCreationService.gameCode, this.gameCreationService.selectedGame._id, newPlayer);
-                this.router.navigate([ROUTES.waiting]);
+                try {
+                    await this.socketService.createRoom(
+                        this.gameCreationService.gameCode,
+                        this.gameCreationService.selectedGame._id,
+                        newPlayer,
+                    );
+                    this.router.navigate([ROUTES.waiting]);
+                } catch (error) {
+                    this.errorMessage = error instanceof Error ? error.message : this.translate.instant('errors.generic');
+                    this.showError = true;
+                }
             } else {
                 this.socketService.createPlayer(this.gameCreationService.gameCode, newPlayer);
                 this.router.navigate([ROUTES.waiting]);

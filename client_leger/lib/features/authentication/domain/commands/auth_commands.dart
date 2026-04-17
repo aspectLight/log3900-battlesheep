@@ -17,6 +17,8 @@ class SignUpCommand with _$SignUpCommand {
     required String email,
     required String password,
     required String avatarId,
+    String? language,
+    String? theme,
   }) = _SignUpCommand;
 }
 

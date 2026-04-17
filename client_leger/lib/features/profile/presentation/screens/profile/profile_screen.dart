@@ -25,7 +25,7 @@ import '../../../../authentication/core/extensions/auth_validation_error_ext.dar
 import '../../../../authentication/core/helpers/email_validator.dart';
 import '../../../../authentication/core/helpers/username_validator.dart';
 import '../../../../authentication/core/localisation/auth_localizations.dart';
-import '../../../../shop/data/repositories/shop_repository.dart';
+import '../../../../shop/data/scoped_shop_access.dart';
 import '../../../../shop/domain/state/shop_state.dart';
 import '../../../core/exceptions/profile_failure.dart';
 import '../../../core/extensions/profile_failure_ext.dart';
@@ -63,8 +63,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   bool get _supportsCameraCapture => Platform.isAndroid || Platform.isIOS;
 
-  ShopRepository get _shopRepository => GetIt.I<ShopRepository>();
-
   ButtonStyle _uploadButtonStyle() {
     return OutlinedButton.styleFrom(
       foregroundColor: const Color(0xFFF5E6E6),
@@ -99,7 +97,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _init() async {
     await _viewModel.load();
-    _shopRepository.refreshCatalogueAndBalance();
+    scopedShopRepositoryOrNull(GetIt.I)?.refreshCatalogueAndBalance();
     _syncFormFromState();
     _presentLoadErrorIfAny();
   }
@@ -261,7 +259,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: const TextStyle(fontFamily: 'CustomFont'),
                   child: Watch((context) {
                     final state = _viewModel.state.value;
-                    final shopState = _shopRepository.state.value;
+                    final shopRepo = scopedShopRepositoryOrNull(GetIt.I);
+                    final shopState =
+                        shopRepo?.state.value ?? const ShopState.loading();
                     final isSaving = _viewModel.isSaving.value;
                     final isDeleting = _viewModel.isDeleting.value;
                     final isUploading = _viewModel.isUploading.value;

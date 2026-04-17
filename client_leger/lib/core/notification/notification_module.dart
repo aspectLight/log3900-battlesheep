@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 
+import '../../features/character_creation/presentation/widgets/character_creation_game_started_notification/character_creation_game_started_notification_widget.dart';
 import '../../features/character_creation/presentation/widgets/character_creation_room_locked_notification/character_creation_room_locked_notification_widget.dart';
 import '../../features/character_creation/presentation/widgets/character_creation_reserve_failed_notification/character_creation_reserve_failed_notification_widget.dart';
 import '../../features/character_creation/presentation/widgets/character_creation_validation_notification/character_creation_validation_notification_widget.dart';
@@ -83,6 +84,12 @@ void registerNotificationModule(GetIt getIt) {
   );
   registry.register<CharacterCreationRoomLockedNotificationIntent>(
     (c, intent, onDismiss) => CharacterCreationRoomLockedNotificationWidget(
+      intent: intent,
+      onDismiss: onDismiss,
+    ),
+  );
+  registry.register<CharacterCreationGameStartedNotificationIntent>(
+    (c, intent, onDismiss) => CharacterCreationGameStartedNotificationWidget(
       intent: intent,
       onDismiss: onDismiss,
     ),
