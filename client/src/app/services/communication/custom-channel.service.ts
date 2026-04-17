@@ -1,4 +1,4 @@
-﻿import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { AuthService } from '@app/services/communication/auth.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
 import { SocialService } from '@app/services/communication/social.service';
@@ -81,6 +81,19 @@ export class CustomChannelService {
         const socket = this.socketService.socket;
         if (!socket) return;
         this.resetState();
+
+        // Remove any existing listeners before re-registering to prevent accumulation on reconnect
+        socket.off(CustomChannelEvents.CustomChannelsListResponse);
+        socket.off(CustomChannelEvents.CustomChannelCreated);
+        socket.off(CustomChannelEvents.CustomChannelDeleted);
+        socket.off(CustomChannelEvents.CustomChannelError);
+        socket.off(CustomChannelEvents.CustomChannelJoined);
+        socket.off(CustomChannelEvents.CustomChannelLeft);
+        socket.off(CustomChannelEvents.CustomChannelMessagesResponse);
+        socket.off(CustomChannelEvents.CustomChannelMessage);
+        socket.off(CustomChannelEvents.CustomChannelEmoji);
+        socket.off(GeneralChatEvents.UsernameUpdated);
+        socket.off(CustomChannelEvents.UserChannelsRestored);
 
         socket.on(CustomChannelEvents.CustomChannelsListResponse, (channels: ChannelInfo[]) => {
             const incomingIds = new Set(channels.map((c) => c.id));

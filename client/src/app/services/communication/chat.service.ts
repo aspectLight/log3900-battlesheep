@@ -23,11 +23,21 @@ export class ChatService {
         private waitingRoomService: WaitingRoomService,
         private gameRoomService: GameRoomService,
         private socialService: SocialService,
-    ) {
-        this.setupListeners();
-    }
+    ) {}
 
     setupListeners(): void {
+        const socket = this.socketService.socket;
+        if (!socket) return;
+
+        // Remove any existing listeners before re-registering to prevent accumulation
+        socket.off('massMessage');
+        socket.off('getMessagesResponse');
+        socket.off(GeneralChatEvents.GeneralChatMessage);
+        socket.off(GeneralChatEvents.GeneralChatEmoji);
+        socket.off(GeneralChatEvents.GetGeneralChatMessagesResponse);
+        socket.off(GeneralChatEvents.UsernameUpdated);
+        socket.off('connect');
+
         this.socketService.on(
             'massMessage',
             (message: { type: string; name?: string | null; content: string; time: string; avatarId?: string | null; avatarUrl?: string | null }) => {
@@ -93,7 +103,7 @@ export class ChatService {
             }
         });
 
-        this.socketService.on('connect', () => {
+        socket.on('connect', () => {
             if (this.username) {
                 this.socketService.send(GeneralChatEvents.JoinGeneralChat, this.username);
             }
