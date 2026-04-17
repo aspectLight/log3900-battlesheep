@@ -26,7 +26,7 @@ class TutorialLocalizationsFr extends TutorialLocalizations {
 
   @override
   String get profileDesc =>
-      'Personnalisez votre avatar, votre pseudo et vos préférences depuis la vue Profil. Vos statistiques de jeu y sont également disponibles.';
+      'Personnalisez votre avatar, votre pseudo et vos préférences depuis la vue Profil. Vous pouvez également consulter vos statistiques de jeu. De plus, vous avez accès à ce tutoriel en tout temps en cas de besoin.';
 
   @override
   String get friendsTitle => 'Amis';
@@ -40,14 +40,14 @@ class TutorialLocalizationsFr extends TutorialLocalizations {
 
   @override
   String get chatDesc =>
-      'Discutez en temps réel avec tous les joueurs connectés via le chat général, ou en privé à travers des canaux de communication customisés.';
+      'Discutez en temps réel avec tous les joueurs connectés via le chat général, ou en privé à travers des canaux de communication customisés. Un secouement vertical vous permet d\'envoyer  l\'émoji sélectionné, alors qu\'un secouement horizontal vous permet de re-envoyer le dernier message envoyé.';
 
   @override
   String get shopTitle => 'Boutique';
 
   @override
   String get shopDesc =>
-      'Achetez de nouveaux avatars et cosmétiques avec vos pièces gagnées en jouant.';
+      'Achetez et équipez de nouveaux avatars et cosmétiques avec vos pièces gagnées en jouant.';
 
   @override
   String get gameModesTitle => 'Modes de jeu';
@@ -61,12 +61,12 @@ class TutorialLocalizationsFr extends TutorialLocalizations {
 
   @override
   String get createGameDesc =>
-      'Appuyez sur "Créer une partie" depuis le menu principal, choisissez votre mode, votre carte et vos paramètres, puis attendez que des joueurs vous rejoignent ou créez des joueurs controllés par IA.';
+      'Appuyez sur "Créer une partie" depuis le menu principal, choisissez votre carte et vos paramètres (Partie avec des amis uniquement et prix d\'entrée), puis attendez que des joueurs vous rejoignent ou créez des joueurs controllés par IA.';
 
   @override
   String get joinGameTitle => 'Rejoindre une partie';
 
   @override
   String get joinGameDesc =>
-      'Rejoignez une partie existante en utilisant un code d\'invitation.';
+      'Rejoignez une partie existante en utilisant un code d\'invitation, en choisissant une partie dans la liste ou en scannant un code QR.';
 }

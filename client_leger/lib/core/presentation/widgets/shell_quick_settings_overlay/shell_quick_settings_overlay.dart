@@ -5,27 +5,27 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../features/authentication/core/interfaces/auth_repository.dart';
+import '../../../../features/character_creation/core/localisation/character_creation_localizations.dart';
+import '../../../../features/join_game_session/core/localisation/join_game_session_localizations.dart';
+import '../../../../features/profile/core/localisation/profile_localizations.dart';
+import '../../../../features/select_game_session/core/localisation/select_game_session_localizations.dart';
 import '../../../../features/shop/data/repositories/shop_repository.dart';
 import '../../../../features/shop/data/scoped_shop_access.dart';
 import '../../../../features/shop/domain/state/shop_state.dart';
-import '../../../../features/authentication/core/interfaces/auth_repository.dart';
-import '../../../connected_scope/session_scope_manager.dart';
+import '../../../../features/waiting_room/core/localisation/waiting_room_localizations.dart';
 import '../../../../routing/app_navigator.dart';
 import '../../../../routing/app_router.dart';
 import '../../../../routing/navigation_command.dart';
 import '../../../appearance/app_interaction_colors.dart';
 import '../../../config/env_config.dart';
+import '../../../connected_scope/session_scope_manager.dart';
 import '../../../constants/auth_avatar_assets.dart';
 import '../../../constants/ui_assets.dart';
 import '../../../localisation/core_localizations.dart';
 import '../../screens/main_menu/main_menu_view_model.dart';
 import '../../shell/shell_chrome_back_handler.dart';
 import '../../shell/shell_chrome_metrics.dart';
-import '../../../../features/character_creation/core/localisation/character_creation_localizations.dart';
-import '../../../../features/join_game_session/core/localisation/join_game_session_localizations.dart';
-import '../../../../features/profile/core/localisation/profile_localizations.dart';
-import '../../../../features/select_game_session/core/localisation/select_game_session_localizations.dart';
-import '../../../../features/waiting_room/core/localisation/waiting_room_localizations.dart';
 
 class ShellQuickSettingsOverlay extends StatefulWidget {
   const ShellQuickSettingsOverlay({super.key});
@@ -178,17 +178,17 @@ class _ShellQuickSettingsOverlayState extends State<ShellQuickSettingsOverlay> {
     BuildContext context,
   ) {
     if (routeName == MainMenuRoute.name) {
-      return l10n.mainMenu;
+      return '';
     }
     if (shell != null &&
         !shell.canPop() &&
         (routeName == null || routeName.isEmpty)) {
-      return l10n.mainMenu;
+      return '';
     }
     if (shell != null && !shell.canPop()) {
       final atRoot = _titleForRoute(routeName, context);
       if (atRoot != null && atRoot.isNotEmpty) return atRoot;
-      return l10n.mainMenu;
+      return '';
     }
     return _titleForRoute(routeName, context) ?? l10n.appTitle;
   }
@@ -199,7 +199,7 @@ class _ShellQuickSettingsOverlayState extends State<ShellQuickSettingsOverlay> {
     if (core == null) return null;
     switch (routeName) {
       case MainMenuRoute.name:
-        return core.mainMenu;
+        return '';
       case JoinGameSessionRoute.name:
         return JoinGameSessionLocalizations.of(context)?.joinGameTitle;
       case SelectGameSessionRoute.name:
@@ -471,12 +471,6 @@ class _ShellQuickSettingsOverlayState extends State<ShellQuickSettingsOverlay> {
                           _menuViewModel.openProfile();
                         }),
                         const Divider(height: 1),
-                        _option(context, l10n.signOut, () {
-                          setState(() => _open = false);
-                          unawaited(_menuViewModel.signOut());
-                          _appNavigator.request(GoToAuth());
-                        }),
-                        const Divider(height: 1),
                         _option(context, l10n.connectionHistory, () {
                           setState(() => _open = false);
                           _menuViewModel.openConnectionHistory();
@@ -485,6 +479,12 @@ class _ShellQuickSettingsOverlayState extends State<ShellQuickSettingsOverlay> {
                         _option(context, l10n.gameHistory, () {
                           setState(() => _open = false);
                           _menuViewModel.openGameHistory();
+                        }),
+                        const Divider(height: 1),
+                        _option(context, l10n.signOut, () {
+                          setState(() => _open = false);
+                          unawaited(_menuViewModel.signOut());
+                          _appNavigator.request(GoToAuth());
                         }),
                       ],
                     ),

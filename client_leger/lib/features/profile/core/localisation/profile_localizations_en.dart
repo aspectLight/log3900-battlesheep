@@ -119,7 +119,7 @@ class ProfileLocalizationsEn extends ProfileLocalizations {
   String get profileAverageTime => 'Average time per game';
 
   @override
-  String get profileThemeLabel => 'Theme';
+  String get profileThemeLabel => 'Visual Theme';
 
   @override
   String get profileLanguageLabel => 'Language';
