@@ -42,17 +42,33 @@ class CharacterCreationSocket {
   // Cancelled in dispose().
   // ignore: cancel_subscriptions
   StreamSubscription<Object?>? _updateCharacterReservedSub;
+  // ignore: cancel_subscriptions
+  StreamSubscription<Object?>? _avatarReservationFailedSub;
+  // ignore: cancel_subscriptions
+  StreamSubscription<Object?>? _gameRoomCreatedSub;
 
   final _reservedCharactersController =
       ReplayLatestBroadcastController<UpdateCharacterReservedPayloadDto>();
   int _reservedUpdateSeq = 0;
 
+  final _avatarReservationFailedController =
+      StreamController<ReserveCharacterFailure>.broadcast();
+
   Stream<UpdateCharacterReservedPayloadDto>
   get reservedCharactersPayloadStream => _reservedCharactersController.stream;
+
+  Stream<ReserveCharacterFailure> get avatarReservationFailedStream =>
+      _avatarReservationFailedController.stream;
 
   Stream<void> get roomLockedStream => _socketService
       .on(CharacterCreationSocketEvents.waitingRoomLocked)
       .map((_) {});
+
+  final _gameStartedLeftOutSignal = StreamController<bool>.broadcast();
+
+  /// Waiting room started a match but this socket is not in the emitted roster (still creating).
+  Stream<void> get gameStartedWhileNotInRosterStream =>
+      _gameStartedLeftOutSignal.stream.map((_) {});
 
   void _setupListeners() {
     _updateCharacterReservedSub = _socketService
@@ -64,6 +80,47 @@ class CharacterCreationSocket {
             _reservedCharactersController.add(payload);
           }
         });
+    _avatarReservationFailedSub = _socketService
+        .on<Object?>(CharacterCreationSocketEvents.avatarReservationFailed)
+        .listen((data) {
+          final message = _parseAvatarReservationError(data);
+          if (!_avatarReservationFailedController.isClosed) {
+            _avatarReservationFailedController.add(
+              reserveCharacterFailureFromServerMessage(message),
+            );
+          }
+        });
+    _gameRoomCreatedSub = _socketService
+        .on<Object?>(CharacterCreationSocketEvents.gameRoomCreated)
+        .listen(_onGameRoomCreatedPayload);
+  }
+
+  void _onGameRoomCreatedPayload(Object? data) {
+    final socketId = _socketService.socketIdOption.match(() => '', (id) => id);
+    if (socketId.isEmpty) return;
+    if (data is! Map) return;
+    final players = data['players'];
+    if (players is! List) return;
+    var inRoster = false;
+    for (final p in players) {
+      if (p is Map && p['id'] == socketId) {
+        inRoster = true;
+        break;
+      }
+    }
+    if (!inRoster && !_gameStartedLeftOutSignal.isClosed) {
+      _gameStartedLeftOutSignal.add(true);
+    }
+  }
+
+  String? _parseAvatarReservationError(Object? data) {
+    if (data is Map) {
+      final err = data['error'];
+      if (err is String) {
+        return err;
+      }
+    }
+    return null;
   }
 
   void _stopListening() {
@@ -72,7 +129,18 @@ class CharacterCreationSocket {
       unawaited(updateSub.cancel());
       _updateCharacterReservedSub = null;
     }
+    final failedSub = _avatarReservationFailedSub;
+    if (failedSub != null) {
+      unawaited(failedSub.cancel());
+      _avatarReservationFailedSub = null;
+    }
+    final gameCreatedSub = _gameRoomCreatedSub;
+    if (gameCreatedSub != null) {
+      unawaited(gameCreatedSub.cancel());
+      _gameRoomCreatedSub = null;
+    }
     _socketService.off(CharacterCreationSocketEvents.updateAvatarReserved);
+    _socketService.off(CharacterCreationSocketEvents.avatarReservationFailed);
   }
 
   void requestReservedCharacters(GetReservedCharactersCommand command) {
@@ -280,6 +348,12 @@ class CharacterCreationSocket {
     _stopListening();
     if (!_reservedCharactersController.isClosed) {
       unawaited(_reservedCharactersController.close());
+    }
+    if (!_avatarReservationFailedController.isClosed) {
+      unawaited(_avatarReservationFailedController.close());
+    }
+    if (!_gameStartedLeftOutSignal.isClosed) {
+      unawaited(_gameStartedLeftOutSignal.close());
     }
   }
 }

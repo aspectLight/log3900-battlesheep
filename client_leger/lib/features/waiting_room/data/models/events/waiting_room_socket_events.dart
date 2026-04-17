@@ -28,6 +28,7 @@ class WaitingRoomSocketEventsInbound {
   String get playerCreated => 'playerCreated';
   String get playerKicked => 'playerKicked';
   String get updateAvatarReserved => 'updateAvatarReserved';
+  String get avatarReservationFailed => 'avatarReservationFailed';
   String get waitingRoomError => 'waitingRoomError';
   String get gameRoomCreated => 'gameRoomCreated';
 }

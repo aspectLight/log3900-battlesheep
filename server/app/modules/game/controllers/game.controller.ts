@@ -35,7 +35,8 @@ export class GameController {
     @Get(':id')
     async findGameById(@Param('id') id: string, @Res() response: Response) {
         try {
-            const game = await this.gameService.getGameById(id);
+            // Blueprint includes soft-deleted maps so in-flight sessions can load the board (lists still hide deleted games).
+            const game = await this.gameService.getGameBlueprintById(id);
             return response.status(HttpStatus.OK).json(game);
         } catch (error) {
             const status = error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR;

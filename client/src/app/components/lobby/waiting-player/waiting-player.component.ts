@@ -14,6 +14,7 @@ import { VirtualPlayerService } from '@app/services/gameplay/virtual-player.serv
 import { GameCreationService } from '@app/services/lobby/game-creation.service';
 import { WaitingRoomService } from '@app/services/lobby/waiting-room.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ErrorMessages } from '@common/error-messages.constants';
 import QRCode from 'qrcode';
 import { Subscription } from 'rxjs';
 
@@ -26,6 +27,8 @@ import { Subscription } from 'rxjs';
 export class WaitingPlayerComponent implements OnInit, OnDestroy {
     showError: boolean = false;
     errorMessage: string = '';
+    /** When the user dismisses `showError`, navigate home only for fatal waiting-room cases. */
+    errorPopupReturnsHome: boolean = true;
     showMessage: boolean = false;
     showConfirmation: boolean = false;
     room: Room | null = null;
@@ -35,7 +38,7 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
 
     readonly routes = ROUTES;
 
-    private roomSubscription!: Subscription;
+    private readonly subscriptions = new Subscription();
 
     constructor(
         private gameCreationService: GameCreationService,
@@ -75,31 +78,45 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.roomSubscription = this.waitingRoomService.room$.subscribe((room) => {
-            this.room = room;
-            this.refreshJoinQrCode();
-        });
+        this.subscriptions.add(
+            this.waitingRoomService.room$.subscribe((room) => {
+                this.room = room;
+                this.refreshJoinQrCode();
+            }),
+        );
         this.refreshJoinQrCode();
-        this.socketService.roomExists$.subscribe((roomExists) => {
-            if (!roomExists) {
-                this.errorMessage = this.translate.instant('waiting.game_deleted');
+        this.subscriptions.add(
+            this.socketService.roomExists$.subscribe((roomExists) => {
+                if (!roomExists) {
+                    this.errorMessage = this.translate.instant('waiting.game_deleted');
+                    this.showError = true;
+                }
+            }),
+        );
+        this.subscriptions.add(
+            this.socketService.isKicked$.subscribe((isKicked) => {
+                if (isKicked) {
+                    this.errorMessage = this.translate.instant('waiting.player_kicked');
+                    this.showError = true;
+                }
+            }),
+        );
+        this.subscriptions.add(
+            this.socketService.avatarReservationFailed$.subscribe((payload) => {
+                if (payload.error !== ErrorMessages.AvatarAlreadyInUse) {
+                    return;
+                }
+                this.errorPopupReturnsHome = false;
+                this.errorMessage = this.translate.instant('errors.avatar_already_used');
                 this.showError = true;
-            }
-        });
-        this.socketService.isKicked$.subscribe((isKicked) => {
-            if (isKicked) {
-                this.errorMessage = this.translate.instant('waiting.player_kicked');
-                this.showError = true;
-            }
-        });
+            }),
+        );
 
         this.virtualPlayerService.resetUsedNames();
     }
 
     ngOnDestroy(): void {
-        if (this.roomSubscription) {
-            this.roomSubscription.unsubscribe();
-        }
+        this.subscriptions.unsubscribe();
     }
 
     async startGame(): Promise<void> {
@@ -107,6 +124,7 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
             try {
                 await this.socketService.startGame(this.code);
             } catch (error) {
+                this.errorPopupReturnsHome = false;
                 this.errorMessage = error instanceof Error ? error.message : 'Failed to start game';
                 this.showError = true;
             }
@@ -160,6 +178,7 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
             if (success) {
                 this.router.navigate([ROUTES.home]);
             } else {
+                this.errorPopupReturnsHome = false;
                 this.errorMessage = error || this.translate.instant('waiting.quit_error');
                 this.showError = true;
             }
@@ -199,8 +218,14 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
             await this.socketService.reserveAvatar(this.gameCreationService.gameCode, newVPlayer.avatar?.name || '', newVPlayer.id, true);
             this.socketService.createPlayer(this.gameCreationService.gameCode, newVPlayer);
         } catch (error) {
-            this.errorMessage = error instanceof Error ? error.message : 'Failed to reserve avatar';
-            this.showError = true;
+            if (error instanceof Error && error.message === ErrorMessages.AvatarAlreadyInUse) {
+                return;
+            }
+            this.errorPopupReturnsHome = false;
+            if (error instanceof Error) {
+                this.errorMessage = error.message;
+                this.showError = true;
+            }
         }
     }
 
@@ -208,11 +233,20 @@ export class WaitingPlayerComponent implements OnInit, OnDestroy {
         this.isProfileSectionVisible = false;
     }
 
+    onShowErrorConfirm(): void {
+        const goHome = this.errorPopupReturnsHome;
+        this.resetMessages();
+        if (goHome) {
+            this.router.navigate([ROUTES.home]);
+        }
+    }
+
     private resetMessages(): void {
         this.errorMessage = '';
         this.showError = false;
         this.showMessage = false;
         this.showConfirmation = false;
+        this.errorPopupReturnsHome = true;
     }
 
     private refreshJoinQrCode(): void {

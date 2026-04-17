@@ -190,6 +190,12 @@ class GameSessionLocalizationsFr extends GameSessionLocalizations {
   String get notificationGameCanceled => 'Partie annulée';
 
   @override
+  String get notificationGameLeft => 'Vous avez quitté la partie!';
+
+  @override
+  String get gameSessionPopupUnderstood => 'Compris';
+
+  @override
   String get notificationDisconnectAutomatic => 'Déconnexion automatique';
 
   @override

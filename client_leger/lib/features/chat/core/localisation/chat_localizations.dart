@@ -206,10 +206,22 @@ abstract class ChatLocalizations {
   /// **'Delete'**
   String get deleteChannel;
 
+  /// No description provided for @confirmDeleteChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you really want to delete this channel?'**
   String get confirmDeleteChannel;
 
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
   String get yes;
 
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
   String get no;
 }
 

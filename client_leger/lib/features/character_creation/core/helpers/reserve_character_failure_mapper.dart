@@ -9,7 +9,11 @@ ReserveCharacterFailure reserveCharacterFailureFromServerMessage(
   final normalized = message.toLowerCase();
   if (normalized.contains('already reserved') ||
       normalized.contains('déjà réservé') ||
-      normalized.contains('deja reserve')) {
+      normalized.contains('deja reserve') ||
+      normalized.contains('déjà utilisé') ||
+      normalized.contains('deja utilise') ||
+      normalized.contains('already taken') ||
+      normalized.contains('already used')) {
     return const CharacterAlreadyReservedReserveCharacterFailure();
   }
   if (normalized.contains('locked') ||

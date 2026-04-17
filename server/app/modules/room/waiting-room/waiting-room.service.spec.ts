@@ -1,6 +1,6 @@
 import { Player } from '@app/shared/interfaces/player';
 import { Test, TestingModule } from '@nestjs/testing';
-import { WaitingRoomService } from './waiting-room.service';
+import { WaitingRoomService } from '@app/modules/shared-room/services/waiting-room.service';
 
 describe('WaitingRoomService', () => {
     let service: WaitingRoomService;
@@ -132,6 +132,16 @@ describe('WaitingRoomService', () => {
 
     it('should throw error if room does not exist when calling reserveCharacter', () => {
         expect(() => service.reserveCharacter('room1', '0001', 'Avatar2')).toThrowError("La salle n'existe pas");
+    });
+
+    it('should throw if another player already reserved the same avatar (case-insensitive)', () => {
+        const host = { id: 'socket1', avatar: { name: 'Avatar1' } };
+        service.createRoom('room1', 'game1', host, 'socket1');
+        service.joinRoom('room1', 'socket2');
+        service.reserveCharacter('room1', 'socket2', 'Avatar2');
+        expect(() => service.reserveCharacter('room1', 'socket1', 'avatar2')).toThrowError(
+            'Ce personnage est déjà utilisé par un autre joueur.',
+        );
     });
 
     it('should leave a room', () => {

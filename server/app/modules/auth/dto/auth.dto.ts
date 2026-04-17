@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { IsEmail, IsNotEmpty, IsObject, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsIn, IsNotEmpty, IsObject, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class RegisterUserDto {
     @IsEmail({}, { message: 'Email Invalide' })
@@ -16,6 +16,16 @@ export class RegisterUserDto {
     @IsString()
     @IsNotEmpty({ message: "L'avatar est requis" })
     avatarId: string;
+
+    @IsOptional()
+    @IsString()
+    @IsIn(['fr', 'en'], { message: 'Langue invalide' })
+    language?: string;
+
+    @IsOptional()
+    @IsString()
+    @IsIn(['default', 'frost', 'village'], { message: 'Thème invalide' })
+    theme?: string;
 }
 
 export class LoginDto {

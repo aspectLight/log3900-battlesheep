@@ -8,7 +8,6 @@ export type GameDocument = Game & Document;
 export class Game extends Document {
     @Prop({
         required: true,
-        unique: true,
     })
     name: string;
 
@@ -49,6 +48,13 @@ export class Game extends Document {
 
     @Prop({ required: true })
     owner: string;
+
+    /** When set, the blueprint is hidden from listings and name is reusable; document is removed after retention. */
+    @Prop({ type: Date, default: null })
+    deletedAt: Date | null;
 }
 
 export const gameSchema = SchemaFactory.createForClass(Game);
+
+// Active games keep unique names; soft-deleted rows are excluded so the same name can be recreated with a new _id.
+gameSchema.index({ name: 1 }, { unique: true, partialFilterExpression: { deletedAt: null } });

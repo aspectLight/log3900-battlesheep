@@ -55,7 +55,7 @@ export class AuthService {
     }
 
     async registerUser(registerDto: RegisterUserDto): Promise<UserDocument> {
-        const { email, password, username, avatarId } = registerDto;
+        const { email, password, username, avatarId, language, theme } = registerDto;
 
         await this.checkUsername(username);
 
@@ -79,6 +79,8 @@ export class AuthService {
                 email: firebaseUser.email,
                 username,
                 avatarId,
+                ...(language ? { language } : {}),
+                ...(theme ? { theme } : {}),
                 statistics: {
                     classicGamesPlayed: 0,
                     ctfGamesPlayed: 0,

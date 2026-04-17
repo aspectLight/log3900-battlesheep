@@ -187,6 +187,12 @@ class GameSessionLocalizationsEn extends GameSessionLocalizations {
   String get notificationGameCanceled => 'Game canceled';
 
   @override
+  String get notificationGameLeft => 'You left the game!';
+
+  @override
+  String get gameSessionPopupUnderstood => 'Got it';
+
+  @override
   String get notificationDisconnectAutomatic => 'Automatic disconnect';
 
   @override

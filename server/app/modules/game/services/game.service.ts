@@ -7,8 +7,13 @@ import { BadRequestException, ConflictException, ForbiddenException, Injectable,
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
 
+/** Retention after soft-delete before the blueprint document is hard-deleted (1h30). */
+const SOFT_DELETE_RETENTION_MS = 90 * 60 * 1000;
+
 @Injectable()
 export class GameService {
+    static readonly SOFT_DELETE_RETENTION_MS = SOFT_DELETE_RETENTION_MS;
+
     constructor(
         @InjectModel(Game.name) private readonly gameModel: Model<GameDocument>,
         private readonly dateService: DateService,
@@ -25,7 +30,7 @@ export class GameService {
     }
 
     async getAllGames(): Promise<Game[]> {
-        const games = await this.gameModel.find().exec();
+        const games = await this.gameModel.find({ deletedAt: null }).exec();
         if (games.length === 0) {
             throw new NotFoundException(ErrorMessages.NoGamesFound);
         }
@@ -34,14 +39,35 @@ export class GameService {
     }
 
     async getAccessibleGames(username: string): Promise<Game[]> {
-        return this.gameModel.find({ $or: [{ privacy: 'public' }, { owner: username }] }).exec();
+        return this.gameModel.find({ deletedAt: null, $or: [{ privacy: 'public' }, { owner: username }] }).exec();
     }
 
     async getPlayableGames(username: string): Promise<Game[]> {
-        return this.gameModel.find({ $or: [{ privacy: 'public' }, { privacy: 'protected' }, { owner: username }] }).exec();
+        return this.gameModel
+            .find({ deletedAt: null, $or: [{ privacy: 'public' }, { privacy: 'protected' }, { owner: username }] })
+            .exec();
     }
 
+    /**
+     * Active blueprint only (API, creating new waiting rooms). Soft-deleted games are not visible.
+     */
     async getGameById(gameId: string): Promise<Game> {
+        if (!isValidObjectId(gameId)) {
+            throw new BadRequestException(ErrorMessages.InvalidIdFormat);
+        }
+
+        const game = await this.gameModel.findOne({ _id: gameId, deletedAt: null }).exec();
+
+        if (!game) {
+            throw new NotFoundException(ErrorMessages.GameDoesNotExist);
+        }
+        return game;
+    }
+
+    /**
+     * Blueprint by id even if soft-deleted, until the purge job removes it. Used by in-flight sessions so board/mode stay resolvable.
+     */
+    async getGameBlueprintById(gameId: string): Promise<Game> {
         if (!isValidObjectId(gameId)) {
             throw new BadRequestException(ErrorMessages.InvalidIdFormat);
         }
@@ -67,7 +93,7 @@ export class GameService {
         if (updates.board) {
             updateData.modificationDate = this.dateService.currentTime();
         }
-        const updatedGame = await this.gameModel.findByIdAndUpdate(gameId, updateData, { new: true }).exec();
+        const updatedGame = await this.gameModel.findOneAndUpdate({ _id: gameId, deletedAt: null }, updateData, { new: true }).exec();
         if (!updatedGame) {
             throw new NotFoundException(ErrorMessages.GameDoesNotExist);
         }
@@ -78,15 +104,22 @@ export class GameService {
         if (!isValidObjectId(gameId)) {
             throw new BadRequestException(ErrorMessages.InvalidIdFormat);
         }
-        const deletedGame = await this.gameModel.findByIdAndDelete(gameId).exec();
+        const deletedGame = await this.gameModel
+            .findOneAndUpdate({ _id: gameId, deletedAt: null }, { $set: { deletedAt: new Date() } }, { new: true })
+            .exec();
         if (!deletedGame) {
             throw new NotFoundException(ErrorMessages.GameDoesNotExist);
         }
     }
 
     async deleteGamesByOwner(owner: string): Promise<number> {
-        const result = await this.gameModel.deleteMany({ owner }).exec();
-        return result.deletedCount;
+        const result = await this.gameModel.updateMany({ owner, deletedAt: null }, { $set: { deletedAt: new Date() } }).exec();
+        return result.modifiedCount;
+    }
+
+    async purgeSoftDeletedGamesPastRetention(): Promise<void> {
+        const cutoff = new Date(Date.now() - SOFT_DELETE_RETENTION_MS);
+        await this.gameModel.deleteMany({ deletedAt: { $lte: cutoff } }).exec();
     }
 
     async duplicateGame(gameId: string, owner: string, language = 'fr'): Promise<void> {
@@ -115,7 +148,7 @@ export class GameService {
         const copySuffix = language.toLowerCase() === 'en' ? 'copy' : 'copie';
         const escapedOriginalName = this.escapeRegex(originalName);
         const copyNamePattern = new RegExp(`^${escapedOriginalName}_(?:copy|copie)(\\d+)?$`);
-        const existingCopyNames = await this.gameModel.find({ name: { $regex: copyNamePattern } }).exec();
+        const existingCopyNames = await this.gameModel.find({ deletedAt: null, name: { $regex: copyNamePattern } }).exec();
 
         let maxSuffix = -1;
         for (const existingGame of existingCopyNames) {
@@ -134,7 +167,7 @@ export class GameService {
     }
 
     private async verifyDuplicateName(gameName: string) {
-        const isDuplicateName = await this.gameModel.findOne({ name: gameName }).exec();
+        const isDuplicateName = await this.gameModel.findOne({ name: gameName, deletedAt: null }).exec();
         if (isDuplicateName) {
             throw new ConflictException(ErrorMessages.GameAlreadyExists);
         }

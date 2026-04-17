@@ -63,6 +63,7 @@ void registerWaitingRoomSideEffect(GetIt scope, GetIt rootGetIt) {
   scope.registerSingleton<WaitingRoomReserveFailedNotificationSideEffect>(
     WaitingRoomReserveFailedNotificationSideEffect(
       waitingRoomEventBus: waitingRoomEventBus,
+      waitingRoomSocket: scope.get<WaitingRoomSocket>(),
       notificationIntentSink: notificationIntentSink,
     ),
     dispose: (sideEffect) => sideEffect.dispose(),

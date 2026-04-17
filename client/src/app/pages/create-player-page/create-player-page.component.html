@@ -11,7 +11,8 @@
         (characterSelected)="onCharacterSelected($event)"
         [reservedAvatars]="reservedAvatars"
         [purchasedItems]="currencyService.purchasedItems"
-        [socketId]="getId()">
+        [socketId]="getId()"
+        [selectionResetNonce]="characterGridResetNonce">
         </app-character-grid>
     </div>
     <div class="char-input">
@@ -53,19 +54,19 @@
                 <div class="stats-row">
                     <div class="stat stat-health">
                         <h3>{{ 'bonus.health' | translate }}</h3>
-                        <p>0</p>
+                        <p>{{ previewPlayer.stats.health.value }}</p>
                     </div>
                     <div class="stat stat-speed">
                         <h3>{{ 'bonus.speed' | translate }}</h3>
-                        <p>0</p>
+                        <p>{{ previewPlayer.stats.speed.value }}</p>
                     </div>
                     <div class="stat stat-attack">
                         <h3>{{ 'bonus.attack' | translate }}</h3>
-                        <p>0</p>
+                        <p>{{ previewPlayer.stats.attack.value }}</p>
                     </div>
                     <div class="stat stat-defense">
                         <h3>{{ 'bonus.defense' | translate }}</h3>
-                        <p>0</p>
+                        <p>{{ previewPlayer.stats.defense.value }}</p>
                     </div>
                 </div>
             </div>
@@ -104,7 +105,7 @@
         [isError]="true"
         popUpMessage="{{errorMessage}}"
         [showSecondButton]="false"
-        (confirm)="handlePopUp()">
+        (confirm)="onCreatePlayerErrorDismiss()">
     </app-pop-up>
 }
 

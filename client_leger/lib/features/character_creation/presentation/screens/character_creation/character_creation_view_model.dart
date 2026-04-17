@@ -4,9 +4,9 @@ import 'package:fpdart/fpdart.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/app_transition/app_transition_bus.dart';
+import '../../../../../core/helpers/functional_programming.dart';
 import '../../../../../core/enums/character.dart';
 import '../../../../../core/enums/shop_item_type.dart';
-import '../../../../../core/helpers/functional_programming.dart';
 import '../../../../../core/notification/notification_intent.dart';
 import '../../../../../core/notification/notification_intent_sink.dart';
 import '../../../../join_game_session/core/exceptions/join_game_session_failure.dart';
@@ -15,6 +15,7 @@ import '../../../../shop/domain/state/shop_state.dart';
 import '../../../core/app_events/character_creation_events.dart';
 import '../../../core/constants/character_creation_constants.dart';
 import '../../../core/event_bus/character_creation_event_bus.dart';
+import '../../../core/exceptions/reserve_character_failure.dart';
 import '../../../core/helpers/character_creation_form_validator.dart';
 import '../../../../profile/data/services/http_profile_service.dart';
 import '../../../data/repositories/character_creation_repository.dart';
@@ -232,8 +233,12 @@ class CharacterCreationViewModel {
   Future<void> _reserveSelectedCharacter(String characterId) async {
     final result = await _reserveCharacterUseCase.execute(characterId);
     result.when(
-      left: (failure) =>
-          _eventBus.fire(CharacterCreationReserveFailedEvent(failure)),
+      left: (failure) {
+        if (failure is CharacterAlreadyReservedReserveCharacterFailure) {
+          return;
+        }
+        _eventBus.fire(CharacterCreationReserveFailedEvent(failure));
+      },
     );
   }
 

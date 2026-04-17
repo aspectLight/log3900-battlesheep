@@ -30,12 +30,13 @@ export class GameRoomService {
     }
 
     async createRoom(waitingRoom: GameRoom): Promise<GameRoom> {
-        if (this.findRoomById(waitingRoom.roomId)) {
+        const gameRoomId = `game_${waitingRoom.roomId}`;
+        if (this.findRoomById(gameRoomId)) {
             throw new Error(ErrorMessages.RoomAlreadyExists);
         }
 
         const newRoom: GameRoom = {
-            roomId: `game_${waitingRoom.roomId}`,
+            roomId: gameRoomId,
             gameId: waitingRoom.gameId,
             hostId: waitingRoom.hostId,
             players: waitingRoom.players,
@@ -74,7 +75,7 @@ export class GameRoomService {
         newRoom.players = this.assignTurnOrder(newRoom.players);
         newRoom.players = this.assignColor(newRoom.players);
 
-        const gameInfo = await this.gameService.getGameById(waitingRoom.gameId);
+        const gameInfo = await this.gameService.getGameBlueprintById(waitingRoom.gameId);
         newRoom.actionPointsPerTurn = gameInfo.actionPoints ?? 1;
         if (gameInfo.mode === 'ctf') {
             newRoom.players = this.assignTeam(newRoom.players);

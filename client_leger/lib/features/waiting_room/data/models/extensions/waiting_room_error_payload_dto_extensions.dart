@@ -37,6 +37,12 @@ extension WaitingRoomServerMessageToFailure on String? {
     if (msg.contains('nombre maximum de joueurs')) {
       return const MaxPlayerLimitReachedWaitingRoomFailure();
     }
+    if (msg.contains('déjà utilisé') ||
+        msg.contains('deja utilise') ||
+        msg.toLowerCase().contains('already taken') ||
+        msg.toLowerCase().contains('already used')) {
+      return const CharacterAlreadyReservedWaitingRoomFailure();
+    }
     return UnknownWaitingRoomFailure(msg);
   }
 }

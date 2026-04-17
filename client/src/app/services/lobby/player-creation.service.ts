@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Player } from '@app/classes/entity/player';
 import { BonusType } from '@app/constants/bonus.constants';
-import { AVATAR_TYPES, BONUS_VALUE, D4_VALUE, DEFAULT_STATS_VALUE } from '@app/constants/player.constants';
+import { AVATAR_TYPES, BONUS_VALUE, D4_VALUE, D6_VALUE, DEFAULT_STATS_VALUE } from '@app/constants/player.constants';
 import { Bonus, Character } from '@app/interfaces/character.interface';
 import { AuthService } from '@app/services/communication/auth.service';
 
@@ -37,6 +37,13 @@ export class PlayerCreationService {
 
     reset(): void {
         this._selectedCharacter = this.defaultCharacter();
+    }
+
+    clearAvatar(): void {
+        this._selectedCharacter = {
+            ...this._selectedCharacter,
+            character: { name: '', id: 0, avatar: '', avatarFull: '' },
+        };
     }
 
     createPlayer(playerName: string): Player | null {
@@ -80,8 +87,8 @@ export class PlayerCreationService {
         return {
             life: DEFAULT_STATS_VALUE,
             speed: DEFAULT_STATS_VALUE,
-            defense: DEFAULT_STATS_VALUE,
-            attack: DEFAULT_STATS_VALUE,
+            attack: D4_VALUE,
+            defense: D6_VALUE,
         };
     }
 }

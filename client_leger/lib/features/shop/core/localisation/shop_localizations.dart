@@ -170,9 +170,6 @@ abstract class ShopLocalizations {
   /// **'Cosmetic unequipped.'**
   String get shopUnequipped;
 
-  /// Shown when updating the equipped banner preference fails unexpectedly.
-  String get shopBannerPreferenceUpdateFailed;
-
   /// No description provided for @shopPurchaseFailedTitle.
   ///
   /// In en, this message translates to:
@@ -209,6 +206,12 @@ abstract class ShopLocalizations {
   /// **'Your purchase could not be completed. Please try again.'**
   String get shopPurchaseFailedUnknown;
 
+  /// No description provided for @shopBannerPreferenceUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update banner preference. Please try again.'**
+  String get shopBannerPreferenceUpdateFailed;
+
   /// No description provided for @shopBannerPreviewPlayer.
   ///
   /// In en, this message translates to:
@@ -239,14 +242,34 @@ abstract class ShopLocalizations {
   /// **'Defense'**
   String get shopBannerPreviewDefense;
 
+  /// No description provided for @bannerGold.
+  ///
+  /// In en, this message translates to:
+  /// **'Golden Banner'**
   String get bannerGold;
 
+  /// No description provided for @bannerShadow.
+  ///
+  /// In en, this message translates to:
+  /// **'Shadow banner'**
   String get bannerShadow;
 
+  /// No description provided for @bannerFlame.
+  ///
+  /// In en, this message translates to:
+  /// **'Flame Banner'**
   String get bannerFlame;
 
+  /// No description provided for @bannerIce.
+  ///
+  /// In en, this message translates to:
+  /// **'Icy Banner'**
   String get bannerIce;
 
+  /// No description provided for @bannerNeon.
+  ///
+  /// In en, this message translates to:
+  /// **'Neon Banner'**
   String get bannerNeon;
 }
 

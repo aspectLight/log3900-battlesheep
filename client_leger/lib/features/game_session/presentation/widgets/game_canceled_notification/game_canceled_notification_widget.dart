@@ -1,12 +1,13 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/notification/notification_intent.dart';
 import '../../../core/localisation/game_session_localizations.dart';
-import '../../../../../core/notification/notification_shell.dart';
-import 'game_canceled_notification_view_model.dart';
 
-class GameCanceledNotificationWidget extends StatefulWidget {
+/// Matches the web main-page [app-pop-up] for game canceled / left (no countdown,
+/// themed surface card, accent title, single dismiss like `common.understood`).
+class GameCanceledNotificationWidget extends StatelessWidget {
   final GameCanceledNotificationIntent intent;
   final VoidCallback onDismiss;
 
@@ -17,77 +18,79 @@ class GameCanceledNotificationWidget extends StatefulWidget {
   });
 
   @override
-  State<GameCanceledNotificationWidget> createState() =>
-      _GameCanceledNotificationWidgetState();
-}
-
-class _GameCanceledNotificationWidgetState
-    extends State<GameCanceledNotificationWidget> {
-  late final GameCanceledNotificationViewModel _viewModel;
-
-  @override
-  void initState() {
-    super.initState();
-    _viewModel = GameCanceledNotificationViewModel(
-      intent: widget.intent,
-      onDismiss: widget.onDismiss,
-    );
-  }
-
-  @override
-  void dispose() {
-    _viewModel.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final l10n = GameSessionLocalizations.of(context)!;
-    return NotificationShell(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final message = intent.isSelfLeave
+        ? l10n.notificationGameLeft
+        : l10n.notificationGameCanceled;
+
+    return Material(
+      color: Colors.transparent,
+      child: Stack(
         children: [
-          Text(
-            l10n.notificationGameCanceled,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'CustomFont',
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+              child: ColoredBox(
+                color: Colors.black.withValues(alpha: 0.55),
+              ),
             ),
           ),
-          const SizedBox(height: 10),
-          Text(
-            '${_viewModel.remainingSeconds.watch(context)}',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 40,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'CustomFont',
-            ),
-          ),
-          const SizedBox(height: 14),
-          SizedBox(
-            width: 180,
-            child: ElevatedButton(
-              onPressed: () {
-                widget.intent.onComplete?.call();
-                widget.onDismiss();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 85, 0, 0),
-                foregroundColor: Colors.white,
-                shadowColor: Colors.transparent,
-                elevation: 0,
-                side: const BorderSide(color: Color.fromARGB(255, 127, 31, 31)),
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                textStyle: const TextStyle(
-                  fontSize: 15,
-                  fontFamily: 'CustomFont',
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 500),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: scheme.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.35),
+                        blurRadius: 24,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(18),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          message.toUpperCase(),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: scheme.primary,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                            fontFamily: 'CustomFont',
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () {
+                            intent.onComplete?.call();
+                            onDismiss();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(120, 48),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 28,
+                              vertical: 12,
+                            ),
+                          ),
+                          child: Text(l10n.gameSessionPopupUnderstood),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-              child: Text(l10n.gameSessionInfoContinue),
             ),
           ),
         ],

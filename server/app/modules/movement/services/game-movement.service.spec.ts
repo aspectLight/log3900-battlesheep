@@ -16,7 +16,7 @@ const BASE_MP = 4;
 
 describe('GameMovementService', () => {
     let service: GameMovementService;
-    const mockGameService = { getGameById: jest.fn() };
+    const mockGameService = { getGameBlueprintById: jest.fn() };
     const testRoom: GameRoom = {
         roomId: 'test_room',
         gameId: 'game1',
@@ -135,7 +135,7 @@ describe('GameMovementService', () => {
     describe('toggleDoor', () => {
         it('should toggle door state from closed to opened', async () => {
             const board = createMockBoard();
-            mockGameService.getGameById.mockResolvedValue({ board });
+            mockGameService.getGameBlueprintById.mockResolvedValue({ board });
             await service['loadBoard']('game1');
             service.toggleDoor(8, 8, testRoom);
             expect(board.matrix[8][8].tile.state).toBe('opened');
@@ -144,7 +144,7 @@ describe('GameMovementService', () => {
         it('should toggle door state from opened to closed', async () => {
             const board = createMockBoard();
             board.matrix[8][8].tile = { type: TileType.Door, state: 'opened' };
-            mockGameService.getGameById.mockResolvedValue({ board });
+            mockGameService.getGameBlueprintById.mockResolvedValue({ board });
             await service['loadBoard']('game1');
             service.toggleDoor(8, 8, testRoom);
             expect(board.matrix[8][8].tile.state).toBe('closed');
@@ -152,7 +152,7 @@ describe('GameMovementService', () => {
 
         it('should not toggle non-door tiles', async () => {
             const board = createMockBoard();
-            mockGameService.getGameById.mockResolvedValue({ board });
+            mockGameService.getGameBlueprintById.mockResolvedValue({ board });
             await service['loadBoard']('game1');
             service.toggleDoor(0, 0, testRoom);
             expect(board.matrix[0][0].tile.type).toBe(TileType.Snow);
@@ -170,7 +170,7 @@ describe('GameMovementService', () => {
                     movementPoints: BASE_MP,
                 },
             ];
-            mockGameService.getGameById.mockResolvedValue({ board });
+            mockGameService.getGameBlueprintById.mockResolvedValue({ board });
             const res = await service.addPlayersToBoard('game1', players);
             expect(res).toBe(players);
             expect(players[0].position).toBeDefined();
@@ -180,13 +180,13 @@ describe('GameMovementService', () => {
         });
 
         it('should throw error when board not found', async () => {
-            mockGameService.getGameById.mockResolvedValue(null);
+            mockGameService.getGameBlueprintById.mockResolvedValue(null);
             await expect(service.addPlayersToBoard('game1', [])).rejects.toThrow("Le jeu n'existe pas");
         });
 
         it('should throw error when no spawn points are available', async () => {
             const board = createMockBoard();
-            mockGameService.getGameById.mockResolvedValue({ board });
+            mockGameService.getGameBlueprintById.mockResolvedValue({ board });
             board.matrix.forEach((row) => row.forEach((c) => (c.item = null)));
             const players = Array(5)
                 .fill(0)
@@ -203,7 +203,7 @@ describe('GameMovementService', () => {
     describe('movePlayer', () => {
         beforeEach(async () => {
             const board = createMockBoard();
-            mockGameService.getGameById.mockResolvedValue({ board });
+            mockGameService.getGameBlueprintById.mockResolvedValue({ board });
             await service['loadBoard']('game1');
         });
 
@@ -296,7 +296,7 @@ describe('GameMovementService', () => {
         it('should remove player from board', async () => {
             const board = createMockBoard();
             const players = createMockPlayers();
-            mockGameService.getGameById.mockResolvedValue({ board });
+            mockGameService.getGameBlueprintById.mockResolvedValue({ board });
             await service['loadBoard']('game1');
             const cell = service['getCell'](0, 0);
             cell.player = players[0];
@@ -306,7 +306,7 @@ describe('GameMovementService', () => {
         it('should do nothing if player not found', async () => {
             const board = createMockBoard();
             const players = createMockPlayers();
-            mockGameService.getGameById.mockResolvedValue({ board });
+            mockGameService.getGameBlueprintById.mockResolvedValue({ board });
             await service['loadBoard']('game1');
             const cell = service['getCell'](0, 0);
             cell.player = players[0];
@@ -318,7 +318,7 @@ describe('GameMovementService', () => {
     describe('getAllPaths / getReachableTilesAndPaths', () => {
         it('should throw "Joueur introuvable" if player not found', async () => {
             const board = createMockBoard();
-            mockGameService.getGameById.mockResolvedValue({ board });
+            mockGameService.getGameBlueprintById.mockResolvedValue({ board });
             const players = createMockPlayers().filter((p) => p.id !== 'player1');
             expect(() => {
                 service.getAllPaths('player1', players);
@@ -327,7 +327,7 @@ describe('GameMovementService', () => {
 
         it('should throw "Joueur introuvable" if player not found', async () => {
             const board = createMockBoard();
-            mockGameService.getGameById.mockResolvedValue({ board });
+            mockGameService.getGameBlueprintById.mockResolvedValue({ board });
             const players = createMockPlayers().filter((p) => p.id !== 'player1');
             expect(() => {
                 service.getReachableTilesAndPaths('player1', players);
@@ -361,7 +361,7 @@ describe('GameMovementService', () => {
             const board = createMockBoard();
             const players = createMockPlayers();
             players[0].movementPoints = 0;
-            mockGameService.getGameById.mockResolvedValue({ board });
+            mockGameService.getGameBlueprintById.mockResolvedValue({ board });
             await service['loadBoard']('game1');
             const paths = service.getAllPaths('player1', players);
             expect(paths.size).toBe(1);
@@ -376,7 +376,7 @@ describe('GameMovementService', () => {
             const players = createMockPlayers();
             players[0].position = { x: 0, y: 0 };
 
-            mockGameService.getGameById.mockResolvedValue({ board });
+            mockGameService.getGameBlueprintById.mockResolvedValue({ board });
             await service['loadBoard']('game1');
 
             const getCellSpy = jest.spyOn(service as any, 'getCell');
@@ -396,7 +396,7 @@ describe('GameMovementService', () => {
 
             players[0].movementPoints = 1;
 
-            mockGameService.getGameById.mockResolvedValue({ board });
+            mockGameService.getGameBlueprintById.mockResolvedValue({ board });
             await service['loadBoard']('game1');
 
             players[0].position = { x: 2, y: 2 };
@@ -437,7 +437,7 @@ describe('GameMovementService', () => {
     //     board.matrix[1][0].tile.type = TileType.Water; // en minuscules pour forcer la capitalisation vers "Water"
 
     //     // Configurer le mock de getGameById pour retourner notre board personnalisé
-    //     mockGameService.getGameById.mockResolvedValue({ board });
+    //     mockGameService.getGameBlueprintById.mockResolvedValue({ board });
     //     await service['loadBoard']('game1');
 
     //     // Créer un joueur avec des boots (hasBoots=true) et assez de points de mouvement
@@ -463,7 +463,7 @@ describe('GameMovementService', () => {
     describe('getCell', () => {
         it('should return null for out-of-bounds coordinates', async () => {
             const board = createMockBoard();
-            mockGameService.getGameById.mockResolvedValue({ board });
+            mockGameService.getGameBlueprintById.mockResolvedValue({ board });
             await service['loadBoard']('game1');
             expect(service['getCell'](-1, 0)).toBeNull();
             expect(service['getCell'](0, -1)).toBeNull();
@@ -472,7 +472,7 @@ describe('GameMovementService', () => {
         });
         it('should return the correct cell for valid coordinates', async () => {
             const board = createMockBoard();
-            mockGameService.getGameById.mockResolvedValue({ board });
+            mockGameService.getGameBlueprintById.mockResolvedValue({ board });
             await service['loadBoard']('game1');
             const cell = service['getCell'](5, 5);
             expect(cell).toBeDefined();
@@ -555,7 +555,7 @@ describe('GameMovementService', () => {
     describe('validatePath', () => {
         beforeEach(async () => {
             const board = createMockBoard();
-            mockGameService.getGameById.mockResolvedValue({ board });
+            mockGameService.getGameBlueprintById.mockResolvedValue({ board });
             await service['loadBoard']('game1');
         });
 

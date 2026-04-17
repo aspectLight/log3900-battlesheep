@@ -215,6 +215,10 @@ abstract class StatisticsLocalizations {
   /// **'Number of different players who held the flag'**
   String get statisticsFlags;
 
+  /// No description provided for @statisticsShareSocialBlurb.
+  ///
+  /// In en, this message translates to:
+  /// **'🎮 Match result: {result}!\n💀 Deaths: {deaths}\n⚔️ Combats won: {combatPct}%\n🗺️ Tiles visited: {tilePct}%\n#EasternSolace #Jeux'**
   String statisticsShareSocialBlurb(
     String result,
     int deaths,
@@ -222,22 +226,58 @@ abstract class StatisticsLocalizations {
     int tilePct,
   );
 
+  /// No description provided for @statisticsShareResultNounWin.
+  ///
+  /// In en, this message translates to:
+  /// **'victory'**
   String get statisticsShareResultNounWin;
 
+  /// No description provided for @statisticsShareResultNounLoss.
+  ///
+  /// In en, this message translates to:
+  /// **'defeat'**
   String get statisticsShareResultNounLoss;
 
+  /// No description provided for @statisticsShareX.
+  ///
+  /// In en, this message translates to:
+  /// **'Share on X'**
   String get statisticsShareX;
 
+  /// No description provided for @statisticsShareBluesky.
+  ///
+  /// In en, this message translates to:
+  /// **'Share on Bluesky'**
   String get statisticsShareBluesky;
 
+  /// No description provided for @statisticsShareSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share my results'**
   String get statisticsShareSectionTitle;
 
+  /// No description provided for @statisticsSharePublishX.
+  ///
+  /// In en, this message translates to:
+  /// **'Post on X'**
   String get statisticsSharePublishX;
 
+  /// No description provided for @statisticsSharePublishBluesky.
+  ///
+  /// In en, this message translates to:
+  /// **'Post on Bluesky'**
   String get statisticsSharePublishBluesky;
 
+  /// No description provided for @statisticsShareXHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to X, then a draft with your stats opens — just post when ready.'**
   String get statisticsShareXHint;
 
+  /// No description provided for @statisticsShareBlueskyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens Bluesky with a ready draft (300 characters max). Sign in if needed, then post.'**
   String get statisticsShareBlueskyHint;
 }
 
