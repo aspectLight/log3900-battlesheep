@@ -8,6 +8,8 @@ import 'package:signals_flutter/signals_flutter.dart';
 import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../core/constants/join_game_session_input_limits.dart';
 import '../../../core/localisation/join_game_session_localizations.dart';
+import '../../../core/utils/join_game_session_scanner_availability.dart';
+import '../join_qr_scanner/join_qr_scanner_dialog.dart';
 import 'join_by_code_panel_view_model.dart';
 
 class JoinByCodePanel extends StatefulWidget {
@@ -19,11 +21,19 @@ class JoinByCodePanel extends StatefulWidget {
 
 class _JoinByCodePanelState extends State<JoinByCodePanel> {
   late final JoinByCodePanelViewModel _viewModel;
+  late final TextEditingController _codeController;
 
   @override
   void initState() {
     super.initState();
     _viewModel = GetIt.I<JoinByCodePanelViewModel>();
+    _codeController = TextEditingController(text: _viewModel.code.value);
+  }
+
+  @override
+  void dispose() {
+    _codeController.dispose();
+    super.dispose();
   }
 
   @override
@@ -59,6 +69,7 @@ class _JoinByCodePanelState extends State<JoinByCodePanel> {
           ),
           const SizedBox(height: 20),
           TextField(
+            controller: _codeController,
             keyboardType: TextInputType.number,
             maxLength: JoinGameSessionInputLimits.joinCodeMaxLength,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -99,6 +110,29 @@ class _JoinByCodePanelState extends State<JoinByCodePanel> {
               letterSpacing: 8,
             ),
             onChanged: _viewModel.onCodeChanged,
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: _viewModel.isJoining ? null : _onScanQrTap,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white,
+                side: BorderSide(color: context.interactionColors.outline),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              child: Text(
+                l10n.joinGameScanQrButton,
+                style: const TextStyle(
+                  fontFamily: 'CustomFont',
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
           const SizedBox(height: 20),
           Watch(
@@ -182,6 +216,30 @@ class _JoinByCodePanelState extends State<JoinByCodePanel> {
   }
 
   void _onJoinTap() {
+    unawaited(_viewModel.onJoinTap());
+  }
+
+  Future<void> _onScanQrTap() async {
+    final JoinGameSessionLocalizations l10n =
+        JoinGameSessionLocalizations.of(context)!;
+    if (!JoinGameSessionScannerAvailability.isSupported) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.joinGameScanQrUnsupportedPlatform)),
+      );
+      return;
+    }
+    final String? scanned = await showDialog<String>(
+      context: context,
+      builder: (_) => const JoinQrScannerDialog(),
+    );
+    if (!mounted || scanned == null) {
+      return;
+    }
+    _viewModel.applyDetectedRoomCode(scanned);
+    _codeController.value = TextEditingValue(
+      text: _viewModel.code.value,
+      selection: TextSelection.collapsed(offset: _viewModel.code.value.length),
+    );
     unawaited(_viewModel.onJoinTap());
   }
 }

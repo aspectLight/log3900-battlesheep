@@ -25,5 +25,8 @@
   "waitingRoomRoomNotFound": "Partie introuvable",
   "waitingRoomRoomLocked": "Partie verrouillée",
   "joinGameMaxPlayerLimitReached": "Nombre maximum de joueurs atteint",
-  "joinGameInsufficientBalance": "Solde insuffisant pour rejoindre cette partie"
+  "joinGameInsufficientBalance": "Solde insuffisant pour rejoindre cette partie",
+  "joinGameScanQrButton": "Scanner un code QR",
+  "joinGameScanQrTitle": "Scannez le code QR affiché dans la salle d'attente",
+  "joinGameScanQrUnsupportedPlatform": "Le scan QR n'est pas disponible sur cet appareil. Saisissez le code manuellement."
 }
