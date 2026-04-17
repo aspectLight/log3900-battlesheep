@@ -165,14 +165,18 @@ class _SlidingChatBoxState extends State<SlidingChatBox> {
 
 // ── Chat header with tabs + channels panel button ──────────────────────────
 
-class _ChatHeader extends StatelessWidget {
+class _ChatHeader extends StatefulWidget {
   const _ChatHeader({required this.viewModel});
 
   final SlidingChatBoxViewModel viewModel;
 
   @override
+  State<_ChatHeader> createState() => _ChatHeaderState();
+}
+
+class _ChatHeaderState extends State<_ChatHeader> {
+  @override
   Widget build(BuildContext context) {
-    final l10n = ChatLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
@@ -181,108 +185,78 @@ class _ChatHeader extends StatelessWidget {
           bottom: BorderSide(color: context.interactionColors.primaryStrong),
         ),
       ),
-      child: Watch((context) {
-        final joinedIds = viewModel.joinedChannelIds.value;
-        final activeId = viewModel.activeChannelId.value;
-        final isPanelOpen = viewModel.showChannelsPanel.value;
-        return Row(
-          children: [
-            // Scrollable channel tabs
-            Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _ChannelTab(
-                      label: l10n.chatGeneralTab,
-                      isActive: activeId == null && !isPanelOpen,
-                      onTap: () {
-                        if (isPanelOpen) viewModel.toggleChannelsPanel();
-                        viewModel.setActiveChannel(null);
-                      },
-                    ),
-                    ...joinedIds.map(
-                      (id) => _ChannelTab(
-                        label: '#${viewModel.resolveChannelName(id)}',
-                        isActive: activeId == id && !isPanelOpen,
-                        onTap: () {
-                          if (isPanelOpen) viewModel.toggleChannelsPanel();
-                          viewModel.setActiveChannel(id);
-                        },
-                      ),
-                    ),
-                  ],
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 300,
+            child: _ChannelDropdown(viewModel: widget.viewModel),
+          ),
+          GestureDetector(
+            onTap: widget.viewModel.toggleChannelsPanel,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(
+                  color: context.interactionColors.primaryStrong,
                 ),
               ),
+              child: const Icon(Icons.menu, color: Colors.white, size: 18),
             ),
-            const SizedBox(width: 6),
-            // Channels panel toggle button
-            GestureDetector(
-              onTap: viewModel.toggleChannelsPanel,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(
-                    color: context.interactionColors.primaryStrong,
-                  ),
-                ),
-                child: const Icon(Icons.menu, color: Colors.white, size: 18),
-              ),
-            ),
-          ],
-        );
-      }),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _ChannelTab extends StatelessWidget {
-  const _ChannelTab({
-    required this.label,
-    required this.isActive,
-    required this.onTap,
-  });
+// ── Channel dropdown widget ────────────────────────────────────────────────
 
-  final String label;
-  final bool isActive;
-  final VoidCallback onTap;
+class _ChannelDropdown extends StatelessWidget {
+  const _ChannelDropdown({required this.viewModel});
+
+  final SlidingChatBoxViewModel viewModel;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        alignment: Alignment.center,
-        constraints: const BoxConstraints(minHeight: 40),
-        margin: const EdgeInsets.only(right: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: isActive
-              ? context.interactionColors.primaryStrong
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(
-            color: isActive
-                ? context.interactionColors.primary
-                : context.interactionColors.primaryStrong,
+    final l10n = ChatLocalizations.of(context)!;
+
+    return Watch((context) {
+      final joinedIds = viewModel.joinedChannelIds.value;
+      final activeId = viewModel.activeChannelId.value;
+      final isPanelOpen = viewModel.showChannelsPanel.value;
+      final String selectedChannel = activeId ?? 'general';
+      final List<DropdownMenuItem<String>> options = [
+        DropdownMenuItem(value: 'general', child: Text(l10n.chatGeneralTab)),
+        ...joinedIds.map(
+          (id) => DropdownMenuItem(
+            value: id,
+            child: Text('#${viewModel.resolveChannelName(id)}'),
           ),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isActive ? const Color(0xFFE0E0FF) : const Color(0xFF999999),
-            fontSize: 13,
-            fontFamily: 'CustomFont',
-            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-          ),
+      ];
+
+      return DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          isExpanded: true,
+          value: selectedChannel,
+          items: options,
+          dropdownColor: context.interactionColors.primary,
+          icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+          onChanged: (value) {
+            if (value == null) return;
+            if (value == 'general') {
+              if (isPanelOpen) viewModel.toggleChannelsPanel();
+              viewModel.setActiveChannel(null);
+            } else {
+              viewModel.setActiveChannel(value);
+            }
+          },
         ),
-      ),
-    );
+      );
+    });
   }
 }
 
@@ -649,6 +623,7 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 if (creator) ...[
@@ -689,6 +664,7 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
                 fontSize: 12,
                 fontFamily: 'CustomFont',
               ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           // Action buttons
@@ -713,12 +689,17 @@ class _ChannelsPanelViewState extends State<_ChannelsPanelView> {
                   ),
                 if (creator) ...[
                   const SizedBox(width: 4),
-                  _PanelButton(
-                    label: l10n.deleteChannel,
-                    textColor: Colors.white,
-                    borderColor: const Color(0xFF7f1f1f),
-                    backgroundColor: const Color(0xFF7f1f1f),
-                    onPressed: () => _requestDelete(channel.id, l10n),
+                  Container(
+                    constraints: const BoxConstraints(
+                      maxWidth: 100,
+                    ), // Limite la largeur
+                    child: _PanelButton(
+                      label: l10n.deleteChannel,
+                      textColor: Colors.white,
+                      borderColor: const Color(0xFF7f1f1f),
+                      backgroundColor: const Color(0xFF7f1f1f),
+                      onPressed: () => _requestDelete(channel.id, l10n),
+                    ),
                   ),
                 ],
               ],
