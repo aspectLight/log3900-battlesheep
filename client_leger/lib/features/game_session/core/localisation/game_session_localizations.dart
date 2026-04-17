@@ -116,7 +116,7 @@ abstract class GameSessionLocalizations {
   /// No description provided for @gameTrapTitle.
   ///
   /// In en, this message translates to:
-  /// **'Trap'**
+  /// **'You are on a trap!'**
   String get gameTrapTitle;
 
   /// No description provided for @gameTrapDescriptionCanAvoid.
@@ -155,16 +155,16 @@ abstract class GameSessionLocalizations {
   /// **'Virtual'**
   String get gamePlayersListVirtual;
 
-  /// No description provided for @gameTimerLabel.
+  /// No description provided for @gameTimerCurrentTurn.
   ///
   /// In en, this message translates to:
-  /// **'Turn in progress'**
-  String get gameTimerLabel;
+  /// **'Current turn: {seconds}'**
+  String gameTimerCurrentTurn(int seconds);
 
   /// No description provided for @gameDebugMode.
   ///
   /// In en, this message translates to:
-  /// **'Game is in debug mode'**
+  /// **'Debug mode activated'**
   String get gameDebugMode;
 
   /// No description provided for @gameActionCancel.
@@ -188,13 +188,13 @@ abstract class GameSessionLocalizations {
   /// No description provided for @gameCellDetailCost.
   ///
   /// In en, this message translates to:
-  /// **'Cost'**
+  /// **'COST'**
   String get gameCellDetailCost;
 
   /// No description provided for @gameCellDetailDescription.
   ///
   /// In en, this message translates to:
-  /// **'Description'**
+  /// **'DESCRIPTION'**
   String get gameCellDetailDescription;
 
   /// No description provided for @gameCellDetailYou.
@@ -206,43 +206,43 @@ abstract class GameSessionLocalizations {
   /// No description provided for @combatYourTurn.
   ///
   /// In en, this message translates to:
-  /// **'Your turn! You have {countdown} seconds left'**
-  String combatYourTurn(Object countdown);
+  /// **'Your turn! You have: {countdown} seconds left'**
+  String combatYourTurn(int countdown);
 
   /// No description provided for @combatYourTurnIn.
   ///
   /// In en, this message translates to:
-  /// **'Your turn in {countdown} seconds'**
-  String combatYourTurnIn(Object countdown);
+  /// **'Your turn in: {countdown} seconds'**
+  String combatYourTurnIn(int countdown);
 
   /// No description provided for @combatFlightAttemptsLeft.
   ///
   /// In en, this message translates to:
-  /// **'{count} flight attempts left'**
-  String combatFlightAttemptsLeft(Object count);
+  /// **'{count} escape attempts remaining'**
+  String combatFlightAttemptsLeft(int count);
 
   /// No description provided for @combatYourDefense.
   ///
   /// In en, this message translates to:
-  /// **'Your defense'**
+  /// **'YOUR DEFENSE'**
   String get combatYourDefense;
 
   /// No description provided for @combatYourAttack.
   ///
   /// In en, this message translates to:
-  /// **'Your attack'**
+  /// **'YOUR ATTACK'**
   String get combatYourAttack;
 
   /// No description provided for @combatEnemyAttack.
   ///
   /// In en, this message translates to:
-  /// **'Enemy attack'**
+  /// **'ENEMY ATTACK'**
   String get combatEnemyAttack;
 
   /// No description provided for @combatEnemyDefense.
   ///
   /// In en, this message translates to:
-  /// **'Enemy defense'**
+  /// **'ENEMY DEFENSE'**
   String get combatEnemyDefense;
 
   /// No description provided for @combatFlee.
@@ -260,25 +260,25 @@ abstract class GameSessionLocalizations {
   /// No description provided for @combatMissTitle.
   ///
   /// In en, this message translates to:
-  /// **'Miss!'**
+  /// **'Missed!'**
   String get combatMissTitle;
 
   /// No description provided for @combatEvadedTitle.
   ///
   /// In en, this message translates to:
-  /// **'Evaded!'**
+  /// **'Dodged!'**
   String get combatEvadedTitle;
 
   /// No description provided for @combatFlightAttemptTitle.
   ///
   /// In en, this message translates to:
-  /// **'Flight attempt!'**
+  /// **'Escape attempt!'**
   String get combatFlightAttemptTitle;
 
   /// No description provided for @combatFlightAttemptSuccess.
   ///
   /// In en, this message translates to:
-  /// **'You fled successfully!'**
+  /// **'You managed to flee!'**
   String get combatFlightAttemptSuccess;
 
   /// No description provided for @combatFlightAttemptFailure.
@@ -290,25 +290,25 @@ abstract class GameSessionLocalizations {
   /// No description provided for @combatBarbedWireTitle.
   ///
   /// In en, this message translates to:
-  /// **'Barbed wire'**
+  /// **'Barbed Wire'**
   String get combatBarbedWireTitle;
 
   /// No description provided for @combatBarbedWireBlockedMessage.
   ///
   /// In en, this message translates to:
-  /// **'Fleeing is prevented by the opponent'**
+  /// **'Fleeing is impossible for the opponent, only if you initiated the combat'**
   String get combatBarbedWireBlockedMessage;
 
   /// No description provided for @combatNotificationVictory.
   ///
   /// In en, this message translates to:
-  /// **'Victory'**
+  /// **'Victory!'**
   String get combatNotificationVictory;
 
   /// No description provided for @combatNotificationVictoryMessage.
   ///
   /// In en, this message translates to:
-  /// **'You won the combat!'**
+  /// **'You won the fight!'**
   String get combatNotificationVictoryMessage;
 
   /// No description provided for @combatNotificationDefeat.
@@ -320,26 +320,26 @@ abstract class GameSessionLocalizations {
   /// No description provided for @combatNotificationDefeatMessage.
   ///
   /// In en, this message translates to:
-  /// **'{winnerName} won the combat!'**
-  String combatNotificationDefeatMessage(Object winnerName);
+  /// **'{winnerName} won the fight!'**
+  String combatNotificationDefeatMessage(String winnerName);
 
   /// No description provided for @combatNotificationFlightSuccessTitle.
   ///
   /// In en, this message translates to:
-  /// **'Fled'**
+  /// **'Escape successful!'**
   String get combatNotificationFlightSuccessTitle;
 
   /// No description provided for @combatNotificationFlightSuccess.
   ///
   /// In en, this message translates to:
-  /// **'You got away.'**
+  /// **'You managed to flee!'**
   String get combatNotificationFlightSuccess;
 
   /// No description provided for @combatNotificationEnemyFled.
   ///
   /// In en, this message translates to:
-  /// **'{enemyName} fled.'**
-  String combatNotificationEnemyFled(Object enemyName);
+  /// **'{enemyName} managed to flee!'**
+  String combatNotificationEnemyFled(String enemyName);
 
   /// No description provided for @combatStartedNotificationTitle.
   ///
@@ -352,8 +352,8 @@ abstract class GameSessionLocalizations {
   /// In en, this message translates to:
   /// **'{attackerName} vs {defenderName}'**
   String combatStartedNotificationMessage(
-    Object attackerName,
-    Object defenderName,
+    String attackerName,
+    String defenderName,
   );
 
   /// No description provided for @combatStatAttack.
@@ -392,28 +392,40 @@ abstract class GameSessionLocalizations {
   /// **'Victory! You won three combats'**
   String get notificationVictoryClassic;
 
-  /// No description provided for @notificationDefeatCtf.
+  /// No description provided for @notificationDefeatCtfKnown.
   ///
   /// In en, this message translates to:
-  /// **'Defeat! {winnerTeamName} captured the flag!'**
-  String notificationDefeatCtf(Object winnerTeamName);
+  /// **'Defeat! Team {winnerTeamName} captured the flag!'**
+  String notificationDefeatCtfKnown(String winnerTeamName);
 
-  /// No description provided for @notificationDefeatClassic.
+  /// No description provided for @notificationDefeatCtfUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Defeat! The opposing team captured the flag!'**
+  String get notificationDefeatCtfUnknown;
+
+  /// No description provided for @notificationDefeatClassicKnown.
   ///
   /// In en, this message translates to:
   /// **'Defeat! {winnerName} won three combats'**
-  String notificationDefeatClassic(Object winnerName);
+  String notificationDefeatClassicKnown(String winnerName);
+
+  /// No description provided for @notificationDefeatClassicUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Defeat! A player won three combats'**
+  String get notificationDefeatClassicUnknown;
 
   /// No description provided for @notificationGameAbandoned.
   ///
   /// In en, this message translates to:
-  /// **'Game abandoned'**
+  /// **'Abandoned'**
   String get notificationGameAbandoned;
 
   /// No description provided for @notificationGameCanceled.
   ///
   /// In en, this message translates to:
-  /// **'Game canceled'**
+  /// **'Game cancelled due to lack of players'**
   String get notificationGameCanceled;
 
   /// No description provided for @notificationGameLeft.
@@ -437,20 +449,20 @@ abstract class GameSessionLocalizations {
   /// No description provided for @notificationTurnStart.
   ///
   /// In en, this message translates to:
-  /// **'{playerName}\'s turn ({seconds}s)'**
-  String notificationTurnStart(Object playerName, Object seconds);
+  /// **'{playerName}\'s turn starts in {seconds} seconds!'**
+  String notificationTurnStart(String playerName, int seconds);
 
   /// No description provided for @playerHudMovements.
   ///
   /// In en, this message translates to:
-  /// **'{count} Movements'**
-  String playerHudMovements(Object count);
+  /// **'{count} movements'**
+  String playerHudMovements(int count);
 
   /// No description provided for @playerHudActions.
   ///
   /// In en, this message translates to:
-  /// **'{count} Actions'**
-  String playerHudActions(Object count);
+  /// **'{count} actions'**
+  String playerHudActions(int count);
 
   /// No description provided for @playerHudStatsSection.
   ///
@@ -461,7 +473,7 @@ abstract class GameSessionLocalizations {
   /// No description provided for @playerHudDiceSection.
   ///
   /// In en, this message translates to:
-  /// **'Dice'**
+  /// **'DICE'**
   String get playerHudDiceSection;
 
   /// No description provided for @statHealth.
@@ -509,19 +521,19 @@ abstract class GameSessionLocalizations {
   /// No description provided for @gameSessionInfoContinue.
   ///
   /// In en, this message translates to:
-  /// **'Continue'**
+  /// **'continue'**
   String get gameSessionInfoContinue;
 
   /// No description provided for @gameSessionInfoQuit.
   ///
   /// In en, this message translates to:
-  /// **'Quit'**
+  /// **'quit'**
   String get gameSessionInfoQuit;
 
   /// No description provided for @toggleDebugMode.
   ///
   /// In en, this message translates to:
-  /// **'Game is in debug mode'**
+  /// **'Debug mode activated'**
   String get toggleDebugMode;
 
   /// No description provided for @itemAdrenalineName.
@@ -569,7 +581,7 @@ abstract class GameSessionLocalizations {
   /// No description provided for @itemBarbedWireDesc.
   ///
   /// In en, this message translates to:
-  /// **'Flight is impossible for the opponent, only if you started the combat'**
+  /// **'Fleeing is impossible for the opponent, only if you initiated the combat'**
   String get itemBarbedWireDesc;
 
   /// No description provided for @itemCamouflageName.
@@ -593,7 +605,7 @@ abstract class GameSessionLocalizations {
   /// No description provided for @itemWaterproofBootsDesc.
   ///
   /// In en, this message translates to:
-  /// **'Movement to another tile costs 1 movement point'**
+  /// **'Moving to another tile costs 1 movement point'**
   String get itemWaterproofBootsDesc;
 
   /// No description provided for @itemAirStrikeName.
@@ -605,7 +617,7 @@ abstract class GameSessionLocalizations {
   /// No description provided for @itemAirStrikeDesc.
   ///
   /// In en, this message translates to:
-  /// **'Allows attacking at range'**
+  /// **'Allows ranged attacks'**
   String get itemAirStrikeDesc;
 
   /// No description provided for @itemTorchName.
@@ -617,7 +629,7 @@ abstract class GameSessionLocalizations {
   /// No description provided for @itemTorchDesc.
   ///
   /// In en, this message translates to:
-  /// **'A lit torch that improves your abilities in the light'**
+  /// **'Adds 1 defense and 1 attack point when under the light of a torch'**
   String get itemTorchDesc;
 
   /// No description provided for @dropTorchButton.
@@ -629,7 +641,7 @@ abstract class GameSessionLocalizations {
   /// No description provided for @itemRandomName.
   ///
   /// In en, this message translates to:
-  /// **'Random'**
+  /// **'Random Item'**
   String get itemRandomName;
 
   /// No description provided for @itemRandomDesc.
@@ -653,7 +665,7 @@ abstract class GameSessionLocalizations {
   /// No description provided for @itemSpawnName.
   ///
   /// In en, this message translates to:
-  /// **'Spawn'**
+  /// **'Spawn Point'**
   String get itemSpawnName;
 
   /// No description provided for @itemSpawnDesc.
@@ -725,13 +737,13 @@ abstract class GameSessionLocalizations {
   /// No description provided for @tileTeleportPadName.
   ///
   /// In en, this message translates to:
-  /// **'Teleport pad'**
+  /// **'Teleport Pad'**
   String get tileTeleportPadName;
 
   /// No description provided for @tileSnowDesc.
   ///
   /// In en, this message translates to:
-  /// **'A basic snow tile'**
+  /// **'A snow tile'**
   String get tileSnowDesc;
 
   /// No description provided for @tileTreeDesc.
@@ -773,13 +785,13 @@ abstract class GameSessionLocalizations {
   /// No description provided for @tileCornerDesc.
   ///
   /// In en, this message translates to:
-  /// **'An impassable wall'**
+  /// **'An impassable corner'**
   String get tileCornerDesc;
 
   /// No description provided for @tileIntersectionDesc.
   ///
   /// In en, this message translates to:
-  /// **'An impassable wall'**
+  /// **'An impassable intersection'**
   String get tileIntersectionDesc;
 
   /// No description provided for @tileTrapDesc.
@@ -791,19 +803,19 @@ abstract class GameSessionLocalizations {
   /// No description provided for @tileTeleportPadDesc.
   ///
   /// In en, this message translates to:
-  /// **'Teleports you to the paired pad'**
+  /// **'A teleport pad that leads to another teleport pad'**
   String get tileTeleportPadDesc;
 
   /// No description provided for @unknownError.
   ///
   /// In en, this message translates to:
-  /// **'An unknown error occurred'**
+  /// **'An error occurred. Please try again.'**
   String get unknownError;
 
   /// No description provided for @gameNotFound.
   ///
   /// In en, this message translates to:
-  /// **'Game not found'**
+  /// **'The game has been deleted.'**
   String get gameNotFound;
 
   /// No description provided for @networkError.

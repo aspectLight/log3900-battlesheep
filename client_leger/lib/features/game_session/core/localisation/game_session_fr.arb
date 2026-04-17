@@ -2,28 +2,56 @@
   "@@locale": "fr",
   "gameContentSoon": "Le contenu du jeu arrive bientôt...",
   "gameInventoryFullDiscardTitle": "Inventaire plein",
-  "gameTrapTitle": "Piège",
+  "gameTrapTitle": "Vous êtes sur un piège!",
   "gameTrapDescriptionCanAvoid": "Vous pouvez éviter le piège ou tenter de le traverser.",
   "gameTrapDescriptionMustTraverse": "Vous n'avez pas assez de points pour éviter le piège. Vous devez le traverser.",
   "gameTrapAvoid": "Éviter",
   "gameTrapTraverse": "Traverser",
   "gamePlayersListPlaying": "Joue...",
   "gamePlayersListVirtual": "Virtuel",
-  "gameTimerLabel": "Tour en cours",
-  "gameDebugMode": "La partie est en mode débogage",
+  "gameTimerCurrentTurn": "Tour en cours: {seconds}",
+  "@gameTimerCurrentTurn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "gameDebugMode": "Mode débogage activé",
   "gameActionCancel": "Annuler",
   "gameActionAct": "Agir",
   "gameActionForwardTurn": "Fin de tour",
-  "gameCellDetailCost": "Coût",
-  "gameCellDetailDescription": "Description",
+  "gameCellDetailCost": "COST",
+  "gameCellDetailDescription": "DESCRIPTION",
   "gameCellDetailYou": "Vous",
   "combatYourTurn": "À vous de jouer! Il vous reste: {countdown} secondes",
+  "@combatYourTurn": {
+    "placeholders": {
+      "countdown": {
+        "type": "int"
+      }
+    }
+  },
   "combatYourTurnIn": "C'est votre tour dans: {countdown} secondes",
+  "@combatYourTurnIn": {
+    "placeholders": {
+      "countdown": {
+        "type": "int"
+      }
+    }
+  },
   "combatFlightAttemptsLeft": "{count} tentatives d'évasion restantes",
-  "combatYourDefense": "Votre défense",
-  "combatYourAttack": "Votre attaque",
-  "combatEnemyAttack": "Attaque adverse",
-  "combatEnemyDefense": "Défense adverse",
+  "@combatFlightAttemptsLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "combatYourDefense": "VOTRE DÉFENSE",
+  "combatYourAttack": "VOTRE ATTAQUE",
+  "combatEnemyAttack": "ATTAQUE ADVERSE",
+  "combatEnemyDefense": "DÉFENSE ADVERSE",
   "combatFlee": "Fuir !",
   "combatAttack": "Attaquer",
   "combatMissTitle": "Raté!",
@@ -31,67 +59,131 @@
   "combatFlightAttemptTitle": "Tentative de fuite !",
   "combatFlightAttemptSuccess": "Vous avez réussi à fuir!",
   "combatFlightAttemptFailure": "Vous n'avez pas réussi à fuir!",
-  "combatBarbedWireTitle": "Barbed wire",
-  "combatBarbedWireBlockedMessage": "La fuite est empêché par l'adversaire",
+  "combatBarbedWireTitle": "Fil barbelé",
+  "combatBarbedWireBlockedMessage": "La fuite est impossible pour l'adversaire, seulement si vous êtes l'instigateur du combat",
   "combatNotificationVictory": "Victoire!",
-  "combatNotificationVictoryMessage": "Vous avez gagné le combat !",
+  "combatNotificationVictoryMessage": "Vous avez gagné le combat!",
   "combatNotificationDefeat": "Défaite",
   "combatNotificationDefeatMessage": "{winnerName} a gagné le combat!",
+  "@combatNotificationDefeatMessage": {
+    "placeholders": {
+      "winnerName": {
+        "type": "String"
+      }
+    }
+  },
   "combatNotificationFlightSuccessTitle": "Tentative de fuite réussie!",
   "combatNotificationFlightSuccess": "Vous avez réussi à fuir!",
   "combatNotificationEnemyFled": "{enemyName} a réussi à fuir!",
+  "@combatNotificationEnemyFled": {
+    "placeholders": {
+      "enemyName": {
+        "type": "String"
+      }
+    }
+  },
   "combatStartedNotificationTitle": "Combat commencé",
   "combatStartedNotificationMessage": "{attackerName} vs {defenderName}",
-  "combatStatAttack": "Attack",
-  "combatStatDefense": "Defense",
-  "combatStatSpeed": "Speed",
-  "combatStatHealth": "Health",
-  "notificationVictoryCtf": "Victoire! Ton équipe a capturé le drapeau !",
-  "notificationVictoryClassic": "Victoire! Tu as gagné trois combats",
-  "notificationDefeatCtf": "Défaite! {winnerTeamName} a capturé le drapeau !",
-  "notificationDefeatClassic": "Défaite! {winnerName} a gagné trois combats",
-  "notificationGameAbandoned": "Partie abandonnée",
-  "notificationGameCanceled": "Partie annulée",
+  "@combatStartedNotificationMessage": {
+    "placeholders": {
+      "attackerName": {
+        "type": "String"
+      },
+      "defenderName": {
+        "type": "String"
+      }
+    }
+  },
+  "combatStatAttack": "Attaque",
+  "combatStatDefense": "Défense",
+  "combatStatSpeed": "Rapidité",
+  "combatStatHealth": "Vie",
+  "notificationVictoryCtf": "Victoire ! Ton équipe a capturé le drapeau !",
+  "notificationVictoryClassic": "Victoire ! Tu as gagné trois combats",
+  "notificationDefeatCtfKnown": "Défaite ! L'équipe {winnerTeamName} a capturé le drapeau !",
+  "@notificationDefeatCtfKnown": {
+    "placeholders": {
+      "winnerTeamName": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationDefeatCtfUnknown": "Défaite ! L'équipe adverse a capturé le drapeau !",
+  "notificationDefeatClassicKnown": "Défaite ! {winnerName} a gagné trois combats",
+  "@notificationDefeatClassicKnown": {
+    "placeholders": {
+      "winnerName": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationDefeatClassicUnknown": "Défaite ! Un joueur a gagné trois combats",
+  "notificationGameAbandoned": "Abandonnée",
+  "notificationGameCanceled": "Partie annulée par manque de joueurs",
   "notificationGameLeft": "Vous avez quitté la partie!",
   "gameSessionPopupUnderstood": "Compris",
   "notificationDisconnectAutomatic": "Déconnexion automatique",
-  "notificationTurnStart": "Tour de {playerName} ({seconds}s)",
-  "playerHudMovements": "{count} Déplacements",
-  "playerHudActions": "{count} Actions",
-  "playerHudStatsSection": "Statistiques",
-  "playerHudDiceSection": "Dés",
-  "statHealth": "Santé",
-  "statSpeed": "Vitesse",
+  "notificationTurnStart": "Le tour de {playerName} commence dans {seconds} secondes !",
+  "@notificationTurnStart": {
+    "placeholders": {
+      "playerName": {
+        "type": "String"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "playerHudMovements": "{count} déplacements",
+  "@playerHudMovements": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playerHudActions": "{count} actions",
+  "@playerHudActions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playerHudStatsSection": "Stats",
+  "playerHudDiceSection": "DÉS",
+  "statHealth": "Vie",
+  "statSpeed": "Rapidité",
   "statAttack": "Attaque",
   "statDefense": "Défense",
   "gameSessionInfoPlayers": "Joueurs",
   "gameSessionInfoActivePlayer": "Joueur actif",
   "gameSessionInfoBoardSize": "Taille du plateau",
-  "gameSessionInfoContinue": "Continuer",
-  "gameSessionInfoQuit": "Quitter",
-  "toggleDebugMode": "La partie est en mode débogage",
+  "gameSessionInfoContinue": "continuer",
+  "gameSessionInfoQuit": "quitter",
+  "toggleDebugMode": "Mode débogage activé",
   "itemAdrenalineName": "Adrénaline",
   "itemAdrenalineDesc": "Ajoute 2 points de vie",
   "itemVodkaName": "Vodka",
   "itemVodkaDesc": "Ajoute 2 points d'attaque, enlève 1 point de rapidité",
-  "itemPropagandaName": "Propaganda",
+  "itemPropagandaName": "Propagande",
   "itemPropagandaDesc": "Ajoute 5 points d'attaque et 5 points de défense si le joueur est à moins de 3 points de vie",
-  "itemBarbedWireName": "Barbed Wire",
+  "itemBarbedWireName": "Fil barbelé",
   "itemBarbedWireDesc": "La fuite est impossible pour l'adversaire, seulement si vous êtes l'instigateur du combat",
   "itemCamouflageName": "Camouflage",
   "itemCamouflageDesc": "Permet de se déplacer vers n'importe quelle case pour 1 point d'action",
-  "itemWaterproofBootsName": "Waterproof Boots",
+  "itemWaterproofBootsName": "Bottes imperméables",
   "itemWaterproofBootsDesc": "Les déplacements vers une autre case coûtent 1 point de mouvement",
-  "itemAirStrikeName": "Air Strike",
+  "itemAirStrikeName": "Frappe aérienne",
   "itemAirStrikeDesc": "Permet d'attaquer à distance",
   "itemTorchName": "Torche",
-  "itemTorchDesc": "Une torche enflammée qui améliore les capacités à la lumière",
+  "itemTorchDesc": "Ajoute 1 point de défense et 1 points d'attaque lorsque sous la lumière d'une torche",
   "dropTorchButton": "Déposer",
-  "itemRandomName": "Random",
+  "itemRandomName": "Objet aléatoire",
   "itemRandomDesc": "Un item aléatoire qui sera révélé en pleine partie",
-  "itemFlagName": "Flag",
+  "itemFlagName": "Drapeau",
   "itemFlagDesc": "Un drapeau à ramener à la base",
-  "itemSpawnName": "Spawn",
+  "itemSpawnName": "Point d'apparition",
   "itemSpawnDesc": "Un feu de camp servant de base",
   "tileSnowName": "Neige",
   "tileTreeName": "Arbre",
@@ -104,19 +196,19 @@
   "tileIntersectionName": "Intersection",
   "tileTrapName": "Piège",
   "tileTeleportPadName": "Téléporteur",
-  "tileSnowDesc": "Une tuile de neige basique",
+  "tileSnowDesc": "Une tuile de neige",
   "tileTreeDesc": "Un arbre qui ne peut pas être grimpé",
   "tileStoneDesc": "Une grande pierre qui bloque la route",
   "tileIceDesc": "Une tuile de glace",
   "tileWaterDesc": "Une tuile d'eau",
   "tileDoorDesc": "Une porte qui peut être ouverte ou fermée",
   "tileWallDesc": "Un mur infranchissable",
-  "tileCornerDesc": "Un mur infranchissable",
-  "tileIntersectionDesc": "Un mur infranchissable",
+  "tileCornerDesc": "Un coin infranchissable",
+  "tileIntersectionDesc": "Une intersection infranchissable",
   "tileTrapDesc": "Un piège qui freine les déplacements",
-  "tileTeleportPadDesc": "Téléporte vers le téléporteur jumelé",
-  "unknownError": "Une erreur inconnue est survenue",
-  "gameNotFound": "Partie introuvable",
+  "tileTeleportPadDesc": "Un téléporteur vers un autre téléporteur",
+  "unknownError": "Une erreur est survenue. Veuillez réessayer.",
+  "gameNotFound": "Le jeu a été supprimé.",
   "networkError": "Problème de connexion réseau",
   "serverError": "Erreur du serveur"
 }
