@@ -76,7 +76,7 @@
 .avatar-circle {
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #cc0000;
+    border: 2px solid var(--theme-slider-accent);
 }
 
 .settings-dropdown {
