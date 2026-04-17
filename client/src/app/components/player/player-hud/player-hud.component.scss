@@ -156,6 +156,10 @@
   display: flex;
   align-items: center;
   gap: 2px;
+
+  &:nth-child(even) {
+    justify-self: end;
+  }
 }
 
 .stat-label {
@@ -195,6 +199,10 @@
   display: flex;
   align-items: center;
   gap: 2px;
+
+  &:nth-child(even) {
+    justify-self: end;
+  }
 }
 
 .dice-label {
