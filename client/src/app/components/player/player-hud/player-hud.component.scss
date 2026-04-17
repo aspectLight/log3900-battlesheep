@@ -171,6 +171,13 @@
   align-items: center;
 }
 
+.stat-value {
+  color: var(--theme-text-primary);
+  font-size: clamp(0.75rem, 2vw, 1rem);
+  font-weight: 600;
+  margin-left: 4px;
+}
+
 .point {
   width: clamp(12px, 3vw, 15px);
   height: clamp(12px, 3vw, 15px);

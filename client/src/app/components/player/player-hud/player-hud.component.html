@@ -30,38 +30,22 @@
       <div class="stats-grid">
         <div class="stat-row">
           <span class="stat-label">{{ 'bonus.health' | translate }}</span>
-          <div class="stat-points">
-            @for(i of healthPoints; track i) {
-              <img src="./assets/stats/health.png" class="point">
-            }
-          </div>
+          <span class="stat-value">{{ player.stats['health'].value }}</span>
         </div>
 
         <div class="stat-row">
           <span class="stat-label">{{ 'bonus.attack' | translate }}</span>
-          <div class="stat-points">
-            @for(i of attackPoints; track i) {
-              <img src="./assets/stats/attack.png" class="point">
-            }
-          </div>
+          <span class="stat-value">{{ player.stats['attack'].value }}</span>
         </div>
 
         <div class="stat-row">
           <span class="stat-label">{{ 'bonus.defense' | translate }}</span>
-          <div class="stat-points">
-            @for(i of defensePoints; track i) {
-              <img src="./assets/stats/defense.png" class="point">
-            }
-          </div>
+          <span class="stat-value">{{ player.stats['defense'].value }}</span>
         </div>
 
         <div class="stat-row">
           <span class="stat-label">{{ 'bonus.speed' | translate }}</span>
-          <div class="stat-points">
-            @for(i of speedPoints; track i) {
-              <img src="./assets/stats/speed.png" class="point">
-            }
-          </div>
+          <span class="stat-value">{{ player.stats['speed'].value }}</span>
         </div>
       </div>
 
