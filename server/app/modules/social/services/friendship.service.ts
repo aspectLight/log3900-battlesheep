@@ -203,6 +203,14 @@ export class FriendshipService {
             .exec();
     }
 
+    async renameUser(oldUsername: string, newUsername: string): Promise<void> {
+        await this.friendRequestModel.updateMany({ senderId: oldUsername }, { senderId: newUsername });
+        await this.friendRequestModel.updateMany({ receiverId: oldUsername }, { receiverId: newUsername });
+        await this.friendshipModel.updateMany({ user1: oldUsername }, { user1: newUsername });
+        await this.friendshipModel.updateMany({ user2: oldUsername }, { user2: newUsername });
+        this.logger.log(`Données d'amitié renommées: ${oldUsername} → ${newUsername}`);
+    }
+
     async cleanupForUser(username: string): Promise<void> {
         await this.friendRequestModel.deleteMany({
             $or: [{ senderId: username }, { receiverId: username }],

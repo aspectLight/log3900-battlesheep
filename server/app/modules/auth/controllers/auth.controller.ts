@@ -4,6 +4,7 @@ import { AuthGuard } from '@app/modules/auth/guards/auth.guard';
 import { UserDocument } from '@app/modules/auth/schemas/user.schema';
 import { AuthService } from '@app/modules/auth/services/auth.service';
 import { GeneralChatGateway } from '@app/modules/general-chat/general-chat.gateway';
+import { FriendshipService } from '@app/modules/social/services/friendship.service';
 import {
     BadRequestException,
     Body,
@@ -30,6 +31,7 @@ export class AuthController {
     constructor(
         private readonly authService: AuthService,
         private readonly generalChatGateway: GeneralChatGateway,
+        private readonly friendshipService: FriendshipService,
     ) {}
 
     // POST /auth/register
@@ -130,6 +132,7 @@ export class AuthController {
         }
         if (user.username !== oldUsername) {
             await this.generalChatGateway.handleUsernameUpdate(oldUsername, user.username);
+            await this.friendshipService.renameUser(oldUsername, user.username);
         }
         return {
             message: 'Profil mis à jour',

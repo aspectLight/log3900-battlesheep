@@ -124,6 +124,16 @@ export class SocialService {
                 f.username === payload.oldUsername ? { ...f, username: payload.newUsername } : f,
             );
             this.friends$.next(friends);
+
+            const pending = this.pendingRequests$.value.map((r) =>
+                r.senderId === payload.oldUsername ? { ...r, senderId: payload.newUsername } : r,
+            );
+            this.pendingRequests$.next(pending);
+
+            const sent = this.sentRequests$.value.map((r) =>
+                r.receiverId === payload.oldUsername ? { ...r, receiverId: payload.newUsername } : r,
+            );
+            this.sentRequests$.next(sent);
         });
     }
 
