@@ -1,75 +1,150 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+// ── Outer panel ─────────────────────────────────────────────────
 .game-creation-container {
     display: flex;
     flex-direction: column;
-    gap: 30px;
-    max-width: 860px;
+    gap: 24px;
+    max-width: 1400px;
+    width: 100%;
     margin: auto;
-    padding: 20px;
+    padding: 0 32px;
     text-align: center;
 }
 
+// ── Grid ────────────────────────────────────────────────────────
 .options-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 30px 40px;
-    align-items: start;
+    gap: 28px 32px;
+    align-items: stretch;
 }
 
-h2 {
-    margin-bottom: 20px;
-    color: var(--theme-text-primary);
-}
-
-.mode-selection-buttons,
-.size-selection-buttons,
-.actions-selection-buttons,
-.privacy-selection-buttons {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-    gap: 10px;
-}
-
-label:hover:not(.ctf-label) {
-    cursor: pointer;
-    color: var(--theme-text-hover);
-}
-
-label:active:not(.ctf-label) {
-    color: var(--theme-text-hover-active);
-} 
-
-.ctf-label {
-    color: var(--theme-text-primary);
-}
-
-input[disabled] {
-    color-scheme: light dark;
-}
-
-input[type='radio'] {
-    accent-color: var(--theme-accent-hover);
-    cursor: pointer;
-}
-
-.mode-description,
-.actions-description {
-    color: var(--theme-text-muted);
-}
-
-.size-description {
-    color: var(--theme-text-muted);
+// ── Individual option card ──────────────────────────────────────
+.option-card {
+    background: var(--theme-bg-card);
+    border: 1px solid var(--theme-scrollbar-thumb-soft);
+    border-radius: 10px;
+    padding: 44px 40px 38px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 12px;
+    transition: background 0.2s, border-color 0.2s;
 }
 
+// ── Section titles ──────────────────────────────────────────────
+h2 {
+    color: var(--theme-text-primary);
+    font-size: 1.1em;
+    font-weight: 600;
+    margin: 0 0 10px;
+    text-align: center;
+}
+
+// ── Pill selectors ──────────────────────────────────────────────
+.pill-group {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.pill {
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 1px solid var(--theme-border-tertiary);
+    background: var(--theme-bg-overlay-medium);
+    color: var(--theme-text-special);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+
+    &:hover:not(.active) {
+        background: var(--theme-bg-button-hover);
+        border-color: var(--theme-border-button);
+        color: var(--theme-text-primary);
+    }
+
+    &.active {
+        border-color: var(--theme-accent);
+        background: var(--theme-bg-button);
+        color: var(--theme-text-primary);
+        box-shadow: 0 0 8px var(--theme-shadow-focus);
+    }
+}
+
+.pill-compact {
+    min-width: 38px;
+    padding: 8px 10px;
+    text-align: center;
+}
+
+// ── Description text ────────────────────────────────────────────
+.card-description {
+    color: var(--theme-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.45;
+    max-width: 320px;
+}
+
+// ── Board-size meta tags ────────────────────────────────────────
+.meta-tags {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.meta-tag {
+    font-size: 0.9rem;
+    color: var(--theme-text-muted);
+    line-height: 1.45;
+}
+
+// ── Create button ───────────────────────────────────────────────
 .actions {
     display: flex;
     justify-content: center;
-    margin-top: 20px;
+    margin-top: 4px;
 }
 
+.create-btn {
+    padding: 0.4rem 2rem;
+    background-color: var(--theme-bg-button);
+    color: var(--theme-text-tertiary);
+    border: 2px solid var(--theme-border-button);
+    border-radius: 5px;
+    box-shadow: 0 0 0 2px var(--theme-outline-soft);
+    cursor: pointer;
+    transition:
+        background-color 0.3s,
+        box-shadow 0.3s,
+        color 0.3s;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+
+    &:hover {
+        background-color: var(--theme-bg-button-hover);
+        box-shadow: 0 0 5px 2px var(--theme-border-focus-shadow);
+        color: var(--theme-text-primary);
+    }
+
+    &:active {
+        transform: translateY(1px);
+    }
+}
+
+// ── Header ──────────────────────────────────────────────────────
 .page-header {
     position: relative;
     display: flex;
@@ -103,29 +178,4 @@ input[type='radio'] {
     width: 15px;
     max-width: 15px;
     filter: brightness(0) invert(1);
-}
-
-.create-btn {
-    background-color: var(--theme-bg-button);
-    color: var(--theme-text-special-alt);
-    padding: 12px 28px;
-    border-radius: 8px;
-    cursor: pointer;
-    border: 1px solid var(--theme-border-button);
-    font-weight: 500;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 6px var(--theme-shadow-button);
-    min-width: 120px;
-    letter-spacing: 0.5px;
-}
-
-.create-btn:hover {
-    background-color: var(--theme-bg-button-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px var(--theme-shadow-button-hover);
-}
-
-.create-btn:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 4px var(--theme-shadow-button);
 }
