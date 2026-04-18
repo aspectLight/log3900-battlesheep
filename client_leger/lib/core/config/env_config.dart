@@ -44,8 +44,10 @@ class EnvConfig {
     }
 
     if (trimmed.startsWith('/') && baseOk) {
+      // Uri.resolve against `http://host:3000/api` replaces the path with
+      // `/auth/...`, dropping `/api`. The API lives under `/api/auth/avatar/...`.
       return _appendAvatarCacheBust(
-        apiBaseUri.resolve(trimmed).toString(),
+        _joinApiBaseWithAbsolutePath(apiBaseUri, trimmed),
         cacheBust,
       );
     }
@@ -65,15 +67,38 @@ class EnvConfig {
         host == '127.0.0.1' ||
         host == '0.0.0.0' ||
         host == '::1';
-    final path = incoming.path;
+    var path = incoming.path;
     final underApi = path.startsWith('/api/') || path == '/api';
-    if (!localhostish && !underApi) return incoming;
+    // Server stores `/auth/avatar/:uid`; global prefix is `api` → `/api/auth/avatar/...`.
+    if (!underApi && path.startsWith('/auth/')) {
+      path = '/api$path';
+    }
+    final underApiAfterFix = path.startsWith('/api/') || path == '/api';
+    if (!localhostish && !underApiAfterFix) return incoming;
 
     return incoming.replace(
       scheme: apiBaseUri.scheme,
       host: apiBaseUri.host,
       port: apiBaseUri.port,
+      path: path,
     );
+  }
+
+  /// Join the API base path (e.g. `/api`) with a path like `/auth/avatar/x?v=…`.
+  static String _joinApiBaseWithAbsolutePath(Uri apiBaseUri, String pathAndQuery) {
+    final ref = Uri.parse('http://_.invalid$pathAndQuery');
+    final basePath = apiBaseUri.path;
+    final normalized = basePath.endsWith('/') && basePath.isNotEmpty
+        ? basePath.substring(0, basePath.length - 1)
+        : basePath;
+    final mergedPath = '$normalized${ref.path}';
+    return apiBaseUri
+        .replace(
+          path: mergedPath,
+          queryParameters: ref.hasQuery ? ref.queryParameters : null,
+          fragment: ref.hasFragment ? ref.fragment : null,
+        )
+        .toString();
   }
 
   static String _appendAvatarCacheBust(String base, int? cacheBust) {
