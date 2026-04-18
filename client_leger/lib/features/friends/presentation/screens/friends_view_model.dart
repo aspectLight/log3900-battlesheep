@@ -63,6 +63,15 @@ class FriendsViewModel {
 
   void setFriends(List<FriendProfile> list) => friends.value = list;
 
+  void updateFriendPresence(String username, {required bool isOnline}) {
+    friends.value = friends.value
+        .map(
+          (f) =>
+              f.username == username ? f.copyWith(isOnline: isOnline) : f,
+        )
+        .toList();
+  }
+
   void setPendingRequests(List<FriendRequest> list) =>
       pendingRequests.value = list;
 

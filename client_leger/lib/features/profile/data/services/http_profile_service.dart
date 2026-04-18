@@ -111,8 +111,15 @@ class HttpProfileService {
       none: () => Future.error(const UnauthorizedProfileFailure()),
       some: (SocketAuthCredentialsModel c) async {
         try {
+          final normalized = filePath.replaceAll(r'\', '/');
+          final slash = normalized.lastIndexOf('/');
+          final uploadName =
+              slash < 0 ? normalized : normalized.substring(slash + 1);
           final formData = FormData.fromMap({
-            'file': await MultipartFile.fromFile(filePath),
+            'file': await MultipartFile.fromFile(
+              filePath,
+              filename: uploadName.contains('.') ? uploadName : '$uploadName.jpg',
+            ),
           });
           final response = await _dio.post<Map<String, dynamic>>(
             ProfileApiEndpoints.uploadAvatar,

@@ -142,6 +142,24 @@ class FriendsSocketListener {
               .toList(),
         );
       }),
+
+      _socketService.on<Object?>(SocialSocketEvents.friendOnline).listen((
+        raw,
+      ) {
+        final m = _toStringKeyMap(raw);
+        final username = m?['username'] as String?;
+        if (username == null) return;
+        _viewModel.updateFriendPresence(username, isOnline: true);
+      }),
+
+      _socketService.on<Object?>(SocialSocketEvents.friendOffline).listen((
+        raw,
+      ) {
+        final m = _toStringKeyMap(raw);
+        final username = m?['username'] as String?;
+        if (username == null) return;
+        _viewModel.updateFriendPresence(username, isOnline: false);
+      }),
     ]);
   }
 

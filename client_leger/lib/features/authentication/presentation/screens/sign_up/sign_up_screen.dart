@@ -26,6 +26,20 @@ import '../../../../../routing/navigation_command.dart';
 import '../../../domain/state/auth_state.dart';
 import 'sign_up_view_model.dart';
 
+/// [XFile.name] is often empty on Android; fall back to the filesystem path.
+String _signUpAvatarUploadExtensionLower(XFile file) {
+  String extFrom(String s) {
+    final lower = s.toLowerCase();
+    final dot = lower.lastIndexOf('.');
+    if (dot < 0 || dot == lower.length - 1) return '';
+    return lower.substring(dot + 1);
+  }
+
+  final fromName = extFrom(file.name);
+  if (fromName.isNotEmpty) return fromName;
+  return extFrom(file.path);
+}
+
 @RoutePage()
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -213,9 +227,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     XFile file,
     AuthLocalizations l10n,
   ) async {
-    final extension = file.name.contains('.')
-        ? file.name.split('.').last.toLowerCase()
-        : '';
+    final extension = _signUpAvatarUploadExtensionLower(file);
     if (!_allowedAvatarExtensions.contains(extension)) {
       return l10n.avatarInvalidFileType;
     }

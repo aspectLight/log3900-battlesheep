@@ -38,6 +38,20 @@ import '../../../domain/models/profile_statistics_model.dart';
 import '../../../domain/state/profile_state.dart';
 import 'profile_view_model.dart';
 
+/// [XFile.name] is often empty on Android; fall back to the filesystem path.
+String _avatarUploadExtensionLower(XFile file) {
+  String extFrom(String s) {
+    final lower = s.toLowerCase();
+    final dot = lower.lastIndexOf('.');
+    if (dot < 0 || dot == lower.length - 1) return '';
+    return lower.substring(dot + 1);
+  }
+
+  final fromName = extFrom(file.name);
+  if (fromName.isNotEmpty) return fromName;
+  return extFrom(file.path);
+}
+
 @RoutePage()
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -156,8 +170,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     XFile file,
     ProfileLocalizations l10n,
   ) async {
-    final fileName = file.name.toLowerCase();
-    final extension = fileName.contains('.') ? fileName.split('.').last : '';
+    final extension = _avatarUploadExtensionLower(file);
     if (!_allowedAvatarExtensions.contains(extension)) {
       return l10n.profileAvatarInvalidFileType;
     }
