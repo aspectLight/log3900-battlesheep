@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
-import '../../../../../core/appearance/app_feature_colors.dart';
 import '../../../../../core/app_transition/app_transition_bus.dart';
+import '../../../../../core/appearance/app_feature_colors.dart';
 import '../../../../../core/constants/ui_assets.dart';
 import '../../../../../core/modal/modal_intent_sink.dart';
 import '../../../core/app_events/game_session_events.dart';
@@ -190,7 +190,6 @@ class _LeftSide extends StatelessWidget {
                           },
                         ),
                       ),
-                    const Expanded(flex: 8, child: GamePlayerHudWidget()),
                     const SizedBox(
                       height: _inventoryRowHeight,
                       child: Center(child: GamePlayerInventoryWidget()),
@@ -317,9 +316,7 @@ class _TimerDebugBarRow extends StatelessWidget {
         height: _barHeight,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(child: GameDebugModeStrip()),
-          ],
+          children: [Expanded(child: GameDebugModeStrip())],
         ),
       );
     }
@@ -327,9 +324,7 @@ class _TimerDebugBarRow extends StatelessWidget {
     if (showTimer && !isDebug) {
       return const SizedBox(
         height: _barHeight,
-        child: Center(
-          child: GameTimerWidget(layout: GameTimerLayout.bar),
-        ),
+        child: Center(child: GameTimerWidget(layout: GameTimerLayout.bar)),
       );
     }
 
@@ -339,9 +334,7 @@ class _TimerDebugBarRow extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Expanded(child: SizedBox()),
-          const Center(
-            child: GameTimerWidget(layout: GameTimerLayout.bar),
-          ),
+          const Center(child: GameTimerWidget(layout: GameTimerLayout.bar)),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(left: 14),
@@ -404,11 +397,11 @@ class _RightSide extends StatelessWidget {
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       child: const Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Let the player cards list take all available
-          // vertical space given by the right panel.
-          Expanded(child: GamePlayerCardsHudWidget()),
+          SizedBox(height: 300, child: GamePlayerCardsHudWidget()),
+          SizedBox(height: 8),
+          Expanded(child: GamePlayerHudWidget()),
         ],
       ),
     );
