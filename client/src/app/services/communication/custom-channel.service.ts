@@ -81,7 +81,6 @@ export class CustomChannelService {
     setupListeners(): void {
         const socket = this.socketService.socket;
         if (!socket) return;
-        this.resetState();
 
         // Remove any existing listeners before re-registering to prevent accumulation on reconnect
         socket.off(CustomChannelEvents.CustomChannelsListResponse);
