@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
 import { SessionService } from '@app/services/state/session.service';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
-import { SocialEvents } from '@common/socket.constants';
+import { GeneralChatEvents, SocialEvents } from '@common/socket.constants';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { firstValueFrom } from 'rxjs';
@@ -109,6 +109,22 @@ export class SocialService {
         this.socketService.on<{ username: string }>(SocialEvents.FriendOffline, (data) => {
             this.updateFriendPresence(data.username, false);
         });
+
+        this.socketService.on<{ username: string; avatarId: string | null; avatarUrl: string | null }>(
+            GeneralChatEvents.AvatarUpdated,
+            (payload) => {
+                if (!payload?.username) return;
+                this.updateFriendAvatar(payload.username, payload.avatarId, payload.avatarUrl);
+            },
+        );
+
+        this.socketService.on<{ oldUsername: string; newUsername: string }>(GeneralChatEvents.UsernameUpdated, (payload) => {
+            if (!payload?.oldUsername || !payload?.newUsername || payload.oldUsername === payload.newUsername) return;
+            const friends = this.friends$.value.map((f) =>
+                f.username === payload.oldUsername ? { ...f, username: payload.newUsername } : f,
+            );
+            this.friends$.next(friends);
+        });
     }
 
     async loadFriends(): Promise<void> {
@@ -203,6 +219,13 @@ export class SocialService {
 
     private updateFriendPresence(username: string, isOnline: boolean): void {
         const friends = this.friends$.value.map((f) => (f.username === username ? { ...f, isOnline } : f));
+        this.friends$.next(friends);
+    }
+
+    private updateFriendAvatar(username: string, avatarId: string | null, avatarUrl: string | null): void {
+        const friends = this.friends$.value.map((f) =>
+            f.username === username ? { ...f, avatarId: avatarId ?? f.avatarId, avatarUrl: avatarUrl ?? undefined } : f,
+        );
         this.friends$.next(friends);
     }
 
