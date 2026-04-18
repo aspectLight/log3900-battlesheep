@@ -48,10 +48,10 @@ export class ProfilePageComponent implements OnInit {
     showDeleteConfirm = false;
     errorMessage = '';
 
-    readonly themes: { value: ThemeType; labelKey: string; description: string; preview: string }[] = [
-        { value: 'default', labelKey: 'profile.theme_default', description: 'Rouge sombre', preview: './assets/ui/default_preview.png' },
-        { value: 'frost', labelKey: 'profile.theme_frost', description: 'Bleu glacial', preview: './assets/ui/froid_preview.png' },
-        { value: 'village', labelKey: 'profile.theme_village', description: 'Brun terreux', preview: './assets/ui/village_preview.png' },
+    readonly themes: { value: ThemeType; labelKey: string; description: string; previewBase: string }[] = [
+        { value: 'default', labelKey: 'profile.theme_default', description: 'Rouge sombre', previewBase: './assets/ui/default_preview' },
+        { value: 'frost', labelKey: 'profile.theme_frost', description: 'Bleu glacial', previewBase: './assets/ui/siberiancold_preview' },
+        { value: 'village', labelKey: 'profile.theme_village', description: 'Brun terreux', previewBase: './assets/ui/village_preview' },
     ];
 
     readonly languages: { value: LanguageType; labelKey: string }[] = [
@@ -182,6 +182,11 @@ export class ProfilePageComponent implements OnInit {
         this.avatarFileError = null;
         this.form.controls.avatarId.setValue(id);
         this.form.controls.avatarId.markAsTouched();
+    }
+
+    getThemePreview(previewBase: string): string {
+        const lang = this.languageService.getCurrentLanguage();
+        return `${previewBase}_${lang}.png`;
     }
 
     async selectTheme(theme: ThemeType) {

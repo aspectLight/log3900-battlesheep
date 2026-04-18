@@ -16,6 +16,7 @@ export class ChatService {
     avatarId: string | null = null;
     avatarUrl: string | null = null;
     private scrollCallback: (() => void) | null = null;
+    private usernameUpdatedHandler: ((payload: { oldUsername: string; newUsername: string }) => void) | null = null;
 
     constructor(
         private socketService: SocketService,
@@ -35,7 +36,9 @@ export class ChatService {
         socket.off(GeneralChatEvents.GeneralChatMessage);
         socket.off(GeneralChatEvents.GeneralChatEmoji);
         socket.off(GeneralChatEvents.GetGeneralChatMessagesResponse);
-        socket.off(GeneralChatEvents.UsernameUpdated);
+        if (this.usernameUpdatedHandler) {
+            socket.off(GeneralChatEvents.UsernameUpdated, this.usernameUpdatedHandler);
+        }
         socket.off('connect');
 
         this.socketService.on(
@@ -88,7 +91,7 @@ export class ChatService {
             },
         );
 
-        this.socketService.on<{ oldUsername: string; newUsername: string }>(GeneralChatEvents.UsernameUpdated, (payload) => {
+        this.usernameUpdatedHandler = (payload) => {
             if (!payload?.oldUsername || !payload?.newUsername || payload.oldUsername === payload.newUsername) return;
             for (const msg of this.messages) {
                 if (msg.name === payload.oldUsername) {
@@ -101,7 +104,8 @@ export class ChatService {
             if (this.playerName === payload.oldUsername) {
                 this.playerName = payload.newUsername;
             }
-        });
+        };
+        this.socketService.on<{ oldUsername: string; newUsername: string }>(GeneralChatEvents.UsernameUpdated, this.usernameUpdatedHandler);
 
         socket.on('connect', () => {
             if (this.username) {

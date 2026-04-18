@@ -977,16 +977,19 @@ mixin _$CharacterCreationExitAppEvent {
   TResult when<TResult extends Object?>({
     required TResult Function() exitRequested,
     required TResult Function(String roomCode) transitionToWaitingRoom,
+    required TResult Function() handedOffToGameSession,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? exitRequested,
     TResult? Function(String roomCode)? transitionToWaitingRoom,
+    TResult? Function()? handedOffToGameSession,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? exitRequested,
     TResult Function(String roomCode)? transitionToWaitingRoom,
+    TResult Function()? handedOffToGameSession,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -995,18 +998,24 @@ mixin _$CharacterCreationExitAppEvent {
     exitRequested,
     required TResult Function(CharacterCreationTransitionToWaitingRoom value)
     transitionToWaitingRoom,
+    required TResult Function(CharacterCreationHandedOffToGameSession value)
+    handedOffToGameSession,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(CharacterCreationExitRequested value)? exitRequested,
     TResult? Function(CharacterCreationTransitionToWaitingRoom value)?
     transitionToWaitingRoom,
+    TResult? Function(CharacterCreationHandedOffToGameSession value)?
+    handedOffToGameSession,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(CharacterCreationExitRequested value)? exitRequested,
     TResult Function(CharacterCreationTransitionToWaitingRoom value)?
     transitionToWaitingRoom,
+    TResult Function(CharacterCreationHandedOffToGameSession value)?
+    handedOffToGameSession,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
 }
@@ -1091,6 +1100,7 @@ class _$CharacterCreationExitRequestedImpl
   TResult when<TResult extends Object?>({
     required TResult Function() exitRequested,
     required TResult Function(String roomCode) transitionToWaitingRoom,
+    required TResult Function() handedOffToGameSession,
   }) {
     return exitRequested();
   }
@@ -1100,6 +1110,7 @@ class _$CharacterCreationExitRequestedImpl
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? exitRequested,
     TResult? Function(String roomCode)? transitionToWaitingRoom,
+    TResult? Function()? handedOffToGameSession,
   }) {
     return exitRequested?.call();
   }
@@ -1109,6 +1120,7 @@ class _$CharacterCreationExitRequestedImpl
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? exitRequested,
     TResult Function(String roomCode)? transitionToWaitingRoom,
+    TResult Function()? handedOffToGameSession,
     required TResult orElse(),
   }) {
     if (exitRequested != null) {
@@ -1124,6 +1136,8 @@ class _$CharacterCreationExitRequestedImpl
     exitRequested,
     required TResult Function(CharacterCreationTransitionToWaitingRoom value)
     transitionToWaitingRoom,
+    required TResult Function(CharacterCreationHandedOffToGameSession value)
+    handedOffToGameSession,
   }) {
     return exitRequested(this);
   }
@@ -1134,6 +1148,8 @@ class _$CharacterCreationExitRequestedImpl
     TResult? Function(CharacterCreationExitRequested value)? exitRequested,
     TResult? Function(CharacterCreationTransitionToWaitingRoom value)?
     transitionToWaitingRoom,
+    TResult? Function(CharacterCreationHandedOffToGameSession value)?
+    handedOffToGameSession,
   }) {
     return exitRequested?.call(this);
   }
@@ -1144,6 +1160,8 @@ class _$CharacterCreationExitRequestedImpl
     TResult Function(CharacterCreationExitRequested value)? exitRequested,
     TResult Function(CharacterCreationTransitionToWaitingRoom value)?
     transitionToWaitingRoom,
+    TResult Function(CharacterCreationHandedOffToGameSession value)?
+    handedOffToGameSession,
     required TResult orElse(),
   }) {
     if (exitRequested != null) {
@@ -1244,6 +1262,7 @@ class _$CharacterCreationTransitionToWaitingRoomImpl
   TResult when<TResult extends Object?>({
     required TResult Function() exitRequested,
     required TResult Function(String roomCode) transitionToWaitingRoom,
+    required TResult Function() handedOffToGameSession,
   }) {
     return transitionToWaitingRoom(roomCode);
   }
@@ -1253,6 +1272,7 @@ class _$CharacterCreationTransitionToWaitingRoomImpl
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? exitRequested,
     TResult? Function(String roomCode)? transitionToWaitingRoom,
+    TResult? Function()? handedOffToGameSession,
   }) {
     return transitionToWaitingRoom?.call(roomCode);
   }
@@ -1262,6 +1282,7 @@ class _$CharacterCreationTransitionToWaitingRoomImpl
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? exitRequested,
     TResult Function(String roomCode)? transitionToWaitingRoom,
+    TResult Function()? handedOffToGameSession,
     required TResult orElse(),
   }) {
     if (transitionToWaitingRoom != null) {
@@ -1277,6 +1298,8 @@ class _$CharacterCreationTransitionToWaitingRoomImpl
     exitRequested,
     required TResult Function(CharacterCreationTransitionToWaitingRoom value)
     transitionToWaitingRoom,
+    required TResult Function(CharacterCreationHandedOffToGameSession value)
+    handedOffToGameSession,
   }) {
     return transitionToWaitingRoom(this);
   }
@@ -1287,6 +1310,8 @@ class _$CharacterCreationTransitionToWaitingRoomImpl
     TResult? Function(CharacterCreationExitRequested value)? exitRequested,
     TResult? Function(CharacterCreationTransitionToWaitingRoom value)?
     transitionToWaitingRoom,
+    TResult? Function(CharacterCreationHandedOffToGameSession value)?
+    handedOffToGameSession,
   }) {
     return transitionToWaitingRoom?.call(this);
   }
@@ -1297,6 +1322,8 @@ class _$CharacterCreationTransitionToWaitingRoomImpl
     TResult Function(CharacterCreationExitRequested value)? exitRequested,
     TResult Function(CharacterCreationTransitionToWaitingRoom value)?
     transitionToWaitingRoom,
+    TResult Function(CharacterCreationHandedOffToGameSession value)?
+    handedOffToGameSession,
     required TResult orElse(),
   }) {
     if (transitionToWaitingRoom != null) {
@@ -1321,4 +1348,132 @@ abstract class CharacterCreationTransitionToWaitingRoom
     _$CharacterCreationTransitionToWaitingRoomImpl
   >
   get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$CharacterCreationHandedOffToGameSessionImplCopyWith<$Res> {
+  factory _$$CharacterCreationHandedOffToGameSessionImplCopyWith(
+    _$CharacterCreationHandedOffToGameSessionImpl value,
+    $Res Function(_$CharacterCreationHandedOffToGameSessionImpl) then,
+  ) = __$$CharacterCreationHandedOffToGameSessionImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$CharacterCreationHandedOffToGameSessionImplCopyWithImpl<$Res>
+    extends
+        _$CharacterCreationExitAppEventCopyWithImpl<
+          $Res,
+          _$CharacterCreationHandedOffToGameSessionImpl
+        >
+    implements _$$CharacterCreationHandedOffToGameSessionImplCopyWith<$Res> {
+  __$$CharacterCreationHandedOffToGameSessionImplCopyWithImpl(
+    _$CharacterCreationHandedOffToGameSessionImpl _value,
+    $Res Function(_$CharacterCreationHandedOffToGameSessionImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of CharacterCreationExitAppEvent
+  /// with the given fields replaced by the non-null parameter values.
+}
+
+/// @nodoc
+
+class _$CharacterCreationHandedOffToGameSessionImpl
+    implements CharacterCreationHandedOffToGameSession {
+  const _$CharacterCreationHandedOffToGameSessionImpl();
+
+  @override
+  String toString() {
+    return 'CharacterCreationExitAppEvent.handedOffToGameSession()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$CharacterCreationHandedOffToGameSessionImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() exitRequested,
+    required TResult Function(String roomCode) transitionToWaitingRoom,
+    required TResult Function() handedOffToGameSession,
+  }) {
+    return handedOffToGameSession();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? exitRequested,
+    TResult? Function(String roomCode)? transitionToWaitingRoom,
+    TResult? Function()? handedOffToGameSession,
+  }) {
+    return handedOffToGameSession?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? exitRequested,
+    TResult Function(String roomCode)? transitionToWaitingRoom,
+    TResult Function()? handedOffToGameSession,
+    required TResult orElse(),
+  }) {
+    if (handedOffToGameSession != null) {
+      return handedOffToGameSession();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(CharacterCreationExitRequested value)
+    exitRequested,
+    required TResult Function(CharacterCreationTransitionToWaitingRoom value)
+    transitionToWaitingRoom,
+    required TResult Function(CharacterCreationHandedOffToGameSession value)
+    handedOffToGameSession,
+  }) {
+    return handedOffToGameSession(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(CharacterCreationExitRequested value)? exitRequested,
+    TResult? Function(CharacterCreationTransitionToWaitingRoom value)?
+    transitionToWaitingRoom,
+    TResult? Function(CharacterCreationHandedOffToGameSession value)?
+    handedOffToGameSession,
+  }) {
+    return handedOffToGameSession?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(CharacterCreationExitRequested value)? exitRequested,
+    TResult Function(CharacterCreationTransitionToWaitingRoom value)?
+    transitionToWaitingRoom,
+    TResult Function(CharacterCreationHandedOffToGameSession value)?
+    handedOffToGameSession,
+    required TResult orElse(),
+  }) {
+    if (handedOffToGameSession != null) {
+      return handedOffToGameSession(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class CharacterCreationHandedOffToGameSession
+    implements CharacterCreationExitAppEvent {
+  const factory CharacterCreationHandedOffToGameSession() =
+      _$CharacterCreationHandedOffToGameSessionImpl;
 }

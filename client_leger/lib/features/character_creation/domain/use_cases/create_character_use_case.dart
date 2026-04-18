@@ -52,15 +52,24 @@ class CreateCharacterUseCase {
           final dropInResult = await _repository.joinGameRoom(command);
           dropInResult.match(
             (failure) => throw failure,
-            (result) => _appTransitionEventBus.fire(
-              GameSessionEntryAppEvent.startRequested(
-                roomId: result.roomId,
-                gameId: result.gameId,
-                socketId: _socketId,
-                gameName: '',
-                gameDescription: '',
-              ),
-            ),
+            (result) {
+              // Start game session first so `GoToGameLoading` arms the overlay and
+              // schedules navigation before character-creation scope teardown. Doing
+              // exit first left a frame where the route still showed disposed DI →
+              // brief black flash.
+              _appTransitionEventBus.fire(
+                GameSessionEntryAppEvent.startRequested(
+                  roomId: result.roomId,
+                  gameId: result.gameId,
+                  socketId: _socketId,
+                  gameName: '',
+                  gameDescription: '',
+                ),
+              );
+              _appTransitionEventBus.fire(
+                const CharacterCreationExitAppEvent.handedOffToGameSession(),
+              );
+            },
           );
           return;
         }

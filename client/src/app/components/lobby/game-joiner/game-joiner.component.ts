@@ -48,6 +48,7 @@ export class GameJoinerComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.socketService.resetRoomState();
         this.currencyService.fetchBalance();
         const socket = this.globalSocketService.socket;
         if (socket) {

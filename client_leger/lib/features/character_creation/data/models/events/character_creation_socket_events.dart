@@ -11,4 +11,5 @@ abstract final class CharacterCreationSocketEvents {
   static const String createWaitingRoom = 'createWaitingRoom';
   static const String waitingRoomLocked = 'waitingRoomLocked';
   static const String gameRoomCreated = 'gameRoomCreated';
+  static const String leaveGameRoom = 'leaveGameRoom';
 }

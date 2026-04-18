@@ -132,7 +132,9 @@ export class CreatePlayerPageComponent implements OnInit, OnDestroy {
 
         // The host creates the waiting room only when clicking the final button,
         // so the room doesn't exist yet — skip avatar reservation for the host.
-        if (this.isHost) {
+        // Drop-in players join a game already in progress (no waiting room to reserve against);
+        // avatar conflicts are validated server-side in handleJoinGameRoom.
+        if (this.isHost || this.gameCreationService.isDropIn) {
             this.validCharacter = true;
             this.updateCreateButtonState();
             return;

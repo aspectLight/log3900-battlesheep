@@ -161,6 +161,12 @@ abstract class AutoScopeCoordinator<
 
   bool get tearDownStaleFeatureScopeOnEntry => false;
 
+  /// Call when this feature's scope was dropped outside [onExit], for example
+  /// after a failed [onCompletedImpl] bootstrap, so the next [onEntry] is not blocked.
+  void markFeatureScopeReleased() {
+    _featureScope = null;
+  }
+
   @override
   Future<void> onEntry(Entry event) async {
     final data = await onEntryImpl(event);

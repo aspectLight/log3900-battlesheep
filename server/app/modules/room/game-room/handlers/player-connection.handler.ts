@@ -29,6 +29,16 @@ export class PlayerConnectionHandler {
     ) {}
 
     /**
+     * Removes a socket from the game-room socket.io channel without touching game state.
+     * Called when a client received GameRoomCreated but was not in the roster
+     * (e.g. still on character creation when the game started). Prevents the socket
+     * from receiving further game broadcasts such as GameCanceled.
+     */
+    handleLeaveGameRoom(roomId: string, socket: Socket): void {
+        socket.leave(roomId);
+    }
+
+    /**
      * Handles player leaving the game room
      */
     handleLeaveRoom(roomId: string, socket: Socket, server: Server): void {

@@ -196,9 +196,9 @@
                                 [attr.data-theme]="t.value"
                                 (click)="selectTheme(t.value)"
                             >
-                                <img class="theme-preview-img" [src]="t.preview" [alt]="t.labelKey | translate" />
+                                <img class="theme-preview-img" [src]="getThemePreview(t.previewBase)" [alt]="t.labelKey | translate" />
                                 <div class="theme-thumbnail-wrapper">
-                                    <img class="theme-thumbnail" [src]="t.preview" [alt]="t.labelKey | translate" />
+                                    <img class="theme-thumbnail" [src]="getThemePreview(t.previewBase)" [alt]="t.labelKey | translate" />
                                 </div>
                                 <div class="theme-label-area">
                                     <span class="theme-label">{{ t.labelKey | translate }}</span>

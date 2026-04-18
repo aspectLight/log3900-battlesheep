@@ -42,6 +42,7 @@ export class GameCreatorComponent implements OnInit {
     ) {}
 
     ngOnInit() {
+        this.socketService.resetRoomState();
         this.gameModified = false;
         this.gameCreationService.isHost = true;
         this.friendsOnly = false;

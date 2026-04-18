@@ -67,8 +67,6 @@ export class MainPageComponent implements OnInit, OnDestroy {
     }
 
     async ngOnInit(): Promise<void> {
-        this.customChannelService.resetState();
-
         this.pendingRequestsSub = this.socialService.pendingRequests$.subscribe((requests) => {
             this.pendingRequestCount = requests.length;
         });
@@ -156,6 +154,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
     async logout() {
         try {
+            this.customChannelService.resetState();
             await this.authService.logout();
             this.router.navigate(['/auth-landing']);
             // eslint-disable-next-line no-console

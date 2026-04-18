@@ -38,6 +38,12 @@ class CharacterCreationCoordinator
   @override
   final String scopeName = 'character_creation';
 
+  /// Drop-in used to leave the feature scope in place until the next visit.
+  /// Without tearing down a stale scope, `onEntry` would return early while
+  /// `onCompleted` still runs and tries to register `CharacterCreationSocket` again.
+  @override
+  bool get tearDownStaleFeatureScopeOnEntry => true;
+
   @override
   void onScopeCreated(GetIt scope) {
     scopeHolder.setScope(scope);
@@ -131,6 +137,8 @@ class CharacterCreationCoordinator
         _onExitRequested(data);
       case CharacterCreationTransitionToWaitingRoom(:final roomCode):
         _onExitToWaitingRoom(roomCode, data);
+      case CharacterCreationHandedOffToGameSession():
+        break;
     }
   }
 

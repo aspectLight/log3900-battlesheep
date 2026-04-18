@@ -157,12 +157,15 @@ export class GameManagerService {
             this.router.navigate([ROUTES.endGame]);
             this.isGameFinished = false;
         }, delay);
-        // room.players contains plain JSON objects from the server — they don't have class
-        // methods like clearInfo(). Use the board's Player instances instead (same pattern
-        // as disconnectPlayer which correctly uses boardPlayer?.clearInfo()).
+        
         for (const player of this.room.players) {
             if (!player.isVirtual) {
-                this.board?.getPlayerById(player.id)?.clearInfo();
+                const boardPlayer = this.board?.getPlayerById(player.id);
+                if (!boardPlayer) {
+                    console.warn(`finishGame: no board player found for id ${player.id}, clearInfo skipped`);
+                } else {
+                    boardPlayer.clearInfo();
+                }
             }
         }
     }

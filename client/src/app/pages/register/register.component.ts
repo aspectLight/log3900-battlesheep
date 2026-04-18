@@ -216,13 +216,26 @@ export class RegisterPageComponent {
                 avatarId,
             });
 
+            const currentLang = this.languageService.getCurrentLanguage();
+            const updates: Promise<unknown>[] = [];
+
+            if (currentLang !== 'fr') {
+                updates.push(this.profileService.updateProfile({ language: currentLang }));
+            }
+
             if (this.selectedAvatarFile) {
-                try {
-                    await this.profileService.uploadAvatar(this.selectedAvatarFile);
-                    this.selectedAvatarFile = null;
-                } catch {
-                    this.errorMessage = "Erreur lors du téléversement de l'avatar (l'image par défaut a été conservée).";
-                }
+                const avatarFile = this.selectedAvatarFile;
+                this.selectedAvatarFile = null;
+                updates.push(
+                    this.profileService.uploadAvatar(avatarFile).catch(() => {
+                        this.errorMessage = "Erreur lors du téléversement de l'avatar (l'image par défaut a été conservée).";
+                    }),
+                );
+            }
+
+            if (updates.length > 0) {
+                await Promise.all(updates);
+                this.profileService.invalidateCache();
             }
 
             await this.router.navigate(['/home']);

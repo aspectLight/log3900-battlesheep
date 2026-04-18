@@ -79,6 +79,14 @@ export class GameRoomGateway implements OnGatewayConnection, OnGatewayDisconnect
         return this.playerConnectionHandler.handleLeaveRoom(roomId, socket, this.server);
     }
 
+    /** Emitted by a client that received GameRoomCreated but was not in the roster
+     *  (e.g. still on character creation when the game started). Removes the socket
+     *  from the game-room channel so it stops receiving game broadcasts. */
+    @SubscribeMessage(GameRoomEvents.LeaveGameRoom)
+    handleLeaveGameRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
+        return this.playerConnectionHandler.handleLeaveGameRoom(roomId, socket);
+    }
+
     @SubscribeMessage(GameRoomEvents.JoinGameRoom)
     async handleJoinGameRoom(@MessageBody() data: { roomId: string; player: Player }, @ConnectedSocket() socket: Socket) {
         return this.playerConnectionHandler.handleJoinGameRoom(data, socket, this.server);

@@ -44,6 +44,7 @@ export class CustomChannelService {
     private messagesByChannel: Record<string, ChannelMessage[]> = {};
     private explicitUsername: string | null = null;
     private usernameOverride: string | null = null;
+    private usernameUpdatedHandler: ((payload: { oldUsername: string; newUsername: string }) => void) | null = null;
 
     constructor(
         private socketService: SocketService,
@@ -80,7 +81,6 @@ export class CustomChannelService {
     setupListeners(): void {
         const socket = this.socketService.socket;
         if (!socket) return;
-        this.resetState();
 
         // Remove any existing listeners before re-registering to prevent accumulation on reconnect
         socket.off(CustomChannelEvents.CustomChannelsListResponse);
@@ -92,7 +92,9 @@ export class CustomChannelService {
         socket.off(CustomChannelEvents.CustomChannelMessagesResponse);
         socket.off(CustomChannelEvents.CustomChannelMessage);
         socket.off(CustomChannelEvents.CustomChannelEmoji);
-        socket.off(GeneralChatEvents.UsernameUpdated);
+        if (this.usernameUpdatedHandler) {
+            socket.off(GeneralChatEvents.UsernameUpdated, this.usernameUpdatedHandler);
+        }
         socket.off(CustomChannelEvents.UserChannelsRestored);
 
         socket.on(CustomChannelEvents.CustomChannelsListResponse, (channels: ChannelInfo[]) => {
@@ -172,7 +174,7 @@ export class CustomChannelService {
             this.appendIncomingMessage(payload.channelId, payload.emoji);
         });
 
-        socket.on(GeneralChatEvents.UsernameUpdated, (payload: { oldUsername: string; newUsername: string }) => {
+        this.usernameUpdatedHandler = (payload: { oldUsername: string; newUsername: string }) => {
             if (!payload?.oldUsername || !payload?.newUsername || payload.oldUsername === payload.newUsername) return;
 
             for (const channelId of Object.keys(this.messagesByChannel)) {
@@ -205,7 +207,8 @@ export class CustomChannelService {
             if (this.username === payload.oldUsername) {
                 this.usernameOverride = payload.newUsername;
             }
-        });
+        };
+        socket.on(GeneralChatEvents.UsernameUpdated, this.usernameUpdatedHandler);
 
         // Restauration des canaux à la (re)connexion : le serveur envoie automatiquement
         // la liste des canaux dont l'utilisateur est membre dans la BD.

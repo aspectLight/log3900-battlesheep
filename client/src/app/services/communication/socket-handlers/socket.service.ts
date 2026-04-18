@@ -62,11 +62,23 @@ export class SocketService implements ISocketService {
     }
 
     async connect() {
-        // Wait for Firebase Auth to restore user state after page refresh
+        // Wait for Firebase Auth to restore the user session.
+        // onAuthStateChanged fires immediately with null on Electron startup (before the
+        // persisted session is read), then fires again with the real user.  Resolving on
+        // the first callback (even when null) was the root cause of unauthenticated sockets
+        // being created at app launch.  We now wait for the first *non-null* user, with a
+        // 3-second timeout so a truly unauthenticated launch never hangs.
         await new Promise<void>((resolve) => {
-            const unsub = onAuthStateChanged(this.auth, () => {
+            const timer = setTimeout(() => {
                 unsub();
                 resolve();
+            }, 3000);
+            const unsub = onAuthStateChanged(this.auth, (user) => {
+                if (user) {
+                    clearTimeout(timer);
+                    unsub();
+                    resolve();
+                }
             });
         });
 
