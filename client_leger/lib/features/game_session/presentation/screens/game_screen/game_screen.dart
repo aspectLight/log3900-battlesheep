@@ -328,16 +328,18 @@ class _TimerDebugBarRow extends StatelessWidget {
       );
     }
 
-    return SizedBox(
+    return const SizedBox(
       height: _barHeight,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Expanded(child: SizedBox()),
-          const Center(child: GameTimerWidget(layout: GameTimerLayout.bar)),
+          Expanded(child: SizedBox()),
+          Center(
+            child: GameTimerWidget(layout: GameTimerLayout.bar),
+          ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(left: 14),
+              padding: EdgeInsets.only(left: 14),
               child: GameDebugModeStrip(),
             ),
           ),

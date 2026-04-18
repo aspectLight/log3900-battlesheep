@@ -241,8 +241,8 @@ class ItemCardWidget extends StatelessWidget {
     final widgets = <Widget>[];
 
     for (final top in positions) {
-      widgets.add(_diamond(left: 6, top: top.toDouble()));
-      widgets.add(_diamond(right: 6, top: top.toDouble()));
+      widgets.add(_diamond(left: 6, top: top));
+      widgets.add(_diamond(right: 6, top: top));
     }
     return widgets;
   }

@@ -121,7 +121,7 @@ class AuthLocalizationsFr extends AuthLocalizations {
   String get avatarCustomHint => 'Ou choisir un avatar personnalisé';
 
   @override
-  String get avatarFileTooLarge => 'L\'image doit faire moins de 2 Mo.';
+  String get avatarFileTooLarge => 'L\'image doit faire moins de 4 Mo.';
 
   @override
   String get avatarInvalidFileType =>

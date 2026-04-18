@@ -195,12 +195,11 @@ class StatisticsContentWidget extends StatelessWidget {
         child: SizedBox(
           width: tableWidth,
           child: Table(
-            border: TableBorder.all(color: borderColor, width: 1),
+            border: TableBorder.all(color: borderColor),
             columnWidths: {
               for (var i = 0; i < headerDefs.length; i++)
                 i: FlexColumnWidth(i == 0 ? 1.2 : 1),
             },
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
             children: [
               TableRow(
                 decoration: BoxDecoration(color: headerBg),
@@ -371,7 +370,6 @@ class StatisticsContentWidget extends StatelessWidget {
               builder: (context, c) {
                 return FittedBox(
                   fit: BoxFit.scaleDown,
-                  alignment: Alignment.center,
                   child: SizedBox(
                     width: math.max(c.maxWidth, _globalStatsRowDesignWidth),
                     child: Row(
@@ -407,7 +405,6 @@ class StatisticsContentWidget extends StatelessWidget {
                 builder: (context, c) {
                   return FittedBox(
                     fit: BoxFit.scaleDown,
-                    alignment: Alignment.center,
                     child: SizedBox(
                       width: math.max(c.maxWidth, _globalStatsRowDesignWidth),
                       child: Row(
@@ -448,7 +445,7 @@ class StatisticsContentWidget extends StatelessWidget {
     final f = context.featureColors;
     final goldBorder = f.goldAccent;
     final Widget card = ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: _rewardsAndShareCardWidth),
+      constraints: const BoxConstraints(maxWidth: _rewardsAndShareCardWidth),
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -462,7 +459,6 @@ class StatisticsContentWidget extends StatelessWidget {
             BoxShadow(
               color: goldBorder.withValues(alpha: 0.15),
               blurRadius: 20,
-              spreadRadius: 0,
             ),
           ],
         ),
@@ -552,7 +548,6 @@ class _PlayerStatsSortableHeader extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                alignment: Alignment.center,
                 child: SizedBox(
                   width: maxW,
                   child: Column(
@@ -663,7 +658,6 @@ class _StatisticsRewardEntryState extends State<_StatisticsRewardEntry> {
                       child: Image.asset(
                         avatarPath,
                         fit: BoxFit.cover,
-                        filterQuality: FilterQuality.medium,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -702,7 +696,6 @@ class _StatisticsRewardEntryState extends State<_StatisticsRewardEntry> {
                     UiAssets.goldCoin,
                     width: 24,
                     height: 24,
-                    filterQuality: FilterQuality.medium,
                   ),
                 ),
               ],

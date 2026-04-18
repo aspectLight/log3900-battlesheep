@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/appearance/app_interaction_colors.dart';
-import '../../../../core/localisation/core_localizations.dart';
 import '../../../../core/presentation/widgets/profile_avatar_thumb/profile_avatar_thumb.dart';
 
 class UserCard extends StatelessWidget {
@@ -22,7 +21,6 @@ class UserCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = CoreLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       margin: const EdgeInsets.only(bottom: 1),

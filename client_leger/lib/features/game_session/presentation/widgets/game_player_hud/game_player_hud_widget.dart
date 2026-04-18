@@ -280,7 +280,7 @@ class _SectionHeader extends StatelessWidget {
             style: const TextStyle(
               color: Color(0xFFC8C8C8),
               fontSize: 12,
-              letterSpacing: 1.0,
+              letterSpacing: 1,
               fontWeight: FontWeight.w700,
               fontFamily: 'CustomFont',
             ),
@@ -386,7 +386,6 @@ class _DiceCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: Text(
@@ -405,7 +404,6 @@ class _DiceCell extends StatelessWidget {
           asset,
           width: 28,
           height: 28,
-          filterQuality: FilterQuality.medium,
         ),
       ],
     );

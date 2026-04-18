@@ -33,7 +33,7 @@ class ProfileLocalizationsEn extends ProfileLocalizations {
   String get profileAvatarOrUpload => 'Or upload a custom photo';
 
   @override
-  String get profileAvatarFileTooLarge => 'Image must be under 2 MB.';
+  String get profileAvatarFileTooLarge => 'Image must be under 4 MB.';
 
   @override
   String get profileAvatarInvalidFileType =>

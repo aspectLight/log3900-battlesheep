@@ -311,7 +311,7 @@ abstract class AuthLocalizations {
   /// No description provided for @avatarFileTooLarge.
   ///
   /// In en, this message translates to:
-  /// **'Image must be under 2 MB.'**
+  /// **'Image must be under 4 MB.'**
   String get avatarFileTooLarge;
 
   /// No description provided for @avatarInvalidFileType.
