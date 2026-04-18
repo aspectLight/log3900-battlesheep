@@ -53,128 +53,131 @@ class _GameBoardWidgetState extends State<GameBoardWidget> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final maxAvailable = constraints.maxWidth < constraints.maxHeight
+        final dpr = MediaQuery.devicePixelRatioOf(context);
+        final rawMax = constraints.maxWidth < constraints.maxHeight
             ? constraints.maxWidth
             : constraints.maxHeight;
+        final maxAvailable = (rawMax * dpr).floor() / dpr;
         final cellSize = (maxAvailable / board.size).floorToDouble();
         final boardSize = cellSize * board.size;
-        return Stack(
-          children: [
-            Container(
-              width: boardSize,
-              height: boardSize,
-              color: const Color(0xFF2B2B2B),
-              child: GridView.builder(
-                padding: EdgeInsets.zero,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: board.size * board.size,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: board.size,
-                  mainAxisExtent: cellSize,
-                ),
-                itemBuilder: (context, index) {
-                  final x = index ~/ board.size;
-                  final y = index % board.size;
-                  final cell = board.matrix[x][y];
-                  final tileUi = _tileUiForCell(cell);
-                  return SizedBox(
-                    width: cellSize,
-                    height: cellSize,
-                    child: ClipRect(
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Image.asset(
-                            tileUi.imagePath,
-                            fit: BoxFit.fill,
-                            errorBuilder: (_, _, _) => Image.asset(
-                              tileUi.imagePathBase,
-                              fit: BoxFit.fill,
+        return ClipRect(
+          child: SizedBox(
+            width: boardSize,
+            height: boardSize,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  width: boardSize,
+                  height: boardSize,
+                  color: const Color(0xFF2B2B2B),
+                  child: GridView.builder(
+                    padding: EdgeInsets.zero,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: board.size * board.size,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: board.size,
+                      mainAxisExtent: cellSize,
+                    ),
+                    itemBuilder: (context, index) {
+                      final x = index ~/ board.size;
+                      final y = index % board.size;
+                      final cell = board.matrix[x][y];
+                      final tileUi = _tileUiForCell(cell);
+                      return SizedBox(
+                        width: cellSize,
+                        height: cellSize,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          fit: StackFit.expand,
+                          children: [
+                            Transform.scale(
+                              scale: 1.01,
+                              child: _GameBoardTileImage(
+                                path: tileUi.imagePath,
+                                pathBase: tileUi.imagePathBase,
+                              ),
                             ),
-                          ),
-                          if (cell.isIlluminated)
-                            const Positioned.fill(
-                              child: IgnorePointer(
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    gradient: RadialGradient(
-                                      radius: 0.95,
-                                      colors: [
-                                        Color.fromRGBO(255, 220, 100, 0.5),
-                                        Color.fromRGBO(255, 200, 50, 0),
-                                      ],
+                            if (cell.isIlluminated)
+                              const Positioned.fill(
+                                child: IgnorePointer(
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      gradient: RadialGradient(
+                                        radius: 0.95,
+                                        colors: [
+                                          Color.fromRGBO(255, 220, 100, 0.5),
+                                          Color.fromRGBO(255, 200, 50, 0),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            Positioned.fill(
-              child: IgnorePointer(
-                child: CustomPaint(
-                  painter: _ReachableHighlightPainter(
-                    reachable: reachable,
-                    cellSize: cellSize,
-                    gridSize: board.size,
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 ),
-              ),
-            ),
-            SizedBox(
-              width: boardSize,
-              height: boardSize,
-              child: GridView.builder(
-                padding: EdgeInsets.zero,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: board.size * board.size,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: board.size,
-                  mainAxisExtent: cellSize,
-                ),
-                itemBuilder: (context, index) {
-                  final x = index ~/ board.size;
-                  final y = index % board.size;
-                  final cell = board.matrix[x][y];
-                  final pos = GameBoardPosition(x: cell.x, y: cell.y);
-                  final onPath = movementPath.contains(pos);
-                  final pathDirectionsUi = onPath
-                      ? Option.of(
-                          GameBoardCellPathDirectionsUi.fromCellPathDirections(
-                            pathDirectionsForCell(x, y, pathOrdered),
-                          ),
-                        )
-                      : const Option<GameBoardCellPathDirectionsUi>.none();
-                  final isSelected = switch (selectedPosition) {
-                    None() => false,
-                    Some(value: final p) => cell.x == p.x && cell.y == p.y,
-                  };
-                  return _GameBoardCellWidget(
-                    cell: cell,
-                    cellSize: cellSize,
-                    interactionState: GameBoardUiCellInteraction(
-                      isSelected: isSelected,
-                      isSelectionModeActive: isSelectionActive,
-                      isActionModeActive: isInActionMode,
-                      isReachable: false,
-                      isOnMovementPath: onPath,
-                      pathDirections: pathDirectionsUi,
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: CustomPaint(
+                      painter: _ReachableHighlightPainter(
+                        reachable: reachable,
+                        cellSize: cellSize,
+                        gridSize: board.size,
+                      ),
                     ),
-                    onTap: () => _viewModel.handleCellPrimaryTap(cell),
-                    onSecondaryTap: () =>
-                        _viewModel.handleCellSecondaryTap(cell),
-                    onLongPress: () => _viewModel.handleCellLongPress(cell),
-                    contentOnly: true,
-                  );
-                },
-              ),
+                  ),
+                ),
+                GridView.builder(
+                  padding: EdgeInsets.zero,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: board.size * board.size,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: board.size,
+                    mainAxisExtent: cellSize,
+                  ),
+                  itemBuilder: (context, index) {
+                    final x = index ~/ board.size;
+                    final y = index % board.size;
+                    final cell = board.matrix[x][y];
+                    final pos = GameBoardPosition(x: cell.x, y: cell.y);
+                    final onPath = movementPath.contains(pos);
+                    final pathDirectionsUi = onPath
+                        ? Option.of(
+                            GameBoardCellPathDirectionsUi.fromCellPathDirections(
+                              pathDirectionsForCell(x, y, pathOrdered),
+                            ),
+                          )
+                        : const Option<GameBoardCellPathDirectionsUi>.none();
+                    final isSelected = switch (selectedPosition) {
+                      None() => false,
+                      Some(value: final p) => cell.x == p.x && cell.y == p.y,
+                    };
+                    return _GameBoardCellWidget(
+                      cell: cell,
+                      cellSize: cellSize,
+                      interactionState: GameBoardUiCellInteraction(
+                        isSelected: isSelected,
+                        isSelectionModeActive: isSelectionActive,
+                        isActionModeActive: isInActionMode,
+                        isReachable: false,
+                        isOnMovementPath: onPath,
+                        pathDirections: pathDirectionsUi,
+                      ),
+                      onTap: () => _viewModel.handleCellPrimaryTap(cell),
+                      onSecondaryTap: () =>
+                          _viewModel.handleCellSecondaryTap(cell),
+                      onLongPress: () => _viewModel.handleCellLongPress(cell),
+                      contentOnly: true,
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -193,6 +196,30 @@ class _GameBoardWidgetState extends State<GameBoardWidget> {
       diagonalSuffix: cell.diagonalSuffix,
       cellX: cell.x,
       cellY: cell.y,
+    );
+  }
+}
+
+class _GameBoardTileImage extends StatelessWidget {
+  const _GameBoardTileImage({
+    required this.path,
+    required this.pathBase,
+  });
+
+  final String path;
+  final String pathBase;
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      path,
+      fit: BoxFit.fill,
+      filterQuality: FilterQuality.none,
+      errorBuilder: (_, _, _) => Image.asset(
+        pathBase,
+        fit: BoxFit.fill,
+        filterQuality: FilterQuality.none,
+      ),
     );
   }
 }
@@ -317,11 +344,12 @@ class _GameBoardCellWidget extends StatelessWidget {
 
   Widget _buildTile(GameBoardUiTile tileUi) {
     return Positioned.fill(
-      child: Image.asset(
-        tileUi.imagePath,
-        fit: BoxFit.fill,
-        errorBuilder: (_, _, _) =>
-            Image.asset(tileUi.imagePathBase, fit: BoxFit.fill),
+      child: Transform.scale(
+        scale: 1.01,
+        child: _GameBoardTileImage(
+          path: tileUi.imagePath,
+          pathBase: tileUi.imagePathBase,
+        ),
       ),
     );
   }

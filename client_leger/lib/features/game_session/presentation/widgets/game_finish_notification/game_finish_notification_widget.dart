@@ -48,8 +48,16 @@ class _GameFinishNotificationWidgetState
               ? l10n.notificationVictoryCtf
               : l10n.notificationVictoryClassic)
         : (widget.intent.isCTF
-              ? l10n.notificationDefeatCtf(widget.intent.winnerTeamName)
-              : l10n.notificationDefeatClassic(widget.intent.winnerName));
+              ? (widget.intent.winnerTeamName.trim().isEmpty
+                    ? l10n.notificationDefeatCtfUnknown
+                    : l10n.notificationDefeatCtfKnown(
+                        widget.intent.winnerTeamName,
+                      ))
+              : (widget.intent.winnerName.trim().isEmpty
+                    ? l10n.notificationDefeatClassicUnknown
+                    : l10n.notificationDefeatClassicKnown(
+                        widget.intent.winnerName,
+                      )));
     return NotificationShell(
       child: Column(
         mainAxisSize: MainAxisSize.min,

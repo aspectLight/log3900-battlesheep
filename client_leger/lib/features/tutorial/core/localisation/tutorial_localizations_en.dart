@@ -26,7 +26,7 @@ class TutorialLocalizationsEn extends TutorialLocalizations {
 
   @override
   String get profileDesc =>
-      'Customize your avatar, username, and preferences from the Profile view. Your game statistics are also available there.';
+      'Customize your avatar, username, and preferences from the Profile view. Your game statistics are also available there. Furthermore, you have access to this tutorial at any time if needed.';
 
   @override
   String get friendsTitle => 'Friends';
@@ -39,14 +39,14 @@ class TutorialLocalizationsEn extends TutorialLocalizations {
 
   @override
   String get chatDesc =>
-      'Chat with other connected players in real-time through the general chat or custom channels.';
+      'Chat with other connected players in real-time through the general chat or custom channels. A vertical shake allows you to send the selected emoji, while a horizontal shake allows you to re-send the last message sent.';
 
   @override
   String get shopTitle => 'Shop';
 
   @override
   String get shopDesc =>
-      'Purchase new avatars and cosmetics with the coins you earn by playing.';
+      'Purchase and equip new avatars and cosmetics with the coins you earn by playing.';
 
   @override
   String get gameModesTitle => 'Game modes';
@@ -60,12 +60,12 @@ class TutorialLocalizationsEn extends TutorialLocalizations {
 
   @override
   String get createGameDesc =>
-      'Press "Create a Game" from the main menu, choose your mode, map, and settings, then wait for players to join or create virtual players controlled by AI.';
+      'Press "Create a Game" from the main menu, choose your map and settings (Private game only and entry fee), then wait for players to join or create virtual players controlled by AI.';
 
   @override
   String get joinGameTitle => 'Join a game';
 
   @override
   String get joinGameDesc =>
-      'Press "Join a Game" from the main menu, then join a game through the list of ongoing games, using a code or the associated QR code.';
+      'Press "Join a Game" from the main menu, then join a game through the list of availables games, using a code or with the associated QR code.';
 }
