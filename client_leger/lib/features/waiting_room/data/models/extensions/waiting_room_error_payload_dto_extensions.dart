@@ -25,12 +25,15 @@ extension WaitingRoomServerMessageToFailure on String? {
       return const UnknownWaitingRoomFailure('Unknown error');
     }
     final msg = this!;
-    if (msg.contains("n'existe pas"))
+    if (msg.contains("n'existe pas")) {
       return const RoomNotFoundWaitingRoomFailure();
-    if (msg.contains('est verrouillée'))
+    }
+    if (msg.contains('est verrouillée')) {
       return const RoomLockedWaitingRoomFailure();
-    if (msg.contains('expulsé de la partie'))
+    }
+    if (msg.contains('expulsé de la partie')) {
       return const PlayerKickedWaitingRoomFailure();
+    }
     if (msg.contains('est déjà dans la salle')) {
       return const PlayerAlreadyInRoomWaitingRoomFailure();
     }

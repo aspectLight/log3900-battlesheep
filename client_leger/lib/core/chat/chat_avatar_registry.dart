@@ -80,9 +80,7 @@ class ChatAvatarRegistry {
     final batch = _queuedForBatch.toList();
     _queuedForBatch.clear();
     if (batch.isEmpty) return;
-    for (final u in batch) {
-      _pendingFetch.add(u);
-    }
+    _pendingFetch.addAll(batch);
     try {
       final response = await _dio.post<List<dynamic>>(
         '/auth/avatars/batch',
@@ -116,7 +114,7 @@ class ChatAvatarRegistry {
         }
         _entries.value = next;
       }
-    } catch (_) {
+    } on Object catch (_) {
       final next = Map<String, ChatAvatarRegistryEntry>.from(_entries.value);
       for (final u in batch) {
         if (!next.containsKey(u)) {
@@ -125,9 +123,7 @@ class ChatAvatarRegistry {
       }
       _entries.value = next;
     } finally {
-      for (final u in batch) {
-        _pendingFetch.remove(u);
-      }
+      _pendingFetch.removeAll(batch);
     }
   }
 

@@ -152,7 +152,7 @@ abstract class ProfileLocalizations {
   /// No description provided for @profileAvatarFileTooLarge.
   ///
   /// In en, this message translates to:
-  /// **'Image must be under 2 MB.'**
+  /// **'Image must be under 4 MB.'**
   String get profileAvatarFileTooLarge;
 
   /// No description provided for @profileAvatarInvalidFileType.
@@ -308,7 +308,7 @@ abstract class ProfileLocalizations {
   /// No description provided for @profileThemeLabel.
   ///
   /// In en, this message translates to:
-  /// **'Theme'**
+  /// **'Visual Theme'**
   String get profileThemeLabel;
 
   /// No description provided for @profileLanguageLabel.

@@ -8,7 +8,7 @@
   "profileAvatarUploadLabel": "Importer une photo",
   "profileAvatarCameraLabel": "Prendre une photo",
   "profileAvatarOrUpload": "Ou importer une photo personnalisée",
-  "profileAvatarFileTooLarge": "L'image doit faire moins de 2 Mo.",
+  "profileAvatarFileTooLarge": "L'image doit faire moins de 4 Mo.",
   "profileAvatarInvalidFileType": "Seuls les formats JPG et PNG sont acceptés.",
   "profileAvatarUploadFailed": "Échec du téléversement de l'avatar. L'avatar précédent a été conservé.",
   "profileAvatarUploading": "Téléversement...",

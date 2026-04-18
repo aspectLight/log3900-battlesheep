@@ -209,7 +209,7 @@ export class AuthController {
     @UseGuards(AuthGuard)
     @UseInterceptors(
         FileInterceptor('file', {
-            limits: { fileSize: 2 * 1024 * 1024 },
+            limits: { fileSize: 4 * 1024 * 1024 },
             fileFilter: (req, file, cb) => {
                 const allowedMimeTypes = ['image/jpeg', 'image/png'];
                 if (!allowedMimeTypes.includes(file.mimetype)) {

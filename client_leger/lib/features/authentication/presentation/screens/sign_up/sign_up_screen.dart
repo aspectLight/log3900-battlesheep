@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/constants/ui_assets.dart';
+import '../../../../../core/presentation/widgets/selfie_capture/selfie_capture_page.dart';
 import '../../../core/constants/auth_constants.dart';
 import '../../../core/enums/auth_validation_error.dart';
 import '../../../core/extensions/auth_exception_ext.dart';
@@ -33,7 +34,7 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  static const int _maxAvatarBytes = 2 * 1024 * 1024;
+  static const int _maxAvatarBytes = 4 * 1024 * 1024;
   static const Set<String> _allowedAvatarExtensions = {'jpg', 'jpeg', 'png'};
 
   late final SignUpViewModel _viewModel;
@@ -178,11 +179,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
     try {
-      final picked = await _imagePicker.pickImage(
-        source: source,
-        preferredCameraDevice: CameraDevice.front,
-      );
-      if (picked == null) return;
+      final XFile picked;
+      if (source == ImageSource.camera) {
+        final path = await openSelfieCapture(context);
+        if (path == null) return;
+        picked = XFile(path);
+      } else {
+        final file = await _imagePicker.pickImage(source: source);
+        if (file == null) return;
+        picked = file;
+      }
       final error = await _validateCustomAvatar(picked, l10n);
       if (error != null) {
         setState(() {

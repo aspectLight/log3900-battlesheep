@@ -4,7 +4,7 @@ import '../../../constants/ui_assets.dart';
 import '../app_background/app_background.dart';
 
 /// Full-screen loading with the same parallax + snow as the rest of the app.
-/// [AppRoot] keeps the route and modal/notification layers [Offstage] during navigation
+/// The app root keeps the route and modal/notification layers offstage during navigation
 /// so only this background + the spinner paint — no page buttons or chrome.
 class LoadingOverlay extends StatelessWidget {
   const LoadingOverlay({super.key});
@@ -24,7 +24,6 @@ class LoadingOverlay extends StatelessWidget {
                 width: 120,
                 height: 120,
                 fit: BoxFit.contain,
-                filterQuality: FilterQuality.medium,
               ),
             );
           },

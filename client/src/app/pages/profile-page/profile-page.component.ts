@@ -114,7 +114,7 @@ export class ProfilePageComponent implements OnInit {
 
         if (!file) return;
 
-        const maxSize = 2 * 1024 * 1024;
+        const maxSize = 4 * 1024 * 1024;
         const validTypes = ['image/jpeg', 'image/png'];
 
         if (!validTypes.includes(file.type)) {

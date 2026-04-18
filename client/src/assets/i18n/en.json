@@ -108,8 +108,8 @@
         "camera_loading": "Initializing camera...",
         "retake": "Retake",
         "use_photo": "Use this photo",
-        "error_file_type": "File type \"{{ ext }}\" not allowed. Allowed formats: JPG, JPEG, PNG (max 2 MB).",
-        "error_file_size": "File too large ({{ size }} MB). Maximum allowed size: 2 MB.",
+        "error_file_type": "File type \"{{ ext }}\" not allowed. Allowed formats: JPG, JPEG, PNG (max 4 MB).",
+        "error_file_size": "File too large ({{ size }} MB). Maximum allowed size: 4 MB.",
         "no_changes": "No changes detected",
         "available_in_shop": "Available in shop (500 coins)",
     "errors": {

@@ -60,8 +60,9 @@ class GameInventoryStateReducer {
   ) {
     if (event.inventoryFull) return previous;
     final current = previous.itemsByPlayerId[event.playerId] ?? [];
-    if (current.length >= GameRulesConstants.inventorySlotCount)
+    if (current.length >= GameRulesConstants.inventorySlotCount) {
       return previous;
+    }
     final next = Map<String, List<GameItem>>.from(previous.itemsByPlayerId);
     next[event.playerId] = [...current, event.item];
     return previous.copyWith(itemsByPlayerId: next);

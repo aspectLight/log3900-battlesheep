@@ -105,18 +105,18 @@ export class RegisterPageComponent {
             return;
         }
 
-        const maxSize = 2 * 1024 * 1024;
+        const maxSize = 4 * 1024 * 1024;
         const validTypes = ['image/jpeg', 'image/png'];
 
         if (!validTypes.includes(file.type)) {
             const extension = file.name.split('.').pop()?.toLowerCase() ?? 'inconnu';
-            this.avatarFileError = `Fichier de type "${extension}" non autorisé. Formats permis : JPG, JPEG, PNG (taille maximale 2 MB).`;
+            this.avatarFileError = `Fichier de type "${extension}" non autorisé. Formats permis : JPG, JPEG, PNG (taille maximale 4 MB).`;
             return;
         }
 
         if (file.size > maxSize) {
             const sizeMb = file.size / (1024 * 1024);
-            this.avatarFileError = `Fichier trop volumineux (${sizeMb.toFixed(2)} MB). Taille maximale autorisée : 2 MB.`;
+            this.avatarFileError = `Fichier trop volumineux (${sizeMb.toFixed(2)} MB). Taille maximale autorisée : 4 MB.`;
             return;
         }
 

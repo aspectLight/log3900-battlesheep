@@ -188,16 +188,21 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                 l10n,
               ),
             ),
-            const SizedBox(height: 20),
-            _buildGameCode(room.roomId, l10n),
-            const SizedBox(height: 20),
-            _buildCurrencyPanel(
-              context,
-              l10n,
-              balance: balance,
-              entryFee: room.entryFee,
+            const SizedBox(height: 5),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildGameCode(room.roomId, l10n),
+                const SizedBox(width: 16),
+                _buildCurrencyPanel(
+                  context,
+                  l10n,
+                  balance: balance,
+                  entryFee: room.entryFee,
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             if (isHost)
               _buildHostActions(
                 context,
@@ -293,7 +298,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: horizontalPadding,
-              vertical: 10,
+              vertical: 5,
             ),
             child: Center(
               child: Row(
@@ -319,13 +324,6 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        if (showQr) ...<Widget>[
-          WaitingRoomJoinQrCorner(
-            roomId: code,
-            semanticLabel: l10n.waitingRoomJoinQrLabel,
-          ),
-          const SizedBox(width: 16),
-        ],
         Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -349,6 +347,13 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
             ),
           ],
         ),
+        if (showQr) ...<Widget>[
+          const SizedBox(width: 16),
+          WaitingRoomJoinQrCorner(
+            roomId: code,
+            semanticLabel: l10n.waitingRoomJoinQrLabel,
+          ),
+        ],
       ],
     );
   }
@@ -441,6 +446,13 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
+            _buildDropInToggle(
+              context,
+              enabled: isDropInDropOutEnabled,
+              onChanged: (_) => _viewModel.toggleDropInDropOut(),
+              label: l10n.waitingRoomDropInDropOut,
+            ),
+            const SizedBox(width: _hostActionSpacing),
             _buildMenuButton(
               context,
               label: isLocked
@@ -451,25 +463,19 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                   : null,
             ),
             const SizedBox(width: _hostActionSpacing),
-            _buildDropInToggle(
-              context,
-              enabled: isDropInDropOutEnabled,
-              onChanged: (_) => _viewModel.toggleDropInDropOut(),
-              label: l10n.waitingRoomDropInDropOut,
-            ),
-            const SizedBox(width: _hostActionSpacing),
-            _buildMenuButton(
-              context,
-              label: l10n.startGame,
-              onPressed:
-                  _viewModel.isStartValid.value ? _requestStartGame : null,
-            ),
-            const SizedBox(width: _hostActionSpacing),
             _buildMenuButton(
               context,
               label: l10n.waitingRoomAddVirtualPlayer,
               onPressed: (isHost && !isLocked && canAddVirtualPlayer)
                   ? _requestAddVirtualPlayerFlow
+                  : null,
+            ),
+            const SizedBox(width: _hostActionSpacing),
+            _buildMenuButton(
+              context,
+              label: l10n.startGame,
+              onPressed: _viewModel.isStartValid.value
+                  ? _requestStartGame
                   : null,
             ),
           ],
