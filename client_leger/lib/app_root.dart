@@ -229,9 +229,6 @@ class _AppRootState extends State<AppRoot> with WidgetsBindingObserver {
 
       if (!isReady) {
         return const MaterialApp(
-          debugShowCheckedModeBanner: false,
-          showPerformanceOverlay: false,
-          debugShowMaterialGrid: false,
           home: Scaffold(body: Center(child: CircularProgressIndicator())),
         );
       }
@@ -250,9 +247,6 @@ class _AppRootState extends State<AppRoot> with WidgetsBindingObserver {
 
       return MaterialApp.router(
         title: 'Eastern Solace',
-        debugShowCheckedModeBanner: false,
-        showPerformanceOverlay: false,
-        debugShowMaterialGrid: false,
         locale: appearance.locale.value,
         theme: _appMaterialTheme(appearance.visualTheme.value),
         routerConfig: _appRouter.config(

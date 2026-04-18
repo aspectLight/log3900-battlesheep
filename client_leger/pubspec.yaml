@@ -59,6 +59,7 @@ dependencies:
     window_manager: ^0.5.1
     qr_flutter: ^4.1.0
     mobile_scanner: ^7.2.0
+    camera: ^0.12.0+1
 
 dev_dependencies:
     auto_route_generator: ^9.0.0

@@ -8,7 +8,7 @@
   "profileAvatarUploadLabel": "Upload photo",
   "profileAvatarCameraLabel": "Take photo",
   "profileAvatarOrUpload": "Or upload a custom photo",
-  "profileAvatarFileTooLarge": "Image must be under 2 MB.",
+  "profileAvatarFileTooLarge": "Image must be under 4 MB.",
   "profileAvatarInvalidFileType": "Only JPG and PNG images are accepted.",
   "profileAvatarUploadFailed": "Avatar upload failed. Your previous avatar was kept.",
   "profileAvatarUploading": "Uploading...",

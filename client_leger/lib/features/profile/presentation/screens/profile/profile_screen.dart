@@ -19,6 +19,7 @@ import '../../../../../core/localisation/core_localizations.dart';
 import '../../../../../core/modal/modal_coordinator.dart';
 import '../../../../../core/modal/modal_intent_sink.dart';
 import '../../../../../core/presentation/widgets/app_background/app_background.dart';
+import '../../../../../core/presentation/widgets/selfie_capture/selfie_capture_page.dart';
 import '../../../../authentication/core/constants/auth_constants.dart';
 import '../../../../authentication/core/enums/auth_validation_error.dart';
 import '../../../../authentication/core/extensions/auth_validation_error_ext.dart';
@@ -46,7 +47,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  static const int _maxAvatarBytes = 2 * 1024 * 1024;
+  static const int _maxAvatarBytes = 4 * 1024 * 1024;
   static const Set<String> _allowedAvatarExtensions = {'jpg', 'jpeg', 'png'};
 
   late final ProfileViewModel _viewModel;
@@ -123,11 +124,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
     try {
-      final picked = await _imagePicker.pickImage(
-        source: source,
-        preferredCameraDevice: CameraDevice.front,
-      );
-      if (picked == null) return;
+      final XFile picked;
+      if (source == ImageSource.camera) {
+        final path = await openSelfieCapture(context);
+        if (path == null) return;
+        picked = XFile(path);
+      } else {
+        final file = await _imagePicker.pickImage(source: source);
+        if (file == null) return;
+        picked = file;
+      }
       final error = await _validateAvatarFile(picked, l10n);
       if (error != null) {
         setState(() {

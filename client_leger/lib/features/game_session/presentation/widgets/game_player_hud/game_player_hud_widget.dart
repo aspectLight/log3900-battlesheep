@@ -280,7 +280,7 @@ class _SectionHeader extends StatelessWidget {
             style: const TextStyle(
               color: Color(0xFFC8C8C8),
               fontSize: 12,
-              letterSpacing: 1.0,
+              letterSpacing: 1,
               fontWeight: FontWeight.w700,
               fontFamily: 'CustomFont',
             ),
@@ -340,12 +340,11 @@ class _StatLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final count = stat.value.clamp(0, 999);
-    final double iconSize = count > 10 ? 14.0 : (count > 6 ? 16.0 : 18.0);
+    final iconSize = count > 10 ? 14.0 : (count > 6 ? 16.0 : 18.0);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             stat.statType.resolveStatLabel(l10n),
@@ -376,7 +375,6 @@ class _StatLine extends StatelessWidget {
                             stat.assetPath,
                             width: iconSize,
                             height: iconSize,
-                            filterQuality: FilterQuality.medium,
                           ),
                         ),
                       ),
@@ -429,7 +427,6 @@ class _DiceCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: Text(
@@ -448,7 +445,6 @@ class _DiceCell extends StatelessWidget {
           asset,
           width: 28,
           height: 28,
-          filterQuality: FilterQuality.medium,
         ),
       ],
     );

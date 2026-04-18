@@ -108,8 +108,8 @@
     "camera_loading": "Initialisation de la caméra...",
     "retake": "Reprendre",
     "use_photo": "Utiliser cette photo",
-    "error_file_type": "Fichier de type \"{{ ext }}\" non autorisé. Formats permis : JPG, JPEG, PNG (taille maximale 2 MB).",
-    "error_file_size": "Fichier trop volumineux ({{ size }} MB). Taille maximale autorisée : 2 MB.",
+    "error_file_type": "Fichier de type \"{{ ext }}\" non autorisé. Formats permis : JPG, JPEG, PNG (taille maximale 4 MB).",
+    "error_file_size": "Fichier trop volumineux ({{ size }} MB). Taille maximale autorisée : 4 MB.",
     "no_changes": "Aucune modification détectée",
     "available_in_shop": "Disponible en boutique (500 pièces)",
     "errors": {
