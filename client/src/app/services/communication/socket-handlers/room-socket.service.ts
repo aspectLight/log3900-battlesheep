@@ -268,7 +268,7 @@ export class RoomSocketService implements ISocketService {
         });
 
         this.socket.on(WaitingRoomEvents.LeaveWaitingRoom, () => {
-            this.roomExistsSubject.next(true);
+            this.resetRoomState();
             this.socketService.navigateToHome();
         });
 
@@ -276,6 +276,9 @@ export class RoomSocketService implements ISocketService {
             const socketId = this.socket.id;
             const inRoster = !!(socketId && gameRoom.players?.some((p) => p.id === socketId));
             if (!inRoster) {
+                this.resetRoomState();
+                this.waitingPlayerService.resetRoom();
+                this.socket.emit(GameRoomEvents.LeaveGameRoom, gameRoom.roomId);
                 this.characterCreationGameStartedLeftOutSubject.next();
                 return;
             }
@@ -304,11 +307,17 @@ export class RoomSocketService implements ISocketService {
         });
 
         this.socket.on(WaitingRoomEvents.RoomCanceled, () => {
+            this.resetRoomState();
             this.roomExistsSubject.next(false);
             this.waitingPlayerService.resetRoom();
         });
 
         this.socket.on(WaitingRoomEvents.PlayerKicked, () => {
+            // Reset room flags without emitting an intermediate false on isKicked$,
+            // then immediately signal the kick so the UI shows the popup.
+            this.roomLockedSubject.next(false);
+            this.roomExistsSubject.next(true);
+            this.reservedAvatarsSubject.next([]);
             this.isKickedSubject.next(true);
         });
 

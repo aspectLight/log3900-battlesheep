@@ -108,8 +108,14 @@ class CharacterCreationSocket {
         break;
       }
     }
-    if (!inRoster && !_gameStartedLeftOutSignal.isClosed) {
-      _gameStartedLeftOutSignal.add(true);
+    if (!inRoster) {
+      final roomId = data['roomId'];
+      if (roomId is String && roomId.isNotEmpty) {
+        _socketService.emit(CharacterCreationSocketEvents.leaveGameRoom, roomId);
+      }
+      if (!_gameStartedLeftOutSignal.isClosed) {
+        _gameStartedLeftOutSignal.add(true);
+      }
     }
   }
 
