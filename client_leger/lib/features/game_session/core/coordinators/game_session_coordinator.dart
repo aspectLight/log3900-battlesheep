@@ -35,6 +35,7 @@ import '../../domain/events/game_events.dart';
 import '../../domain/models/game.dart';
 import '../../domain/services/game_start_board_items_resolver.dart';
 import '../../domain/state/game_board_state.dart';
+import '../../../join_game_session/core/exceptions/join_game_session_failure.dart';
 
 class GameSessionCoordinator
     extends
@@ -70,6 +71,9 @@ class GameSessionCoordinator
 
   @override
   final String scopeName = 'game';
+
+  @override
+  bool get tearDownStaleFeatureScopeOnEntry => true;
 
   @override
   void onScopeCreated(GetIt scope) {
@@ -132,67 +136,92 @@ class GameSessionCoordinator
   ) async {
     final scope = featureScope;
     if (scope == null) return;
-    if (scope.isRegistered<GameSessionData>()) return;
-    scope.registerLazySingleton<GameSessionData>(() => data);
-    final fetchedGame = await gameService.getGame(data.gameId);
-    final resolvedItems = resolveRandomBoardItems(
-      items: fetchedGame.initialItems,
-      board: fetchedGame.board,
-      roomId: data.roomId,
-    );
-    final game = Game(
-      id: fetchedGame.id,
-      name: fetchedGame.name,
-      description: fetchedGame.description,
-      mode: fetchedGame.mode,
-      board: fetchedGame.board,
-      initialItems: resolvedItems,
-      privacy: fetchedGame.privacy,
-      owner: fetchedGame.owner,
-      actionPoints: fetchedGame.actionPoints,
-      modificationDate: fetchedGame.modificationDate,
-    );
-    scope.registerLazySingleton<Game>(() => game);
-    scope.registerLazySingleton<Board>(() => game.board);
-    final dropInSync = getIt<DropInJoinSyncHolder>();
-    final effectiveHostId = data.gameRoomHostId.isNotEmpty
-        ? data.gameRoomHostId
-        : dropInSync.gameRoomHostId;
-    scope.registerLazySingleton<GameMetadataRepository>(
-      () => GameMetadataRepository(
-        reducer: _gameMetadataStateReducer,
+    try {
+      if (scope.isRegistered<GameSessionData>()) return;
+      final fetchedGame = await gameService.getGame(data.gameId);
+      // Drop-in (and similar paths) pass empty title/description; the UI reads
+      // [GameSessionData], not the domain [Game], so fill from the REST payload.
+      final sessionData = data.copyWith(
+        gameName: data.gameName.isNotEmpty ? data.gameName : fetchedGame.name,
+        gameDescription: data.gameDescription.isNotEmpty
+            ? data.gameDescription
+            : fetchedGame.description,
+      );
+      scope.registerLazySingleton<GameSessionData>(() => sessionData);
+      final resolvedItems = resolveRandomBoardItems(
+        items: fetchedGame.initialItems,
+        board: fetchedGame.board,
         roomId: data.roomId,
-        isCTF: game.isCTF,
-        initialHostId: effectiveHostId.isNotEmpty
-            ? effectiveHostId
-            : (data.isHost ? data.socketId : ''),
-      ),
-    );
-    final shouldEmitPlayGame = effectiveHostId.isNotEmpty
-        ? data.socketId == effectiveHostId
-        : data.isHost;
-    registerGameSessionScope(
-      scope,
-      getIt,
-      roomId: data.roomId,
-      socketId: data.socketId,
-      isHost: shouldEmitPlayGame,
-    );
-    final modeStr = game.isCTF ? 'CTF' : 'Classique';
-    final startDate = await _gameHistoryRepository.startGameHistory(modeStr);
-    if (startDate.isNotEmpty) {
-      scope.get<GameHistoryRecordHolder>().startDate = startDate;
+      );
+      final game = Game(
+        id: fetchedGame.id,
+        name: fetchedGame.name,
+        description: fetchedGame.description,
+        mode: fetchedGame.mode,
+        board: fetchedGame.board,
+        initialItems: resolvedItems,
+        privacy: fetchedGame.privacy,
+        owner: fetchedGame.owner,
+        actionPoints: fetchedGame.actionPoints,
+        modificationDate: fetchedGame.modificationDate,
+      );
+      scope.registerLazySingleton<Game>(() => game);
+      scope.registerLazySingleton<Board>(() => game.board);
+      final dropInSync = getIt<DropInJoinSyncHolder>();
+      final effectiveHostId = data.gameRoomHostId.isNotEmpty
+          ? data.gameRoomHostId
+          : dropInSync.gameRoomHostId;
+      scope.registerLazySingleton<GameMetadataRepository>(
+        () => GameMetadataRepository(
+          reducer: _gameMetadataStateReducer,
+          roomId: data.roomId,
+          isCTF: game.isCTF,
+          initialHostId: effectiveHostId.isNotEmpty
+              ? effectiveHostId
+              : (data.isHost ? data.socketId : ''),
+        ),
+      );
+      final shouldEmitPlayGame = effectiveHostId.isNotEmpty
+          ? data.socketId == effectiveHostId
+          : data.isHost;
+      registerGameSessionScope(
+        scope,
+        getIt,
+        roomId: data.roomId,
+        socketId: data.socketId,
+        isHost: shouldEmitPlayGame,
+      );
+      final modeStr = game.isCTF ? 'CTF' : 'Classique';
+      final startDate = await _gameHistoryRepository.startGameHistory(modeStr);
+      if (startDate.isNotEmpty) {
+        scope.get<GameHistoryRecordHolder>().startDate = startDate;
+      }
+      bootstrapGameSessionScope(
+        scope,
+        roomId: data.roomId,
+        isHost: shouldEmitPlayGame,
+      );
+      _applyDropInJoinSyncIfNeeded(scope, data.roomId);
+      appTransitionEventBus.fire(const GameSessionEntryAppEvent.loaded());
+    } on Object catch (e, st) {
+      LogService.e('[GameSessionCoordinator] onCompletedImpl failed', e, st);
+      getIt<DropInJoinSyncHolder>().clear();
+      final sessionScope = sessionScopeManager.currentScope;
+      if (sessionScope != null) {
+        await sessionScope.dropScope(scopeName);
+      }
+      markFeatureScopeReleased();
+      onScopeDropped();
+      notificationCoordinator.addIntent(
+        const JoinGameSessionFailureNotificationIntent(
+          UnknownJoinGameSessionFailure('Game session bootstrap failed'),
+        ),
+      );
+      appNavigator.request(ExitToMainMenu());
     }
-    bootstrapGameSessionScope(
-      scope,
-      roomId: data.roomId,
-      isHost: shouldEmitPlayGame,
-    );
-    _applyDropInJoinSyncIfNeeded(scope);
-    appTransitionEventBus.fire(const GameSessionEntryAppEvent.loaded());
   }
 
-  void _applyDropInJoinSyncIfNeeded(GetIt scope) {
+  void _applyDropInJoinSyncIfNeeded(GetIt scope, String roomId) {
     final holder = getIt<DropInJoinSyncHolder>();
     final raw = holder.playersRaw;
     if (raw == null || raw.isEmpty) {
@@ -221,9 +250,14 @@ class GameSessionCoordinator
           actionPoints: game.actionPoints,
         );
         final rebuiltGame = gameDto.toEntity();
+        final dropInResolvedItems = resolveRandomBoardItems(
+          items: rebuiltGame.initialItems,
+          board: rebuiltGame.board,
+          roomId: roomId,
+        );
         scope.get<GameBoardRepository>().replaceBoardAndItems(
           board: rebuiltGame.board,
-          items: rebuiltGame.initialItems,
+          items: dropInResolvedItems,
         );
       } on Object catch (_) {
         unawaited(Future<void>.value());

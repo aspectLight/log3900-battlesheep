@@ -2,6 +2,7 @@ import 'package:fpdart/fpdart.dart';
 
 import '../config/env_config.dart';
 import 'preset_profile_avatar_data_url.dart';
+import 'profile_avatar_cross_client.dart';
 import '../../features/authentication/core/interfaces/auth_repository.dart';
 
 Future<void> mergeProfileAvatarFieldsFromAuth(
@@ -22,8 +23,12 @@ Future<void> mergeProfileAvatarFieldsFromAuth(
               url.startsWith('data:')
           ? url
           : EnvConfig.resolveAvatarUrl(url);
-      playerPayload['profileAvatarUrl'] =
-          absolute.isNotEmpty ? absolute : url;
+      final out = normalizeProfileAvatarUrlForCrossClient(
+        absolute.isNotEmpty ? absolute : url,
+      );
+      if (out != null && out.isNotEmpty) {
+        playerPayload['profileAvatarUrl'] = out;
+      }
     } else {
       playerPayload.remove('profileAvatarUrl');
       // Preset-only profile: embed bundled image so web clients can use

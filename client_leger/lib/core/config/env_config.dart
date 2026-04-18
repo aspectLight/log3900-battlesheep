@@ -43,6 +43,13 @@ class EnvConfig {
       return _appendAvatarCacheBust(trimmed, cacheBust);
     }
 
+    if (trimmed.startsWith('/') && baseOk) {
+      return _appendAvatarCacheBust(
+        apiBaseUri.resolve(trimmed).toString(),
+        cacheBust,
+      );
+    }
+
     final base = baseOk ? '$baseUrl$trimmed' : trimmed;
     return _appendAvatarCacheBust(base, cacheBust);
   }

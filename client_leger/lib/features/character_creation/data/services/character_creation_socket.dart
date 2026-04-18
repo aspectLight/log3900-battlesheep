@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:fpdart/fpdart.dart';
 
@@ -49,7 +50,6 @@ class CharacterCreationSocket {
 
   final _reservedCharactersController =
       ReplayLatestBroadcastController<UpdateCharacterReservedPayloadDto>();
-  int _reservedUpdateSeq = 0;
 
   final _avatarReservationFailedController =
       StreamController<ReserveCharacterFailure>.broadcast();
@@ -76,7 +76,6 @@ class CharacterCreationSocket {
         .listen((data) {
           final payload = UpdateCharacterReservedPayloadDto.fromObject(data);
           if (!_reservedCharactersController.isClosed) {
-            _reservedUpdateSeq++;
             _reservedCharactersController.add(payload);
           }
         });
@@ -145,8 +144,6 @@ class CharacterCreationSocket {
       unawaited(gameCreatedSub.cancel());
       _gameRoomCreatedSub = null;
     }
-    _socketService.off(CharacterCreationSocketEvents.updateAvatarReserved);
-    _socketService.off(CharacterCreationSocketEvents.avatarReservationFailed);
   }
 
   void requestReservedCharacters(GetReservedCharactersCommand command) {
@@ -160,13 +157,24 @@ class CharacterCreationSocket {
   Future<List<ReservedCharacterEvent>> fetchReservedCharacters(
     GetReservedCharactersCommand command,
   ) {
-    final beforeSeq = _reservedUpdateSeq;
-    requestReservedCharacters(command);
-
-    return reservedCharactersPayloadStream
-        .skipWhile((_) => _reservedUpdateSeq == beforeSeq)
+    _reservedCharactersController.clearLatest();
+    final future = reservedCharactersPayloadStream
         .map((payload) => payload.toReservedCharacterEventList())
-        .first;
+        .first
+        .timeout(const Duration(seconds: 10));
+    requestReservedCharacters(command);
+    return future;
+  }
+
+  Map<String, dynamic>? _normalizeSocketMap(Object? raw) {
+    if (raw == null || raw is! Map) return null;
+    try {
+      return Map<String, dynamic>.from(
+        jsonDecode(jsonEncode(raw)) as Map<dynamic, dynamic>,
+      );
+    } on Object {
+      return null;
+    }
   }
 
   Future<String> generateRoomCode() async {
@@ -241,14 +249,15 @@ class CharacterCreationSocket {
       CharacterCreationSocketEvents.joinGameRoom,
       payload,
     );
-    if (raw is! Map<String, dynamic>) {
+    final ack = _normalizeSocketMap(raw);
+    if (ack == null) {
       return left(
         const UnknownJoinGameSessionFailure('Invalid join game room response'),
       );
     }
-    final success = raw['success'] as bool? ?? false;
+    final success = ack['success'] as bool? ?? false;
     if (!success) {
-      final message = raw['error'] as String? ?? 'Unknown error';
+      final message = ack['error'] as String? ?? 'Unknown error';
       return left(_mapJoinGameRoomError(message));
     }
     final response = await responseFuture.timeout(
@@ -260,26 +269,24 @@ class CharacterCreationSocket {
         const UnknownJoinGameSessionFailure('Missing joinGameRoomResponse'),
       );
     }
-    if (response is! Map<String, dynamic>) {
+    final responseMap = _normalizeSocketMap(response);
+    if (responseMap == null) {
       return left(
         const UnknownJoinGameSessionFailure('Invalid joinGameRoomResponse'),
       );
     }
-    final ok = response['success'] as bool? ?? false;
+    final ok = responseMap['success'] as bool? ?? false;
     if (!ok) {
-      final message = response['error'] as String? ?? 'Unknown error';
+      final message = responseMap['error'] as String? ?? 'Unknown error';
       return left(_mapJoinGameRoomError(message));
     }
-    final gameRoom = response['gameRoom'];
-    if (gameRoom is! Map<String, dynamic>) {
+    final gameRoom = _normalizeSocketMap(responseMap['gameRoom']);
+    if (gameRoom == null) {
       return left(
         const UnknownJoinGameSessionFailure('Invalid game room payload'),
       );
     }
-    final currentBoardRaw = response['currentBoard'];
-    final currentBoard = currentBoardRaw is Map<String, dynamic>
-        ? currentBoardRaw
-        : null;
+    final currentBoard = _normalizeSocketMap(responseMap['currentBoard']);
     final roomId = gameRoom['roomId'] as String? ?? command.roomId;
     final gameId = gameRoom['gameId'] as String? ?? '';
     if (gameId.isEmpty) {
@@ -287,9 +294,10 @@ class CharacterCreationSocket {
         const UnknownJoinGameSessionFailure('Missing game id in response'),
       );
     }
-    final currentPlayerId = response['currentPlayerId'] as String?;
-    final turnTimeRemaining = (response['turnTimeRemaining'] as num?)?.toInt();
-    final turnCountdownPhase = response['turnCountdownPhase'] as String?;
+    final currentPlayerId = responseMap['currentPlayerId'] as String?;
+    final turnTimeRemaining =
+        (responseMap['turnTimeRemaining'] as num?)?.toInt();
+    final turnCountdownPhase = responseMap['turnCountdownPhase'] as String?;
     _dropInJoinSyncHolder.setFromJoinResponse(
       gameRoom,
       currentBoard,

@@ -46,4 +46,9 @@ sealed class CharacterCreationExitAppEvent
   const factory CharacterCreationExitAppEvent.transitionToWaitingRoom({
     required String roomCode,
   }) = CharacterCreationTransitionToWaitingRoom;
+
+  /// Drop-in joins an in-progress game: release this feature scope without
+  /// navigating — [GameSessionEntryAppEvent] already drives the transition.
+  const factory CharacterCreationExitAppEvent.handedOffToGameSession() =
+      CharacterCreationHandedOffToGameSession;
 }
