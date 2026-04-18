@@ -15,7 +15,7 @@ class GameDebugShakeSideEffect with DisposableSideEffect {
   final GameMetadataRepository _metadataRepository;
   final GameDebugRepository _debugRepository;
 
-  int _horizontalShakeCount = 0;
+  int _shakeCount = 0;
   DateTime? _firstShakeInSequence;
   DateTime? _lastShakeTime;
 
@@ -27,18 +27,21 @@ class GameDebugShakeSideEffect with DisposableSideEffect {
        _metadataRepository = metadataRepository,
        _debugRepository = debugRepository {
     if (!Platform.isAndroid && !Platform.isIOS) return;
-    // Linear acceleration (gravity removed) — raw accelerometer often keeps |y|
-    // above the horizontal dead zone unless the phone is perfectly flat.
-    final sub = userAccelerometerEventStream().listen(_onUserAccelerometerEvent);
+    // Raw accelerometer (same as chat) so the same physical motion hits similar values.
+    final sub = accelerometerEventStream().listen(_onAccelerometerEvent);
     trackSubscription(sub);
   }
 
-  void _onUserAccelerometerEvent(UserAccelerometerEvent event) {
+  void _onAccelerometerEvent(AccelerometerEvent event) {
     final now = DateTime.now();
-    final isHorizontalShake =
-        event.x.abs() > GameDebugConstants.shakeThresholdHorizontal &&
-        event.y.abs() < GameDebugConstants.shakeDeadZone;
-    if (!isHorizontalShake) return;
+    // App is landscape-locked; screen top-to-bottom maps to device X, in-plane
+    // “horizontal” on screen to device Y.
+    final alongScreenVertical = event.x.abs();
+    final alongScreenHorizontal = event.y.abs();
+    final isVerticalOnScreenShake =
+        alongScreenVertical > GameDebugConstants.shakeThresholdVertical &&
+        alongScreenHorizontal < GameDebugConstants.shakeDeadZone;
+    if (!isVerticalOnScreenShake) return;
     if (_lastShakeTime != null &&
         now.difference(_lastShakeTime!).inMilliseconds <
             GameDebugConstants.shakeMinIntervalMs) {
@@ -51,28 +54,28 @@ class GameDebugShakeSideEffect with DisposableSideEffect {
       if (kDebugMode) {
         debugPrint(
           '[DebugShake] sequence reset (>${GameDebugConstants.shakeSequenceWindowMs}ms) '
-          'had $_horizontalShakeCount/3',
+          'had $_shakeCount/3',
         );
       }
       _resetSequence();
       _firstShakeInSequence = now;
     }
-    _horizontalShakeCount++;
+    _shakeCount++;
     if (kDebugMode) {
       debugPrint(
-        '[DebugShake] horizontal hit $_horizontalShakeCount/'
+        '[DebugShake] vertical-on-screen hit $_shakeCount/'
         '${GameDebugConstants.shakesRequiredCount} '
         '(x=${event.x.toStringAsFixed(1)} y=${event.y.toStringAsFixed(1)})',
       );
     }
-    if (_horizontalShakeCount >= GameDebugConstants.shakesRequiredCount) {
+    if (_shakeCount >= GameDebugConstants.shakesRequiredCount) {
       _tryToggleDebugMode();
       _resetSequence();
     }
   }
 
   void _resetSequence() {
-    _horizontalShakeCount = 0;
+    _shakeCount = 0;
     _firstShakeInSequence = null;
   }
 

@@ -1,8 +1,9 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../core/extensions/tile_type_ext.dart';
+import '../../../../core/enums/item_type.dart';
 import '../../core/enums/tile_orientation.dart';
+import '../../core/extensions/tile_type_ext.dart';
 import '../models/game_board_position.dart';
 import '../models/game_item.dart';
 import '../models/tile.dart';
@@ -123,6 +124,20 @@ class GameBoardState with _$GameBoardState {
   Option<GameItem> itemAtPathDestination(List<GameBoardPosition> path) {
     if (path.isEmpty) return const Option.none();
     return Option.fromNullable(items[path.last]);
+  }
+
+  /// Same rule as Angular path service getSelectedPathAsCoords: the player
+  /// stops on the first cell along [path] (after the start cell) that holds
+  /// a non-spawn item, so pickups match the route rather than the final click.
+  List<GameBoardPosition> pathForMovement(List<GameBoardPosition> path) {
+    if (path.length <= 1) return path;
+    for (var i = 1; i < path.length; i++) {
+      final item = items[path[i]];
+      if (item != null && item.type != ItemType.spawnPoint) {
+        return path.sublist(0, i + 1);
+      }
+    }
+    return path;
   }
 
   factory GameBoardState.scopedInitial({

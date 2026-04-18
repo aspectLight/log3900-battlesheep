@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../core/enums/board_interaction_mode.dart';
@@ -111,6 +112,9 @@ class GameBoardViewModel {
     }
     if (isSelectionActive.value) {
       if (_debugRepository.state.value.isDebugMode) {
+        if (_debugTeleportPlayerUseCase.execute(cell.x, cell.y)) {
+          return;
+        }
         _boardRepository.setSelectedPath([]);
         return;
       }
@@ -122,12 +126,14 @@ class GameBoardViewModel {
       }
       final path = reachablePathsByDestination.value[pos];
       if (path == null || path.isEmpty) return;
-      final currentPath = _boardRepository.state.value.selectedPathCoords;
-      final isSecondTapOnSameTile =
+      final boardState = _boardRepository.state.value;
+      final currentPath = boardState.selectedPathCoords;
+      final effectivePath = boardState.pathForMovement(path);
+      final isSecondTapConfirm =
           currentPath.isNotEmpty &&
-          currentPath.last.x == pos.x &&
-          currentPath.last.y == pos.y;
-      if (isSecondTapOnSameTile) {
+          ( (currentPath.last.x == pos.x && currentPath.last.y == pos.y) ||
+              listEquals(currentPath, effectivePath) );
+      if (isSecondTapConfirm) {
         _movePlayerUseCase.execute();
         return;
       }
@@ -138,6 +144,10 @@ class GameBoardViewModel {
   void handleCellSecondaryTap(GameBoardCellUi cell) {
     if (isMoving.value) return;
     _gameBoardSelectedCellRepository.setSelectedCell(cell.x, cell.y);
+    if (_debugRepository.state.value.isDebugMode &&
+        _debugTeleportPlayerUseCase.execute(cell.x, cell.y)) {
+      return;
+    }
     _interactionRepository.toggleSelectionMode();
   }
 

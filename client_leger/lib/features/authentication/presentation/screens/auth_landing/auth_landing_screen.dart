@@ -58,7 +58,7 @@ class AuthLandingScreen extends StatelessWidget {
           ),
           Positioned(
             top: 16,
-            left: 16,
+            right: 16,
             child: Watch((context) {
               final current = appearance.locale.value.languageCode;
               return Row(

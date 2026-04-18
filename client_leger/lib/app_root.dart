@@ -32,6 +32,47 @@ import 'features/waiting_room/core/localisation/waiting_room_localizations.dart'
 import 'routing/app_router.dart';
 import 'routing/app_router_observer.dart';
 
+/// [MaterialApp] installs a debug [DefaultTextStyle] (red text, double yellow
+/// underline) above your content. Descendant [Text] merges ambient styles with
+/// the theme; **null** fields in the theme keep the debug underline metadata, and
+/// `copyWith(decoration: none)` alone still leaves decoration color/style from
+/// the previous style.
+///
+/// We merge an explicit patch and use [DefaultTextStyle.merge] in
+/// `MaterialApp.builder` so the debug fallback cannot survive a merge.
+TextStyle _stripDebugUnderlinePatch() => const TextStyle(
+      decoration: TextDecoration.none,
+      decorationColor: Color(0x00000000),
+    );
+
+TextTheme _stripMaterialDebugTextDecoration(TextTheme base) {
+  final patch = _stripDebugUnderlinePatch();
+  TextStyle clear(TextStyle? style) {
+    if (style == null) {
+      return patch;
+    }
+    return style.merge(patch);
+  }
+
+  return TextTheme(
+    displayLarge: clear(base.displayLarge),
+    displayMedium: clear(base.displayMedium),
+    displaySmall: clear(base.displaySmall),
+    headlineLarge: clear(base.headlineLarge),
+    headlineMedium: clear(base.headlineMedium),
+    headlineSmall: clear(base.headlineSmall),
+    titleLarge: clear(base.titleLarge),
+    titleMedium: clear(base.titleMedium),
+    titleSmall: clear(base.titleSmall),
+    bodyLarge: clear(base.bodyLarge),
+    bodyMedium: clear(base.bodyMedium),
+    bodySmall: clear(base.bodySmall),
+    labelLarge: clear(base.labelLarge),
+    labelMedium: clear(base.labelMedium),
+    labelSmall: clear(base.labelSmall),
+  );
+}
+
 ThemeData _appMaterialTheme(AppVisualTheme visual) {
   final ColorScheme scheme;
   final AppInteractionColors interaction;
@@ -73,7 +114,7 @@ ThemeData _appMaterialTheme(AppVisualTheme visual) {
 
   final featureColors = AppFeatureColors.fromVisualTheme(visual);
 
-  return ThemeData(
+  final base = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
     colorScheme: scheme,
@@ -104,12 +145,17 @@ ThemeData _appMaterialTheme(AppVisualTheme visual) {
         color: scheme.onSurface,
         fontFamily: 'CustomFont',
         fontSize: 16,
+        decoration: TextDecoration.none,
       ),
     ),
     dividerTheme: DividerThemeData(
       color: interaction.outline.withValues(alpha: 0.45),
       thickness: 1,
     ),
+  );
+  return base.copyWith(
+    textTheme: _stripMaterialDebugTextDecoration(base.textTheme),
+    primaryTextTheme: _stripMaterialDebugTextDecoration(base.primaryTextTheme),
   );
 }
 
@@ -236,42 +282,47 @@ class _AppRootState extends State<AppRoot> with WidgetsBindingObserver {
         supportedLocales: CoreLocalizations.supportedLocales,
         builder: (context, child) {
           _scheduleNavAssetPrecacheOnce();
-          return Watch((context) {
-            final isNavigating = _loadingOverlayViewModel.isNavigating.value;
+          final theme = Theme.of(context);
+          final body = theme.textTheme.bodyMedium!.merge(_stripDebugUnderlinePatch());
+          return DefaultTextStyle.merge(
+            style: body,
+            child: Watch((context) {
+              final isNavigating = _loadingOverlayViewModel.isNavigating.value;
 
-            // While navigating: only [LoadingOverlay] paints (parallax + spinner).
-            // Route is [Offstage] so no page UI is shown. Do not disable [TickerMode]
-            // on the router during overlay: that pauses the route fade; when the
-            // overlay hides the transition restarts and the previous route flashes.
-            // Notification/modal stay in the tree with [Offstage] to avoid jank.
-            return Stack(
-              fit: StackFit.expand,
-              children: [
-                Offstage(
-                  offstage: isNavigating,
-                  child: child ?? const SizedBox.shrink(),
-                ),
-                Positioned.fill(
-                  child: Offstage(
+              // While navigating: only [LoadingOverlay] paints (parallax + spinner).
+              // Route is [Offstage] so no page UI is shown. Do not disable [TickerMode]
+              // on the router during overlay: that pauses the route fade; when the
+              // overlay hides the transition restarts and the previous route flashes.
+              // Notification/modal stay in the tree with [Offstage] to avoid jank.
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Offstage(
                     offstage: isNavigating,
-                    child: const NotificationOverlay(),
+                    child: child ?? const SizedBox.shrink(),
                   ),
-                ),
-                Positioned.fill(
-                  child: Offstage(
-                    offstage: isNavigating,
-                    child: const ModalOverlay(),
-                  ),
-                ),
-                if (isNavigating)
-                  const Positioned.fill(
-                    child: RepaintBoundary(
-                      child: LoadingOverlay(),
+                  Positioned.fill(
+                    child: Offstage(
+                      offstage: isNavigating,
+                      child: const NotificationOverlay(),
                     ),
                   ),
-              ],
-            );
-          });
+                  Positioned.fill(
+                    child: Offstage(
+                      offstage: isNavigating,
+                      child: const ModalOverlay(),
+                    ),
+                  ),
+                  if (isNavigating)
+                    const Positioned.fill(
+                      child: RepaintBoundary(
+                        child: LoadingOverlay(),
+                      ),
+                    ),
+                ],
+              );
+            }),
+          );
         },
       );
     });
