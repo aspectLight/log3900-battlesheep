@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/constants/auth_avatar_assets.dart';
 import '../../../../../core/enums/auth_avatar.dart';
 import '../../../core/localisation/auth_localizations.dart';
@@ -87,7 +88,7 @@ class AvatarPicker extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(
                       color: isSelected
-                          ? const Color(0xFFC60D0D)
+                          ? kAuthFieldFocusBorder
                           : const Color(0xFF333333),
                       width: 2,
                     ),
@@ -120,14 +121,14 @@ class AvatarPicker extends StatelessWidget {
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
                 color: hasCustomAvatarSelected
-                    ? const Color(0xFFC60D0D)
+                    ? kAuthFieldFocusBorder
                     : const Color(0xFF444444),
                 width: 2,
               ),
               boxShadow: hasCustomAvatarSelected
-                  ? const [
+                  ? [
                       BoxShadow(
-                        color: Color(0x66C60D0D),
+                        color: kAuthFieldFocusBorder.withValues(alpha: 0.4),
                         blurRadius: 8,
                         spreadRadius: 1,
                       ),

@@ -43,7 +43,7 @@ class _DeferredSelectGameSessionBoardPreviewState
   @override
   Widget build(BuildContext context) {
     if (!_ready) {
-      return const ColoredBox(color: Color(0xFF2A2A2A));
+      return const ColoredBox(color: Color(0xFF2B2B2B));
     }
     return SelectGameSessionBoardPreviewWidget(
       boardSize: widget.boardSize,
@@ -108,28 +108,39 @@ class _SelectGameSessionBoardPreviewWidgetState
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final side = constraints.maxWidth < constraints.maxHeight
+        final dpr = MediaQuery.devicePixelRatioOf(context);
+        final rawMax = constraints.maxWidth < constraints.maxHeight
             ? constraints.maxWidth
             : constraints.maxHeight;
-        if (side <= 0) {
+        if (rawMax <= 0) {
           return const SizedBox.shrink();
         }
-        final cellSize = side / _boardUi.size;
-        return SizedBox(
-          width: side,
-          height: side,
-          child: ClipRect(
-            child: GridView.count(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: _boardUi.size,
-              children: List.generate(_boardUi.size * _boardUi.size, (index) {
-                final x = index ~/ _boardUi.size;
-                final y = index % _boardUi.size;
-                final cell = _boardUi.matrix[x][y];
-                return _CellUiRenderer(cell: cell, cellSize: cellSize);
-              }),
+        // Match [GameBoardWidget]: snap to device pixels so cell sizes stay integral
+        // and hairline gaps from fractional layout do not appear between tiles.
+        final maxAvailable = (rawMax * dpr).floor() / dpr;
+        final cellSize = (maxAvailable / _boardUi.size).floorToDouble();
+        final boardPixelSide = cellSize * _boardUi.size;
+        return ClipRect(
+          child: SizedBox(
+            width: boardPixelSide,
+            height: boardPixelSide,
+            child: ColoredBox(
+              color: const Color(0xFF2B2B2B),
+              child: GridView.builder(
+                padding: EdgeInsets.zero,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _boardUi.size * _boardUi.size,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: _boardUi.size,
+                  mainAxisExtent: cellSize,
+                ),
+                itemBuilder: (context, index) {
+                  final x = index ~/ _boardUi.size;
+                  final y = index % _boardUi.size;
+                  final cell = _boardUi.matrix[x][y];
+                  return _CellUiRenderer(cell: cell, cellSize: cellSize);
+                },
+              ),
             ),
           ),
         );
@@ -153,24 +164,9 @@ class _CellUiRenderer extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset(
-              GameBoardUiTile(
-                sourceTile: cell.tile,
-                displayType: cell.displayTileType.fold(
-                  () => cell.tile.type,
-                  (t) => t,
-                ),
-                orientation: cell.tileOrientation,
-                doorState: switch (cell.tile) {
-                  DoorTile(:final state) => fp.Option.of(state),
-                  _ => const fp.Option<TileState>.none(),
-                },
-                diagonalSuffix: cell.diagonalSuffix,
-                cellX: cell.x,
-                cellY: cell.y,
-              ).imagePath,
-              fit: BoxFit.fill,
-              errorBuilder: (context, error, stackTrace) => Image.asset(
+            Transform.scale(
+              scale: 1.01,
+              child: Image.asset(
                 GameBoardUiTile(
                   sourceTile: cell.tile,
                   displayType: cell.displayTileType.fold(
@@ -185,8 +181,26 @@ class _CellUiRenderer extends StatelessWidget {
                   diagonalSuffix: cell.diagonalSuffix,
                   cellX: cell.x,
                   cellY: cell.y,
-                ).imagePathBase,
+                ).imagePath,
                 fit: BoxFit.fill,
+                errorBuilder: (context, error, stackTrace) => Image.asset(
+                  GameBoardUiTile(
+                    sourceTile: cell.tile,
+                    displayType: cell.displayTileType.fold(
+                      () => cell.tile.type,
+                      (t) => t,
+                    ),
+                    orientation: cell.tileOrientation,
+                    doorState: switch (cell.tile) {
+                      DoorTile(:final state) => fp.Option.of(state),
+                      _ => const fp.Option<TileState>.none(),
+                    },
+                    diagonalSuffix: cell.diagonalSuffix,
+                    cellX: cell.x,
+                    cellY: cell.y,
+                  ).imagePathBase,
+                  fit: BoxFit.fill,
+                ),
               ),
             ),
             switch (cell.item) {

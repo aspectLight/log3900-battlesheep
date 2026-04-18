@@ -10,5 +10,6 @@ extension WaitingRoomDtoToModel on WaitingRoomDto {
     isLocked: isLocked,
     dropInDropOut: dropInDropOut,
     entryFee: entryFee,
+    friendsOnly: friendsOnly,
   );
 }

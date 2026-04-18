@@ -6,6 +6,8 @@
     right: 0;
     bottom: 0;
     overflow: hidden;
+    --auth-input-focus-border: #9333ea;
+    --auth-input-focus-glow: rgba(168, 85, 247, 0.55);
 }
 
 .lang-switcher {
@@ -154,11 +156,11 @@
 }
 
 .login-form input:focus {
-    border-color: var(--theme-border-focus);
+    border-color: var(--auth-input-focus-border);
     box-shadow:
         0 0 0 2px var(--theme-outline-strong),
         0 0 0 6px var(--theme-outline-soft),
-        0 0 10px 3px var(--theme-border-focus-shadow) inset;
+        0 0 10px 3px var(--auth-input-focus-glow) inset;
 }
 
 .password-wrapper {
@@ -252,7 +254,7 @@
 }
 
 .register-link a {
-    color: var(--theme-error);
+    color: var(--auth-input-focus-border);
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s;

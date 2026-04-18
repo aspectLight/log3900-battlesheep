@@ -6,6 +6,8 @@
     right: 0;
     bottom: 0;
     overflow: hidden;
+    --auth-input-focus-border: #9333ea;
+    --auth-input-focus-glow: rgba(168, 85, 247, 0.55);
 }
 
 .container {
@@ -164,11 +166,11 @@
 }
 
 .profile-form input:focus {
-    border-color: var(--theme-border-focus);
+    border-color: var(--auth-input-focus-border);
     box-shadow:
         0 0 0 2px var(--theme-outline-strong),
         0 0 0 6px var(--theme-outline-soft),
-        0 0 10px 3px var(--theme-border-focus-shadow) inset;
+        0 0 10px 3px var(--auth-input-focus-glow) inset;
 }
 
 .profile-form .error {
@@ -199,7 +201,7 @@
     position: relative;
 
     &:hover {
-        border-color: var(--theme-border-focus);
+        border-color: var(--auth-input-focus-border);
     }
 
     &.premium-locked {
@@ -215,8 +217,8 @@
 }
 
 .avatar-btn.selected {
-    border-color: var(--theme-border-focus);
-    box-shadow: 0 0 8px 2px var(--theme-border-focus-shadow);
+    border-color: var(--auth-input-focus-border);
+    box-shadow: 0 0 8px 2px var(--auth-input-focus-glow);
 }
 
 .avatar-img {

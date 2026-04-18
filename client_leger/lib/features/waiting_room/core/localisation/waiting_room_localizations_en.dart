@@ -136,6 +136,9 @@ class WaitingRoomLocalizationsEn extends WaitingRoomLocalizations {
   String get waitingRoomEntryFeeLabel => 'Entry fee:';
 
   @override
+  String get waitingRoomFriendsOnlyLabel => 'Friends only:';
+
+  @override
   String get gameNotFound => 'Game not found';
 
   @override

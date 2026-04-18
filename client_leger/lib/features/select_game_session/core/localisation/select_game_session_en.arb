@@ -8,6 +8,7 @@
   "createGameNameHeader": "Name",
   "createGameSizeHeader": "Size",
   "createGameModeHeader": "Mode",
+  "createGameOwnerHeader": "Owner",
   "createGameLastModifiedHeader": "Last modified",
   "createGameModeClassic": "Classic",
   "createGameModeCtf": "Capture the flag",

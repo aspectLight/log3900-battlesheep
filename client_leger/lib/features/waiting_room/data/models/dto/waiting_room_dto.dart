@@ -15,6 +15,8 @@ class WaitingRoomDto {
   final bool dropInDropOut;
   @JsonKey(defaultValue: 0)
   final int entryFee;
+  @JsonKey(defaultValue: false)
+  final bool friendsOnly;
 
   const WaitingRoomDto({
     required this.roomId,
@@ -23,6 +25,7 @@ class WaitingRoomDto {
     required this.isLocked,
     required this.dropInDropOut,
     this.entryFee = 0,
+    this.friendsOnly = false,
   });
 
   factory WaitingRoomDto.fromJson(Map<String, dynamic> json) =>

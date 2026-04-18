@@ -34,6 +34,9 @@ class SelectGameSessionLocalizationsEn extends SelectGameSessionLocalizations {
   String get createGameModeHeader => 'Mode';
 
   @override
+  String get createGameOwnerHeader => 'Owner';
+
+  @override
   String get createGameLastModifiedHeader => 'Last modified';
 
   @override

@@ -69,6 +69,8 @@ class JoinRoomDto {
     required this.players,
     required this.isLocked,
     required this.dropInDropOut,
+    this.entryFee = 0,
+    this.friendsOnly = false,
   });
 
   @JsonKey(name: 'roomId')
@@ -78,6 +80,10 @@ class JoinRoomDto {
   final bool isLocked;
   @JsonKey(defaultValue: false)
   final bool dropInDropOut;
+  @JsonKey(defaultValue: 0)
+  final int entryFee;
+  @JsonKey(defaultValue: false)
+  final bool friendsOnly;
 
   factory JoinRoomDto.fromJson(Map<String, dynamic> json) =>
       _$JoinRoomDtoFromJson(json);

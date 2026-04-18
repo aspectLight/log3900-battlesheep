@@ -8,6 +8,7 @@ import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/constants/ui_assets.dart';
 import '../../../../../core/presentation/widgets/selfie_capture/selfie_capture_page.dart';
 import '../../../core/constants/auth_constants.dart';
@@ -301,7 +302,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: Text(
               l10n.signIn,
               style: const TextStyle(
-                color: Color(0xFFC60D0D),
+                color: kAuthFieldFocusGlow,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'CustomFont',
@@ -541,7 +542,7 @@ class _AuthTextFieldState extends State<_AuthTextField> {
             borderRadius: BorderRadius.circular(4),
             border: Border.all(
               color: isFocused
-                  ? const Color(0xFFC60D0D)
+                  ? kAuthFieldFocusBorder
                   : const Color(0xFF333333),
               width: 1.5,
             ),
@@ -557,7 +558,7 @@ class _AuthTextFieldState extends State<_AuthTextField> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      const Color(0xFFDC3545).withValues(alpha: 0.3),
+                      kAuthFieldFocusGlow.withValues(alpha: 0.3),
                       Colors.transparent,
                     ],
                     stops: const [0.0, 0.5],
@@ -706,7 +707,7 @@ class _PasswordTextFieldState extends State<_PasswordTextField> {
             borderRadius: BorderRadius.circular(4),
             border: Border.all(
               color: isFocused
-                  ? const Color(0xFFC60D0D)
+                  ? kAuthFieldFocusBorder
                   : const Color(0xFF333333),
               width: 1.5,
             ),
@@ -722,7 +723,7 @@ class _PasswordTextFieldState extends State<_PasswordTextField> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      const Color(0xFFDC3545).withValues(alpha: 0.3),
+                      kAuthFieldFocusGlow.withValues(alpha: 0.3),
                       Colors.transparent,
                     ],
                     stops: const [0.0, 0.5],

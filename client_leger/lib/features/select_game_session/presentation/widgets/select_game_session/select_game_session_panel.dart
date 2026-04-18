@@ -402,6 +402,7 @@ class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
           _headerCell(l10n.createGameNameHeader),
           _headerCell(l10n.createGameSizeHeader),
           _headerCell(l10n.createGameModeHeader),
+          _headerCell(l10n.createGameOwnerHeader),
           _headerCell(l10n.createGameLastModifiedHeader),
         ],
       ),
@@ -584,6 +585,21 @@ class _GameListItem extends StatelessWidget {
                             child: Text(
                               game.mode.toLocalizedLabel(context),
                               textAlign: TextAlign.center,
+                              style: _textStyleBase.copyWith(
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              game.owner,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                               style: _textStyleBase.copyWith(
                                 fontWeight: isSelected
                                     ? FontWeight.bold

@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
@@ -122,7 +123,16 @@ class _LeftSide extends StatelessWidget {
   static const double _inventoryRowHeight = 196;
 
   /// Square cell preview uses this fraction of column width (centered above actions).
-  static const double _cellDetailSizeFactor = 0.86 * 0.8;
+  static const double _cellDetailSizeFactor = 0.86 * 0.84;
+
+  /// Reserve space for the settings gear overlay (`_GameInfoGearButton`).
+  static const double _gearRowHeight = 44;
+
+  /// Must match [GameActionsWidget] fixed bar height.
+  static const double _actionsBarHeight = 48;
+
+  /// Breathing room between cell preview and actions; actions strip and board; and above inventory.
+  static const double _sectionGap = 10;
 
   @override
   Widget build(BuildContext context) {
@@ -131,72 +141,65 @@ class _LeftSide extends StatelessWidget {
       child: Stack(
         children: [
           Positioned.fill(
-            child: LayoutBuilder(
-              builder: (context, columnConstraints) {
-                final combatActionsPanelHeight =
-                    (columnConstraints.maxHeight * 0.22).clamp(220.0, 320.0);
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 44),
-                    if (!isCombatMode)
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final side =
-                              constraints.maxWidth * _cellDetailSizeFactor;
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Align(
-                                alignment: Alignment.topCenter,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: _gearRowHeight),
+                if (!isCombatMode)
+                  Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, inner) {
+                        final maxCellSide = math.min(
+                          inner.maxWidth * _cellDetailSizeFactor,
+                          inner.maxHeight - _actionsBarHeight - _sectionGap,
+                        );
+                        final side = math.max(0, maxCellSide).toDouble();
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
+                              child: Center(
                                 child: SizedBox(
                                   width: side,
                                   height: side,
                                   child: const GameCellDetailWidget(),
                                 ),
                               ),
-                              const GameActionsWidget(),
-                            ],
-                          );
-                        },
-                      )
-                    else
-                      SizedBox(
-                        height: combatActionsPanelHeight,
-                        child: const Align(
-                          alignment: Alignment.bottomCenter,
-                          child: GameActionsWidget(),
-                        ),
-                      ),
-                    const SizedBox(height: 8),
-                    if (isCombatMode)
-                      Expanded(
-                        flex: 2,
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            final squareSize =
-                                constraints.maxWidth < constraints.maxHeight
-                                ? constraints.maxWidth
-                                : constraints.maxHeight;
-                            final size = squareSize;
-                            return Center(
-                              child: _BoardContainer(
-                                size: size,
-                                isCombatBlurred: true,
-                                child: const GameBoardWidget(),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    const SizedBox(
-                      height: _inventoryRowHeight,
-                      child: Center(child: GamePlayerInventoryWidget()),
+                            ),
+                            const SizedBox(height: _sectionGap),
+                            const GameActionsWidget(),
+                          ],
+                        );
+                      },
                     ),
-                  ],
-                );
-              },
+                  )
+                else ...[
+                  const GameActionsWidget(),
+                  const SizedBox(height: _sectionGap),
+                  Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final squareSize = math.min(
+                          constraints.maxWidth,
+                          constraints.maxHeight,
+                        );
+                        return Center(
+                          child: _BoardContainer(
+                            size: squareSize,
+                            isCombatBlurred: true,
+                            child: const GameBoardWidget(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+                const SizedBox(height: _sectionGap),
+                const SizedBox(
+                  height: _inventoryRowHeight,
+                  child: Center(child: GamePlayerInventoryWidget()),
+                ),
+              ],
             ),
           ),
           Positioned(

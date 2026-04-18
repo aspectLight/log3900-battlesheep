@@ -72,4 +72,13 @@ class TutorialViewModel {
   void exit() {
     _appTransitionEventBus.fire(const TutorialExitAppEvent.leaveRequested());
   }
+
+  /// Close from the header: keep current step so the user can resume later.
+  Future<void> dismiss() async {
+    final s = state.value;
+    if (s is TutorialStateLoaded) {
+      await _tutorialService.saveProgress(step: s.currentStep);
+    }
+    exit();
+  }
 }

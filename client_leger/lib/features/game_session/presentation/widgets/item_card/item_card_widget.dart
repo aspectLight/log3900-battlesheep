@@ -14,6 +14,10 @@ class ItemCardWidget extends StatelessWidget {
   final bool dropEnabled;
   final VoidCallback? onDropPressed;
 
+  /// Smaller art + more room for title/description when shown in the in-game
+  /// cell detail panel.
+  final bool compactForCellDetail;
+
   const ItemCardWidget({
     required this.item,
     this.width = 110,
@@ -22,6 +26,7 @@ class ItemCardWidget extends StatelessWidget {
     this.showDropButton = false,
     this.dropEnabled = false,
     this.onDropPressed,
+    this.compactForCellDetail = false,
     super.key,
   });
 
@@ -35,8 +40,12 @@ class ItemCardWidget extends StatelessWidget {
     // Without extra height + tighter layout, the middle Column overflows (~100px
     // tall): the Drop button sits in a clipped region and never receives taps.
     final cardHeight = showDropButton ? 196.0 : height;
-    final insetV = showDropButton ? 18.0 : 30.0;
-    final imageSize = showDropButton ? 52.0 : 80.0;
+    final insetV = showDropButton
+        ? 18.0
+        : (compactForCellDetail ? 14.0 : 30.0);
+    final imageSize = showDropButton
+        ? 52.0
+        : (compactForCellDetail ? 48.0 : 80.0);
 
     Widget card = Container(
       width: width,
@@ -132,14 +141,14 @@ class ItemCardWidget extends StatelessWidget {
                         fit: BoxFit.contain,
                       ),
                     ),
-                    SizedBox(height: showDropButton ? 4 : 8),
+                    SizedBox(height: showDropButton ? 4 : (compactForCellDetail ? 6 : 8)),
                     Text(
                       name,
                       textAlign: TextAlign.center,
-                      maxLines: 1,
+                      maxLines: compactForCellDetail ? 2 : 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 14,
+                      style: TextStyle(
+                        fontSize: compactForCellDetail ? 13 : 14,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                         decoration: TextDecoration.none,
@@ -161,18 +170,19 @@ class ItemCardWidget extends StatelessWidget {
                         ),
                       )
                     else
-                      Flexible(
-                        child: Text(
-                          description,
-                          textAlign: TextAlign.center,
-                          maxLines: 4,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: Colors.black,
-                            decoration: TextDecoration.none,
-                            fontFamily: 'CustomFont',
-                          ),
+                      Text(
+                        description,
+                        textAlign: TextAlign.center,
+                        maxLines: compactForCellDetail ? null : 4,
+                        overflow: compactForCellDetail
+                            ? TextOverflow.visible
+                            : TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: compactForCellDetail ? 11 : 10,
+                          height: 1.35,
+                          color: Colors.black,
+                          decoration: TextDecoration.none,
+                          fontFamily: 'CustomFont',
                         ),
                       ),
                     if (showDropButton) ...[

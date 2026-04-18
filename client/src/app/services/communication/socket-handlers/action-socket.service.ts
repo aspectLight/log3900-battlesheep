@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { AttackPayload, AttackResult, CombatPayload, FlightResult } from '@app/interfaces/payload.interface';
 import { ISocketService } from '@app/interfaces/socket-service.interface';
 import { SocketService } from '@app/services/communication/socket-handlers/socket.service';
@@ -21,6 +21,7 @@ export class ActionSocketService implements ISocketService {
         private gameManagerService: GameManagerService,
         private combatService: CombatService,
         private gameRoomService: GameRoomService,
+        private ngZone: NgZone,
     ) {
         this.socketService.registerSocketService(this);
         this.setUpConnection();
@@ -33,7 +34,8 @@ export class ActionSocketService implements ISocketService {
 
     toggleDebugMode(): void {
         const room = this.gameManagerService.room;
-        if (this.gameManagerService.currentPlayerId === this.socket.id && room.hostId === this.socket.id) {
+        // Host-only: do not require "current turn" — otherwise D does nothing when it is not the host's turn.
+        if (room.hostId === this.socket.id && room.roomId) {
             this.socket.emit(GameRoomEvents.ToggleDebugMode, room.roomId);
         }
     }
@@ -123,18 +125,22 @@ export class ActionSocketService implements ISocketService {
         });
 
         this.socket.on(GameRoomEvents.DebugModeEnabled, () => {
-            this.gameRoomService.setDebugMode(true);
-            this.gameManagerService.clearPaths();
-            const actionPoints = this.gameManagerService.getGame()?.actionPoints ?? 1;
-            this.gameManagerService.setActionPoints(actionPoints);
+            this.ngZone.run(() => {
+                this.gameRoomService.setDebugMode(true);
+                this.gameManagerService.clearPaths();
+                const actionPoints = this.gameManagerService.getGame()?.actionPoints ?? 1;
+                this.gameManagerService.setActionPoints(actionPoints);
+            });
         });
 
         this.socket.on(GameRoomEvents.DebugModeDisabled, () => {
-            this.gameRoomService.setDebugMode(false);
+            this.ngZone.run(() => {
+                this.gameRoomService.setDebugMode(false);
 
-            if (this.gameManagerService.isPlayerTurn) {
-                this.movementSocketService.getPlayerMovements();
-            }
+                if (this.gameManagerService.isPlayerTurn) {
+                    this.movementSocketService.getPlayerMovements();
+                }
+            });
         });
 
         this.socket.on(GameRoomEvents.DoorToggled, (coords) => {
