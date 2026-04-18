@@ -248,6 +248,7 @@ class _SelectGameSessionPanelState extends State<SelectGameSessionPanel> {
                                                 inputFormatters: [
                                                   FilteringTextInputFormatter
                                                       .digitsOnly,
+                                                  MaxValueInputFormatter(1000),
                                                 ],
                                                 style: TextStyle(
                                                   color: hasSelection
@@ -614,5 +615,30 @@ class _GameListItem extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class MaxValueInputFormatter extends TextInputFormatter {
+  final int max;
+
+  MaxValueInputFormatter(this.max);
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) {
+      return newValue;
+    }
+
+    final int? value = int.tryParse(newValue.text);
+    if (value != null && value > max) {
+      return TextEditingValue(
+        text: max.toString(),
+        selection: TextSelection.collapsed(offset: max.toString().length),
+      );
+    }
+    return newValue;
   }
 }
