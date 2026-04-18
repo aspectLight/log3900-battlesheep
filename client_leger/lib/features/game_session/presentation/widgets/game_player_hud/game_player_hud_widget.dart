@@ -68,11 +68,11 @@ class _GamePlayerHudWidgetState extends State<GamePlayerHudWidget> {
             _PlayerHeader(model: model, l10n: l10n),
             const SizedBox(height: 10),
             _SectionHeader(title: l10n.playerHudStatsSection),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Expanded(
               child: _StatsOnePerRow(statRows: model.statRows, l10n: l10n),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 4),
             _SectionHeader(title: l10n.playerHudDiceSection),
             const SizedBox(height: 6),
             _DiceRowPair(
@@ -314,80 +314,37 @@ class _StatsOnePerRow extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               mainAxisSize: MainAxisSize.min,
               children: [
-                _StatLine(stat: statRows[0], l10n: l10n),
-                const SizedBox(height: 10),
-                _StatLine(stat: statRows[1], l10n: l10n),
-                const SizedBox(height: 10),
-                _StatLine(stat: statRows[2], l10n: l10n),
-                const SizedBox(height: 10),
-                _StatLine(stat: statRows[3], l10n: l10n),
+                Row(
+                  children: [
+                    Text(
+                      '${statRows[0].statType.resolveStatLabel(l10n)}  ${statRows[0].value.clamp(0, 999)}',
+                      style: const TextStyle(fontFamily: 'CustomFont'),
+                    ),
+                    const Spacer(),
+                    Text(
+                      '${statRows[1].statType.resolveStatLabel(l10n)}  ${statRows[1].value.clamp(0, 999)}',
+                      style: const TextStyle(fontFamily: 'CustomFont'),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      '${statRows[2].statType.resolveStatLabel(l10n)}  ${statRows[2].value.clamp(0, 999)}',
+                      style: const TextStyle(fontFamily: 'CustomFont'),
+                    ),
+                    const Spacer(),
+                    Text(
+                      '${statRows[3].statType.resolveStatLabel(l10n)}  ${statRows[3].value.clamp(0, 999)}',
+                      style: const TextStyle(fontFamily: 'CustomFont'),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
         );
       },
-    );
-  }
-}
-
-/// Label (full text) + icons in a single horizontal strip; scrolls horizontally if needed.
-class _StatLine extends StatelessWidget {
-  final GamePlayerUiStat stat;
-  final GameSessionLocalizations l10n;
-
-  const _StatLine({required this.stat, required this.l10n});
-
-  @override
-  Widget build(BuildContext context) {
-    final count = stat.value.clamp(0, 999);
-    final double iconSize = count > 10 ? 14.0 : (count > 6 ? 16.0 : 18.0);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            stat.statType.resolveStatLabel(l10n),
-            softWrap: true,
-            style: const TextStyle(
-              color: Color(0xFFF0F0F0),
-              fontSize: 14,
-              height: 1.35,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'CustomFont',
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
-                    child: Row(
-                      children: List.generate(
-                        count,
-                        (_) => Padding(
-                          padding: const EdgeInsets.only(right: 3),
-                          child: Image.asset(
-                            stat.assetPath,
-                            width: iconSize,
-                            height: iconSize,
-                            filterQuality: FilterQuality.medium,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

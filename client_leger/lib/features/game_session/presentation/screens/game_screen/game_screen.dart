@@ -399,7 +399,7 @@ class _RightSide extends StatelessWidget {
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SizedBox(height: 300, child: GamePlayerCardsHudWidget()),
+          SizedBox(height: 350, child: GamePlayerCardsHudWidget()),
           SizedBox(height: 8),
           Expanded(child: GamePlayerHudWidget()),
         ],
