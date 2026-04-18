@@ -33,9 +33,7 @@ class GameCanceledNotificationWidget extends StatelessWidget {
           Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-              child: ColoredBox(
-                color: Colors.black.withValues(alpha: 0.55),
-              ),
+              child: ColoredBox(color: Colors.black.withValues(alpha: 0.55)),
             ),
           ),
           Center(
@@ -45,7 +43,7 @@ class GameCanceledNotificationWidget extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: scheme.surface,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(

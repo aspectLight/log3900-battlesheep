@@ -68,11 +68,11 @@ class _GamePlayerHudWidgetState extends State<GamePlayerHudWidget> {
             _PlayerHeader(model: model, l10n: l10n),
             const SizedBox(height: 10),
             _SectionHeader(title: l10n.playerHudStatsSection),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Expanded(
               child: _StatsOnePerRow(statRows: model.statRows, l10n: l10n),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 4),
             _SectionHeader(title: l10n.playerHudDiceSection),
             const SizedBox(height: 6),
             _DiceRowPair(
@@ -315,11 +315,8 @@ class _StatsOnePerRow extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _StatLine(stat: statRows[0], l10n: l10n),
-                const SizedBox(height: 10),
                 _StatLine(stat: statRows[1], l10n: l10n),
-                const SizedBox(height: 10),
                 _StatLine(stat: statRows[2], l10n: l10n),
-                const SizedBox(height: 10),
                 _StatLine(stat: statRows[3], l10n: l10n),
               ],
             ),

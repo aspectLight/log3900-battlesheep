@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../../core/constants/item_assets.dart';
 import '../../../core/localisation/game_session_localizations.dart';
-
 import '../../ui_models/components/game_player_inventory_item_ui.dart';
 
 class ItemCardWidget extends StatelessWidget {
@@ -40,133 +39,119 @@ class ItemCardWidget extends StatelessWidget {
     final imageSize = showDropButton ? 52.0 : 80.0;
 
     Widget card = Container(
-        width: width,
-        height: cardHeight,
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFFEDEBE9), Color(0xFFD3CBC6)],
-          ),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x4D000000),
-              blurRadius: 8,
-              offset: Offset(0, 4),
-            ),
-          ],
+      width: width,
+      height: cardHeight,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFEDEBE9), Color(0xFFD3CBC6)],
         ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            const Positioned(top: -2, left: -2, child: _CornerRing()),
-            const Positioned(top: -2, right: -2, child: _CornerRing()),
-            const Positioned(bottom: -2, left: -2, child: _CornerRing()),
-            const Positioned(bottom: -2, right: -2, child: _CornerRing()),
-            Positioned(
-              top: -2,
-              left: -2,
-              child: SizedBox(
-                width: 30,
-                height: 30,
-                child: Center(
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x4D000000),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          const Positioned(top: -2, left: -2, child: _CornerRing()),
+          const Positioned(top: -2, right: -2, child: _CornerRing()),
+          const Positioned(bottom: -2, left: -2, child: _CornerRing()),
+          const Positioned(bottom: -2, right: -2, child: _CornerRing()),
+          Positioned(
+            top: -2,
+            left: -2,
+            child: SizedBox(
+              width: 30,
+              height: 30,
+              child: Center(child: Text(cornerLetter, style: _cornerTextStyle)),
+            ),
+          ),
+          Positioned(
+            bottom: -2,
+            right: -2,
+            child: SizedBox(
+              width: 30,
+              height: 30,
+              child: Center(
+                child: Transform.rotate(
+                  angle: 3.14159,
                   child: Text(cornerLetter, style: _cornerTextStyle),
                 ),
               ),
             ),
-            Positioned(
-              bottom: -2,
-              right: -2,
-              child: SizedBox(
-                width: 30,
-                height: 30,
-                child: Center(
-                  child: Transform.rotate(
-                    angle: 3.14159,
-                    child: Text(cornerLetter, style: _cornerTextStyle),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 15,
-              bottom: 15,
-              left: 8,
-              child: Container(width: 4, color: const Color(0x33990000)),
-            ),
-            Positioned(
-              top: 15,
-              bottom: 15,
-              right: 8,
-              child: Container(width: 4, color: const Color(0x33990000)),
-            ),
-            ..._buildDiamonds(cardHeight),
-            const Positioned(
-              top: 8,
-              left: 25,
-              right: 25,
-              child: _BorderGradientLine(),
-            ),
-            const Positioned(
-              bottom: 8,
-              left: 25,
-              right: 25,
-              child: _BorderGradientLine(),
-            ),
-            Positioned(
-              top: insetV,
-              bottom: insetV,
-              left: 16,
-              right: 16,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize:
-                    showDropButton ? MainAxisSize.min : MainAxisSize.max,
-                children: [
-                  SizedBox(
-                    height: imageSize,
-                    width: imageSize,
-                    child: Image.asset(
-                      ItemAssets.gameBoardItem(item.type),
-                      fit: BoxFit.contain,
+          ),
+          Positioned(
+            top: 15,
+            bottom: 15,
+            left: 8,
+            child: Container(width: 4, color: const Color(0x33990000)),
+          ),
+          Positioned(
+            top: 15,
+            bottom: 15,
+            right: 8,
+            child: Container(width: 4, color: const Color(0x33990000)),
+          ),
+          ..._buildDiamonds(cardHeight),
+          const Positioned(
+            top: 8,
+            left: 25,
+            right: 25,
+            child: _BorderGradientLine(),
+          ),
+          const Positioned(
+            bottom: 8,
+            left: 25,
+            right: 25,
+            child: _BorderGradientLine(),
+          ),
+          Positioned(
+            top: insetV,
+            bottom: insetV,
+            left: 16,
+            right: 16,
+            child: SizedBox(
+              height: cardHeight - 2 * insetV,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      height: imageSize,
+                      width: imageSize,
+                      child: Image.asset(
+                        ItemAssets.gameBoardItem(item.type),
+                        fit: BoxFit.contain,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: showDropButton ? 4 : 8),
-                  Text(
-                    name,
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      decoration: TextDecoration.none,
-                      fontFamily: 'CustomFont',
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  if (showDropButton)
+                    SizedBox(height: showDropButton ? 4 : 8),
                     Text(
-                      description,
+                      name,
                       textAlign: TextAlign.center,
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 10,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
                         color: Colors.black,
                         decoration: TextDecoration.none,
                         fontFamily: 'CustomFont',
                       ),
-                    )
-                  else
-                    Flexible(
-                      child: Text(
+                    ),
+                    const SizedBox(height: 4),
+                    if (showDropButton)
+                      Text(
                         description,
                         textAlign: TextAlign.center,
-                        maxLines: 4,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 10,
@@ -174,46 +159,62 @@ class ItemCardWidget extends StatelessWidget {
                           decoration: TextDecoration.none,
                           fontFamily: 'CustomFont',
                         ),
-                      ),
-                    ),
-                  if (showDropButton) ...[
-                    const SizedBox(height: 6),
-                    SizedBox(
-                      height: 28,
-                      width: double.infinity,
-                      child: OutlinedButton(
-                        onPressed: dropEnabled
-                            ? () {
-                                if (kDebugMode) {
-                                  debugPrint(
-                                    '[torch-drop] Drop button activated (item=${item.type})',
-                                  );
-                                }
-                                onDropPressed?.call();
-                              }
-                            : null,
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          minimumSize: const Size(0, 26),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          foregroundColor: const Color(0xFF5A1A1A),
-                          side: const BorderSide(color: Color(0x995A1A1A)),
-                          textStyle: const TextStyle(
+                      )
+                    else
+                      Flexible(
+                        child: Text(
+                          description,
+                          textAlign: TextAlign.center,
+                          maxLines: 4,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
                             fontSize: 10,
-                            fontWeight: FontWeight.w700,
+                            color: Colors.black,
+                            decoration: TextDecoration.none,
                             fontFamily: 'CustomFont',
                           ),
                         ),
-                        child: Text(l10n.dropTorchButton),
                       ),
-                    ),
+                    if (showDropButton) ...[
+                      const SizedBox(height: 6),
+                      SizedBox(
+                        height: 28,
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: dropEnabled
+                              ? () {
+                                  if (kDebugMode) {
+                                    debugPrint(
+                                      '[torch-drop] Drop button activated (item=${item.type})',
+                                    );
+                                  }
+                                  onDropPressed?.call();
+                                }
+                              : null,
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            minimumSize: const Size(0, 26),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            foregroundColor: const Color(0xFF5A1A1A),
+                            side: const BorderSide(color: Color(0x995A1A1A)),
+                            textStyle: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'CustomFont',
+                            ),
+                          ),
+                          child: Text(l10n.dropTorchButton),
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
 
     if (onTap != null) {
       card = GestureDetector(
