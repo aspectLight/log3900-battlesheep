@@ -656,31 +656,18 @@ class _NotificationOverlay extends StatelessWidget {
           child: Center(
             child: Transform.translate(
               offset: const Offset(0, -20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    notification.title,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: color,
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'CustomFont',
-                      shadows: const [
-                        Shadow(blurRadius: 6),
-                        Shadow(blurRadius: 12),
-                      ],
-                    ),
-                  ),
-                  if (notification.message.isNotEmpty) ...[
-                    const SizedBox(height: 8),
+              child: Material(
+                type: MaterialType.transparency,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                     Text(
-                      notification.message,
+                      notification.title,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: color,
-                        fontSize: 24,
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
                         fontFamily: 'CustomFont',
                         shadows: const [
                           Shadow(blurRadius: 6),
@@ -688,8 +675,24 @@ class _NotificationOverlay extends StatelessWidget {
                         ],
                       ),
                     ),
+                    if (notification.message.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        notification.message,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: color,
+                          fontSize: 24,
+                          fontFamily: 'CustomFont',
+                          shadows: const [
+                            Shadow(blurRadius: 6),
+                            Shadow(blurRadius: 12),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ),

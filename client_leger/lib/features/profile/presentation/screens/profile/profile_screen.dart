@@ -428,8 +428,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 16),
         Text(
           l10n.profileAvatarLabel,
-          style: TextStyle(
-            color: context.interactionColors.text,
+          style: const TextStyle(
+            color: Colors.white,
             fontSize: 16,
             fontWeight: FontWeight.bold,
             fontFamily: 'CustomFont',
@@ -639,14 +639,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildThemeCard(themes[0], selectedThemeId),
-            const SizedBox(width: 10),
+            const SizedBox(width: 5),
             _buildThemeCard(themes[1], selectedThemeId),
+            const SizedBox(width: 5),
+            _buildThemeCard(themes[2], selectedThemeId),
           ],
-        ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [_buildThemeCard(themes[2], selectedThemeId)],
         ),
       ],
     );
@@ -930,11 +927,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String selectedLanguage,
   ) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: const Color.fromRGBO(255, 255, 255, 0.1),
+        color: context.interactionColors.primary.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color.fromRGBO(255, 255, 255, 0.2)),
+        border: Border.all(color: context.interactionColors.outline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -942,8 +939,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Text(
             l10n.profileStatisticsTitle,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: context.interactionColors.text,
+            style: const TextStyle(
+              color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.w600,
               fontFamily: 'CustomFont',
@@ -954,38 +951,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
             label: l10n.profileClassicGames,
             value: stats.classicGamesPlayed.toString(),
           ),
-          const SizedBox(height: 25),
+          const SizedBox(height: 10),
           _buildStatCard(
             label: l10n.profileCtfGames,
             value: stats.ctfGamesPlayed.toString(),
           ),
-          const SizedBox(height: 25),
+          const SizedBox(height: 10),
           _buildStatCard(
             label: l10n.profileGamesWon,
             value: stats.totalGamesWon.toString(),
           ),
-          const SizedBox(height: 25),
+          const SizedBox(height: 10),
           _buildStatCard(
             label: l10n.profileAverageTime,
             value: '${stats.averagePlaytimePerGame}s',
           ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.profileThemeLabel,
-            style: TextStyle(
-              color: context.interactionColors.text,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'CustomFont',
-            ),
-            textAlign: TextAlign.center,
-          ),
-          _buildThemeSelector(selectedThemeId, l10n),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
           Text(
             l10n.profileLanguageLabel,
-            style: TextStyle(
-              color: context.interactionColors.text,
+            style: const TextStyle(
+              color: Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
@@ -996,9 +981,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildLanguageSelector(selectedLanguage, l10n),
           const SizedBox(height: 16),
           Text(
+            l10n.profileThemeLabel,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'CustomFont',
+            ),
+            textAlign: TextAlign.center,
+          ),
+          _buildThemeSelector(selectedThemeId, l10n),
+          const SizedBox(height: 16),
+          Text(
             l10n.tutorial,
-            style: TextStyle(
-              color: context.interactionColors.text,
+            style: const TextStyle(
+              color: Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.bold,
               fontFamily: 'CustomFont',
@@ -1046,8 +1043,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Text(
             label,
-            style: TextStyle(
-              color: context.interactionColors.text,
+            style: const TextStyle(
+              color: Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.w500,
               fontFamily: 'CustomFont',
@@ -1249,8 +1246,8 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
         if (widget.label.isNotEmpty) ...[
           Text(
             widget.label,
-            style: TextStyle(
-              color: context.interactionColors.text,
+            style: const TextStyle(
+              color: Colors.white,
               fontSize: 20,
               fontFamily: 'CustomFont',
               fontWeight: FontWeight.bold,

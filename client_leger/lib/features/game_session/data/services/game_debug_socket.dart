@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import '../models/dto/game_debug_dto.dart';
-import '../models/extensions/game_debug_dto_extensions.dart';
-import '../models/events/game_debug_socket_events.dart';
+import '../../../../core/services/socket_service.dart';
 import '../../domain/commands/game_debug_commands.dart';
 import '../../domain/events/game_debug_events.dart';
-import '../../../../core/services/socket_service.dart';
+import '../models/dto/game_debug_dto.dart';
+import '../models/events/game_debug_socket_events.dart';
+import '../models/extensions/game_debug_dto_extensions.dart';
 
 class GameDebugSocket {
   final SocketService _socketService;
@@ -37,10 +37,8 @@ class GameDebugSocket {
   ];
 
   void toggleDebugMode(ToggleDebugModeCommand command) {
-    _socketService.emit(
-      GameDebugSocketEvents.toggleDebugMode,
-      command.toDto().toJson(),
-    );
+    // Server + Angular send the room id as a plain string, not { roomId }.
+    _socketService.emit(GameDebugSocketEvents.toggleDebugMode, command.roomId);
   }
 
   Stream<DebugModeEnabledEvent> get debugModeEnabledStream =>

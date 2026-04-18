@@ -137,61 +137,63 @@ class _LogsHistoryScreenState extends State<LogsHistoryScreen> {
   }
 
   Widget _buildTableHeader(CoreLocalizations l10n, BuildContext context) {
-    return Container(
-      height: 56,
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-      decoration: BoxDecoration(
-        color: context.interactionColors.primary,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-        border: Border(
-          left: BorderSide(color: context.interactionColors.outline),
-          right: BorderSide(color: context.interactionColors.outline),
-          top: BorderSide(color: context.interactionColors.outline),
+    return SafeArea(
+      child: Container(
+        height: 56,
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+        decoration: BoxDecoration(
+          color: context.interactionColors.primary,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+          border: Border(
+            left: BorderSide(color: context.interactionColors.outline),
+            right: BorderSide(color: context.interactionColors.outline),
+            top: BorderSide(color: context.interactionColors.outline),
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 220,
-            child: Text(
-              l10n.action.toUpperCase(),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontFamily: 'CustomFont',
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1,
-                fontSize: 18,
+        child: Row(
+          children: [
+            SizedBox(
+              width: 220,
+              child: Text(
+                l10n.action.toUpperCase(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'CustomFont',
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                  fontSize: 18,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: Text(
-              l10n.date.toUpperCase(),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontFamily: 'CustomFont',
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1,
-                fontSize: 18,
+            Expanded(
+              child: Text(
+                l10n.date.toUpperCase(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'CustomFont',
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                  fontSize: 18,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: Text(
-              l10n.time.toUpperCase(),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontFamily: 'CustomFont',
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1,
-                fontSize: 18,
+            Expanded(
+              child: Text(
+                l10n.time.toUpperCase(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'CustomFont',
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                  fontSize: 18,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

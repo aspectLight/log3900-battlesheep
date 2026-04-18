@@ -34,7 +34,7 @@ class GamePlayerMovementRepository {
   }
 
   void teleportPlayer(PlayerTeleportedCommand command) {
-    _movementSocket.playerTeleported(command);
+    unawaited(_movementSocket.playerTeleported(command));
   }
 
   void trapChoice(TrapChoiceCommand command) {

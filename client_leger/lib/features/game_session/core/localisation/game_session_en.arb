@@ -2,64 +2,156 @@
   "@@locale": "en",
   "gameContentSoon": "Game content coming soon...",
   "gameInventoryFullDiscardTitle": "Inventory full",
-  "gameTrapTitle": "Trap",
+  "gameTrapTitle": "You are on a trap!",
   "gameTrapDescriptionCanAvoid": "You can avoid the trap or try to cross it.",
   "gameTrapDescriptionMustTraverse": "You don't have enough movement points to avoid the trap. You must cross it.",
   "gameTrapAvoid": "Avoid",
   "gameTrapTraverse": "Cross",
   "gamePlayersListPlaying": "Playing...",
   "gamePlayersListVirtual": "Virtual",
-  "gameTimerLabel": "Turn in progress",
-  "gameDebugMode": "Game is in debug mode",
+  "gameTimerCurrentTurn": "Current turn: {seconds}",
+  "@gameTimerCurrentTurn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "gameDebugMode": "Debug mode activated",
   "gameActionCancel": "Cancel",
   "gameActionAct": "Act",
   "gameActionForwardTurn": "End turn",
-  "gameCellDetailCost": "Cost",
-  "gameCellDetailDescription": "Description",
+  "gameCellDetailCost": "COST",
+  "gameCellDetailDescription": "DESCRIPTION",
   "gameCellDetailYou": "You",
-  "combatYourTurn": "Your turn! You have {countdown} seconds left",
-  "combatYourTurnIn": "Your turn in {countdown} seconds",
-  "combatFlightAttemptsLeft": "{count} flight attempts left",
-  "combatYourDefense": "Your defense",
-  "combatYourAttack": "Your attack",
-  "combatEnemyAttack": "Enemy attack",
-  "combatEnemyDefense": "Enemy defense",
+  "combatYourTurn": "Your turn! You have: {countdown} seconds left",
+  "@combatYourTurn": {
+    "placeholders": {
+      "countdown": {
+        "type": "int"
+      }
+    }
+  },
+  "combatYourTurnIn": "Your turn in: {countdown} seconds",
+  "@combatYourTurnIn": {
+    "placeholders": {
+      "countdown": {
+        "type": "int"
+      }
+    }
+  },
+  "combatFlightAttemptsLeft": "{count} escape attempts remaining",
+  "@combatFlightAttemptsLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "combatYourDefense": "YOUR DEFENSE",
+  "combatYourAttack": "YOUR ATTACK",
+  "combatEnemyAttack": "ENEMY ATTACK",
+  "combatEnemyDefense": "ENEMY DEFENSE",
   "combatFlee": "Flee!",
   "combatAttack": "Attack",
-  "combatMissTitle": "Miss!",
-  "combatEvadedTitle": "Evaded!",
-  "combatFlightAttemptTitle": "Flight attempt!",
-  "combatFlightAttemptSuccess": "You fled successfully!",
+  "combatMissTitle": "Missed!",
+  "combatEvadedTitle": "Dodged!",
+  "combatFlightAttemptTitle": "Escape attempt!",
+  "combatFlightAttemptSuccess": "You managed to flee!",
   "combatFlightAttemptFailure": "You failed to flee!",
-  "combatBarbedWireTitle": "Barbed wire",
-  "combatBarbedWireBlockedMessage": "Fleeing is prevented by the opponent",
-  "combatNotificationVictory": "Victory",
-  "combatNotificationVictoryMessage": "You won the combat!",
+  "combatBarbedWireTitle": "Barbed Wire",
+  "combatBarbedWireBlockedMessage": "Fleeing is impossible for the opponent, only if you initiated the combat",
+  "combatNotificationVictory": "Victory!",
+  "combatNotificationVictoryMessage": "You won the fight!",
   "combatNotificationDefeat": "Defeat",
-  "combatNotificationDefeatMessage": "{winnerName} won the combat!",
-  "combatNotificationFlightSuccessTitle": "Fled",
-  "combatNotificationFlightSuccess": "You got away.",
-  "combatNotificationEnemyFled": "{enemyName} fled.",
+  "combatNotificationDefeatMessage": "{winnerName} won the fight!",
+  "@combatNotificationDefeatMessage": {
+    "placeholders": {
+      "winnerName": {
+        "type": "String"
+      }
+    }
+  },
+  "combatNotificationFlightSuccessTitle": "Escape successful!",
+  "combatNotificationFlightSuccess": "You managed to flee!",
+  "combatNotificationEnemyFled": "{enemyName} managed to flee!",
+  "@combatNotificationEnemyFled": {
+    "placeholders": {
+      "enemyName": {
+        "type": "String"
+      }
+    }
+  },
   "combatStartedNotificationTitle": "Combat started",
   "combatStartedNotificationMessage": "{attackerName} vs {defenderName}",
+  "@combatStartedNotificationMessage": {
+    "placeholders": {
+      "attackerName": {
+        "type": "String"
+      },
+      "defenderName": {
+        "type": "String"
+      }
+    }
+  },
   "combatStatAttack": "Attack",
   "combatStatDefense": "Defense",
   "combatStatSpeed": "Speed",
   "combatStatHealth": "Health",
   "notificationVictoryCtf": "Victory! Your team captured the flag!",
   "notificationVictoryClassic": "Victory! You won three combats",
-  "notificationDefeatCtf": "Defeat! {winnerTeamName} captured the flag!",
-  "notificationDefeatClassic": "Defeat! {winnerName} won three combats",
-  "notificationGameAbandoned": "Game abandoned",
-  "notificationGameCanceled": "Game canceled",
+  "notificationDefeatCtfKnown": "Defeat! Team {winnerTeamName} captured the flag!",
+  "@notificationDefeatCtfKnown": {
+    "placeholders": {
+      "winnerTeamName": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationDefeatCtfUnknown": "Defeat! The opposing team captured the flag!",
+  "notificationDefeatClassicKnown": "Defeat! {winnerName} won three combats",
+  "@notificationDefeatClassicKnown": {
+    "placeholders": {
+      "winnerName": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationDefeatClassicUnknown": "Defeat! A player won three combats",
+  "notificationGameAbandoned": "Abandoned",
+  "notificationGameCanceled": "Game cancelled due to lack of players",
   "notificationGameLeft": "You left the game!",
   "gameSessionPopupUnderstood": "Got it",
   "notificationDisconnectAutomatic": "Automatic disconnect",
-  "notificationTurnStart": "{playerName}'s turn ({seconds}s)",
-  "playerHudMovements": "{count} Movements",
-  "playerHudActions": "{count} Actions",
+  "notificationTurnStart": "{playerName}'s turn starts in {seconds} seconds!",
+  "@notificationTurnStart": {
+    "placeholders": {
+      "playerName": {
+        "type": "String"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "playerHudMovements": "{count} movements",
+  "@playerHudMovements": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playerHudActions": "{count} actions",
+  "@playerHudActions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "playerHudStatsSection": "Stats",
-  "playerHudDiceSection": "Dice",
+  "playerHudDiceSection": "DICE",
   "statHealth": "Health",
   "statSpeed": "Speed",
   "statAttack": "Attack",
@@ -67,9 +159,9 @@
   "gameSessionInfoPlayers": "Players",
   "gameSessionInfoActivePlayer": "Active player",
   "gameSessionInfoBoardSize": "Board size",
-  "gameSessionInfoContinue": "Continue",
-  "gameSessionInfoQuit": "Quit",
-  "toggleDebugMode": "Game is in debug mode",
+  "gameSessionInfoContinue": "continue",
+  "gameSessionInfoQuit": "quit",
+  "toggleDebugMode": "Debug mode activated",
   "itemAdrenalineName": "Adrenaline",
   "itemAdrenalineDesc": "Adds 2 health points",
   "itemVodkaName": "Vodka",
@@ -77,21 +169,21 @@
   "itemPropagandaName": "Propaganda",
   "itemPropagandaDesc": "Adds 5 attack and 5 defense if player has less than 3 health points",
   "itemBarbedWireName": "Barbed Wire",
-  "itemBarbedWireDesc": "Flight is impossible for the opponent, only if you started the combat",
+  "itemBarbedWireDesc": "Fleeing is impossible for the opponent, only if you initiated the combat",
   "itemCamouflageName": "Camouflage",
   "itemCamouflageDesc": "Allows moving to any tile for 1 action point",
   "itemWaterproofBootsName": "Waterproof Boots",
-  "itemWaterproofBootsDesc": "Movement to another tile costs 1 movement point",
+  "itemWaterproofBootsDesc": "Moving to another tile costs 1 movement point",
   "itemAirStrikeName": "Air Strike",
-  "itemAirStrikeDesc": "Allows attacking at range",
+  "itemAirStrikeDesc": "Allows ranged attacks",
   "itemTorchName": "Torch",
-  "itemTorchDesc": "A lit torch that improves your abilities in the light",
+  "itemTorchDesc": "Adds 1 defense and 1 attack point when under the light of a torch",
   "dropTorchButton": "Drop",
-  "itemRandomName": "Random",
+  "itemRandomName": "Random Item",
   "itemRandomDesc": "A random item revealed during the game",
   "itemFlagName": "Flag",
   "itemFlagDesc": "A flag to bring back to base",
-  "itemSpawnName": "Spawn",
+  "itemSpawnName": "Spawn Point",
   "itemSpawnDesc": "A campfire serving as base",
   "tileSnowName": "Snow",
   "tileTreeName": "Tree",
@@ -103,20 +195,20 @@
   "tileCornerName": "Corner",
   "tileIntersectionName": "Intersection",
   "tileTrapName": "Trap",
-  "tileTeleportPadName": "Teleport pad",
-  "tileSnowDesc": "A basic snow tile",
+  "tileTeleportPadName": "Teleport Pad",
+  "tileSnowDesc": "A snow tile",
   "tileTreeDesc": "A tree that cannot be climbed",
   "tileStoneDesc": "A large stone blocking the path",
   "tileIceDesc": "An ice tile",
   "tileWaterDesc": "A water tile",
   "tileDoorDesc": "A door that can be opened or closed",
   "tileWallDesc": "An impassable wall",
-  "tileCornerDesc": "An impassable wall",
-  "tileIntersectionDesc": "An impassable wall",
+  "tileCornerDesc": "An impassable corner",
+  "tileIntersectionDesc": "An impassable intersection",
   "tileTrapDesc": "A trap that slows movement",
-  "tileTeleportPadDesc": "Teleports you to the paired pad",
-  "unknownError": "An unknown error occurred",
-  "gameNotFound": "Game not found",
+  "tileTeleportPadDesc": "A teleport pad that leads to another teleport pad",
+  "unknownError": "An error occurred. Please try again.",
+  "gameNotFound": "The game has been deleted.",
   "networkError": "Network connection problem",
   "serverError": "Server error"
 }
