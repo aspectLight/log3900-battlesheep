@@ -140,6 +140,9 @@ class WaitingRoomLocalizationsFr extends WaitingRoomLocalizations {
   String get waitingRoomEntryFeeLabel => 'Prix d\'entrée :';
 
   @override
+  String get waitingRoomFriendsOnlyLabel => 'Amis seulement :';
+
+  @override
   String get gameNotFound => 'Partie introuvable';
 
   @override

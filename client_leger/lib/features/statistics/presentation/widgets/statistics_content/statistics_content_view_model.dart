@@ -12,8 +12,12 @@ class StatisticsContentViewModel {
   final StatisticsRepository _statisticsRepository;
   final bool isCTF;
 
+  /// Active column for player stats (matches Angular `sortedProperty`).
   final sortField = signal<PlayerStatsSortField>(PlayerStatsSortField.name);
-  final isAscending = signal<bool>(false);
+  /// Matches Angular `isAscending` **after** each `sortBy` (post-toggle). The
+  /// comparator uses `!isAscending` so the first effective sort is descending
+  /// by name, same as `sortBy('name')` in `end-game.component.ts`.
+  final isAscending = signal<bool>(true);
 
   late final statistics = computed(() => _statisticsRepository.state.value);
   late final rewards = computed(() => _statisticsRepository.rewardsInfo.value);
@@ -26,7 +30,9 @@ class StatisticsContentViewModel {
       statistics.value.data.playerStats,
     );
     final field = sortField.value;
-    final ascending = isAscending.value;
+    // Angular sorts with `isAscending` *before* each click, then toggles.
+    // Our signal holds the value *after* the last toggle, so invert here.
+    final useAscendingOrder = !isAscending.value;
     players.sort((a, b) {
       final comparison = switch (field) {
         PlayerStatsSortField.name => a.name.compareTo(b.name),
@@ -42,7 +48,7 @@ class StatisticsContentViewModel {
           b.tilesVisited.length,
         ),
       };
-      return ascending ? comparison : -comparison;
+      return useAscendingOrder ? comparison : -comparison;
     });
     return players;
   });
@@ -54,13 +60,11 @@ class StatisticsContentViewModel {
   }) : _appTransitionEventBus = appTransitionEventBus,
        _statisticsRepository = statisticsRepository;
 
+  /// Same behavior as Angular `EndGameComponent.sortBy`: sort by the clicked
+  /// column using the current direction, then flip direction for the next sort.
   void sortBy(PlayerStatsSortField field) {
-    if (sortField.value == field) {
-      isAscending.value = !isAscending.value;
-    } else {
-      sortField.value = field;
-      isAscending.value = false;
-    }
+    sortField.value = field;
+    isAscending.value = !isAscending.value;
   }
 
   void requestLeave() {

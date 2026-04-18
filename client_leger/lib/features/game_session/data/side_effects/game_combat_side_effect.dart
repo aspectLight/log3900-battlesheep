@@ -25,6 +25,8 @@ class GameCombatSideEffect with DisposableSideEffect {
   Timer? _combatResultsClearTimer;
   Timer? _combatEndOverlayClearTimer;
   Timer? _flightAttemptFeedbackClearTimer;
+  /// Avoid resetting the clear timer on every combat countdown tick (re-reads combat state).
+  String? _combatResultsClearSignature;
   Option<bool> _lastFlightAttemptSuccess = const Option.none();
   Option<int> _initialSelfHealth = const Option.none();
   Option<String> _enemyId = const Option.none();
@@ -137,6 +139,7 @@ class GameCombatSideEffect with DisposableSideEffect {
     if (combat is CombatResolved) {
       _combatResultsClearTimer?.cancel();
       _combatResultsClearTimer = null;
+      _combatResultsClearSignature = null;
       _combatEndOverlayClearTimer ??= Timer(
         const Duration(milliseconds: CombatUiConstants.notificationDurationMs),
         () {
@@ -149,14 +152,25 @@ class GameCombatSideEffect with DisposableSideEffect {
       _combatEndOverlayClearTimer = null;
     }
     if (combat is CombatWithResult) {
-      _combatResultsClearTimer?.cancel();
-      _combatResultsClearTimer = Timer(
-        const Duration(milliseconds: CombatUiConstants.notificationDurationMs),
-        _combatRepository.clearCombatResults,
-      );
+      final sig =
+          '${combat.lastAttackValue}_${combat.lastDefenseValue}_${combat.lastActorIdRaw}';
+      if (_combatResultsClearSignature != sig) {
+        _combatResultsClearSignature = sig;
+        _combatResultsClearTimer?.cancel();
+        _combatResultsClearTimer = Timer(
+          const Duration(
+            milliseconds: CombatUiConstants.notificationDurationMs,
+          ),
+          () {
+            _combatResultsClearTimer = null;
+            _combatRepository.clearCombatResults();
+          },
+        );
+      }
     } else if (combat is! CombatResolved) {
       _combatResultsClearTimer?.cancel();
       _combatResultsClearTimer = null;
+      _combatResultsClearSignature = null;
     }
     final flightAttemptSuccess = combat.lastFlightAttemptSuccess;
     if (flightAttemptSuccess.isSome() &&

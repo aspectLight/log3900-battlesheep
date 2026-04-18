@@ -27,6 +27,9 @@ class _GameCombatWidgetState extends State<GameCombatWidget> {
   GameCombatNotificationUi? _currentNotification;
   EffectCleanup? _notificationEffectCleanup;
   GameSessionLocalizations? _l10n;
+  /// Suppresses re-showing hit/miss feedback when combat UI recomputes every
+  /// countdown tick (same attack/defense outcome).
+  String? _completedResultsFeedbackSig;
 
   @override
   void initState() {
@@ -61,13 +64,18 @@ class _GameCombatWidgetState extends State<GameCombatWidget> {
 
   void _handleCombatStateChange(GameCombatUiState state) {
     if (state is! GameCombatActive) {
+      _completedResultsFeedbackSig = null;
       _dismissNotification();
       return;
+    }
+    if (!state.showResults) {
+      _completedResultsFeedbackSig = null;
     }
 
     final l10n = _l10n;
     const duration = CombatUiConstants.feedbackDurationMs;
     GameCombatNotificationUi? notification;
+    String? pendingCombatResultsSig;
 
     final endOverlay = state.endOverlay;
     if (endOverlay != null) {
@@ -121,6 +129,11 @@ class _GameCombatWidgetState extends State<GameCombatWidget> {
     if (state.showResults) {
       if (l10n == null) return;
       final results = state.combatResults;
+      pendingCombatResultsSig =
+          '${results.attackValue}_${results.defenseValue}_${results.isPlayerAttacking}_${state.isAttackSuccess}';
+      if (pendingCombatResultsSig == _completedResultsFeedbackSig) {
+        return;
+      }
       final isPlayerAttacking = results.isPlayerAttacking;
       final damage = (results.attackValue - results.defenseValue)
           .clamp(0, double.infinity)
@@ -143,6 +156,9 @@ class _GameCombatWidgetState extends State<GameCombatWidget> {
     }
 
     if (notification != null) {
+      if (pendingCombatResultsSig != null) {
+        _completedResultsFeedbackSig = pendingCombatResultsSig;
+      }
       _showNotification(notification, duration);
     }
   }
@@ -151,6 +167,14 @@ class _GameCombatWidgetState extends State<GameCombatWidget> {
     GameCombatNotificationUi notification,
     int durationMs,
   ) {
+    final cur = _currentNotification;
+    if (cur != null &&
+        cur.title == notification.title &&
+        cur.message == notification.message &&
+        cur.isSuccess == notification.isSuccess &&
+        cur.isWinLossNotification == notification.isWinLossNotification) {
+      return;
+    }
     _dismissNotification();
     setState(() {
       _currentNotification = notification;
@@ -331,19 +355,23 @@ class _CombatCenterLayout extends StatelessWidget {
         final height = constraints.maxHeight;
         final avatarHeight = height * 0.72;
         final avatarBottom = -(height * 0.02);
-        final resultsBottom = height * 0.24;
+        // Angular `.dice-combat-container`: `bottom: 12%` of the combat container, above actions.
+        // Slightly lower on screen than the old 0.24 * height (which sat too high).
+        final resultsBottom = height * 0.12;
+        // Stack order = paint order (bottom → top). Matches Angular: stats, then portrait over
+        // stats (`enemy` img after `stats-container`), then dice values with z-index above all.
         return Stack(
           clipBehavior: Clip.none,
           children: [
+            Align(
+              alignment: Alignment.topCenter,
+              child: _EnemyStatsCard(enemy: enemy, l10n: l10n),
+            ),
             Positioned(
               left: 0,
               right: 0,
               bottom: avatarBottom,
               child: _EnemyAvatarLarge(enemy: enemy, height: avatarHeight),
-            ),
-            Align(
-              alignment: Alignment.topCenter,
-              child: _EnemyStatsCard(enemy: enemy, l10n: l10n),
             ),
             if (showResults)
               Positioned(
@@ -399,8 +427,16 @@ class _CombatResultsBar extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFF3A3A3A).withValues(alpha: 0.9),
+          color: const Color(0xFF3A3A3A).withValues(alpha: 0.95),
           borderRadius: BorderRadius.circular(6),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black54,
+              blurRadius: 20,
+              spreadRadius: 1,
+              offset: Offset(0, 8),
+            ),
+          ],
         ),
         child: Row(
           children: [

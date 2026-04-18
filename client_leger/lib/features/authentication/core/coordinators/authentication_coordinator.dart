@@ -3,19 +3,19 @@ import 'dart:async';
 import 'package:get_it/get_it.dart';
 
 import '../../../../core/app_transition/app_transition_bus.dart';
+import '../../../../core/app_transition/feature_coordinator.dart';
 import '../../../../core/chat/chat_avatar_registry.dart';
 import '../../../../core/chat/chat_outgoing_avatars.dart';
 import '../../../../core/connected_scope/connected_session.dart';
 import '../../../../core/connected_scope/session_scope_manager.dart';
-import '../../../../core/app_transition/feature_coordinator.dart';
 import '../../../../routing/app_navigator.dart';
 import '../../../../routing/navigation_command.dart';
+import '../../../shop/data/repositories/shop_repository.dart';
+import '../../domain/commands/auth_commands.dart' as auth_commands;
 import '../app_events/auth_events.dart';
 import '../context/auth_data.dart';
-import '../interfaces/auth_repository.dart';
-import '../../domain/commands/auth_commands.dart' as auth_commands;
 import '../di/auth_module.dart';
-import '../../../shop/data/repositories/shop_repository.dart';
+import '../interfaces/auth_repository.dart';
 
 class AuthenticationCoordinator
     implements
@@ -40,10 +40,25 @@ class AuthenticationCoordinator
 
   late AuthData _authData;
 
+  /// Ensures [AuthCompletedAppEvent] runs at most once per login and only when
+  /// the session scope exists (chat bootstrap requires [SessionScopeManager.currentScope]).
+  bool _authCompletedDispatchedForSession = false;
+
+  void _tryDispatchAuthCompleted() {
+    if (_authCompletedDispatchedForSession) return;
+    if (sessionScopeManager.currentScope == null) return;
+    if (_authData.socketId.isEmpty) return;
+    _authCompletedDispatchedForSession = true;
+    appTransitionEventBus.fire(
+      AuthCompletedAppEvent(username: _authData.username),
+    );
+  }
+
   @override
   Future<void> onEntry(AuthEntryAppEvent event) async {
     switch (event) {
       case SignInSuccessEvent(:final user):
+        _authCompletedDispatchedForSession = false;
         getIt<ChatOutgoingAvatars>().setFromAvatarFields(
           avatarId: user.avatarId,
           avatarRelativeUrl: user.avatarUrl,
@@ -68,6 +83,8 @@ class AuthenticationCoordinator
             socketId: _authData.socketId,
           ),
         );
+        // Socket may connect while we await [dropScope]; completion was skipped then.
+        _tryDispatchAuthCompleted();
       case SessionConnectedEvent(:final socketId):
         _authData = _authData.copyWith(socketId: socketId);
         sessionScopeManager.setSession(
@@ -76,9 +93,7 @@ class AuthenticationCoordinator
             socketId: _authData.socketId,
           ),
         );
-        appTransitionEventBus.fire(
-          AuthCompletedAppEvent(username: _authData.username),
-        );
+        _tryDispatchAuthCompleted();
     }
   }
 
@@ -91,6 +106,7 @@ class AuthenticationCoordinator
 
   @override
   Future<void> onExit(AuthExitAppEvent event) async {
+    _authCompletedDispatchedForSession = false;
     await authRepository.signOut(const auth_commands.SignOutCommand()).run();
     getIt<ChatOutgoingAvatars>().clear();
     getIt<ChatAvatarRegistry>().clear();
@@ -99,7 +115,6 @@ class AuthenticationCoordinator
       scope.get<ShopRepository>().resetToInitial();
     }
     await sessionScopeManager.dropScope();
-    // Only Auth drops root scope; feature scopes are dropped by their coordinators
     appNavigator.request(ForceUnauthenticated());
   }
 }

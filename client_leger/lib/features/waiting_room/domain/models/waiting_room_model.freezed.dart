@@ -24,6 +24,7 @@ mixin _$WaitingRoomModel {
   bool get isLocked => throw _privateConstructorUsedError;
   bool get dropInDropOut => throw _privateConstructorUsedError;
   int get entryFee => throw _privateConstructorUsedError;
+  bool get friendsOnly => throw _privateConstructorUsedError;
 
   /// Create a copy of WaitingRoomModel
   /// with the given fields replaced by the non-null parameter values.
@@ -46,6 +47,7 @@ abstract class $WaitingRoomModelCopyWith<$Res> {
     bool isLocked,
     bool dropInDropOut,
     int entryFee,
+    bool friendsOnly,
   });
 }
 
@@ -70,6 +72,7 @@ class _$WaitingRoomModelCopyWithImpl<$Res, $Val extends WaitingRoomModel>
     Object? isLocked = null,
     Object? dropInDropOut = null,
     Object? entryFee = null,
+    Object? friendsOnly = null,
   }) {
     return _then(
       _value.copyWith(
@@ -97,6 +100,10 @@ class _$WaitingRoomModelCopyWithImpl<$Res, $Val extends WaitingRoomModel>
                 ? _value.entryFee
                 : entryFee // ignore: cast_nullable_to_non_nullable
                       as int,
+            friendsOnly: null == friendsOnly
+                ? _value.friendsOnly
+                : friendsOnly // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -119,6 +126,7 @@ abstract class _$$WaitingRoomModelImplCopyWith<$Res>
     bool isLocked,
     bool dropInDropOut,
     int entryFee,
+    bool friendsOnly,
   });
 }
 
@@ -142,6 +150,7 @@ class __$$WaitingRoomModelImplCopyWithImpl<$Res>
     Object? isLocked = null,
     Object? dropInDropOut = null,
     Object? entryFee = null,
+    Object? friendsOnly = null,
   }) {
     return _then(
       _$WaitingRoomModelImpl(
@@ -169,6 +178,10 @@ class __$$WaitingRoomModelImplCopyWithImpl<$Res>
             ? _value.entryFee
             : entryFee // ignore: cast_nullable_to_non_nullable
                   as int,
+        friendsOnly: null == friendsOnly
+            ? _value.friendsOnly
+            : friendsOnly // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -184,6 +197,7 @@ class _$WaitingRoomModelImpl implements _WaitingRoomModel {
     this.isLocked = false,
     this.dropInDropOut = false,
     this.entryFee = 0,
+    this.friendsOnly = false,
   }) : _players = players;
 
   @override
@@ -207,10 +221,13 @@ class _$WaitingRoomModelImpl implements _WaitingRoomModel {
   @override
   @JsonKey()
   final int entryFee;
+  @override
+  @JsonKey()
+  final bool friendsOnly;
 
   @override
   String toString() {
-    return 'WaitingRoomModel(roomId: $roomId, hostId: $hostId, players: $players, isLocked: $isLocked, dropInDropOut: $dropInDropOut, entryFee: $entryFee)';
+    return 'WaitingRoomModel(roomId: $roomId, hostId: $hostId, players: $players, isLocked: $isLocked, dropInDropOut: $dropInDropOut, entryFee: $entryFee, friendsOnly: $friendsOnly)';
   }
 
   @override
@@ -226,7 +243,9 @@ class _$WaitingRoomModelImpl implements _WaitingRoomModel {
             (identical(other.dropInDropOut, dropInDropOut) ||
                 other.dropInDropOut == dropInDropOut) &&
             (identical(other.entryFee, entryFee) ||
-                other.entryFee == entryFee));
+                other.entryFee == entryFee) &&
+            (identical(other.friendsOnly, friendsOnly) ||
+                other.friendsOnly == friendsOnly));
   }
 
   @override
@@ -238,6 +257,7 @@ class _$WaitingRoomModelImpl implements _WaitingRoomModel {
     isLocked,
     dropInDropOut,
     entryFee,
+    friendsOnly,
   );
 
   /// Create a copy of WaitingRoomModel
@@ -260,6 +280,7 @@ abstract class _WaitingRoomModel implements WaitingRoomModel {
     final bool isLocked,
     final bool dropInDropOut,
     final int entryFee,
+    final bool friendsOnly,
   }) = _$WaitingRoomModelImpl;
 
   @override
@@ -274,6 +295,8 @@ abstract class _WaitingRoomModel implements WaitingRoomModel {
   bool get dropInDropOut;
   @override
   int get entryFee;
+  @override
+  bool get friendsOnly;
 
   /// Create a copy of WaitingRoomModel
   /// with the given fields replaced by the non-null parameter values.

@@ -1270,7 +1270,7 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(
                   color: isFocused
-                      ? interaction.focus
+                      ? kAuthFieldFocusBorder
                       : interaction.outline.withValues(alpha: 0.45),
                   width: 1.5,
                 ),
@@ -1286,7 +1286,7 @@ class _ProfileTextFieldState extends State<_ProfileTextField> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          interaction.dangerBorder.withValues(alpha: 0.28),
+                          kAuthFieldFocusGlow.withValues(alpha: 0.28),
                           Colors.transparent,
                         ],
                         stops: const [0.0, 0.5],

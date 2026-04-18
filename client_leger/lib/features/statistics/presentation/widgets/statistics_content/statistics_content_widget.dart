@@ -562,7 +562,8 @@ class _PlayerStatsSortableHeader extends StatelessWidget {
                       ),
                       if (active)
                         Text(
-                          isAscending ? '\u25B2' : '\u25BC',
+                          // Match Angular: `isAscending` true → down arrow asset.
+                          isAscending ? '\u25BC' : '\u25B2',
                           style: headerStyle.copyWith(fontSize: 10),
                           textAlign: TextAlign.center,
                         ),

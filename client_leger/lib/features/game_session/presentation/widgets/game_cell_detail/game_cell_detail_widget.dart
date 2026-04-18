@@ -218,12 +218,20 @@ class _MagnifyingGlass extends StatelessWidget {
 
 class _SectionHeader extends StatelessWidget {
   final String title;
-  const _SectionHeader({required this.title});
+  /// Tighter padding and label size for compact panels (e.g. tile detail).
+  final bool compact;
+  /// When set (e.g. 1), the label stays on one line with an ellipsis if needed.
+  final int? titleMaxLines;
+  const _SectionHeader({
+    required this.title,
+    this.compact = false,
+    this.titleMaxLines,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: EdgeInsets.symmetric(vertical: compact ? 4 : 10),
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -237,11 +245,17 @@ class _SectionHeader extends StatelessWidget {
             color: const Color(0xFF222222), // Match layout background
             child: Text(
               title,
-              style: const TextStyle(
-                color: Color(0xFF888888),
-                fontSize: 12,
+              textAlign: TextAlign.center,
+              maxLines: titleMaxLines,
+              overflow: titleMaxLines != null
+                  ? TextOverflow.ellipsis
+                  : TextOverflow.visible,
+              softWrap: titleMaxLines != 1,
+              style: TextStyle(
+                color: const Color(0xFF888888),
+                fontSize: compact ? 10 : 12,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
+                letterSpacing: compact ? 1.0 : 1.5,
                 fontFamily: 'CustomFont',
               ),
             ),
@@ -262,9 +276,10 @@ class _TileDetailView extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final maxH = constraints.maxHeight;
+        // Keep magnifier modest so title + description keep room; matches “smaller image” ask.
         final glassHeight = maxH.isFinite
-            ? maxH.clamp(120.0, 560.0)
-            : 216.0;
+            ? (maxH * 0.42).clamp(100.0, 200.0)
+            : 180.0;
         return Row(
           children: [
             Flexible(
@@ -284,59 +299,61 @@ class _TileDetailView extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               flex: 2,
-              child: LayoutBuilder(
-                builder: (context, textConstraints) {
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: textConstraints.maxWidth,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    info.type.getName(l10n).toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'CustomFont',
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  if (info.baseMoveModifier >= 0) ...[
+                    _SectionHeader(
+                      compact: true,
+                      title: l10n.gameCellDetailCost,
+                    ),
+                    Text(
+                      info.baseMoveModifier == 0
+                          ? '0'
+                          : '+${info.baseMoveModifier}',
+                      style: const TextStyle(
+                        color: Color(0xFFBB0000),
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'CustomFont',
                       ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(
-                            info.type.getName(l10n).toUpperCase(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'CustomFont',
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 10),
-                          if (info.baseMoveModifier >= 0) ...[
-                            _SectionHeader(title: l10n.gameCellDetailCost),
-                            Text(
-                              info.baseMoveModifier == 0
-                                  ? '0'
-                                  : '+${info.baseMoveModifier}',
-                              style: const TextStyle(
-                                color: Color(0xFFBB0000),
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'CustomFont',
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                          _SectionHeader(title: l10n.gameCellDetailDescription),
-                          Text(
-                            info.type.getDescription(l10n),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Color(0xFFCCCCCC),
-                              fontSize: 13,
-                              height: 1.45,
-                              fontFamily: 'CustomFont',
-                            ),
-                          ),
-                        ],
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                  _SectionHeader(
+                    compact: true,
+                    title: l10n.gameCellDetailDescription,
+                    titleMaxLines: 1,
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text(
+                        info.type.getDescription(l10n),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0xFFCCCCCC),
+                          fontSize: 11.5,
+                          height: 1.3,
+                          fontFamily: 'CustomFont',
+                        ),
                       ),
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
             ),
           ],
@@ -359,7 +376,7 @@ class _PlayerDetailView extends StatelessWidget {
     );
     return LayoutBuilder(
       builder: (context, constraints) {
-        final iconSize = (constraints.maxHeight * 0.28).clamp(48.0, 88.0);
+        final iconSize = (constraints.maxHeight * 0.22).clamp(40.0, 72.0);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -389,11 +406,14 @@ class _PlayerDetailView extends StatelessWidget {
                     color: Colors.white24,
                   ),
                 ),
-                (path) => Image.asset(
-                  path,
+                (path) => FittedBox(
                   fit: BoxFit.contain,
-                  width: double.infinity,
-                  height: double.infinity,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: constraints.maxHeight * 0.62,
+                    ),
+                    child: Image.asset(path),
+                  ),
                 ),
               ),
             ),
@@ -411,12 +431,18 @@ class _ItemDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: FittedBox(
-        child: ItemCardWidget(
-          item: GamePlayerInventoryItemUi(type: info.type),
-        ),
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Align(
+          alignment: Alignment.topCenter,
+          child: ItemCardWidget(
+            item: GamePlayerInventoryItemUi(type: info.type),
+            width: constraints.maxWidth,
+            height: constraints.maxHeight,
+            compactForCellDetail: true,
+          ),
+        );
+      },
     );
   }
 }

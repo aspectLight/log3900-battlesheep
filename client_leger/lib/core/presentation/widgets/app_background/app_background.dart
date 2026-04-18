@@ -43,7 +43,32 @@ class _AppBackgroundState extends State<AppBackground>
     return Watch((context) {
       final visual = getIt<AppAppearanceService>().visualTheme.value;
       final isDefault = visual == AppVisualTheme.defaultTheme;
+      final isFrost = visual == AppVisualTheme.frost;
       final size = MediaQuery.sizeOf(context);
+
+      Widget nonDefaultBackground() {
+        final blurred = ImageFiltered(
+          imageFilter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+          child: Image.asset(
+            backgroundAssetForVisualTheme(visual),
+            width: double.infinity,
+            height: double.infinity,
+            fit: BoxFit.cover,
+          ),
+        );
+        if (!isFrost) return blurred;
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            blurred,
+            Positioned.fill(
+              child: ColoredBox(
+                color: Colors.black.withValues(alpha: 0.2),
+              ),
+            ),
+          ],
+        );
+      }
 
       return Scaffold(
         backgroundColor: Colors.black,
@@ -87,15 +112,7 @@ class _AppBackgroundState extends State<AppBackground>
                             );
                           },
                         )
-                      : ImageFiltered(
-                          imageFilter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-                          child: Image.asset(
-                            backgroundAssetForVisualTheme(visual),
-                            width: double.infinity,
-                            height: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                      : nonDefaultBackground(),
                 ),
               ),
             ),

@@ -6,6 +6,8 @@
     right: 0;
     bottom: 0;
     overflow: hidden;
+    --auth-input-focus-border: #9333ea;
+    --auth-input-focus-glow: rgba(168, 85, 247, 0.55);
 }
 
 .lang-switcher {
@@ -211,11 +213,11 @@
 }
 
 .signup-form input:focus {
-    border-color: var(--theme-border-focus);
+    border-color: var(--auth-input-focus-border);
     box-shadow:
         0 0 0 2px var(--theme-outline-strong),
         0 0 0 6px var(--theme-outline-soft),
-        0 0 10px 3px var(--theme-border-focus-shadow) inset;
+        0 0 10px 3px var(--auth-input-focus-glow) inset;
 }
 
 .password-wrapper {
@@ -303,7 +305,7 @@
 }
 
 .login-link a {
-    color: var(--theme-error);
+    color: var(--auth-input-focus-border);
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s;
@@ -351,12 +353,12 @@
 }
 
 .avatar-btn:hover {
-    border-color: var(--theme-border-focus);
+    border-color: var(--auth-input-focus-border);
 }
 
 .avatar-btn.selected {
-    border-color: var(--theme-border-focus);
-    box-shadow: 0 0 8px 2px var(--theme-border-focus-shadow);
+    border-color: var(--auth-input-focus-border);
+    box-shadow: 0 0 8px 2px var(--auth-input-focus-glow);
 }
 
 .avatar-img {
@@ -417,9 +419,9 @@
     flex-shrink: 0;
     width: 56px;
     height: 56px;
-    border: 2px solid #7f1f1f;
+    border: 2px solid var(--auth-input-focus-border);
     border-radius: 10px;
-    box-shadow: 0 0 8px 2px rgba(227, 75, 75, 0.5);
+    box-shadow: 0 0 8px 2px var(--auth-input-focus-glow);
     overflow: hidden;
     background: #2b2b2b;
 }

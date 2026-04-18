@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+/// Focus accent for sign-in, sign-up, and profile text fields (non-error).
+const Color kAuthFieldFocusBorder = Color(0xFF9333EA);
+const Color kAuthFieldFocusGlow = Color(0xFFA855F7);
+
 @immutable
 class AppInteractionColors extends ThemeExtension<AppInteractionColors> {
   const AppInteractionColors({
@@ -26,7 +30,7 @@ class AppInteractionColors extends ThemeExtension<AppInteractionColors> {
     outline: Color(0xFF7F1F1F),
     danger: Color(0xFF8B0000),
     dangerBorder: Color(0xFFDC3545),
-    focus: Color(0xFFC60D0D),
+    focus: kAuthFieldFocusBorder,
     text: Color(0xFFf5e6e6),
   );
 

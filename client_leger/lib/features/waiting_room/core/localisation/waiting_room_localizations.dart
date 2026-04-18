@@ -353,6 +353,12 @@ abstract class WaitingRoomLocalizations {
   /// **'Entry fee:'**
   String get waitingRoomEntryFeeLabel;
 
+  /// No description provided for @waitingRoomFriendsOnlyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends only:'**
+  String get waitingRoomFriendsOnlyLabel;
+
   /// No description provided for @gameNotFound.
   ///
   /// In en, this message translates to:

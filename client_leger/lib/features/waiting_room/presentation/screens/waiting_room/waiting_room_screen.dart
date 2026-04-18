@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../../core/appearance/app_feature_colors.dart';
+import '../../../../../core/localisation/core_localizations.dart';
 import '../../../../../core/constants/ui_assets.dart';
 import '../../../../../core/enums/virtual_player_type.dart';
 import '../../../../../core/helpers/functional_programming.dart';
@@ -167,10 +168,17 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = WaitingRoomLocalizations.of(context)!;
-    return AppBackground(child: SafeArea(child: _buildBody(context, l10n)));
+    final coreL10n = CoreLocalizations.of(context)!;
+    return AppBackground(
+      child: SafeArea(child: _buildBody(context, l10n, coreL10n)),
+    );
   }
 
-  Widget _buildBody(BuildContext context, WaitingRoomLocalizations l10n) {
+  Widget _buildBody(
+    BuildContext context,
+    WaitingRoomLocalizations l10n,
+    CoreLocalizations coreL10n,
+  ) {
     return Watch((context) {
       final room = _viewModel.room.value;
       final isHost = _viewModel.isHost.value;
@@ -197,8 +205,10 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                 _buildCurrencyPanel(
                   context,
                   l10n,
+                  coreL10n,
                   balance: balance,
                   entryFee: room.entryFee,
+                  friendsOnly: room.friendsOnly,
                 ),
               ],
             ),
@@ -360,9 +370,11 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
 
   Widget _buildCurrencyPanel(
     BuildContext context,
-    WaitingRoomLocalizations l10n, {
+    WaitingRoomLocalizations l10n,
+    CoreLocalizations coreL10n, {
     required int balance,
     required int entryFee,
+    required bool friendsOnly,
   }) {
     final f = context.featureColors;
     return Container(
@@ -395,8 +407,49 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
               value: '$entryFee',
             ),
           ],
+          const SizedBox(height: 6),
+          _buildFriendsOnlyRow(
+            context,
+            label: l10n.waitingRoomFriendsOnlyLabel,
+            friendsOnly: friendsOnly,
+            yesText: coreL10n.yes,
+            noText: coreL10n.no,
+          ),
         ],
       ),
+    );
+  }
+
+  /// Same layout as balance/entry fee rows but without the coin icon (matches Angular).
+  Widget _buildFriendsOnlyRow(
+    BuildContext context, {
+    required String label,
+    required bool friendsOnly,
+    required String yesText,
+    required String noText,
+  }) {
+    final f = context.featureColors;
+    final labelStyle = TextStyle(
+      color: f.textSpecial,
+      fontSize: 16,
+      fontFamily: 'CustomFont',
+    );
+    final valueStyle = TextStyle(
+      color: f.goldAccent,
+      fontSize: 16,
+      fontWeight: FontWeight.w600,
+      fontFamily: 'CustomFont',
+    );
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(label, style: labelStyle),
+        const SizedBox(width: 6),
+        Text(
+          friendsOnly ? yesText : noText,
+          style: valueStyle,
+        ),
+      ],
     );
   }
 

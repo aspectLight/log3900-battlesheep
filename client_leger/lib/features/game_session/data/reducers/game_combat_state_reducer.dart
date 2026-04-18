@@ -36,6 +36,18 @@ class GameCombatStateReducer {
     GameCombatState previous,
     CombatTurnStartedEvent event,
   ) {
+    // Keep showing attack/defense dice until [CombatResultsClearedEvent] fires.
+    // Replacing with plain [CombatActive] here made results vanish immediately when
+    // the server emitted combatTurnStarted right after attackResult (common timing).
+    if (previous is CombatWithResult) {
+      return previous.copyWith(
+        combatRoomId: event.combatRoomId,
+        attackerId: event.attackerId,
+        defenderId: event.defenderId,
+        currentPlayerId: event.currentPlayerId,
+        currentOpponentId: event.currentOpponentId,
+      );
+    }
     return CombatActive(
       combatRoomId: event.combatRoomId,
       attackerId: event.attackerId,

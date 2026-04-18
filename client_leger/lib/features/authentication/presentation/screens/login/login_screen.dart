@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../../core/appearance/app_interaction_colors.dart';
 import '../../../../../core/constants/ui_assets.dart';
 import '../../../core/constants/auth_constants.dart';
 import '../../../core/extensions/auth_exception_ext.dart';
@@ -80,12 +81,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Text(
                               AuthLocalizations.of(context)!.signUp,
                               style: const TextStyle(
-                                color: Color(0xFFE34B4B),
+                                color: kAuthFieldFocusGlow,
                                 fontFamily: 'CustomFont',
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                                 decoration: TextDecoration.underline,
-                                decorationColor: Color(0xFFE34B4B),
+                                decorationColor: kAuthFieldFocusGlow,
                               ),
                             ),
                           ),
@@ -356,13 +357,13 @@ class _AuthTextFieldState extends State<_AuthTextField> {
                   color: hasError
                       ? const Color(0xFFDC3545)
                       : (isFocused
-                            ? const Color(0xFFC60D0D)
+                            ? kAuthFieldFocusBorder
                             : const Color(0xFF333333)),
                   width: 1.5,
                 ),
               ),
             ),
-            if (isFocused)
+            if (isFocused && !hasError)
               Positioned.fill(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(5),
@@ -372,7 +373,7 @@ class _AuthTextFieldState extends State<_AuthTextField> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          const Color(0xFFDC3545).withValues(alpha: 0.3),
+                          kAuthFieldFocusGlow.withValues(alpha: 0.3),
                           Colors.transparent,
                         ],
                         stops: const [0.0, 0.5],
@@ -527,13 +528,13 @@ class _PasswordTextFieldState extends State<_PasswordTextField> {
                   color: hasError
                       ? const Color(0xFFDC3545)
                       : (isFocused
-                            ? const Color(0xFFC60D0D)
+                            ? kAuthFieldFocusBorder
                             : const Color(0xFF333333)),
                   width: 1.5,
                 ),
               ),
             ),
-            if (isFocused)
+            if (isFocused && !hasError)
               Positioned.fill(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(5),
@@ -543,7 +544,7 @@ class _PasswordTextFieldState extends State<_PasswordTextField> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          const Color(0xFFDC3545).withValues(alpha: 0.3),
+                          kAuthFieldFocusGlow.withValues(alpha: 0.3),
                           Colors.transparent,
                         ],
                         stops: const [0.0, 0.5],

@@ -149,8 +149,7 @@ describe('ActionSocketService', () => {
             expect(mockSocket.emit).toHaveBeenCalledWith(GameRoomEvents.ToggleDebugMode, 'testRoomId');
         });
 
-        it('should not emit ToggleDebugMode when current player is not the socket owner', () => {
-            // Set up the conditions for toggleDebugMode to not emit
+        it('should emit ToggleDebugMode when host even if it is not the current turn player', () => {
             currentPlayerIdValue = 'differentSocketId';
             Object.defineProperty(mockGameManagerService.room, 'hostId', {
                 get: () => 'testSocketId',
@@ -158,7 +157,7 @@ describe('ActionSocketService', () => {
 
             service.toggleDebugMode();
 
-            expect(mockSocket.emit).not.toHaveBeenCalledWith(GameRoomEvents.ToggleDebugMode, 'testRoomId');
+            expect(mockSocket.emit).toHaveBeenCalledWith(GameRoomEvents.ToggleDebugMode, 'testRoomId');
         });
 
         it('should not emit ToggleDebugMode when current player is not the host', () => {

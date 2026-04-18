@@ -42,6 +42,7 @@
   "waitingRoomStatDefense": "Défense",
   "waitingRoomBalanceLabel": "Solde :",
   "waitingRoomEntryFeeLabel": "Prix d'entrée :",
+  "waitingRoomFriendsOnlyLabel": "Amis seulement :",
   "gameNotFound": "Partie introuvable",
   "unknownError": "Une erreur inconnue est survenue",
   "waitingRoomWelcomeMessage": "Bienvenue dans la salle d'attente, partagez le code de la partie avec vos amis !",

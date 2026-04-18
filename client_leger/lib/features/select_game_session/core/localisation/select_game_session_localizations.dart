@@ -149,6 +149,12 @@ abstract class SelectGameSessionLocalizations {
   /// **'Mode'**
   String get createGameModeHeader;
 
+  /// No description provided for @createGameOwnerHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner'**
+  String get createGameOwnerHeader;
+
   /// No description provided for @createGameLastModifiedHeader.
   ///
   /// In en, this message translates to:

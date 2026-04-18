@@ -13,7 +13,9 @@ extension LobbyRoomToWaitingRoomModel on LobbyRoomModel {
     hostId: hostId,
     players: players.map((p) => p.toWaitingRoomPlayerModel()).toList(),
     isLocked: isLocked,
+    dropInDropOut: dropInDropOut,
     entryFee: entryFee,
+    friendsOnly: friendsOnly,
   );
 }
 

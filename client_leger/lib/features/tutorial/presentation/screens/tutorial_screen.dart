@@ -107,7 +107,15 @@ class _TutorialScreenState extends State<TutorialScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 48), // Placeholder for alignment
+          IconButton(
+            onPressed: () => unawaited(_viewModel.dismiss()),
+            icon: const Icon(Icons.close),
+            tooltip: l10n.quit,
+            style: IconButton.styleFrom(
+              foregroundColor: Colors.white70,
+              hoverColor: Colors.white.withValues(alpha: 0.08),
+            ),
+          ),
         ],
       ),
     );

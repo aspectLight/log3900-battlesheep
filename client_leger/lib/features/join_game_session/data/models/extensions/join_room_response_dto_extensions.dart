@@ -30,6 +30,8 @@ extension JoinRoomDtoRoomExtensions on JoinRoomDto {
     players: players.map((p) => p.toLobbyPlayerModel()).toList(),
     isLocked: isLocked,
     dropInDropOut: dropInDropOut,
+    entryFee: entryFee,
+    friendsOnly: friendsOnly,
   );
 }
 

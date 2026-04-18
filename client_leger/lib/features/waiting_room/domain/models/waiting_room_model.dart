@@ -13,6 +13,7 @@ class WaitingRoomModel with _$WaitingRoomModel {
     @Default(false) bool isLocked,
     @Default(false) bool dropInDropOut,
     @Default(0) int entryFee,
+    @Default(false) bool friendsOnly,
   }) = _WaitingRoomModel;
 
   factory WaitingRoomModel.initial({

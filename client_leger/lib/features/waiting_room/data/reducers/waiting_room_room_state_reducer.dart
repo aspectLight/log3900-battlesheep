@@ -60,6 +60,7 @@ class WaitingRoomRoomStateReducer {
       isLocked: previous.room.isLocked,
       dropInDropOut: previous.room.dropInDropOut,
       entryFee: previous.room.entryFee,
+      friendsOnly: previous.room.friendsOnly,
     );
     return WaitingRoomRoomState(room: updatedRoom, socketId: previous.socketId);
   }
@@ -78,6 +79,7 @@ class WaitingRoomRoomStateReducer {
       isLocked: previous.room.isLocked,
       dropInDropOut: previous.room.dropInDropOut,
       entryFee: previous.room.entryFee,
+      friendsOnly: previous.room.friendsOnly,
     );
     return WaitingRoomRoomState(room: updatedRoom, socketId: previous.socketId);
   }
@@ -93,6 +95,7 @@ class WaitingRoomRoomStateReducer {
       isLocked: previous.room.isLocked,
       dropInDropOut: previous.room.dropInDropOut,
       entryFee: previous.room.entryFee,
+      friendsOnly: previous.room.friendsOnly,
     );
     return WaitingRoomRoomState(room: updatedRoom, socketId: previous.socketId);
   }
@@ -105,6 +108,7 @@ class WaitingRoomRoomStateReducer {
       isLocked: true,
       dropInDropOut: previous.room.dropInDropOut,
       entryFee: previous.room.entryFee,
+      friendsOnly: previous.room.friendsOnly,
     );
     return WaitingRoomRoomState(room: updatedRoom, socketId: previous.socketId);
   }
@@ -116,6 +120,7 @@ class WaitingRoomRoomStateReducer {
       players: previous.room.players,
       dropInDropOut: previous.room.dropInDropOut,
       entryFee: previous.room.entryFee,
+      friendsOnly: previous.room.friendsOnly,
     );
     return WaitingRoomRoomState(room: updatedRoom, socketId: previous.socketId);
   }

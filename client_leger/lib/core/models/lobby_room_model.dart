@@ -8,6 +8,7 @@ class LobbyRoomModel {
     required this.isLocked,
     required this.dropInDropOut,
     this.entryFee = 0,
+    this.friendsOnly = false,
   });
 
   final String roomId;
@@ -16,4 +17,5 @@ class LobbyRoomModel {
   final bool isLocked;
   final bool dropInDropOut;
   final int entryFee;
+  final bool friendsOnly;
 }

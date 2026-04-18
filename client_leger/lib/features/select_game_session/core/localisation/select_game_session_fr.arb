@@ -8,6 +8,7 @@
   "createGameNameHeader": "Nom",
   "createGameSizeHeader": "Taille",
   "createGameModeHeader": "Mode",
+  "createGameOwnerHeader": "Propriétaire",
   "createGameLastModifiedHeader": "Dernière modification",
   "createGameModeClassic": "Classique",
   "createGameModeCtf": "Capture du drapeau",

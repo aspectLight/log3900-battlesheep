@@ -140,6 +140,7 @@ class JoinGameSessionSocket {
           isLocked: false,
           dropInDropOut: true,
           entryFee: room.entryFee,
+          friendsOnly: false,
         ),
         isDropIn: true,
       ),
