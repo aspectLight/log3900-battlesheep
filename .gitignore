@@ -10,8 +10,17 @@ coverage/
 #Node Modules
 /node_modules
 
+# Secrets & local config (never commit)
+.env
+server/.env
+client_leger/.env.dev
+client_leger/.env.prod
+# Keep templates
+!**/.env.example
+
 # Firebase
 firebase-service-account.json
+server/firebase-service-account.json
 
 # Agent
 .agent
