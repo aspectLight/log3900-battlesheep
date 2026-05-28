@@ -16,3 +16,10 @@ firebase-service-account.json
 # Agent
 .agent
 UPDATELOG/
+
+# Build outputs (do not commit — GitHub limit 100 MB)
+client/build/
+client_leger/build/
+**/build/app/
+*.apk
+*.app/
